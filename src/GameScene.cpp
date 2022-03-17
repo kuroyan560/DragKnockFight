@@ -52,7 +52,7 @@ GameScene::GameScene()
 	lightRangeSprite->mesh.SetSize({ RANGE,RANGE });
 	lightRangeSprite->mesh.SetAnchorPoint({ 0.5f,0.5f });
 
-	
+
 	auto splitImg = D3D12App::Instance()->GenerateTextureBuffer("resource/test.png", SPLIT_SPRITE_NUM, { SPLIT,SPLIT });
 	for (int y = 0; y < SPLIT; ++y)
 	{
@@ -100,6 +100,9 @@ void GameScene::OnUpdate()
 	//test_shadow->transform.SetPos({ pos.x,pos.y });
 
 	game.Update();
+
+
+
 }
 
 void GameScene::OnDraw()
