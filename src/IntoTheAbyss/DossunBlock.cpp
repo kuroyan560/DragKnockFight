@@ -74,11 +74,19 @@ void DossunBlock::Update()
 
 	}
 
+	// プレイヤーと当たっていなかったら移動量を0にする。
+	if (!isHitPlayer) {
+
+		// 移動量をかき消す。
+		speed = 0;
+
+	}
+
 	// タイマーが一定以上だったら移動処理を行う。
 	if (isMoveTimer >= IS_MOVE_TIMER) {
 
 		// 移動する。
-		pos = moveDir * Vec2<float>(speed, speed);
+		pos += moveDir * Vec2<float>(speed, speed);
 
 		// IDに応じて移動量を加算する。
 		switch (id)

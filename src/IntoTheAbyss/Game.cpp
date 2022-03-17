@@ -8,6 +8,7 @@
 #include"ViewPort.h"
 #include"MovingBlockMgr.h"
 #include"Bullet.h"
+#include"Collider.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -299,10 +300,6 @@ Game::Game()
 	// 弾パーティクルをセッティング。
 	BulletParticleMgr::Instance()->Setting();
 
-	// ドッスンブロックを生成。
-	testDossunBlock.Generate(player.centerPos + Vec2<float>(0, MAP_CHIP_SIZE), player.centerPos + Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), DOSSUN_LOW_POWER);
-
-
 	//マップ開始時の場所にスポーンさせる
 	for (int y = 0; y < mapData.size(); ++y)
 	{
@@ -315,6 +312,10 @@ Game::Game()
 			}
 		}
 	}
+
+	// ドッスンブロックを生成。
+	testDossunBlock.Generate(player.centerPos + Vec2<float>(0, MAP_CHIP_SIZE), player.centerPos + Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), DOSSUN_LOW_POWER);
+
 
 	//オーラブロック生成
 	int auraChipNum = 40;//オーラブロックのチップ番号
@@ -740,7 +741,7 @@ void Game::Update()
 
 	/*===== 当たり判定 =====*/
 
-		// プレイヤーの当たり判定
+	// プレイヤーの当たり判定
 	player.CheckHit(mapData, testBlock);
 
 	// 動的ブロックの当たり判定
@@ -749,15 +750,9 @@ void Game::Update()
 	// 弾とマップチップの当たり判定
 	BulletMgr::Instance()->CheckHit(mapData);
 
-	// ビューポートの右側でも左側でもオーラとの当たり判定がなかったら、X軸を更新する。
-	//if (!ViewPort::Instance()->isHitRight || !ViewPort::Instance()->isHitLeft || !ViewPort::Instance()->holdFlags[ViewPort::Instance()->LEFT] || !ViewPort::Instance()->holdFlags[ViewPort::Instance()->RIGHT])
-	//	{
+	// ビューポートをプレイヤー基準で移動させる。
 	ViewPort::Instance()->SetPlayerPosX(player.centerPos.x);
-	//}
-	// ビューポートの上側でも下側でもオーラとの当たり判定がなかったら、Y軸を更新する。
-	//if (!ViewPort::Instance()->isHitBottom && !ViewPort::Instance()->isHitTop) {
 	ViewPort::Instance()->SetPlayerPosY(player.centerPos.y);
-	//}
 
 	// オーラブロックのデータとビューポートの判定を行う。
 	ViewPort::Instance()->SavePrevFlamePos();
@@ -794,7 +789,7 @@ void Game::Update()
 		}
 	}
 
-
+	// オーラとビューポートの当たり判定
 	{
 		// オーラブロックのデータとビューポートの判定を行う。
 		vector<ViewPortAuraReturnData> buff;
@@ -1070,6 +1065,36 @@ void Game::Update()
 
 	}
 	ViewPort::Instance()->playerPos = player.centerPos;
+
+	bool isDossunVel = Collider::Instance()->CheckHitVel(player.centerPos, player.prevFrameCenterPos, player.vel, player.PLAYER_SIZE, testDossunBlock.pos, testDossunBlock.size) != INTERSECTED_NONE;
+	bool isDossunTop = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, testDossunBlock.pos, testDossunBlock.size, INTERSECTED_TOP) != INTERSECTED_NONE;
+	bool isDossunRight = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, testDossunBlock.pos, testDossunBlock.size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+	bool isDossunLeft = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, testDossunBlock.pos, testDossunBlock.size, INTERSECTED_LEFT) != INTERSECTED_NONE;
+	bool isDossunBottom = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, testDossunBlock.pos, testDossunBlock.size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+
+	// ドッスンブロックとプレイヤーの当たり判定
+	if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
+
+		// プレイヤーにドッスンブロックの移動量を渡す。
+		player.gimmickVel = Vec2<float>(testDossunBlock.speed, testDossunBlock.speed) * testDossunBlock.moveDir;
+
+		// ドッスンの移動量タイマーを更新。
+		testDossunBlock.isHitPlayer = true;
+
+		// プレイヤーの移動量をかき消す。
+		player.gravity = 0;
+		player.vel = {};
+
+	}
+	else {
+
+		// ドッスンの移動量タイマーを初期化。
+		testDossunBlock.isHitPlayer = false;
+		testDossunBlock.isMoveTimer = 0;
+
+	}
+
+
 }
 
 void Game::Draw()

@@ -802,6 +802,12 @@ void Player::Move()
 	// 移動処理
 	centerPos += vel;
 
+	// ギミックから与えられる移動量を加算
+	centerPos += gimmickVel;
+
+	// ギミックから与えられる移動量を初期化。
+	gimmickVel = {};
+
 	// スクロール量を更新
 	//ScrollMgr::Instance()->honraiScrollAmount -= prevFrameCenterPos - centerPos;
 	ScrollMgr::Instance()->CalucurateScroll(prevFrameCenterPos - centerPos);
