@@ -22,8 +22,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	engineOption.useHDR = false;
 	engineOption.frameRate = 60;
 
-	int test = 0;
-
 	//===============================
 	
 	//ƒGƒ“ƒWƒ“‹N“®
