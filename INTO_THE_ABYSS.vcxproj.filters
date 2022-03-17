@@ -1,0 +1,474 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="HLSL">
+      <UniqueIdentifier>{ae411f7a-146c-4ee5-8baa-66823782bad9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Engine">
+      <UniqueIdentifier>{bb350e5b-66c6-47c5-9f03-8ecdc649565f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Engine\DrawFunc">
+      <UniqueIdentifier>{8f8edc9d-5d9a-4d8a-be0b-75617fb21b43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Engine\PostEffect">
+      <UniqueIdentifier>{f402dcef-4912-4d02-be11-3f58c574236b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{b4cff03c-a68b-4e14-badd-3f448da05cfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\Common">
+      <UniqueIdentifier>{7e0ace4f-d07b-4e82-b154-37da45f5b931}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Common\デザインパターン">
+      <UniqueIdentifier>{63f7ecfb-97a8-43de-bd7f-649bafa4e767}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Common\デザインパターン\Observer">
+      <UniqueIdentifier>{249a16e4-c8b9-4366-a8a2-a7a3a196f57a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Common\データコンテナ">
+      <UniqueIdentifier>{8f819d9e-2e9c-41fa-8243-501d2aba89e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine">
+      <UniqueIdentifier>{71b6e566-65d0-454e-97f6-b044c879881a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\DirectX12">
+      <UniqueIdentifier>{5bdb5c09-a0c9-436f-bf1d-8c62f30a54c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\DirectX12\レンダリングフロー管理">
+      <UniqueIdentifier>{c3690b42-4eed-4b4a-8a00-d53c13e5f411}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\KuroEngine">
+      <UniqueIdentifier>{b450dec0-a8a2-43d7-9add-a31edff90622}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\KuroEngine\PostEffect">
+      <UniqueIdentifier>{f678a11b-401d-430d-b236-989d2fcc6515}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\フレームワーク">
+      <UniqueIdentifier>{7e1d21d3-1dc8-44a7-903e-573c1b1bd42a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\ユーザー向け">
+      <UniqueIdentifier>{99e4f563-7abb-4335-8d80-9ac0318accfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\IntoTheAbyss">
+      <UniqueIdentifier>{e17f096d-e032-4165-9774-4bbfc2d58b64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\IntoTheAbyss\Engineとの橋渡し用">
+      <UniqueIdentifier>{72588a57-c63e-4a99-88a4-81565f2d0d30}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resource\HLSL\Engine\DrawBox.hlsl">
+      <Filter>HLSL\Engine\DrawFunc</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\HLSL\Engine\DrawCircle.hlsl">
+      <Filter>HLSL\Engine\DrawFunc</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\HLSL\Engine\DrawExtendGraph.hlsl">
+      <Filter>HLSL\Engine\DrawFunc</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\HLSL\Engine\DrawLine.hlsl">
+      <Filter>HLSL\Engine\DrawFunc</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\HLSL\Engine\DrawRotaGraph.hlsl">
+      <Filter>HLSL\Engine\DrawFunc</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\HLSL\Engine\GaussianBlur.hlsl">
+      <Filter>HLSL\Engine\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\HLSL\Engine\RectTexture.hlsl">
+      <Filter>HLSL\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\HLSL\Engine\Sprite.hlsl">
+      <Filter>HLSL\Engine</Filter>
+    </FxCompile>
+    <FxCompile Include="resource\HLSL\Engine\Sprite_Shadow.hlsl">
+      <Filter>HLSL\Engine</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resource\HLSL\Engine\LightInfo.hlsli">
+      <Filter>HLSL\Engine</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lib\imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui\imgui_impl_dx12.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui\imgui_impl_win32.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Observer.h">
+      <Filter>src\Common\デザインパターン\Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Subject.h">
+      <Filter>src\Common\デザインパターン\Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Command.h">
+      <Filter>src\Common\デザインパターン</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Singleton.h">
+      <Filter>src\Common\デザインパターン</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Angle.h">
+      <Filter>src\Common\データコンテナ</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Color.h">
+      <Filter>src\Common\データコンテナ</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Transform.h">
+      <Filter>src\Common\データコンテナ</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Transform2D.h">
+      <Filter>src\Common\データコンテナ</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Vec.h">
+      <Filter>src\Common\データコンテナ</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\KuroFunc.h">
+      <Filter>src\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\KuroMath.h">
+      <Filter>src\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Primitive.h">
+      <Filter>src\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\GraphicsManager.h">
+      <Filter>src\Engine\DirectX12\レンダリングフロー管理</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\D3D12App.h">
+      <Filter>src\Engine\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\D3D12Data.h">
+      <Filter>src\Engine\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\DescriptorHeap.h">
+      <Filter>src\Engine\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Swapchain.h">
+      <Filter>src\Engine\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\GaussianBlur.h">
+      <Filter>src\Engine\KuroEngine\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\PostEffect.h">
+      <Filter>src\Engine\KuroEngine\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Light.h">
+      <Filter>src\Engine\KuroEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\LightManager.h">
+      <Filter>src\Engine\KuroEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Mesh.h">
+      <Filter>src\Engine\KuroEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\SpriteMesh.h">
+      <Filter>src\Engine\KuroEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\AudioApp.h">
+      <Filter>src\Engine\フレームワーク</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Fps.h">
+      <Filter>src\Engine\フレームワーク</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\ImguiApp.h">
+      <Filter>src\Engine\フレームワーク</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\UsersInput.h">
+      <Filter>src\Engine\フレームワーク</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\WinApp.h">
+      <Filter>src\Engine\フレームワーク</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\DrawFunc.h">
+      <Filter>src\Engine\ユーザー向け</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Sprite.h">
+      <Filter>src\Engine\ユーザー向け</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Sprite_Shadow.h">
+      <Filter>src\Engine\ユーザー向け</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\Game.h">
+      <Filter>src\IntoTheAbyss\Engineとの橋渡し用</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\TexHandleMgr.h">
+      <Filter>src\IntoTheAbyss\Engineとの橋渡し用</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\AuraBlock.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\Beacon.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\Bullet.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\BulletMgr.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\BulletParticle.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\BulletParticleMgr.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\Collider.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\CSVLoader.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\DossunBlock.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\Enemy.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\Intersected.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\MapChipCollider.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\MovingBlock.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\MovingBlockMgr.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\Player.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\PlayerHand.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\ScrollMgr.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\ShakeMgr.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\SightCollisionStorage.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\StageMgr.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\TimeStopTestBlock.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\ViewPort.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IntoTheAbyss\ViewPortCollider.h">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameScene.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\KuroEngine.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lib\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\imgui_impl_dx12.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\imgui_impl_win32.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Subject.cpp">
+      <Filter>src\Common\デザインパターン\Observer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Color.cpp">
+      <Filter>src\Common\データコンテナ</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Transform.cpp">
+      <Filter>src\Common\データコンテナ</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Transform2D.cpp">
+      <Filter>src\Common\データコンテナ</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Vec.cpp">
+      <Filter>src\Common\データコンテナ</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\KuroFunc.cpp">
+      <Filter>src\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\KuroMath.cpp">
+      <Filter>src\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Primitive.cpp">
+      <Filter>src\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\GraphicsManager.cpp">
+      <Filter>src\Engine\DirectX12\レンダリングフロー管理</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\D3D12App.cpp">
+      <Filter>src\Engine\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\D3D12Data.cpp">
+      <Filter>src\Engine\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\DescriptorHeap.cpp">
+      <Filter>src\Engine\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Swapchain.cpp">
+      <Filter>src\Engine\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\GaussianBlur.cpp">
+      <Filter>src\Engine\KuroEngine\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\PostEffect.cpp">
+      <Filter>src\Engine\KuroEngine\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\LightManager.cpp">
+      <Filter>src\Engine\KuroEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\SpriteMesh.cpp">
+      <Filter>src\Engine\KuroEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\AudioApp.cpp">
+      <Filter>src\Engine\フレームワーク</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Fps.cpp">
+      <Filter>src\Engine\フレームワーク</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\ImguiApp.cpp">
+      <Filter>src\Engine\フレームワーク</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UsersInput.cpp">
+      <Filter>src\Engine\フレームワーク</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\WinApp.cpp">
+      <Filter>src\Engine\フレームワーク</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\DrawFunc.cpp">
+      <Filter>src\Engine\ユーザー向け</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Sprite.cpp">
+      <Filter>src\Engine\ユーザー向け</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Sprite_Shadow.cpp">
+      <Filter>src\Engine\ユーザー向け</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\Game.cpp">
+      <Filter>src\IntoTheAbyss\Engineとの橋渡し用</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\TexHandleMgr.cpp">
+      <Filter>src\IntoTheAbyss\Engineとの橋渡し用</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\AuraBlock.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\Beacon.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\Bullet.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\BulletMgr.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\BulletParticle.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\BulletParticleMgr.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\Collider.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\CSVLoader.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\DossunBlock.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\Enemy.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\MapChipCollider.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\MovingBlock.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\MovingBlockMgr.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\Player.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\PlayerHand.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\ScrollMgr.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\StageMgr.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\TimeStopTestBlock.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\ViewPort.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntoTheAbyss\ViewPortCollider.cpp">
+      <Filter>src\IntoTheAbyss</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\KuroEngine.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

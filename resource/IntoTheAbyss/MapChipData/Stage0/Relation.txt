@@ -1,0 +1,7 @@
+roomNum 0
+link 0 1
+link 1 1
+
+roomNum 1
+link 0 0
+link 1 0

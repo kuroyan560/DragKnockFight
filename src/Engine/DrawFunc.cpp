@@ -1,0 +1,379 @@
+#include "DrawFunc.h"
+#include"KuroEngine.h"
+
+//DrawLine
+std::shared_ptr<GraphicsPipeline>DrawFunc::LINE_PIPELINE[AlphaBlendModeNum];
+int DrawFunc::DRAW_LINE_COUNT = 0;
+std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::LINE_VERTEX_BUFF;
+
+//DrawBox
+std::shared_ptr<GraphicsPipeline>DrawFunc::BOX_PIPELINE[AlphaBlendModeNum];
+int DrawFunc::DRAW_BOX_COUNT = 0;
+std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::BOX_VERTEX_BUFF;
+
+//DrawCircle
+std::shared_ptr<GraphicsPipeline>DrawFunc::CIRCLE_PIPELINE[AlphaBlendModeNum];
+int DrawFunc::DRAW_CIRCLE_COUNT = 0;
+std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::CIRCLE_VERTEX_BUFF;
+
+//DrawExtendGraph
+std::shared_ptr<GraphicsPipeline>DrawFunc::EXTEND_GRAPH_PIPELINE[AlphaBlendModeNum];
+int DrawFunc::DRAW_EXTEND_GRAPH_COUNT = 0;
+std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::EXTEND_GRAPH_VERTEX_BUFF;
+
+//DrawRotaGraph
+std::shared_ptr<GraphicsPipeline>DrawFunc::ROTA_GRAPH_PIPELINE[AlphaBlendModeNum];
+int DrawFunc::DRAW_ROTA_GRAPH_COUNT;
+std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::ROTA_GRAPH_VERTEX_BUFF;
+
+void DrawFunc::DrawLine2D(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const Color& LineColor, const AlphaBlendMode& BlendMode)
+{
+	//DrawLine専用頂点
+	class LineVertex
+	{
+	public:
+		Vec2<float>pos;
+		Color color;
+		LineVertex(const Vec2<float>& Pos, const Color& Color) :pos(Pos), color(Color) {}
+	};
+
+	//パイプライン未生成
+	if(!LINE_PIPELINE[0])
+	{
+		//パイプライン設定
+		static PipelineInitializeOption PIPELINE_OPTION(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE, D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+		PIPELINE_OPTION.depthTest = false;
+
+		//シェーダー情報
+		static Shaders SHADERS;
+		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawLine.hlsl", "VSmain", "vs_5_0");
+		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawLine.hlsl", "PSmain", "ps_5_0");
+
+		//インプットレイアウト
+		static std::vector<InputLayoutParam>INPUT_LAYOUT =
+		{
+			InputLayoutParam("POSITION",DXGI_FORMAT_R32G32_FLOAT),
+			InputLayoutParam("COLOR",DXGI_FORMAT_R32G32B32A32_FLOAT)
+		};
+
+		//ルートパラメータ
+		static std::vector<RootParam>ROOT_PARAMETER =
+		{
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"平行投影行列定数バッファ")
+		};
+
+		//レンダーターゲット描画先情報
+		for (int i = 0; i < AlphaBlendModeNum; ++i)
+		{
+			std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(), (AlphaBlendMode)i) };
+			//パイプライン生成
+			LINE_PIPELINE[i] = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
+		}
+	}
+
+	KuroEngine::Instance().Graphics().SetPipeline(LINE_PIPELINE[BlendMode]);
+
+	if (LINE_VERTEX_BUFF.size() < (DRAW_LINE_COUNT + 1))
+	{
+		LINE_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(LineVertex), 2, nullptr, ("DrawLine -" + std::to_string(DRAW_LINE_COUNT)).c_str()));
+	}
+
+	LineVertex vertex[2] =
+	{
+		{FromPos,LineColor },
+		{ToPos,LineColor}
+	};
+	LINE_VERTEX_BUFF[DRAW_LINE_COUNT]->Mapping(&vertex[0]);
+
+	KuroEngine::Instance().Graphics().ObjectRender(LINE_VERTEX_BUFF[DRAW_LINE_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff() }, { CBV }, 0.0f, true);
+
+	DRAW_LINE_COUNT++;
+}
+
+void DrawFunc::DrawBox2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& BoxColor, const bool& FillFlg, const AlphaBlendMode& BlendMode)
+{
+	if (FillFlg)
+	{
+		//DrawBox専用頂点
+		class BoxVertex
+		{
+		public:
+			Vec2<float>leftUpPos;
+			Vec2<float>rightBottomPos;
+			Color color;
+			BoxVertex(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& Color)
+				:leftUpPos(LeftUpPos), rightBottomPos(RightBottomPos), color(Color) {}
+		};
+
+		//パイプライン未精製
+		if (!BOX_PIPELINE[0])
+		{
+			//パイプライン設定
+			static PipelineInitializeOption PIPELINE_OPTION(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT, D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
+			PIPELINE_OPTION.depthTest = false;
+
+			//シェーダー情報
+			static Shaders SHADERS;
+			SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawBox.hlsl", "VSmain", "vs_5_0");
+			SHADERS.gs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawBox.hlsl", "GSmain", "gs_5_0");
+			SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawBox.hlsl", "PSmain", "ps_5_0");
+
+			//インプットレイアウト
+			static std::vector<InputLayoutParam>INPUT_LAYOUT =
+			{
+				InputLayoutParam("POSITION_L_U",DXGI_FORMAT_R32G32_FLOAT),
+				InputLayoutParam("POSITION_R_B",DXGI_FORMAT_R32G32_FLOAT),
+				InputLayoutParam("COLOR",DXGI_FORMAT_R32G32B32A32_FLOAT)
+			};
+
+			//ルートパラメータ
+			static std::vector<RootParam>ROOT_PARAMETER =
+			{
+				RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"平行投影行列定数バッファ")
+			};
+
+			//レンダーターゲット描画先情報
+			for (int i = 0; i < AlphaBlendModeNum; ++i)
+			{
+				std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(), (AlphaBlendMode)i) };
+				//パイプライン生成
+				BOX_PIPELINE[i] = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
+			}
+		}
+
+		KuroEngine::Instance().Graphics().SetPipeline(BOX_PIPELINE[BlendMode]);
+
+		if (BOX_VERTEX_BUFF.size() < (DRAW_BOX_COUNT + 1))
+		{
+			BOX_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(BoxVertex), 1, nullptr, ("DrawBox -" + std::to_string(DRAW_BOX_COUNT)).c_str()));
+		}
+
+		BoxVertex vertex(LeftUpPos, RightBottomPos, BoxColor);
+		BOX_VERTEX_BUFF[DRAW_BOX_COUNT]->Mapping(&vertex);
+
+		KuroEngine::Instance().Graphics().ObjectRender(BOX_VERTEX_BUFF[DRAW_BOX_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff() }, { CBV }, 0.0f, true);
+
+		DRAW_BOX_COUNT++;
+	}
+	//外枠だけのときはDrawLineで済ます
+	else
+	{
+		const float width = RightBottomPos.x - LeftUpPos.x;
+		Vec2<float>pos[4] =
+		{
+			LeftUpPos,
+			{LeftUpPos.x + width,LeftUpPos.y},
+			RightBottomPos,
+			{RightBottomPos.x - width,RightBottomPos.y}
+		};
+		for (int i = 0; i < 4; ++i)
+		{
+			int next = 4 <= (i + 1) ? 0 : i + 1;
+			DrawLine2D(pos[i], pos[next], BoxColor, BlendMode);
+		}
+	}
+}
+
+void DrawFunc::DrawCircle2D(const Vec2<float>& Center, const float& Radius, const Color& CircleColor, const bool& FillFlg, const int& LineThickness, const AlphaBlendMode& BlendMode)
+{
+	//DrawCircle専用頂点
+	class CircleVertex
+	{
+	public:
+		Vec2<float>center;
+		float radius;
+		Color color;
+		unsigned int fillFlg;
+		int thickness;
+
+		CircleVertex(const Vec2<float>& Center, const float& Radius, const Color& Color, const bool& FillFlg, const int& Thickness)
+			:center(Center), radius(Radius), color(Color), fillFlg(FillFlg ? 0 : 1), thickness(Thickness) {}
+	};
+
+	//パイプライン未生成
+	if (!CIRCLE_PIPELINE[0])
+	{
+		//パイプライン設定
+		static PipelineInitializeOption PIPELINE_OPTION(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT, D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
+		PIPELINE_OPTION.depthTest = false;
+
+		//シェーダー情報
+		static Shaders SHADERS;
+		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawCircle.hlsl", "VSmain", "vs_5_0");
+		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawCircle.hlsl", "GSmain", "gs_5_0");
+		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawCircle.hlsl", "PSmain", "ps_5_0");
+
+		//インプットレイアウト
+		static std::vector<InputLayoutParam>INPUT_LAYOUT =
+		{
+			InputLayoutParam("CENTER",DXGI_FORMAT_R32G32_FLOAT),
+			InputLayoutParam("RADIUS",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("COLOR",DXGI_FORMAT_R32G32B32A32_FLOAT),
+			InputLayoutParam("FILL",DXGI_FORMAT_R32_UINT),
+			InputLayoutParam("THICKNESS",DXGI_FORMAT_R32_SINT),
+		};
+
+		//ルートパラメータ
+		static std::vector<RootParam>ROOT_PARAMETER =
+		{
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"平行投影行列定数バッファ")
+		};
+
+		//レンダーターゲット描画先情報
+		for (int i = 0; i < AlphaBlendModeNum; ++i)
+		{
+			std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(), (AlphaBlendMode)i) };
+			//パイプライン生成
+			CIRCLE_PIPELINE[i] = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
+		}
+	}
+
+	KuroEngine::Instance().Graphics().SetPipeline(CIRCLE_PIPELINE[BlendMode]);
+
+	if (CIRCLE_VERTEX_BUFF.size() < (DRAW_CIRCLE_COUNT + 1))
+	{
+		CIRCLE_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(CircleVertex), 1, nullptr, ("DrawCircle -" + std::to_string(DRAW_CIRCLE_COUNT)).c_str()));
+	}
+
+	CircleVertex vertex(Center, Radius, CircleColor, FillFlg, LineThickness);
+
+	CIRCLE_VERTEX_BUFF[DRAW_CIRCLE_COUNT]->Mapping(&vertex);
+
+	KuroEngine::Instance().Graphics().ObjectRender(CIRCLE_VERTEX_BUFF[DRAW_CIRCLE_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff() }, { CBV }, 0.0f, true);
+
+	DRAW_CIRCLE_COUNT++;
+}
+
+void DrawFunc::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode)
+{
+	//DrawExtendGraph専用頂点
+	class ExtendGraphVertex
+	{
+	public:
+		Vec2<float>leftUpPos;
+		Vec2<float>rightBottomPos;
+		ExtendGraphVertex(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos)
+			:leftUpPos(LeftUpPos), rightBottomPos(RightBottomPos) {}
+	};
+
+	//パイプライン未生成
+	if (!EXTEND_GRAPH_PIPELINE[0])
+	{
+		//パイプライン設定
+		static PipelineInitializeOption PIPELINE_OPTION(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT, D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
+		PIPELINE_OPTION.depthTest = false;
+
+		//シェーダー情報
+		static Shaders SHADERS;
+		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawExtendGraph.hlsl", "VSmain", "vs_5_0");
+		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawExtendGraph.hlsl", "GSmain", "gs_5_0");
+		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawExtendGraph.hlsl", "PSmain", "ps_5_0");
+
+		//インプットレイアウト
+		//インプットレイアウト
+		static std::vector<InputLayoutParam>INPUT_LAYOUT =
+		{
+			InputLayoutParam("POSITION_L_U",DXGI_FORMAT_R32G32_FLOAT),
+			InputLayoutParam("POSITION_R_B",DXGI_FORMAT_R32G32_FLOAT)
+		};
+
+		//ルートパラメータ
+		static std::vector<RootParam>ROOT_PARAMETER =
+		{
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"平行投影行列定数バッファ"),
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャリソース")
+		};
+
+		//レンダーターゲット描画先情報
+		for (int i = 0; i < AlphaBlendModeNum; ++i)
+		{
+			std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(), (AlphaBlendMode)i) };
+			//パイプライン生成
+			EXTEND_GRAPH_PIPELINE[i] = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
+		}
+	}
+
+	KuroEngine::Instance().Graphics().SetPipeline(EXTEND_GRAPH_PIPELINE[BlendMode]);
+
+	if (EXTEND_GRAPH_VERTEX_BUFF.size() < (DRAW_EXTEND_GRAPH_COUNT + 1))
+	{
+		EXTEND_GRAPH_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(ExtendGraphVertex), 1, nullptr, ("DrawExtendGraph -" + std::to_string(DRAW_EXTEND_GRAPH_COUNT)).c_str()));
+	}
+
+	ExtendGraphVertex vertex(LeftUpPos, RightBottomPos);
+	EXTEND_GRAPH_VERTEX_BUFF[DRAW_EXTEND_GRAPH_COUNT]->Mapping(&vertex);
+
+	KuroEngine::Instance().Graphics().ObjectRender(EXTEND_GRAPH_VERTEX_BUFF[DRAW_EXTEND_GRAPH_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff(),Tex }, { CBV,SRV }, 0.0f, true);
+
+	DRAW_EXTEND_GRAPH_COUNT++;
+}
+
+void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const float& ExtRate, const float& Radian, const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode, const bool& LRTurn)
+{
+	//DrawRotaGraph専用頂点
+	class RotaGraphVertex
+	{
+	public:
+		Vec2<float>center;
+		float extRate;
+		float radian;
+		int mirorX;
+		Vec2<float>texSize;
+		RotaGraphVertex(const Vec2<float>& Center, const float& ExtRate, const float& Radian, const bool& MirorX, const Vec2<float>& TexSize)
+			:center(Center), extRate(ExtRate), radian(Radian), mirorX(MirorX ? 1 :0), texSize(TexSize) {}
+	};
+
+	//パイプライン未生成
+	if (!ROTA_GRAPH_PIPELINE[0])
+	{
+		//パイプライン設定
+		static PipelineInitializeOption PIPELINE_OPTION(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT, D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
+		PIPELINE_OPTION.depthTest = false;
+
+		//シェーダー情報
+		static Shaders SHADERS;
+		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph.hlsl", "VSmain", "vs_5_0");
+		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph.hlsl", "GSmain", "gs_5_0");
+		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph.hlsl", "PSmain", "ps_5_0");
+
+		//インプットレイアウト
+		static std::vector<InputLayoutParam>INPUT_LAYOUT =
+		{
+			InputLayoutParam("CENTER",DXGI_FORMAT_R32G32_FLOAT),
+			InputLayoutParam("EXT_RATE",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("RADIAN",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("MIROR_X",DXGI_FORMAT_R32_SINT),
+			InputLayoutParam("TEX_SIZE",DXGI_FORMAT_R32G32_FLOAT)
+		};
+
+		//ルートパラメータ
+		static std::vector<RootParam>ROOT_PARAMETER =
+		{
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"平行投影行列定数バッファ"),
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャリソース")
+		};
+
+		//レンダーターゲット描画先情報
+		for (int i = 0; i < AlphaBlendModeNum; ++i)
+		{
+			std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(), (AlphaBlendMode)i) };
+			//パイプライン生成
+			ROTA_GRAPH_PIPELINE[i] = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
+		}
+	}
+
+	KuroEngine::Instance().Graphics().SetPipeline(ROTA_GRAPH_PIPELINE[BlendMode]);
+
+	if (ROTA_GRAPH_VERTEX_BUFF.size() < (DRAW_ROTA_GRAPH_COUNT + 1))
+	{
+		ROTA_GRAPH_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(RotaGraphVertex), 1, nullptr, ("DrawRotaGraph -" + std::to_string(DRAW_ROTA_GRAPH_COUNT)).c_str()));
+	}
+
+	RotaGraphVertex vertex(Center, ExtRate, Radian, LRTurn, Vec2<int>(Tex->GetDesc().Width, Tex->GetDesc().Height).Float());
+	ROTA_GRAPH_VERTEX_BUFF[DRAW_ROTA_GRAPH_COUNT]->Mapping(&vertex);
+
+	KuroEngine::Instance().Graphics().ObjectRender(ROTA_GRAPH_VERTEX_BUFF[DRAW_ROTA_GRAPH_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff(),Tex }, { CBV,SRV }, 0.0f, true);
+
+	DRAW_ROTA_GRAPH_COUNT++;
+}
+
