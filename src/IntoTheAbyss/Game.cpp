@@ -1066,33 +1066,8 @@ void Game::Update()
 	}
 	ViewPort::Instance()->playerPos = player.centerPos;
 
-	bool isDossunVel = Collider::Instance()->CheckHitVel(player.centerPos, player.prevFrameCenterPos, player.vel, player.PLAYER_SIZE, testDossunBlock.pos, testDossunBlock.size) != INTERSECTED_NONE;
-	bool isDossunTop = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, testDossunBlock.pos, testDossunBlock.size, INTERSECTED_TOP) != INTERSECTED_NONE;
-	bool isDossunRight = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, testDossunBlock.pos, testDossunBlock.size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
-	bool isDossunLeft = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, testDossunBlock.pos, testDossunBlock.size, INTERSECTED_LEFT) != INTERSECTED_NONE;
-	bool isDossunBottom = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, testDossunBlock.pos, testDossunBlock.size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
-
-	// ドッスンブロックとプレイヤーの当たり判定
-	if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
-
-		// プレイヤーにドッスンブロックの移動量を渡す。
-		player.gimmickVel = Vec2<float>(testDossunBlock.speed, testDossunBlock.speed) * testDossunBlock.moveDir;
-
-		// ドッスンの移動量タイマーを更新。
-		testDossunBlock.isHitPlayer = true;
-
-		// プレイヤーの移動量をかき消す。
-		player.gravity = 0;
-		player.vel = {};
-
-	}
-	else {
-
-		// ドッスンの移動量タイマーを初期化。
-		testDossunBlock.isHitPlayer = false;
-		testDossunBlock.isMoveTimer = 0;
-
-	}
+	// ドッスンブロックの当たり判定
+	testDossunBlock.CheckHit(player, mapData);
 
 
 }
