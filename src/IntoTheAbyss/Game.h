@@ -37,13 +37,9 @@ class Game
 
 	DossunBlock testDossunBlock;
 
-	int roomNum = 0;
-
 
 	int nowSelectNum = 0;
-	array<int, 2> debugStageData = { 0,0 };
 
-	int stageNum = 0;//ステージ番号
 
 	int oldStageNum = -1;
 	int oldRoomNum = -1;
@@ -56,6 +52,12 @@ class Game
 	int countHitNum = 0;
 
 public:
+	int stageNum = 0;//ステージ番号
+	int roomNum = 0; //部屋番号
+
+	array<int, 2> debugStageData = { 0,0 };//デバック用のステージと部屋番号
+
+
 	Game();
 	void Update();
 	void Draw();
