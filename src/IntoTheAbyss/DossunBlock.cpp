@@ -83,7 +83,7 @@ void DossunBlock::Update()
 	if (!isHitPlayer) {
 
 		// 移動量をかき消す。
-		speed = 0;
+		//speed = 0;
 
 	}
 
@@ -96,7 +96,7 @@ void DossunBlock::Update()
 	}
 
 	// タイマーが一定以上だったら移動処理を行う。
-	if (isMoveTimer >= IS_MOVE_TIMER) {
+	if (isMoveTimer >= 0) {
 
 		// 移動する。
 		pos += moveDir * Vec2<float>(speed, speed);
@@ -187,7 +187,7 @@ void DossunBlock::CheckHit(Player& player, const vector<vector<int>>& mapData)
 
 		// ドッスンの移動量タイマーを初期化。
 		isHitPlayer = false;
-		isMoveTimer = 0;
+		//isMoveTimer = 0;
 
 	}
 
