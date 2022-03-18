@@ -678,6 +678,7 @@ void Game::Update()
 
 		// ドッスンブロックデータを取得
 		dossunData = GimmickLoader::Instance()->GetThowpeData(stageNum, roomNum);
+
 		const int dossunCount = dossunData.size();
 
 		// ドッスンブロックを初期化。
@@ -778,6 +779,9 @@ void Game::Update()
 	{
 		auraBlock[i]->Update();
 	}
+
+	// シャボン玉ブロックの更新処理
+	bubbleBlock.Update();
 
 	//if (Input::isKey(KEY_INPUT_UP)) ViewPort::Instance()->zoomRate += 0.01f;
 	//if (UsersInput::Instance()->OnTrigger(DIK_UP))  ViewPort::Instance()->zoomRate += 0.01f;
@@ -1137,6 +1141,9 @@ void Game::Draw()
 	for (int index = 0; index < DOSSUN_COUNT; ++index) {
 		dossunBlock[index].Draw();
 	}
+
+	// シャボン玉ブロックの更新処理
+	bubbleBlock.Draw();
 
 	player.Draw();
 

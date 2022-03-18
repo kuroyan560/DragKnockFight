@@ -44,7 +44,7 @@ void DossunBlock::Init()
 
 }
 
-void DossunBlock::Generate(Vec2<float> generatePos, Vec2<float> endPos, const Vec2<float>& size, const DossunID& dossunID)
+void DossunBlock::Generate(Vec2<float> generatePos, Vec2<float> endPos, const Vec2<float>& size, const E_GIMMICK& dossunID)
 {
 
 	/*===== 生成処理 =====*/
@@ -130,12 +130,12 @@ void DossunBlock::Update()
 		// IDに応じて移動量を加算する。
 		switch (id)
 		{
-		case DOSSUN_OFF_POWER:
+		case GIMMICK_DOSSN_OFF:
 
 			/*-- 電源OFFドッスンの場合 --*/
 
 			break;
-		case DOSSUN_LOW_POWER:
+		case GIMMICK_DOSSN_ON_LOW:
 
 			/*-- 低出力ドッスンの場合 --*/
 
@@ -151,7 +151,7 @@ void DossunBlock::Update()
 
 
 			break;
-		case DOSSUN_HIGH_POWER:
+		case GIMMICK_DOSSN_ON_HIGH:
 
 			/*-- 高出力ドッスンの場合 --*/
 
