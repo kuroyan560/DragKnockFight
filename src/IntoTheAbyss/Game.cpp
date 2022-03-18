@@ -314,7 +314,7 @@ Game::Game()
 	}
 
 	// ドッスンブロックを生成。
-	//testDossunBlock.Generate(player.centerPos + Vec2<float>(0, MAP_CHIP_SIZE), player.centerPos + Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), DOSSUN_LOW_POWER);
+	//testDossunBlock.Generate(player.centerPos + Vec2<float>(0, MAP_CHIP_SIZE), player.centerPos + Vec2<float>(0, -MAP_CHIP_SIZE), Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), DOSSUN_LOW_POWER);
 
 
 	//オーラブロック生成
