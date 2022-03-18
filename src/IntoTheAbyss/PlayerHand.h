@@ -15,9 +15,11 @@ public:
 	Vec2<float> handPos;			// 腕の描画座標
 	Vec2<float> vel;				// 弾を打った時の移動量
 	Vec2<float> sightPos;			// 照準座標
+	Vec2<float> drawPos;			// Draw You
 	float armDistance;		// プレイヤーの中心からの距離 右手と左手で変えるため
 	float inputAngle;		// 入力された角度
 	bool isFirstShot;		// 最初の一発は強い反動フラグ
+	bool isNoInputTimer;	// Input Sitenai Tokiha Honrai Amount Wo Herasu
 
 	Beacon teleportPike;	// 瞬間移動の短槍
 	Beacon timeStopPike;	// 時間停止の短槍
@@ -66,6 +68,12 @@ public:
 	bool IsIntersected(const Vec2<float>& posA1, const Vec2<float>& posA2, const Vec2<float>& posB1, const Vec2<float>& posB2);
 
 	Vec2<float> CalIntersectPoint(Vec2<float> posA1, Vec2<float> posA2, Vec2<float> posB1, Vec2<float> posB2);
+
+	// Angle wo Tikadukeru
+	inline void PutCloseAngle(const float& defAngle) { inputAngle += (defAngle - inputAngle) / 10.0f; }
+
+	// isNoInputTimer no Setter
+	inline void SetIsNoInputTimer(const bool& set) { isNoInputTimer = set; }
 
 	// 壁にあたった時に最初に当たったフラグを初期化する処理.
 	inline void Hit() { isFirstShot = false; }
