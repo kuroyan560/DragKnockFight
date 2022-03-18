@@ -505,9 +505,9 @@ Game::Game()
 		}
 	}
 
-	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum, {});
-
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
+
+	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 }
 
 void Game::Update()
@@ -566,12 +566,12 @@ void Game::Update()
 		mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 
 		Vec2<float> door;
-		//次につながるドアを探す
+		//デバック用のマップチップ番号からスタートする
 		for (int y = 0; y < mapData.size(); ++y)
 		{
 			for (int x = 0; x < mapData[y].size(); ++x)
 			{
-				if (mapData[y][x] == StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR).min)
+				if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
 				{
 					door = { (float)x,(float)y };
 				}
@@ -598,6 +598,7 @@ void Game::Update()
 	if (roomNum != oldRoomNum)
 	{
 		debugStageData[1] = roomNum;
+		mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 	}
 	oldRoomNum = roomNum;
 
