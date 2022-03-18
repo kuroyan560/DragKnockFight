@@ -281,6 +281,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, TimeStopTestBlock& test
 		HitMapChipLeft();
 	}
 	xChip = (centerPos.x + PLAYER_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	if (xChip >= mapData[yChip].size() - 1) xChip = mapData[yChip].size() - 1;
 	// プレイヤーの右側がマップチップだったら
 	if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
 		HitMapChipRight();
@@ -607,8 +608,6 @@ void Player::Input(const vector<vector<int>> mapData)
 
 	}
 
-	printf("%f\n", lHand->GetAngle());
-
 	// LBが押されたら反動をつける。
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
 
@@ -807,6 +806,9 @@ void Player::Input(const vector<vector<int>> mapData)
 
 			// 移動量を無効化する。
 			vel = {};
+
+			// 移動量を無効化する。
+			gimmickVel = {};
 
 			// 重力無効化タイマーを設定。
 			gravityInvalidTimer = GRAVITY_INVALID_TIMER;
