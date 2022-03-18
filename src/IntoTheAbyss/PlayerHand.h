@@ -25,14 +25,10 @@ public:
 	Beacon timeStopPike;	// ŠÔ’â~‚Ì’Z‘„
 	int pikeCooltime;		// ’Z‘„‘S”Ê‚Ì‚ÌƒN[ƒ‹ƒ^ƒCƒ€
 
-	int playerHandGraph;
-
-
 	/*-- ’è” --*/
 
 public:
 
-	const Vec2<float> ARM_SIZE = { 10,10 };			// è‚Ì‘å‚«‚³
 	const float ARM_RANGE_OF_MOTION = 15.0f;	// è‚Ì‰Â“®ˆæ
 	const float SHOT_VEL = 15.0f;				// ’e‚ğŒ‚‚Á‚½‚Ì”½“®
 	const float FIRST_SHOT_VEL = 20.0f;			// Å‰‚Ìˆê”­–Ú‚ğŒ‚‚Á‚½‚Ì”½“®
@@ -54,7 +50,7 @@ public:
 	void Update(const Vec2<float>& playerCenterPos);
 
 	// •`‰æˆ—
-	void Draw();
+	void Draw(const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV);
 
 	// ’e‚ğ‘Å‚Á‚½‚Ìˆ—
 	void Shot(const Vec2<float>& forwardVec, const bool& isFirstShot);

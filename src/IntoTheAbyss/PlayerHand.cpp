@@ -36,7 +36,7 @@ PlayerHand::PlayerHand()
 
 	// 手の画像をロード
 	//playerHandGraph = LoadGraph("Resource/PlayerHand.png");
-	playerHandGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/PlayerHand.png");
+	//playerHandGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/PlayerHand.png");
 
 	isNoInputTimer = false;
 }
@@ -74,11 +74,12 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 	/*-- 更新処理 --*/
 
 	// プレイヤーの中心座標を元に、腕の位置をセット。
-	Vec2<float> honraiHandPos = { playerCenterPos.x + armDistance, playerCenterPos.y };
+	static const float OFFSET = 4.0f;
+	Vec2<float> honraiHandPos = { playerCenterPos.x + armDistance, playerCenterPos.y + OFFSET };
 
 	// 本来あるべきプレイヤーの手の座標に近付ける。
-	handPos.x += (honraiHandPos.x - handPos.x) / 3.0f;
-	handPos.y += (honraiHandPos.y - handPos.y) / 3.0f;
+	handPos.x += (honraiHandPos.x - handPos.x) / 1.0f;
+	handPos.y += (honraiHandPos.y - handPos.y) / 1.0f;
 
 	// 移動させる。
 	handPos += vel;
@@ -88,7 +89,7 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 	vel.y -= vel.y / 4.0f;
 
 	// 更にそこから角度の方向に移動させる。
-	handPos += {ARM_RANGE_OF_MOTION* cosf(inputAngle), ARM_RANGE_OF_MOTION* sinf(inputAngle)};
+	//handPos += {ARM_RANGE_OF_MOTION* cosf(inputAngle), ARM_RANGE_OF_MOTION* sinf(inputAngle)};
 
 	// No Input Dattara
 	if (isNoInputTimer) {
@@ -112,46 +113,24 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 }
 
 #include"DrawFunc.h"
-void PlayerHand::Draw()
+void PlayerHand::Draw(const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV)
 {
 
 	/*-- 描画処理 --*/
-	//unsigned int innerColor = GetColor(0x80, 0x80, 0xE5);
-	Color innerColor = Color(128, 128, 229, 255);
-
 	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
 
-	// 腕の内側の描画
-	//DrawExtendGraph(handPos.x * ScrollMgr::Instance()->zoom - ARM_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-	//	handPos.y * ScrollMgr::Instance()->zoom - ARM_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y,
-	//	handPos.x * ScrollMgr::Instance()->zoom + ARM_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-	//	handPos.y * ScrollMgr::Instance()->zoom + ARM_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y,
-	//	playerHandGraph, TRUE);
-
-	Vec2<float>leftUp = { drawPos.x * ScrollMgr::Instance()->zoom - ARM_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-	drawPos.y * ScrollMgr::Instance()->zoom - ARM_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	Vec2<float>rightBottom = { drawPos.x * ScrollMgr::Instance()->zoom + ARM_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		drawPos.y * ScrollMgr::Instance()->zoom + ARM_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-
-	// 腕の内側の描画
-	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(playerHandGraph));
+	Vec2<float>center = drawPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
+	DrawFunc::DrawRotaGraph2D(center, ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle), RotaCenterUV);
 
 	// ビーコンを描画
 	if (teleportPike.isActive) teleportPike.Draw();
 	if (timeStopPike.isActive) timeStopPike.Draw();
 
-	// 照準を描画
-	//DrawBox(sightPos.x * ScrollMgr::Instance()->zoom - SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-	//	sightPos.y * ScrollMgr::Instance()->zoom - SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y,
-	//	sightPos.x * ScrollMgr::Instance()->zoom + SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-	//	sightPos.y * ScrollMgr::Instance()->zoom + SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y,
-	//	GetColor(179, 255, 239), TRUE);
-
-	leftUp = { sightPos.x * ScrollMgr::Instance()->zoom - SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
+	Vec2<float>leftUp = { sightPos.x * ScrollMgr::Instance()->zoom - SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 		sightPos.y * ScrollMgr::Instance()->zoom - SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	rightBottom = { sightPos.x * ScrollMgr::Instance()->zoom + SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
+	Vec2<float>rightBottom = { sightPos.x * ScrollMgr::Instance()->zoom + SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 		sightPos.y * ScrollMgr::Instance()->zoom + SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
 
 	//照準を描画

@@ -37,7 +37,7 @@ void SpriteMesh::SetUv(const float& Top, const float& Buttom, const float& Left,
 	dirty = true;
 }
 
-void SpriteMesh::Render(const std::vector<std::shared_ptr<DescriptorData>>& DescDatas, const std::vector<DESC_HANDLE_TYPE>& DescHandleTypes)
+void SpriteMesh::Render(const std::vector<std::shared_ptr<DescriptorData>>& DescDatas, const std::vector<DESC_HANDLE_TYPE>& DescHandleTypes, const int& InstanceNum)
 {
 	if (dirty)
 	{
@@ -94,5 +94,5 @@ void SpriteMesh::Render(const std::vector<std::shared_ptr<DescriptorData>>& Desc
 		dirty = false;
 	}
 
-	KuroEngine::Instance().Graphics().ObjectRender(mesh->vertBuff, DescDatas, DescHandleTypes, zLayer, trans);
+	KuroEngine::Instance().Graphics().ObjectRender(mesh->vertBuff, DescDatas, DescHandleTypes, zLayer, trans, InstanceNum);
 }
