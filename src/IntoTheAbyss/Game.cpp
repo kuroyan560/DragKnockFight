@@ -776,9 +776,9 @@ void Game::Update()
 	}
 
 	//if (Input::isKey(KEY_INPUT_UP)) ViewPort::Instance()->zoomRate += 0.01f;
-	if (UsersInput::Instance()->OnTrigger(DIK_UP))  ViewPort::Instance()->zoomRate += 0.01f;
+	//if (UsersInput::Instance()->OnTrigger(DIK_UP))  ViewPort::Instance()->zoomRate += 0.01f;
 	//if (Input::isKey(KEY_INPUT_DOWN)) ViewPort::Instance()->zoomRate -= 0.01f;
-	if (UsersInput::Instance()->OnTrigger(DIK_DOWN)) ViewPort::Instance()->zoomRate -= 0.01f;
+	//if (UsersInput::Instance()->OnTrigger(DIK_DOWN)) ViewPort::Instance()->zoomRate -= 0.01f;
 
 	/*===== “–‚½‚è”»’è =====*/
 
