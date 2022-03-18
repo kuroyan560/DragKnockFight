@@ -1,18 +1,11 @@
 #pragma once
 #include "Vec.h"
 #include "Player.h"
+#include "GimmickLoader.h"
 #include <vector>
 
 using namespace std;
 
-// ドッスンクラス識別ID
-enum DossunID {
-
-	DOSSUN_OFF_POWER,	// 電源オフのドッスン
-	DOSSUN_LOW_POWER,	// 低出力のドッスン
-	DOSSUN_HIGH_POWER,	// 高出力のドッスン
-
-};
 
 // ドッスンクラス
 class DossunBlock {
@@ -30,7 +23,7 @@ public:
 	bool isHitPlayer;	// プレイヤーと当たっているかどうか。
 	bool isMove;		// 動き出したかどうか
 	bool isReturn;		// 初期位置に戻っているかどうか
-	DossunID id;		// どのドッスンかのID
+	E_GIMMICK id;		// どのドッスンかのID
 
 
 public:
@@ -54,7 +47,7 @@ public:
 	void Init();
 
 	// 生成処理
-	void Generate(Vec2<float> generatePos, Vec2<float> endPos, const Vec2<float>& size, const DossunID& dossunID);
+	void Generate(Vec2<float> generatePos, Vec2<float> endPos, const Vec2<float>& size, const E_GIMMICK& dossunID);
 
 	// 更新処理
 	void Update();

@@ -506,6 +506,10 @@ Game::Game()
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+
+	// シャボン玉ブロックを生成。
+	bubbleBlock.Generate(player.centerPos);
+
 }
 
 void Game::Update()

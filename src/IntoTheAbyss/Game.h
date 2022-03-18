@@ -7,6 +7,8 @@ using namespace std;
 #include "Enemy.h"
 #include"AuraBlock.h"
 #include "DossunBlock.h"
+#include "Bubble.h"
+#include"GimmickLoader.h"
 
 #include<memory>
 class TextureBuffer;
@@ -15,7 +17,7 @@ class TextureBuffer;
 class Game
 {
 	bool CheckUsedData(vector<Vec2<float>> DATA, Vec2<float> DATA2);
-	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int & mapBlockGraph, const int& stageNum, const int& roomNum);
+	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum);
 	Vec2<float> GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS);
 	Vec2<float> GetPlayerPos(const int& STAGE_NUMBER, int* ROOM_NUMBER, const int& DOOR_NUMBER, const SizeData& SIZE_DATA, vector<vector<int>>* MAPCHIP_DATA);
 
@@ -35,8 +37,8 @@ class Game
 	// マップチップのデータ
 	vector<vector<int>> mapData;
 
-	DossunBlock testDossunBlock;
-
+	vector<DossunBlock> dossunBlock;
+	Bubble bubbleBlock;
 
 	int nowSelectNum = 0;
 

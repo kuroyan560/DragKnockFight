@@ -68,6 +68,9 @@ Player::Player()
 	rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
 	lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
 
+	// 入力してから少しだけ数えるタイマーを初期化
+	asSoonAsInputTimer = 0;
+
 }
 
 Player::~Player()
@@ -117,6 +120,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	// 手を初期位置に戻す。
 	rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
 	lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
+
+	// 入力してから少しだけ数えるタイマーを初期化
+	asSoonAsInputTimer = 0;
 
 }
 
