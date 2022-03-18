@@ -19,6 +19,7 @@ public:
 	Vec2<float> centerPos;					// プレイヤーの中心座標
 	Vec2<float> prevFrameCenterPos;		// 前フレームのプレイヤーの中心座標
 	Vec2<float> vel;						// 移動量
+	Vec2<float> gimmickVel;			// ギミックから与えられる移動量(ドッスンブロックに張り付いた時等。)
 	float gravity;					// 重力
 	bool onGround;					// プレイヤーが接地しているかのフラグ
 	bool firstShot;					// 最初の一発が撃たれたかどうか trueで撃たれた判定
