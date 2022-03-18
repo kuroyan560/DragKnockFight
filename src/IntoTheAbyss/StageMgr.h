@@ -5,6 +5,7 @@
 #include<array>
 #include"Vec.h"
 #include<assert.h>
+#include"GimmickLoader.h"
 
 #include"WinApp.h"
 #include"Angle.h"
@@ -41,9 +42,10 @@ enum MapChipData
 	MAPCHIP_TYPE_MOVING_BLOCK,
 	MAPCHIP_TYPE_TOCH,
 	MAPCHIP_TYPE_DOOR,
+	MAPCHIP_TYPE_THOWNP,
+	MAPCHIP_TYPE_BUBBLE,
 	MAPCHIP_TYPE_MAX
 };
-
 enum MapChipBlockData
 {
 	MAPCHIP_BLOCK_START = 30,
@@ -168,6 +170,7 @@ public:
 	}
 
 	std::vector<MapChipAnimationData *> animationData;//マップチップのアニメーション情報の一覧
+	std::unique_ptr<GimmickLoader> loadGimmickData;	  //ギミックに関するデータの読み込み
 
 
 private:

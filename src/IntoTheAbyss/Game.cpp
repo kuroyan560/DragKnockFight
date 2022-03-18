@@ -80,10 +80,8 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 					handle = mapChipDrawData[height][width].handle;
 				}
 
-
 				Vec2<float> pos(centerX + ShakeMgr::Instance()->shakeAmount.x * ScrollMgr::Instance()->zoom, centerY + ShakeMgr::Instance()->shakeAmount.y * ScrollMgr::Instance()->zoom);
 				pos += mapChipDrawData[height][width].offset;
-
 				if (0 <= handle)
 				{
 					DrawFunc::DrawRotaGraph2D({ pos.x, pos.y }, 1.6f * ScrollMgr::Instance()->zoom, mapChipDrawData[height][width].radian, TexHandleMgr::GetTexBuffer(handle));
