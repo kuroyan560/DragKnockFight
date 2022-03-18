@@ -54,7 +54,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -80,10 +80,8 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 					handle = mapChipDrawData[height][width].handle;
 				}
 
-
 				Vec2<float> pos(centerX + ShakeMgr::Instance()->shakeAmount.x * ScrollMgr::Instance()->zoom, centerY + ShakeMgr::Instance()->shakeAmount.y * ScrollMgr::Instance()->zoom);
 				pos += mapChipDrawData[height][width].offset;
-
 				if (0 <= handle)
 				{
 					DrawFunc::DrawRotaGraph2D({ pos.x, pos.y }, 1.6f * ScrollMgr::Instance()->zoom, mapChipDrawData[height][width].radian, TexHandleMgr::GetTexBuffer(handle));
@@ -93,7 +91,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS)
+Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS)
 {
 	Vec2<float> doorPos;
 	int roopCount = 0;
@@ -133,13 +131,13 @@ Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_N
 	int leftChip = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, checkWall[1]);
 
 	//右に壁がある場合
-	if (rightChip == 1 && leftChip == 0)
+	if ((rightChip == 1 && leftChip == 0) || (rightChip == 1 && leftChip == -1))
 	{
 		//左に2ブロック離れた所にリスポーンさせる
 		return Vec2<float>((doorPos.x - 2) * 50.0f, doorPos.y * 50.0f);
 	}
 	//左に壁がある場合
-	else if (rightChip == 0 && leftChip == 1)
+	else if ((rightChip == 0 && leftChip == 1) || (rightChip == 0 && leftChip == -1))
 	{
 		//右に2ブロック離れた所にリスポーンさせる
 		return Vec2<float>((doorPos.x + 2) * 50.0f, doorPos.y * 50.0f);
@@ -245,7 +243,7 @@ Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_N
 	return Vec2<float>(-1, -1);
 }
 
-Vec2<float> Game::GetPlayerPos(const int& STAGE_NUMBER, int* ROOM_NUMBER, const int& DOOR_NUMBER, const SizeData& SIZE_DATA, vector<vector<int>>* MAPCHIP_DATA)
+Vec2<float> Game::GetPlayerPos(const int &STAGE_NUMBER, int *ROOM_NUMBER, const int &DOOR_NUMBER, const SizeData &SIZE_DATA, vector<vector<int>> *MAPCHIP_DATA)
 {
 	int roomNum = StageMgr::Instance()->GetRelationData(STAGE_NUMBER, *ROOM_NUMBER, DOOR_NUMBER - SIZE_DATA.min);
 	*MAPCHIP_DATA = StageMgr::Instance()->GetMapChipData(STAGE_NUMBER, roomNum);
@@ -506,57 +504,18 @@ Game::Game()
 		}
 	}
 
-	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum, {});
-
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
+
+	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 }
 
 void Game::Update()
 {
 	ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 
-	//ゴールに触れたら次のステージに向かう処理
-	{
-		Vec2<float> playerBlockPos(player.centerPos), block(50.0f, 50.0f);
-		playerBlockPos = playerBlockPos / block;
-		//ゴールに触れたら次のステージに向かう
-		if (mapData[playerBlockPos.y][playerBlockPos.x] == MAPCHIP_BLOCK_GOAL)
-		{
-			++stageNum;
-			roomNum = 0;
 
-			mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
-			Vec2<float> door;
-			//ゴール探索
-			for (int y = 0; y < mapData.size(); ++y)
-			{
-				for (int x = 0; x < mapData[y].size(); ++x)
-				{
-					if (mapData[y][x] == MAPCHIP_BLOCK_START)
-					{
-						door = { (float)x,(float)y };
-					}
-				}
-			}
-			Vec2<float> tmp = { door.x * 50.0f,door.y * 50.0f };
-			player.centerPos = tmp;
-			ScrollMgr::Instance()->WarpScroll(player.centerPos);
-		}
-	}
 
 #pragma region ステージの切り替え
-	if (stageNum != oldStageNum)
-	{
-		debugStageData[0] = stageNum;
-	}
-	oldStageNum = stageNum;
-
-	if (roomNum != oldRoomNum)
-	{
-		debugStageData[1] = roomNum;
-	}
-	oldRoomNum = roomNum;
-
 	bool enableToSelectStageFlag = 0 < debugStageData[0];
 	bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//マップの切り替え
@@ -606,12 +565,12 @@ void Game::Update()
 		mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 
 		Vec2<float> door;
-		//次につながるドアを探す
+		//デバック用のマップチップ番号からスタートする
 		for (int y = 0; y < mapData.size(); ++y)
 		{
 			for (int x = 0; x < mapData[y].size(); ++x)
 			{
-				if (mapData[y][x] == StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR).min)
+				if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
 				{
 					door = { (float)x,(float)y };
 				}
@@ -622,6 +581,61 @@ void Game::Update()
 		ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
+	//ImGui::Begin("Stage");
+	//ImGui::Text("StageNumber:%d", debugStageData[0]);
+	//ImGui::Text("RoomNumber:%d", debugStageData[1]);
+	//ImGui::End();
+
+	//ステージ毎の切り替え判定
+	if (stageNum != oldStageNum)
+	{
+		debugStageData[0] = stageNum;
+	}
+	oldStageNum = stageNum;
+
+	//部屋毎の切り替え判定
+	if (roomNum != oldRoomNum)
+	{
+		debugStageData[1] = roomNum;
+		mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+	}
+	oldRoomNum = roomNum;
+
+
+
+
+
+
+
+
+	//ゴールに触れたら次のステージに向かう処理
+	{
+		Vec2<float> playerBlockPos(player.centerPos), block(50.0f, 50.0f);
+		playerBlockPos = playerBlockPos / block;
+		//ゴールに触れたら次のステージに向かう
+		if (mapData[playerBlockPos.y][playerBlockPos.x] == MAPCHIP_BLOCK_GOAL)
+		{
+			++stageNum;
+			roomNum = 0;
+
+			mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
+			Vec2<float> door;
+			//ゴール探索
+			for (int y = 0; y < mapData.size(); ++y)
+			{
+				for (int x = 0; x < mapData[y].size(); ++x)
+				{
+					if (mapData[y][x] == MAPCHIP_BLOCK_START)
+					{
+						door = { (float)x,(float)y };
+					}
+				}
+			}
+			Vec2<float> tmp = { door.x * 50.0f,door.y * 50.0f };
+			player.centerPos = tmp;
+			ScrollMgr::Instance()->WarpScroll(player.centerPos);
+		}
+	}
 
 	/*===== 更新処理 =====*/
 
