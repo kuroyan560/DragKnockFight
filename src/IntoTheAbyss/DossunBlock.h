@@ -28,6 +28,8 @@ public:
 	int isMoveTimer;	// 移動するまでのタイマー(プレイヤーがこのブロックに触れてから指定フレーム後に動き出すようにするために必要。)
 	int changeDirTimer;	// 壁と当たったときに方向転換するタイマー
 	bool isHitPlayer;	// プレイヤーと当たっているかどうか。
+	bool isMove;		// 動き出したかどうか
+	bool isReturn;		// 初期位置に戻っているかどうか
 	DossunID id;		// どのドッスンかのID
 
 
@@ -38,7 +40,7 @@ public:
 	const int IS_MOVE_TIMER = 60;			// プレイヤーがブロックに触れてから動き出すまでのタイマー
 	const int CHANGE_DIR_TIMER = 180;		// 壁にあたったら方向転換するタイマー
 	const float LOW_POWER_ADD_SPEED = 0.5f;	// 低出力ドッスンの移動速度の加算量
-	const float LOW_POWER_MAX_SPEED = 5.0f;	// 低出力ドッスンの移動速度の最大量
+	const float LOW_POWER_MAX_SPEED = 7.5f;	// 低出力ドッスンの移動速度の最大量
 
 
 public:
