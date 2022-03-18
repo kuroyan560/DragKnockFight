@@ -13,6 +13,8 @@ StageMgr::StageMgr()
 	int allRoomNum = 10;
 	int nowStage = 0;
 
+	loadGimmickData = std::make_unique<GimmickLoader>(allStageNum);
+
 	allMapChipData.resize(allStageNum);
 	relationRoomData.resize(allStageNum);
 	allMapChipDrawData.resize(allStageNum);
@@ -21,6 +23,8 @@ StageMgr::StageMgr()
 	mapChipMemoryData[MAPCHIP_TYPE_MOVING_BLOCK] = { 10,19 };
 	mapChipMemoryData[MAPCHIP_TYPE_DOOR] = { 20,29 };
 	mapChipMemoryData[MAPCHIP_TYPE_TOCH] = { 30,39 };
+	mapChipMemoryData[MAPCHIP_TYPE_THOWNP] = { 50,79 };
+	mapChipMemoryData[MAPCHIP_TYPE_BUBBLE] = { 80,89 };
 
 
 	//LoadDivGraph("Resource/chip_sheet.png", 18, 6, 3, 32, 32, mapChipGraphHandle.data());
@@ -55,6 +59,22 @@ StageMgr::StageMgr()
 	std::string rootFilePass = "resource/IntoTheAbyss/MapChipData/";
 	std::string stageFilePass = "Stage";
 	std::string roomFileName = "Room_";
+
+
+	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
+	{
+		for (int roomNum = 0; roomNum < allRoomNum; ++roomNum)
+		{
+			//ファイルパス
+			std::string filePass =
+				rootFilePass + stageFilePass + std::to_string(stageNum) + "/";
+			//ファイル名
+			std::string fileName =
+				roomFileName + std::to_string(roomNum) + "_Gimmick.txt";
+
+			loadGimmickData->LoadData(stageNum, roomNum, filePass + fileName);
+		}
+	}
 
 	//ステージ毎の小部屋読み込み-----------------------
 	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
@@ -173,7 +193,7 @@ StageMgr::StageMgr()
 
 
 
-					bool doorFlag = false;		//ドアをを探索したかどうかを示すフラグ
+					bool skipFlag = false;		//ドアをを探索したかどうかを示すフラグ
 					for (int doorNumber = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min; doorNumber < mapChipMemoryData[MAPCHIP_TYPE_DOOR].max; ++doorNumber)
 					{
 						int arrayNum = doorNumber - mapChipMemoryData[MAPCHIP_TYPE_DOOR].min;//ドア番号から配列の添え字用に数値を調整
@@ -219,7 +239,7 @@ StageMgr::StageMgr()
 							tmp.offset.x = 2.0f * doorCallCount[arrayNum];
 							tmp.offset.y = -50.0f;
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							doorFlag = true;
+							skipFlag = true;
 
 							++doorCallCount[arrayNum];
 						}
@@ -234,7 +254,7 @@ StageMgr::StageMgr()
 							tmp.offset.x = 2.0f * doorCallCount[arrayNum];
 							tmp.offset.y = 50.0f;
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							doorFlag = true;
+							skipFlag = true;
 
 							++doorCallCount[arrayNum];
 						}
@@ -249,7 +269,7 @@ StageMgr::StageMgr()
 							tmp.offset.x = -50.0f;
 							tmp.offset.y = 2.0f * doorCallCount[arrayNum];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							doorFlag = true;
+							skipFlag = true;
 
 							++doorCallCount[arrayNum];
 						}
@@ -264,7 +284,7 @@ StageMgr::StageMgr()
 							tmp.offset.x = 50.0f;
 							tmp.offset.y = 2.0f * doorCallCount[arrayNum];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							doorFlag = true;
+							skipFlag = true;
 
 							++doorCallCount[arrayNum];
 						}
@@ -291,6 +311,34 @@ StageMgr::StageMgr()
 					}
 
 
+					//ドッスンの場合
+					if (mapChipMemoryData[MAPCHIP_TYPE_THOWNP].min <= now && now <= mapChipMemoryData[MAPCHIP_TYPE_THOWNP].max)
+					{
+						//この番号が開始位置か終了位置か調べる
+						int gimmickNumber = now - mapChipMemoryData[MAPCHIP_TYPE_THOWNP].min;
+
+						//偶数なら開始位置、奇数なら終了位置とする
+						if (gimmickNumber % 2 == 0)
+						{
+							loadGimmickData->SetThwompStartPos(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+						}
+						else
+						{
+							loadGimmickData->SetThwompEndPos(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+						}
+						skipFlag = true;
+					}
+
+					//バブルの場合
+					if (mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].min <= now && now <= mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].max)
+					{
+						int gimmickNumber = now - mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].min;
+						loadGimmickData->PushBubbleData(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+						skipFlag = true;
+					}
+
+
+
 					//マップチップの値を0か1に絞る
 					AlimentSpaceNumber(&Up);
 					AlimentSpaceNumber(&Down);
@@ -314,7 +362,7 @@ StageMgr::StageMgr()
 					{
 
 						//ドアだったらスキップ
-						if (doorFlag)
+						if (skipFlag)
 						{
 							continue;
 						}
@@ -786,10 +834,39 @@ const SizeData StageMgr::GetMapChipSizeData(MapChipData TYPE)
 }
 
 
-RoomMapChipDrawArray StageMgr::GetMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const Vec2<float> &MAPCHIP_POS)
+RoomMapChipDrawArray StageMgr::GetMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	RoomMapChipDrawArray tmp = allMapChipDrawData[STAGE_NUMBER][ROOM_NUMBER];
 	return tmp;
+}
+
+const bool &StageMgr::CheckStageNum(const int &STAGE_NUMBER)
+{
+	if (0 <= STAGE_NUMBER && STAGE_NUMBER < allMapChipDrawData.size())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+const bool &StageMgr::CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
+{
+	bool checkStageFlag = 0 <= STAGE_NUMBER && STAGE_NUMBER < allMapChipDrawData.size();//ステージ番号が配列内にあるか確認
+
+	if (checkStageFlag)
+	{
+		bool checkRoomFlag = 0 <= ROOM_NUMBER && ROOM_NUMBER < allMapChipDrawData[STAGE_NUMBER].size();//部屋番号が配列内にあるか確認
+		bool checkRoomHaveMapChipFlag = allMapChipDrawData[STAGE_NUMBER][ROOM_NUMBER].size() != 0;				   //部屋にマップチップがあるかどうか確認
+		if (checkRoomFlag && checkRoomHaveMapChipFlag)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)

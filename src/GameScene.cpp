@@ -3,6 +3,7 @@
 #include"Sprite.h"
 #include"Sprite_Shadow.h"
 #include"GaussianBlur.h"
+#include"IntoTheAbyss/StageMgr.h"
 
 GameScene::GameScene()
 {
@@ -127,6 +128,31 @@ void GameScene::OnDraw()
 
 void GameScene::OnImguiDebug()
 {
+	ImGui::Begin("StageInfo");
+	ImGui::Text("---Now---");
+	ImGui::Text("StageNumber:%d",game.stageNum);
+	ImGui::Text("RoomNumber:%d\n\n",game.roomNum);
+	ImGui::Text("---Select---");
+
+	ImGui::Text("StageNumber:%d", game.debugStageData[0]);
+	//選択できないステージ番号なら表示する
+	if (!StageMgr::Instance()->CheckStageNum(game.debugStageData[0]))
+	{
+		ImGui::SameLine();
+		ImGui::Text("Don't use");
+	}
+
+	ImGui::Text("RoomNumber:%d", game.debugStageData[1]);
+	//選択できない部屋番号なら表示する
+	if (!StageMgr::Instance()->CheckRoomNum(game.debugStageData[0],game.debugStageData[1]))
+	{
+		ImGui::SameLine();
+		ImGui::Text("Don't use");
+	}
+
+	ImGui::Text("Up Down:SelectNumber");
+	ImGui::Text("Left Right:SelectStageOrRoom");
+	ImGui::End();
 }
 
 void GameScene::OnFinalize()

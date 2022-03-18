@@ -15,7 +15,7 @@ Fps::Fps(const int& FrameRate) : frameRate(FrameRate), minFrameTime(1.0f / (floa
 
 void Fps::Update()
 {
-	Sleep(MILL_SECOND * 20);	//20ms‘Ò‚Â
+	//Sleep(MILL_SECOND * 20);	//20ms‘Ò‚Â
 
 	// ¡‚ÌŠÔ‚ğæ“¾
 	QueryPerformanceCounter(&timeEnd);
