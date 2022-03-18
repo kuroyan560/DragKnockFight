@@ -62,7 +62,11 @@ Player::Player()
 	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
 
 	// 初期位置に戻るまでのタイマーを初期化
-	handReturnTimer = 0;
+	handReturnTimer = DEF_HAND_RETURN_TIMER;
+
+	// 手を初期位置に戻す。
+	rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
+	lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
 
 }
 
@@ -108,7 +112,11 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
 
 	// 初期位置に戻るまでのタイマーを初期化
-	handReturnTimer = 0;
+	handReturnTimer = DEF_HAND_RETURN_TIMER;
+
+	// 手を初期位置に戻す。
+	rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
+	lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
 
 }
 
@@ -676,6 +684,9 @@ void Player::Input(const vector<vector<int>> mapData)
 		// 連射タイマーをセット
 		rapidFireTimerLeft = RAPID_FIRE_TIMER;
 
+		// 一定時間入力がなかったら初期位置に戻す
+		handReturnTimer = DEF_HAND_RETURN_TIMER;
+
 	}
 	// 同時に撃たれると貫通してしまうため、無理やり1Fずらします。
 	else
@@ -754,6 +765,9 @@ void Player::Input(const vector<vector<int>> mapData)
 
 			// 連射タイマーをセット
 			rapidFireTimerRight = RAPID_FIRE_TIMER;
+
+			// 一定時間入力がなかったら初期位置に戻す
+			handReturnTimer = DEF_HAND_RETURN_TIMER;
 
 		}
 
