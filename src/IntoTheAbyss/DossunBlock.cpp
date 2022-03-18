@@ -17,6 +17,8 @@ DossunBlock::DossunBlock()
 	moveDir = {};
 	speed = 0;
 	isHitPlayer = false;
+	isMove = false;
+	isReturn = false;
 	isMoveTimer = 0;
 	changeDirTimer = 0;
 	id = {};
@@ -34,6 +36,8 @@ void DossunBlock::Init()
 	moveDir = {};
 	speed = 0;
 	isHitPlayer = false;
+	isMove = false;
+	isReturn = false;
 	isMoveTimer = 0;
 	changeDirTimer = 0;
 	id = {};
@@ -63,6 +67,8 @@ void DossunBlock::Generate(Vec2<float> generatePos, Vec2<float> endPos, const Ve
 	isMoveTimer = 0;
 	changeDirTimer = 0;
 	isHitPlayer = false;
+	isMove = false;
+	isReturn = false;
 
 }
 
@@ -72,18 +78,22 @@ void DossunBlock::Update()
 	/*===== 更新処理 =====*/
 
 	// プレイヤーと当たっていたらタイマーを加算する。
-	if (isHitPlayer && isMoveTimer < IS_MOVE_TIMER) {
+	if (isHitPlayer) {
 
 		// タイマーを加算する。
 		++isMoveTimer;
 
 	}
+	else {
 
-	// プレイヤーと当たっていなかったら移動量を0にする。
-	if (!isHitPlayer) {
+		isMoveTimer = 0;
 
-		// 移動量をかき消す。
-		//speed = 0;
+	}
+
+	// 移動するまでのタイマーが一定以上になったら移動させる。
+	if (isMoveTimer >= IS_MOVE_TIMER) {
+
+		isMove = true;
 
 	}
 
@@ -93,10 +103,26 @@ void DossunBlock::Update()
 		changeDirTimer = 0;
 		moveDir *= {-1.0f, -1.0f};
 
+		bool prevFrameFlag = isReturn;
+
+		// 戻っているフラグを反転させる。
+		isReturn = isReturn ? false : true;
+
+		// 戻った瞬間は移動を停止させる。
+		if (prevFrameFlag && !isReturn && isHitPlayer) {
+
+		}
+		else if (prevFrameFlag && !isReturn) {
+
+			speed = 0;
+			isMove = false;
+
+		}
+
 	}
 
 	// タイマーが一定以上だったら移動処理を行う。
-	if (isMoveTimer >= 0) {
+	if (isMove) {
 
 		// 移動する。
 		pos += moveDir * Vec2<float>(speed, speed);
@@ -161,41 +187,11 @@ void DossunBlock::Draw()
 void DossunBlock::CheckHit(Player& player, const vector<vector<int>>& mapData)
 {
 
-	// ドッスンブロックとプレイヤーの当たり判定
-
-	bool isDossunVel = Collider::Instance()->CheckHitVel(player.centerPos, player.prevFrameCenterPos, player.vel, player.PLAYER_SIZE, pos, size) != INTERSECTED_NONE;
-	bool isDossunTop = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_TOP) != INTERSECTED_NONE;
-	bool isDossunRight = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
-	bool isDossunLeft = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_LEFT) != INTERSECTED_NONE;
-	bool isDossunBottom = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
-
-	// どこかしらにぶつかっていれば当たった判定にする。
-	if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
-
-		// プレイヤーにドッスンブロックの移動量を渡す。
-		player.gimmickVel = Vec2<float>(speed, speed) * moveDir;
-
-		// ドッスンの移動量タイマーを更新。
-		isHitPlayer = true;
-
-		// プレイヤーの移動量をかき消す。
-		player.gravity *= 0.0f;
-		player.vel *= {0.5f,0.5f};
-
-	}
-	else {
-
-		// ドッスンの移動量タイマーを初期化。
-		isHitPlayer = false;
-		//isMoveTimer = 0;
-
-	}
-
 	// フラグを初期化。
-	isDossunTop = false;
-	isDossunRight = false;
-	isDossunLeft = false;
-	isDossunBottom = false;
+	bool isDossunTop = false;
+	bool isDossunRight = false;
+	bool isDossunLeft = false;
+	bool isDossunBottom = false;
 
 	// マップチップとドッスンブロックの当たり判定
 
@@ -223,6 +219,36 @@ void DossunBlock::CheckHit(Player& player, const vector<vector<int>>& mapData)
 
 		// 方向転換タイマーを初期化。
 		changeDirTimer = 0;
+
+	}
+
+	// ドッスンブロックとプレイヤーの当たり判定
+
+	bool isDossunVel = Collider::Instance()->CheckHitVel(player.centerPos, player.prevFrameCenterPos, player.vel + player.gimmickVel, player.PLAYER_SIZE, pos, size) != INTERSECTED_NONE;
+	isDossunTop = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_TOP) != INTERSECTED_NONE;
+	isDossunRight = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+	isDossunLeft = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_LEFT) != INTERSECTED_NONE;
+	isDossunBottom = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+
+	// どこかしらにぶつかっていれば当たった判定にする。
+	if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
+
+		// プレイヤーにドッスンブロックの移動量を渡す。
+		player.gimmickVel = Vec2<float>(speed, speed) * moveDir;
+
+		// ドッスンの移動量タイマーを更新。
+		isHitPlayer = true;
+
+		// プレイヤーの移動量をかき消す。
+		player.gravity *= 0.0f;
+		player.vel *= {0.5f, 0.5f};
+
+	}
+	else {
+
+		// ドッスンの移動量タイマーを初期化。
+		isHitPlayer = false;
+		//isMoveTimer = 0;
 
 	}
 

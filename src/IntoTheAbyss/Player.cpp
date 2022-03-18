@@ -175,6 +175,8 @@ void Player::Update(const vector<vector<int>> mapData)
 	if (handReturnTimer > 0) {
 		--handReturnTimer;
 	}
+	// 何かしらの移動量が存在したらNoInputを初期化する。
+	if (vel.x != 0 || vel.y != 0 || gimmickVel.x != 0 || gimmickVel.y != 0) handReturnTimer = DEF_HAND_RETURN_TIMER;
 	// 0以下になったら
 	if (handReturnTimer <= 0) {
 
@@ -193,6 +195,9 @@ void Player::Update(const vector<vector<int>> mapData)
 		lHand->SetIsNoInputTimer(false);
 
 	}
+
+	// ギミックから与えられる移動量を初期化。
+	gimmickVel = {};
 
 }
 
@@ -872,9 +877,6 @@ void Player::Move()
 
 	// ギミックから与えられる移動量を加算
 	centerPos += gimmickVel;
-
-	// ギミックから与えられる移動量を初期化。
-	gimmickVel = {};
 
 	// スクロール量を更新
 	//ScrollMgr::Instance()->honraiScrollAmount -= prevFrameCenterPos - centerPos;
