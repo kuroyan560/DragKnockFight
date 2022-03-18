@@ -36,10 +36,11 @@ Player::Player()
 	onGround = false;
 
 	// 腕をセット
+	static const float OFFSET = -8.0f;
 	lHand = make_unique<PlayerHand>();
-	lHand->Init(-PLAYER_SIZE.x);
+	lHand->Init(-PLAYER_SIZE.x + OFFSET);
 	rHand = make_unique<PlayerHand>();
-	rHand->Init(PLAYER_SIZE.x);
+	rHand->Init(PLAYER_SIZE.x - OFFSET);
 
 	// 連射タイマーを初期化
 	rapidFireTimerLeft = 0;
@@ -198,6 +199,15 @@ void Player::Update(const vector<vector<int>> mapData)
 
 void Player::Draw()
 {
+	static enum { LEFT, RIGHT, DEFAULT = RIGHT, DIR_NUM }DIR = DEFAULT;
+	if (vel.x < 0)DIR = LEFT;
+	if (0 < vel.x)DIR = RIGHT;
+
+	static const int HAND_GRAPH[DIR_NUM] =
+	{
+		TexHandleMgr::LoadGraph("resource/IntoTheAbyss/hand_L.png"),
+		TexHandleMgr::LoadGraph("resource/IntoTheAbyss/hand_R.png"),
+	};
 
 	/*===== 描画処理 =====*/
 
@@ -210,12 +220,30 @@ void Player::Draw()
 		centerPos.y * ScrollMgr::Instance()->zoom - PLAYER_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
 	Vec2<float>rightBottom = { centerPos.x * ScrollMgr::Instance()->zoom + PLAYER_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 		centerPos.y * ScrollMgr::Instance()->zoom + PLAYER_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
+	const float expRate = EXT_RATE * ScrollMgr::Instance()->zoom;
 
-	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(playerGraph), AlphaBlendMode_Trans);
+	if (DIR == RIGHT)
+	{
+		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+	}
+	else if (DIR == LEFT)
+	{
+		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+	}
 
-	// 両腕を描画
-	lHand->Draw();
-	rHand->Draw();
+	//胴体
+	//DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(playerGraph), AlphaBlendMode_Trans, { DIR == LEFT,false });
+	DrawFunc::DrawRotaGraph2D(centerPos* ScrollMgr::Instance()->zoom - scrollShakeZoom, expRate, 0.0f, TexHandleMgr::GetTexBuffer(playerGraph),
+		{ 0.5f,0.5f }, AlphaBlendMode_Trans, { DIR == LEFT,false });
+
+	if (DIR == RIGHT)
+	{
+		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+	}
+	else if (DIR == LEFT)
+	{
+		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+	}
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
@@ -912,7 +940,6 @@ void Player::Move()
 		vel.y *= sign ? -1 : 1;
 
 	}
-
 }
 
 void Player::UpdateGravity()
