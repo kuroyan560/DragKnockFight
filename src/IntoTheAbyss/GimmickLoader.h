@@ -1,5 +1,6 @@
 #pragma once
 #include"Vec.h"
+#include "Singleton.h"
 #include<vector>
 #include <assert.h>
 #include <fstream>
@@ -25,7 +26,7 @@ struct ThownpeData
 	Vec2<float> size;			//画像の大きさ
 	E_GIMMICK type;		//ギミックの種類
 
-	ThownpeData(const Vec2<float> &SIZE = Vec2<float>(-1.0f, -1.0f), const E_GIMMICK &TYPE = GIMMICK_NONE) :size(SIZE), type(TYPE), startPos(Vec2<float>(0.0f, 0.0f)), endPos(Vec2<float>(0.0f, 0.0f))
+	ThownpeData(const Vec2<float>& SIZE = Vec2<float>(-1.0f, -1.0f), const E_GIMMICK& TYPE = GIMMICK_NONE) :size(SIZE), type(TYPE), startPos(Vec2<float>(0.0f, 0.0f)), endPos(Vec2<float>(0.0f, 0.0f))
 	{
 	};
 };
@@ -33,23 +34,24 @@ struct ThownpeData
 struct BubbleData
 {
 	Vec2<float> pos;	//生成座標
-	BubbleData(const Vec2<float> &POS = Vec2<float>(-1.0f, -1.0f)) :pos(POS)
+	BubbleData(const Vec2<float>& POS = Vec2<float>(-1.0f, -1.0f)) :pos(POS)
 	{
 	};
 };
 
-class GimmickLoader
+class GimmickLoader :public Singleton<GimmickLoader>
 {
 public:
-	GimmickLoader(const int &STAGE_NUM);
-	void LoadData(const int &STAGE_NUM, const int &ROOM_NUM, const std::string &FILE_PASS);
-	const std::vector< std::shared_ptr<ThownpeData>> &GetThowpeData(const int &STAGE_NUM, const int &ROOM_NUM);
-	const std::vector< std::shared_ptr<BubbleData>> &GetBubbleData(const int &STAGE_NUM, const int &ROOM_NUM);
+	GimmickLoader(){};
+	GimmickLoader(const int& STAGE_NUM);
+	void LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const std::string& FILE_PASS);
+	std::vector< std::shared_ptr<ThownpeData>> GetThowpeData(const int& STAGE_NUM, const int& ROOM_NUM);
+	const std::vector< std::shared_ptr<BubbleData>>& GetBubbleData(const int& STAGE_NUM, const int& ROOM_NUM);
 
 
-	void SetThwompStartPos(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS);
-	void SetThwompEndPos(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS);
-	void PushBubbleData(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS);
+	void SetThwompStartPos(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS);
+	void SetThwompEndPos(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS);
+	void PushBubbleData(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS);
 
 private:
 	std::vector<std::vector<std::vector<std::shared_ptr<ThownpeData>>>> allGimmickData;//ドッスンに関する情報
@@ -88,6 +90,6 @@ private:
 	std::array<std::string, GIMMCK_THOWMPE_DATA_MAX>gimmickThowmpeDataName;	//Key値を読み込む際に無効な文字が入ってないか確認する為の比較対象。特定のギミックに使うKey値が格納される
 	std::array<std::string, GIMMCK_THOWMPE_TYPE_MAX>gimmickThowmpeType;		//ギミックの項目を読み込む際に無効な文字が入ってないか確認する為の比較対象
 
-	void LoadThowmpeData(const std::string &KEY, std::istringstream *LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA);
+	void LoadThowmpeData(const std::string& KEY, std::istringstream* LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA);
 };
 

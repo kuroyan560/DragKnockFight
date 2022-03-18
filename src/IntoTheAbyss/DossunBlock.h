@@ -1,18 +1,11 @@
 #pragma once
 #include "Vec.h"
 #include "Player.h"
+#include "GimmickLoader.h"
 #include <vector>
 
 using namespace std;
 
-// ドッスンクラス識別ID
-enum DossunID {
-
-	DOSSUN_OFF_POWER,	// 電源オフのドッスン
-	DOSSUN_LOW_POWER,	// 低出力のドッスン
-	DOSSUN_HIGH_POWER,	// 高出力のドッスン
-
-};
 
 // ドッスンクラス
 class DossunBlock {
@@ -28,7 +21,9 @@ public:
 	int isMoveTimer;	// 移動するまでのタイマー(プレイヤーがこのブロックに触れてから指定フレーム後に動き出すようにするために必要。)
 	int changeDirTimer;	// 壁と当たったときに方向転換するタイマー
 	bool isHitPlayer;	// プレイヤーと当たっているかどうか。
-	DossunID id;		// どのドッスンかのID
+	bool isMove;		// 動き出したかどうか
+	bool isReturn;		// 初期位置に戻っているかどうか
+	E_GIMMICK id;		// どのドッスンかのID
 
 
 public:
@@ -38,7 +33,7 @@ public:
 	const int IS_MOVE_TIMER = 60;			// プレイヤーがブロックに触れてから動き出すまでのタイマー
 	const int CHANGE_DIR_TIMER = 180;		// 壁にあたったら方向転換するタイマー
 	const float LOW_POWER_ADD_SPEED = 0.5f;	// 低出力ドッスンの移動速度の加算量
-	const float LOW_POWER_MAX_SPEED = 5.0f;	// 低出力ドッスンの移動速度の最大量
+	const float LOW_POWER_MAX_SPEED = 7.5f;	// 低出力ドッスンの移動速度の最大量
 
 
 public:
@@ -52,7 +47,7 @@ public:
 	void Init();
 
 	// 生成処理
-	void Generate(Vec2<float> generatePos, Vec2<float> endPos, const Vec2<float>& size, const DossunID& dossunID);
+	void Generate(Vec2<float> generatePos, Vec2<float> endPos, const Vec2<float>& size, const E_GIMMICK& dossunID);
 
 	// 更新処理
 	void Update();

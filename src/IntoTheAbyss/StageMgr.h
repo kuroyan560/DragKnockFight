@@ -154,8 +154,6 @@ public:
 	const bool &CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
 
 
-
-
 	/// <summary>
 	/// 指定したステージ番号の小部屋の数を返します
 	/// </summary>
