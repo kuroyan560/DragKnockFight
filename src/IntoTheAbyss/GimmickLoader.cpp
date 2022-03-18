@@ -168,7 +168,7 @@ const std::vector<std::shared_ptr<BubbleData>> &GimmickLoader::GetBubbleData(con
 	return allBubbleData[STAGE_NUM][ROOM_NUM];
 }
 
-const std::vector<std::shared_ptr<ThownpeData>> &GimmickLoader::GetThowpeData(const int &STAGE_NUM, const int &ROOM_NUM)
+std::vector<std::shared_ptr<ThownpeData>> GimmickLoader::GetThowpeData(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	//ステージ番号が配列の範囲外なら返さない
 	if (STAGE_NUM < 0 || allGimmickData.size() <= STAGE_NUM)

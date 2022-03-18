@@ -54,7 +54,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -91,7 +91,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS)
+Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS)
 {
 	Vec2<float> doorPos;
 	int roopCount = 0;
@@ -243,7 +243,7 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	return Vec2<float>(-1, -1);
 }
 
-Vec2<float> Game::GetPlayerPos(const int &STAGE_NUMBER, int *ROOM_NUMBER, const int &DOOR_NUMBER, const SizeData &SIZE_DATA, vector<vector<int>> *MAPCHIP_DATA)
+Vec2<float> Game::GetPlayerPos(const int& STAGE_NUMBER, int* ROOM_NUMBER, const int& DOOR_NUMBER, const SizeData& SIZE_DATA, vector<vector<int>>* MAPCHIP_DATA)
 {
 	int roomNum = StageMgr::Instance()->GetRelationData(STAGE_NUMBER, *ROOM_NUMBER, DOOR_NUMBER - SIZE_DATA.min);
 	*MAPCHIP_DATA = StageMgr::Instance()->GetMapChipData(STAGE_NUMBER, roomNum);
@@ -310,9 +310,7 @@ Game::Game()
 		}
 	}
 
-	// ドッスンブロックを生成。
-	//testDossunBlock.Generate(player.centerPos + Vec2<float>(0, MAP_CHIP_SIZE), player.centerPos + Vec2<float>(0, -MAP_CHIP_SIZE), Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), DOSSUN_LOW_POWER);
-
+	StageMgr::Instance()->loadGimmickData->GetThowpeData(0, 0);
 
 	//オーラブロック生成
 	int auraChipNum = 40;//オーラブロックのチップ番号
@@ -507,6 +505,10 @@ Game::Game()
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+
+	// シャボン玉ブロックを生成。
+	bubbleBlock.Generate(player.centerPos);
+
 }
 
 void Game::Update()
@@ -586,22 +588,6 @@ void Game::Update()
 	//ImGui::Text("RoomNumber:%d", debugStageData[1]);
 	//ImGui::End();
 
-	//ステージ毎の切り替え判定
-	if (stageNum != oldStageNum)
-	{
-		debugStageData[0] = stageNum;
-	}
-	oldStageNum = stageNum;
-
-	//部屋毎の切り替え判定
-	if (roomNum != oldRoomNum)
-	{
-		debugStageData[1] = roomNum;
-		mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
-	}
-	oldRoomNum = roomNum;
-
-
 
 
 
@@ -671,6 +657,49 @@ void Game::Update()
 	}
 	//ドア判定-----------------------
 
+
+
+	//ステージ毎の切り替え判定
+	if (stageNum != oldStageNum)
+	{
+		debugStageData[0] = stageNum;
+	}
+	oldStageNum = stageNum;
+
+	//部屋の初期化
+	if (roomNum != oldRoomNum)
+	{
+		debugStageData[1] = roomNum;
+		mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+
+		// ドッスンブロックを生成。
+		vector<shared_ptr<ThownpeData>> dossunData;
+
+		// ドッスンブロックデータを取得
+		dossunData = GimmickLoader::Instance()->GetThowpeData(stageNum, roomNum);
+
+		const int dossunCount = dossunData.size();
+
+		// ドッスンブロックを初期化。
+		dossunBlock.clear();
+
+		// ドッスンを生成。
+		for (int index = 0; index < dossunCount; ++index) {
+
+			DossunBlock dossunBuff;
+			dossunBuff.Generate(dossunData[index]->startPos, dossunData[index]->endPos, dossunData[index]->size, dossunData[index]->type);
+
+			// データを追加。
+			dossunBlock.push_back(dossunBuff);
+
+		}
+
+	}
+	oldRoomNum = roomNum;
+
+
+
+
 	// R or Aが押されたらプレイヤーの位置を初期化する。
 	//if (Input::isKeyTrigger(KEY_INPUT_R) || Input::isJoyBottomTrigger(XINPUT_BUTTON_A))
 	if (UsersInput::Instance()->OnTrigger(DIK_R) || UsersInput::Instance()->OnTrigger(XBOX_BUTTON::A))
@@ -739,7 +768,10 @@ void Game::Update()
 	BulletParticleMgr::Instance()->Update();
 
 	// ドッスンブロックの更新処理
-	testDossunBlock.Update();
+	const int DOSSUN_COUNT = dossunBlock.size();
+	for (int index = 0; index < DOSSUN_COUNT; ++index) {
+		dossunBlock[index].Update();
+	}
 
 	ViewPort::Instance()->Update(player.centerPos);
 	for (int i = 0; i < auraBlock.size(); ++i)
@@ -747,10 +779,13 @@ void Game::Update()
 		auraBlock[i]->Update();
 	}
 
+	// シャボン玉ブロックの更新処理
+	bubbleBlock.Update();
+
 	//if (Input::isKey(KEY_INPUT_UP)) ViewPort::Instance()->zoomRate += 0.01f;
-	if (UsersInput::Instance()->OnTrigger(DIK_UP))  ViewPort::Instance()->zoomRate += 0.01f;
+	//if (UsersInput::Instance()->OnTrigger(DIK_UP))  ViewPort::Instance()->zoomRate += 0.01f;
 	//if (Input::isKey(KEY_INPUT_DOWN)) ViewPort::Instance()->zoomRate -= 0.01f;
-	if (UsersInput::Instance()->OnTrigger(DIK_DOWN)) ViewPort::Instance()->zoomRate -= 0.01f;
+	//if (UsersInput::Instance()->OnTrigger(DIK_DOWN)) ViewPort::Instance()->zoomRate -= 0.01f;
 
 	/*===== 当たり判定 =====*/
 
@@ -1081,7 +1116,9 @@ void Game::Update()
 	ViewPort::Instance()->playerPos = player.centerPos;
 
 	// ドッスンブロックの当たり判定
-	testDossunBlock.CheckHit(player, mapData);
+	for (int index = 0; index < DOSSUN_COUNT; ++index) {
+		dossunBlock[index].CheckHit(player, mapData);
+	}
 
 
 }
@@ -1100,7 +1137,13 @@ void Game::Draw()
 	BulletParticleMgr::Instance()->Draw();
 
 	// ドッスンブロックの描画処理
-	testDossunBlock.Draw();
+	const int DOSSUN_COUNT = dossunBlock.size();
+	for (int index = 0; index < DOSSUN_COUNT; ++index) {
+		dossunBlock[index].Draw();
+	}
+
+	// シャボン玉ブロックの更新処理
+	bubbleBlock.Draw();
 
 	player.Draw();
 
