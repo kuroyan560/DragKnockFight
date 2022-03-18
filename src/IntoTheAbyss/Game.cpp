@@ -28,7 +28,6 @@ bool Game::CheckUsedData(std::vector<Vec2<float>> DATA, Vec2<float> DATA2)
 }
 
 void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
-//void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
 {
 	// 描画するチップのサイズ
 	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
@@ -822,9 +821,10 @@ void Game::Update()
 			BulletMgr::Instance()->GetBullet(i)->MAX_RADIUS
 		);
 
-		bool hitFlag =
-			BulletMgr::Instance()->GetBullet(i)->GetIsActive() &&
-			hitArea != ViewPortCollider::Instance()->HIT_AREA_NONE;
+		//bool hitFlag =
+		//	BulletMgr::Instance()->GetBullet(i)->GetIsActive() &&
+		//	hitArea != ViewPortCollider::Instance()->HIT_AREA_NONE;
+		auto hitFlag = false;
 
 		if (hitFlag)
 		{
@@ -1147,7 +1147,7 @@ void Game::Draw()
 
 	player.Draw();
 
-	ViewPort::Instance()->Draw();
+	//ViewPort::Instance()->Draw();
 
 
 	for (int i = 0; i < auraBlock.size(); ++i)

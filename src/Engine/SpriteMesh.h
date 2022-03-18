@@ -88,5 +88,5 @@ public:
 		dirty = true;
 	}
 
-	void Render(const std::vector<std::shared_ptr<DescriptorData>>& DescDatas, const std::vector<DESC_HANDLE_TYPE>& DescHandleTypes);
+	void Render(const std::vector<std::shared_ptr<DescriptorData>>& DescDatas, const std::vector<DESC_HANDLE_TYPE>& DescHandleTypes, const int& InstanceNum = 1);
 };

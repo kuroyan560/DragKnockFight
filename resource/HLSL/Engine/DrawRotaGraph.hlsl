@@ -8,7 +8,8 @@ struct VSOutput
     float4 center : CENTER;
     float extRate : EXT_RATE;
     float radian : RADIAN;
-    int mirorX : MIROR_X;
+    float2 rotaCenterUV : ROTA_CENTER_UV;
+    int2 miror : MIROR;
     float2 texSize : TEX_SIZE;
 };
 
@@ -38,7 +39,10 @@ void GSmain(
 )
 {
     float width_h = input[0].texSize.x * input[0].extRate / 2.0f;
-    float height_h = input[0].texSize.x * input[0].extRate / 2.0f;
+    float height_h = input[0].texSize.y * input[0].extRate / 2.0f;
+    
+    float2 rotateCenter = input[0].center.xy;
+    rotateCenter += input[0].texSize.xy * float2(input[0].extRate,input[0].extRate) * (input[0].rotaCenterUV - float2(0.5f, 0.5f));
     
     GSOutput element;
         
@@ -46,36 +50,36 @@ void GSmain(
     element.pos = input[0].center;
     element.pos.x -= width_h;
     element.pos.y += height_h;
-    element.pos.xy = input[0].center.xy + RotateFloat2(element.pos.xy - input[0].center.xy, input[0].radian);
+    element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(0.0f + input[0].mirorX, 1.0f);
+    element.uv = float2(0.0f + input[0].miror.x, 1.0f - input[0].miror.y);
     output.Append(element);
     
     //ç∂è„
     element.pos = input[0].center;
     element.pos.x -= width_h;
     element.pos.y -= height_h;
-    element.pos.xy = input[0].center.xy + RotateFloat2(element.pos.xy - input[0].center.xy, input[0].radian);
+    element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(0.0f + input[0].mirorX, 0.0f);
+    element.uv = float2(0.0f + input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
     
      //âEâ∫
     element.pos = input[0].center;
     element.pos.x += width_h;
     element.pos.y += height_h;
-    element.pos.xy = input[0].center.xy + RotateFloat2(element.pos.xy - input[0].center.xy, input[0].radian);
+    element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(1.0f - input[0].mirorX, 1.0f);
+    element.uv = float2(1.0f - input[0].miror.x, 1.0f - input[0].miror.y);
     output.Append(element);
     
     //âEè„
     element.pos = input[0].center;
     element.pos.x += width_h;
     element.pos.y -= height_h;
-    element.pos.xy = input[0].center.xy + RotateFloat2(element.pos.xy - input[0].center.xy, input[0].radian);
+    element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(1.0f - input[0].mirorX, 0.0f);
+    element.uv = float2(1.0f - input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
 }
 

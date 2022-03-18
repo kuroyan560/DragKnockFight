@@ -104,6 +104,8 @@ class GPUResource
 	ComPtr<ID3D12Resource1>buff = nullptr;	//リソースバッファ
 	D3D12_RESOURCE_STATES barrier = D3D12_RESOURCE_STATE_COMMON;	//リソースバリアの状態
 
+	void MapBuffOnCPU();
+
 public:
 	GPUResource(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier,const wchar_t* Name = nullptr) 
 	{
@@ -132,7 +134,7 @@ public:
 	//CPUからアクセス可能なリソース取得
 	void* GetBuffOnCPU()
 	{
-		if (!mapped)ASSERT_MSG("マッピングされていないので、CPUからGPUデータにアクセスできません\n");
+		MapBuffOnCPU();
 		return buffOnCPU;
 	}
 };
@@ -226,6 +228,9 @@ public:
 	//バッファセット
 	void SetGraphicsDescriptorBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const DESC_HANDLE_TYPE& Type, const int& RootParam);
 	void SetComputeDescriptorBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const DESC_HANDLE_TYPE& Type, const int& RootParam);
+
+	//CPU上でのメモリ取得
+	void* GetBuffOnCPU() { return resource.GetBuffOnCPU(); }
 };
 
 //定数バッファ
@@ -464,9 +469,10 @@ public:
 	D3D12_DESCRIPTOR_RANGE_TYPE descriptorRangeType;
 	DESC_HANDLE_TYPE viewType;
 	bool descriptor = false;	//ディスクリプタとして登録されているか
+	int descNum = 1;
 
-	RootParam(const D3D12_DESCRIPTOR_RANGE_TYPE& Range, const char* Comment = nullptr)
-		:descriptorRangeType(Range), descriptor(true) {
+	RootParam(const D3D12_DESCRIPTOR_RANGE_TYPE& Range, const char* Comment = nullptr, const int& DescNum = 1)
+		:descriptorRangeType(Range), descriptor(true), descNum(DescNum) {
 		if (Comment != nullptr)comment = Comment;
 	}
 	RootParam(const DESC_HANDLE_TYPE& ViewType, const char* Comment = nullptr)

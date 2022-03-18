@@ -1,10 +1,7 @@
 #include"D3D12Data.h""
 
-void GPUResource::Mapping(const size_t& DataSize, const int& ElementNum, void* SendData)
+void GPUResource::MapBuffOnCPU()
 {
-	//送るデータがnullなら何もしない
-	if (SendData == nullptr)ASSERT_MSG("データのマッピングに失敗、引数がnullptrです\n");
-
 	//まだマッピングしていなければマッピング
 	if (!mapped)
 	{
@@ -13,6 +10,14 @@ void GPUResource::Mapping(const size_t& DataSize, const int& ElementNum, void* S
 		if (FAILED(hr))ASSERT_MSG("データのマッピングに失敗\n");
 		mapped = true;
 	}
+}
+
+void GPUResource::Mapping(const size_t& DataSize, const int& ElementNum, void* SendData)
+{
+	//送るデータがnullなら何もしない
+	if (SendData == nullptr)ASSERT_MSG("データのマッピングに失敗、引数がnullptrです\n");
+
+	MapBuffOnCPU();
 
 	memcpy(buffOnCPU, SendData, DataSize * ElementNum);
 }

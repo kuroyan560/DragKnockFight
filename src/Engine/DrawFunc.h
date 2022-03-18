@@ -84,7 +84,7 @@ public:
 	/// <param name="Tex">テクスチャ</param>
 	/// <param name="BlendMode">ブレンドモード</param>
 	static void DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos,
-		const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode = AlphaBlendMode_None);
+		const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode = AlphaBlendMode_None, const Vec2<bool>& Miror = { false,false });
 
 	/// <summary>
 	/// ２D画像回転描画
@@ -96,5 +96,6 @@ public:
 	/// <param name="BlendMode">ブレンドモード</param>
 	/// <param name="LRTurn">左右反転フラグ</param>
 	static void DrawRotaGraph2D(const Vec2<float>& Center, const float& ExtRate, const float& Radian,
-		const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode = AlphaBlendMode_Trans, const bool& LRTurn = false);
+		const std::shared_ptr<TextureBuffer>& Tex, const Vec2<float>& RotaCenterUV = { 0.5f,0.5f },
+		const AlphaBlendMode& BlendMode = AlphaBlendMode_Trans, const Vec2<bool>& Mirror = { false,false });
 };
