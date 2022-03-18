@@ -152,6 +152,7 @@ void GameScene::OnImguiDebug()
 
 	ImGui::Text("Up Down:SelectNumber");
 	ImGui::Text("Left Right:SelectStageOrRoom");
+	ImGui::Text("Return:Done");
 	ImGui::End();
 }
 
