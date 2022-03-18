@@ -19,6 +19,7 @@ public:
 	Vec2<float> centerPos;					// プレイヤーの中心座標
 	Vec2<float> prevFrameCenterPos;		// 前フレームのプレイヤーの中心座標
 	Vec2<float> vel;						// 移動量
+	Vec2<float> gimmickVel;			// ギミックから与えられる移動量(ドッスンブロックに張り付いた時等。)
 	float gravity;					// 重力
 	bool onGround;					// プレイヤーが接地しているかのフラグ
 	bool firstShot;					// 最初の一発が撃たれたかどうか trueで撃たれた判定
@@ -27,13 +28,14 @@ public:
 	int rapidFireTimerLeft;			// 連射タイマー左手
 	int rapidFireTimerRight;		// 連射タイマー右手
 	int gravityInvalidTimer;		// 重力無効化タイマー
+	int handReturnTimer;			// 入力が終わってから腕がデフォルトの位置に戻るまでのタイマー
 
 	// 壁ズリフラグ
 	bool isSlippingWall[4];			// 壁ズリパーティクルを出すフラグ
 
 	// プレイヤーの腕
-	unique_ptr<PlayerHand> rHand;	// 右手
 	unique_ptr<PlayerHand> lHand;	// 左手
+	unique_ptr<PlayerHand> rHand;	// 右手
 	bool isPrevFrameShotBeacon;
 
 	int playerGraph;
@@ -57,6 +59,14 @@ public:
 	// コヨーテ的なやつのためのパラメーター
 	const float STOP_DEADLINE_Y = 5.0f;		// Y軸の移動量がコレ以下だったら移動量を0にする。
 	const float STOP_DEADLINE_X = 3.0f;		// X軸の移動量がコレ以下だったら移動量を0にする。
+
+	// 手が初期位置に戻るまでのタイマー
+	const int DEF_HAND_RETURN_TIMER = 180;
+
+	// 左手の初期位置
+	const float DEF_LEFT_HAND_ANGLE = 2.35619f;
+	// 右手の初期位置
+	const float DEF_RIGHT_HAND_ANGLE = 0.785398f;
 
 	// プレイヤーの方向
 	enum PLAYER_DIR {

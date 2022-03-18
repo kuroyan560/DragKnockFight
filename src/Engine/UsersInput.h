@@ -50,7 +50,7 @@ public:
 		}
 		return INSTANCE;
 	}
-	
+
 	struct MouseMove
 	{
 		LONG IX;
@@ -125,5 +125,10 @@ public:
 	Vec2<float>GetLeftStickVec(const Vec2<float>& DeadRate = { 1.0f,1.0f });
 	Vec2<float>GetRightStickVec(const Vec2<float>& DeadRate = { 1.0f,1.0f });
 	void ShakeController(const float& Power, const int& Span);
+
+	// 生のスティックのレートが欲しかったので臨時で実装しました。開発が終わったら消してください；；
+	Vec2<float>GetLeftStickVecFuna(){return Vec2<float>(xinputState.Gamepad.sThumbLX, -xinputState.Gamepad.sThumbLY);}
+	Vec2<float>GetRightStickVecFuna(){return Vec2<float>(xinputState.Gamepad.sThumbRX, -xinputState.Gamepad.sThumbRY);}
+
 };
 

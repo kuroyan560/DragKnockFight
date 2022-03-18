@@ -37,6 +37,8 @@ PlayerHand::PlayerHand()
 	// 手の画像をロード
 	//playerHandGraph = LoadGraph("Resource/PlayerHand.png");
 	playerHandGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/PlayerHand.png");
+
+	isNoInputTimer = false;
 }
 
 void PlayerHand::Init(const float& armDistance)
@@ -62,6 +64,8 @@ void PlayerHand::Init(const float& armDistance)
 	// ビーコンのクールタイムを初期化
 	pikeCooltime = 0;
 
+	isNoInputTimer = false;
+
 }
 
 void PlayerHand::Update(const Vec2<float>& playerCenterPos)
@@ -85,6 +89,18 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 
 	// 更にそこから角度の方向に移動させる。
 	handPos += {ARM_RANGE_OF_MOTION* cosf(inputAngle), ARM_RANGE_OF_MOTION* sinf(inputAngle)};
+
+	// No Input Dattara
+	if (isNoInputTimer) {
+
+		drawPos += (handPos - drawPos) / Vec2<float>(10.0f, 10.0f);
+
+	}
+	else {
+
+		drawPos = handPos;
+
+	}
 
 	// 各短槍の更新処理を行う。
 	if (teleportPike.isActive) teleportPike.Update();
@@ -114,10 +130,10 @@ void PlayerHand::Draw()
 	//	handPos.y * ScrollMgr::Instance()->zoom + ARM_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y,
 	//	playerHandGraph, TRUE);
 
-	Vec2<float>leftUp = { handPos.x * ScrollMgr::Instance()->zoom - ARM_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-	handPos.y * ScrollMgr::Instance()->zoom - ARM_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	Vec2<float>rightBottom = { handPos.x * ScrollMgr::Instance()->zoom + ARM_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		handPos.y * ScrollMgr::Instance()->zoom + ARM_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
+	Vec2<float>leftUp = { drawPos.x * ScrollMgr::Instance()->zoom - ARM_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
+	drawPos.y * ScrollMgr::Instance()->zoom - ARM_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
+	Vec2<float>rightBottom = { drawPos.x * ScrollMgr::Instance()->zoom + ARM_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
+		drawPos.y * ScrollMgr::Instance()->zoom + ARM_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
 
 	// 腕の内側の描画
 	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(playerHandGraph));

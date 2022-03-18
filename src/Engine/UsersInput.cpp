@@ -154,8 +154,8 @@ UsersInput::MouseMove UsersInput::GetMouseMove()
 //Ray UsersInput::GetMouseRay()
 //{
 //	Ray mouseRay;
-//	Vec3<float> start = MyFunc::ConvertScreenToWorld(mousePos, 0.0f, 
-//	Camera::GetNowCam()->MatView(), 
+//	Vec3<float> start = MyFunc::ConvertScreenToWorld(mousePos, 0.0f,
+//	Camera::GetNowCam()->MatView(),
 //		Camera::GetNowCam()->MatProjection(),
 //		App::GetWinApp().GetWinSize());
 //	mouseRay.start = { start.x,start.y,start.z };

@@ -36,10 +36,10 @@ Player::Player()
 	onGround = false;
 
 	// 腕をセット
-	rHand = make_unique<PlayerHand>();
-	rHand->Init(-PLAYER_SIZE.x);
 	lHand = make_unique<PlayerHand>();
-	lHand->Init(PLAYER_SIZE.x);
+	lHand->Init(-PLAYER_SIZE.x);
+	rHand = make_unique<PlayerHand>();
+	rHand->Init(PLAYER_SIZE.x);
 
 	// 連射タイマーを初期化
 	rapidFireTimerLeft = 0;
@@ -60,6 +60,13 @@ Player::Player()
 
 	// 壁ズリフラグを初期化。
 	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
+
+	// 初期位置に戻るまでのタイマーを初期化
+	handReturnTimer = DEF_HAND_RETURN_TIMER;
+
+	// 手を初期位置に戻す。
+	rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
+	lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
 
 }
 
@@ -87,8 +94,8 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	firstShot = false;
 
 	// 腕をセット
-	rHand->Init(-PLAYER_SIZE.x);
-	lHand->Init(PLAYER_SIZE.x);
+	lHand->Init(-PLAYER_SIZE.x);
+	rHand->Init(PLAYER_SIZE.x);
 
 	// 連射タイマーを初期化
 	rapidFireTimerLeft = 0;
@@ -103,6 +110,13 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	// 壁ズリフラグを初期化。
 	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
+
+	// 初期位置に戻るまでのタイマーを初期化
+	handReturnTimer = DEF_HAND_RETURN_TIMER;
+
+	// 手を初期位置に戻す。
+	rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
+	lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
 
 }
 
@@ -127,8 +141,8 @@ void Player::Update(const vector<vector<int>> mapData)
 	if (rapidFireTimerRight > 0) --rapidFireTimerRight;
 
 	// 腕を更新
-	rHand->Update(centerPos);
 	lHand->Update(centerPos);
+	rHand->Update(centerPos);
 
 	// 弾を更新
 	BulletMgr::Instance()->Update();
@@ -157,6 +171,29 @@ void Player::Update(const vector<vector<int>> mapData)
 	// 壁ズリフラグを初期化。
 	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
 
+	// 一定時間入力がなかったら腕を初期位置に戻すタイマーを更新。
+	if (handReturnTimer > 0) {
+		--handReturnTimer;
+	}
+	// 0以下になったら
+	if (handReturnTimer <= 0) {
+
+		// 手を初期位置に戻す。
+		rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
+		lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
+
+		// Syokiiti Ni Modosu Timer Ga <=0 no Tokiha Honrai no Amount Wo Herasu
+		rHand->SetIsNoInputTimer(true);
+		lHand->SetIsNoInputTimer(true);
+
+	}
+	else {
+
+		rHand->SetIsNoInputTimer(false);
+		lHand->SetIsNoInputTimer(false);
+
+	}
+
 }
 
 void Player::Draw()
@@ -177,8 +214,8 @@ void Player::Draw()
 	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(playerGraph), AlphaBlendMode_Trans);
 
 	// 両腕を描画
-	rHand->Draw();
 	lHand->Draw();
+	rHand->Draw();
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
@@ -334,51 +371,51 @@ void Player::CheckHit(const vector<vector<int>> mapData, TimeStopTestBlock& test
 	/*===== 短槍の当たり判定 =====*/
 
 	// 瞬間移動の短槍の当たり判定を行う。
-	if (!lHand->teleportPike.isHitWall && lHand->teleportPike.isActive) {
+	if (!rHand->teleportPike.isHitWall && rHand->teleportPike.isActive) {
 		bool onGround = false;
-		INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(lHand->teleportPike.pos, lHand->teleportPike.prevFramePos, lHand->teleportPike.forwardVec, Vec2<float>(lHand->teleportPike.SCALE, lHand->teleportPike.SCALE), onGround, mapData);
-		if (buff != INTERSECTED_NONE) { lHand->teleportPike.isHitWall = true; }
+		INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(rHand->teleportPike.pos, rHand->teleportPike.prevFramePos, rHand->teleportPike.forwardVec, Vec2<float>(rHand->teleportPike.SCALE, rHand->teleportPike.SCALE), onGround, mapData);
+		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
 
 		// 押し戻し
-		Vec2<float> scale = Vec2<float>(lHand->teleportPike.SCALE * 2.0f, lHand->teleportPike.SCALE * 2.0f);
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->teleportPike.pos, scale, mapData, INTERSECTED_BOTTOM);
-		if (buff != INTERSECTED_NONE) { lHand->teleportPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->teleportPike.pos, scale, mapData, INTERSECTED_TOP);
-		if (buff != INTERSECTED_NONE) { lHand->teleportPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->teleportPike.pos, scale, mapData, INTERSECTED_LEFT);
-		if (buff != INTERSECTED_NONE) { lHand->teleportPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->teleportPike.pos, scale, mapData, INTERSECTED_RIGHT);
-		if (buff != INTERSECTED_NONE) { lHand->teleportPike.isHitWall = true; }
+		Vec2<float> scale = Vec2<float>(rHand->teleportPike.SCALE * 2.0f, rHand->teleportPike.SCALE * 2.0f);
+		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_BOTTOM);
+		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_TOP);
+		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_LEFT);
+		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_RIGHT);
+		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
 
 	}
 
 	// 時間停止の短槍の当たり判定を行う。
-	if (!rHand->timeStopPike.isHitWall && rHand->timeStopPike.isActive) {
+	if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
 		bool onGround = false;
-		INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(rHand->timeStopPike.pos, rHand->timeStopPike.prevFramePos, rHand->timeStopPike.forwardVec, Vec2<float>(rHand->timeStopPike.SCALE, rHand->timeStopPike.SCALE), onGround, mapData);
-		if (buff != INTERSECTED_NONE) { rHand->timeStopPike.isHitWall = true; }
+		INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(lHand->timeStopPike.pos, lHand->timeStopPike.prevFramePos, lHand->timeStopPike.forwardVec, Vec2<float>(lHand->timeStopPike.SCALE, lHand->timeStopPike.SCALE), onGround, mapData);
+		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
 
 		// 押し戻し
-		Vec2<float> scale = Vec2<float>(rHand->timeStopPike.SCALE * 2.0f, rHand->timeStopPike.SCALE * 2.0f);
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->timeStopPike.pos, scale, mapData, INTERSECTED_BOTTOM);
-		if (buff != INTERSECTED_NONE) { rHand->timeStopPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->timeStopPike.pos, scale, mapData, INTERSECTED_TOP);
-		if (buff != INTERSECTED_NONE) { rHand->timeStopPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->timeStopPike.pos, scale, mapData, INTERSECTED_LEFT);
-		if (buff != INTERSECTED_NONE) { rHand->timeStopPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->timeStopPike.pos, scale, mapData, INTERSECTED_RIGHT);
-		if (buff != INTERSECTED_NONE) { rHand->timeStopPike.isHitWall = true; }
+		Vec2<float> scale = Vec2<float>(lHand->timeStopPike.SCALE * 2.0f, lHand->timeStopPike.SCALE * 2.0f);
+		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_BOTTOM);
+		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_TOP);
+		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_LEFT);
+		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_RIGHT);
+		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
 	}
 
 	// 時間停止の短槍とテスト用ブロックの当たり判定を行う。
-	if (!rHand->timeStopPike.isHitWall && rHand->timeStopPike.isActive) {
+	if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
 		// 時間停止の短槍の座標
-		Vec2<float> pikePos = rHand->timeStopPike.pos;
+		Vec2<float> pikePos = lHand->timeStopPike.pos;
 		// ブロックの当たり判定 判定は円で適当です。
-		if (testBlock.pos.Distance(rHand->timeStopPike.pos) <= testBlock.SCALE * 3.0f) {
+		if (testBlock.pos.Distance(lHand->timeStopPike.pos) <= testBlock.SCALE * 3.0f) {
 
 			// 短槍を止める。
-			rHand->timeStopPike.isHitWall = true;
+			lHand->timeStopPike.isHitWall = true;
 			// ブロックを止める。
 			testBlock.isTimeStop = true;
 
@@ -395,8 +432,8 @@ void Player::CheckHit(const vector<vector<int>> mapData, TimeStopTestBlock& test
 
 	/*===== 腕の当たり判定 =====*/
 
-	rHand->CheckHit(mapData);
 	lHand->CheckHit(mapData);
+	rHand->CheckHit(mapData);
 
 }
 
@@ -445,8 +482,8 @@ void Player::HitMapChipLeft()
 	isWallLeft = true;
 
 	// 最初の一発フラグを初期化
-	rHand->isFirstShot = false;
 	lHand->isFirstShot = false;
+	rHand->isFirstShot = false;
 
 }
 
@@ -483,8 +520,8 @@ void Player::HitMapChipRight()
 	isWallRight = true;
 
 	// 最初の一発フラグを初期化
-	rHand->isFirstShot = false;
 	lHand->isFirstShot = false;
+	rHand->isFirstShot = false;
 
 }
 
@@ -529,8 +566,8 @@ void Player::HitMapChipBottom()
 	firstShot = false;
 
 	// 最初の一発フラグを初期化
-	rHand->isFirstShot = false;
 	lHand->isFirstShot = false;
+	rHand->isFirstShot = false;
 
 }
 
@@ -541,19 +578,42 @@ void Player::Input(const vector<vector<int>> mapData)
 
 	const float INPUT_DEAD_LINE = 0.3f;
 
-	// 右手の角度を更新
-	rHand->SetAngle(KuroFunc::GetAngle(UsersInput::Instance()->GetLeftStickVec()));
+	Vec2<float> inputVec;
 
+	inputVec = UsersInput::Instance()->GetLeftStickVecFuna();
+	inputVec /= {32768.0f, 32768.0f};
+	// 入力のデッドラインを設ける。
+	if (inputVec.Length() >= 0.9f) {
 
-	// 左手の角度を更新
-	lHand->SetAngle(KuroFunc::GetAngle(UsersInput::Instance()->GetRightStickVec()));
+		// 右手の角度を更新
+		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
 
+		// 一定時間入力がなかったら初期位置に戻す
+		handReturnTimer = DEF_HAND_RETURN_TIMER;
+
+	}
+
+	inputVec = UsersInput::Instance()->GetRightStickVecFuna();
+	inputVec /= {32768.0f, 32768.0f};
+
+	// 入力のデッドラインを設ける。
+	if (inputVec.Length() >= 0.9f) {
+
+		// 左手の角度を更新
+		rHand->SetAngle(KuroFunc::GetAngle(inputVec));
+
+		// 一定時間入力がなかったら初期位置に戻す
+		handReturnTimer = DEF_HAND_RETURN_TIMER;
+
+	}
+
+	printf("%f\n", lHand->GetAngle());
 
 	// LBが押されたら反動をつける。
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
 
 		// 反動をつける。
-		float rHandAngle = rHand->GetAngle();
+		float rHandAngle = lHand->GetAngle();
 
 		// Getした値は手の向いている方向なので、-180度する。
 		rHandAngle -= Angle::PI();
@@ -561,7 +621,7 @@ void Player::Input(const vector<vector<int>> mapData)
 		bool isFirstShot = false;
 
 		// 移動量を加算
-		if (!rHand->isFirstShot) {
+		if (!lHand->isFirstShot) {
 
 			// onGroundがtrueだったら移動量を加算しない。
 			if (!onGround || sinf(rHandAngle) < 0.6f) {
@@ -595,13 +655,13 @@ void Player::Input(const vector<vector<int>> mapData)
 
 			firstShot = true;
 
-			rHand->isFirstShot = true;
+			lHand->isFirstShot = true;
 
 			// シェイク量を設定
 			ShakeMgr::Instance()->maxShakeAmount = ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT;
 
 			// プレイヤーの腕を動かす。
-			rHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), true);
+			lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), true);
 
 		}
 		else {
@@ -614,15 +674,18 @@ void Player::Input(const vector<vector<int>> mapData)
 			vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
 
 			// プレイヤーの腕を動かす。
-			rHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
+			lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
 
 		}
 
 		// 弾を生成する。
-		BulletMgr::Instance()->Generate(rHand->GetPos(), rHand->GetAngle(), isFirstShot, false);
+		BulletMgr::Instance()->Generate(lHand->GetPos(), lHand->GetAngle(), isFirstShot, false);
 
 		// 連射タイマーをセット
 		rapidFireTimerLeft = RAPID_FIRE_TIMER;
+
+		// 一定時間入力がなかったら初期位置に戻す
+		handReturnTimer = DEF_HAND_RETURN_TIMER;
 
 	}
 	// 同時に撃たれると貫通してしまうため、無理やり1Fずらします。
@@ -632,7 +695,7 @@ void Player::Input(const vector<vector<int>> mapData)
 		if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
 
 			// 反動をつける。
-			float lHandAngle = lHand->GetAngle();
+			float lHandAngle = rHand->GetAngle();
 
 			// Getした値は手の向いている方向なので、-180度する。
 			lHandAngle -= Angle::PI();
@@ -648,7 +711,7 @@ void Player::Input(const vector<vector<int>> mapData)
 			if (mapY >= mapData.size()) mapY = mapData.size() - 1;
 
 			// 移動量を加算
-			if (!lHand->isFirstShot) {
+			if (!rHand->isFirstShot) {
 
 				// onGroundがtrueだったら移動量を加算しない。
 				if (!onGround || sinf(lHandAngle) < 0.6f) {
@@ -675,13 +738,13 @@ void Player::Input(const vector<vector<int>> mapData)
 
 				isFirstShot = true;
 
-				lHand->isFirstShot = true;
+				rHand->isFirstShot = true;
 
 				// シェイク量を設定
 				ShakeMgr::Instance()->maxShakeAmount = ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT;
 
 				// プレイヤーの腕を動かす。
-				lHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), true);
+				rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), true);
 
 			}
 			else {
@@ -693,15 +756,18 @@ void Player::Input(const vector<vector<int>> mapData)
 				vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
 
 				// プレイヤーの腕を動かす。
-				lHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
+				rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
 
 			}
 
 			// 弾を生成する。
-			BulletMgr::Instance()->Generate(lHand->GetPos(), lHand->GetAngle(), isFirstShot, true);
+			BulletMgr::Instance()->Generate(rHand->GetPos(), rHand->GetAngle(), isFirstShot, true);
 
 			// 連射タイマーをセット
 			rapidFireTimerRight = RAPID_FIRE_TIMER;
+
+			// 一定時間入力がなかったら初期位置に戻す
+			handReturnTimer = DEF_HAND_RETURN_TIMER;
 
 		}
 
@@ -717,22 +783,22 @@ void Player::Input(const vector<vector<int>> mapData)
 		// 瞬間移動の短槍に関する処理を行う。
 
 		// 右腕の弾が発射されていなかったら。
-		if (!lHand->teleportPike.isActive && !isPrevFrameShotBeacon) {
+		if (!rHand->teleportPike.isActive && !isPrevFrameShotBeacon) {
 
 			// クールタイムが0以下だったら
-			if (lHand->pikeCooltime <= 0) {
+			if (rHand->pikeCooltime <= 0) {
 
 				// 弾を発射する処理を行う。
-				lHand->teleportPike.Generate(lHand->GetPos(), Vec2<float>(cosf(lHand->GetAngle()), sinf(lHand->GetAngle())), PIKE_TELEPORT);
+				rHand->teleportPike.Generate(rHand->GetPos(), Vec2<float>(cosf(rHand->GetAngle()), sinf(rHand->GetAngle())), PIKE_TELEPORT);
 
 			}
 
 		}
 		// ビーコンが発射されていたら。
-		else if (lHand->teleportPike.isActive && (lHand->teleportPike.isHitWall || lHand->teleportPike.isHitWindow) && !isPrevFrameShotBeacon) {
+		else if (rHand->teleportPike.isActive && (rHand->teleportPike.isHitWall || rHand->teleportPike.isHitWindow) && !isPrevFrameShotBeacon) {
 
 			// プレイヤーを瞬間移動させる。
-			centerPos = lHand->teleportPike.pos;
+			centerPos = rHand->teleportPike.pos;
 
 			ScrollMgr::Instance()->WarpScroll(centerPos);
 
@@ -746,10 +812,10 @@ void Player::Input(const vector<vector<int>> mapData)
 			gravityInvalidTimer = GRAVITY_INVALID_TIMER;
 
 			// ビーコンを初期化する。
-			lHand->teleportPike.Init();
+			rHand->teleportPike.Init();
 
 			// ビーコンのクールタイムを設定
-			lHand->pikeCooltime = lHand->PIKE_COOL_TIME;
+			rHand->pikeCooltime = rHand->PIKE_COOL_TIME;
 
 		}
 
@@ -761,25 +827,25 @@ void Player::Input(const vector<vector<int>> mapData)
 		// 時間停止の短槍に関する処理を行う。
 
 		// 左腕の弾が発射されていなかったら。
-		if (!rHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
+		if (!lHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
 
 			// クールタイムが0以下だったら
-			if (rHand->pikeCooltime <= 0) {
+			if (lHand->pikeCooltime <= 0) {
 
 				// 弾を発射する処理を行う。
-				rHand->timeStopPike.Generate(rHand->GetPos(), Vec2<float>(cosf(rHand->GetAngle()), sinf(rHand->GetAngle())), PIKE_TIMESTOP);
+				lHand->timeStopPike.Generate(lHand->GetPos(), Vec2<float>(cosf(lHand->GetAngle()), sinf(lHand->GetAngle())), PIKE_TIMESTOP);
 
 			}
 
 		}
 		// ビーコンが発射されていたら。
-		else if (rHand->timeStopPike.isActive && (rHand->timeStopPike.isHitWall || rHand->timeStopPike.isHitWindow) && !isPrevFrameShotBeacon) {
+		else if (lHand->timeStopPike.isActive && (lHand->timeStopPike.isHitWall || lHand->timeStopPike.isHitWindow) && !isPrevFrameShotBeacon) {
 
 			// ビーコンを初期化する。
-			rHand->timeStopPike.Init();
+			lHand->timeStopPike.Init();
 
 			// ビーコンのクールタイムを設定
-			rHand->pikeCooltime = rHand->PIKE_COOL_TIME;
+			lHand->pikeCooltime = lHand->PIKE_COOL_TIME;
 
 		}
 
@@ -801,6 +867,12 @@ void Player::Move()
 
 	// 移動処理
 	centerPos += vel;
+
+	// ギミックから与えられる移動量を加算
+	centerPos += gimmickVel;
+
+	// ギミックから与えられる移動量を初期化。
+	gimmickVel = {};
 
 	// スクロール量を更新
 	//ScrollMgr::Instance()->honraiScrollAmount -= prevFrameCenterPos - centerPos;

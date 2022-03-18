@@ -8,6 +8,7 @@
 #include"ViewPort.h"
 #include"MovingBlockMgr.h"
 #include"Bullet.h"
+#include"Collider.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -298,10 +299,6 @@ Game::Game()
 	// 弾パーティクルをセッティング。
 	BulletParticleMgr::Instance()->Setting();
 
-	// ドッスンブロックを生成。
-	testDossunBlock.Generate(player.centerPos + Vec2<float>(0, MAP_CHIP_SIZE), player.centerPos + Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), DOSSUN_LOW_POWER);
-
-
 	//マップ開始時の場所にスポーンさせる
 	for (int y = 0; y < mapData.size(); ++y)
 	{
@@ -314,6 +311,10 @@ Game::Game()
 			}
 		}
 	}
+
+	// ドッスンブロックを生成。
+	//testDossunBlock.Generate(player.centerPos + Vec2<float>(0, MAP_CHIP_SIZE), player.centerPos + Vec2<float>(0, -MAP_CHIP_SIZE), Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), DOSSUN_LOW_POWER);
+
 
 	//オーラブロック生成
 	int auraChipNum = 40;//オーラブロックのチップ番号
@@ -739,7 +740,7 @@ void Game::Update()
 
 	/*===== 当たり判定 =====*/
 
-		// プレイヤーの当たり判定
+	// プレイヤーの当たり判定
 	player.CheckHit(mapData, testBlock);
 
 	// 動的ブロックの当たり判定
@@ -748,15 +749,9 @@ void Game::Update()
 	// 弾とマップチップの当たり判定
 	BulletMgr::Instance()->CheckHit(mapData);
 
-	// ビューポートの右側でも左側でもオーラとの当たり判定がなかったら、X軸を更新する。
-	//if (!ViewPort::Instance()->isHitRight || !ViewPort::Instance()->isHitLeft || !ViewPort::Instance()->holdFlags[ViewPort::Instance()->LEFT] || !ViewPort::Instance()->holdFlags[ViewPort::Instance()->RIGHT])
-	//	{
+	// ビューポートをプレイヤー基準で移動させる。
 	ViewPort::Instance()->SetPlayerPosX(player.centerPos.x);
-	//}
-	// ビューポートの上側でも下側でもオーラとの当たり判定がなかったら、Y軸を更新する。
-	//if (!ViewPort::Instance()->isHitBottom && !ViewPort::Instance()->isHitTop) {
 	ViewPort::Instance()->SetPlayerPosY(player.centerPos.y);
-	//}
 
 	// オーラブロックのデータとビューポートの判定を行う。
 	ViewPort::Instance()->SavePrevFlamePos();
@@ -794,7 +789,7 @@ void Game::Update()
 		}
 	}
 
-
+	// オーラとビューポートの当たり判定
 	{
 		// オーラブロックのデータとビューポートの判定を行う。
 		vector<ViewPortAuraReturnData> buff;
@@ -1070,6 +1065,11 @@ void Game::Update()
 
 	}
 	ViewPort::Instance()->playerPos = player.centerPos;
+
+	// ドッスンブロックの当たり判定
+	testDossunBlock.CheckHit(player, mapData);
+
+
 }
 
 void Game::Draw()
