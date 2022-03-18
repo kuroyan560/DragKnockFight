@@ -48,7 +48,8 @@ public:
 	const float RECOIL_AMOUNT = 5.0f;			// 弾を撃った際の反動
 	const float FIRST_RECOIL_AMOUNT = 20.0;		// 弾を撃った際の反動
 	const float MAX_RECOIL_AMOUNT = 30.0f;		// 弾を撃った際の反動の最大値
-	const Vec2<float> PLAYER_SIZE = { 20,20 };			// プレイヤーのサイズ
+	//const Vec2<float> PLAYER_SIZE = { 20,20 };			// プレイヤーのサイズ
+	const Vec2<float> PLAYER_SIZE = { 56 / 3.0f,144 / 3.0f };			// プレイヤーのサイズ
 	static Vec2<float>GetGeneratePos();
 	const int RAPID_FIRE_TIMER = 21;			// 連射タイマー
 	const int GRAVITY_INVALID_TIMER = 20;		// 重力無効化タイマー
