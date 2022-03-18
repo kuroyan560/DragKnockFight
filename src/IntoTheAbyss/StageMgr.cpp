@@ -834,10 +834,39 @@ const SizeData StageMgr::GetMapChipSizeData(MapChipData TYPE)
 }
 
 
-RoomMapChipDrawArray StageMgr::GetMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const Vec2<float> &MAPCHIP_POS)
+RoomMapChipDrawArray StageMgr::GetMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	RoomMapChipDrawArray tmp = allMapChipDrawData[STAGE_NUMBER][ROOM_NUMBER];
 	return tmp;
+}
+
+const bool &StageMgr::CheckStageNum(const int &STAGE_NUMBER)
+{
+	if (0 <= STAGE_NUMBER && STAGE_NUMBER < allMapChipDrawData.size())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+const bool &StageMgr::CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
+{
+	bool checkStageFlag = 0 <= STAGE_NUMBER && STAGE_NUMBER < allMapChipDrawData.size();//ステージ番号が配列内にあるか確認
+
+	if (checkStageFlag)
+	{
+		bool checkRoomFlag = 0 <= ROOM_NUMBER && ROOM_NUMBER < allMapChipDrawData[STAGE_NUMBER].size();//部屋番号が配列内にあるか確認
+		bool checkRoomHaveMapChipFlag = allMapChipDrawData[STAGE_NUMBER][ROOM_NUMBER].size() != 0;				   //部屋にマップチップがあるかどうか確認
+		if (checkRoomFlag && checkRoomHaveMapChipFlag)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)

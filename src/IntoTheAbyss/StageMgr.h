@@ -49,7 +49,9 @@ enum MapChipData
 enum MapChipBlockData
 {
 	MAPCHIP_BLOCK_START = 30,
-	MAPCHIP_BLOCK_GOAL = 31
+	MAPCHIP_BLOCK_GOAL = 31,
+	MAPCHIP_BLOCK_DEBUG_START = 32,
+	MAPCHIP_BLOCK_AURABLOCK = 40
 };
 
 struct MapChipDrawData
@@ -145,7 +147,11 @@ public:
 		return result;
 	};
 
-	RoomMapChipDrawArray GetMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const Vec2<float> &MAPCHIP_POS);
+	RoomMapChipDrawArray GetMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
+
+
+	const bool &CheckStageNum(const int &STAGE_NUMBER);
+	const bool &CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
 
 
 
