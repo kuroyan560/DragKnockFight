@@ -236,7 +236,7 @@ Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_N
 	//上下どちらかの扉からリスポーンさせる場合-----------------------
 
 
-	string result = "次につながるドアが見つかりません。\nRalationファイルを確認するか、担当の大石に連絡をください";
+	string result = "次につながるドアが見つかりません。\nRalationファイルを確認するか、担当の大石に連絡をください。";
 	MessageBox(NULL, KuroFunc::GetWideStrFromStr(result).c_str(), TEXT("ドアが見つかりません"), MB_OK);
 	assert(0);
 	//失敗
@@ -507,7 +507,7 @@ Game::Game()
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 
 	// シャボン玉ブロックを生成。
-	bubbleBlock.Generate(player.centerPos);
+	bubbleBlock.Generate(player.centerPos + Vec2<float>(0, 50));
 
 }
 
@@ -790,7 +790,7 @@ void Game::Update()
 	/*===== 当たり判定 =====*/
 
 	// プレイヤーの当たり判定
-	player.CheckHit(mapData, testBlock);
+	player.CheckHit(mapData, bubbleBlock, testBlock);
 
 	// 動的ブロックの当たり判定
 	MovingBlockMgr::Instance()->CheckHit(mapData);
@@ -1142,10 +1142,12 @@ void Game::Draw()
 		dossunBlock[index].Draw();
 	}
 
-	// シャボン玉ブロックの更新処理
-	bubbleBlock.Draw();
-
 	player.Draw();
+
+	// シャボン玉ブロックの更新処理
+	if (!bubbleBlock.isBreak) {
+		bubbleBlock.Draw();
+	}
 
 	//ViewPort::Instance()->Draw();
 

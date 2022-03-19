@@ -18,7 +18,7 @@ public:
 
 	/*===== íËêî =====*/
 
-	const float CHECK_HIT_RADIUS = 25.0f;	// CheckHit Radius  and  Defoult Radius
+	const float RADIUS = 35.0f;				// Draw and CheckHit Radius
 	const int BREAK_COOL_TIME = 120;		// Resporn cool time
 
 

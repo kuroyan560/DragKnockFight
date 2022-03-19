@@ -1,6 +1,7 @@
 #pragma once
 #include "Vec.h"
 #include "TimeStopTestBlock.h"
+#include "Bubble.h"
 #include <memory>
 #include <vector>
 
@@ -25,6 +26,7 @@ public:
 	bool firstShot;					// 最初の一発が撃たれたかどうか trueで撃たれた判定
 	bool isWallRight;				// 右の壁にくっついているか
 	bool isWallLeft;				// 左の壁にくっついているか
+	bool inBubble;					// シャボン玉に入っているかどうか
 	int rapidFireTimerLeft;			// 連射タイマー左手
 	int rapidFireTimerRight;		// 連射タイマー右手
 	int gravityInvalidTimer;		// 重力無効化タイマー
@@ -68,6 +70,9 @@ public:
 	// 右手の初期位置
 	const float DEF_RIGHT_HAND_ANGLE = 0.785398f;
 
+	// 入力されてから数フレームを取得するためのタイマーのでフォルチ値
+	const int AS_SOON_AS_INPUT_TIMER = 2;
+
 	// プレイヤーの方向
 	enum PLAYER_DIR {
 
@@ -97,7 +102,7 @@ public:
 	void Draw();
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, TimeStopTestBlock& testBlock);
+	void CheckHit(const vector<vector<int>> mapData, Bubble& bubble, TimeStopTestBlock& testBlock);
 
 
 	// 方向ごとのマップチップとの当たり判定関数

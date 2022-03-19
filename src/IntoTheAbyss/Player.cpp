@@ -72,6 +72,8 @@ Player::Player()
 	// 入力してから少しだけ数えるタイマーを初期化
 	asSoonAsInputTimer = 0;
 
+	inBubble = false;
+
 }
 
 Player::~Player()
@@ -124,6 +126,8 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	// 入力してから少しだけ数えるタイマーを初期化
 	asSoonAsInputTimer = 0;
+
+	inBubble = false;
 
 }
 
@@ -206,6 +210,9 @@ void Player::Update(const vector<vector<int>> mapData)
 	// ギミックから与えられる移動量を初期化。
 	gimmickVel = {};
 
+	// 入力されてから数フレームを取得するタイマーを更新。
+	if (asSoonAsInputTimer > 0) --asSoonAsInputTimer;
+
 }
 
 void Player::Draw()
@@ -244,7 +251,7 @@ void Player::Draw()
 
 	//胴体
 	//DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(playerGraph), AlphaBlendMode_Trans, { DIR == LEFT,false });
-	DrawFunc::DrawRotaGraph2D(centerPos* ScrollMgr::Instance()->zoom - scrollShakeZoom, expRate, 0.0f, TexHandleMgr::GetTexBuffer(playerGraph),
+	DrawFunc::DrawRotaGraph2D(centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom, expRate, 0.0f, TexHandleMgr::GetTexBuffer(playerGraph),
 		{ 0.5f,0.5f }, AlphaBlendMode_Trans, { DIR == LEFT,false });
 
 	if (DIR == RIGHT)
@@ -261,219 +268,276 @@ void Player::Draw()
 
 }
 
-void Player::CheckHit(const vector<vector<int>> mapData, TimeStopTestBlock& testBlock)
+void Player::CheckHit(const vector<vector<int>> mapData, Bubble& bubble, TimeStopTestBlock& testBlock)
 {
 
 	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
 
-	// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
-	INTERSECTED_LINE intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, vel, PLAYER_SIZE, onGround, mapData);
+	{
 
-	// 当たった位置に応じて処理を分ける。
-	if (intersectedLine == INTERSECTED_TOP) {
+		// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
+		INTERSECTED_LINE intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, vel, PLAYER_SIZE, onGround, mapData);
 
-		// 下に当たった場合
-		HitMapChipBottom();
+		// 当たった位置に応じて処理を分ける。
+		if (intersectedLine == INTERSECTED_TOP) {
 
-	}
-	else if (intersectedLine == INTERSECTED_RIGHT) {
+			// 下に当たった場合
+			HitMapChipBottom();
 
-		// 左に当たった場合
-		HitMapChipLeft();
+		}
+		else if (intersectedLine == INTERSECTED_RIGHT) {
 
-	}
-	else if (intersectedLine == INTERSECTED_BOTTOM) {
+			// 左に当たった場合
+			HitMapChipLeft();
 
-		// 上に当たった場合
-		HitMapChipTop();
+		}
+		else if (intersectedLine == INTERSECTED_BOTTOM) {
 
-	}
-	else if (intersectedLine == INTERSECTED_LEFT) {
+			// 上に当たった場合
+			HitMapChipTop();
 
-		// 右に当たった場合
-		HitMapChipRight();
+		}
+		else if (intersectedLine == INTERSECTED_LEFT) {
 
-	}
-	else if (intersectedLine == INTERSECTED_RISE) {
+			// 右に当たった場合
+			HitMapChipRight();
 
-		// のし上がりの場所に当たった場合
-		vel.y *= 0.5f;
-		gravity = 0;
+		}
+		else if (intersectedLine == INTERSECTED_RISE) {
 
-	}
+			// のし上がりの場所に当たった場合
+			vel.y *= 0.5f;
+			gravity = 0;
 
-	// マップチップとプレイヤーの当たり判定 絶対に被せないための処理
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_SIZE, mapData, INTERSECTED_TOP);
-	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_SIZE, mapData, INTERSECTED_BOTTOM);
-	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_SIZE, mapData, INTERSECTED_LEFT);
-	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_SIZE, mapData, INTERSECTED_RIGHT);
-	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
+		}
 
-	// 左右に当たった際に壁釣りさせるための処理。
-	int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	int xChip = (centerPos.x - PLAYER_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	// プレイヤーの左側がマップチップだったら
-	if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
-		HitMapChipLeft();
-	}
-	xChip = (centerPos.x + PLAYER_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	if (xChip >= mapData[yChip].size() - 1) xChip = mapData[yChip].size() - 1;
-	// プレイヤーの右側がマップチップだったら
-	if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
-		HitMapChipRight();
+		// マップチップとプレイヤーの当たり判定 絶対に被せないための処理
+		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_SIZE, mapData, INTERSECTED_TOP);
+		if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
+		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_SIZE, mapData, INTERSECTED_BOTTOM);
+		if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
+		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_SIZE, mapData, INTERSECTED_LEFT);
+		if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
+		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_SIZE, mapData, INTERSECTED_RIGHT);
+		if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
+
+		// 左右に当たった際に壁釣りさせるための処理。
+		int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		int xChip = (centerPos.x - PLAYER_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		// プレイヤーの左側がマップチップだったら
+		if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+			HitMapChipLeft();
+		}
+		xChip = (centerPos.x + PLAYER_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		if (xChip >= mapData[yChip].size() - 1) xChip = mapData[yChip].size() - 1;
+		// プレイヤーの右側がマップチップだったら
+		if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+			HitMapChipRight();
+		}
+
 	}
 
 
 	/*===== 動的ブロックとプレイヤーの当たり判定 =====*/
 
-	const int MOVING_BLOCK_COUNT = MovingBlockMgr::Instance()->movingBlock.size();
-	for (int movingIndex = 0; movingIndex < MOVING_BLOCK_COUNT; ++movingIndex) {
+	{
 
-		// 動的ブロックのプレイヤーから近いフラグが立っていなかったら処理を飛ばす。
-		if (!MovingBlockMgr::Instance()->movingBlock[movingIndex]->isCloseToThePlayer) continue;
+		const int MOVING_BLOCK_COUNT = MovingBlockMgr::Instance()->movingBlock.size();
+		for (int movingIndex = 0; movingIndex < MOVING_BLOCK_COUNT; ++movingIndex) {
 
-		// X軸、Y軸での距離を求める。
-		float distanceX = MovingBlockMgr::Instance()->movingBlock[movingIndex]->pos.x - centerPos.x;
-		float distanceY = MovingBlockMgr::Instance()->movingBlock[movingIndex]->pos.y - centerPos.y;
+			// 動的ブロックのプレイヤーから近いフラグが立っていなかったら処理を飛ばす。
+			if (!MovingBlockMgr::Instance()->movingBlock[movingIndex]->isCloseToThePlayer) continue;
 
-		// 距離の絶対値
-		float distanceXABS = fabs(distanceX);
-		float distanceYABS = fabs(distanceY);
+			// X軸、Y軸での距離を求める。
+			float distanceX = MovingBlockMgr::Instance()->movingBlock[movingIndex]->pos.x - centerPos.x;
+			float distanceY = MovingBlockMgr::Instance()->movingBlock[movingIndex]->pos.y - centerPos.y;
 
-		// 移動ブロックとプレイヤーの大きさの合計。
-		Vec2<float> playerMovingBlockSize = { MovingBlockMgr::Instance()->movingBlock[movingIndex]->SCALE + PLAYER_SIZE.x,MovingBlockMgr::Instance()->movingBlock[movingIndex]->SCALE + PLAYER_SIZE.y };
+			// 距離の絶対値
+			float distanceXABS = fabs(distanceX);
+			float distanceYABS = fabs(distanceY);
 
-		// XYの距離が動的ブロックとプレイヤーのサイズ以上だったら処理を飛ばす。
-		if (distanceXABS >= playerMovingBlockSize.x ||
-			distanceYABS >= playerMovingBlockSize.y) continue;
+			// 移動ブロックとプレイヤーの大きさの合計。
+			Vec2<float> playerMovingBlockSize = { MovingBlockMgr::Instance()->movingBlock[movingIndex]->SCALE + PLAYER_SIZE.x,MovingBlockMgr::Instance()->movingBlock[movingIndex]->SCALE + PLAYER_SIZE.y };
 
-		// XYの遠い方を検索して遠い方のみ押し戻し処理を行う。
-		bool isPushBackX = distanceXABS >= distanceYABS;
+			// XYの距離が動的ブロックとプレイヤーのサイズ以上だったら処理を飛ばす。
+			if (distanceXABS >= playerMovingBlockSize.x ||
+				distanceYABS >= playerMovingBlockSize.y) continue;
 
-		// Xを押し戻す場合。
-		if (isPushBackX) {
+			// XYの遠い方を検索して遠い方のみ押し戻し処理を行う。
+			bool isPushBackX = distanceXABS >= distanceYABS;
 
-			// プレイヤーより右に居た場合
-			if (distanceX <= 0) {
+			// Xを押し戻す場合。
+			if (isPushBackX) {
 
-				// 押し戻す距離を求める。
-				float pushBackDistance = playerMovingBlockSize.x + distanceX;
+				// プレイヤーより右に居た場合
+				if (distanceX <= 0) {
 
-				// 押し戻す。
-				centerPos.x += pushBackDistance;
+					// 押し戻す距離を求める。
+					float pushBackDistance = playerMovingBlockSize.x + distanceX;
+
+					// 押し戻す。
+					centerPos.x += pushBackDistance;
+
+				}
+				else {
+
+					// 押し戻す距離を求める。
+					float pushBackDistance = playerMovingBlockSize.x - distanceX;
+
+					// 押し戻す。
+					centerPos.x -= pushBackDistance;
+
+				}
 
 			}
+			// Yを押し戻す場合。
 			else {
 
-				// 押し戻す距離を求める。
-				float pushBackDistance = playerMovingBlockSize.x - distanceX;
+				if (distanceY >= 0) {
 
-				// 押し戻す。
-				centerPos.x -= pushBackDistance;
+					// 押し戻す距離を求める。
+					float pushBackDistance = playerMovingBlockSize.y - distanceY;
 
-			}
+					// 押し戻す。
+					centerPos.y -= pushBackDistance;
 
-		}
-		// Yを押し戻す場合。
-		else {
+					// この場合は地面にあたった状態。
+					HitMapChipBottom();
 
-			if (distanceY >= 0) {
+				}
+				else {
 
-				// 押し戻す距離を求める。
-				float pushBackDistance = playerMovingBlockSize.y - distanceY;
+					// 押し戻す距離を求める。
+					float pushBackDistance = playerMovingBlockSize.y + distanceY;
 
-				// 押し戻す。
-				centerPos.y -= pushBackDistance;
+					// 押し戻す。
+					centerPos.y += pushBackDistance;
 
-				// この場合は地面にあたった状態。
-				HitMapChipBottom();
-
-			}
-			else {
-
-				// 押し戻す距離を求める。
-				float pushBackDistance = playerMovingBlockSize.y + distanceY;
-
-				// 押し戻す。
-				centerPos.y += pushBackDistance;
+				}
 
 			}
 
 		}
 
 	}
-
 
 
 	/*===== 短槍の当たり判定 =====*/
 
-	// 瞬間移動の短槍の当たり判定を行う。
-	if (!rHand->teleportPike.isHitWall && rHand->teleportPike.isActive) {
-		bool onGround = false;
-		INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(rHand->teleportPike.pos, rHand->teleportPike.prevFramePos, rHand->teleportPike.forwardVec, Vec2<float>(rHand->teleportPike.SCALE, rHand->teleportPike.SCALE), onGround, mapData);
-		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+	{
 
-		// 押し戻し
-		Vec2<float> scale = Vec2<float>(rHand->teleportPike.SCALE * 2.0f, rHand->teleportPike.SCALE * 2.0f);
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_BOTTOM);
-		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_TOP);
-		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_LEFT);
-		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_RIGHT);
-		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+		// 瞬間移動の短槍の当たり判定を行う。
+		if (!rHand->teleportPike.isHitWall && rHand->teleportPike.isActive) {
+			bool onGround = false;
+			INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(rHand->teleportPike.pos, rHand->teleportPike.prevFramePos, rHand->teleportPike.forwardVec, Vec2<float>(rHand->teleportPike.SCALE, rHand->teleportPike.SCALE), onGround, mapData);
+			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
 
-	}
+			// 押し戻し
+			Vec2<float> scale = Vec2<float>(rHand->teleportPike.SCALE * 2.0f, rHand->teleportPike.SCALE * 2.0f);
+			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_BOTTOM);
+			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_TOP);
+			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_LEFT);
+			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_RIGHT);
+			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
 
-	// 時間停止の短槍の当たり判定を行う。
-	if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
-		bool onGround = false;
-		INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(lHand->timeStopPike.pos, lHand->timeStopPike.prevFramePos, lHand->timeStopPike.forwardVec, Vec2<float>(lHand->timeStopPike.SCALE, lHand->timeStopPike.SCALE), onGround, mapData);
-		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+		}
 
-		// 押し戻し
-		Vec2<float> scale = Vec2<float>(lHand->timeStopPike.SCALE * 2.0f, lHand->timeStopPike.SCALE * 2.0f);
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_BOTTOM);
-		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_TOP);
-		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_LEFT);
-		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
-		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_RIGHT);
-		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
-	}
+		// 時間停止の短槍の当たり判定を行う。
+		if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
+			bool onGround = false;
+			INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(lHand->timeStopPike.pos, lHand->timeStopPike.prevFramePos, lHand->timeStopPike.forwardVec, Vec2<float>(lHand->timeStopPike.SCALE, lHand->timeStopPike.SCALE), onGround, mapData);
+			if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
 
-	// 時間停止の短槍とテスト用ブロックの当たり判定を行う。
-	if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
-		// 時間停止の短槍の座標
-		Vec2<float> pikePos = lHand->timeStopPike.pos;
-		// ブロックの当たり判定 判定は円で適当です。
-		if (testBlock.pos.Distance(lHand->timeStopPike.pos) <= testBlock.SCALE * 3.0f) {
+			// 押し戻し
+			Vec2<float> scale = Vec2<float>(lHand->timeStopPike.SCALE * 2.0f, lHand->timeStopPike.SCALE * 2.0f);
+			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_BOTTOM);
+			if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_TOP);
+			if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_LEFT);
+			if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_RIGHT);
+			if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+		}
 
-			// 短槍を止める。
-			lHand->timeStopPike.isHitWall = true;
-			// ブロックを止める。
-			testBlock.isTimeStop = true;
+		// 時間停止の短槍とテスト用ブロックの当たり判定を行う。
+		if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
+			// 時間停止の短槍の座標
+			Vec2<float> pikePos = lHand->timeStopPike.pos;
+			// ブロックの当たり判定 判定は円で適当です。
+			if (testBlock.pos.Distance(lHand->timeStopPike.pos) <= testBlock.SCALE * 3.0f) {
 
+				// 短槍を止める。
+				lHand->timeStopPike.isHitWall = true;
+				// ブロックを止める。
+				testBlock.isTimeStop = true;
+
+			}
+			else {
+				// 短槍が消えたら時間停止を解除するため。
+				testBlock.isTimeStop = false;
+			}
 		}
 		else {
-			// 短槍が消えたら時間停止を解除するため。
+			// 短槍が消えたら時間停止を開場するため。
 			testBlock.isTimeStop = false;
 		}
-	}
-	else {
-		// 短槍が消えたら時間停止を開場するため。
-		testBlock.isTimeStop = false;
+
 	}
 
 	/*===== 腕の当たり判定 =====*/
 
 	lHand->CheckHit(mapData);
 	rHand->CheckHit(mapData);
+
+	/*===== プレイヤーとシャボン玉の当たり判定 =====*/
+
+	{
+
+		if (!bubble.isBreak) {
+
+			// hitcheck
+			bool isHitBubbleX = centerPos.Distance(bubble.pos) <= PLAYER_SIZE.x + bubble.RADIUS;
+			bool isHitBubbleY = centerPos.Distance(bubble.pos) <= PLAYER_SIZE.y + bubble.RADIUS;
+
+			// isHit
+			if (isHitBubbleX || isHitBubbleY) {
+
+				// Recovery of recoil
+				rHand->isFirstShot = false;
+				lHand->isFirstShot = false;
+
+				// If there is an input
+				if (inBubble && asSoonAsInputTimer >= 1) {
+
+					// break a bubble
+					bubble.isBreak = true;
+					bubble.breakCoolTime = bubble.BREAK_COOL_TIME;
+					inBubble = false;
+
+				}
+				else {
+
+					vel = {};
+					gravity = {};
+					gimmickVel = {};
+
+					// Get closer to the bubble
+					centerPos.x += (bubble.pos.x - centerPos.x) / 5.0f;
+					centerPos.y += (bubble.pos.y - centerPos.y) / 5.0f;
+
+					inBubble = true;
+
+				}
+
+			}
+
+		}
+
+	}
 
 }
 
@@ -725,89 +789,93 @@ void Player::Input(const vector<vector<int>> mapData)
 		// 一定時間入力がなかったら初期位置に戻す
 		handReturnTimer = DEF_HAND_RETURN_TIMER;
 
+		// 入力タイマーをセット。
+		asSoonAsInputTimer = AS_SOON_AS_INPUT_TIMER;
+
 	}
-	// 同時に撃たれると貫通してしまうため、無理やり1Fずらします。
-	else
 
-		// RBが押されたら反動をつける。
-		if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+	// RBが押されたら反動をつける。
+	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
 
-			// 反動をつける。
-			float lHandAngle = rHand->GetAngle();
+		// 反動をつける。
+		float lHandAngle = rHand->GetAngle();
 
-			// Getした値は手の向いている方向なので、-180度する。
-			lHandAngle -= Angle::PI();
+		// Getした値は手の向いている方向なので、-180度する。
+		lHandAngle -= Angle::PI();
 
-			bool isFirstShot = false;
+		bool isFirstShot = false;
 
-			// プレイヤーのひとつ上のブロックを検索する為の処理。
-			int mapX = centerPos.x / MAP_CHIP_SIZE;
-			int mapY = centerPos.y / MAP_CHIP_SIZE;
-			if (mapX <= 0) mapX = 1;
-			if (mapX >= mapData[0].size()) mapX = mapData[0].size() - 1;
-			if (mapY <= 0) mapY = 1;
-			if (mapY >= mapData.size()) mapY = mapData.size() - 1;
+		// プレイヤーのひとつ上のブロックを検索する為の処理。
+		int mapX = centerPos.x / MAP_CHIP_SIZE;
+		int mapY = centerPos.y / MAP_CHIP_SIZE;
+		if (mapX <= 0) mapX = 1;
+		if (mapX >= mapData[0].size()) mapX = mapData[0].size() - 1;
+		if (mapY <= 0) mapY = 1;
+		if (mapY >= mapData.size()) mapY = mapData.size() - 1;
 
-			// 移動量を加算
-			if (!rHand->isFirstShot) {
+		// 移動量を加算
+		if (!rHand->isFirstShot) {
 
-				// onGroundがtrueだったら移動量を加算しない。
-				if (!onGround || sinf(lHandAngle) < 0.6f) {
-					vel.x += cosf(lHandAngle) * FIRST_RECOIL_AMOUNT;
-				}
-
-				// 入力を受け付けないフラグが立っていなかったら
-				if (!isWallLeft && !isWallRight) {
-					vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
-				}
-				// プレイヤーの一個上のマップチップがブロックだったら最初に一発を大きくするフラグを大きくする。
-				else if (mapData[mapY - 1][mapX] > 0 && mapData[mapY - 1][mapX] < 10 && cosf(lHandAngle) < 0.5f && cosf(lHandAngle) > -0.5f) {
-					vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
-				}
-				else if (isWallRight && cosf(lHandAngle) < 0.3f) {
-					vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
-				}
-				else if (isWallLeft && cosf(lHandAngle) > 0.1f) {
-					vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
-				}
-
-				// 最初の一発を撃ったフラグを立てる。
-				firstShot = true;
-
-				isFirstShot = true;
-
-				rHand->isFirstShot = true;
-
-				// シェイク量を設定
-				ShakeMgr::Instance()->maxShakeAmount = ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT;
-
-				// プレイヤーの腕を動かす。
-				rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), true);
-
-			}
-			else {
-				// onGroundがtrueだったら移動量を加算しない。
-				if (!onGround || sinf(lHandAngle) < 0) {
-					vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
-				}
-
-				vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
-
-				// プレイヤーの腕を動かす。
-				rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
-
+			// onGroundがtrueだったら移動量を加算しない。
+			if (!onGround || sinf(lHandAngle) < 0.6f) {
+				vel.x += cosf(lHandAngle) * FIRST_RECOIL_AMOUNT;
 			}
 
-			// 弾を生成する。
-			BulletMgr::Instance()->Generate(rHand->GetPos(), rHand->GetAngle(), isFirstShot, true);
+			// 入力を受け付けないフラグが立っていなかったら
+			if (!isWallLeft && !isWallRight) {
+				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
+			// プレイヤーの一個上のマップチップがブロックだったら最初に一発を大きくするフラグを大きくする。
+			else if (mapData[mapY - 1][mapX] > 0 && mapData[mapY - 1][mapX] < 10 && cosf(lHandAngle) < 0.5f && cosf(lHandAngle) > -0.5f) {
+				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
+			else if (isWallRight && cosf(lHandAngle) < 0.3f) {
+				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
+			else if (isWallLeft && cosf(lHandAngle) > 0.1f) {
+				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
 
-			// 連射タイマーをセット
-			rapidFireTimerRight = RAPID_FIRE_TIMER;
+			// 最初の一発を撃ったフラグを立てる。
+			firstShot = true;
 
-			// 一定時間入力がなかったら初期位置に戻す
-			handReturnTimer = DEF_HAND_RETURN_TIMER;
+			isFirstShot = true;
+
+			rHand->isFirstShot = true;
+
+			// シェイク量を設定
+			ShakeMgr::Instance()->maxShakeAmount = ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT;
+
+			// プレイヤーの腕を動かす。
+			rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), true);
 
 		}
+		else {
+			// onGroundがtrueだったら移動量を加算しない。
+			if (!onGround || sinf(lHandAngle) < 0) {
+				vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
+			}
+
+			vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
+
+			// プレイヤーの腕を動かす。
+			rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
+
+		}
+
+		// 弾を生成する。
+		BulletMgr::Instance()->Generate(rHand->GetPos(), rHand->GetAngle(), isFirstShot, true);
+
+		// 連射タイマーをセット
+		rapidFireTimerRight = RAPID_FIRE_TIMER;
+
+		// 一定時間入力がなかったら初期位置に戻す
+		handReturnTimer = DEF_HAND_RETURN_TIMER;
+
+		// 入力タイマーをセット。
+		asSoonAsInputTimer = AS_SOON_AS_INPUT_TIMER;
+
+	}
 
 	// 移動速度が限界値を超えないようにする。
 	if (vel.x >= MAX_RECOIL_AMOUNT) vel.x = MAX_RECOIL_AMOUNT;
