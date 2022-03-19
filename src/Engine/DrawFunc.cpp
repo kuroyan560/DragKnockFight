@@ -321,10 +321,9 @@ void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const float& ExtRate, 
 		float radian;
 		Vec2<float>rotaCenterUV;
 		Vec2<int> miror;
-		Vec2<float>texSize;
 		RotaGraphVertex(const Vec2<float>& Center, const float& ExtRate, const float& Radian,
-			const Vec2<float>& RotaCenterUV, const Vec2<bool>& Miror, const Vec2<float>& TexSize)
-			:center(Center), extRate(ExtRate), radian(Radian),rotaCenterUV(RotaCenterUV), miror({ Miror.x ? 1 : 0,Miror.y ? 1 : 0 }), texSize(TexSize) {}
+			const Vec2<float>& RotaCenterUV, const Vec2<bool>& Miror)
+			:center(Center), extRate(ExtRate), radian(Radian),rotaCenterUV(RotaCenterUV), miror({ Miror.x ? 1 : 0,Miror.y ? 1 : 0 }) {}
 	};
 
 	//パイプライン未生成
@@ -347,8 +346,7 @@ void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const float& ExtRate, 
 			InputLayoutParam("EXT_RATE",DXGI_FORMAT_R32_FLOAT),
 			InputLayoutParam("RADIAN",DXGI_FORMAT_R32_FLOAT),
 			InputLayoutParam("ROTA_CENTER_UV",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("MIROR",DXGI_FORMAT_R32G32_SINT),
-			InputLayoutParam("TEX_SIZE",DXGI_FORMAT_R32G32_FLOAT)
+			InputLayoutParam("MIROR",DXGI_FORMAT_R32G32_SINT)
 		};
 
 		//ルートパラメータ
@@ -374,7 +372,7 @@ void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const float& ExtRate, 
 		ROTA_GRAPH_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(RotaGraphVertex), 1, nullptr, ("DrawRotaGraph -" + std::to_string(DRAW_ROTA_GRAPH_COUNT)).c_str()));
 	}
 
-	RotaGraphVertex vertex(Center, ExtRate, Radian,RotaCenterUV, Miror, Vec2<int>(Tex->GetDesc().Width, Tex->GetDesc().Height).Float());
+	RotaGraphVertex vertex(Center, ExtRate, Radian,RotaCenterUV, Miror);
 	ROTA_GRAPH_VERTEX_BUFF[DRAW_ROTA_GRAPH_COUNT]->Mapping(&vertex);
 
 	KuroEngine::Instance().Graphics().ObjectRender(ROTA_GRAPH_VERTEX_BUFF[DRAW_ROTA_GRAPH_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff(),Tex }, { CBV,SRV }, 0.0f, true);

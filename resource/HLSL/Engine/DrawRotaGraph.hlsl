@@ -10,7 +10,6 @@ struct VSOutput
     float radian : RADIAN;
     float2 rotaCenterUV : ROTA_CENTER_UV;
     int2 miror : MIROR;
-    float2 texSize : TEX_SIZE;
 };
 
 VSOutput VSmain(VSOutput input)
@@ -23,6 +22,9 @@ struct GSOutput
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD;
 };
+
+Texture2D<float4> tex : register(t0);
+SamplerState smp : register(s0);
 
 float2 RotateFloat2(float2 Pos,float Radian)
 {
@@ -38,11 +40,14 @@ void GSmain(
 	inout TriangleStream<GSOutput> output
 )
 {
-    float width_h = input[0].texSize.x * input[0].extRate / 2.0f;
-    float height_h = input[0].texSize.y * input[0].extRate / 2.0f;
+    uint2 texSize;
+    tex.GetDimensions(texSize.x, texSize.y);
+    
+    float width_h = texSize.x * input[0].extRate / 2.0f;
+    float height_h = texSize.y * input[0].extRate / 2.0f;
     
     float2 rotateCenter = input[0].center.xy;
-    rotateCenter += input[0].texSize.xy * float2(input[0].extRate,input[0].extRate) * (input[0].rotaCenterUV - float2(0.5f, 0.5f));
+    rotateCenter += texSize.xy * float2(input[0].extRate,input[0].extRate) * (input[0].rotaCenterUV - float2(0.5f, 0.5f));
     
     GSOutput element;
         
@@ -82,9 +87,6 @@ void GSmain(
     element.uv = float2(1.0f - input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
 }
-
-Texture2D<float4> tex : register(t0);
-SamplerState smp : register(s0);
 
 float4 PSmain(GSOutput input) : SV_TARGET
 {

@@ -13,6 +13,8 @@ using namespace std;
 #include<memory>
 class TextureBuffer;
 
+#include"DrawMap.h"
+
 //元ソリューションのmain処理をまとめたもの
 class Game
 {
@@ -52,6 +54,8 @@ class Game
 
 	int countStopNum = 0;
 	int countHitNum = 0;
+
+	std::vector<DrawMap>drawMap;
 
 public:
 	int stageNum = 0;//ステージ番号

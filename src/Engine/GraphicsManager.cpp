@@ -44,7 +44,7 @@ void GraphicsManager::RenderCommand::Excute(const ComPtr<ID3D12GraphicsCommandLi
 	//インデックスなし
 	if (idxBuff.expired())
 	{
-		CmdList->DrawInstanced(vertexBuff.lock()->vertexNum, instanceNum, 0, 0);
+		CmdList->DrawInstanced(vertexBuff.lock()->sendVertexNum, instanceNum, 0, 0);
 	}
 	//インデックスあり
 	else

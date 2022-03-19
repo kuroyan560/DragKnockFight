@@ -27,8 +27,11 @@ bool Game::CheckUsedData(std::vector<Vec2<float>> DATA, Vec2<float> DATA2)
 	return false;
 }
 
+#include<map>
 void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
 {
+	std::map<int, std::vector<ChipData>>datas;
+
 	// 描画するチップのサイズ
 	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
 
@@ -84,10 +87,30 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				pos += mapChipDrawData[height][width].offset;
 				if (0 <= handle)
 				{
-					DrawFunc::DrawRotaGraph2D({ pos.x, pos.y }, 1.6f * ScrollMgr::Instance()->zoom, mapChipDrawData[height][width].radian, TexHandleMgr::GetTexBuffer(handle));
+					ChipData chipData;
+					chipData.pos = pos;
+					chipData.radian = mapChipDrawData[height][width].radian;
+					datas[handle].emplace_back(chipData);
+					//DrawFunc::DrawRotaGraph2D({ pos.x, pos.y }, 1.6f * ScrollMgr::Instance()->zoom, mapChipDrawData[height][width].radian, TexHandleMgr::GetTexBuffer(handle));
 				}
 			}
 		}
+	}
+
+	while (drawMap.size() < datas.size())
+	{
+		drawMap.emplace_back();
+	}
+
+	int i = 0;
+	for (auto itr = datas.begin(); itr != datas.end(); ++itr)
+	{
+		for (int chipIdx = 0; chipIdx < itr->second.size(); ++chipIdx)
+		{
+			drawMap[i].AddChip(itr->second[chipIdx].pos, itr->second[chipIdx].radian);
+		}
+		drawMap[i].Draw(TexHandleMgr::GetTexBuffer(itr->first));
+		i++;
 	}
 }
 

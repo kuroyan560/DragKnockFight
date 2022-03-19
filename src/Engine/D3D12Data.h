@@ -131,12 +131,6 @@ public:
 	void ChangeBarrier(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const D3D12_RESOURCE_STATES& NewBarrier);
 	//バッファのコピー（インスタンスは別物、引数にコピー元）
 	void CopyGPUResource(const ComPtr<ID3D12GraphicsCommandList>& CmdList, GPUResource& CopySource);
-	//CPUからアクセス可能なリソース取得
-	void* GetBuffOnCPU()
-	{
-		MapBuffOnCPU();
-		return buffOnCPU;
-	}
 };
 
 //頂点バッファ
@@ -156,21 +150,20 @@ class VertexBuffer
 public:
 	//頂点サイズ
 	const size_t vertexSize;
-	//頂点数
-	const unsigned int vertexNum;
+	//送信する頂点数
+	unsigned int sendVertexNum;
 
 	VertexBuffer(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier, const D3D12_VERTEX_BUFFER_VIEW& VBView)
-		:resource(Buff, Barrier), vbView(VBView), vertexSize(VBView.StrideInBytes), vertexNum(VBView.SizeInBytes / VBView.StrideInBytes) {}
+		:resource(Buff, Barrier), vbView(VBView), vertexSize(VBView.StrideInBytes), sendVertexNum(VBView.SizeInBytes / VBView.StrideInBytes) {}
 	void Mapping(void* SendData)
 	{
-		resource.Mapping(vertexSize, vertexNum, SendData);
+		resource.Mapping(vertexSize, sendVertexNum, SendData);
 	}
 	void SetName(const wchar_t* Name)
 	{
 		resource.SetName(Name);
 	}
 	const D3D12_VERTEX_BUFFER_VIEW& GetVBView() { return vbView; }
-	void* GetOnCPU() { return resource.GetBuffOnCPU(); }
 };
 
 //インデックスバッファ
@@ -228,9 +221,6 @@ public:
 	//バッファセット
 	void SetGraphicsDescriptorBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const DESC_HANDLE_TYPE& Type, const int& RootParam);
 	void SetComputeDescriptorBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const DESC_HANDLE_TYPE& Type, const int& RootParam);
-
-	//CPU上でのメモリ取得
-	void* GetBuffOnCPU() { return resource.GetBuffOnCPU(); }
 };
 
 //定数バッファ
@@ -309,7 +299,6 @@ public:
 		handles.Initialize(UAV, UAVHandles);
 	}
 
-	void CopyBuffOnCPU(void* Dest) {	memcpy(Dest, resource.GetBuffOnCPU(), dataSize * elementNum); }
 	void CopyBuffOnGPU(const ComPtr<ID3D12GraphicsCommandList>& CmdList, GPUResource& Dest) { Dest.CopyGPUResource(CmdList, this->resource); }
 };
 
