@@ -38,7 +38,7 @@ class Game
 	vector<vector<int>> mapData;
 
 	vector<DossunBlock> dossunBlock;
-	Bubble bubbleBlock;
+	vector<Bubble> bubbleBlock;
 
 	int nowSelectNum = 0;
 

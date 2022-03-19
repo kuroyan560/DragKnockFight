@@ -268,7 +268,7 @@ void Player::Draw()
 
 }
 
-void Player::CheckHit(const vector<vector<int>> mapData, Bubble& bubble, TimeStopTestBlock& testBlock)
+void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, TimeStopTestBlock& testBlock)
 {
 
 	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
@@ -496,42 +496,42 @@ void Player::CheckHit(const vector<vector<int>> mapData, Bubble& bubble, TimeSto
 	/*===== プレイヤーとシャボン玉の当たり判定 =====*/
 
 	{
+		const int BUBBLE_COUNT = bubble.size();
+		for (int index = 0; index < BUBBLE_COUNT; ++index) {
 
-		if (!bubble.isBreak) {
+			if (bubble[index].isBreak) continue;
 
 			// hitcheck
-			bool isHitBubbleX = centerPos.Distance(bubble.pos) <= PLAYER_SIZE.x + bubble.RADIUS;
-			bool isHitBubbleY = centerPos.Distance(bubble.pos) <= PLAYER_SIZE.y + bubble.RADIUS;
+			bool isHitBubbleX = centerPos.Distance(bubble[index].pos) <= PLAYER_SIZE.x + bubble[index].RADIUS;
+			bool isHitBubbleY = centerPos.Distance(bubble[index].pos) <= PLAYER_SIZE.y + bubble[index].RADIUS;
 
 			// isHit
-			if (isHitBubbleX || isHitBubbleY) {
+			if (!isHitBubbleX && !isHitBubbleY) continue;
 
-				// Recovery of recoil
-				rHand->isFirstShot = false;
-				lHand->isFirstShot = false;
+			// Recovery of recoil
+			rHand->isFirstShot = false;
+			lHand->isFirstShot = false;
 
-				// If there is an input
-				if (inBubble && asSoonAsInputTimer >= 1) {
+			// If there is an input
+			if (inBubble && asSoonAsInputTimer >= 1) {
 
-					// break a bubble
-					bubble.isBreak = true;
-					bubble.breakCoolTime = bubble.BREAK_COOL_TIME;
-					inBubble = false;
+				// break a bubble
+				bubble[index].isBreak = true;
+				bubble[index].breakCoolTime = bubble[index].BREAK_COOL_TIME;
+				inBubble = false;
 
-				}
-				else {
+			}
+			else {
 
-					vel = {};
-					gravity = {};
-					gimmickVel = {};
+				vel = {};
+				gravity = {};
+				gimmickVel = {};
 
-					// Get closer to the bubble
-					centerPos.x += (bubble.pos.x - centerPos.x) / 5.0f;
-					centerPos.y += (bubble.pos.y - centerPos.y) / 5.0f;
+				// Get closer to the bubble
+				centerPos.x += (bubble[index].pos.x - centerPos.x) / 5.0f;
+				centerPos.y += (bubble[index].pos.y - centerPos.y) / 5.0f;
 
-					inBubble = true;
-
-				}
+				inBubble = true;
 
 			}
 

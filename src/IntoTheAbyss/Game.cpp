@@ -506,9 +506,6 @@ Game::Game()
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 
-	// シャボン玉ブロックを生成。
-	bubbleBlock.Generate(player.centerPos + Vec2<float>(0, 50));
-
 }
 
 void Game::Update()
@@ -694,6 +691,26 @@ void Game::Update()
 
 		}
 
+		// シャボン玉ブロックの情報を取得。
+		vector<shared_ptr<BubbleData>> bubbleData;
+		bubbleData = GimmickLoader::Instance()->GetBubbleData(stageNum, roomNum);
+
+		const int bubbleCount = bubbleData.size();
+
+		// シャボン玉ブロックを初期化。
+		bubbleBlock.clear();
+
+		// シャボン玉ブロックを生成。
+		for (int index = 0; index < bubbleCount; ++index) {
+
+			Bubble bubbleBuff;
+			bubbleBuff.Generate(bubbleData[index]->pos);
+
+			// データを追加。
+			bubbleBlock.push_back(bubbleBuff);
+
+		}
+
 	}
 	oldRoomNum = roomNum;
 
@@ -780,7 +797,12 @@ void Game::Update()
 	}
 
 	// シャボン玉ブロックの更新処理
-	bubbleBlock.Update();
+	{
+		const int BUBBLE_COUNT = bubbleBlock.size();
+		for (int index = 0; index < BUBBLE_COUNT; ++index) {
+			bubbleBlock[index].Update();
+		}
+	}
 
 	//if (Input::isKey(KEY_INPUT_UP)) ViewPort::Instance()->zoomRate += 0.01f;
 	//if (UsersInput::Instance()->OnTrigger(DIK_UP))  ViewPort::Instance()->zoomRate += 0.01f;
@@ -1144,9 +1166,13 @@ void Game::Draw()
 
 	player.Draw();
 
-	// シャボン玉ブロックの更新処理
-	if (!bubbleBlock.isBreak) {
-		bubbleBlock.Draw();
+	// シャボン玉ブロックの描画処理
+	{
+		const int BUBBLE_COUNT = bubbleBlock.size();
+		for (int index = 0; index < BUBBLE_COUNT; ++index) {
+			if (bubbleBlock[index].isBreak) continue;
+			bubbleBlock[index].Draw();
+		}
 	}
 
 	//ViewPort::Instance()->Draw();

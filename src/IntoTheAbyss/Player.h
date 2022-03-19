@@ -102,7 +102,7 @@ public:
 	void Draw();
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, Bubble& bubble, TimeStopTestBlock& testBlock);
+	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, TimeStopTestBlock& testBlock);
 
 
 	// 方向ごとのマップチップとの当たり判定関数
