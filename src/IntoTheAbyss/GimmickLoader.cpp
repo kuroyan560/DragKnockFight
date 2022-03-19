@@ -1,7 +1,7 @@
 #include "GimmickLoader.h"
 #include"KuroEngine.h"
 
-GimmickLoader::GimmickLoader(const int &STAGE_NUM)
+GimmickLoader::GimmickLoader(const int& STAGE_NUM)
 {
 	allGimmickData.reserve(STAGE_NUM);
 	allGimmickData.resize(STAGE_NUM);
@@ -25,7 +25,7 @@ GimmickLoader::GimmickLoader(const int &STAGE_NUM)
 
 }
 
-void GimmickLoader::LoadData(const int &STAGE_NUM, const int &ROOM_NUM, const std::string &FILE_PASS)
+void GimmickLoader::LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const std::string& FILE_PASS)
 {
 	std::vector<std::shared_ptr<ThownpeData>> gimmickData;
 	int gimmickArrayNum = 0;
@@ -148,7 +148,7 @@ void GimmickLoader::LoadData(const int &STAGE_NUM, const int &ROOM_NUM, const st
 	allGimmickData[STAGE_NUM][ROOM_NUM] = gimmickData;
 }
 
-const std::vector<std::shared_ptr<BubbleData>> &GimmickLoader::GetBubbleData(const int &STAGE_NUM, const int &ROOM_NUM)
+std::vector<std::shared_ptr<BubbleData>> GimmickLoader::GetBubbleData(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	//ステージ番号が配列の範囲外なら返さない
 	if (STAGE_NUM < 0 || allBubbleData.size() <= STAGE_NUM)
@@ -168,7 +168,7 @@ const std::vector<std::shared_ptr<BubbleData>> &GimmickLoader::GetBubbleData(con
 	return allBubbleData[STAGE_NUM][ROOM_NUM];
 }
 
-std::vector<std::shared_ptr<ThownpeData>> GimmickLoader::GetThowpeData(const int &STAGE_NUM, const int &ROOM_NUM)
+std::vector<std::shared_ptr<ThownpeData>> GimmickLoader::GetThowpeData(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	//ステージ番号が配列の範囲外なら返さない
 	if (STAGE_NUM < 0 || allGimmickData.size() <= STAGE_NUM)
@@ -188,23 +188,23 @@ std::vector<std::shared_ptr<ThownpeData>> GimmickLoader::GetThowpeData(const int
 	return allGimmickData[STAGE_NUM][ROOM_NUM];
 }
 
-void GimmickLoader::SetThwompStartPos(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS)
+void GimmickLoader::SetThwompStartPos(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS)
 {
 	allGimmickData[STAGE_NUM][ROOM_NUM][GIMMICK_NUMBER]->startPos = POS;
 }
 
-void GimmickLoader::SetThwompEndPos(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS)
+void GimmickLoader::SetThwompEndPos(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS)
 {
 	allGimmickData[STAGE_NUM][ROOM_NUM][GIMMICK_NUMBER]->endPos = POS;
 }
 
-void GimmickLoader::PushBubbleData(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS)
+void GimmickLoader::PushBubbleData(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS)
 {
 	allBubbleData[STAGE_NUM][ROOM_NUM].push_back(std::make_shared<BubbleData>());
 	allBubbleData[STAGE_NUM][ROOM_NUM][GIMMICK_NUMBER]->pos = POS;
 }
 
-void GimmickLoader::LoadThowmpeData(const std::string &KEY, std::istringstream *LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA)
+void GimmickLoader::LoadThowmpeData(const std::string& KEY, std::istringstream* LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA)
 {
 	//ギミックの種類を判別する
 	if (KEY == gimmickThowmpeDataName[GIMMCK_THOWMPE_DATA_TYPE])

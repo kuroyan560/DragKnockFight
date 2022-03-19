@@ -1,5 +1,7 @@
 #include "Bubble.h"
-#include"DrawFunc.h"
+#include "DrawFunc.h"
+#include "ScrollMgr.h"
+#include "ShakeMgr.h"
 
 Bubble::Bubble()
 {
@@ -19,7 +21,7 @@ void Bubble::Generate(const Vec2<float>& generatePos)
 	/*===== generate =====*/
 
 	pos = generatePos;
-	radius = CHECK_HIT_RADIUS;
+	radius = RADIUS;
 	breakCoolTime = 0;
 	isBreak = false;
 
@@ -54,7 +56,7 @@ void Bubble::Update()
 	}
 
 	// update radius
-	radius += (CHECK_HIT_RADIUS - radius) / 10.0f;
+	radius += (RADIUS - radius) / 10.0f;
 
 }
 
@@ -63,6 +65,11 @@ void Bubble::Draw()
 
 	/*===== draw =====*/
 
-	DrawFunc::DrawCircle2D(pos, radius, Color(100, 100, 100, 255), true);
+	Vec2<float> drawPos = pos;
+
+	drawPos.x -= ScrollMgr::Instance()->scrollAmount.x - ShakeMgr::Instance()->shakeAmount.x;
+	drawPos.y -= ScrollMgr::Instance()->scrollAmount.y - ShakeMgr::Instance()->shakeAmount.y;
+
+	DrawFunc::DrawCircle2D(drawPos, radius, Color(100, 100, 100, 255), true);
 
 }

@@ -46,7 +46,7 @@ public:
 	GimmickLoader(const int& STAGE_NUM);
 	void LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const std::string& FILE_PASS);
 	std::vector< std::shared_ptr<ThownpeData>> GetThowpeData(const int& STAGE_NUM, const int& ROOM_NUM);
-	const std::vector< std::shared_ptr<BubbleData>>& GetBubbleData(const int& STAGE_NUM, const int& ROOM_NUM);
+	std::vector< std::shared_ptr<BubbleData>> GetBubbleData(const int& STAGE_NUM, const int& ROOM_NUM);
 
 
 	void SetThwompStartPos(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS);
