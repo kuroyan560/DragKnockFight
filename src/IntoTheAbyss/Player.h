@@ -111,6 +111,9 @@ public:
 	void HitMapChipRight();
 	void HitMapChipBottom();
 
+	//プレイヤーの入力を禁止する
+	void Stop();
+
 
 private:
 
@@ -127,5 +130,7 @@ private:
 
 	// 壁との押し戻しに関する更新処理
 	void PushBackWall();
+
+	bool stopInputFlag;//入力を禁止するフラグ
 
 };

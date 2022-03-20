@@ -49,11 +49,19 @@ class Game
 	int oldRoomNum = -1;
 
 	vector<std::unique_ptr<AuraBlock>> auraBlock;
-
 	vector<vector<MapChipDrawData>> mapChipDrawData;
-
 	int countStopNum = 0;
 	int countHitNum = 0;
+
+	Vec2<float> prevPlayerChipPos;
+
+	bool sceneBlackFlag;//フラグが立つと暗転する
+	bool sceneLightFlag;//フラグが立つと明転する
+	int alphaValue;
+	int timer;
+	Vec2<float> responePos;
+	int doorNumber;
+	int sceneChangeHandle;//シーン遷移用の画像
 
 	std::vector<DrawMap>drawMap;
 

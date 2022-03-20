@@ -136,8 +136,12 @@ void Player::Update(const vector<vector<int>> mapData)
 
 	/*===== 入力処理 =====*/
 
-	// 入力に関する更新処理を行う。
-	Input(mapData);
+	if (!stopInputFlag)
+	{
+		// 入力に関する更新処理を行う。
+		Input(mapData);
+	}
+	stopInputFlag = false;
 
 	/*===== 更新処理 =====*/
 
@@ -673,6 +677,11 @@ void Player::HitMapChipBottom()
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
 
+}
+
+void Player::Stop()
+{
+	stopInputFlag = true;
 }
 
 void Player::Input(const vector<vector<int>> mapData)
