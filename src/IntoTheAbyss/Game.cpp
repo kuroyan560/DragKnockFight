@@ -314,7 +314,7 @@ Game::Game()
 	mapData = StageMgr::Instance()->GetMapChipData(0, 0);
 
 	movingBlockGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/MovingBlock.png");
-	sceneChangeHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/SceneChange.png");
+	//sceneChangeHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/SceneChange.png");
 	//movingBlockGraph = D3D12App::Instance()->GenerateTextureBuffer("resource/IntoTheAbyss/MovingBlock.png");
 
 	// スクロールマネージャーを初期化。
@@ -676,8 +676,8 @@ void Game::Update()
 		{
 			sceneBlackFlag = true;
 			//player.centerPos = GetPlayerPos(stageNum, &roomNum, i, chipMemorySize, &mapData);
-			player.vel = { 0.0f,0.0f };
-			player.gravity = 0.0f;
+			//player.vel = { 0.0f,0.0f };
+			//player.gravity = 0.0f;
 			//ScrollMgr::Instance()->WarpScroll(player.centerPos);
 			doorNumber = i;
 		}
@@ -685,8 +685,8 @@ void Game::Update()
 		{
 			sceneBlackFlag = true;
 			//player.centerPos = GetPlayerPos(stageNum, &roomNum, i, chipMemorySize, &mapData);
-			player.vel = { 0.0f,0.0f };
-			player.gravity = { 0.0f };
+			//player.vel = { 0.0f,0.0f };
+			//player.gravity = { 0.0f};
 			//ScrollMgr::Instance()->WarpScroll(player.centerPos);
 			doorNumber = i;
 		}
