@@ -114,7 +114,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS)
+Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR)
 {
 	Vec2<float> doorPos;
 	int roopCount = 0;
@@ -156,18 +156,21 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	//右に壁がある場合
 	if ((rightChip == 1 && leftChip == 0) || (rightChip == -1 && leftChip == 0))
 	{
+		*DIR = DOOR_LEFT;
 		//左に2ブロック離れた所にリスポーンさせる
 		return Vec2<float>((doorPos.x - 2) * 50.0f, doorPos.y * 50.0f);
 	}
 	//左に壁がある場合
 	else if ((rightChip == 0 && leftChip == 1) || (rightChip == 0 && leftChip == -1))
 	{
+		*DIR = DOOR_RIGHT;
 		//右に2ブロック離れた所にリスポーンさせる
 		return Vec2<float>((doorPos.x + 2) * 50.0f, doorPos.y * 50.0f);
 	}
 	//左右どちらとも壁が無かった場合
 	else if (rightChip == 0 && leftChip == 0)
 	{
+		*DIR = DOOR_Z;
 		//扉座標にリスポーンさせる
 		return Vec2<float>(doorPos.x * 50.0f, doorPos.y * 50.0f);
 	}
@@ -240,6 +243,7 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 
 		int num = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, check);
 
+		*DIR = DOOR_UP;
 		//左に壁があった場合、右の壁にリスポーンさせる。
 		if (num == 0)
 		{
@@ -253,6 +257,7 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	//両方とも壁があり、下に空間があるなら
 	else if (rightChip != 0 && leftChip != 0 && downWall == 0)
 	{
+		*DIR = DOOR_DOWN;
 		//扉座標の一マス下にリスポーンさせる
 		return Vec2<float>(rightDoor.x * 50.0f, (rightDoor.y + 1) * 50.0f);
 	}
@@ -266,7 +271,7 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	return Vec2<float>(-1, -1);
 }
 
-Vec2<float> Game::GetPlayerPos(const int &STAGE_NUMBER, int *ROOM_NUMBER, const int &DOOR_NUMBER, const SizeData &SIZE_DATA, vector<vector<int>> *MAPCHIP_DATA)
+Vec2<float> Game::GetPlayerPos(const int &STAGE_NUMBER, int *ROOM_NUMBER, const int &DOOR_NUMBER, const SizeData &SIZE_DATA, vector<vector<int>> *MAPCHIP_DATA, E_DOOR_DIR *DIR)
 {
 	int roomNum = StageMgr::Instance()->GetRelationData(STAGE_NUMBER, *ROOM_NUMBER, DOOR_NUMBER - SIZE_DATA.min);
 	*MAPCHIP_DATA = StageMgr::Instance()->GetMapChipData(STAGE_NUMBER, roomNum);
@@ -286,7 +291,7 @@ Vec2<float> Game::GetPlayerPos(const int &STAGE_NUMBER, int *ROOM_NUMBER, const 
 			}
 		}
 	}
-	Vec2<float> tmp = GetPlayerResponePos(STAGE_NUMBER, roomNum, DOOR_NUMBER, door);
+	Vec2<float> tmp = GetPlayerResponePos(STAGE_NUMBER, roomNum, DOOR_NUMBER, door, DIR);
 	*ROOM_NUMBER = roomNum;
 	return tmp;
 }
@@ -599,8 +604,7 @@ void Game::Update()
 				}
 			}
 		}
-		Vec2<float> tmp = GetPlayerResponePos(stageNum, roomNum, 0, door);
-		player.centerPos = tmp;
+		player.centerPos = door * Vec2<float>(50.0f, 50.0f);
 		ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
@@ -682,7 +686,7 @@ void Game::Update()
 			sceneBlackFlag = true;
 			//player.centerPos = GetPlayerPos(stageNum, &roomNum, i, chipMemorySize, &mapData);
 			player.vel = { 0.0f,0.0f };
-			player.gravity = { 0.0f};
+			player.gravity = { 0.0f };
 			//ScrollMgr::Instance()->WarpScroll(player.centerPos);
 			doorNumber = i;
 		}
@@ -704,9 +708,30 @@ void Game::Update()
 
 			if (10 <= timer)
 			{
-				responePos = GetPlayerPos(stageNum, &roomNum, doorNumber, chipMemorySize, &mapData);
+				responePos = GetPlayerPos(stageNum, &roomNum, doorNumber, chipMemorySize, &mapData, &door);
 				ScrollMgr::Instance()->WarpScroll(responePos);
-				player.centerPos = { responePos.x + 50.0f * 2.0f, responePos.y };
+
+				switch (door)
+				{
+				case Game::DOOR_UP:
+					break;
+
+				case Game::DOOR_DOWN:
+					break;
+
+				case Game::DOOR_LEFT:
+					player.centerPos = { responePos.x + 50.0f * 2.0f, responePos.y };
+					break;
+
+				case Game::DOOR_RIGHT:
+					player.centerPos = { responePos.x - 50.0f * 2.0f, responePos.y };
+					break;
+
+				case Game::DOOR_Z:
+					break;
+				default:
+					break;
+				}
 				sceneBlackFlag = false;
 				sceneLightFlag = true;
 			}
@@ -721,14 +746,42 @@ void Game::Update()
 		//プレイヤーを動かす
 		if (alphaValue <= 50)
 		{
-			if (responePos.x <= player.centerPos.x)
+			switch (door)
 			{
-				player.centerPos.x -= 5.0f;
+			case Game::DOOR_UP:
+				break;
+
+			case Game::DOOR_DOWN:
+				break;
+
+			case Game::DOOR_LEFT:
+				if (responePos.x <= player.centerPos.x)
+				{
+					player.centerPos.x -= 5.0f;
+				}
+				else
+				{
+					goFlag = true;
+				}
+				break;
+
+			case Game::DOOR_RIGHT:
+				if (player.centerPos.x <= responePos.x)
+				{
+					player.centerPos.x += 5.0f;
+				}
+				else
+				{
+					goFlag = true;
+				}
+				break;
+
+			case Game::DOOR_Z:
+				break;
+			default:
+				break;
 			}
-			else
-			{
-				goFlag = true;
-			}
+
 		}
 		if (alphaValue <= 0 && goFlag)
 		{
