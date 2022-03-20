@@ -1,4 +1,5 @@
 #include "MapChipCollider.h"
+#include "DrawFunc.h"
 
 bool MapChipCollider::IsIntersected(const Vec2<float>& posA1, const Vec2<float>& posA2, const Vec2<float>& posB1, const Vec2<float>& posB2)
 {
@@ -338,6 +339,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 		break;
 
 	}
+
 
 	const int HEIGHT = mapChipData.size();
 	for (int height = 0; height < HEIGHT; ++height) {
