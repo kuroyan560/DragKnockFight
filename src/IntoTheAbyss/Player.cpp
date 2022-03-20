@@ -129,6 +129,10 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	inBubble = false;
 
+	//ストレッチ初期化
+	stretch_LU = { 0.0f,0.0f };
+	stretch_RB = { 0.0f,0.0f };
+	stretchTimer = STRETCH_RETURN_TIME;
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -213,6 +217,8 @@ void Player::Update(const vector<vector<int>> mapData)
 	// 入力されてから数フレームを取得するタイマーを更新。
 	if (asSoonAsInputTimer > 0) --asSoonAsInputTimer;
 
+	//ストレッチ更新
+	UpdateStretch();
 }
 
 void Player::Draw()
@@ -249,10 +255,14 @@ void Player::Draw()
 		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
 	}
 
+	//ストレッチ加算
+	leftUp += stretch_LU;
+	rightBottom += stretch_RB;
+
 	//胴体
-	//DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(playerGraph), AlphaBlendMode_Trans, { DIR == LEFT,false });
-	DrawFunc::DrawRotaGraph2D(centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom, expRate, 0.0f, TexHandleMgr::GetTexBuffer(playerGraph),
-		{ 0.5f,0.5f }, AlphaBlendMode_Trans, { DIR == LEFT,false });
+	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom , TexHandleMgr::GetTexBuffer(playerGraph), AlphaBlendMode_Trans, { DIR == LEFT,false });
+	//DrawFunc::DrawRotaGraph2D(centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom, expRate, 0.0f, TexHandleMgr::GetTexBuffer(playerGraph),
+		//{ 0.5f,0.5f }, AlphaBlendMode_Trans, { DIR == LEFT,false });
 
 	if (DIR == RIGHT)
 	{
@@ -552,11 +562,11 @@ void Player::HitMapChipTop()
 	// 最初の一発は反動が強いフラグを初期化する。
 	//rHand->Hit();
 	//lHand->Hit();
-
 }
 
 void Player::HitMapChipLeft()
 {
+	stretch_LU.x = 0.0f;
 
 	// Y軸の移動量の合計が一定以上だったら摩擦を作る。
 	if (fabs(vel.y + gravity) >= STOP_DEADLINE_Y || fabs(gravity) >= MAX_GRAVITY) {
@@ -577,6 +587,9 @@ void Player::HitMapChipLeft()
 		vel.y = 0;
 		gravity = 0;
 
+		//摩擦無いときはストレッチを弱くする
+		stretch_RB.y /= STRETCH_DIV_RATE;
+		stretch_LU.y /= STRETCH_DIV_RATE;
 	}
 
 	// 最初の一発は反動が強いフラグを初期化する。
@@ -588,11 +601,11 @@ void Player::HitMapChipLeft()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
-
 }
 
 void Player::HitMapChipRight()
 {
+	stretch_RB.x = 0.0f;
 
 	// Y軸の移動量の合計が一定以上だったら摩擦を作る。
 	if (fabs(vel.y + gravity) >= STOP_DEADLINE_Y || fabs(gravity) >= MAX_GRAVITY) {
@@ -613,6 +626,9 @@ void Player::HitMapChipRight()
 		vel.y = 0;
 		gravity = 0;
 
+		//摩擦無いときはストレッチを弱くする
+		stretch_RB.y /= STRETCH_DIV_RATE;
+		stretch_LU.y /= STRETCH_DIV_RATE;
 	}
 
 	// 最初の一発は反動が強いフラグを初期化する。
@@ -626,11 +642,11 @@ void Player::HitMapChipRight()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
-
 }
 
 void Player::HitMapChipBottom()
 {
+	stretch_RB.y = 0.0f;
 
 	// 接地フラグを立てる。
 	onGround = true;
@@ -658,6 +674,9 @@ void Player::HitMapChipBottom()
 		// 重力を無効化する。
 		gravity = 0.5f;
 
+		//摩擦無いときはストレッチを弱くする
+		stretch_RB.x /= STRETCH_DIV_RATE;
+		stretch_LU.x /= STRETCH_DIV_RATE;
 	}
 
 	gravity = 0;
@@ -672,7 +691,6 @@ void Player::HitMapChipBottom()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
-
 }
 
 void Player::Input(const vector<vector<int>> mapData)
@@ -792,6 +810,8 @@ void Player::Input(const vector<vector<int>> mapData)
 		// 入力タイマーをセット。
 		asSoonAsInputTimer = AS_SOON_AS_INPUT_TIMER;
 
+		//ストレッチ
+		CalculateStretch(vel);
 	}
 
 	// RBが押されたら反動をつける。
@@ -875,6 +895,8 @@ void Player::Input(const vector<vector<int>> mapData)
 		// 入力タイマーをセット。
 		asSoonAsInputTimer = AS_SOON_AS_INPUT_TIMER;
 
+		//ストレッチ
+		CalculateStretch(vel);
 	}
 
 	// 移動速度が限界値を超えないようにする。
@@ -903,6 +925,9 @@ void Player::Input(const vector<vector<int>> mapData)
 		// ビーコンが発射されていたら。
 		else if (rHand->teleportPike.isActive && (rHand->teleportPike.isHitWall || rHand->teleportPike.isHitWindow) && !isPrevFrameShotBeacon) {
 
+			//ストレッチ
+			CalculateStretch(rHand->teleportPike.pos - centerPos);
+
 			// プレイヤーを瞬間移動させる。
 			centerPos = rHand->teleportPike.pos;
 
@@ -925,7 +950,6 @@ void Player::Input(const vector<vector<int>> mapData)
 
 			// ビーコンのクールタイムを設定
 			rHand->pikeCooltime = rHand->PIKE_COOL_TIME;
-
 		}
 
 		isPrevFrameShotBeacon = true;
@@ -1128,4 +1152,79 @@ void Player::PushBackWall()
 
 	}
 
+}
+
+void Player::CalculateStretch(const Vec2<float>& Move)
+{
+	static const Vec2<float> MAX_STRETCH = { 16.0f,37.0f };
+	Vec2<float> stretchRate = { abs(Move.x / MAX_RECOIL_AMOUNT),abs(Move.y / MAX_RECOIL_AMOUNT) };
+	if (1.0f < stretchRate.x)stretchRate.x = 1.0f;
+	if (1.0f < stretchRate.y)stretchRate.y = 1.0f;
+
+	//左
+	if (Move.x < 0.0f)
+	{
+		//右に伸びる
+		stretch_RB.x += MAX_STRETCH.x * stretchRate.x;
+		if (MAX_STRETCH.x < stretch_RB.x)stretch_RB.x = MAX_STRETCH.x;
+	}
+	//右
+	else if (0.0f < Move.x)
+	{
+		//左に伸びる
+		stretch_LU.x -= MAX_STRETCH.x * stretchRate.x;
+		if (stretch_LU.x < -MAX_STRETCH.x)stretch_LU.x = -MAX_STRETCH.x;
+	}
+
+	//左右移動時
+	if (Move.x != 0.0f)
+	{
+		//上下が縮む
+		stretch_LU.y += MAX_STRETCH.y * stretchRate.x;
+		if (MAX_STRETCH.y < stretch_LU.y)stretch_LU.y = MAX_STRETCH.y;
+		stretch_RB.y -= MAX_STRETCH.y * stretchRate.x;
+		if (stretch_RB.y < -MAX_STRETCH.y)stretch_RB.y = -MAX_STRETCH.y;
+	}
+
+	//上
+	if (Move.y < 0.0f)
+	{
+		//下に伸びる
+		stretch_RB.y += MAX_STRETCH.y * stretchRate.y;
+		if (MAX_STRETCH.y < stretch_RB.y)stretch_RB.y = MAX_STRETCH.y;
+	}
+	//下
+	else if (0.0f < Move.y)
+	{
+		//上に伸びる
+		stretch_LU.y -= MAX_STRETCH.y * stretchRate.y;
+		if (stretch_LU.y < -MAX_STRETCH.y)stretch_LU.y = -MAX_STRETCH.y;
+	}
+
+	//上下移動時
+	if (Move.y != 0.0f)
+	{
+		//左右が縮む
+		stretch_LU.x += MAX_STRETCH.x * stretchRate.y;
+		if (MAX_STRETCH.x < stretch_LU.x)stretch_LU.x = MAX_STRETCH.x;
+		stretch_RB.x -= MAX_STRETCH.x * stretchRate.y;
+		if (stretch_RB.x < -MAX_STRETCH.x)stretch_RB.x = -MAX_STRETCH.x;
+	}
+
+	stretchTimer = 0;
+	fromStretch_LU = stretch_LU;
+	fromStretch_RB = stretch_RB;
+}
+
+#include"KuroMath.h"
+void Player::UpdateStretch()
+{
+	static const EASING_TYPE STRETCH_EASE_TYPE = Cubic;
+	stretch_LU = KuroMath::Ease(Out, STRETCH_EASE_TYPE, stretchTimer, STRETCH_RETURN_TIME, fromStretch_LU, { 0.0f,0.0f });
+	stretch_RB = KuroMath::Ease(Out, STRETCH_EASE_TYPE, stretchTimer, STRETCH_RETURN_TIME, fromStretch_RB, { 0.0f,0.0f });
+
+	if (stretchTimer < STRETCH_RETURN_TIME)
+	{
+		stretchTimer++;
+	}
 }

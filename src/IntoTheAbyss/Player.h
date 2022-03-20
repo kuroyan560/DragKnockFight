@@ -43,6 +43,16 @@ public:
 
 	int playerGraph;
 
+	//勢いによるストレッチ
+	const Vec2<float> MAX_STRETCH = { 16.0f,37.0f };	//最大ストレッチ量
+	Vec2<float>stretch_LU = { 0,0 };	//左上
+	Vec2<float>stretch_RB = { 0,0 };	//右下
+	Vec2<float>fromStretch_LU = { 0,0 };	//イージング用スタート値
+	Vec2<float>fromStretch_RB = { 0,0 };	//イージング用スタート値
+	const int STRETCH_RETURN_TIME = 17;	//ストレッチが０になるまでのフレーム数
+	int stretchTimer = STRETCH_RETURN_TIME;	
+	const float STRETCH_DIV_RATE = 2.0f;	//ストレッチを弱くするときの割合
+
 public:
 
 	/*-- 定数 --*/
@@ -128,4 +138,8 @@ private:
 	// 壁との押し戻しに関する更新処理
 	void PushBackWall();
 
+	//ストレッチの値を計算
+	void CalculateStretch(const Vec2<float>& Move);
+	//ストレッチ値更新
+	void UpdateStretch();
 };
