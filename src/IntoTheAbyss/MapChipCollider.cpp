@@ -374,7 +374,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			// 全ての線分との当たり判定を行う。
 
 			// 上辺
-			if (direction == INTERSECTED_BOTTOM) {
+	//		if (direction == INTERSECTED_BOTTOM) {
 				if (IsIntersected(rightTop, leftTop, pos, checkHitDirection)) {
 
 					// 当たっていたら交点を計算して保存
@@ -395,10 +395,10 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 					}
 
 				}
-			}
+	//		}
 
 			// 右辺
-			if (direction == INTERSECTED_LEFT) {
+	//		if (direction == INTERSECTED_LEFT) {
 				if (IsIntersected(rightTop, rightBottom, pos, checkHitDirection)) {
 
 					// 当たっていたら交点を計算して保存
@@ -419,10 +419,10 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 					}
 
 				}
-			}
+	//		}
 
 			// 下辺
-			if (direction == INTERSECTED_TOP) {
+	//		if (direction == INTERSECTED_TOP) {
 				if (IsIntersected(leftBottom, rightBottom, pos, checkHitDirection)) {
 
 					// 当たっていたら交点を計算して保存
@@ -447,10 +447,10 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 					}
 
 				}
-			}
+	//	}
 
 			// 左辺
-			if (direction == INTERSECTED_RIGHT) {
+			//if (direction == INTERSECTED_RIGHT) {
 				if (IsIntersected(leftBottom, leftTop, pos, checkHitDirection)) {
 
 					// 当たっていたら交点を計算して保存
@@ -471,7 +471,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 					}
 
 				}
-			}
+		//	}
 
 			// 交点が0個だったら次へ
 			if (intersectPos.size() <= 0) continue;
