@@ -80,7 +80,7 @@ Player::~Player()
 {
 }
 
-void Player::Init(const Vec2<float>& INIT_POS)
+void Player::Init(const Vec2<float> &INIT_POS)
 {
 
 	/*===== 初期化処理 =====*/
@@ -140,16 +140,29 @@ void Player::Update(const vector<vector<int>> mapData)
 	{
 		// 入力に関する更新処理を行う。
 		Input(mapData);
+		drawCursorFlag = true;
 	}
-	stopInputFlag = false;
+	else
+	{
+		drawCursorFlag = false;
+	}
 
 	/*===== 更新処理 =====*/
+	if (!stopMoveFlag)
+	{
+		// 移動に関する処理
+		Move();
 
-	// 移動に関する処理
-	Move();
+	}
+	if (!stopInputFlag)
+	{
+		// 重力に関する更新処理
+		UpdateGravity();
+	}
 
-	// 重力に関する更新処理
-	UpdateGravity();
+
+	stopMoveFlag = false;
+	stopInputFlag = false;
 
 	// 連射タイマーを更新
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;
@@ -246,11 +259,11 @@ void Player::Draw()
 
 	if (DIR == RIGHT)
 	{
-		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	}
 	else if (DIR == LEFT)
 	{
-		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 	}
 
 	//胴体
@@ -260,19 +273,18 @@ void Player::Draw()
 
 	if (DIR == RIGHT)
 	{
-		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 	}
 	else if (DIR == LEFT)
 	{
-		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	}
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
-
 }
 
-void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, TimeStopTestBlock& testBlock)
+void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble> &bubble, TimeStopTestBlock &testBlock)
 {
 
 	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
@@ -328,9 +340,9 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		// 左右に当たった際に壁釣りさせるための処理。
 		int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 		int xChip = (centerPos.x - PLAYER_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		if (yChip < 0) yChip = 0;
+		if (yChip <= 0) yChip = 1;
 		if (yChip >= mapData.size()) yChip = mapData.size() - 1;
-		if (xChip < 0) xChip = 0;
+		if (xChip <= 0) xChip = 1;
 		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
 		// プレイヤーの左側がマップチップだったら
 		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
@@ -687,6 +699,11 @@ void Player::HitMapChipBottom()
 void Player::Stop()
 {
 	stopInputFlag = true;
+}
+
+void Player::DontMove()
+{
+	stopMoveFlag = true;
 }
 
 void Player::Input(const vector<vector<int>> mapData)

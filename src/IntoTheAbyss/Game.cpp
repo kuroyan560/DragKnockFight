@@ -720,11 +720,11 @@ void Game::Update()
 					break;
 
 				case Game::DOOR_LEFT:
-					player.centerPos = { responePos.x + 50.0f * 2.0f, responePos.y };
+					player.centerPos = { responePos.x + 50.0f * 3.0f, responePos.y };
 					break;
 
 				case Game::DOOR_RIGHT:
-					player.centerPos = { responePos.x - 50.0f * 2.0f, responePos.y };
+					player.centerPos = { responePos.x - 50.0f * 3.0f, responePos.y };
 					break;
 
 				case Game::DOOR_Z:
@@ -743,8 +743,10 @@ void Game::Update()
 	{
 		alphaValue -= 10;
 		bool goFlag = false;
+		player.vel = { 0.0f,0.0f };
+
 		//プレイヤーを動かす
-		if (alphaValue <= 50)
+		if (alphaValue <= 250)
 		{
 			switch (door)
 			{
@@ -781,7 +783,6 @@ void Game::Update()
 			default:
 				break;
 			}
-
 		}
 		if (alphaValue <= 0 && goFlag)
 		{
@@ -790,11 +791,19 @@ void Game::Update()
 	}
 
 	//暗転と明転中はプレイヤーの入力を禁止する
-	if (sceneLightFlag || sceneBlackFlag)
+
+	if (sceneBlackFlag)
 	{
 		player.Stop();
 	}
-	else
+
+	if (sceneLightFlag)
+	{
+		player.Stop();
+		player.DontMove();
+	}
+
+	if (!sceneBlackFlag && !sceneLightFlag)
 	{
 		alphaValue = 0;
 		timer = 0;

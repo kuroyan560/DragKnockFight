@@ -113,6 +113,7 @@ public:
 
 	//プレイヤーの入力を禁止する
 	void Stop();
+	void DontMove();
 
 
 private:
@@ -132,5 +133,6 @@ private:
 	void PushBackWall();
 
 	bool stopInputFlag;//入力を禁止するフラグ
-
+	bool stopMoveFlag;
+	bool drawCursorFlag;
 };
