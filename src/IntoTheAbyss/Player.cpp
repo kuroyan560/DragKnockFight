@@ -169,10 +169,10 @@ void Player::Update(const vector<vector<int>> mapData)
 	// プレイヤーのすぐ一個上のマップチップ座標を検索する。
 	int mapX = centerPos.x / MAP_CHIP_SIZE;
 	int mapY = (centerPos.y - PLAYER_SIZE.y - 1.0f) / MAP_CHIP_SIZE;
-	if (mapX <= 0) mapX = 1;
-	if (mapX >= mapData[0].size()) mapX = mapData[0].size() - 1;
-	if (mapY <= 0) mapY = 1;
 	if (mapY >= mapData.size()) mapY = mapData.size() - 1;
+	if (mapY <= 0) mapY = 1;
+	if (mapX <= 0) mapX = 1;
+	if (mapX >= mapData[mapY].size()) mapX = mapData[mapY].size() - 1;
 
 	// 一個上のマップチップがブロックで、X軸方向の移動量が一定以上だったらパーティクルを生成する。
 	if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - PLAYER_SIZE.y), Vec2<float>(0, -1));
@@ -328,14 +328,19 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		// 左右に当たった際に壁釣りさせるための処理。
 		int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 		int xChip = (centerPos.x - PLAYER_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		if (yChip < 0) yChip = 0;
+		if (yChip >= mapData.size()) yChip = mapData.size() - 1;
+		if (xChip < 0) xChip = 0;
+		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
 		// プレイヤーの左側がマップチップだったら
-		if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
 			HitMapChipLeft();
 		}
 		xChip = (centerPos.x + PLAYER_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		if (xChip >= mapData[yChip].size() - 1) xChip = mapData[yChip].size() - 1;
+		if (xChip < 0) xChip = 0;
+		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
 		// プレイヤーの右側がマップチップだったら
-		if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
 			HitMapChipRight();
 		}
 
