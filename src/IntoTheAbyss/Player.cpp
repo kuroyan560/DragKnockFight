@@ -164,7 +164,7 @@ void Player::Update(const vector<vector<int>> mapData)
 	}
 	doorMoveLeftRightFlag = false;
 	doorMoveUpDownFlag = false;
-
+	doorMoveDownFlag = false;
 
 	// 連射タイマーを更新
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;

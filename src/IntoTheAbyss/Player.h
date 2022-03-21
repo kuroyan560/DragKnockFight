@@ -138,4 +138,5 @@ private:
 
 	bool doorMoveLeftRightFlag;
 	bool doorMoveUpDownFlag;
+	bool doorMoveDownFlag;
 };

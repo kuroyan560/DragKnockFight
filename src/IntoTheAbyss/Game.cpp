@@ -720,10 +720,10 @@ void Game::Update()
 				switch (door)
 				{
 				case Game::DOOR_UP:
-					sceneUpDownFlag = true;
+					sceneleftRightFlag = true;
 					break;
 				case Game::DOOR_DOWN:
-					sceneUpDownFlag = true;
+					sceneleftRightFlag = true;
 					break;
 				case Game::DOOR_LEFT:
 					sceneleftRightFlag = true;
@@ -779,11 +779,12 @@ void Game::Update()
 	{
 		alphaValue -= 10;
 		bool goFlag = false;
-		player.vel = { 0.0f,0.0f };
+
 
 		//ÉvÉåÉCÉÑÅ[ÇìÆÇ©Ç∑
 		if (alphaValue <= 250)
 		{
+			sceneleftRightFlag = false;
 			switch (door)
 			{
 			case Game::DOOR_UP:
@@ -843,6 +844,11 @@ void Game::Update()
 			default:
 				break;
 			}
+		}
+		else
+		{
+			player.vel = { 0.0f,0.0f };
+			player.gravity = 0.0f;
 		}
 		if (alphaValue <= 0 && goFlag)
 		{
