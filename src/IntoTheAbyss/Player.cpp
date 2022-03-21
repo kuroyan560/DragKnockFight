@@ -525,11 +525,11 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 	const int DOSSUN_COUNT = dossun.size();
 	for (int index = 0; index < DOSSUN_COUNT; ++index) {
 
-		bool isDossunVel = Collider::Instance()->CheckHitVel(centerPos, prevFrameCenterPos, vel + gimmickVel, PLAYER_SIZE, dossun[index].pos, dossun[index].size) != INTERSECTED_NONE;
-		bool isDossunTop = Collider::Instance()->CheckHitSize(centerPos, PLAYER_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_TOP) != INTERSECTED_NONE;
-		bool isDossunRight = Collider::Instance()->CheckHitSize(centerPos, PLAYER_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
-		bool isDossunLeft = Collider::Instance()->CheckHitSize(centerPos, PLAYER_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_LEFT) != INTERSECTED_NONE;
-		bool isDossunBottom = Collider::Instance()->CheckHitSize(centerPos, PLAYER_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+		bool isDossunVel = Collider::Instance()->CheckHitVel(centerPos, prevFrameCenterPos, vel + gimmickVel, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size) != INTERSECTED_NONE;
+		bool isDossunTop = Collider::Instance()->CheckHitSize(centerPos, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_TOP) != INTERSECTED_NONE;
+		bool isDossunRight = Collider::Instance()->CheckHitSize(centerPos, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+		bool isDossunLeft = Collider::Instance()->CheckHitSize(centerPos, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_LEFT) != INTERSECTED_NONE;
+		bool isDossunBottom = Collider::Instance()->CheckHitSize(centerPos, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
 
 		// Ç«Ç±Ç©ÇµÇÁÇ…Ç‘Ç¬Ç©Ç¡ÇƒÇ¢ÇÍÇŒìñÇΩÇ¡ÇΩîªíËÇ…Ç∑ÇÈÅB
 		if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
