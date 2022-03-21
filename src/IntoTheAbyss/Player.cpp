@@ -23,57 +23,13 @@ Player::Player()
 {
 	/*====== コンストラクタ =====*/
 
-	// プレイヤーの位置をセット
-	centerPos = GetGeneratePos();
-
-	// 移動量をリセット
-	vel = {};
-
-	// 重力をリセット
-	gravity = 0;
-
-	// 接地していないフラグをリセット
-	onGround = false;
-
-	// 腕をセット
-	static const float OFFSET = -8.0f;
 	lHand = make_unique<PlayerHand>();
-	lHand->Init(-PLAYER_SIZE.x + OFFSET);
 	rHand = make_unique<PlayerHand>();
-	rHand->Init(PLAYER_SIZE.x - OFFSET);
-
-	// 連射タイマーを初期化
-	rapidFireTimerLeft = 0;
-	rapidFireTimerRight = 0;
-
-	// 重力無効化タイマーを初期化。
-	gravityInvalidTimer = 0;
-
-	isPrevFrameShotBeacon = false;
-	firstShot = false;
 
 	// 画像をロード
-	playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
+	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
 
-	// 壁フラグを初期化
-	isWallRight = false;
-	isWallLeft = false;
-
-	// 壁ズリフラグを初期化。
-	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
-
-	// 初期位置に戻るまでのタイマーを初期化
-	handReturnTimer = DEF_HAND_RETURN_TIMER;
-
-	// 手を初期位置に戻す。
-	rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
-	lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
-
-	// 入力してから少しだけ数えるタイマーを初期化
-	asSoonAsInputTimer = 0;
-
-	inBubble = false;
-
+	this->Init(GetGeneratePos());
 }
 
 Player::~Player()
@@ -85,9 +41,12 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	/*===== 初期化処理 =====*/
 
+	//アニメーション初期化
+	anim.Init();
+
 	// プレイヤーの位置をセット
 	centerPos = INIT_POS;
-	prevFrameCenterPos = INIT_POS;
+	//prevFrameCenterPos = INIT_POS;
 
 	// 移動量をリセット
 	vel = {};
@@ -100,8 +59,10 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	firstShot = false;
 
 	// 腕をセット
-	lHand->Init(-PLAYER_SIZE.x);
-	rHand->Init(PLAYER_SIZE.x);
+	static const float OFFSET = -8.0f;
+
+	lHand->Init(-GetPlayerGraphSize().x + OFFSET);
+	rHand->Init(GetPlayerGraphSize().x - OFFSET);
 
 	// 連射タイマーを初期化
 	rapidFireTimerLeft = 0;
@@ -109,6 +70,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	// 重力無効化タイマーを初期化。
 	gravityInvalidTimer = 0;
+
+	isPrevFrameShotBeacon = false;
+	firstShot = false;
 
 	// 壁フラグを初期化
 	isWallRight = false;
@@ -129,6 +93,10 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	inBubble = false;
 
+	//ストレッチ初期化
+	stretch_LU = { 0.0f,0.0f };
+	stretch_RB = { 0.0f,0.0f };
+	stretchTimer = STRETCH_RETURN_TIME;
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -152,8 +120,8 @@ void Player::Update(const vector<vector<int>> mapData)
 	if (rapidFireTimerRight > 0) --rapidFireTimerRight;
 
 	// 腕を更新
-	lHand->Update(centerPos);
-	rHand->Update(centerPos);
+	lHand->Update(centerPos + anim.GetHandOffsetLeft());
+	rHand->Update(centerPos + anim.GetHandOffsetRight());
 
 	// 弾を更新
 	BulletMgr::Instance()->Update();
@@ -164,20 +132,20 @@ void Player::Update(const vector<vector<int>> mapData)
 
 	// プレイヤーのすぐ一個上のマップチップ座標を検索する。
 	int mapX = centerPos.x / MAP_CHIP_SIZE;
-	int mapY = (centerPos.y - PLAYER_SIZE.y - 1.0f) / MAP_CHIP_SIZE;
+	int mapY = (centerPos.y - PLAYER_HIT_SIZE.y - 1.0f) / MAP_CHIP_SIZE;
 	if (mapX <= 0) mapX = 1;
 	if (mapX >= mapData[0].size()) mapX = mapData[0].size() - 1;
 	if (mapY <= 0) mapY = 1;
 	if (mapY >= mapData.size()) mapY = mapData.size() - 1;
 
 	// 一個上のマップチップがブロックで、X軸方向の移動量が一定以上だったらパーティクルを生成する。
-	if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - PLAYER_SIZE.y), Vec2<float>(0, -1));
+	if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
 
 	// 壁ズリのパーティクルを生成。
-	if (isSlippingWall[PLAYER_TOP]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - PLAYER_SIZE.y), Vec2<float>(0, -1));
-	if (isSlippingWall[PLAYER_RIGHT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x + PLAYER_SIZE.x, centerPos.y), Vec2<float>(1, 0));
-	if (isSlippingWall[PLAYER_BOTTOM]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y + PLAYER_SIZE.y), Vec2<float>(0, 1));
-	if (isSlippingWall[PLAYER_LEFT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x - PLAYER_SIZE.x, centerPos.y), Vec2<float>(-1, 0));
+	if (isSlippingWall[PLAYER_TOP]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
+	if (isSlippingWall[PLAYER_RIGHT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x + GetPlayerGraphSize().x, centerPos.y), Vec2<float>(1, 0));
+	if (isSlippingWall[PLAYER_BOTTOM]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y), Vec2<float>(0, 1));
+	if (isSlippingWall[PLAYER_LEFT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x - GetPlayerGraphSize().x, centerPos.y), Vec2<float>(-1, 0));
 
 	// 壁ズリフラグを初期化。
 	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
@@ -213,6 +181,11 @@ void Player::Update(const vector<vector<int>> mapData)
 	// 入力されてから数フレームを取得するタイマーを更新。
 	if (asSoonAsInputTimer > 0) --asSoonAsInputTimer;
 
+	//ストレッチ更新
+	UpdateStretch();
+
+	//アニメーション更新
+	anim.Update();
 }
 
 void Player::Draw()
@@ -234,10 +207,10 @@ void Player::Draw()
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
 
 	// プレイヤーの描画処理
-	Vec2<float>leftUp = { centerPos.x * ScrollMgr::Instance()->zoom - PLAYER_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		centerPos.y * ScrollMgr::Instance()->zoom - PLAYER_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	Vec2<float>rightBottom = { centerPos.x * ScrollMgr::Instance()->zoom + PLAYER_SIZE.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		centerPos.y * ScrollMgr::Instance()->zoom + PLAYER_SIZE.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
+	Vec2<float>leftUp = { centerPos.x * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
+		centerPos.y * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
+	Vec2<float>rightBottom = { centerPos.x * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
+		centerPos.y * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
 	const float expRate = EXT_RATE * ScrollMgr::Instance()->zoom;
 
 	if (DIR == RIGHT)
@@ -249,10 +222,14 @@ void Player::Draw()
 		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
 	}
 
+	//ストレッチ加算
+	leftUp += stretch_LU;
+	rightBottom += stretch_RB;
+
 	//胴体
-	//DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(playerGraph), AlphaBlendMode_Trans, { DIR == LEFT,false });
-	DrawFunc::DrawRotaGraph2D(centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom, expRate, 0.0f, TexHandleMgr::GetTexBuffer(playerGraph),
-		{ 0.5f,0.5f }, AlphaBlendMode_Trans, { DIR == LEFT,false });
+	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom , TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), AlphaBlendMode_Trans, { DIR == LEFT,false });
+	//DrawFunc::DrawRotaGraph2D(centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom, expRate, 0.0f, TexHandleMgr::GetTexBuffer(playerGraph),
+		//{ 0.5f,0.5f }, AlphaBlendMode_Trans, { DIR == LEFT,false });
 
 	if (DIR == RIGHT)
 	{
@@ -276,7 +253,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 	{
 
 		// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
-		INTERSECTED_LINE intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, vel, PLAYER_SIZE, onGround, mapData);
+		INTERSECTED_LINE intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, vel, PLAYER_HIT_SIZE, onGround, mapData);
 
 		// 当たった位置に応じて処理を分ける。
 		if (intersectedLine == INTERSECTED_TOP) {
@@ -312,24 +289,24 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		}
 
 		// マップチップとプレイヤーの当たり判定 絶対に被せないための処理
-		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, Vec2<float>(PLAYER_SIZE.x, PLAYER_SIZE.y), mapData, INTERSECTED_TOP);
+		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_TOP);
 		if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
-		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, Vec2<float>(PLAYER_SIZE.x, PLAYER_SIZE.y), mapData, INTERSECTED_BOTTOM);
+		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_BOTTOM);
 		if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
-		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, Vec2<float>(PLAYER_SIZE.x, PLAYER_SIZE.y), mapData, INTERSECTED_LEFT);
+		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_LEFT);
 		if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
-		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, Vec2<float>(PLAYER_SIZE.x, PLAYER_SIZE.y), mapData, INTERSECTED_RIGHT);
+		intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_RIGHT);
 		if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 
 
 		// 左右に当たった際に壁釣りさせるための処理。
 		int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		int xChip = (centerPos.x - PLAYER_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 		// プレイヤーの左側がマップチップだったら
 		if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
 			HitMapChipLeft();
 		}
-		xChip = (centerPos.x + PLAYER_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 		if (xChip >= mapData[yChip].size() - 1) xChip = mapData[yChip].size() - 1;
 		// プレイヤーの右側がマップチップだったら
 		if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
@@ -358,7 +335,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			float distanceYABS = fabs(distanceY);
 
 			// 移動ブロックとプレイヤーの大きさの合計。
-			Vec2<float> playerMovingBlockSize = { MovingBlockMgr::Instance()->movingBlock[movingIndex]->SCALE + PLAYER_SIZE.x,MovingBlockMgr::Instance()->movingBlock[movingIndex]->SCALE + PLAYER_SIZE.y };
+			Vec2<float> playerMovingBlockSize = { MovingBlockMgr::Instance()->movingBlock[movingIndex]->SCALE + PLAYER_HIT_SIZE.x,MovingBlockMgr::Instance()->movingBlock[movingIndex]->SCALE + PLAYER_HIT_SIZE.y };
 
 			// XYの距離が動的ブロックとプレイヤーのサイズ以上だったら処理を飛ばす。
 			if (distanceXABS >= playerMovingBlockSize.x ||
@@ -503,8 +480,8 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			if (bubble[index].isBreak) continue;
 
 			// hitcheck
-			bool isHitBubbleX = centerPos.Distance(bubble[index].pos) <= PLAYER_SIZE.x + bubble[index].RADIUS;
-			bool isHitBubbleY = centerPos.Distance(bubble[index].pos) <= PLAYER_SIZE.y + bubble[index].RADIUS;
+			bool isHitBubbleX = centerPos.Distance(bubble[index].pos) <= PLAYER_HIT_SIZE.x + bubble[index].RADIUS;
+			bool isHitBubbleY = centerPos.Distance(bubble[index].pos) <= PLAYER_HIT_SIZE.y + bubble[index].RADIUS;
 
 			// isHit
 			if (!isHitBubbleX && !isHitBubbleY) continue;
@@ -553,11 +530,11 @@ void Player::HitMapChipTop()
 	// 最初の一発は反動が強いフラグを初期化する。
 	//rHand->Hit();
 	//lHand->Hit();
-
 }
 
 void Player::HitMapChipLeft()
 {
+	stretch_LU.x = 0.0f;
 
 	// Y軸の移動量の合計が一定以上だったら摩擦を作る。
 	if (fabs(vel.y + gravity) >= STOP_DEADLINE_Y || fabs(gravity) >= MAX_GRAVITY) {
@@ -570,6 +547,8 @@ void Player::HitMapChipLeft()
 		// 壁ズリフラグを設定
 		isSlippingWall[PLAYER_LEFT] = true;
 
+		//摩擦用アニメーション
+		anim.ChangeAnim(ON_WALL_DASH);
 	}
 	else {
 
@@ -578,6 +557,12 @@ void Player::HitMapChipLeft()
 		vel.y = 0;
 		gravity = 0;
 
+		//摩擦無いときはストレッチを弱くする
+		stretch_RB.y /= STRETCH_DIV_RATE;
+		stretch_LU.y /= STRETCH_DIV_RATE;
+
+		//壁貼り付きアニメーション
+		anim.ChangeAnim(ON_WALL_WAIT);
 	}
 
 	// 最初の一発は反動が強いフラグを初期化する。
@@ -589,11 +574,11 @@ void Player::HitMapChipLeft()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
-
 }
 
 void Player::HitMapChipRight()
 {
+	stretch_RB.x = 0.0f;
 
 	// Y軸の移動量の合計が一定以上だったら摩擦を作る。
 	if (fabs(vel.y + gravity) >= STOP_DEADLINE_Y || fabs(gravity) >= MAX_GRAVITY) {
@@ -606,6 +591,8 @@ void Player::HitMapChipRight()
 		// 壁ズリフラグを設定
 		isSlippingWall[PLAYER_RIGHT] = true;
 
+		//摩擦用アニメーション
+		anim.ChangeAnim(ON_WALL_DASH);
 	}
 	else {
 
@@ -614,6 +601,12 @@ void Player::HitMapChipRight()
 		vel.y = 0;
 		gravity = 0;
 
+		//摩擦無いときはストレッチを弱くする
+		stretch_RB.y /= STRETCH_DIV_RATE;
+		stretch_LU.y /= STRETCH_DIV_RATE;
+
+		//壁貼り付きアニメーション
+		anim.ChangeAnim(ON_WALL_WAIT);
 	}
 
 	// 最初の一発は反動が強いフラグを初期化する。
@@ -627,11 +620,11 @@ void Player::HitMapChipRight()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
-
 }
 
 void Player::HitMapChipBottom()
 {
+	stretch_RB.y = 0.0f;
 
 	// 接地フラグを立てる。
 	onGround = true;
@@ -649,6 +642,8 @@ void Player::HitMapChipBottom()
 		// 壁ズリフラグを設定
 		isSlippingWall[PLAYER_BOTTOM] = true;
 
+		//摩擦用アニメーション
+		anim.ChangeAnim(ON_GROUND_DASH);
 	}
 	else {
 
@@ -659,6 +654,12 @@ void Player::HitMapChipBottom()
 		// 重力を無効化する。
 		gravity = 0.5f;
 
+		//摩擦無いときはストレッチを弱くする
+		stretch_RB.x /= STRETCH_DIV_RATE;
+		stretch_LU.x /= STRETCH_DIV_RATE;
+
+		//待機アニメーションに戻す
+		anim.ChangeAnim(ON_GROUND_WAIT);
 	}
 
 	gravity = 0;
@@ -673,7 +674,6 @@ void Player::HitMapChipBottom()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
-
 }
 
 void Player::Input(const vector<vector<int>> mapData)
@@ -793,6 +793,8 @@ void Player::Input(const vector<vector<int>> mapData)
 		// 入力タイマーをセット。
 		asSoonAsInputTimer = AS_SOON_AS_INPUT_TIMER;
 
+		//ストレッチ
+		CalculateStretch(vel);
 	}
 
 	// RBが押されたら反動をつける。
@@ -876,6 +878,8 @@ void Player::Input(const vector<vector<int>> mapData)
 		// 入力タイマーをセット。
 		asSoonAsInputTimer = AS_SOON_AS_INPUT_TIMER;
 
+		//ストレッチ
+		CalculateStretch(vel);
 	}
 
 	// 移動速度が限界値を超えないようにする。
@@ -904,6 +908,9 @@ void Player::Input(const vector<vector<int>> mapData)
 		// ビーコンが発射されていたら。
 		else if (rHand->teleportPike.isActive && (rHand->teleportPike.isHitWall || rHand->teleportPike.isHitWindow) && !isPrevFrameShotBeacon) {
 
+			//ストレッチ
+			CalculateStretch(rHand->teleportPike.pos - centerPos);
+
 			// プレイヤーを瞬間移動させる。
 			centerPos = rHand->teleportPike.pos;
 
@@ -926,7 +933,6 @@ void Player::Input(const vector<vector<int>> mapData)
 
 			// ビーコンのクールタイムを設定
 			rHand->pikeCooltime = rHand->PIKE_COOL_TIME;
-
 		}
 
 		isPrevFrameShotBeacon = true;
@@ -1063,7 +1069,7 @@ void Player::PushBackWall()
 	// X軸に関する押し戻し処理。
 
 	// 右側
-	const float PLAYER_RIGHT_X = centerPos.x + PLAYER_SIZE.x;
+	const float PLAYER_RIGHT_X = centerPos.x + PLAYER_HIT_SIZE.x;
 	if (PLAYER_RIGHT_X > WIN_WIDTH) {
 
 		// 差分押し戻す。
@@ -1075,7 +1081,7 @@ void Player::PushBackWall()
 	}
 
 	// 左側
-	const float PLAYER_LEFT_X = centerPos.x - PLAYER_SIZE.x;
+	const float PLAYER_LEFT_X = centerPos.x - PLAYER_HIT_SIZE.x;
 	if (PLAYER_LEFT_X < 0) {
 
 		// 差分押し戻す。
@@ -1090,7 +1096,7 @@ void Player::PushBackWall()
 	// Y軸に関する押し戻し処理
 
 	// 上側
-	const float PLAYER_UP_Y = centerPos.y - PLAYER_SIZE.y;
+	const float PLAYER_UP_Y = centerPos.y - PLAYER_HIT_SIZE.y;
 	if (PLAYER_UP_Y < 0) {
 
 		// 差分押し戻す。
@@ -1102,7 +1108,7 @@ void Player::PushBackWall()
 	}
 
 	// 下側
-	const float PLAYER_DOWN_Y = centerPos.y + PLAYER_SIZE.y;
+	const float PLAYER_DOWN_Y = centerPos.y + PLAYER_HIT_SIZE.y;
 	if (PLAYER_DOWN_Y >= WIN_HEIGHT) {
 
 		// 差分押し戻す。
@@ -1129,4 +1135,96 @@ void Player::PushBackWall()
 
 	}
 
+}
+
+void Player::CalculateStretch(const Vec2<float>& Move)
+{
+	Vec2<float> stretchRate = { abs(Move.x / MAX_RECOIL_AMOUNT),abs(Move.y / MAX_RECOIL_AMOUNT) };
+
+	//X移動の勢いの方が強い
+	if (stretchRate.y < stretchRate.x)
+	{
+		anim.ChangeAnim(ON_AIR_DASH_X);
+	}
+	//Y移動の勢いの方が強い
+	else if (stretchRate.x < stretchRate.y)
+	{
+		anim.ChangeAnim(ON_AIR_DASH_Y);
+	}
+
+	if (1.0f < stretchRate.x)stretchRate.x = 1.0f;
+	if (1.0f < stretchRate.y)stretchRate.y = 1.0f;
+
+	//左
+	if (Move.x < 0.0f)
+	{
+		//右に伸びる
+		stretch_RB.x += MAX_STRETCH.x * stretchRate.x;
+		if (MAX_STRETCH.x < stretch_RB.x)stretch_RB.x = MAX_STRETCH.x;
+	}
+	//右
+	else if (0.0f < Move.x)
+	{
+		//左に伸びる
+		stretch_LU.x -= MAX_STRETCH.x * stretchRate.x;
+		if (stretch_LU.x < -MAX_STRETCH.x)stretch_LU.x = -MAX_STRETCH.x;
+	}
+
+	//左右移動時
+	if (Move.x != 0.0f)
+	{
+		//上下が縮む
+		stretch_LU.y += MAX_STRETCH.y * stretchRate.x;
+		if (MAX_STRETCH.y < stretch_LU.y)stretch_LU.y = MAX_STRETCH.y;
+		stretch_RB.y -= MAX_STRETCH.y * stretchRate.x;
+		if (stretch_RB.y < -MAX_STRETCH.y)stretch_RB.y = -MAX_STRETCH.y;
+	}
+
+	//上
+	if (Move.y < 0.0f)
+	{
+		//下に伸びる
+		stretch_RB.y += MAX_STRETCH.y * stretchRate.y;
+		if (MAX_STRETCH.y < stretch_RB.y)stretch_RB.y = MAX_STRETCH.y;
+	}
+	//下
+	else if (0.0f < Move.y)
+	{
+		//上に伸びる
+		stretch_LU.y -= MAX_STRETCH.y * stretchRate.y;
+		if (stretch_LU.y < -MAX_STRETCH.y)stretch_LU.y = -MAX_STRETCH.y;
+	}
+
+	//上下移動時
+	if (Move.y != 0.0f)
+	{
+		//左右が縮む
+		stretch_LU.x += MAX_STRETCH.x * stretchRate.y;
+		if (MAX_STRETCH.x < stretch_LU.x)stretch_LU.x = MAX_STRETCH.x;
+		stretch_RB.x -= MAX_STRETCH.x * stretchRate.y;
+		if (stretch_RB.x < -MAX_STRETCH.x)stretch_RB.x = -MAX_STRETCH.x;
+	}
+
+	stretchTimer = 0;
+	fromStretch_LU = stretch_LU;
+	fromStretch_RB = stretch_RB;
+}
+
+#include"KuroMath.h"
+void Player::UpdateStretch()
+{
+	static const EASING_TYPE STRETCH_EASE_TYPE = Cubic;
+	stretch_LU = KuroMath::Ease(Out, STRETCH_EASE_TYPE, stretchTimer, STRETCH_RETURN_TIME, fromStretch_LU, { 0.0f,0.0f });
+	stretch_RB = KuroMath::Ease(Out, STRETCH_EASE_TYPE, stretchTimer, STRETCH_RETURN_TIME, fromStretch_RB, { 0.0f,0.0f });
+
+	if (stretchTimer < STRETCH_RETURN_TIME)
+	{
+		stretchTimer++;
+	}
+}
+
+Vec2<float> Player::GetPlayerGraphSize()
+{
+	//return { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 }

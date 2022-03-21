@@ -39,6 +39,7 @@ void BulletParticle::Generate(const Vec2<float>& generatePos, const Vec2<float>&
 	// 重ならないように切り上げする。
 	pos.x = RoundUp(pos.x, SCALE);
 	pos.y = RoundUp(pos.y, SCALE);
+	scale = SCALE;
 
 	// 進行方向を設定
 	this->forwardVec = forwardVec;
@@ -67,26 +68,26 @@ void BulletParticle::Update()
 	movedVel += Vec2<float>(forwardVec.x * speed, forwardVec.y * speed);
 
 	// 移動した量がサイズを上回ったらサイズを動かす。
-	if (fabs(movedVel.x) >= SCALE) {
+	if (fabs(movedVel.x) >= scale) {
 
 		// 符号を取得。
 		int sign = signbit(movedVel.x) ? -1 : 1;
 
 		// 座標を動かす。
-		pos.x += SCALE * sign;
+		pos.x += scale * sign;
 
 		// 移動した量を減らす。
-		movedVel.x -= SCALE * sign;
+		movedVel.x -= scale * sign;
 
 	}
 	// 移動した量がサイズを上回ったらサイズを動かす。Yバージョン
-	if (fabs(movedVel.y) >= SCALE) {
+	if (fabs(movedVel.y) >= scale) {
 
 		// 符号を取得。
 		int sign = signbit(movedVel.y) ? -1 : 1;
 
 		// 座標を動かす。
-		pos.y += SCALE * sign;
+		pos.y += scale * sign;
 
 		// 移動した量を減らす。
 		movedVel.y -= SCALE * sign;
@@ -106,6 +107,8 @@ void BulletParticle::Update()
 	// アルファ値が一定以下になったら初期化する。
 	if (alpha <= 10.0f) Init();
 
+	if (alpha <= 123)scale = SCALE / 2.0f;
+
 }
 
 void BulletParticle::Draw()
@@ -117,7 +120,7 @@ void BulletParticle::Draw()
 	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
 
-	float scale = (SCALE / 2.0f) * ScrollMgr::Instance()->zoom;
+	float drawScale = (scale / 2.0f) * ScrollMgr::Instance()->zoom;
 
 	//SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
 
@@ -129,13 +132,13 @@ void BulletParticle::Draw()
 
 	//SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-	Vec2<float>leftUp = { pos.x * ScrollMgr::Instance()->zoom - scale - scrollShakeZoom.x,
-		pos.y * ScrollMgr::Instance()->zoom - scale - scrollShakeZoom.y };
-	Vec2<float>rightBottom = { pos.x * ScrollMgr::Instance()->zoom + scale - scrollShakeZoom.x,
-		pos.y * ScrollMgr::Instance()->zoom + scale - scrollShakeZoom.y };
+	Vec2<float>leftUp = { pos.x * ScrollMgr::Instance()->zoom - drawScale - scrollShakeZoom.x,
+		pos.y * ScrollMgr::Instance()->zoom - drawScale - scrollShakeZoom.y };
+	Vec2<float>rightBottom = { pos.x * ScrollMgr::Instance()->zoom + drawScale - scrollShakeZoom.x,
+		pos.y * ScrollMgr::Instance()->zoom + drawScale - scrollShakeZoom.y };
 
 	//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(217, 26, 96, (int)alpha), true, AlphaBlendMode_Trans);
-	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(255, 255, 255, (int)alpha), true, AlphaBlendMode_Trans);
+	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(255, 255, 255, 255), true, AlphaBlendMode_Trans);
 
 }
 

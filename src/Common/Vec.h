@@ -99,6 +99,27 @@ struct Vec2
 		x = fmodf(x, rhs.x);
 		y = fmodf(y, rhs.y);
 	};
+
+	void operator+=(const float& rhs) {
+		x += rhs;
+		y += rhs;
+	};
+	void operator-=(const float& rhs) {
+		x -= rhs;
+		y -= rhs;
+	};
+	void operator*=(const float& rhs) {
+		x *= rhs;
+		y *= rhs;
+	};
+	void operator/=(const float& rhs) {
+		x /= rhs;
+		y /= rhs;
+	};
+	void operator%=(const float& rhs) {
+		x = fmodf(x, rhs);
+		y = fmodf(y, rhs);
+	};
 #pragma endregion
 };
 

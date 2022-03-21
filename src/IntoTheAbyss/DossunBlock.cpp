@@ -224,11 +224,11 @@ void DossunBlock::CheckHit(Player& player, const vector<vector<int>>& mapData)
 
 	// ドッスンブロックとプレイヤーの当たり判定
 
-	bool isDossunVel = Collider::Instance()->CheckHitVel(player.centerPos, player.prevFrameCenterPos, player.vel + player.gimmickVel, player.PLAYER_SIZE, pos, size) != INTERSECTED_NONE;
-	isDossunTop = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_TOP) != INTERSECTED_NONE;
-	isDossunRight = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
-	isDossunLeft = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_LEFT) != INTERSECTED_NONE;
-	isDossunBottom = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_SIZE, pos, size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+	bool isDossunVel = Collider::Instance()->CheckHitVel(player.centerPos, player.prevFrameCenterPos, player.vel + player.gimmickVel, player.PLAYER_HIT_SIZE, pos, size) != INTERSECTED_NONE;
+	isDossunTop = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_HIT_SIZE, pos, size, INTERSECTED_TOP) != INTERSECTED_NONE;
+	isDossunRight = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_HIT_SIZE, pos, size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+	isDossunLeft = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_HIT_SIZE, pos, size, INTERSECTED_LEFT) != INTERSECTED_NONE;
+	isDossunBottom = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_HIT_SIZE, pos, size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
 
 	// どこかしらにぶつかっていれば当たった判定にする。
 	if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {

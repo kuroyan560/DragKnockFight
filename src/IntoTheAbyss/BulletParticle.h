@@ -16,6 +16,7 @@ public:
 	float alpha;		// アルファ値
 	float speed;		// 移動速度
 	bool isAlive;		// 生存フラグ
+	float scale;
 
 
 public:
