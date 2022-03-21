@@ -1,6 +1,7 @@
 #pragma once
 #include "Vec.h"
 #include "GimmickLoader.h"
+#include "SightCollisionStorage.h"
 #include <vector>
 
 using namespace std;
@@ -16,6 +17,7 @@ public:
 	Vec2<float> pos;			// 座標
 	Vec2<float> size;			// 大きさ
 	Vec2<float> moveDir;		// 移動方向
+	SightCollisionData sightData;// 昇順の判定に使用するデータ
 	float speed;		// 移動速度
 	int isMoveTimer;	// 移動するまでのタイマー(プレイヤーがこのブロックに触れてから指定フレーム後に動き出すようにするために必要。)
 	int changeDirTimer;	// 壁と当たったときに方向転換するタイマー

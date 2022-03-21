@@ -9,6 +9,7 @@
 #include"MovingBlockMgr.h"
 #include"Bullet.h"
 #include"Collider.h"
+#include"SightCollisionStorage.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -700,11 +701,15 @@ void Game::Update()
 
 		const int dossunCount = dossunData.size();
 
+		// 照準の判定に使用するデータを保存。
+		SightCollisionStorage::Instance()->data.clear();
+
 		// ドッスンブロックを初期化。
 		dossunBlock.clear();
 
 		dossunBlock.push_back({});
-		dossunBlock[0].Generate(player.centerPos, player.centerPos + Vec2<float>(100,0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), GIMMICK_DOSSN_ON_LOW);
+		dossunBlock[0].Generate(player.centerPos, player.centerPos + Vec2<float>(100, 0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), GIMMICK_DOSSN_ON_LOW);
+		SightCollisionStorage::Instance()->data.push_back(dossunBlock[dossunBlock.size() - 1].sightData);
 
 		// ドッスンを生成。
 		for (int index = 0; index < dossunCount; ++index) {
@@ -715,7 +720,11 @@ void Game::Update()
 			// データを追加。
 			dossunBlock.push_back(dossunBuff);
 
+			SightCollisionStorage::Instance()->data.push_back(dossunBlock[dossunBlock.size() - 1].sightData);
+
 		}
+
+
 
 		// シャボン玉ブロックの情報を取得。
 		vector<shared_ptr<BubbleData>> bubbleData;
