@@ -102,8 +102,6 @@ void GameScene::OnUpdate()
 
 	game.Update();
 
-
-
 }
 
 void GameScene::OnDraw()

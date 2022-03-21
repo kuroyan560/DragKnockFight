@@ -9,6 +9,7 @@
 #include"MovingBlockMgr.h"
 #include"Bullet.h"
 #include"Collider.h"
+#include"SelectStage.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -28,7 +29,7 @@ bool Game::CheckUsedData(std::vector<Vec2<float>> DATA, Vec2<float> DATA2)
 }
 
 #include<map>
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -57,7 +58,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -114,7 +115,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS)
+Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS)
 {
 	Vec2<float> doorPos;
 	int roopCount = 0;
@@ -266,7 +267,7 @@ Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_N
 	return Vec2<float>(-1, -1);
 }
 
-Vec2<float> Game::GetPlayerPos(const int& STAGE_NUMBER, int* ROOM_NUMBER, const int& DOOR_NUMBER, const SizeData& SIZE_DATA, vector<vector<int>>* MAPCHIP_DATA)
+Vec2<float> Game::GetPlayerPos(const int &STAGE_NUMBER, int *ROOM_NUMBER, const int &DOOR_NUMBER, const SizeData &SIZE_DATA, vector<vector<int>> *MAPCHIP_DATA)
 {
 	int roomNum = StageMgr::Instance()->GetRelationData(STAGE_NUMBER, *ROOM_NUMBER, DOOR_NUMBER - SIZE_DATA.min);
 	*MAPCHIP_DATA = StageMgr::Instance()->GetMapChipData(STAGE_NUMBER, roomNum);
@@ -538,6 +539,8 @@ void Game::Update()
 
 
 #pragma region ステージの切り替え
+	stageNum = SelectStage::Instance()->GetStageNum();
+
 	bool enableToSelectStageFlag = 0 < debugStageData[0];
 	bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//マップの切り替え
@@ -680,16 +683,12 @@ void Game::Update()
 
 
 	//ステージ毎の切り替え判定
-	if (stageNum != oldStageNum)
+	//部屋の初期化
+	if (roomNum != oldRoomNum || stageNum != oldStageNum)
 	{
 		debugStageData[0] = stageNum;
-	}
-	oldStageNum = stageNum;
-
-	//部屋の初期化
-	if (roomNum != oldRoomNum)
-	{
 		debugStageData[1] = roomNum;
+
 		mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 
 		// ドッスンブロックを生成。
@@ -704,7 +703,7 @@ void Game::Update()
 		dossunBlock.clear();
 
 		dossunBlock.push_back({});
-		dossunBlock[0].Generate(player.centerPos, player.centerPos + Vec2<float>(100,0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), GIMMICK_DOSSN_ON_LOW);
+		dossunBlock[0].Generate(player.centerPos, player.centerPos + Vec2<float>(100, 0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), GIMMICK_DOSSN_ON_LOW);
 
 		// ドッスンを生成。
 		for (int index = 0; index < dossunCount; ++index) {
@@ -739,7 +738,7 @@ void Game::Update()
 
 	}
 	oldRoomNum = roomNum;
-
+	oldStageNum = stageNum;
 
 
 
