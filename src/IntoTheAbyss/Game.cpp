@@ -684,8 +684,9 @@ void Game::Update()
 
 	//ステージ毎の切り替え判定
 	//部屋の初期化
-	if (roomNum != oldRoomNum || stageNum != oldStageNum)
+	if ((roomNum != oldRoomNum || stageNum != oldStageNum) || SelectStage::Instance()->resetStageFlag)
 	{
+		SelectStage::Instance()->resetStageFlag = false;
 		debugStageData[0] = stageNum;
 		debugStageData[1] = roomNum;
 
@@ -733,9 +734,40 @@ void Game::Update()
 
 			// データを追加。
 			bubbleBlock.push_back(bubbleBuff);
-
 		}
 
+
+		bool responeFlag = false;
+		//マップ開始時の場所にスポーンさせる
+		for (int y = 0; y < mapData.size(); ++y)
+		{
+			for (int x = 0; x < mapData[y].size(); ++x)
+			{
+				if (mapData[y][x] == MAPCHIP_BLOCK_START)
+				{
+					player.centerPos = { (float)x * 50.0f,(float)y * 50.0f };
+					responeFlag = true;
+					break;
+				}
+			}
+		}
+
+		//マップ開始用の場所からリスポーンしたらこの処理を通さない
+		if (!responeFlag)
+		{
+			for (int y = 0; y < mapData.size(); ++y)
+			{
+				for (int x = 0; x < mapData[y].size(); ++x)
+				{
+					if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
+					{
+						player.centerPos = { (float)x * 50.0f,(float)y * 50.0f };
+						ScrollMgr::Instance()->WarpScroll(player.centerPos);
+						break;
+					}
+				}
+			}
+		}
 	}
 	oldRoomNum = roomNum;
 	oldStageNum = stageNum;

@@ -11,6 +11,8 @@ public:
 		stageNum = STAGE_NUM;
 	};
 	const int &GetStageNum();
+
+	bool resetStageFlag;
 private:
 	int stageNum;	//ステージ番号
 };

@@ -18,6 +18,7 @@ void StageSelectScene::OnUpdate()
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::A))
 	{
 		KuroEngine::Instance().ChangeScene(2, changeScene);
+		SelectStage::Instance()->resetStageFlag = true;
 	}
 	//タイトルシーンに移動する
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::B))
