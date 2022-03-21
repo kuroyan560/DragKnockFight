@@ -10,6 +10,8 @@ using namespace std;
 // プレイヤーの腕の前方宣言
 class PlayerHand;
 
+#include"PlayerAnimation.h"
+
 // プレイヤークラス
 class Player {
 
@@ -41,7 +43,20 @@ public:
 	unique_ptr<PlayerHand> rHand;	// 右手
 	bool isPrevFrameShotBeacon;
 
-	int playerGraph;
+	//int playerGraph;
+
+	//勢いによるストレッチ
+	const Vec2<float> MAX_STRETCH = { 16.0f,37.0f };	//最大ストレッチ量
+	Vec2<float>stretch_LU = { 0,0 };	//左上
+	Vec2<float>stretch_RB = { 0,0 };	//右下
+	Vec2<float>fromStretch_LU = { 0,0 };	//イージング用スタート値
+	Vec2<float>fromStretch_RB = { 0,0 };	//イージング用スタート値
+	const int STRETCH_RETURN_TIME = 17;	//ストレッチが０になるまでのフレーム数
+	int stretchTimer = STRETCH_RETURN_TIME;	
+	const float STRETCH_DIV_RATE = 2.0f;	//ストレッチを弱くするときの割合
+
+	//アニメーション統括
+	PlayerAnimation anim;
 
 public:
 
@@ -53,7 +68,7 @@ public:
 	const float FIRST_RECOIL_AMOUNT = 20.0;		// 弾を撃った際の反動
 	const float MAX_RECOIL_AMOUNT = 30.0f;		// 弾を撃った際の反動の最大値
 	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
-	const Vec2<float> PLAYER_SIZE = { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+	const Vec2<float> PLAYER_HIT_SIZE = { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 	static Vec2<float>GetGeneratePos();
 	const int RAPID_FIRE_TIMER = 21;			// 連射タイマー
 	const int GRAVITY_INVALID_TIMER = 20;		// 重力無効化タイマー
@@ -111,9 +126,7 @@ public:
 	void HitMapChipRight();
 	void HitMapChipBottom();
 
-
 private:
-
 	/*-- クラス内で使用する関数 --*/
 
 	// 入力処理
@@ -128,4 +141,10 @@ private:
 	// 壁との押し戻しに関する更新処理
 	void PushBackWall();
 
+	//ストレッチの値を計算
+	void CalculateStretch(const Vec2<float>& Move);
+	//ストレッチ値更新
+	void UpdateStretch();
+	//画像サイズからプレイヤーサイズ取得
+	Vec2<float> GetPlayerGraphSize();
 };
