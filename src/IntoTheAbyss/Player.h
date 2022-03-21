@@ -1,6 +1,6 @@
 #pragma once
 #include "Vec.h"
-#include "TimeStopTestBlock.h"
+#include "DossunBlock.h"
 #include "Bubble.h"
 #include <memory>
 #include <vector>
@@ -102,7 +102,7 @@ public:
 	void Draw();
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, TimeStopTestBlock& testBlock);
+	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun);
 
 
 	// 方向ごとのマップチップとの当たり判定関数

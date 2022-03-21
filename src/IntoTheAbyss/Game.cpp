@@ -703,6 +703,9 @@ void Game::Update()
 		// ドッスンブロックを初期化。
 		dossunBlock.clear();
 
+		dossunBlock.push_back({});
+		dossunBlock[0].Generate(player.centerPos, player.centerPos + Vec2<float>(100,0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), GIMMICK_DOSSN_ON_LOW);
+
 		// ドッスンを生成。
 		for (int index = 0; index < dossunCount; ++index) {
 
@@ -798,9 +801,6 @@ void Game::Update()
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();
 
-	// 時間停止の短槍の性能テスト用のブロックの更新処理
-	testBlock.Update(player.centerPos);
-
 	// 動的ブロックの更新処理
 	MovingBlockMgr::Instance()->Update(player.centerPos);
 
@@ -834,8 +834,13 @@ void Game::Update()
 
 	/*===== 当たり判定 =====*/
 
+	// ドッスンブロックの当たり判定
+	for (int index = 0; index < DOSSUN_COUNT; ++index) {
+		dossunBlock[index].CheckHit(mapData);
+	}
+
 	// プレイヤーの当たり判定
-	player.CheckHit(mapData, bubbleBlock, testBlock);
+	player.CheckHit(mapData, bubbleBlock, dossunBlock);
 
 	// 動的ブロックの当たり判定
 	MovingBlockMgr::Instance()->CheckHit(mapData);
@@ -1160,11 +1165,6 @@ void Game::Update()
 	}
 	ViewPort::Instance()->playerPos = player.centerPos;
 
-	// ドッスンブロックの当たり判定
-	for (int index = 0; index < DOSSUN_COUNT; ++index) {
-		dossunBlock[index].CheckHit(player, mapData);
-	}
-
 
 }
 
@@ -1173,8 +1173,6 @@ void Game::Draw()
 	/*===== 描画処理 =====*/
 
 	DrawMapChip(mapData, mapChipDrawData, mapBlockGraph, 0, roomNum);
-
-	testBlock.Draw(mapBlockGraph);
 
 	MovingBlockMgr::Instance()->Draw(movingBlockGraph);
 

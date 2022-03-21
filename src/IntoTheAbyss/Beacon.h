@@ -20,6 +20,8 @@ public:
 	Vec2<float> prevFramePos;		// 前フレームの座標
 	Vec2<float> forwardVec;		// 移動方向ベクトル
 	Vec2<float> prevFrameScroll;	// 前フレームのウィンドウスクロール量 ウィンドウに刺さったときにウィンドウに合わせて動かすために必要
+	float* stopTargetPos;
+	float stopPos;
 	float speed;			// 移動速度
 	bool isActive;			// 有効化されているか(発射されたか)フラグ
 	bool isHitWall;			// 壁に当たっているかのフラグ
@@ -55,5 +57,10 @@ public:
 
 	// 描画処理
 	void Draw();
+
+	// 再び動かす。
+	void MoveAgain() {
+		if (stopTargetPos != nullptr)*stopTargetPos = stopPos;
+	}
 
 };

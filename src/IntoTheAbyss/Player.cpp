@@ -7,6 +7,7 @@
 #include "MovingBlockMgr.h"
 #include "MovingBlock.h"
 #include "BulletParticleMgr.h"
+#include "Collider.h"
 #include <cmath>
 
 #include"TexHandleMgr.h"
@@ -268,7 +269,7 @@ void Player::Draw()
 
 }
 
-void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, TimeStopTestBlock& testBlock)
+void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun)
 {
 
 	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
@@ -464,27 +465,28 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
 		}
 
-		// 時間停止の短槍とテスト用ブロックの当たり判定を行う。
-		if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
-			// 時間停止の短槍の座標
-			Vec2<float> pikePos = lHand->timeStopPike.pos;
-			// ブロックの当たり判定 判定は円で適当です。
-			if (testBlock.pos.Distance(lHand->timeStopPike.pos) <= testBlock.SCALE * 3.0f) {
+		// 時間停止の短槍とドッスンブロックの当たり判定を行う。
+		const int DOSSUN_COUNT = dossun.size();
+		for (int index = 0; index < DOSSUN_COUNT; ++index) {
 
-				// 短槍を止める。
-				lHand->timeStopPike.isHitWall = true;
-				// ブロックを止める。
-				testBlock.isTimeStop = true;
+			if (lHand->timeStopPike.isHitWall) continue;
 
-			}
-			else {
-				// 短槍が消えたら時間停止を解除するため。
-				testBlock.isTimeStop = false;
-			}
-		}
-		else {
-			// 短槍が消えたら時間停止を開場するため。
-			testBlock.isTimeStop = false;
+			// まずは当たっているかをチェックする。
+			if (fabs(lHand->timeStopPike.pos.x - dossun[index].pos.x) > lHand->timeStopPike.SCALE + dossun[index].size.x) continue;
+			if (fabs(lHand->timeStopPike.pos.y - dossun[index].pos.y) > lHand->timeStopPike.SCALE + dossun[index].size.y) continue;
+
+			lHand->timeStopPike.isHitWall = true;
+			lHand->timeStopPike.stopPos = dossun[index].speed;
+			lHand->timeStopPike.stopTargetPos = &dossun[index].speed;
+
+			// この時点でドッスンブロックは1F分移動しちゃっているので、押し戻す。
+			dossun[index].pos -= dossun[index].moveDir * Vec2<float>(dossun[index].speed, dossun[index].speed);
+
+			// ぷれいやーもおしもどす。
+			centerPos -= gimmickVel;
+
+			dossun[index].isTimeStopPikeAlive = &(lHand->timeStopPike.isHitWall);
+
 		}
 
 	}
@@ -535,6 +537,42 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 				inBubble = true;
 
 			}
+
+		}
+
+	}
+
+
+	/*===== プレイヤーとドッスンブロックの当たり判定 =====*/
+
+	const int DOSSUN_COUNT = dossun.size();
+	for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+		bool isDossunVel = Collider::Instance()->CheckHitVel(centerPos, prevFrameCenterPos, vel + gimmickVel, PLAYER_SIZE, dossun[index].pos, dossun[index].size) != INTERSECTED_NONE;
+		bool isDossunTop = Collider::Instance()->CheckHitSize(centerPos, PLAYER_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_TOP) != INTERSECTED_NONE;
+		bool isDossunRight = Collider::Instance()->CheckHitSize(centerPos, PLAYER_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+		bool isDossunLeft = Collider::Instance()->CheckHitSize(centerPos, PLAYER_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_LEFT) != INTERSECTED_NONE;
+		bool isDossunBottom = Collider::Instance()->CheckHitSize(centerPos, PLAYER_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+
+		// どこかしらにぶつかっていれば当たった判定にする。
+		if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
+
+			// プレイヤーにドッスンブロックの移動量を渡す。
+			gimmickVel = Vec2<float>(dossun[index].speed, dossun[index].speed) * dossun[index].moveDir;
+
+			// ドッスンの移動量タイマーを更新。
+			dossun[index].isHitPlayer = true;
+
+			// プレイヤーの移動量をかき消す。
+			gravity *= 0.0f;
+			vel *= {0.5f, 0.5f};
+
+		}
+		else {
+
+			// ドッスンの移動量タイマーを初期化。
+			dossun[index].isHitPlayer = false;
+			//isMoveTimer = 0;
 
 		}
 
@@ -950,6 +988,9 @@ void Player::Input(const vector<vector<int>> mapData)
 		}
 		// ビーコンが発射されていたら。
 		else if (lHand->timeStopPike.isActive && (lHand->timeStopPike.isHitWall || lHand->timeStopPike.isHitWindow) && !isPrevFrameShotBeacon) {
+
+			// 止められていたものを動かす。
+			lHand->timeStopPike.MoveAgain();
 
 			// ビーコンを初期化する。
 			lHand->timeStopPike.Init();

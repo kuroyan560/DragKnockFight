@@ -33,9 +33,6 @@ class Game
 	// 敵
 	Enemy enemy;
 
-	// 時間停止の短槍の挙動をテストするようのブロック。
-	TimeStopTestBlock testBlock;
-
 	// マップチップのデータ
 	vector<vector<int>> mapData;
 

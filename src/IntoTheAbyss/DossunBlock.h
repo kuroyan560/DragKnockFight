@@ -1,6 +1,5 @@
 #pragma once
 #include "Vec.h"
-#include "Player.h"
 #include "GimmickLoader.h"
 #include <vector>
 
@@ -23,6 +22,7 @@ public:
 	bool isHitPlayer;	// プレイヤーと当たっているかどうか。
 	bool isMove;		// 動き出したかどうか
 	bool isReturn;		// 初期位置に戻っているかどうか
+	bool* isTimeStopPikeAlive;
 	E_GIMMICK id;		// どのドッスンかのID
 
 
@@ -56,6 +56,6 @@ public:
 	void Draw();
 
 	// 当たり判定
-	void CheckHit(Player& player, const vector<vector<int>>& mapData);
+	void CheckHit(const vector<vector<int>>& mapData);
 
 };

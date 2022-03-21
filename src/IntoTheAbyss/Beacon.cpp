@@ -24,9 +24,11 @@ void Beacon::Init()
 
 	/*===== ‰Šú‰»ˆ— =====*/
 
+	pos = {-1000,-1000};
 	isActive = false;
 	isHitWall = false;
 	isHitWindow = false;
+	stopTargetPos = nullptr;
 
 }
 
@@ -40,6 +42,7 @@ void Beacon::Generate(const Vec2<float>& generatePos, const Vec2<float>& forwadV
 	isActive = true;
 	isHitWall = false;
 	isHitWindow = false;
+	stopTargetPos = nullptr;
 
 	// ¯•ÊID‚ğİ’è
 	this->id = id;
@@ -72,6 +75,12 @@ void Beacon::Update()
 			prevFrameScroll = ScrollMgr::Instance()->scrollAmount;
 
 		}
+
+	}
+
+	if (isHitWall && stopTargetPos != nullptr) {
+
+		*stopTargetPos = 0;
 
 	}
 
