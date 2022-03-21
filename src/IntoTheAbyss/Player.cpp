@@ -37,7 +37,7 @@ Player::~Player()
 {
 }
 
-void Player::Init(const Vec2<float>& INIT_POS)
+void Player::Init(const Vec2<float> &INIT_POS)
 {
 
 	/*===== 初期化処理 =====*/
@@ -105,16 +105,35 @@ void Player::Update(const vector<vector<int>> mapData)
 
 	/*===== 入力処理 =====*/
 
-	// 入力に関する更新処理を行う。
-	Input(mapData);
+	if (!doorMoveLeftRightFlag && !doorMoveUpDownFlag)
+	{
+		// 入力に関する更新処理を行う。
+		Input(mapData);
+		drawCursorFlag = true;
+	}
+	else
+	{
+		drawCursorFlag = false;
+	}
 
 	/*===== 更新処理 =====*/
+	if (!doorMoveLeftRightFlag && !doorMoveUpDownFlag)
+	{
+		//移動に関する処理
+		Move();
+	}
 
-	// 移動に関する処理
-	Move();
+	ScrollMgr::Instance()->CalucurateScroll(prevFrameCenterPos - centerPos);
+	prevFrameCenterPos = centerPos;
 
-	// 重力に関する更新処理
-	UpdateGravity();
+	if (!doorMoveLeftRightFlag)
+	{
+		// 重力に関する更新処理
+		UpdateGravity();
+	}
+	doorMoveLeftRightFlag = false;
+	doorMoveUpDownFlag = false;
+	doorMoveDownFlag = false;
 
 	// 連射タイマーを更新
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;
@@ -138,6 +157,9 @@ void Player::Update(const vector<vector<int>> mapData)
 	if (mapX >= mapData[0].size()) mapX = mapData[0].size() - 1;
 	if (mapY <= 0) mapY = 1;
 	if (mapY >= mapData.size()) mapY = mapData.size() - 1;
+	if (mapY <= 0) mapY = 1;
+	if (mapX <= 0) mapX = 1;
+	if (mapX >= mapData[mapY].size()) mapX = mapData[mapY].size() - 1;
 
 	// 一個上のマップチップがブロックで、X軸方向の移動量が一定以上だったらパーティクルを生成する。
 	if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
@@ -216,11 +238,11 @@ void Player::Draw()
 
 	if (DIR == RIGHT)
 	{
-		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	}
 	else if (DIR == LEFT)
 	{
-		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 	}
 
 	//ストレッチ加算
@@ -234,16 +256,15 @@ void Player::Draw()
 
 	if (DIR == RIGHT)
 	{
-		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 	}
 	else if (DIR == LEFT)
 	{
-		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	}
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
-
 }
 
 void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun)
@@ -302,15 +323,20 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 		// 左右に当たった際に壁釣りさせるための処理。
 		int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		int xChip = (centerPos.x - PLAYER_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		if (yChip <= 0) yChip = 1;
+		if (yChip >= mapData.size()) yChip = mapData.size() - 1;
+		if (xChip <= 0) xChip = 1;
+		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
 		// プレイヤーの左側がマップチップだったら
-		if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
 			HitMapChipLeft();
 		}
-		xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		if (xChip >= mapData[yChip].size() - 1) xChip = mapData[yChip].size() - 1;
+		xChip = (centerPos.x + PLAYER_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		if (xChip < 0) xChip = 0;
+		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
 		// プレイヤーの右側がマップチップだったら
-		if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
 			HitMapChipRight();
 		}
 
@@ -712,6 +738,17 @@ void Player::HitMapChipBottom()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
+
+}
+
+void Player::StopDoorLeftRight()
+{
+	doorMoveLeftRightFlag = true;
+}
+
+void Player::StopDoorUpDown()
+{
+	doorMoveUpDownFlag = true;
 }
 
 void Player::Input(const vector<vector<int>> mapData)
@@ -1030,14 +1067,14 @@ void Player::Move()
 
 	// スクロール量を更新
 	//ScrollMgr::Instance()->honraiScrollAmount -= prevFrameCenterPos - centerPos;
-	ScrollMgr::Instance()->CalucurateScroll(prevFrameCenterPos - centerPos);
+
 
 	// 移動量を0に近付ける。
 	vel.x -= vel.x / 25.0f;
 	vel.y -= vel.y / 25.0f;
 
 	// 中心座標を保存
-	prevFrameCenterPos = centerPos;
+	//prevFrameCenterPos = centerPos;
 
 	// 移動量が限界を超えないようにする。
 	if (fabs(vel.x) > MAX_RECOIL_AMOUNT) {

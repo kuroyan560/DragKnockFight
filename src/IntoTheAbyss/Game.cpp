@@ -115,7 +115,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS)
+Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR)
 {
 	Vec2<float> doorPos;
 	int roopCount = 0;
@@ -155,20 +155,23 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	int leftChip = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, checkWall[1]);
 
 	//右に壁がある場合
-	if ((rightChip == 1 && leftChip == 0) || (rightChip == 1 && leftChip == -1))
+	if ((rightChip == 1 && leftChip == 0) || (rightChip == -1 && leftChip == 0))
 	{
+		*DIR = DOOR_LEFT;
 		//左に2ブロック離れた所にリスポーンさせる
 		return Vec2<float>((doorPos.x - 2) * 50.0f, doorPos.y * 50.0f);
 	}
 	//左に壁がある場合
 	else if ((rightChip == 0 && leftChip == 1) || (rightChip == 0 && leftChip == -1))
 	{
+		*DIR = DOOR_RIGHT;
 		//右に2ブロック離れた所にリスポーンさせる
 		return Vec2<float>((doorPos.x + 2) * 50.0f, doorPos.y * 50.0f);
 	}
 	//左右どちらとも壁が無かった場合
 	else if (rightChip == 0 && leftChip == 0)
 	{
+		*DIR = DOOR_Z;
 		//扉座標にリスポーンさせる
 		return Vec2<float>(doorPos.x * 50.0f, doorPos.y * 50.0f);
 	}
@@ -236,11 +239,12 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	if (rightChip != 0 && leftChip != 0 && topWall == 0)
 	{
 		//壁が無い方にリスポーンさせる
-		Vec2<float> check(leftDoor.x - 2, leftDoor.y - 1);
-		Vec2<float> check2(rightDoor.x + 2, rightDoor.y - 1);
+		Vec2<float> check(leftDoor.x - 0, leftDoor.y - 1);
+		Vec2<float> check2(rightDoor.x + 0, rightDoor.y - 1);
 
 		int num = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, check);
 
+		*DIR = DOOR_UP;
 		//左に壁があった場合、右の壁にリスポーンさせる。
 		if (num == 0)
 		{
@@ -254,8 +258,9 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	//両方とも壁があり、下に空間があるなら
 	else if (rightChip != 0 && leftChip != 0 && downWall == 0)
 	{
+		*DIR = DOOR_DOWN;
 		//扉座標の一マス下にリスポーンさせる
-		return Vec2<float>(rightDoor.x * 50.0f, (rightDoor.y + 1) * 50.0f);
+		return Vec2<float>(rightDoor.x * 50.0f, (rightDoor.y) * 50.0f);
 	}
 	//上下どちらかの扉からリスポーンさせる場合-----------------------
 
@@ -267,7 +272,7 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	return Vec2<float>(-1, -1);
 }
 
-Vec2<float> Game::GetPlayerPos(const int &STAGE_NUMBER, int *ROOM_NUMBER, const int &DOOR_NUMBER, const SizeData &SIZE_DATA, vector<vector<int>> *MAPCHIP_DATA)
+Vec2<float> Game::GetPlayerPos(const int &STAGE_NUMBER, int *ROOM_NUMBER, const int &DOOR_NUMBER, const SizeData &SIZE_DATA, vector<vector<int>> *MAPCHIP_DATA, E_DOOR_DIR *DIR)
 {
 	int roomNum = StageMgr::Instance()->GetRelationData(STAGE_NUMBER, *ROOM_NUMBER, DOOR_NUMBER - SIZE_DATA.min);
 	*MAPCHIP_DATA = StageMgr::Instance()->GetMapChipData(STAGE_NUMBER, roomNum);
@@ -287,7 +292,7 @@ Vec2<float> Game::GetPlayerPos(const int &STAGE_NUMBER, int *ROOM_NUMBER, const 
 			}
 		}
 	}
-	Vec2<float> tmp = GetPlayerResponePos(STAGE_NUMBER, roomNum, DOOR_NUMBER, door);
+	Vec2<float> tmp = GetPlayerResponePos(STAGE_NUMBER, roomNum, DOOR_NUMBER, door, DIR);
 	*ROOM_NUMBER = roomNum;
 	return tmp;
 }
@@ -310,6 +315,7 @@ Game::Game()
 	mapData = StageMgr::Instance()->GetMapChipData(0, 0);
 
 	movingBlockGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/MovingBlock.png");
+	//sceneChangeHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/SceneChange.png");
 	//movingBlockGraph = D3D12App::Instance()->GenerateTextureBuffer("resource/IntoTheAbyss/MovingBlock.png");
 
 	// スクロールマネージャーを初期化。
@@ -529,7 +535,7 @@ Game::Game()
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
-
+	alphaValue = 0;
 }
 
 void Game::Update()
@@ -601,8 +607,7 @@ void Game::Update()
 				}
 			}
 		}
-		Vec2<float> tmp = GetPlayerResponePos(stageNum, roomNum, 0, door);
-		player.centerPos = tmp;
+		player.centerPos = door * Vec2<float>(50.0f, 50.0f);
 		ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
@@ -619,10 +624,9 @@ void Game::Update()
 
 	//ゴールに触れたら次のステージに向かう処理
 	{
-		Vec2<float> playerBlockPos(player.centerPos), block(50.0f, 50.0f);
-		playerBlockPos = playerBlockPos / block;
+		Vec2<float> playerChip((player.centerPos.x + 25.0f) / 50.0f, (player.centerPos.y + 25.0f) / 50.0f);
 		//ゴールに触れたら次のステージに向かう
-		if (mapData[playerBlockPos.y][playerBlockPos.x] == MAPCHIP_BLOCK_GOAL)
+		if (StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, playerChip) == MAPCHIP_BLOCK_GOAL)
 		{
 			++stageNum;
 			roomNum = 0;
@@ -654,6 +658,7 @@ void Game::Update()
 	{
 		//奥扉判定-----------------------
 		Vec2<float> playerChip((player.centerPos.x + 25.0f) / 50.0f, (player.centerPos.y + 25.0f) / 50.0f);
+		Vec2<float> playerChip2((player.centerPos.x + 25.0f) / 50.0f, (player.centerPos.y + 75.0f) / 50.0f);
 		Vec2<float> rightCehck(playerChip.x + 1, playerChip.y);
 		int rightChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, rightCehck);
 		Vec2<float> leftCehck(playerChip.x - 1, playerChip.y);
@@ -662,23 +667,222 @@ void Game::Update()
 
 		int num = 1;
 		bool hitDoorFlag;
-
 		//奥扉判定-----------------------
-		if (mapData[playerChip.y][playerChip.x] == i && !zDoorFlag)
+
+
+		int nowChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, playerChip);
+		int nowChip2 = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, playerChip2);
+		int prevChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, prevPlayerChipPos);
+
+		bool goToNextStageFlag = (nowChip == -1 && nowChip2 == -1);
+
+
+		if (StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, playerChip) == i)
 		{
-			player.centerPos = GetPlayerPos(stageNum, &roomNum, i, chipMemorySize, &mapData);
-			player.vel = { 0.0f,0.0f };
-			ScrollMgr::Instance()->WarpScroll(player.centerPos);
+			doorNumber = i;
 		}
-		//else if (mapData[playerChip.y][playerChip.x] == i && zDoorFlag && Input::isJoyBottomTrigger(XINPUT_BUTTON_B))
-		else if (mapData[playerChip.y][playerChip.x] == i && zDoorFlag && UsersInput::Instance()->OnTrigger(XBOX_BUTTON::B))
+
+
+		//ドアとの判定
+		if (goToNextStageFlag && !zDoorFlag && !sceneBlackFlag && !sceneLightFlag)
 		{
-			player.centerPos = GetPlayerPos(stageNum, &roomNum, i, chipMemorySize, &mapData);
-			player.vel = { 0.0f,0.0f };
-			ScrollMgr::Instance()->WarpScroll(player.centerPos);
+			sceneBlackFlag = true;
+			//player.centerPos = GetPlayerPos(stageNum, &roomNum, i, chipMemorySize, &mapData);
+			//player.gravity = 0.0f;
+			//ScrollMgr::Instance()->WarpScroll(player.centerPos);
+			//doorNumber = i;
 		}
+		else if (goToNextStageFlag && zDoorFlag && UsersInput::Instance()->OnTrigger(XBOX_BUTTON::B) && !sceneBlackFlag && !sceneLightFlag)
+		{
+			sceneBlackFlag = true;
+			//player.centerPos = GetPlayerPos(stageNum, &roomNum, i, chipMemorySize, &mapData);
+			//player.gravity = { 0.0f};
+			//ScrollMgr::Instance()->WarpScroll(player.centerPos);
+			//doorNumber = i;
+		}
+		prevPlayerChipPos = playerChip;
 	}
 	//ドア判定-----------------------
+
+
+
+	//シーン遷移-----------------------
+	//暗転中
+	if (sceneBlackFlag)
+	{
+		alphaValue += 10;
+
+		//暗転フラグを下げ、明転準備に入る
+		if (255 <= alphaValue)
+		{
+			alphaValue = 355;
+			++timer;
+			if (10 <= timer)
+			{
+				responePos = GetPlayerPos(stageNum, &roomNum, doorNumber, chipMemorySize, &mapData, &door);
+				switch (door)
+				{
+				case Game::DOOR_UP:
+					sceneleftRightFlag = true;
+					break;
+				case Game::DOOR_DOWN:
+					sceneleftRightFlag = true;
+					break;
+				case Game::DOOR_LEFT:
+					sceneleftRightFlag = true;
+					break;
+				case Game::DOOR_RIGHT:
+					sceneleftRightFlag = true;
+					break;
+				case Game::DOOR_Z:
+					break;
+				default:
+					break;
+				}
+
+				//画面外から登場させる
+				switch (door)
+				{
+				case Game::DOOR_UP:
+					ScrollMgr::Instance()->WarpScroll(responePos);
+					initJumpFlag = false;
+					player.centerPos = { responePos.x + 50.0f , responePos.y - 50.0f * 2.0f };
+					break;
+
+				case Game::DOOR_DOWN:
+					player.centerPos = { responePos.x, responePos.y - 50.0f * 2.0f };
+					ScrollMgr::Instance()->WarpScroll(player.centerPos);
+					break;
+
+				case Game::DOOR_LEFT:
+					ScrollMgr::Instance()->WarpScroll(responePos);
+					player.centerPos = { responePos.x + 50.0f * 3.0f, responePos.y };
+					break;
+
+				case Game::DOOR_RIGHT:
+					ScrollMgr::Instance()->WarpScroll(responePos);
+					player.centerPos = { responePos.x - 50.0f * 3.0f, responePos.y };
+					break;
+
+				case Game::DOOR_Z:
+
+					break;
+
+				default:
+					break;
+				}
+				sceneBlackFlag = false;
+				sceneLightFlag = true;
+			}
+		}
+	}
+
+	//明転中
+	if (sceneLightFlag)
+	{
+		alphaValue -= 10;
+		bool goFlag = false;
+
+
+		//プレイヤーを動かす
+		if (alphaValue <= 250)
+		{
+			sceneleftRightFlag = false;
+			switch (door)
+			{
+			case Game::DOOR_UP:
+				//ジャンプする
+				if (!initJumpFlag)
+				{
+					gravity = 1.0f;
+					initJumpFlag = true;
+				}
+				player.centerPos.y -= 15.0f * gravity;
+				gravity -= 0.1f;
+
+				if (gravity <= 0.0f)
+				{
+					gravity = 0.0f;
+				}
+
+				if (!player.onGround)
+				{
+					player.centerPos.x += 7.0f;
+				}
+				else
+				{
+					goFlag = true;
+				}
+
+				break;
+
+			case Game::DOOR_DOWN:
+				goFlag = true;
+				break;
+
+			case Game::DOOR_LEFT:
+				if (responePos.x <= player.centerPos.x)
+				{
+					player.centerPos.x -= 5.0f;
+				}
+				else
+				{
+					goFlag = true;
+				}
+				break;
+
+			case Game::DOOR_RIGHT:
+				if (player.centerPos.x <= responePos.x)
+				{
+					player.centerPos.x += 5.0f;
+				}
+				else
+				{
+					goFlag = true;
+				}
+				break;
+
+			case Game::DOOR_Z:
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			player.vel = { 0.0f,0.0f };
+			player.gravity = 0.0f;
+		}
+		if (alphaValue <= 0 && goFlag)
+		{
+			sceneLightFlag = false;
+		}
+	}
+
+	//暗転と明転中はプレイヤーの入力を禁止する
+
+	if (sceneleftRightFlag)
+	{
+		player.StopDoorLeftRight();
+	}
+	//上下ドアの場合はこの処理を通すと重力を使った移動が出来ない
+	if (sceneUpDownFlag)
+	{
+		player.StopDoorUpDown();
+	}
+
+
+	if (!sceneBlackFlag && !sceneLightFlag)
+	{
+		alphaValue = 0;
+		timer = 0;
+		sceneleftRightFlag = false;
+		sceneUpDownFlag = false;
+	}
+	//シーン遷移-----------------------
+
+
+
 
 
 
@@ -1233,5 +1437,10 @@ void Game::Draw()
 	for (int i = 0; i < auraBlock.size(); ++i)
 	{
 		auraBlock[i]->Draw();
+	}
+
+	if (sceneBlackFlag || sceneLightFlag)
+	{
+		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), true, AlphaBlendMode_Trans);
 	}
 }

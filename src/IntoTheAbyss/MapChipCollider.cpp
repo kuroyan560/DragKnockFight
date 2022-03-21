@@ -89,6 +89,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			const float centerX = width * MAP_CHIP_SIZE;
 			const float centerY = height * MAP_CHIP_SIZE;
 
+			// 配列外だったら処理を飛ばす。
+			//if (centerX < 0) return INTERSECTED_NONE;
+			//if (centerX >= WIDTH) return INTERSECTED_NONE;
+			//if (centerY < 0) return INTERSECTED_NONE;
+			//if (centerY >= HEIGHT) return INTERSECTED_NONE;
+
 			// プレイヤーとの距離が一定以上離れていたら処理を行わない。
 			if (Vec2<float>(centerX - pos.x, centerY - pos.y).Length() >= 100.0f) {
 				onGround = false;
@@ -354,6 +360,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			// このマップの中心座標を求める。
 			const float centerX = width * MAP_CHIP_SIZE;
 			const float centerY = height * MAP_CHIP_SIZE;
+
+			// 配列外だったら処理を飛ばす。
+			//if (centerX < 0) return INTERSECTED_NONE;
+			//if (centerX >= WIDTH) return INTERSECTED_NONE;
+			//if (centerY < 0) return INTERSECTED_NONE;
+			//if (centerY >= HEIGHT) return INTERSECTED_NONE;
 
 			// プレイヤーとの距離が一定以上離れていたら処理を行わない。
 			if (Vec2<float>(centerX - pos.x, centerY - pos.y).Length() >= 100.0f) {

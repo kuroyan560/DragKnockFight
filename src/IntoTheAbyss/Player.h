@@ -126,6 +126,11 @@ public:
 	void HitMapChipRight();
 	void HitMapChipBottom();
 
+	//プレイヤーの入力を禁止する
+	void StopDoorLeftRight();
+	void StopDoorUpDown();
+
+
 private:
 	/*-- クラス内で使用する関数 --*/
 
@@ -141,6 +146,13 @@ private:
 	// 壁との押し戻しに関する更新処理
 	void PushBackWall();
 
+	bool stopInputFlag;//入力を禁止するフラグ
+	bool stopMoveFlag;
+	bool drawCursorFlag;
+
+	bool doorMoveLeftRightFlag;
+	bool doorMoveUpDownFlag;
+	bool doorMoveDownFlag;
 	//ストレッチの値を計算
 	void CalculateStretch(const Vec2<float>& Move);
 	//ストレッチ値更新
