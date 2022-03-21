@@ -66,12 +66,16 @@ class Game
 
 	bool sceneBlackFlag;//フラグが立つと暗転する
 	bool sceneLightFlag;//フラグが立つと明転する
+	bool sceneUpDownFlag;
+	bool sceneleftRightFlag;
 	int alphaValue;
 	int timer;
 	Vec2<float> responePos;
 	int doorNumber;
 	int sceneChangeHandle;//シーン遷移用の画像
 	E_DOOR_DIR door;		//どの方向で出るか
+	bool initJumpFlag;
+	float gravity;
 
 	std::vector<DrawMap>drawMap;
 

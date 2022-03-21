@@ -136,7 +136,7 @@ void Player::Update(const vector<vector<int>> mapData)
 
 	/*===== 入力処理 =====*/
 
-	if (!stopInputFlag)
+	if (!doorMoveLeftRightFlag && !doorMoveUpDownFlag)
 	{
 		// 入力に関する更新処理を行う。
 		Input(mapData);
@@ -148,21 +148,23 @@ void Player::Update(const vector<vector<int>> mapData)
 	}
 
 	/*===== 更新処理 =====*/
-	if (!stopMoveFlag)
+	if (!doorMoveLeftRightFlag && !doorMoveUpDownFlag)
 	{
-		// 移動に関する処理
+		//移動に関する処理
 		Move();
-
 	}
-	if (!stopInputFlag)
+
+	ScrollMgr::Instance()->CalucurateScroll(prevFrameCenterPos - centerPos);
+	prevFrameCenterPos = centerPos;
+
+	if (!doorMoveLeftRightFlag)
 	{
 		// 重力に関する更新処理
 		UpdateGravity();
 	}
+	doorMoveLeftRightFlag = false;
+	doorMoveUpDownFlag = false;
 
-
-	stopMoveFlag = false;
-	stopInputFlag = false;
 
 	// 連射タイマーを更新
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;
@@ -696,14 +698,14 @@ void Player::HitMapChipBottom()
 
 }
 
-void Player::Stop()
+void Player::StopDoorLeftRight()
 {
-	stopInputFlag = true;
+	doorMoveLeftRightFlag = true;
 }
 
-void Player::DontMove()
+void Player::StopDoorUpDown()
 {
-	stopMoveFlag = true;
+	doorMoveUpDownFlag = true;
 }
 
 void Player::Input(const vector<vector<int>> mapData)
@@ -1013,14 +1015,14 @@ void Player::Move()
 
 	// スクロール量を更新
 	//ScrollMgr::Instance()->honraiScrollAmount -= prevFrameCenterPos - centerPos;
-	ScrollMgr::Instance()->CalucurateScroll(prevFrameCenterPos - centerPos);
+
 
 	// 移動量を0に近付ける。
 	vel.x -= vel.x / 25.0f;
 	vel.y -= vel.y / 25.0f;
 
 	// 中心座標を保存
-	prevFrameCenterPos = centerPos;
+	//prevFrameCenterPos = centerPos;
 
 	// 移動量が限界を超えないようにする。
 	if (fabs(vel.x) > MAX_RECOIL_AMOUNT) {

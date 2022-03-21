@@ -112,8 +112,8 @@ public:
 	void HitMapChipBottom();
 
 	//プレイヤーの入力を禁止する
-	void Stop();
-	void DontMove();
+	void StopDoorLeftRight();
+	void StopDoorUpDown();
 
 
 private:
@@ -135,4 +135,7 @@ private:
 	bool stopInputFlag;//入力を禁止するフラグ
 	bool stopMoveFlag;
 	bool drawCursorFlag;
+
+	bool doorMoveLeftRightFlag;
+	bool doorMoveUpDownFlag;
 };
