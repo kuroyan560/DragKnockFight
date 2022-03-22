@@ -320,23 +320,23 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 
 		// 左右に当たった際に壁釣りさせるための処理。
-		//int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		//int xChip = (centerPos.x - PLAYER_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		//if (yChip <= 0) yChip = 1;
-		//if (yChip >= mapData.size()) yChip = mapData.size() - 1;
-		//if (xChip <= 0) xChip = 1;
-		//if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
-		//// プレイヤーの左側がマップチップだったら
-		//if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
-		//	HitMapChipLeft();
-		//}
-		//xChip = (centerPos.x + PLAYER_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		//if (xChip < 0) xChip = 0;
-		//if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
-		//// プレイヤーの右側がマップチップだったら
-		//if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
-		//	HitMapChipRight();
-		//}
+		int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		if (yChip <= 0) yChip = 1;
+		if (yChip >= mapData.size()) yChip = mapData.size() - 1;
+		if (xChip <= 0) xChip = 1;
+		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
+		// プレイヤーの左側がマップチップだったら
+		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+			HitMapChipLeft();
+		}
+		xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		if (xChip < 0) xChip = 0;
+		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
+		// プレイヤーの右側がマップチップだったら
+		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+			HitMapChipRight();
+		}
 
 	}
 
