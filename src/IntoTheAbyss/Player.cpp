@@ -621,7 +621,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			int playerChipY = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 
 			// 求めた番号が範囲外じゃなかったら。
-			if (0 <= playerChipY && playerChipY <= mapData.size() && 0 <= playerChipX && playerChipX <= mapData[playerChipY].size()) {
+			if (0 <= playerChipY && playerChipY < mapData.size() && 0 <= playerChipX && playerChipX < mapData[playerChipY].size()) {
 
 				// そのマップチップの番号が1~9の間だったら。
 				if (0 < mapData[playerChipY][playerChipX] && mapData[playerChipY][playerChipX] < 10) {
@@ -680,7 +680,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			int playerChipY = (centerPos.y - PLAYER_HIT_SIZE.y - offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 
 			// 求めた番号が範囲外じゃなかったら。
-			if (0 <= playerChipY && playerChipY <= mapData.size() && 0 <= playerChipX && playerChipX <= mapData[playerChipY].size()) {
+			if (0 <= playerChipY && playerChipY < mapData.size() && 0 <= playerChipX && playerChipX < mapData[playerChipY].size()) {
 
 				// そのマップチップの番号が1~9の間だったら。
 				if (0 < mapData[playerChipY][playerChipX] && mapData[playerChipY][playerChipX] < 10) {
