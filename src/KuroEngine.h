@@ -55,7 +55,7 @@ struct EngineOption
 	//ウィンドウ関連
 	std::string windowName;	//ウィンドウ名
 	Vec2<int>windowSize;	//ウィンドウサイズ
-	const wchar_t* iconPath = nullptr;	//ウィンドウアイコンファイル名
+	const wchar_t *iconPath = nullptr;	//ウィンドウアイコンファイル名
 
 	//バックバッファ関連
 	Color backBuffClearColor = Color(0.0f, 0.0f, 0.0f, 1.0f);
@@ -70,7 +70,7 @@ class KuroEngine : public D3D12AppUser
 {
 public:
 	//シングルトン
-	static KuroEngine& Instance()
+	static KuroEngine &Instance()
 	{
 		static KuroEngine engine;
 		return engine;
@@ -100,10 +100,10 @@ private:
 	std::shared_ptr<ConstantBuffer>parallelMatProjBuff;
 
 	//シーンリスト
-	std::vector<BaseScene*>scenes;
+	std::vector<BaseScene *>scenes;
 	int nowScene;	//現在のシーン番号
 	int nextScene = -1;	//次のシーン番号
-	SceneTransition* nowSceneTransition = nullptr;	//現在セットされているシーン遷移
+	SceneTransition *nowSceneTransition;	//現在セットされているシーン遷移
 
 	//FPS固定
 	std::shared_ptr<Fps>fps;
@@ -114,8 +114,8 @@ private:
 	void Render()override;
 public:
 	~KuroEngine();
-	void Initialize(const EngineOption& Option);
-	void SetSceneList(const std::vector<BaseScene*>& SceneList, const int& AwakeSceneNum);
+	void Initialize(const EngineOption &Option);
+	void SetSceneList(const std::vector<BaseScene *> &SceneList, const int &AwakeSceneNum);
 	void Update();
 	void Draw();
 	bool End() { return end; }
@@ -123,7 +123,7 @@ public:
 	//ゲーム終了
 	void GameEnd() { end = true; }
 	//シーンチェンジ
-	void ChangeScene(const int& SceneNum, SceneTransition* SceneTransition)
+	void ChangeScene(const int &SceneNum, SceneTransition *SceneTransition)
 	{
 		nextScene = SceneNum;
 		nowSceneTransition = SceneTransition;
@@ -131,12 +131,13 @@ public:
 	}
 
 	//グラフィックスマネージャゲッタ
-	GraphicsManager& Graphics() { return gManager; }
+	GraphicsManager &Graphics() { return gManager; }
 
 	//平行投影行列定数バッファ
-	const std::shared_ptr<ConstantBuffer>& GetParallelMatProjBuff()
+	const std::shared_ptr<ConstantBuffer> &GetParallelMatProjBuff()
 	{
 		return parallelMatProjBuff;
 	}
+
 };
 

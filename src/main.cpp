@@ -5,6 +5,8 @@
 #include"Transform2D.h"
 #include"Color.h"
 #include"DrawFunc.h"
+#include"TitleScene.h"
+#include"StageSelectScene.h"
 
 #ifdef _DEBUG
 int main()
@@ -29,8 +31,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//シーンリスト=====================
 
-	std::vector<BaseScene*>sceneList =
+	std::vector<BaseScene *>sceneList =
 	{
+		new TitleScene(),
+		new StageSelectScene(),
 		new GameScene()
 	};
 	int awakeScene = 0;	//開始時のステージ番号

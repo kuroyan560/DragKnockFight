@@ -80,6 +80,8 @@ GameScene::GameScene()
 
 	emissiveMap = D3D12App::Instance()->GenerateRenderTarget(DXGI_FORMAT_R32G32B32A32_FLOAT, Color(0.0f, 0.0f, 0.0f, 1.0f),
 		WinApp::Instance()->GetWinSize(), L"EmissiveMap");
+
+	sceneChange = new SceneCange();
 }
 
 void GameScene::OnInitialize()
@@ -103,7 +105,10 @@ void GameScene::OnUpdate()
 	game.Update();
 
 
-
+	if (UsersInput::Instance()->OnTrigger(DIK_B))
+	{
+		KuroEngine::Instance().ChangeScene(1, sceneChange);
+	}
 }
 
 void GameScene::OnDraw()
@@ -152,6 +157,7 @@ void GameScene::OnImguiDebug()
 
 	ImGui::Text("Up Down:SelectNumber");
 	ImGui::Text("Left Right:SelectStageOrRoom");
+	ImGui::Text("B Key:StageSelectScene");
 	ImGui::Text("Return:Done");
 	ImGui::End();
 }

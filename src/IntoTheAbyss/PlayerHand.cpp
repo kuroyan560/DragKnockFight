@@ -113,7 +113,7 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 }
 
 #include"DrawFunc.h"
-void PlayerHand::Draw(const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV)
+void PlayerHand::Draw(const float &ExtRate, const int &GraphHandle, const float &InitAngle, const Vec2<float> &RotaCenterUV, const bool &DRAW_CURSOR)
 {
 
 	/*-- ï`âÊèàóù --*/
@@ -134,8 +134,10 @@ void PlayerHand::Draw(const float& ExtRate, const int& GraphHandle, const float&
 		sightPos.y * ScrollMgr::Instance()->zoom + SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
 
 	//è∆èÄÇï`âÊ
-	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), true);
-
+	if (DRAW_CURSOR)
+	{
+		DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), true);
+	}
 }
 
 void PlayerHand::Shot(const Vec2<float>& forwardVec, const bool& isFirstShot)
