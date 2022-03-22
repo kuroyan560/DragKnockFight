@@ -18,10 +18,20 @@ class TextureBuffer;
 //元ソリューションのmain処理をまとめたもの
 class Game
 {
+	enum E_DOOR_DIR
+	{
+		DOOR_UP_GORIGHT,		//上に出て右に行くドア
+		DOOR_UP_GOLEFT,	//上に出て左に行くドア
+		DOOR_DOWN,	//下に出るドア
+		DOOR_LEFT,	//左に出るドア
+		DOOR_RIGHT,	//右に出るドア
+		DOOR_Z,		//真ん中から出るドア
+	};
+
 	bool CheckUsedData(vector<Vec2<float>> DATA, Vec2<float> DATA2);
 	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum);
-	Vec2<float> GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS);
-	Vec2<float> GetPlayerPos(const int& STAGE_NUMBER, int* ROOM_NUMBER, const int& DOOR_NUMBER, const SizeData& SIZE_DATA, vector<vector<int>>* MAPCHIP_DATA);
+	Vec2<float> GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR);
+	Vec2<float> GetPlayerPos(const int& STAGE_NUMBER, int* ROOM_NUMBER, const int& DOOR_NUMBER, const SizeData& SIZE_DATA, vector<vector<int>>* MAPCHIP_DATA, E_DOOR_DIR *DIR);
 
 	int mapBlockGraph;
 	// 動的ブロックの画像。
@@ -46,11 +56,24 @@ class Game
 	int oldRoomNum = -1;
 
 	vector<std::unique_ptr<AuraBlock>> auraBlock;
-
 	vector<vector<MapChipDrawData>> mapChipDrawData;
-
 	int countStopNum = 0;
 	int countHitNum = 0;
+
+	Vec2<float> prevPlayerChipPos;
+
+	bool sceneBlackFlag;//フラグが立つと暗転する
+	bool sceneLightFlag;//フラグが立つと明転する
+	bool sceneUpDownFlag;
+	bool sceneleftRightFlag;
+	int alphaValue;
+	int timer;
+	Vec2<float> responePos;
+	int doorNumber;
+	int sceneChangeHandle;//シーン遷移用の画像
+	E_DOOR_DIR door;		//どの方向で出るか
+	bool initJumpFlag;
+	float gravity;
 
 	std::vector<DrawMap>drawMap;
 

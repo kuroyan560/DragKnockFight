@@ -108,6 +108,7 @@ void KuroEngine::Initialize(const EngineOption& Option)
 
 	printf("KuroEngine‹N“®¬Œ÷\n");
 	invalid = false;
+
 }
 
 void KuroEngine::SetSceneList(const std::vector<BaseScene*>& SceneList, const int& AwakeSceneNum)
