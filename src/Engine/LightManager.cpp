@@ -98,22 +98,16 @@ LightManager::LightManager()
 	//０個の状態の送信用データ
 	LightNum sendLigNum = { 0,0,0,0 };
 	ligNumConstBuff = D3D12App::Instance()->GenerateConstantBuffer(sizeof(LightNum), 1, &sendLigNum, "LightsNum");
-
-	ligStructuredBuff[Light::DIRECTION] = D3D12App::Instance()->GenerateStructuredBuffer(
-		sizeof(Light::Direction::ConstData), MAX_LIG_NUM[Light::DIRECTION], nullptr, "LightInfo - Direction");
-
-	ligStructuredBuff[Light::POINT] = D3D12App::Instance()->GenerateStructuredBuffer(
-		sizeof(Light::Point::ConstData), MAX_LIG_NUM[Light::POINT], nullptr, "LightInfo - Point");
-
-	ligStructuredBuff[Light::SPOT] = D3D12App::Instance()->GenerateStructuredBuffer(
-		sizeof(Light::Spot::ConstData), MAX_LIG_NUM[Light::SPOT], nullptr, "LightInfo - Spot");
-
-	ligStructuredBuff[Light::HEMISPHERE] = D3D12App::Instance()->GenerateStructuredBuffer(
-		sizeof(Light::HemiSphere::ConstData), MAX_LIG_NUM[Light::HEMISPHERE], nullptr, "LightInfo - HemiSphere");
 }
 
 void LightManager::RegisterDirLight(Light::Direction* DirLight)
 {
+	if (!ligStructuredBuff[Light::DIRECTION])
+	{
+		ligStructuredBuff[Light::DIRECTION] = D3D12App::Instance()->GenerateStructuredBuffer(
+			sizeof(Light::Direction::ConstData), MAX_LIG_NUM[Light::DIRECTION], nullptr, "LightInfo - Direction");
+	}
+
 	dirLights.emplace_back(DirLight);
 	if (MAX_LIG_NUM[Light::DIRECTION] < dirLights.size())ASSERT_MSG("ディレクションライトの登録数の最大を超えています\n");
 
@@ -126,6 +120,12 @@ void LightManager::RegisterDirLight(Light::Direction* DirLight)
 
 void LightManager::RegisterPointLight(Light::Point* PtLight)
 {
+	if (!ligStructuredBuff[Light::POINT])
+	{
+		ligStructuredBuff[Light::POINT] = D3D12App::Instance()->GenerateStructuredBuffer(
+			sizeof(Light::Point::ConstData), MAX_LIG_NUM[Light::POINT], nullptr, "LightInfo - Point");
+	}
+
 	ptLights.emplace_back(PtLight);
 	if (MAX_LIG_NUM[Light::POINT] < ptLights.size())ASSERT_MSG("ポイントライトの登録数の最大を超えています\n");
 
@@ -138,6 +138,12 @@ void LightManager::RegisterPointLight(Light::Point* PtLight)
 
 void LightManager::RegisterSpotLight(Light::Spot* SpotLight)
 {
+	if (!ligStructuredBuff[Light::SPOT])
+	{
+		ligStructuredBuff[Light::SPOT] = D3D12App::Instance()->GenerateStructuredBuffer(
+			sizeof(Light::Spot::ConstData), MAX_LIG_NUM[Light::SPOT], nullptr, "LightInfo - Spot");
+	}
+
 	spotLights.emplace_back(SpotLight);
 	if (MAX_LIG_NUM[Light::SPOT] < spotLights.size())ASSERT_MSG("スポットライトの登録数の最大を超えています\n");
 
@@ -150,6 +156,12 @@ void LightManager::RegisterSpotLight(Light::Spot* SpotLight)
 
 void LightManager::RegisterHemiSphereLight(Light::HemiSphere* HemiSphereLight)
 {
+	if (!ligStructuredBuff[Light::HEMISPHERE])
+	{
+		ligStructuredBuff[Light::HEMISPHERE] = D3D12App::Instance()->GenerateStructuredBuffer(
+			sizeof(Light::HemiSphere::ConstData), MAX_LIG_NUM[Light::HEMISPHERE], nullptr, "LightInfo - HemiSphere");
+	}
+
 	hemiSphereLights.emplace_back(HemiSphereLight);
 	if (MAX_LIG_NUM[Light::HEMISPHERE] < hemiSphereLights.size())ASSERT_MSG("天球ライトの登録数の最大を超えています\n");
 

@@ -12,6 +12,7 @@ class PlayerHand;
 
 #include"PlayerAnimation.h"
 #include"AfterImg.h"
+class LightManager;
 
 // プレイヤークラス
 class Player {
@@ -120,7 +121,7 @@ public:
 	void Update(const vector<vector<int>> mapData);
 
 	// 描画処理
-	void Draw();
+	void Draw(LightManager& LigManager);
 
 	// マップチップとの当たり判定
 	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, TimeStopTestBlock& testBlock);

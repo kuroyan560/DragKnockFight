@@ -11,7 +11,8 @@
 
 #include"TexHandleMgr.h"
 #include"UsersInput.h"
-#include"DrawFunc.h"
+//#include"DrawFunc.h"
+#include"DrawFunc_Shadow.h"
 #include"WinApp.h"
 
 Vec2<float> Player::GetGeneratePos()
@@ -191,7 +192,7 @@ void Player::Update(const vector<vector<int>> mapData)
 	anim.Update();
 }
 
-void Player::Draw()
+void Player::Draw(LightManager& LigManager)
 {
 	if (vel.x < 0)playerDir = LEFT;
 	if (0 < vel.x)playerDir = RIGHT;
@@ -220,11 +221,11 @@ void Player::Draw()
 
 	if (playerDir == RIGHT)
 	{
-		rHand->Draw(expRate, HAND_GRAPH[RIGHT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(LigManager, expRate, HAND_GRAPH[RIGHT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
 	}
 	else if (playerDir == LEFT)
 	{
-		lHand->Draw(expRate, HAND_GRAPH[LEFT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(LigManager, expRate, HAND_GRAPH[LEFT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
 	}
 
 	//ƒXƒgƒŒƒbƒ`‰ÁŽZ
@@ -235,15 +236,18 @@ void Player::Draw()
 	//DrawFunc::DrawExtendGraph2D(leftUp, rightBottom , TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), AlphaBlendMode_Trans, { playerDir != DEFAULT,false });
 	Vec2<float> pos = centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
 	const Vec2<float> expRateBody = expRate * ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc::DrawRotaGraph2D(pos, expRateBody, 0.0f, TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), { 0.5f,0.5f }, AlphaBlendMode_Trans, { playerDir != DEFAULT,false });
+	//DrawFunc::DrawRotaGraph2D(pos, expRateBody, 0.0f, TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), { 0.5f,0.5f }, AlphaBlendMode_Trans, { playerDir != DEFAULT,false });
+	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, pos, expRateBody, 0.0f,
+		TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), nullptr, nullptr, 0.0f,
+		{ 0.5f,0.5f }, { playerDir != DEFAULT,false });
 
 	if (playerDir == RIGHT)
 	{
-		lHand->Draw(expRate, HAND_GRAPH[LEFT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(LigManager, expRate, HAND_GRAPH[LEFT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
 	}
 	else if (playerDir == LEFT)
 	{
-		rHand->Draw(expRate, HAND_GRAPH[RIGHT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(LigManager, expRate, HAND_GRAPH[RIGHT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
 	}
 
 	// ’e‚ð•`‰æ

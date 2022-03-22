@@ -113,7 +113,8 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 }
 
 #include"DrawFunc.h"
-void PlayerHand::Draw(const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV)
+#include"DrawFunc_Shadow.h"
+void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV)
 {
 
 	/*-- •`‰æˆ— --*/
@@ -122,7 +123,9 @@ void PlayerHand::Draw(const Vec2<float>& ExtRate, const int& GraphHandle, const 
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
 
 	Vec2<float>center = drawPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
-	DrawFunc::DrawRotaGraph2D(center, ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle), RotaCenterUV);
+	//DrawFunc::DrawRotaGraph2D(center, ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle), RotaCenterUV);
+	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, center, ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle,
+		TexHandleMgr::GetTexBuffer(GraphHandle), nullptr, nullptr, 0.0f, RotaCenterUV);
 
 	// ƒr[ƒRƒ“‚ğ•`‰æ
 	if (teleportPike.isActive) teleportPike.Draw();

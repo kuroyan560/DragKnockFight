@@ -5,6 +5,8 @@
 using namespace std;
 #include"WinApp.h"
 
+class LightManager;
+
 // プレイヤーの手クラス
 class PlayerHand {
 
@@ -50,7 +52,7 @@ public:
 	void Update(const Vec2<float>& playerCenterPos);
 
 	// 描画処理
-	void Draw(const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV);
+	void Draw(LightManager& LigManager, const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV);
 
 	// 弾を打った時の処理
 	void Shot(const Vec2<float>& forwardVec, const bool& isFirstShot);

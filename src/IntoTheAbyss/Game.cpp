@@ -529,13 +529,17 @@ Game::Game()
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 
+	//ライト情報
+	static const float RANGE = 256.0f;
+	ptLig.SetInfluenceRange(RANGE);
+
+	ligMgr.RegisterPointLight(&ptLig);
+	ligMgr.RegisterHemiSphereLight(&hemiLig);
 }
 
 void Game::Update()
 {
 	ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
-
-
 
 #pragma region ステージの切り替え
 	bool enableToSelectStageFlag = 0 < debugStageData[0];
@@ -607,12 +611,6 @@ void Game::Update()
 	//ImGui::Text("StageNumber:%d", debugStageData[0]);
 	//ImGui::Text("RoomNumber:%d", debugStageData[1]);
 	//ImGui::End();
-
-
-
-
-
-
 
 	//ゴールに触れたら次のステージに向かう処理
 	{
@@ -1166,6 +1164,11 @@ void Game::Update()
 	}
 
 
+	//ライト更新
+	Vec3<float>pos = { 0.0f,0.0f,-20.0f };
+	pos.x = UsersInput::Instance()->GetMousePos().x;
+	pos.y = UsersInput::Instance()->GetMousePos().y;
+	ptLig.SetPos(pos);
 }
 
 void Game::Draw()
@@ -1187,8 +1190,6 @@ void Game::Draw()
 		dossunBlock[index].Draw();
 	}
 
-	player.Draw();
-
 	// シャボン玉ブロックの描画処理
 	{
 		const int BUBBLE_COUNT = bubbleBlock.size();
@@ -1205,4 +1206,6 @@ void Game::Draw()
 	{
 		auraBlock[i]->Draw();
 	}
+
+	player.Draw(ligMgr);
 }

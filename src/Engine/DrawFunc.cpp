@@ -23,7 +23,7 @@ std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::EXTEND_GRAPH_VERTEX_BUFF;
 
 //DrawRotaGraph
 std::shared_ptr<GraphicsPipeline>DrawFunc::ROTA_GRAPH_PIPELINE[AlphaBlendModeNum];
-int DrawFunc::DRAW_ROTA_GRAPH_COUNT;
+int DrawFunc::DRAW_ROTA_GRAPH_COUNT = 0;
 std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::ROTA_GRAPH_VERTEX_BUFF;
 
 void DrawFunc::DrawLine2D(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const Color& LineColor, const AlphaBlendMode& BlendMode)
