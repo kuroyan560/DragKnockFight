@@ -688,7 +688,7 @@ void Game::Update()
 	oldStageNum = stageNum;
 
 	//部屋の初期化
-	if (roomNum != oldRoomNum)
+	if (roomNum != oldRoomNum || player.isDead)
 	{
 		debugStageData[1] = roomNum;
 		mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
@@ -708,7 +708,7 @@ void Game::Update()
 		dossunBlock.clear();
 
 		dossunBlock.push_back({});
-		dossunBlock[0].Generate(player.centerPos, player.centerPos + Vec2<float>(0, 100), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), GIMMICK_DOSSN_ON_LOW);
+		dossunBlock[0].Generate(player.centerPos + Vec2<float>(100, 0), player.centerPos + Vec2<float>(1000, 0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), GIMMICK_DOSSN_ON_LOW);
 		SightCollisionStorage::Instance()->data.push_back(dossunBlock[dossunBlock.size() - 1].sightData);
 
 		// ドッスンを生成。
@@ -745,6 +745,9 @@ void Game::Update()
 			bubbleBlock.push_back(bubbleBuff);
 
 		}
+
+		// プレイヤーを死んでない判定にする。
+		player.isDead = false;
 
 	}
 	oldRoomNum = roomNum;
@@ -785,6 +788,7 @@ void Game::Update()
 	{
 		ScrollMgr::Instance()->StopScroll(ScrollMgr::Instance()->RIGHT);
 	}
+
 
 
 

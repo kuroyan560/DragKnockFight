@@ -31,6 +31,9 @@ Player::Player()
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
 
 	this->Init(GetGeneratePos());
+
+
+	isDead = false;
 }
 
 Player::~Player()
@@ -78,6 +81,8 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	// 壁フラグを初期化
 	isWallRight = false;
 	isWallLeft = false;
+
+	isDead = false;
 
 	// 壁ズリフラグを初期化。
 	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
@@ -757,6 +762,12 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			isDead = true;
 
 		}
+
+	}
+
+	if (isDead) {
+
+		int a = 0;
 
 	}
 
