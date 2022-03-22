@@ -50,7 +50,7 @@ public:
 	void Update(const Vec2<float>& playerCenterPos);
 
 	// •`‰æˆ—
-	void Draw(const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV);
+	void Draw(const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV);
 
 	// ’e‚ğ‘Å‚Á‚½‚Ìˆ—
 	void Shot(const Vec2<float>& forwardVec, const bool& isFirstShot);

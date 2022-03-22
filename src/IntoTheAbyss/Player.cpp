@@ -41,6 +41,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	/*===== 初期化処理 =====*/
 
+	//プレイヤーの向き初期化
+	playerDir = DEFAULT;
+
 	//アニメーション初期化
 	anim.Init();
 
@@ -190,9 +193,8 @@ void Player::Update(const vector<vector<int>> mapData)
 
 void Player::Draw()
 {
-	static enum { LEFT, RIGHT, DEFAULT = RIGHT, DIR_NUM }DIR = DEFAULT;
-	if (vel.x < 0)DIR = LEFT;
-	if (0 < vel.x)DIR = RIGHT;
+	if (vel.x < 0)playerDir = LEFT;
+	if (0 < vel.x)playerDir = RIGHT;
 
 	static const int HAND_GRAPH[DIR_NUM] =
 	{
@@ -207,37 +209,41 @@ void Player::Draw()
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
 
 	// プレイヤーの描画処理
-	Vec2<float>leftUp = { centerPos.x * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		centerPos.y * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	Vec2<float>rightBottom = { centerPos.x * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		centerPos.y * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	const float expRate = EXT_RATE * ScrollMgr::Instance()->zoom;
+	//Vec2<float>leftUp = { centerPos.x * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
+	//	centerPos.y * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
+	//Vec2<float>rightBottom = { centerPos.x * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
+	//	centerPos.y * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
+	const Vec2<float> expRate = { EXT_RATE * ScrollMgr::Instance()->zoom, EXT_RATE * ScrollMgr::Instance()->zoom };
 
-	if (DIR == RIGHT)
+	//残像描画
+	afImg.Draw(ScrollMgr::Instance()->zoom, scrollShakeZoom);
+
+	if (playerDir == RIGHT)
 	{
-		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(expRate, HAND_GRAPH[RIGHT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
 	}
-	else if (DIR == LEFT)
+	else if (playerDir == LEFT)
 	{
-		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(expRate, HAND_GRAPH[LEFT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
 	}
 
 	//ストレッチ加算
-	leftUp += stretch_LU;
-	rightBottom += stretch_RB;
+	//leftUp += stretch_LU;
+	//rightBottom += stretch_RB;
 
 	//胴体
-	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom , TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), AlphaBlendMode_Trans, { DIR == LEFT,false });
-	//DrawFunc::DrawRotaGraph2D(centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom, expRate, 0.0f, TexHandleMgr::GetTexBuffer(playerGraph),
-		//{ 0.5f,0.5f }, AlphaBlendMode_Trans, { DIR == LEFT,false });
+	//DrawFunc::DrawExtendGraph2D(leftUp, rightBottom , TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), AlphaBlendMode_Trans, { playerDir != DEFAULT,false });
+	Vec2<float> pos = centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
+	const Vec2<float> expRateBody = expRate * ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
+	DrawFunc::DrawRotaGraph2D(pos, expRateBody, 0.0f, TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), { 0.5f,0.5f }, AlphaBlendMode_Trans, { playerDir != DEFAULT,false });
 
-	if (DIR == RIGHT)
+	if (playerDir == RIGHT)
 	{
-		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(expRate, HAND_GRAPH[LEFT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
 	}
-	else if (DIR == LEFT)
+	else if (playerDir == LEFT)
 	{
-		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(expRate, HAND_GRAPH[RIGHT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
 	}
 
 	// 弾を描画
@@ -908,8 +914,18 @@ void Player::Input(const vector<vector<int>> mapData)
 		// ビーコンが発射されていたら。
 		else if (rHand->teleportPike.isActive && (rHand->teleportPike.isHitWall || rHand->teleportPike.isHitWindow) && !isPrevFrameShotBeacon) {
 
+
+			auto vec = rHand->teleportPike.pos - centerPos;
+
+			//向き変え
+			if (vec.x < 0)playerDir = LEFT;
+			if (0 < vec.x)playerDir = RIGHT;
+
 			//ストレッチ
-			CalculateStretch(rHand->teleportPike.pos - centerPos);
+			CalculateStretch(vec);
+
+			//残像エミット
+			afImg.EmitArray(centerPos, rHand->teleportPike.pos, anim.GetGraphHandle(), GetPlayerGraphSize(), { playerDir != DEFAULT,false });
 
 			// プレイヤーを瞬間移動させる。
 			centerPos = rHand->teleportPike.pos;
@@ -1170,13 +1186,15 @@ void Player::CalculateStretch(const Vec2<float>& Move)
 		if (stretch_LU.x < -MAX_STRETCH.x)stretch_LU.x = -MAX_STRETCH.x;
 	}
 
+	static const float SHRINK_RATE = 1.0f / 2.0f;
+
 	//左右移動時
 	if (Move.x != 0.0f)
 	{
 		//上下が縮む
-		stretch_LU.y += MAX_STRETCH.y * stretchRate.x;
+		stretch_LU.y += MAX_STRETCH.y * stretchRate.x * SHRINK_RATE;
 		if (MAX_STRETCH.y < stretch_LU.y)stretch_LU.y = MAX_STRETCH.y;
-		stretch_RB.y -= MAX_STRETCH.y * stretchRate.x;
+		stretch_RB.y -= MAX_STRETCH.y * stretchRate.x * SHRINK_RATE;
 		if (stretch_RB.y < -MAX_STRETCH.y)stretch_RB.y = -MAX_STRETCH.y;
 	}
 
@@ -1199,9 +1217,9 @@ void Player::CalculateStretch(const Vec2<float>& Move)
 	if (Move.y != 0.0f)
 	{
 		//左右が縮む
-		stretch_LU.x += MAX_STRETCH.x * stretchRate.y;
+		stretch_LU.x += MAX_STRETCH.x * stretchRate.y * SHRINK_RATE;
 		if (MAX_STRETCH.x < stretch_LU.x)stretch_LU.x = MAX_STRETCH.x;
-		stretch_RB.x -= MAX_STRETCH.x * stretchRate.y;
+		stretch_RB.x -= MAX_STRETCH.x * stretchRate.y * SHRINK_RATE;
 		if (stretch_RB.x < -MAX_STRETCH.x)stretch_RB.x = -MAX_STRETCH.x;
 	}
 

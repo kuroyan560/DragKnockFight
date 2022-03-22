@@ -113,7 +113,7 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 }
 
 #include"DrawFunc.h"
-void PlayerHand::Draw(const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV)
+void PlayerHand::Draw(const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV)
 {
 
 	/*-- •`‰æˆ— --*/

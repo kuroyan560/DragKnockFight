@@ -11,6 +11,7 @@ using namespace std;
 class PlayerHand;
 
 #include"PlayerAnimation.h"
+#include"AfterImg.h"
 
 // プレイヤークラス
 class Player {
@@ -55,8 +56,13 @@ public:
 	int stretchTimer = STRETCH_RETURN_TIME;	
 	const float STRETCH_DIV_RATE = 2.0f;	//ストレッチを弱くするときの割合
 
+	//プレイヤーの向き
+	enum DRAW_DIR{ LEFT, RIGHT, DEFAULT = RIGHT, DIR_NUM }playerDir = DEFAULT;
 	//アニメーション統括
 	PlayerAnimation anim;
+
+	//残像
+	AfterImg afImg;
 
 public:
 

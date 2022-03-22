@@ -35,6 +35,7 @@ void GraphicsManager::RenderCommand::Excute(const ComPtr<ID3D12GraphicsCommandLi
 	//ディスクリプタセット
 	for (int i = 0; i < descDatas.size(); ++i)
 	{
+		if (!descDatas[i].lock())continue;
 		descDatas[i].lock()->SetGraphicsDescriptorBuffer(CmdList, types[i], i);
 	}
 

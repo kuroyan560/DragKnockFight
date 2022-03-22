@@ -6,7 +6,7 @@ cbuffer cbuff0 : register(b0)
 struct VSOutput
 {
     float4 center : CENTER;
-    float extRate : EXT_RATE;
+    float2 extRate : EXT_RATE;
     float radian : RADIAN;
     float2 rotaCenterUV : ROTA_CENTER_UV;
     int2 miror : MIROR;
@@ -43,11 +43,11 @@ void GSmain(
     uint2 texSize;
     tex.GetDimensions(texSize.x, texSize.y);
     
-    float width_h = texSize.x * input[0].extRate / 2.0f;
-    float height_h = texSize.y * input[0].extRate / 2.0f;
+    float width_h = texSize.x * input[0].extRate.x / 2.0f;
+    float height_h = texSize.y * input[0].extRate.y / 2.0f;
     
     float2 rotateCenter = input[0].center.xy;
-    rotateCenter += texSize.xy * float2(input[0].extRate,input[0].extRate) * (input[0].rotaCenterUV - float2(0.5f, 0.5f));
+    rotateCenter += texSize.xy * input[0].extRate * (input[0].rotaCenterUV - float2(0.5f, 0.5f));
     
     GSOutput element;
         
