@@ -109,7 +109,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 		{
 			drawMap[i].AddChip(itr->second[chipIdx].pos, itr->second[chipIdx].radian);
 		}
-		drawMap[i].Draw(TexHandleMgr::GetTexBuffer(itr->first));
+		drawMap[i].Draw(ligMgr, TexHandleMgr::GetTexBuffer(itr->first), nullptr, nullptr);
 		i++;
 	}
 }
@@ -530,10 +530,11 @@ Game::Game()
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 
 	//ライト情報
-	static const float RANGE = 256.0f;
-	ptLig.SetInfluenceRange(RANGE);
+	ptLig.SetInfluenceRange(PT_LIG_RANGE);
+	spotLig.SetInfluenceRange(SPOT_LIG_RANGE);
 
 	ligMgr.RegisterPointLight(&ptLig);
+	ligMgr.RegisterSpotLight(&spotLig);
 	ligMgr.RegisterHemiSphereLight(&hemiLig);
 }
 
@@ -1163,12 +1164,12 @@ void Game::Update()
 		dossunBlock[index].CheckHit(player, mapData);
 	}
 
-
 	//ライト更新
-	Vec3<float>pos = { 0.0f,0.0f,-20.0f };
-	pos.x = UsersInput::Instance()->GetMousePos().x;
-	pos.y = UsersInput::Instance()->GetMousePos().y;
-	ptLig.SetPos(pos);
+	auto pos = player.GetCenterDrawPos();
+	ptLig.SetPos({ pos.x,pos.y,PT_LIG_Z });
+
+	spotLig.SetTarget({ pos.x,pos.y + SPOT_LIG_TARGET_OFFSET_Y,0.0f });
+	spotLig.SetPos({ pos.x,pos.y + SPOT_LIG_TARGET_OFFSET_Y,SPOT_LIG_Z });
 }
 
 void Game::Draw()

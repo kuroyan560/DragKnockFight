@@ -233,11 +233,8 @@ void Player::Draw(LightManager& LigManager)
 	//rightBottom += stretch_RB;
 
 	//“·‘Ì
-	//DrawFunc::DrawExtendGraph2D(leftUp, rightBottom , TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), AlphaBlendMode_Trans, { playerDir != DEFAULT,false });
-	Vec2<float> pos = centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
 	const Vec2<float> expRateBody = expRate * ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	//DrawFunc::DrawRotaGraph2D(pos, expRateBody, 0.0f, TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), { 0.5f,0.5f }, AlphaBlendMode_Trans, { playerDir != DEFAULT,false });
-	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, pos, expRateBody, 0.0f,
+	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), expRateBody, 0.0f,
 		TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), nullptr, nullptr, 0.0f,
 		{ 0.5f,0.5f }, { playerDir != DEFAULT,false });
 
@@ -684,6 +681,14 @@ void Player::HitMapChipBottom()
 	// Å‰‚Ìˆê”­ƒtƒ‰ƒO‚ð‰Šú‰»
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
+}
+
+Vec2<float> Player::GetCenterDrawPos()
+{
+	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
+	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
+	return centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
 }
 
 void Player::Input(const vector<vector<int>> mapData)

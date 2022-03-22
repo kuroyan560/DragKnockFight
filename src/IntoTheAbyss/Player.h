@@ -126,12 +126,14 @@ public:
 	// マップチップとの当たり判定
 	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, TimeStopTestBlock& testBlock);
 
-
 	// 方向ごとのマップチップとの当たり判定関数
 	void HitMapChipTop();
 	void HitMapChipLeft();
 	void HitMapChipRight();
 	void HitMapChipBottom();
+
+	//スクロールなどにも考慮した中心座標
+	Vec2<float> GetCenterDrawPos();
 
 private:
 	/*-- クラス内で使用する関数 --*/

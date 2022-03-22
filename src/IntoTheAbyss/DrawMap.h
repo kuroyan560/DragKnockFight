@@ -9,6 +9,8 @@ class TextureBuffer;
 class StructuredBuffer;
 #include<vector>
 
+class LightManager;
+
 struct ChipData
 {
 	Vec2<float>pos;
@@ -21,6 +23,11 @@ class DrawMap
 	static std::shared_ptr<GraphicsPipeline>PIPELINE;
 	static std::shared_ptr<ConstantBuffer>EXT_RATE_BUFF;
 
+	// (0,0,-1) のベタ塗りノーマルマップ
+	static std::shared_ptr<TextureBuffer>DEFAULT_NORMAL_MAP;
+	//黒のベタ塗りテクスチャ
+	static std::shared_ptr<TextureBuffer>DEFAULT_EMISSIVE_MAP;
+
 	std::shared_ptr<VertexBuffer>vertexBuff;
 
 	ChipData chipDatas[MAX_CHIP_NUM];
@@ -28,5 +35,6 @@ class DrawMap
 public:
 	DrawMap();
 	void AddChip(const Vec2<float>& Pos, const float& Radian);
-	void Draw(const std::shared_ptr<TextureBuffer>& Tex);
+	void Draw(LightManager& LigManager, const std::shared_ptr<TextureBuffer>& Tex,
+		const std::shared_ptr<TextureBuffer>& NormalMap = nullptr, const std::shared_ptr<TextureBuffer>& EmissiveMap = nullptr);
 };

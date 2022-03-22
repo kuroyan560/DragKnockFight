@@ -62,7 +62,13 @@ class Game
 
 	//ÉâÉCÉgèÓïÒ
 	LightManager ligMgr;
+	const float PT_LIG_RANGE = 128.0;
+	const float PT_LIG_Z = -2.0f;
 	Light::Point ptLig;
+	const float SPOT_LIG_RANGE = 128.0;
+	const float SPOT_LIG_TARGET_OFFSET_Y= -10.0f;
+	const float SPOT_LIG_Z = -20.0f;
+	Light::Spot spotLig;
 	Light::HemiSphere hemiLig;
 
 public:
