@@ -129,7 +129,7 @@ public:
 	//プレイヤーの入力を禁止する
 	void StopDoorLeftRight();
 	void StopDoorUpDown();
-
+	bool drawCursorFlag;
 
 private:
 	/*-- クラス内で使用する関数 --*/
@@ -148,7 +148,7 @@ private:
 
 	bool stopInputFlag;//入力を禁止するフラグ
 	bool stopMoveFlag;
-	bool drawCursorFlag;
+
 
 	bool doorMoveLeftRightFlag;
 	bool doorMoveUpDownFlag;
