@@ -602,6 +602,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			int playerChipX = (centerPos.x - PLAYER_HIT_SIZE.x - offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 			int playerChipY = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 
+
 			// 求めた番号が範囲外じゃなかったら。
 			if (0 <= playerChipY && playerChipY <= mapData.size() && 0 <= playerChipX && playerChipX <= mapData[playerChipY].size()) {
 
@@ -639,10 +640,10 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 		// マップチップとの当たり判定。
 		{
-
 			// プレイヤーの右側のマップチップ番号を求める。
 			int playerChipX = (centerPos.x + PLAYER_HIT_SIZE.x + offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 			int playerChipY = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+
 
 			// 求めた番号が範囲外じゃなかったら。
 			if (0 <= playerChipY && playerChipY <= mapData.size() && 0 <= playerChipX && playerChipX <= mapData[playerChipY].size()) {
@@ -703,6 +704,8 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			int playerChipX = (centerPos.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 			int playerChipY = (centerPos.y - PLAYER_HIT_SIZE.y - offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 
+
+
 			// 求めた番号が範囲外じゃなかったら。
 			if (0 <= playerChipY && playerChipY <= mapData.size() && 0 <= playerChipX && playerChipX <= mapData[playerChipY].size()) {
 
@@ -744,6 +747,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			// プレイヤーの下側のマップチップ番号を求める。
 			int playerChipX = (centerPos.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 			int playerChipY = (centerPos.y + PLAYER_HIT_SIZE.y + offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+
 
 			// 求めた番号が範囲外じゃなかったら。
 			if (0 <= playerChipY && playerChipY <= mapData.size() && 0 <= playerChipX && playerChipX <= mapData[playerChipY].size()) {
