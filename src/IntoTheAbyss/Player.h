@@ -29,6 +29,7 @@ public:
 	bool isWallRight;				// 右の壁にくっついているか
 	bool isWallLeft;				// 左の壁にくっついているか
 	bool inBubble;					// シャボン玉に入っているかどうか
+	bool isDead;					// 死んだかどうかフラグ
 	int rapidFireTimerLeft;			// 連射タイマー左手
 	int rapidFireTimerRight;		// 連射タイマー右手
 	int gravityInvalidTimer;		// 重力無効化タイマー

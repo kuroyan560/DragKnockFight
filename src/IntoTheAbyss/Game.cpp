@@ -708,7 +708,7 @@ void Game::Update()
 		dossunBlock.clear();
 
 		dossunBlock.push_back({});
-		dossunBlock[0].Generate(player.centerPos, player.centerPos + Vec2<float>(100, 0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), GIMMICK_DOSSN_ON_LOW);
+		dossunBlock[0].Generate(player.centerPos, player.centerPos + Vec2<float>(0, 100), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), GIMMICK_DOSSN_ON_LOW);
 		SightCollisionStorage::Instance()->data.push_back(dossunBlock[dossunBlock.size() - 1].sightData);
 
 		// ドッスンを生成。

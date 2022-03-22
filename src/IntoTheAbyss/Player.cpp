@@ -228,7 +228,7 @@ void Player::Draw()
 	rightBottom += stretch_RB;
 
 	//胴体
-	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom , TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), AlphaBlendMode_Trans, { DIR == LEFT,false });
+	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), AlphaBlendMode_Trans, { DIR == LEFT,false });
 	//DrawFunc::DrawRotaGraph2D(centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom, expRate, 0.0f, TexHandleMgr::GetTexBuffer(playerGraph),
 		//{ 0.5f,0.5f }, AlphaBlendMode_Trans, { DIR == LEFT,false });
 
@@ -550,6 +550,211 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			// ドッスンの移動量タイマーを初期化。
 			dossun[index].isHitPlayer = false;
 			//isMoveTimer = 0;
+
+		}
+
+	}
+
+
+	/*===== プレイヤーがドッスンに挟まれた判定 =====*/
+
+	// プレイヤーの左右がドッスンもしくはマップチップと当たっていたら死亡判定を行う。
+	{
+
+		float offset = 10.0f;
+
+		bool isHitLeft = false;
+		bool isHitRight = false;
+
+		// マップチップとの当たり判定。
+		{
+
+			// プレイヤーの左側のマップチップ番号を求める。
+			int playerChipX = (centerPos.x - PLAYER_HIT_SIZE.x - offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			int playerChipY = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+
+			// 求めた番号が範囲外じゃなかったら。
+			if (0 <= playerChipY && playerChipY <= mapData.size() && 0 <= playerChipX && playerChipX <= mapData[playerChipY].size()) {
+
+				// そのマップチップの番号が1~9の間だったら。
+				if (0 < mapData[playerChipY][playerChipX] && mapData[playerChipY][playerChipX] < 10) {
+
+					// 当たっている
+					isHitLeft = true;
+
+				}
+
+			}
+
+		}
+
+		// ドッスンとの当たり判定
+		{
+
+			Vec2<float> checkPos = { centerPos.x - PLAYER_HIT_SIZE.x - offset, centerPos.y };
+
+			// 全てのドッスンブロックと判定を行う。
+			const int DOSSUN_COUNT = dossun.size();
+			for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+				// 求める座標がドッスンブロックの範囲内にあるかどうかをチェックする。
+				if (checkPos.x < dossun[index].pos.x - dossun[index].size.x || dossun[index].pos.x + dossun[index].size.x < checkPos.x) continue;
+				if (checkPos.y < dossun[index].pos.y - dossun[index].size.y || dossun[index].pos.y + dossun[index].size.y < checkPos.y) continue;
+
+				// ここまでくれば当たっている判定。
+				isHitLeft = true;
+
+			}
+
+		}
+
+		// マップチップとの当たり判定。
+		{
+
+			// プレイヤーの右側のマップチップ番号を求める。
+			int playerChipX = (centerPos.x + PLAYER_HIT_SIZE.x + offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			int playerChipY = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+
+			// 求めた番号が範囲外じゃなかったら。
+			if (0 <= playerChipY && playerChipY <= mapData.size() && 0 <= playerChipX && playerChipX <= mapData[playerChipY].size()) {
+
+				// そのマップチップの番号が1~9の間だったら。
+				if (0 < mapData[playerChipY][playerChipX] && mapData[playerChipY][playerChipX] < 10) {
+
+					// 当たっている
+					isHitRight = true;
+
+				}
+
+			}
+
+		}
+
+		// ドッスンとの当たり判定
+		{
+
+			Vec2<float> checkPos = { centerPos.x + PLAYER_HIT_SIZE.x + offset, centerPos.y };
+
+			// 全てのドッスンブロックと判定を行う。
+			const int DOSSUN_COUNT = dossun.size();
+			for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+				// 求める座標がドッスンブロックの範囲内にあるかどうかをチェックする。
+				if (checkPos.x < dossun[index].pos.x - dossun[index].size.x || dossun[index].pos.x + dossun[index].size.x < checkPos.x) continue;
+				if (checkPos.y < dossun[index].pos.y - dossun[index].size.y || dossun[index].pos.y + dossun[index].size.y < checkPos.y) continue;
+
+				// ここまでくれば当たっている判定。
+				isHitRight = true;
+
+			}
+
+		}
+
+		// 挟まれていたら死亡
+		if (isHitRight && isHitLeft) {
+
+			isDead = true;
+
+		}
+
+	}
+
+	// プレイヤーの上下がドッスンもしくはマップチップと当たっていたら死亡判定を行う。
+	{
+
+		float offset = 10.0f;
+
+		bool isHitTop = false;
+		bool isHitBottom = false;
+
+		// マップチップとの当たり判定。
+		{
+
+			// プレイヤーの上側のマップチップ番号を求める。
+			int playerChipX = (centerPos.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			int playerChipY = (centerPos.y - PLAYER_HIT_SIZE.y - offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+
+			// 求めた番号が範囲外じゃなかったら。
+			if (0 <= playerChipY && playerChipY <= mapData.size() && 0 <= playerChipX && playerChipX <= mapData[playerChipY].size()) {
+
+				// そのマップチップの番号が1~9の間だったら。
+				if (0 < mapData[playerChipY][playerChipX] && mapData[playerChipY][playerChipX] < 10) {
+
+					// 当たっている
+					isHitTop = true;
+
+				}
+
+			}
+
+		}
+
+		// ドッスンとの当たり判定
+		{
+
+			Vec2<float> checkPos = { centerPos.x, centerPos.y - PLAYER_HIT_SIZE.y - offset };
+
+			// 全てのドッスンブロックと判定を行う。
+			const int DOSSUN_COUNT = dossun.size();
+			for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+				// 求める座標がドッスンブロックの範囲内にあるかどうかをチェックする。
+				if (checkPos.x < dossun[index].pos.x - dossun[index].size.x || dossun[index].pos.x + dossun[index].size.x < checkPos.x) continue;
+				if (checkPos.y < dossun[index].pos.y - dossun[index].size.y || dossun[index].pos.y + dossun[index].size.y < checkPos.y) continue;
+
+				// ここまでくれば当たっている判定。
+				isHitTop = true;
+
+			}
+
+		}
+
+		// マップチップとの当たり判定。
+		{
+
+			// プレイヤーの下側のマップチップ番号を求める。
+			int playerChipX = (centerPos.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			int playerChipY = (centerPos.y + PLAYER_HIT_SIZE.y + offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+
+			// 求めた番号が範囲外じゃなかったら。
+			if (0 <= playerChipY && playerChipY <= mapData.size() && 0 <= playerChipX && playerChipX <= mapData[playerChipY].size()) {
+
+				// そのマップチップの番号が1~9の間だったら。
+				if (0 < mapData[playerChipY][playerChipX] && mapData[playerChipY][playerChipX] < 10) {
+
+					// 当たっている
+					isHitBottom = true;
+
+				}
+
+			}
+
+		}
+
+		// ドッスンとの当たり判定
+		{
+
+			Vec2<float> checkPos = { centerPos.x, centerPos.y + PLAYER_HIT_SIZE.y + offset };
+
+			// 全てのドッスンブロックと判定を行う。
+			const int DOSSUN_COUNT = dossun.size();
+			for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+				// 求める座標がドッスンブロックの範囲内にあるかどうかをチェックする。
+				if (checkPos.x < dossun[index].pos.x - dossun[index].size.x || dossun[index].pos.x + dossun[index].size.x < checkPos.x) continue;
+				if (checkPos.y < dossun[index].pos.y - dossun[index].size.y || dossun[index].pos.y + dossun[index].size.y < checkPos.y) continue;
+
+				// ここまでくれば当たっている判定。
+				isHitBottom = true;
+
+			}
+
+		}
+
+		// 挟まれていたら死亡
+		if (isHitTop && isHitBottom) {
+
+			isDead = true;
 
 		}
 
