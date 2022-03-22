@@ -687,6 +687,10 @@ void Game::Update()
 		bool hitDoorFlag;
 		//奥扉判定-----------------------
 
+		if (playerChip.y <= 0.0f)
+		{
+			playerChip.y = -1.0f;
+		}
 
 		int nowChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, playerChip);
 		int nowChip2 = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, playerChip2);
@@ -894,38 +898,37 @@ void Game::Update()
 			}
 			else
 			{
-				// プレイヤーを死んでない判定にする。
-				if (player.isDead)
+				//ドア座標を入手
+				Vec2<float>doorPos = GetDoorPos(doorNumber, mapData);
+				//プレイヤーがリスポーンする座標を入手
+				responePos = GetPlayerResponePos(stageNum, roomNum, doorNumber, doorPos, &door);
+				//プレイヤーをリスポーンさせる
+				switch (door)
 				{
-					//プレイヤーをリスポーンさせる
-					switch (door)
-					{
-					case Game::DOOR_UP_GORIGHT:
-						player.centerPos = { responePos.x + 50.0f * 2,responePos.y };
-						break;
+				case Game::DOOR_UP_GORIGHT:
+					player.centerPos = { responePos.x + 50.0f * 2,responePos.y };
+					break;
 
-					case Game::DOOR_UP_GOLEFT:
-						player.centerPos = { responePos.x - 50.0f * 2,responePos.y };
-						break;
+				case Game::DOOR_UP_GOLEFT:
+					player.centerPos = { responePos.x - 50.0f * 2,responePos.y };
+					break;
 
-					case Game::DOOR_DOWN:
-						player.centerPos = responePos;
-						break;
+				case Game::DOOR_DOWN:
+					player.centerPos = { responePos.x,responePos.y - 50.0f };
+					break;
 
-					case Game::DOOR_LEFT:
-						player.centerPos = responePos;
-						break;
+				case Game::DOOR_LEFT:
+					player.centerPos = responePos;
+					break;
 
-					case Game::DOOR_RIGHT:
-						player.centerPos = responePos;
-						break;
-					case Game::DOOR_Z:
-						break;
-					default:
-						break;
-					}
+				case Game::DOOR_RIGHT:
+					player.centerPos = responePos;
+					break;
+				case Game::DOOR_Z:
+					break;
+				default:
+					break;
 				}
-
 				goFlag = true;
 			}
 		}
