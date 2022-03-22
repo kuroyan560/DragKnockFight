@@ -680,14 +680,17 @@ void Game::Update()
 		setPlayerPos[DOOR_UP_GORIGHT] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y - 30.0f) / 50.0f);
 		setPlayerPos[DOOR_UP_GOLEFT] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y - 30.0f) / 50.0f);
 
-		setPlayerPos[DOOR_DOWN] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y + 70.0f) / 50.0f);
-		setPlayerPos[DOOR_LEFT] = Vec2<float>((player.centerPos.x - 30.0f) / 50.0f, player.centerPos.y / 50.0f);
-		setPlayerPos[DOOR_RIGHT] = Vec2<float>((player.centerPos.x + 25.0f) / 50.0f, player.centerPos.y / 50.0f);
+		setPlayerPos[DOOR_DOWN] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y + 61.0f) / 50.0f);
+		setPlayerPos[DOOR_LEFT] = Vec2<float>((player.centerPos.x - 60.0f) / 50.0f, player.centerPos.y / 50.0f);
+		setPlayerPos[DOOR_RIGHT] = Vec2<float>((player.centerPos.x + 60.0f) / 50.0f, player.centerPos.y / 50.0f);
 		//触れているドアによって座標変更-----------------------
 
 		//触れているドアによって、どこの座標を基準にするか変える
 		Vec2<float> playerChip = setPlayerPos[doorDir];
-
+		if (playerChip.x <= 0.0f)
+		{
+			playerChip.x = -1.0f;
+		}
 		if (playerChip.y <= 0.0f)
 		{
 			playerChip.y = -1.0f;
@@ -927,23 +930,23 @@ void Game::Update()
 				switch (door)
 				{
 				case Game::DOOR_UP_GORIGHT:
-					player.centerPos = { responePos.x + 50.0f * 2,responePos.y };
+					player.Init({ responePos.x + 50.0f * 2,responePos.y });
 					break;
 
 				case Game::DOOR_UP_GOLEFT:
-					player.centerPos = { responePos.x - 50.0f * 2,responePos.y };
+					player.Init({ responePos.x - 50.0f * 2,responePos.y });
 					break;
 
 				case Game::DOOR_DOWN:
-					player.centerPos = { responePos.x,responePos.y - 60.0f };
+					player.Init({ responePos.x,responePos.y - 80.0f });
 					break;
 
 				case Game::DOOR_LEFT:
-					player.centerPos = responePos;
+					player.Init(responePos);
 					break;
 
 				case Game::DOOR_RIGHT:
-					player.centerPos = responePos;
+					player.Init(responePos);
 					break;
 				case Game::DOOR_Z:
 					break;
@@ -1049,8 +1052,6 @@ void Game::Update()
 			bubbleBlock.push_back(bubbleBuff);
 		}
 
-		player.isDead = false;
-
 		if (SelectStage::Instance()->resetStageFlag)
 		{
 			bool responeFlag = false;
@@ -1085,6 +1086,7 @@ void Game::Update()
 				}
 			}
 		}
+
 		SelectStage::Instance()->resetStageFlag = false;
 	}
 	oldRoomNum = roomNum;
