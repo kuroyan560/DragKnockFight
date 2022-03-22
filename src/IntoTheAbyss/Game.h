@@ -75,6 +75,7 @@ class Game
 	E_DOOR_DIR door;		//‚Ç‚Ì•ûŒü‚Åo‚é‚©
 	bool initJumpFlag;
 	float gravity;
+	E_DOOR_DIR doorDir;
 
 	std::vector<DrawMap>drawMap;
 
