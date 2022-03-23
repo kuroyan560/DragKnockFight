@@ -309,23 +309,30 @@ StageMgr::StageMgr()
 					}
 
 
+
 					//ドッスンの場合
 					if (mapChipMemoryData[MAPCHIP_TYPE_THOWNP].min <= now && now <= mapChipMemoryData[MAPCHIP_TYPE_THOWNP].max)
 					{
 						//この番号が開始位置か終了位置か調べる
 						int gimmickNumber = now - mapChipMemoryData[MAPCHIP_TYPE_THOWNP].min;
 
-						//偶数なら開始位置、奇数なら終了位置とする
-						if (gimmickNumber % 2 == 0)
+						bool loadDataFlag = GimmickLoader::Instance()->CanLoadData(stageNum, roomNum, gimmickNumber) || GimmickLoader::Instance()->CanLoadData(stageNum, roomNum, gimmickNumber - 1);
+						if (loadDataFlag)
 						{
-							GimmickLoader::Instance()->SetThwompStartPos(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+							int arrayNumber = GetGimmickNumber(gimmickNumber);
+							//偶数なら開始位置、奇数なら終了位置とする
+							if (gimmickNumber % 2 == 0)
+							{
+								GimmickLoader::Instance()->SetThwompStartPos(stageNum, roomNum, arrayNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+							}
+							else
+							{
+								GimmickLoader::Instance()->SetThwompEndPos(stageNum, roomNum, arrayNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+							}
+							skipFlag = true;
 						}
-						else
-						{
-							GimmickLoader::Instance()->SetThwompEndPos(stageNum, roomNum, gimmickNumber - 1, Vec2<float>(x * 50.0f, y * 50.0f));
-						}
-						skipFlag = true;
 					}
+
 
 					//バブルの場合
 					if (mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].min <= now && now <= mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].max)

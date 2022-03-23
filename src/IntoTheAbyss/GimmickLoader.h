@@ -52,6 +52,8 @@ public:
 	void SetThwompEndPos(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS);
 	void PushBubbleData(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS);
 
+	const bool &CanLoadData(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER);
+
 private:
 	std::vector<std::vector<std::vector<std::shared_ptr<ThownpeData>>>> allGimmickData;//ドッスンに関する情報
 	std::vector<std::vector<std::vector<std::shared_ptr<BubbleData>>>> allBubbleData;//ドッスンに関する情報

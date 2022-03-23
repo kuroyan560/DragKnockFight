@@ -207,6 +207,27 @@ void GimmickLoader::PushBubbleData(const int& STAGE_NUM, const int& ROOM_NUM, co
 	allBubbleData[STAGE_NUM][ROOM_NUM][GIMMICK_NUMBER]->pos = POS;
 }
 
+const bool &GimmickLoader::CanLoadData(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER)
+{
+	//ステージ番号が配列の範囲外ならfalse
+	if (STAGE_NUM < 0 || allGimmickData.size() < STAGE_NUM)
+	{
+		return false;
+	}
+	//部屋番号が配列の範囲外ならfalse
+	if (ROOM_NUM < 0 || allGimmickData[STAGE_NUM].size() < ROOM_NUM)
+	{
+		return false;
+	}
+	//指定した場所がnullptrならfalse
+	if (GIMMICK_NUMBER < 0 || allGimmickData[STAGE_NUM][ROOM_NUM].size() < GIMMICK_NUMBER)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 void GimmickLoader::LoadThowmpeData(const std::string& KEY, std::istringstream* LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA)
 {
 	//ギミックの種類を判別する

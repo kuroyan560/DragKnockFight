@@ -114,7 +114,7 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 
 #include"DrawFunc.h"
 #include"DrawFunc_Shadow.h"
-void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV)
+void PlayerHand::Draw(LightManager &LigManager, const Vec2<float> &ExtRate, const int &GraphHandle, const float &InitAngle, const Vec2<float> &RotaCenterUV, const bool &DRAW_CURSOR)
 {
 	/*-- •`‰æˆ— --*/
 	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;

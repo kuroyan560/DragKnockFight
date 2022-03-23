@@ -273,11 +273,11 @@ void Player::Draw(LightManager& LigManager)
 
 	if (playerDir == RIGHT)
 	{
-		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f },drawCursorFlag);
 	}
 	else if (playerDir == LEFT)
 	{
-		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f },drawCursorFlag);
 	}
 
 	//ƒXƒgƒŒƒbƒ`‰ÁŽZ
@@ -299,11 +299,11 @@ void Player::Draw(LightManager& LigManager)
 
 	if (playerDir == RIGHT)
 	{
-		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f },drawCursorFlag);
 	}
 	else if (playerDir == LEFT)
 	{
-		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f },drawCursorFlag);
 	}
 
 	// ’e‚ð•`‰æ
