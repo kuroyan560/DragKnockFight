@@ -29,11 +29,13 @@ class Game
 		DOOR_LEFT,	//左に出るドア
 		DOOR_RIGHT,	//右に出るドア
 		DOOR_Z,		//真ん中から出るドア
+		DOOR_NONE,		//ドア無し
+		DOOR_MAX		
 	};
 
 	bool CheckUsedData(vector<Vec2<float>> DATA, Vec2<float> DATA2);
 	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum);
-	Vec2<float> GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR);
+	Vec2<float> GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR, const bool &ONLY_GET_DOOR_DIR = false);
 	Vec2<float> GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA);
 
 	int mapBlockGraph;

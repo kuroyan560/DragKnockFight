@@ -31,7 +31,7 @@ bool Game::CheckUsedData(std::vector<Vec2<float>> DATA, Vec2<float> DATA2)
 }
 
 #include<map>
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -60,7 +60,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -117,7 +117,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR* DIR)
+Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR, const bool &ONLY_GET_DOOR_DIR)
 {
 	Vec2<float> doorPos;
 	int roopCount = 0;
@@ -155,6 +155,17 @@ Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_N
 	checkWall[1] = { doorPos.x - 1,doorPos.y };
 	int rightChip = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, checkWall[0]);
 	int leftChip = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, checkWall[1]);
+
+	//壁以外は空白として判定を出す
+	if (leftChip <= -2 || 9 <= leftChip)
+	{
+		leftChip = 0;
+	}
+	if (rightChip <= -2 || 9 <= rightChip)
+	{
+		rightChip = 0;
+	}
+
 
 	//右に壁がある場合
 	if ((rightChip == 1 && leftChip == 0) || (rightChip == -1 && leftChip == 0))
@@ -289,15 +300,19 @@ Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_N
 	}
 	//上下どちらかの扉からリスポーンさせる場合-----------------------
 
+	if (!ONLY_GET_DOOR_DIR)
+	{
+		string result = "次につながるドアが見つかりません。\nRalationファイルを確認するか、担当の大石に連絡をください。";
+		MessageBox(NULL, KuroFunc::GetWideStrFromStr(result).c_str(), TEXT("ドアが見つかりません"), MB_OK);
+		assert(0);
+	}
 
-	string result = "次につながるドアが見つかりません。\nRalationファイルを確認するか、担当の大石に連絡をください。";
-	MessageBox(NULL, KuroFunc::GetWideStrFromStr(result).c_str(), TEXT("ドアが見つかりません"), MB_OK);
-	assert(0);
 	//失敗
+	*DIR = DOOR_NONE;
 	return Vec2<float>(-1, -1);
 }
 
-Vec2<float> Game::GetDoorPos(const int& DOOR_NUMBER, const vector<vector<int>>& MAPCHIP_DATA)
+Vec2<float> Game::GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA)
 {
 	Vec2<float> door;
 	//次につながるドアを探す
@@ -630,7 +645,7 @@ void Game::Update()
 				}
 			}
 		}
-		player.centerPos = door * Vec2<float>(50.0f, 50.0f);
+		player.Init(door * Vec2<float>(50.0f, 50.0f));
 		ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
@@ -675,13 +690,14 @@ void Game::Update()
 	{
 		//触れているドアによって座標変更-----------------------
 
-		array<Vec2<float>, 5> setPlayerPos;
+		array<Vec2<float>, DOOR_MAX> setPlayerPos;
 		setPlayerPos[DOOR_UP_GORIGHT] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y - 30.0f) / 50.0f);
 		setPlayerPos[DOOR_UP_GOLEFT] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y - 30.0f) / 50.0f);
 
 		setPlayerPos[DOOR_DOWN] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y + 61.0f) / 50.0f);
 		setPlayerPos[DOOR_LEFT] = Vec2<float>((player.centerPos.x - 60.0f) / 50.0f, player.centerPos.y / 50.0f);
 		setPlayerPos[DOOR_RIGHT] = Vec2<float>((player.centerPos.x + 60.0f) / 50.0f, player.centerPos.y / 50.0f);
+		setPlayerPos[DOOR_NONE] = Vec2<float>(player.centerPos.x / 50.0f, player.centerPos.y / 50.0f);
 		//触れているドアによって座標変更-----------------------
 
 		//触れているドアによって、どこの座標を基準にするか変える
@@ -705,7 +721,7 @@ void Game::Update()
 			//ドア座標を入手
 			Vec2<float>doorPos = GetDoorPos(giveDoorNumber, mapData);
 			//プレイヤーがリスポーンする座標を入手
-			GetPlayerResponePos(stageNum, roomNum, giveDoorNumber, doorPos, &doorDir);
+			GetPlayerResponePos(stageNum, roomNum, giveDoorNumber, doorPos, &doorDir, true);
 		}
 
 
@@ -774,8 +790,8 @@ void Game::Update()
 					//ドア座標を入手
 					Vec2<float>doorPos = GetDoorPos(doorNumber, mapData);
 					//プレイヤーがリスポーンする座標を入手
-					responePos = GetPlayerResponePos(stageNum, roomNum, doorNumber, doorPos, &door);
-
+					responePos = GetPlayerResponePos(stageNum, localRoomNum, doorNumber, doorPos, &door);
+					roomNum = localRoomNum;
 
 					sceneChangingFlag = true;
 					//画面外から登場させる
@@ -999,6 +1015,8 @@ void Game::Update()
 	//部屋の初期化
 	if ((roomNum != oldRoomNum || stageNum != oldStageNum) || SelectStage::Instance()->resetStageFlag)
 	{
+		giveDoorNumber = 0;
+
 		debugStageData[0] = stageNum;
 		debugStageData[1] = roomNum;
 
