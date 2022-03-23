@@ -324,7 +324,7 @@ StageMgr::StageMgr()
 						}
 						else
 						{
-							loadGimmickData->SetThwompEndPos(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+							loadGimmickData->SetThwompEndPos(stageNum, roomNum, gimmickNumber - 1, Vec2<float>(x * 50.0f, y * 50.0f));
 						}
 						skipFlag = true;
 					}
