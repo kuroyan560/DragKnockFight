@@ -1267,7 +1267,7 @@ void Player::Input(const vector<vector<int>> mapData)
 
 		}
 		// ビーコンが発射されていたら。
-		else if (rHand->teleportPike.isActive && (rHand->teleportPike.isHitWall || rHand->teleportPike.isHitWindow) && !isPrevFrameShotBeacon) {
+		else if (rHand->teleportPike.isActive && !isPrevFrameShotBeacon) {
 
 			auto vec = rHand->teleportPike.pos - centerPos;
 
