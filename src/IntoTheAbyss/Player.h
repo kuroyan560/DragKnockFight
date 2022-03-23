@@ -35,6 +35,7 @@ public:
 	int gravityInvalidTimer;		// 重力無効化タイマー
 	int handReturnTimer;			// 入力が終わってから腕がデフォルトの位置に戻るまでのタイマー
 	int asSoonAsInputTimer;			// 移動入力が行われてから数フレーム間有効化する処理を作るためにタイマー 主にシャボン玉
+	int firstRecoilParticleTimer;	// 最初のショットのときのパーティクルを出すタイマー
 
 	// 壁ズリフラグ
 	bool isSlippingWall[4];			// 壁ズリパーティクルを出すフラグ
@@ -53,8 +54,9 @@ public:
 	Vec2<float>fromStretch_LU = { 0,0 };	//イージング用スタート値
 	Vec2<float>fromStretch_RB = { 0,0 };	//イージング用スタート値
 	const int STRETCH_RETURN_TIME = 17;	//ストレッチが０になるまでのフレーム数
-	int stretchTimer = STRETCH_RETURN_TIME;	
+	int stretchTimer = STRETCH_RETURN_TIME;
 	const float STRETCH_DIV_RATE = 2.0f;	//ストレッチを弱くするときの割合
+	const int FIRST_SHOT_RECOIL_PARTICLE_TIMER = 10.0f;
 
 	//アニメーション統括
 	PlayerAnimation anim;
