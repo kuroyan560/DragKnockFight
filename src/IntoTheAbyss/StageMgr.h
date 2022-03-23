@@ -303,5 +303,17 @@ private:
 		}
 	};
 
+	const int &GetGimmickNumber(const int &NUMBER)
+	{
+		int num = NUMBER;
+		int sum = 0;
+
+		for (; 0 <= num - 2;)
+		{
+			num -= 2;
+			++sum;
+		}
+		return sum;
+	}
 };
 

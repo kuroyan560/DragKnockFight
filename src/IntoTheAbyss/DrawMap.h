@@ -19,7 +19,7 @@ struct ChipData
 
 class DrawMap
 {
-	static const int MAX_CHIP_NUM = 200;
+	static const int MAX_CHIP_NUM = 300;
 	static std::shared_ptr<GraphicsPipeline>PIPELINE;
 	static std::shared_ptr<ConstantBuffer>EXT_RATE_BUFF;
 
