@@ -74,6 +74,7 @@ void DossunBlock::Generate(Vec2<float> generatePos, Vec2<float> endPos, const Ve
 	isReturn = false;
 	isTimeStopPikeAlive = nullptr;
 	sightData = { &pos,size/* * Vec2<float>(2.0f,2.0f)*/ };
+	alpha = 1;
 
 }
 
@@ -180,6 +181,24 @@ void DossunBlock::Update()
 
 	if (0 < noCheckHitTimer) --noCheckHitTimer;
 
+
+	// アルファ値に関する処理
+
+	// アルファを毎フレーム0に近づける。
+	alpha -= alpha / 10.0f;
+
+	if (isHitPlayer) {
+
+		alpha = (float)isMoveTimer / IS_MOVE_TIMER * 255.0f;
+
+	}
+	if (isMove) {
+
+		alpha = 255;
+
+	}
+
+
 }
 
 void DossunBlock::Draw()
@@ -200,6 +219,9 @@ void DossunBlock::Draw()
 		posZoom.y + sizeZoom.y - scrollShakeZoom.y };
 
 	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(100, 100, 100, 255), true);
+
+	// 移動し始めるときに光らせる用
+	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(255, 255, 255, alpha), true, AlphaBlendMode_Trans);
 }
 
 void DossunBlock::CheckHit(const vector<vector<int>>& mapData)

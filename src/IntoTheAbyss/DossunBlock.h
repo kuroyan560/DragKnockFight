@@ -22,6 +22,7 @@ public:
 	int isMoveTimer;	// 移動するまでのタイマー(プレイヤーがこのブロックに触れてから指定フレーム後に動き出すようにするために必要。)
 	int changeDirTimer;	// 壁と当たったときに方向転換するタイマー
 	int noCheckHitTimer;// 方向転換してから一定時間判定を無効化するためのタイマー
+	int alpha;			// アルファ値
 	bool isHitPlayer;	// プレイヤーと当たっているかどうか。
 	bool isMove;		// 動き出したかどうか
 	bool isReturn;		// 初期位置に戻っているかどうか
