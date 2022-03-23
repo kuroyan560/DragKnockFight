@@ -23,7 +23,7 @@ std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::EXTEND_GRAPH_VERTEX_BUFF;
 
 //DrawRotaGraph
 std::shared_ptr<GraphicsPipeline>DrawFunc::ROTA_GRAPH_PIPELINE[AlphaBlendModeNum];
-int DrawFunc::DRAW_ROTA_GRAPH_COUNT;
+int DrawFunc::DRAW_ROTA_GRAPH_COUNT = 0;
 std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::ROTA_GRAPH_VERTEX_BUFF;
 
 void DrawFunc::DrawLine2D(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const Color& LineColor, const AlphaBlendMode& BlendMode)
@@ -309,7 +309,7 @@ void DrawFunc::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>
 	DRAW_EXTEND_GRAPH_COUNT++;
 }
 
-void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const float& ExtRate, const float& Radian,
+void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian,
 	const std::shared_ptr<TextureBuffer>& Tex, const Vec2<float>& RotaCenterUV, const AlphaBlendMode& BlendMode, const Vec2<bool>& Miror)
 {
 	//DrawRotaGraphêÍópí∏ì_
@@ -317,11 +317,11 @@ void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const float& ExtRate, 
 	{
 	public:
 		Vec2<float>center;
-		float extRate;
+		Vec2<float> extRate;
 		float radian;
 		Vec2<float>rotaCenterUV;
 		Vec2<int> miror;
-		RotaGraphVertex(const Vec2<float>& Center, const float& ExtRate, const float& Radian,
+		RotaGraphVertex(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian,
 			const Vec2<float>& RotaCenterUV, const Vec2<bool>& Miror)
 			:center(Center), extRate(ExtRate), radian(Radian),rotaCenterUV(RotaCenterUV), miror({ Miror.x ? 1 : 0,Miror.y ? 1 : 0 }) {}
 	};
@@ -343,7 +343,7 @@ void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const float& ExtRate, 
 		static std::vector<InputLayoutParam>INPUT_LAYOUT =
 		{
 			InputLayoutParam("CENTER",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("EXT_RATE",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("EXT_RATE",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("RADIAN",DXGI_FORMAT_R32_FLOAT),
 			InputLayoutParam("ROTA_CENTER_UV",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("MIROR",DXGI_FORMAT_R32G32_SINT)

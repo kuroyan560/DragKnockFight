@@ -5,8 +5,11 @@
 #include"Transform2D.h"
 #include"Color.h"
 #include"DrawFunc.h"
+#include"DrawFunc_Shadow.h"
+#include"DrawFunc_Color.h"
 #include"TitleScene.h"
 #include"StageSelectScene.h"
+
 
 #ifdef _DEBUG
 int main()
@@ -55,6 +58,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		Transform2D::DirtyReset();
 
 		DrawFunc::CountReset();
+		DrawFunc_Shadow::CountReset();
+		DrawFunc_Color::CountReset();
 
 		//メッセージがある？
 		MSG msg{};

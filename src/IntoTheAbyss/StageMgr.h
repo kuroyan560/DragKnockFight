@@ -176,8 +176,6 @@ public:
 	}
 
 	std::vector<MapChipAnimationData *> animationData;//マップチップのアニメーション情報の一覧
-	std::unique_ptr<GimmickLoader> loadGimmickData;	  //ギミックに関するデータの読み込み
-
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
