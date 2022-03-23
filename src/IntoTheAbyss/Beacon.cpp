@@ -62,19 +62,19 @@ void Beacon::Update()
 
 		pos += Vec2<float>(forwardVec.x * MAX_SPEED, forwardVec.y * MAX_SPEED);
 
-		// 座標が画面外にいったらその場所で止める。
-		const int WIN_WIDTH = WinApp::Instance()->GetWinSize().x;
-		const int WIN_HEIGHT = WinApp::Instance()->GetWinSize().y;
-		if (pos.x - ScrollMgr::Instance()->scrollAmount.x - SCALE * 2.0f <= 0 || pos.x - ScrollMgr::Instance()->scrollAmount.x + SCALE * 2.0f >= WIN_WIDTH ||
-			pos.y - ScrollMgr::Instance()->scrollAmount.y - SCALE * 2.0f <= 0 || pos.y - ScrollMgr::Instance()->scrollAmount.y + SCALE * 2.0f >= WIN_HEIGHT) {
+		//// 座標が画面外にいったらその場所で止める。
+		//const int WIN_WIDTH = WinApp::Instance()->GetWinSize().x;
+		//const int WIN_HEIGHT = WinApp::Instance()->GetWinSize().y;
+		//if (pos.x - ScrollMgr::Instance()->scrollAmount.x - SCALE * 2.0f <= 0 || pos.x - ScrollMgr::Instance()->scrollAmount.x + SCALE * 2.0f >= WIN_WIDTH ||
+		//	pos.y - ScrollMgr::Instance()->scrollAmount.y - SCALE * 2.0f <= 0 || pos.y - ScrollMgr::Instance()->scrollAmount.y + SCALE * 2.0f >= WIN_HEIGHT) {
 
-			isHitWall = true;
-			isHitWindow = true;
+		//	isHitWall = true;
+		//	isHitWindow = true;
 
-			// スクロール量を保存。
-			prevFrameScroll = ScrollMgr::Instance()->scrollAmount;
+		//	// スクロール量を保存。
+		//	prevFrameScroll = ScrollMgr::Instance()->scrollAmount;
 
-		}
+		//}
 
 	}
 
