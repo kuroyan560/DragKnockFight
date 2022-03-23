@@ -306,7 +306,7 @@ void Player::Draw(LightManager& LigManager)
 	//テレポート時のフラッシュ
 	Color teleFlashCol;
 	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, teleFlashTimer, TELE_FLASH_TIME, 1.0f, 0.0f);
-	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f,	bodyTex, teleFlashCol);
+	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
 
 	if (playerDir == RIGHT)
 	{
@@ -483,6 +483,10 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 	/*===== 短槍の当たり判定 =====*/
 
+	// 時間停止の短槍とドッスンブロックが当たっているかを保存する変数
+	bool isHitTeleportPikeDossun = false;
+	int hitTeleportPikeIndex = 0;
+
 	{
 
 		// 瞬間移動の短槍の当たり判定を行う。
@@ -501,6 +505,26 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
 			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_RIGHT);
 			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+
+		}
+
+		// 時間停止の短槍とドッスンブロックの当たり判定を行う。
+		const int DOSSUN_COUNT = dossun.size();
+		for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+			//if (rHand->teleportPike.isHitWall) continue;
+
+			// まずは当たっているかをチェックする。
+			if (fabs(rHand->teleportPike.pos.x - dossun[index].pos.x) > rHand->teleportPike.SCALE + dossun[index].size.x) continue;
+			if (fabs(rHand->teleportPike.pos.y - dossun[index].pos.y) > rHand->teleportPike.SCALE + dossun[index].size.y) continue;
+
+			// 瞬間移動の短槍に壁にあたったフラグを付ける。
+			rHand->teleportPike.isHitWall = true;
+
+			rHand->teleportPike.gimmickVel = dossun[index].moveDir * Vec2<float>(dossun[index].speed, dossun[index].speed);
+
+			isHitTeleportPikeDossun = true;
+			hitTeleportPikeIndex = index;
 
 		}
 
@@ -523,7 +547,6 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		}
 
 		// 時間停止の短槍とドッスンブロックの当たり判定を行う。
-		const int DOSSUN_COUNT = dossun.size();
 		for (int index = 0; index < DOSSUN_COUNT; ++index) {
 
 			if (lHand->timeStopPike.isHitWall) continue;
@@ -630,6 +653,12 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			// 最初の一発フラグを大きくする。
 			lHand->isFirstShot = false;
 			rHand->isFirstShot = false;
+
+		}
+		else if (isHitTeleportPikeDossun && hitTeleportPikeIndex == index) {
+
+			// ドッスンの移動量タイマーを更新。
+			dossun[index].isHitPlayer = true;
 
 		}
 		else {
