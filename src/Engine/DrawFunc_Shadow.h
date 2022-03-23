@@ -5,8 +5,6 @@
 #include"Vec.h"
 #include"Color.h"
 
-class GraphicsPipeline;
-class VertexBuffer;
 class LightManager;
 
 static class DrawFunc_Shadow
@@ -29,8 +27,6 @@ static class DrawFunc_Shadow
 	static std::shared_ptr<GraphicsPipeline>ROTA_GRAPH_PIPELINE;
 	static int DRAW_ROTA_GRAPH_COUNT;
 	static std::vector<std::shared_ptr<VertexBuffer>>ROTA_GRAPH_VERTEX_BUFF;
-
-	static std::vector<RootParam>ROOT_PARAMETER;
 
 	static void StaticInit();
 public:

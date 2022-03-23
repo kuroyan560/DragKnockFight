@@ -30,6 +30,8 @@ public:
 		SetColor(Vec4<int>(R, G, B, A));
 	}
 
+	float& Alpha() { return color.w; }
+
 	//”äŠr‰‰ŽZŽq
 	bool operator==(const Color& rhs) {
 		if (color.x != rhs.color.x)return false;

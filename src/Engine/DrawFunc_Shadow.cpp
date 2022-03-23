@@ -17,7 +17,7 @@ std::shared_ptr<GraphicsPipeline>DrawFunc_Shadow::ROTA_GRAPH_PIPELINE;
 int DrawFunc_Shadow::DRAW_ROTA_GRAPH_COUNT = 0;
 std::vector<std::shared_ptr<VertexBuffer>>DrawFunc_Shadow::ROTA_GRAPH_VERTEX_BUFF;
 
-std::vector<RootParam>DrawFunc_Shadow::ROOT_PARAMETER =
+static std::vector<RootParam>ROOT_PARAMETER =
 {
 	RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, "平行投影行列定数バッファ"),
 		RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, "視点座標情報"),

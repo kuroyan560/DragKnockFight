@@ -13,6 +13,7 @@
 #include"UsersInput.h"
 //#include"DrawFunc.h"
 #include"DrawFunc_Shadow.h"
+#include"DrawFunc_Color.h"
 #include"WinApp.h"
 
 Vec2<float> Player::GetGeneratePos()
@@ -101,6 +102,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	stretch_LU = { 0.0f,0.0f };
 	stretch_RB = { 0.0f,0.0f };
 	stretchTimer = STRETCH_RETURN_TIME;
+
+	//テレポート時の点滅の初期化
+	teleFlashTimer = TELE_FLASH_TIME;
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -190,6 +194,9 @@ void Player::Update(const vector<vector<int>> mapData)
 
 	//アニメーション更新
 	anim.Update();
+
+	//テレポート時のフラッシュのタイマー計測
+	if (teleFlashTimer < TELE_FLASH_TIME)teleFlashTimer++;
 }
 
 void Player::Draw(LightManager& LigManager)
@@ -227,10 +234,17 @@ void Player::Draw(LightManager& LigManager)
 	//rightBottom += stretch_RB;
 
 	//胴体
+	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = expRate * ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f,
-		TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), nullptr, nullptr, 0.0f,
+		bodyTex, nullptr, nullptr, 0.0f,
 		{ 0.5f,0.5f }, { playerDir != DEFAULT,false });
+	
+	//テレポート時のフラッシュ
+	Color teleFlashCol;
+	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, teleFlashTimer, TELE_FLASH_TIME, 1.0f, 0.0f);
+	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f,
+		bodyTex, teleFlashCol);
 
 	if (playerDir == RIGHT)
 	{
@@ -940,6 +954,9 @@ void Player::Input(const vector<vector<int>> mapData)
 			graphSize *= EXT_RATE / 2.0f;
 			rHand->EmitAfterImg(vec, GetHandGraph(RIGHT), graphSize.Float(), { false,false });
 
+			//点滅
+			teleFlashTimer = 0;
+
 			// プレイヤーを瞬間移動させる。
 			centerPos = rHand->teleportPike.pos;
 
@@ -1200,9 +1217,10 @@ void Player::CalculateStretch(const Vec2<float>& Move)
 	}
 
 	static const float SHRINK_RATE = 1.0f / 2.0f;
+	static const float OTHER_STRETCH_BOOL_RATE = 0.8f;
 
 	//左右移動時
-	if (Move.x != 0.0f)
+	if (Move.x != 0.0f && stretchRate.y < OTHER_STRETCH_BOOL_RATE)
 	{
 		//上下が縮む
 		stretch_LU.y += MAX_STRETCH.y * stretchRate.x * SHRINK_RATE;
@@ -1227,7 +1245,7 @@ void Player::CalculateStretch(const Vec2<float>& Move)
 	}
 
 	//上下移動時
-	if (Move.y != 0.0f)
+	if (Move.y != 0.0f && stretchRate.x < OTHER_STRETCH_BOOL_RATE)
 	{
 		//左右が縮む
 		stretch_LU.x += MAX_STRETCH.x * stretchRate.y * SHRINK_RATE;

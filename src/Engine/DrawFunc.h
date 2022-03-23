@@ -5,9 +5,6 @@
 #include"Vec.h"
 #include"Color.h"
 
-class GraphicsPipeline;
-class VertexBuffer;
-
 static class DrawFunc
 {
 	//DrawLine

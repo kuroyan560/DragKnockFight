@@ -48,7 +48,8 @@ public:
 	//int playerGraph;
 
 	//勢いによるストレッチ
-	const Vec2<float> MAX_STRETCH = { 16.0f,37.0f };	//最大ストレッチ量
+	//const Vec2<float> MAX_STRETCH = { 16.0f,37.0f };	//最大ストレッチ量
+	const Vec2<float> MAX_STRETCH = { 10.0f,31.0f };	//最大ストレッチ量
 	Vec2<float>stretch_LU = { 0,0 };	//左上
 	Vec2<float>stretch_RB = { 0,0 };	//右下
 	Vec2<float>fromStretch_LU = { 0,0 };	//イージング用スタート値
@@ -64,6 +65,10 @@ public:
 
 	//残像
 	AfterImg afImg;
+
+	//テレポートしたとき光る
+	const int TELE_FLASH_TIME = 120;
+	int teleFlashTimer;
 
 public:
 
