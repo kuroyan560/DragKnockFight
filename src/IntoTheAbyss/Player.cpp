@@ -34,13 +34,14 @@ Player::Player()
 
 
 	isDead = false;
+	firstRecoilParticleTimer = 0;
 }
 
 Player::~Player()
 {
 }
 
-void Player::Init(const Vec2<float> &INIT_POS)
+void Player::Init(const Vec2<float>& INIT_POS)
 {
 
 	/*===== 初期化処理 =====*/
@@ -103,6 +104,9 @@ void Player::Init(const Vec2<float> &INIT_POS)
 	stretch_LU = { 0.0f,0.0f };
 	stretch_RB = { 0.0f,0.0f };
 	stretchTimer = STRETCH_RETURN_TIME;
+
+	firstRecoilParticleTimer = 0;
+
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -212,6 +216,28 @@ void Player::Update(const vector<vector<int>> mapData)
 
 	//アニメーション更新
 	anim.Update();
+
+
+	// 最初の一発のタイマーが起動していたらパーティクルを生成する。
+	if (0 < firstRecoilParticleTimer) {
+
+		// 移動している方向を求める。
+		Vec2<float> invForwardVec = -vel;
+
+		// 最高速度からのパーセンテージを求める。
+		float per = (float)firstRecoilParticleTimer / (float)FIRST_SHOT_RECOIL_PARTICLE_TIMER;
+
+		// 正規化する。
+		invForwardVec.Normalize();
+
+		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+
+		--firstRecoilParticleTimer;
+	}
+
 }
 
 void Player::Draw()
@@ -590,7 +616,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 	// プレイヤーの左右がドッスンもしくはマップチップと当たっていたら死亡判定を行う。
 	{
 
-		float offset = 3.0f;
+		float offset = 1.0f;
 
 		bool isHitLeft = false;
 		bool isHitRight = false;
@@ -692,7 +718,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 	// プレイヤーの上下がドッスンもしくはマップチップと当たっていたら死亡判定を行う。
 	{
 
-		float offset = 3.0f;
+		float offset = 1.0f;
 
 		bool isHitTop = false;
 		bool isHitBottom = false;
@@ -839,6 +865,8 @@ void Player::HitMapChipLeft()
 		vel.y = 0;
 		gravity = 0;
 
+		firstRecoilParticleTimer = 0;
+
 		//摩擦無いときはストレッチを弱くする
 		stretch_RB.y /= STRETCH_DIV_RATE;
 		stretch_LU.y /= STRETCH_DIV_RATE;
@@ -856,6 +884,7 @@ void Player::HitMapChipLeft()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
+
 }
 
 void Player::HitMapChipRight()
@@ -882,6 +911,8 @@ void Player::HitMapChipRight()
 		vel.x = 0;
 		vel.y = 0;
 		gravity = 0;
+
+		firstRecoilParticleTimer = 0;
 
 		//摩擦無いときはストレッチを弱くする
 		stretch_RB.y /= STRETCH_DIV_RATE;
@@ -935,6 +966,8 @@ void Player::HitMapChipBottom()
 
 		// 重力を無効化する。
 		gravity = 0.5f;
+
+		firstRecoilParticleTimer = 0;
 
 		//摩擦無いときはストレッチを弱くする
 		stretch_RB.x /= STRETCH_DIV_RATE;
@@ -1059,6 +1092,8 @@ void Player::Input(const vector<vector<int>> mapData)
 			// プレイヤーの腕を動かす。
 			lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), true);
 
+			firstRecoilParticleTimer = FIRST_SHOT_RECOIL_PARTICLE_TIMER;
+
 		}
 		else {
 
@@ -1144,6 +1179,8 @@ void Player::Input(const vector<vector<int>> mapData)
 
 			// プレイヤーの腕を動かす。
 			rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), true);
+
+			firstRecoilParticleTimer = FIRST_SHOT_RECOIL_PARTICLE_TIMER;
 
 		}
 		else {
