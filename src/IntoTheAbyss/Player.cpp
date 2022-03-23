@@ -290,7 +290,7 @@ void Player::Draw(LightManager& LigManager)
 	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f,
 		bodyTex, nullptr, nullptr, 0.0f,
 		{ 0.5f,0.5f }, { playerDir != DEFAULT,false });
-	
+
 	//テレポート時のフラッシュ
 	Color teleFlashCol;
 	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, teleFlashTimer, TELE_FLASH_TIME, 1.0f, 0.0f);
@@ -604,7 +604,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		bool isDossunBottom = Collider::Instance()->CheckHitSize(centerPos, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
 
 		// どこかしらにぶつかっていれば当たった判定にする。
-		if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
+		if (!isDossunTop && (isDossunVel || isDossunRight || isDossunLeft || isDossunBottom)) {
 
 			// プレイヤーにドッスンブロックの移動量を渡す。
 			gimmickVel = Vec2<float>(dossun[index].speed, dossun[index].speed) * dossun[index].moveDir;
@@ -624,6 +624,8 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			//isMoveTimer = 0;
 
 		}
+
+		if (isDossunTop) vel.y /= 2.0f;
 
 	}
 
