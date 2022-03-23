@@ -193,7 +193,7 @@ INTERSECTED_LINE Collider::CheckHitSize(Vec2<float>& posA, const Vec2<float>& si
 	}
 
 	// プレイヤーとの距離が一定以上離れていたら処理を行わない。
-	if (Vec2<float>(posB.x - posA.x, posB.y - posA.y).Length() >= 100.0f) {
+	if (Vec2<float>(posB.x - posA.x, posB.y - posA.y).Length() >= 1000.0f) {
 		return INTERSECTED_NONE;
 	}
 

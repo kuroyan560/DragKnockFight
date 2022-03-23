@@ -3,6 +3,7 @@
 #include "ShakeMgr.h"
 #include "Collider.h"
 #include "MapChipCollider.h"
+#include "BulletParticleMgr.h"
 
 #include"DrawFunc.h"
 
@@ -73,6 +74,7 @@ void DossunBlock::Generate(Vec2<float> generatePos, Vec2<float> endPos, const Ve
 	isReturn = false;
 	isTimeStopPikeAlive = nullptr;
 	sightData = { &pos,size/* * Vec2<float>(2.0f,2.0f)*/ };
+	alpha = 1;
 
 }
 
@@ -104,6 +106,8 @@ void DossunBlock::Update()
 	// 移動方向チェンジタイマーが一定以上だったら方向転換する。
 	if (changeDirTimer >= CHANGE_DIR_TIMER) {
 		moveDir *= {-1.0f, -1.0f};
+
+		noCheckHitTimer = 10.0f;
 
 		bool prevFrameFlag = isReturn;
 
@@ -175,6 +179,26 @@ void DossunBlock::Update()
 
 	if (isTimeStopPikeAlive != nullptr && *isTimeStopPikeAlive == false) isTimeStopPikeAlive = nullptr;
 
+	if (0 < noCheckHitTimer) --noCheckHitTimer;
+
+
+	// アルファ値に関する処理
+
+	// アルファを毎フレーム0に近づける。
+	alpha -= alpha / 10.0f;
+
+	if (isHitPlayer) {
+
+		alpha = (float)isMoveTimer / IS_MOVE_TIMER * 255.0f;
+
+	}
+	if (isMove) {
+
+		alpha = 255;
+
+	}
+
+
 }
 
 void DossunBlock::Draw()
@@ -195,6 +219,9 @@ void DossunBlock::Draw()
 		posZoom.y + sizeZoom.y - scrollShakeZoom.y };
 
 	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(100, 100, 100, 255), true);
+
+	// 移動し始めるときに光らせる用
+	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(255, 255, 255, alpha), true, AlphaBlendMode_Trans);
 }
 
 void DossunBlock::CheckHit(const vector<vector<int>>& mapData)
@@ -210,21 +237,33 @@ void DossunBlock::CheckHit(const vector<vector<int>>& mapData)
 
 	float offset = 1.0f;
 
-	if (moveDir.y != 0) {
-		isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
-		pos.y -= offset;
-	}
-	if (moveDir.x != 0) {
-		isDossunRight = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_RIGHT) != INTERSECTED_NONE;
-		pos.x -= offset;
-	}
-	if (moveDir.x != 0) {
-		isDossunLeft = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_LEFT) != INTERSECTED_NONE;
-		pos.x += offset;
-	}
-	if (moveDir.y != 0) {
-		isDossunBottom = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
-		pos.y += offset;
+	if (noCheckHitTimer <= 0) {
+
+		if (moveDir.y != 0) {
+			isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
+			if (!isDossunTop) isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(-size.x, 0), size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
+			if (!isDossunTop) isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(size.x, 0), size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
+			pos.y -= offset;
+		}
+		if (moveDir.x != 0) {
+			isDossunRight = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+			if (!isDossunRight) isDossunRight = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, -size.y), size, mapData, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+			if (!isDossunRight) isDossunRight = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, size.y), size, mapData, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+			pos.x -= offset;
+		}
+		if (moveDir.x != 0) {
+			isDossunLeft = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_LEFT) != INTERSECTED_NONE;
+			if (!isDossunLeft) isDossunLeft = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, -size.y), size, mapData, INTERSECTED_LEFT) != INTERSECTED_NONE;
+			if (!isDossunLeft) isDossunLeft = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, size.y), size, mapData, INTERSECTED_LEFT) != INTERSECTED_NONE;
+			pos.x += offset;
+		}
+		if (moveDir.y != 0) {
+			isDossunBottom = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+			if (!isDossunBottom) isDossunBottom = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(-size.x, 0), size, mapData, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+			if (!isDossunBottom) isDossunBottom = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(size.x, 0), size, mapData, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+			pos.y += offset;
+		}
+
 	}
 
 	// どこかしらにぶつかっていれば当たった判定にする。
@@ -234,6 +273,48 @@ void DossunBlock::CheckHit(const vector<vector<int>>& mapData)
 		if (changeDirTimer == 1) {
 
 			ShakeMgr::Instance()->SetShake(ShakeMgr::Instance()->DOSSUN_LOW_POWER_SHAKE_AMOUNT);
+
+			const float div = 5.0f;
+
+			// 移動している方向に応じて生成する位置を変える。
+			if (0 < fabs(moveDir.x)) {
+
+				// 左右に動いている場合
+
+				const float generateCount = size.y * 2.0f / div;
+
+				for (int index = 0; index < generateCount; ++index) {
+
+					BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y + (index * div)), moveDir);
+
+				}
+
+				// 上と下に生成する。
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y), moveDir + Vec2<float>(0, -1.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, size.y), moveDir + Vec2<float>(0, 1.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y), Vec2<float>(0.0f, -1.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, size.y), Vec2<float>(0.0f, 1.0f));
+
+			}
+			else if (0 < fabs(moveDir.y)) {
+
+				// 上下に動いている場合
+
+				const float generateCount = size.x * 2.0f / div;
+
+				for (int index = 0; index < generateCount; ++index) {
+
+					BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x + (index * div), size.y * moveDir.y), moveDir);
+
+				}
+
+				// 上と下に生成する。
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x, size.y * moveDir.y), moveDir + Vec2<float>(-1.0f, 0.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x, size.y * moveDir.y), moveDir + Vec2<float>(1.0f, 0.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x, size.y * moveDir.y), Vec2<float>(-1.0f, 0.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x, size.y * moveDir.y), Vec2<float>(1.0f, 0.0f));
+
+			}
 
 		}
 
