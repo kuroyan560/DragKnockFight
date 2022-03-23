@@ -193,7 +193,7 @@ void Player::Update(const vector<vector<int>> mapData)
 		--handReturnTimer;
 	}
 	// 何かしらの移動量が存在したらNoInputを初期化する。
-	if (vel.x != 0 || vel.y != 0 || gimmickVel.x != 0 || gimmickVel.y != 0) handReturnTimer = DEF_HAND_RETURN_TIMER;
+	if (vel.x != 0 || vel.y != 0 || gimmickVel.x != 0 || gimmickVel.y != 0 || gravity != 0) handReturnTimer = DEF_HAND_RETURN_TIMER;
 	// 0以下になったら
 	if (handReturnTimer <= 0) {
 
@@ -273,11 +273,11 @@ void Player::Draw(LightManager& LigManager)
 
 	if (playerDir == RIGHT)
 	{
-		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f },drawCursorFlag);
+		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	}
 	else if (playerDir == LEFT)
 	{
-		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f },drawCursorFlag);
+		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 	}
 
 	//ストレッチ加算
@@ -299,11 +299,11 @@ void Player::Draw(LightManager& LigManager)
 
 	if (playerDir == RIGHT)
 	{
-		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f },drawCursorFlag);
+		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 	}
 	else if (playerDir == LEFT)
 	{
-		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f },drawCursorFlag);
+		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	}
 
 	// 弾を描画

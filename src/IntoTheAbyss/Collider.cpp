@@ -295,7 +295,7 @@ INTERSECTED_LINE Collider::CheckHitSize(Vec2<float>& posA, const Vec2<float>& si
 	}
 
 	// ピッタリ押し戻したら不都合なことが起こるので、多少オフセット値を設ける。
-	float pushBackOffset = 1.0f;
+	float pushBackOffset = -1.0f;
 
 	// 最小の交点の種類によって処理を分ける。
 	if (miniIntersectedPoint.second == INTERSECTED_TOP) {
