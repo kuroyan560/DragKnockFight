@@ -926,6 +926,7 @@ void Game::Update()
 				Vec2<float>doorPos = GetDoorPos(doorNumber, mapData);
 				//プレイヤーがリスポーンする座標を入手
 				responePos = GetPlayerResponePos(stageNum, roomNum, doorNumber, doorPos, &door);
+
 				//プレイヤーをリスポーンさせる
 				switch (door)
 				{
@@ -953,6 +954,9 @@ void Game::Update()
 				default:
 					break;
 				}
+				ScrollMgr::Instance()->WarpScroll(player.centerPos);
+				ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
+				ScrollMgr::Instance()->Restart(player.prevFrameCenterPos - player.centerPos);
 				goFlag = true;
 			}
 		}
