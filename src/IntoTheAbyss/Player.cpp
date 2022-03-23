@@ -226,25 +226,25 @@ void Player::Update(const vector<vector<int>> mapData)
 	anim.Update();
 
 
-	// 最初の一発のタイマーが起動していたらパーティクルを生成する。
-	if (0 < firstRecoilParticleTimer) {
+	//// 最初の一発のタイマーが起動していたらパーティクルを生成する。
+	//if (0 < firstRecoilParticleTimer) {
 
-		// 移動している方向を求める。
-		Vec2<float> invForwardVec = -vel;
+	//	// 移動している方向を求める。
+	//	Vec2<float> invForwardVec = -vel;
 
-		// 最高速度からのパーセンテージを求める。
-		float per = (float)firstRecoilParticleTimer / (float)FIRST_SHOT_RECOIL_PARTICLE_TIMER;
+	//	// 最高速度からのパーセンテージを求める。
+	//	float per = (float)firstRecoilParticleTimer / (float)FIRST_SHOT_RECOIL_PARTICLE_TIMER;
 
-		// 正規化する。
-		invForwardVec.Normalize();
+	//	// 正規化する。
+	//	invForwardVec.Normalize();
 
-		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
-		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
-		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
-		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
 
-		--firstRecoilParticleTimer;
-	}
+	//	--firstRecoilParticleTimer;
+	//}
 
 	//テレポート時のフラッシュのタイマー計測
 	if (teleFlashTimer < TELE_FLASH_TIME)teleFlashTimer++;
@@ -273,11 +273,11 @@ void Player::Draw(LightManager& LigManager)
 
 	if (playerDir == RIGHT)
 	{
-		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	}
 	else if (playerDir == LEFT)
 	{
-		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 	}
 
 	//ストレッチ加算
@@ -299,11 +299,11 @@ void Player::Draw(LightManager& LigManager)
 
 	if (playerDir == RIGHT)
 	{
-		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 	}
 	else if (playerDir == LEFT)
 	{
-		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	}
 
 	// 弾を描画
