@@ -614,7 +614,11 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 			// プレイヤーの移動量をかき消す。
 			gravity *= 0.0f;
-			vel *= {0.5f, 0.5f};
+			vel *= {0.0f, 0.0f};
+
+			// 最初の一発フラグを大きくする。
+			lHand->isFirstShot = false;
+			rHand->isFirstShot = false;
 
 		}
 		else {
@@ -1114,7 +1118,7 @@ void Player::Input(const vector<vector<int>> mapData)
 			lHand->isFirstShot = true;
 
 			// シェイク量を設定
-			ShakeMgr::Instance()->maxShakeAmount = ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT;
+			ShakeMgr::Instance()->SetShake(ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT);
 
 			// プレイヤーの腕を動かす。
 			lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), true);
@@ -1202,7 +1206,7 @@ void Player::Input(const vector<vector<int>> mapData)
 			rHand->isFirstShot = true;
 
 			// シェイク量を設定
-			ShakeMgr::Instance()->maxShakeAmount = ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT;
+			ShakeMgr::Instance()->SetShake(ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT);
 
 			// プレイヤーの腕を動かす。
 			rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), true);
