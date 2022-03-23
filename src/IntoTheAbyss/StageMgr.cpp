@@ -812,6 +812,7 @@ StageMgr::StageMgr()
 const RoomMapChipArray &StageMgr::GetMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	return allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
+
 }
 
 const int &StageMgr::GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER)
