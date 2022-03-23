@@ -12,6 +12,7 @@ public:
 	float radius;			// Draw Radius
 	int breakCoolTime;		// Resporn cool time
 	bool isBreak;			// states ga break ka
+	int graphHandle;
 
 
 public:
@@ -20,6 +21,7 @@ public:
 
 	const float RADIUS = 35.0f;				// Draw and CheckHit Radius
 	const int BREAK_COOL_TIME = 120;		// Resporn cool time
+	const float OFFSET_SCALE = 32.0f;
 
 
 public:

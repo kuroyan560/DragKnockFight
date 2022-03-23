@@ -29,13 +29,44 @@ void BulletParticleMgr::Init()
 
 }
 
-void BulletParticleMgr::Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec)
+void BulletParticleMgr::Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const float& par)
 {
 
 	/*===== 生成処理 =====*/
 
 	// 生成する数分処理を回す。
-	for (int generateCount = 0; generateCount < GENERATE_PARTICLE; ++generateCount) {
+	for (int generateCount = 0; generateCount < GENERATE_PARTICLE * par; ++generateCount) {
+
+		for (int index = 0; index < MAX_PARTICLE; ++index) {
+
+			// 生成済みだったら処理を飛ばす。
+			if (particle[index]->isAlive) continue;
+
+			// 生成する位置をランダムにずらす。
+			Vec2<float> pos = generatePos;
+			//pos.x += GetRand(6) - 3;
+			//pos.y += GetRand(6) - 3;
+			pos.x += KuroFunc::GetRand(6) - 3;
+			pos.y += KuroFunc::GetRand(6) - 3;
+
+			// 生成する。
+			particle[index]->Generate(pos, forwardVec);
+
+			break;
+
+		}
+
+	}
+
+}
+
+void BulletParticleMgr::GeneratePer(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const float& par, const int& generate)
+{
+
+	/*===== 生成処理 =====*/
+
+	// 生成する数分処理を回す。
+	for (int generateCount = 0; generateCount < generate * par; ++generateCount) {
 
 		for (int index = 0; index < MAX_PARTICLE; ++index) {
 
