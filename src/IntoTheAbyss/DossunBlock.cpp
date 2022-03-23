@@ -103,8 +103,6 @@ void DossunBlock::Update()
 
 	// 移動方向チェンジタイマーが一定以上だったら方向転換する。
 	if (changeDirTimer >= CHANGE_DIR_TIMER) {
-
-		changeDirTimer = 0;
 		moveDir *= {-1.0f, -1.0f};
 
 		bool prevFrameFlag = isReturn;
@@ -121,6 +119,10 @@ void DossunBlock::Update()
 			speed = 0;
 			isMove = false;
 
+		}
+
+		if (isMove) {
+			changeDirTimer = 0;
 		}
 
 	}
@@ -180,8 +182,8 @@ void DossunBlock::Draw()
 
 	/*===== 描画処理 =====*/
 
-	Vec2<float> scrollShakeZoom = { ScrollMgr::Instance()->scrollAmount.x * ScrollMgr::Instance()->zoom + ShakeMgr::Instance()->shakeAmount.x * ScrollMgr::Instance()->zoom,
-	ScrollMgr::Instance()->scrollAmount.y * ScrollMgr::Instance()->zoom + ShakeMgr::Instance()->shakeAmount.y * ScrollMgr::Instance()->zoom };
+	Vec2<float> scrollShakeZoom = { ScrollMgr::Instance()->scrollAmount.x * ScrollMgr::Instance()->zoom - ShakeMgr::Instance()->shakeAmount.x * ScrollMgr::Instance()->zoom,
+	ScrollMgr::Instance()->scrollAmount.y * ScrollMgr::Instance()->zoom - ShakeMgr::Instance()->shakeAmount.y * ScrollMgr::Instance()->zoom };
 
 	Vec2<float> posZoom = { pos.x * ScrollMgr::Instance()->zoom,pos.y * ScrollMgr::Instance()->zoom };
 
@@ -228,8 +230,17 @@ void DossunBlock::CheckHit(const vector<vector<int>>& mapData)
 	// どこかしらにぶつかっていれば当たった判定にする。
 	if (isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
 
+		// 最初の1F目はシェイクをつける。
+		if (changeDirTimer == 1) {
+
+			ShakeMgr::Instance()->SetShake(ShakeMgr::Instance()->DOSSUN_LOW_POWER_SHAKE_AMOUNT);
+
+		}
+
 		// 方向転換タイマーを加算。
-		++changeDirTimer;
+		if (isMove) {
+			++changeDirTimer;
+		}
 
 	}
 	else {
