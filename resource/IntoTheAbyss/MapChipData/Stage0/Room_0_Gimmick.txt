@@ -1,5 +1,5 @@
 name Thwomp
-type off
+type onLow
 size 32 32
 
 name Thwomp

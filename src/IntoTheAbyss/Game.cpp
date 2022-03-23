@@ -1042,9 +1042,6 @@ void Game::Update()
 		// シャボン玉ブロックを初期化。
 		bubbleBlock.clear();
 
-		bubbleBlock.push_back({});
-		bubbleBlock[0].Generate(player.centerPos + Vec2<float>(0, -100));
-
 		// シャボン玉ブロックを生成。
 		for (int index = 0; index < bubbleCount; ++index) {
 
@@ -1178,7 +1175,7 @@ void Game::Update()
 	MovingBlockMgr::Instance()->CheckHit(mapData);
 
 	// 弾とマップチップの当たり判定
-	BulletMgr::Instance()->CheckHit(mapData);
+	BulletMgr::Instance()->CheckHit(mapData, bubbleBlock);
 
 	// ビューポートをプレイヤー基準で移動させる。
 	ViewPort::Instance()->SetPlayerPosX(player.centerPos.x);

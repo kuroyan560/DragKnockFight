@@ -226,25 +226,25 @@ void Player::Update(const vector<vector<int>> mapData)
 	anim.Update();
 
 
-	// 最初の一発のタイマーが起動していたらパーティクルを生成する。
-	if (0 < firstRecoilParticleTimer) {
+	//// 最初の一発のタイマーが起動していたらパーティクルを生成する。
+	//if (0 < firstRecoilParticleTimer) {
 
-		// 移動している方向を求める。
-		Vec2<float> invForwardVec = -vel;
+	//	// 移動している方向を求める。
+	//	Vec2<float> invForwardVec = -vel;
 
-		// 最高速度からのパーセンテージを求める。
-		float per = (float)firstRecoilParticleTimer / (float)FIRST_SHOT_RECOIL_PARTICLE_TIMER;
+	//	// 最高速度からのパーセンテージを求める。
+	//	float per = (float)firstRecoilParticleTimer / (float)FIRST_SHOT_RECOIL_PARTICLE_TIMER;
 
-		// 正規化する。
-		invForwardVec.Normalize();
+	//	// 正規化する。
+	//	invForwardVec.Normalize();
 
-		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
-		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
-		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
-		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
 
-		--firstRecoilParticleTimer;
-	}
+	//	--firstRecoilParticleTimer;
+	//}
 
 	//テレポート時のフラッシュのタイマー計測
 	if (teleFlashTimer < TELE_FLASH_TIME)teleFlashTimer++;
@@ -290,7 +290,7 @@ void Player::Draw(LightManager& LigManager)
 	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f,
 		bodyTex, nullptr, nullptr, 0.0f,
 		{ 0.5f,0.5f }, { playerDir != DEFAULT,false });
-	
+
 	//テレポート時のフラッシュ
 	Color teleFlashCol;
 	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, teleFlashTimer, TELE_FLASH_TIME, 1.0f, 0.0f);
@@ -557,10 +557,6 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			// isHit
 			if (!isHitBubbleX && !isHitBubbleY) continue;
 
-			// Recovery of recoil
-			rHand->isFirstShot = false;
-			lHand->isFirstShot = false;
-
 			// If there is an input
 			if (inBubble && asSoonAsInputTimer >= 1) {
 
@@ -572,6 +568,9 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			}
 			else {
 
+				// 入った最初の1F目だったら
+				if (fabs(vel.x) > 0 || fabs(vel.y) > 0 || fabs(gravity) > ADD_GRAVITY) bubble[index].addEasingTimer = 30.0f;
+
 				vel = {};
 				gravity = {};
 				gimmickVel = {};
@@ -581,6 +580,10 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 				centerPos.y += (bubble[index].pos.y - centerPos.y) / 5.0f;
 
 				inBubble = true;
+
+				// Recovery of recoil
+				rHand->isFirstShot = false;
+				lHand->isFirstShot = false;
 
 			}
 
@@ -601,7 +604,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		bool isDossunBottom = Collider::Instance()->CheckHitSize(centerPos, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
 
 		// どこかしらにぶつかっていれば当たった判定にする。
-		if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
+		if (!isDossunTop && (isDossunVel || isDossunRight || isDossunLeft || isDossunBottom)) {
 
 			// プレイヤーにドッスンブロックの移動量を渡す。
 			gimmickVel = Vec2<float>(dossun[index].speed, dossun[index].speed) * dossun[index].moveDir;
@@ -621,6 +624,8 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			//isMoveTimer = 0;
 
 		}
+
+		if (isDossunTop) vel.y /= 2.0f;
 
 	}
 
