@@ -3,7 +3,7 @@
 #include"ShakeMgr.h"
 #include "BulletMgr.h"
 #include"ScrollMgr.h"
-#include"BulletParticleMgr.h"
+//#include"BulletParticleMgr.h"
 #include"AuraBlock.h"
 #include"ViewPort.h"
 #include"MovingBlockMgr.h"
@@ -17,6 +17,7 @@
 #include"KuroEngine.h"
 #include"TexHandleMgr.h"
 #include"DrawFunc.h"
+#include"ParticleMgr.h"
 
 bool Game::CheckUsedData(std::vector<Vec2<float>> DATA, Vec2<float> DATA2)
 {
@@ -323,6 +324,26 @@ Game::Game()
 	// 弾管理クラスを初期化。
 	BulletMgr::Instance()->Setting();
 
+	movingBlockGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/MovingBlock.png");
+	//sceneChangeHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/SceneChange.png");
+	//movingBlockGraph = D3D12App::Instance()->GenerateTextureBuffer("resource/IntoTheAbyss/MovingBlock.png");
+
+	// 弾パーティクルをセッティング。
+	//BulletParticleMgr::Instance()->Setting();
+
+	//ライト情報
+	ptLig.SetInfluenceRange(PT_LIG_RANGE);
+	spotLig.SetInfluenceRange(SPOT_LIG_RANGE);
+
+	ligMgr.RegisterPointLight(&ptLig);
+	ligMgr.RegisterSpotLight(&spotLig);
+	ligMgr.RegisterHemiSphereLight(&hemiLig);
+
+	Init();
+}
+
+void Game::Init()
+{
 	// スクロール量を設定。
 	const float WIN_WIDTH_HALF = WinApp::Instance()->GetWinCenter().x;
 	const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
@@ -332,18 +353,11 @@ Game::Game()
 	// マップチップのデータをロード
 	mapData = StageMgr::Instance()->GetMapChipData(0, 0);
 
-	movingBlockGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/MovingBlock.png");
-	//sceneChangeHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/SceneChange.png");
-	//movingBlockGraph = D3D12App::Instance()->GenerateTextureBuffer("resource/IntoTheAbyss/MovingBlock.png");
-
 	// スクロールマネージャーを初期化。
 	ScrollMgr::Instance()->Init(&mapData);
 
 	// シェイク量を設定。
 	ShakeMgr::Instance()->Init();
-
-	// 弾パーティクルをセッティング。
-	BulletParticleMgr::Instance()->Setting();
 
 	//マップ開始時の場所にスポーンさせる
 	for (int y = 0; y < mapData.size(); ++y)
@@ -551,16 +565,10 @@ Game::Game()
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
-
-	//ライト情報
-	ptLig.SetInfluenceRange(PT_LIG_RANGE);
-	spotLig.SetInfluenceRange(SPOT_LIG_RANGE);
-
-	ligMgr.RegisterPointLight(&ptLig);
-	ligMgr.RegisterSpotLight(&spotLig);
-	ligMgr.RegisterHemiSphereLight(&hemiLig);
-
+	
 	alphaValue = 0;
+
+	ParticleMgr::Instance()->Init();
 }
 
 void Game::Update()
@@ -1134,7 +1142,7 @@ void Game::Update()
 	MovingBlockMgr::Instance()->Update(player.centerPos);
 
 	// 弾パーティクルの更新処理
-	BulletParticleMgr::Instance()->Update();
+	//BulletParticleMgr::Instance()->Update();
 
 	// ドッスンブロックの更新処理
 	const int DOSSUN_COUNT = dossunBlock.size();
@@ -1210,8 +1218,10 @@ void Game::Update()
 			//ViewPort::Instance()->MoveLine(hitArea, 0.01f);
 
 			// 弾パーティクルを生成する。
-			BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
-			BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
+			//BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
+			//BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
+			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
+			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
 
 			BulletMgr::Instance()->GetBullet(i)->Init();
 		}
@@ -1499,6 +1509,9 @@ void Game::Update()
 
 	spotLig.SetTarget({ pos.x,pos.y + SPOT_LIG_TARGET_OFFSET_Y,0.0f });
 	spotLig.SetPos({ pos.x,pos.y + SPOT_LIG_TARGET_OFFSET_Y,SPOT_LIG_Z });
+
+	//パーティクル更新
+	ParticleMgr::Instance()->Update();
 }
 
 void Game::Draw()
@@ -1510,7 +1523,7 @@ void Game::Draw()
 	MovingBlockMgr::Instance()->Draw(movingBlockGraph);
 
 	// 弾パーティクルの描画処理
-	BulletParticleMgr::Instance()->Draw();
+	//BulletParticleMgr::Instance()->Draw();
 
 	// ドッスンブロックの描画処理
 	const int DOSSUN_COUNT = dossunBlock.size();
@@ -1541,4 +1554,6 @@ void Game::Draw()
 	}
 
 	player.Draw(ligMgr);
+
+	ParticleMgr::Instance()->Draw();
 }

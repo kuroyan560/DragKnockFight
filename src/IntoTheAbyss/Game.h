@@ -101,6 +101,7 @@ public:
 
 
 	Game();
+	void Init();
 	void Update();
 	void Draw();
 
