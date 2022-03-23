@@ -39,6 +39,8 @@ void GraphicsManager::RenderCommand::Excute(const ComPtr<ID3D12GraphicsCommandLi
 		descDatas[i].lock()->SetGraphicsDescriptorBuffer(CmdList, types[i], i);
 	}
 
+	vertexBuff.lock()->ChangeBarrierForVertexBuffer(CmdList);
+
 	//頂点ビューセット
 	CmdList->IASetVertexBuffers(0, 1, &vertexBuff.lock()->GetVBView());
 

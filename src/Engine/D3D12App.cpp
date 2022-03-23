@@ -214,7 +214,7 @@ void D3D12App::Initialize(const HWND& Hwnd, const Vec2<int>& ScreenSize, const b
 	}
 }
 
-std::shared_ptr<VertexBuffer> D3D12App::GenerateVertexBuffer(const size_t& VertexSize, const int& VertexNum, void* InitSendData, const char* Name)
+std::shared_ptr<VertexBuffer> D3D12App::GenerateVertexBuffer(const size_t& VertexSize, const int& VertexNum, void* InitSendData, const char* Name, const bool& RWStructuredBuff)
 {
 	//リソースバリア
 	auto barrier = D3D12_RESOURCE_STATE_GENERIC_READ;
@@ -222,12 +222,25 @@ std::shared_ptr<VertexBuffer> D3D12App::GenerateVertexBuffer(const size_t& Verte
 	//頂点バッファサイズ
 	UINT sizeVB = static_cast<UINT>(VertexSize * VertexNum);
 
+	D3D12_HEAP_PROPERTIES prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(sizeVB);
+	if (RWStructuredBuff)
+	{
+		desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		//ヒーププロパティ
+		prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+		prop.CreationNodeMask = 1;
+		prop.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+		prop.Type = D3D12_HEAP_TYPE_CUSTOM;
+		prop.VisibleNodeMask = 1;
+	}
+
 	//頂点バッファ生成
 	ComPtr<ID3D12Resource1>buff;
 	auto hr = device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		&prop,
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(sizeVB),
+		&desc,
 		barrier,
 		nullptr,
 		IID_PPV_ARGS(&buff));
@@ -244,8 +257,24 @@ std::shared_ptr<VertexBuffer> D3D12App::GenerateVertexBuffer(const size_t& Verte
 	vbView.StrideInBytes = VertexSize;
 
 	//専用のクラスにまとめる
-	auto result = std::make_shared<VertexBuffer>(buff, barrier, vbView);
-	
+	std::shared_ptr<VertexBuffer>result;
+
+	//読み取り専用構造化バッファを生成するか
+	if (RWStructuredBuff)
+	{
+		//シェーダリソースビュー作成
+		descHeapCBV_SRV_UAV->CreateUAV(device, buff, VertexSize, VertexNum);
+
+		//ビューを作成した位置のディスクリプタハンドルを取得
+		DescHandles handles(descHeapCBV_SRV_UAV->GetCpuHandleTail(), descHeapCBV_SRV_UAV->GetGpuHandleTail());
+
+		result = std::make_shared<VertexBuffer>(buff, barrier, vbView, handles);
+	}
+	else
+	{
+		result = std::make_shared<VertexBuffer>(buff, barrier, vbView);
+	}
+
 	//初期化マッピング
 	if (InitSendData != nullptr)result->Mapping(InitSendData);
 
@@ -372,6 +401,9 @@ std::shared_ptr<StructuredBuffer> D3D12App::GenerateStructuredBuffer(const size_
 
 std::shared_ptr<RWStructuredBuffer> D3D12App::GenerateRWStructuredBuffer(const size_t& DataSize, const int& ElementNum, const char* Name)
 {
+	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(DataSize * ElementNum);
+	desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+
 	//リソースバリア
 	auto barrier = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
@@ -388,7 +420,7 @@ std::shared_ptr<RWStructuredBuffer> D3D12App::GenerateRWStructuredBuffer(const s
 	auto hr = device->CreateCommittedResource(
 		&prop,
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(DataSize * ElementNum),
+		&desc,
 		barrier,
 		nullptr,
 		IID_PPV_ARGS(&buff));
@@ -762,11 +794,16 @@ std::shared_ptr<DepthStencil> D3D12App::GenerateDepthStencil(const Vec2<int>& Si
 	return result;
 }
 
-void D3D12App::Render(D3D12AppUser* User)
+void D3D12App::SetDescHeaps()
 {
 	//ディスクリプタヒープをセット
 	ID3D12DescriptorHeap* heaps[] = { descHeapCBV_SRV_UAV->GetHeap().Get() };
 	commandList->SetDescriptorHeaps(_countof(heaps), heaps);
+}
+
+void D3D12App::Render(D3D12AppUser* User)
+{
+	SetDescHeaps();
 
 	//スワップチェイン表示可能からレンダーターゲット描画可能へ
 	swapchain->GetBackBufferRenderTarget()->ChangeBarrier(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);

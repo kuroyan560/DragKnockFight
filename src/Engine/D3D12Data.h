@@ -105,8 +105,6 @@ class GPUResource
 	ComPtr<ID3D12Resource1>buff = nullptr;	//リソースバッファ
 	D3D12_RESOURCE_STATES barrier = D3D12_RESOURCE_STATE_COMMON;	//リソースバリアの状態
 
-	void MapBuffOnCPU();
-
 public:
 	GPUResource(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier,const wchar_t* Name = nullptr) 
 	{
@@ -126,79 +124,17 @@ public:
 		buff->SetName(Name);
 	}
 
+	//バッファ取得
+	const ComPtr<ID3D12Resource1>& GetBuff() { return buff; }
 	//マッピング
 	void Mapping(const size_t& DataSize, const int& ElementNum, void* SendData);
 	//リソースバリアの変更
 	void ChangeBarrier(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const D3D12_RESOURCE_STATES& NewBarrier);
 	//バッファのコピー（インスタンスは別物、引数にコピー元）
 	void CopyGPUResource(const ComPtr<ID3D12GraphicsCommandList>& CmdList, GPUResource& CopySource);
-};
 
-//頂点バッファ
-class VertexBuffer
-{
-	template<class T>
-	using ComPtr = Microsoft::WRL::ComPtr<T>;
-
-	VertexBuffer() = delete;
-	VertexBuffer(const VertexBuffer& tmp) = delete;
-	VertexBuffer(VertexBuffer&& tmp) = delete;
-
-	//頂点バッファ
-	GPUResource resource;
-	//頂点バッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vbView = {};
-public:
-	//頂点サイズ
-	const size_t vertexSize;
-	//送信する頂点数
-	unsigned int sendVertexNum;
-
-	VertexBuffer(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier, const D3D12_VERTEX_BUFFER_VIEW& VBView)
-		:resource(Buff, Barrier), vbView(VBView), vertexSize(VBView.StrideInBytes), sendVertexNum(VBView.SizeInBytes / VBView.StrideInBytes) {}
-	void Mapping(void* SendData)
-	{
-		resource.Mapping(vertexSize, sendVertexNum, SendData);
-	}
-	void SetName(const wchar_t* Name)
-	{
-		resource.SetName(Name);
-	}
-	const D3D12_VERTEX_BUFFER_VIEW& GetVBView() { return vbView; }
-};
-
-//インデックスバッファ
-class IndexBuffer
-{
-	template<class T>
-	using ComPtr = Microsoft::WRL::ComPtr<T>;
-
-	IndexBuffer() = delete;
-	IndexBuffer(const IndexBuffer& tmp) = delete;
-	IndexBuffer(IndexBuffer&& tmp) = delete;
-
-	//インデックスバッファ
-	GPUResource resource;
-	//インデックスバッファビュー
-	D3D12_INDEX_BUFFER_VIEW ibView = {};
-
-public:
-	//インデックスサイズ
-	const size_t indexSize;
-	//インデックス数
-	const unsigned int indexNum;
-
-	IndexBuffer(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier, const D3D12_INDEX_BUFFER_VIEW& IBView, const size_t& IndexSize)
-		:resource(Buff, Barrier), ibView(IBView), indexSize(IndexSize), indexNum(IBView.SizeInBytes / IndexSize) {}
-	void Mapping(void* SendData)
-	{
-		resource.Mapping(indexSize, indexNum, SendData);
-	}
-	void SetName(const wchar_t* Name)
-	{
-		resource.SetName(Name);
-	}
-	const D3D12_INDEX_BUFFER_VIEW& GetIBView() { return ibView; }
+	template<typename T>
+	const T* GetBuffOnCpu() { return (T*) buffOnCPU; }
 };
 
 //レンダリングの際にセットするバッファ（ディスクリプタ登録の必要があるタイプのデータ）
@@ -211,10 +147,11 @@ protected:
 	template<class T>
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-	GPUResource resource;	//定数バッファ
+	std::shared_ptr<GPUResource> resource;	//定数バッファ
 	DescHandlesContainer handles;	//ディスクリプタハンドル
 
-	DescriptorData(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier) :resource(Buff, Barrier) {}
+	DescriptorData(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier) :resource(std::make_shared<GPUResource>(Buff, Barrier)) {}
+	DescriptorData(const std::shared_ptr<GPUResource>& GPUResource) :resource(GPUResource) {}	//同じものを差す
 
 	//バッファセットのタイミングで呼ばれる関数、リソースバリアを変えるなど
 	virtual void OnSetDescriptorBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const DESC_HANDLE_TYPE& Type) = 0;
@@ -236,7 +173,7 @@ private:
 
 	void OnSetDescriptorBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const DESC_HANDLE_TYPE& Type)override
 	{
-		resource.ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_GENERIC_READ);
+		resource->ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
 public:
@@ -247,7 +184,7 @@ public:
 	}
 	void Mapping(void* SendData)
 	{
-		resource.Mapping(dataSize, elementNum, SendData);
+		resource->Mapping(dataSize, elementNum, SendData);
 	}
 };
 
@@ -264,7 +201,7 @@ private:
 
 	void OnSetDescriptorBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const DESC_HANDLE_TYPE& Type)override
 	{
-		resource.ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_GENERIC_READ);
+		resource->ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 public:
 	StructuredBuffer(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier, const DescHandles& SRVHandles, const size_t& DataSize, const int& ElementNum)
@@ -274,7 +211,7 @@ public:
 	}
 	void Mapping(void* SendData)
 	{
-		resource.Mapping(dataSize, elementNum, SendData);
+		resource->Mapping(dataSize, elementNum, SendData);
 	}
 };
 
@@ -291,7 +228,7 @@ private:
 
 	void OnSetDescriptorBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const DESC_HANDLE_TYPE& Type)override
 	{
-		resource.ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		resource->ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	}
 public:
 	RWStructuredBuffer(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier, const DescHandles& UAVHandles, const size_t& DataSize, const int& ElementNum)
@@ -299,8 +236,15 @@ public:
 	{
 		handles.Initialize(UAV, UAVHandles);
 	}
+	RWStructuredBuffer(const std::shared_ptr<GPUResource>& GPUResource, const DescHandles& UAVHandles, const size_t& DataSize, const int& ElementNum)
+		:DescriptorData(GPUResource), dataSize(DataSize), elementNum(ElementNum)
+	{
+		handles.Initialize(UAV, UAVHandles);
+	}
 
-	void CopyBuffOnGPU(const ComPtr<ID3D12GraphicsCommandList>& CmdList, GPUResource& Dest) { Dest.CopyGPUResource(CmdList, this->resource); }
+	void CopyBuffOnGPU(const ComPtr<ID3D12GraphicsCommandList>& CmdList, GPUResource& Dest) { Dest.CopyGPUResource(CmdList, *this->resource); }
+
+	std::weak_ptr<GPUResource>GetResource() { return resource; }
 };
 
 //テクスチャリソース基底クラス
@@ -316,7 +260,7 @@ protected:
 
 	void OnSetDescriptorBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const DESC_HANDLE_TYPE& Type)override
 	{
-		resource.ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		resource->ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	}
 
 public:
@@ -331,7 +275,7 @@ public:
 		handles.Initialize(SRV, SRVHandles);
 	}
 
-	void ChangeBarrier(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const D3D12_RESOURCE_STATES& Barrier) { resource.ChangeBarrier(CmdList, Barrier); }
+	void ChangeBarrier(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const D3D12_RESOURCE_STATES& Barrier) { resource->ChangeBarrier(CmdList, Barrier); }
 	void CopyTexResource(const ComPtr<ID3D12GraphicsCommandList>& CmdList, TextureBuffer* CopySource);
 	const CD3DX12_RESOURCE_DESC& GetDesc() { return texDesc; }
 	void SetUAVHandles(const DescHandles& UAVHandles) { handles.Initialize(UAV, UAVHandles); }
@@ -354,7 +298,7 @@ private:
 	//ピクセルシェーダーリソースとして使われる
 	void OnSetDescriptorBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const DESC_HANDLE_TYPE& Type)override
 	{
-		resource.ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		resource->ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	}
 public:
 	RenderTarget(const ComPtr<ID3D12Resource1>& Buff,
@@ -379,12 +323,12 @@ public:
 	void Clear(const ComPtr<ID3D12GraphicsCommandList>& CmdList);
 
 	//リソースバリア変更
-	void ChangeBarrier(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const D3D12_RESOURCE_STATES& Barrier) { resource.ChangeBarrier(CmdList, Barrier); }
+	void ChangeBarrier(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const D3D12_RESOURCE_STATES& Barrier) { resource->ChangeBarrier(CmdList, Barrier); }
 
 	//レンダーターゲットとしてセットする準備
 	const DescHandles& AsRTV(const ComPtr<ID3D12GraphicsCommandList>& CmdList)
 	{
-		resource.ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		resource->ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		return handles.GetHandle(RTV);
 	}
 };
@@ -424,6 +368,98 @@ public:
 		resource.ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 		return handles.GetHandle(DSV);
 	}
+};
+
+//頂点バッファ
+class VertexBuffer
+{
+	template<class T>
+	using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+	VertexBuffer() = delete;
+	VertexBuffer(const VertexBuffer& tmp) = delete;
+	VertexBuffer(VertexBuffer&& tmp) = delete;
+
+	//頂点バッファ
+	std::shared_ptr<GPUResource> resource;
+	//頂点バッファビュー
+	D3D12_VERTEX_BUFFER_VIEW vbView = {};
+	//読み取り専用
+	std::shared_ptr<RWStructuredBuffer>rwBuff;
+public:
+	//頂点サイズ
+	const size_t vertexSize;
+	//生成した頂点数
+	const unsigned int vertexNum;
+	//送信する頂点数
+	unsigned int sendVertexNum;
+
+	VertexBuffer(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier, const D3D12_VERTEX_BUFFER_VIEW& VBView)
+		:vbView(VBView), vertexSize(VBView.StrideInBytes), vertexNum(VBView.SizeInBytes / VBView.StrideInBytes), sendVertexNum(vertexNum) 
+	{
+		resource = std::make_shared<GPUResource>(Buff, Barrier);
+	}
+	VertexBuffer(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier, const D3D12_VERTEX_BUFFER_VIEW& VBView, const DescHandles& UAVHandle)
+		:vbView(VBView), vertexSize(VBView.StrideInBytes), vertexNum(VBView.SizeInBytes / VBView.StrideInBytes), sendVertexNum(vertexNum)
+	{
+		resource = std::make_shared<GPUResource>(Buff, Barrier);
+		rwBuff = std::make_shared<RWStructuredBuffer>(resource, UAVHandle, vertexSize, sendVertexNum);
+	}
+	void Mapping(void* SendData)
+	{
+		resource->Mapping(vertexSize, sendVertexNum, SendData);
+	}
+	void SetName(const wchar_t* Name)
+	{
+		resource->SetName(Name);
+	}
+	const D3D12_VERTEX_BUFFER_VIEW& GetVBView() { return vbView; }
+
+	//読み取り専用構造化バッファ取得
+	std::weak_ptr<RWStructuredBuffer>GetRWStructuredBuff()
+	{
+		if (!rwBuff)ASSERT_MSG("頂点バッファの描き込み用構造化バッファは未生成です\n");
+		return rwBuff;
+	}
+	//頂点バッファとして使うためにリソースバリア変更
+	void ChangeBarrierForVertexBuffer(const ComPtr<ID3D12GraphicsCommandList>& CmdList)
+	{
+		resource->ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_GENERIC_READ);
+	}
+};
+
+//インデックスバッファ
+class IndexBuffer
+{
+	template<class T>
+	using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+	IndexBuffer() = delete;
+	IndexBuffer(const IndexBuffer& tmp) = delete;
+	IndexBuffer(IndexBuffer&& tmp) = delete;
+
+	//インデックスバッファ
+	GPUResource resource;
+	//インデックスバッファビュー
+	D3D12_INDEX_BUFFER_VIEW ibView = {};
+
+public:
+	//インデックスサイズ
+	const size_t indexSize;
+	//インデックス数
+	const unsigned int indexNum;
+
+	IndexBuffer(const ComPtr<ID3D12Resource1>& Buff, const D3D12_RESOURCE_STATES& Barrier, const D3D12_INDEX_BUFFER_VIEW& IBView, const size_t& IndexSize)
+		:resource(Buff, Barrier), ibView(IBView), indexSize(IndexSize), indexNum(IBView.SizeInBytes / IndexSize) {}
+	void Mapping(void* SendData)
+	{
+		resource.Mapping(indexSize, indexNum, SendData);
+	}
+	void SetName(const wchar_t* Name)
+	{
+		resource.SetName(Name);
+	}
+	const D3D12_INDEX_BUFFER_VIEW& GetIBView() { return ibView; }
 };
 
 //シェーダー情報
