@@ -81,7 +81,14 @@ void Bubble::Update()
 	// updateEasing
 	if (easingFlag) {
 
-		//easingScale.x = KuroMath::Ease(Cubic, Out, (float)easingTimer / EASING_TIMER, 0, 1.0f);
+		easingScale.x = KuroMath::Ease(Out, Cubic, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * EASINIG_RADIUS;
+		easingScale.y = KuroMath::Ease(In, Cubic, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * -EASINIG_RADIUS;
+
+	}
+	else {
+
+		easingScale.x = KuroMath::Ease(Out, Cubic, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * -EASINIG_RADIUS;
+		easingScale.y = KuroMath::Ease(In, Cubic, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * EASINIG_RADIUS;
 
 	}
 
