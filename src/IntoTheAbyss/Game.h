@@ -31,7 +31,7 @@ class Game
 	bool CheckUsedData(vector<Vec2<float>> DATA, Vec2<float> DATA2);
 	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum);
 	Vec2<float> GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR);
-	Vec2<float> GetPlayerPos(const int& STAGE_NUMBER, int* ROOM_NUMBER, const int& DOOR_NUMBER, const SizeData& SIZE_DATA, vector<vector<int>>* MAPCHIP_DATA, E_DOOR_DIR *DIR);
+	Vec2<float> GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA);
 
 	int mapBlockGraph;
 	// 動的ブロックの画像。
@@ -65,15 +65,17 @@ class Game
 	bool sceneBlackFlag;//フラグが立つと暗転する
 	bool sceneLightFlag;//フラグが立つと明転する
 	bool sceneUpDownFlag;
-	bool sceneleftRightFlag;
+	bool sceneChangingFlag;
 	int alphaValue;
 	int timer;
 	Vec2<float> responePos;
 	int doorNumber;
+	int giveDoorNumber;
 	int sceneChangeHandle;//シーン遷移用の画像
 	E_DOOR_DIR door;		//どの方向で出るか
 	bool initJumpFlag;
 	float gravity;
+	E_DOOR_DIR doorDir;
 
 	std::vector<DrawMap>drawMap;
 
