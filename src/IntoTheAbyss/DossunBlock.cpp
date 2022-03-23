@@ -3,6 +3,7 @@
 #include "ShakeMgr.h"
 #include "Collider.h"
 #include "MapChipCollider.h"
+#include "BulletParticleMgr.h"
 
 #include"DrawFunc.h"
 
@@ -234,6 +235,48 @@ void DossunBlock::CheckHit(const vector<vector<int>>& mapData)
 		if (changeDirTimer == 1) {
 
 			ShakeMgr::Instance()->SetShake(ShakeMgr::Instance()->DOSSUN_LOW_POWER_SHAKE_AMOUNT);
+
+			const float div = 5.0f;
+
+			// 移動している方向に応じて生成する位置を変える。
+			if (0 < fabs(moveDir.x)) {
+
+				// 左右に動いている場合
+
+				const float generateCount = size.y * 2.0f / div;
+
+				for (int index = 0; index < generateCount; ++index) {
+
+					BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y + (index * div)), moveDir);
+
+				}
+
+				// 上と下に生成する。
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y), moveDir + Vec2<float>(0, -1.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, size.y), moveDir + Vec2<float>(0, 1.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y), Vec2<float>(0.0f, -1.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, size.y), Vec2<float>(0.0f, 1.0f));
+
+			}
+			else if (0 < fabs(moveDir.y)) {
+
+				// 上下に動いている場合
+
+				const float generateCount = size.x * 2.0f / div;
+
+				for (int index = 0; index < generateCount; ++index) {
+
+					BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x + (index * div), size.y * moveDir.y), moveDir);
+
+				}
+
+				// 上と下に生成する。
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x, size.y * moveDir.y), moveDir + Vec2<float>(-1.0f, 0.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x, size.y * moveDir.y), moveDir + Vec2<float>(1.0f, 0.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x, size.y * moveDir.y), Vec2<float>(-1.0f, 0.0f));
+				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x, size.y * moveDir.y), Vec2<float>(1.0f, 0.0f));
+
+			}
 
 		}
 
