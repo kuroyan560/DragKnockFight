@@ -543,10 +543,6 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			// isHit
 			if (!isHitBubbleX && !isHitBubbleY) continue;
 
-			// Recovery of recoil
-			rHand->isFirstShot = false;
-			lHand->isFirstShot = false;
-
 			// If there is an input
 			if (inBubble && asSoonAsInputTimer >= 1) {
 
@@ -558,6 +554,9 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			}
 			else {
 
+				// “ü‚Á‚½Å‰‚Ì1F–Ú‚¾‚Á‚½‚ç
+				if (fabs(vel.x) > 0 || fabs(vel.y) > 0 || fabs(gravity) > ADD_GRAVITY) bubble[index].addEasingTimer = 30.0f;
+
 				vel = {};
 				gravity = {};
 				gimmickVel = {};
@@ -567,6 +566,10 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 				centerPos.y += (bubble[index].pos.y - centerPos.y) / 5.0f;
 
 				inBubble = true;
+
+				// Recovery of recoil
+				rHand->isFirstShot = false;
+				lHand->isFirstShot = false;
 
 			}
 

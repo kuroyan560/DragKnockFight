@@ -19,6 +19,8 @@ Bubble::Bubble()
 	easingTimer = 30;
 	easingFlag = false;
 	easingScale = {};
+	addEasingTimer = 0;
+	isHitBullet = false;
 
 }
 
@@ -35,6 +37,9 @@ void Bubble::Generate(const Vec2<float>& generatePos)
 	easingTimer = 30;
 	easingFlag = false;
 	easingScale = {};
+	addEasingTimer = 0;
+	easingScale = {};
+	isHitBullet = false;
 
 }
 
@@ -64,6 +69,9 @@ void Bubble::Update()
 		// cooltime is over
 		if (breakCoolTime <= 0) isBreak = false;
 
+		radius = 0;
+		easingTimer = EASING_TIMER / 2.0f;
+
 	}
 
 	// update radius
@@ -71,6 +79,7 @@ void Bubble::Update()
 
 	// updateEasingTimer
 	++easingTimer;
+	easingTimer += addEasingTimer;
 	if (easingTimer >= EASING_TIMER) {
 
 		easingTimer = 0;
@@ -78,17 +87,46 @@ void Bubble::Update()
 
 	}
 
+	float easingRadius = EASINIG_RADIUS;
+	if (isHitBullet) {
+		easingRadius += EASINIG_RADIUS / 2.0f;
+	}
+	else if (addEasingTimer > 0) {
+		easingRadius += EASINIG_RADIUS;
+	}
+
+	Vec2<float> honraiEasingScale = {};
+
 	// updateEasing
 	if (easingFlag) {
 
-		easingScale.x = KuroMath::Ease(Out, Cubic, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * EASINIG_RADIUS;
-		easingScale.y = KuroMath::Ease(In, Cubic, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * -EASINIG_RADIUS;
+		honraiEasingScale.x = KuroMath::Ease(InOut, Sine, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * easingRadius;
+		honraiEasingScale.y = KuroMath::Ease(InOut, Sine, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * -easingRadius + easingRadius;
 
 	}
 	else {
 
-		easingScale.x = KuroMath::Ease(Out, Cubic, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * -EASINIG_RADIUS;
-		easingScale.y = KuroMath::Ease(In, Cubic, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * EASINIG_RADIUS;
+		honraiEasingScale.x = KuroMath::Ease(InOut, Sine, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * -easingRadius + easingRadius;
+		honraiEasingScale.y = KuroMath::Ease(InOut, Sine, (float)easingTimer / EASING_TIMER, 1.0f, 0.0f, 1.0f) * easingRadius;
+
+	}
+
+
+	// update AddEasingTimer
+	if (addEasingTimer > 0) {
+		//addEasingTimer -= addEasingTimer / 10.0f;
+		--addEasingTimer;
+
+		easingScale.x += (honraiEasingScale.x - easingScale.x) / 1.0f;
+		easingScale.y += (honraiEasingScale.y - easingScale.y) / 1.0f;
+
+	}
+	else {
+
+		easingScale.x += (honraiEasingScale.x - easingScale.x) / 10.0f;
+		easingScale.y += (honraiEasingScale.y - easingScale.y) / 10.0f;
+
+		isHitBullet = false;
 
 	}
 
@@ -107,6 +145,6 @@ void Bubble::Draw()
 	Vec2<float> leftUpPos = centerPos - Vec2<float>(radius, radius) - easingScale;
 	Vec2<float> rightDownPos = centerPos + Vec2<float>(radius, radius) + easingScale;
 
-	DrawFunc::DrawExtendGraph2D(leftUpPos, rightDownPos, TexHandleMgr::GetTexBuffer(graphHandle));
+	DrawFunc::DrawExtendGraph2D(leftUpPos, rightDownPos, TexHandleMgr::GetTexBuffer(graphHandle), AlphaBlendMode_Trans);
 
 }

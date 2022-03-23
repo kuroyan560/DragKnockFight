@@ -1,5 +1,6 @@
 #pragma once
 #include "Singleton.h"
+#include "Bubble.h"
 #include "Vec.h"
 #include <memory>
 #include <vector>
@@ -46,7 +47,7 @@ public:
 	void Draw();
 
 	// ’e‚Ì“–‚½‚è”»’è
-	void CheckHit(const vector<vector<int>>& mapData);
+	void CheckHit(const vector<vector<int>>& mapData, vector<Bubble>& bubble);
 
 	const shared_ptr<Bullet>& GetBullet(const int& index) { return bullets[index]; };
 

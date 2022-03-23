@@ -95,7 +95,7 @@ void BulletMgr::Draw()
 
 }
 
-void BulletMgr::CheckHit(const vector<vector<int>>& mapData)
+void BulletMgr::CheckHit(const vector<vector<int>>& mapData, vector<Bubble>& bubble)
 {
 
 	/*===== マップチップとの当たり判定 =====*/
@@ -137,6 +137,42 @@ void BulletMgr::CheckHit(const vector<vector<int>>& mapData)
 			bullets[index]->Init();
 
 		}
+
+	}
+
+
+	/*===== 弾とシャボン玉の当たり判定 =====*/
+
+	const int BUBBLE_COUNT = bubble.size();
+
+	for (int index = 0; index < BULLET_COUNT; ++index) {
+
+		// 弾が生成されていなかったら処理を飛ばす。
+		if (!bullets[index]->isActive) continue;
+
+		for (int bubbleIndex = 0; bubbleIndex < BUBBLE_COUNT; ++bubbleIndex) {
+
+			// 割れていたら処理を飛ばす。
+			if (bubble[bubbleIndex].isBreak) continue;
+
+			// 円の当たり判定を行う。
+			bool checkHit = bullets[index]->pos.Distance(bubble[bubbleIndex].pos) < bullets[index]->MAX_RADIUS + bubble[bubbleIndex].RADIUS;
+
+			// 当たっていなかったら処理を飛ばす。
+			if (!checkHit) continue;
+
+			// 弾のぱーてぃくるを生成する。
+			BulletParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec);
+
+			// バブルを動かす。
+			bubble[bubbleIndex].addEasingTimer = 30.0f;
+			bubble[bubbleIndex].isHitBullet = true;
+
+			// 弾を削除する。
+			bullets[index]->Init();
+
+		}
+
 	}
 
 }
