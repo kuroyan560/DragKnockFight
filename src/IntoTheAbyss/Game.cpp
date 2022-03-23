@@ -1014,18 +1014,15 @@ void Game::Update()
 
 		// ドッスンブロックを初期化。
 		dossunBlock.clear();
-		dossunBlock.push_back({});
-		dossunBlock[0].Generate(player.centerPos + Vec2<float>(-100, 0), player.centerPos + Vec2<float>(1000, 0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), GIMMICK_DOSSN_ON_LOW);
-		SightCollisionStorage::Instance()->data.push_back(dossunBlock[dossunBlock.size() - 1].sightData);
 
 		// ドッスンを生成。
 		for (int index = 0; index < dossunCount; ++index) {
 
 			DossunBlock dossunBuff;
-			//dossunBuff.Generate(dossunData[index]->startPos, dossunData[index]->endPos, dossunData[index]->size, dossunData[index]->type);
+			dossunBuff.Generate(dossunData[index]->startPos, dossunData[index]->endPos, dossunData[index]->size, dossunData[index]->type);
 
 			// データを追加。
-			//dossunBlock.push_back(dossunBuff);
+			dossunBlock.push_back(dossunBuff);
 
 			SightCollisionStorage::Instance()->data.push_back(dossunBlock[dossunBlock.size() - 1].sightData);
 
