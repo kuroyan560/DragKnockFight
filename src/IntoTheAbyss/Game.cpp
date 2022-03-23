@@ -112,7 +112,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 		{
 			drawMap[i].AddChip(itr->second[chipIdx].pos, itr->second[chipIdx].radian);
 		}
-		drawMap[i].Draw(TexHandleMgr::GetTexBuffer(itr->first));
+		drawMap[i].Draw(ligMgr, TexHandleMgr::GetTexBuffer(itr->first), nullptr, nullptr);
 		i++;
 	}
 }
@@ -551,14 +551,21 @@ Game::Game()
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+
+	//ライト情報
+	ptLig.SetInfluenceRange(PT_LIG_RANGE);
+	spotLig.SetInfluenceRange(SPOT_LIG_RANGE);
+
+	ligMgr.RegisterPointLight(&ptLig);
+	ligMgr.RegisterSpotLight(&spotLig);
+	ligMgr.RegisterHemiSphereLight(&hemiLig);
+
 	alphaValue = 0;
 }
 
 void Game::Update()
 {
 	ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
-
-
 
 #pragma region ステージの切り替え
 	stageNum = SelectStage::Instance()->GetStageNum();
@@ -631,12 +638,6 @@ void Game::Update()
 	//ImGui::Text("StageNumber:%d", debugStageData[0]);
 	//ImGui::Text("RoomNumber:%d", debugStageData[1]);
 	//ImGui::End();
-
-
-
-
-
-
 
 	//ゴールに触れたら次のステージに向かう処理
 	{
@@ -1495,8 +1496,12 @@ void Game::Update()
 
 	}
 	ViewPort::Instance()->playerPos = player.centerPos;
+	//ライト更新
+	auto pos = player.GetCenterDrawPos();
+	ptLig.SetPos({ pos.x,pos.y,PT_LIG_Z });
 
-
+	spotLig.SetTarget({ pos.x,pos.y + SPOT_LIG_TARGET_OFFSET_Y,0.0f });
+	spotLig.SetPos({ pos.x,pos.y + SPOT_LIG_TARGET_OFFSET_Y,SPOT_LIG_Z });
 }
 
 void Game::Draw()
@@ -1515,8 +1520,6 @@ void Game::Draw()
 	for (int index = 0; index < DOSSUN_COUNT; ++index) {
 		dossunBlock[index].Draw();
 	}
-
-	player.Draw();
 
 	// シャボン玉ブロックの描画処理
 	{
@@ -1539,4 +1542,6 @@ void Game::Draw()
 	{
 		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), true, AlphaBlendMode_Trans);
 	}
+
+	player.Draw(ligMgr);
 }

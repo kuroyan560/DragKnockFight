@@ -39,8 +39,8 @@ private:
 	template<class T>
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-public:
 	static UsersInput* INSTANCE;
+public:
 	static UsersInput* Instance()
 	{
 		if (INSTANCE == nullptr)

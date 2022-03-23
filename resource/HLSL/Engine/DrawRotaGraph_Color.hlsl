@@ -9,7 +9,7 @@ struct VSOutput
     float2 extRate : EXT_RATE;
     float radian : RADIAN;
     float2 rotaCenterUV : ROTA_CENTER_UV;
-    int2 miror : MIROR;
+    float4 paintColor : PAINT_COLOR;
 };
 
 VSOutput VSmain(VSOutput input)
@@ -21,6 +21,7 @@ struct GSOutput
 {
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD;
+    float4 paintColor : PAINT_COLOR;
 };
 
 Texture2D<float4> tex : register(t0);
@@ -50,6 +51,7 @@ void GSmain(
     rotateCenter += texSize.xy * input[0].extRate * (input[0].rotaCenterUV - float2(0.5f, 0.5f));
     
     GSOutput element;
+    element.paintColor = input[0].paintColor;
         
     //ç∂â∫
     element.pos = input[0].center;
@@ -57,7 +59,7 @@ void GSmain(
     element.pos.y += height_h;
     element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(0.0f + input[0].miror.x, 1.0f - input[0].miror.y);
+    element.uv = float2(0.0f, 1.0f);
     output.Append(element);
     
     //ç∂è„
@@ -66,7 +68,7 @@ void GSmain(
     element.pos.y -= height_h;
     element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(0.0f + input[0].miror.x, 0.0f + input[0].miror.y);
+    element.uv = float2(0.0f, 0.0f);
     output.Append(element);
     
      //âEâ∫
@@ -75,7 +77,7 @@ void GSmain(
     element.pos.y += height_h;
     element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(1.0f - input[0].miror.x, 1.0f - input[0].miror.y);
+    element.uv = float2(1.0f, 1.0f);
     output.Append(element);
     
     //âEè„
@@ -84,13 +86,14 @@ void GSmain(
     element.pos.y -= height_h;
     element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(1.0f - input[0].miror.x, 0.0f + input[0].miror.y);
+    element.uv = float2(1.0f, 0.0f);
     output.Append(element);
 }
 
 float4 PSmain(GSOutput input) : SV_TARGET
 {
-    return tex.Sample(smp, input.uv);
+    float4 texCol = tex.Sample(smp, input.uv);
+    return float4(input.paintColor.xyz, texCol.w * input.paintColor.w);
 }
 
 float4 main(float4 pos : POSITION) : SV_POSITION

@@ -12,7 +12,9 @@
 
 #include"TexHandleMgr.h"
 #include"UsersInput.h"
-#include"DrawFunc.h"
+//#include"DrawFunc.h"
+#include"DrawFunc_Shadow.h"
+#include"DrawFunc_Color.h"
 #include"WinApp.h"
 
 Vec2<float> Player::GetGeneratePos()
@@ -45,6 +47,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 {
 
 	/*===== 初期化処理 =====*/
+
+	//プレイヤーの向き初期化
+	playerDir = DEFAULT;
 
 	//アニメーション初期化
 	anim.Init();
@@ -104,6 +109,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	stretch_LU = { 0.0f,0.0f };
 	stretch_RB = { 0.0f,0.0f };
 	stretchTimer = STRETCH_RETURN_TIME;
+
+	//テレポート時の点滅の初期化
+	teleFlashTimer = TELE_FLASH_TIME;
 
 	firstRecoilParticleTimer = 0;
 
@@ -238,19 +246,14 @@ void Player::Update(const vector<vector<int>> mapData)
 		--firstRecoilParticleTimer;
 	}
 
+	//テレポート時のフラッシュのタイマー計測
+	if (teleFlashTimer < TELE_FLASH_TIME)teleFlashTimer++;
 }
 
-void Player::Draw()
+void Player::Draw(LightManager& LigManager)
 {
-	static enum { LEFT, RIGHT, DEFAULT = RIGHT, DIR_NUM }DIR = DEFAULT;
-	if (vel.x < 0)DIR = LEFT;
-	if (0 < vel.x)DIR = RIGHT;
-
-	static const int HAND_GRAPH[DIR_NUM] =
-	{
-		TexHandleMgr::LoadGraph("resource/IntoTheAbyss/hand_L.png"),
-		TexHandleMgr::LoadGraph("resource/IntoTheAbyss/hand_R.png"),
-	};
+	if (vel.x < 0)playerDir = LEFT;
+	if (0 < vel.x)playerDir = RIGHT;
 
 	/*===== 描画処理 =====*/
 
@@ -259,37 +262,48 @@ void Player::Draw()
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
 
 	// プレイヤーの描画処理
-	Vec2<float>leftUp = { centerPos.x * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		centerPos.y * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	Vec2<float>rightBottom = { centerPos.x * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		centerPos.y * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	const float expRate = EXT_RATE * ScrollMgr::Instance()->zoom;
+	//Vec2<float>leftUp = { centerPos.x * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
+	//	centerPos.y * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
+	//Vec2<float>rightBottom = { centerPos.x * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
+	//	centerPos.y * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
+	const Vec2<float> expRate = { EXT_RATE * ScrollMgr::Instance()->zoom, EXT_RATE * ScrollMgr::Instance()->zoom };
 
-	if (DIR == RIGHT)
+	//残像描画
+	afImg.Draw(ScrollMgr::Instance()->zoom, scrollShakeZoom);
+
+	if (playerDir == RIGHT)
 	{
-		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
+		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
 	}
-	else if (DIR == LEFT)
+	else if (playerDir == LEFT)
 	{
-		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
+		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
 	}
 
 	//ストレッチ加算
-	leftUp += stretch_LU;
-	rightBottom += stretch_RB;
+	//leftUp += stretch_LU;
+	//rightBottom += stretch_RB;
 
 	//胴体
-	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), AlphaBlendMode_Trans, { DIR == LEFT,false });
-	//DrawFunc::DrawRotaGraph2D(centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom, expRate, 0.0f, TexHandleMgr::GetTexBuffer(playerGraph),
-		//{ 0.5f,0.5f }, AlphaBlendMode_Trans, { DIR == LEFT,false });
+	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
+	const Vec2<float> expRateBody = expRate * ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
+	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f,
+		bodyTex, nullptr, nullptr, 0.0f,
+		{ 0.5f,0.5f }, { playerDir != DEFAULT,false });
+	
+	//テレポート時のフラッシュ
+	Color teleFlashCol;
+	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, teleFlashTimer, TELE_FLASH_TIME, 1.0f, 0.0f);
+	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f,
+		bodyTex, teleFlashCol);
 
-	if (DIR == RIGHT)
+	if (playerDir == RIGHT)
 	{
-		lHand->Draw(expRate, HAND_GRAPH[DEFAULT ? LEFT : RIGHT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
+		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
 	}
-	else if (DIR == LEFT)
+	else if (playerDir == LEFT)
 	{
-		rHand->Draw(expRate, HAND_GRAPH[DEFAULT ? RIGHT : LEFT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
+		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
 	}
 
 	// 弾を描画
@@ -1002,6 +1016,14 @@ void Player::StopDoorUpDown()
 	doorMoveUpDownFlag = true;
 }
 
+Vec2<float> Player::GetCenterDrawPos()
+{
+	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
+	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
+	return centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
+}
+
 void Player::Input(const vector<vector<int>> mapData)
 {
 
@@ -1238,8 +1260,31 @@ void Player::Input(const vector<vector<int>> mapData)
 		// ビーコンが発射されていたら。
 		else if (rHand->teleportPike.isActive && (rHand->teleportPike.isHitWall || rHand->teleportPike.isHitWindow) && !isPrevFrameShotBeacon) {
 
+			auto vec = rHand->teleportPike.pos - centerPos;
+
+			//向き変え
+			if (vec.x < 0)playerDir = LEFT;
+			if (0 < vec.x)playerDir = RIGHT;
+
+			//画像サイズの違いによって壁にくっつかないときがあるので少しめり込むようにする
+			static const float OFFSET = 3.0f;
+			rHand->teleportPike.pos.x += (playerDir == RIGHT) ? OFFSET : -OFFSET;
+			vec = rHand->teleportPike.pos - centerPos;	//移動量更新
+
 			//ストレッチ
-			CalculateStretch(rHand->teleportPike.pos - centerPos);
+			CalculateStretch(vec);
+
+			//残像エミット
+			afImg.EmitArray(centerPos, rHand->teleportPike.pos, anim.GetGraphHandle(), GetPlayerGraphSize(), { playerDir != DEFAULT,false });
+			Vec2<int>graphSize = TexHandleMgr::GetTexBuffer(GetHandGraph(LEFT))->GetGraphSize();
+			graphSize *= EXT_RATE / 2.0f;
+			lHand->EmitAfterImg(vec, GetHandGraph(LEFT), graphSize.Float(), { false,false });
+			graphSize = TexHandleMgr::GetTexBuffer(GetHandGraph(RIGHT))->GetGraphSize();
+			graphSize *= EXT_RATE / 2.0f;
+			rHand->EmitAfterImg(vec, GetHandGraph(RIGHT), graphSize.Float(), { false,false });
+
+			//点滅
+			teleFlashTimer = 0;
 
 			// プレイヤーを瞬間移動させる。
 			centerPos = rHand->teleportPike.pos;
@@ -1503,13 +1548,16 @@ void Player::CalculateStretch(const Vec2<float>& Move)
 		if (stretch_LU.x < -MAX_STRETCH.x)stretch_LU.x = -MAX_STRETCH.x;
 	}
 
+	static const float SHRINK_RATE = 1.0f / 2.0f;
+	static const float OTHER_STRETCH_BOOL_RATE = 0.8f;
+
 	//左右移動時
-	if (Move.x != 0.0f)
+	if (Move.x != 0.0f && stretchRate.y < OTHER_STRETCH_BOOL_RATE)
 	{
 		//上下が縮む
-		stretch_LU.y += MAX_STRETCH.y * stretchRate.x;
+		stretch_LU.y += MAX_STRETCH.y * stretchRate.x * SHRINK_RATE;
 		if (MAX_STRETCH.y < stretch_LU.y)stretch_LU.y = MAX_STRETCH.y;
-		stretch_RB.y -= MAX_STRETCH.y * stretchRate.x;
+		stretch_RB.y -= MAX_STRETCH.y * stretchRate.x * SHRINK_RATE;
 		if (stretch_RB.y < -MAX_STRETCH.y)stretch_RB.y = -MAX_STRETCH.y;
 	}
 
@@ -1529,12 +1577,12 @@ void Player::CalculateStretch(const Vec2<float>& Move)
 	}
 
 	//上下移動時
-	if (Move.y != 0.0f)
+	if (Move.y != 0.0f && stretchRate.x < OTHER_STRETCH_BOOL_RATE)
 	{
 		//左右が縮む
-		stretch_LU.x += MAX_STRETCH.x * stretchRate.y;
+		stretch_LU.x += MAX_STRETCH.x * stretchRate.y * SHRINK_RATE;
 		if (MAX_STRETCH.x < stretch_LU.x)stretch_LU.x = MAX_STRETCH.x;
-		stretch_RB.x -= MAX_STRETCH.x * stretchRate.y;
+		stretch_RB.x -= MAX_STRETCH.x * stretchRate.y * SHRINK_RATE;
 		if (stretch_RB.x < -MAX_STRETCH.x)stretch_RB.x = -MAX_STRETCH.x;
 	}
 
@@ -1560,4 +1608,15 @@ Vec2<float> Player::GetPlayerGraphSize()
 {
 	//return { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+}
+
+int Player::GetHandGraph(const DRAW_DIR& Dir)
+{
+	static const int HAND_GRAPH[DIR_NUM] =
+	{
+		TexHandleMgr::LoadGraph("resource/IntoTheAbyss/hand_L.png"),
+		TexHandleMgr::LoadGraph("resource/IntoTheAbyss/hand_R.png"),
+	};
+
+	return HAND_GRAPH[Dir];
 }

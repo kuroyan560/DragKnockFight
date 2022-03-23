@@ -14,6 +14,9 @@ using namespace std;
 class TextureBuffer;
 
 #include"DrawMap.h"
+#include"LightManager.h"
+class RenderTarget;
+
 
 //元ソリューションのmain処理をまとめたもの
 class Game
@@ -79,6 +82,17 @@ class Game
 
 	std::vector<DrawMap>drawMap;
 
+	//ライト情報
+	LightManager ligMgr;
+	const float PT_LIG_RANGE = 128.0;
+	const float PT_LIG_Z = -2.0f;
+	Light::Point ptLig;
+	const float SPOT_LIG_RANGE = 128.0;
+	const float SPOT_LIG_TARGET_OFFSET_Y= -10.0f;
+	const float SPOT_LIG_Z = -20.0f;
+	Light::Spot spotLig;
+	Light::HemiSphere hemiLig;
+
 public:
 	int stageNum = 0;//ステージ番号
 	int roomNum = 0; //部屋番号
@@ -89,5 +103,7 @@ public:
 	Game();
 	void Update();
 	void Draw();
+
+	LightManager& GetLigManager() { return ligMgr; }
 };
 

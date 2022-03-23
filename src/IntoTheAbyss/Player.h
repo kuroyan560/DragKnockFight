@@ -11,6 +11,8 @@ using namespace std;
 class PlayerHand;
 
 #include"PlayerAnimation.h"
+#include"AfterImg.h"
+class LightManager;
 
 // プレイヤークラス
 class Player {
@@ -48,7 +50,8 @@ public:
 	//int playerGraph;
 
 	//勢いによるストレッチ
-	const Vec2<float> MAX_STRETCH = { 16.0f,37.0f };	//最大ストレッチ量
+	//const Vec2<float> MAX_STRETCH = { 16.0f,37.0f };	//最大ストレッチ量
+	const Vec2<float> MAX_STRETCH = { 10.0f,31.0f };	//最大ストレッチ量
 	Vec2<float>stretch_LU = { 0,0 };	//左上
 	Vec2<float>stretch_RB = { 0,0 };	//右下
 	Vec2<float>fromStretch_LU = { 0,0 };	//イージング用スタート値
@@ -58,8 +61,17 @@ public:
 	const float STRETCH_DIV_RATE = 2.0f;	//ストレッチを弱くするときの割合
 	const int FIRST_SHOT_RECOIL_PARTICLE_TIMER = 10.0f;
 
+	//プレイヤーの向き
+	enum DRAW_DIR{ LEFT, RIGHT, DEFAULT = RIGHT, DIR_NUM }playerDir = DEFAULT;
 	//アニメーション統括
 	PlayerAnimation anim;
+
+	//残像
+	AfterImg afImg;
+
+	//テレポートしたとき光る
+	const int TELE_FLASH_TIME = 120;
+	int teleFlashTimer;
 
 public:
 
@@ -117,11 +129,10 @@ public:
 	void Update(const vector<vector<int>> mapData);
 
 	// 描画処理
-	void Draw();
+	void Draw(LightManager& LigManager);
 
 	// マップチップとの当たり判定
 	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun);
-
 
 	// 方向ごとのマップチップとの当たり判定関数
 	void HitMapChipTop();
@@ -133,6 +144,9 @@ public:
 	void StopDoorLeftRight();
 	void StopDoorUpDown();
 	bool drawCursorFlag;
+
+	//スクロールなどにも考慮した中心座標
+	Vec2<float> GetCenterDrawPos();
 
 private:
 	/*-- クラス内で使用する関数 --*/
@@ -162,4 +176,7 @@ private:
 	void UpdateStretch();
 	//画像サイズからプレイヤーサイズ取得
 	Vec2<float> GetPlayerGraphSize();
+
+	//プレイヤーの手の画像ハンドル取得
+	int GetHandGraph(const DRAW_DIR& Dir);
 };
