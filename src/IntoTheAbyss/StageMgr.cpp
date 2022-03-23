@@ -13,7 +13,6 @@ StageMgr::StageMgr()
 	int allRoomNum = 10;
 	int nowStage = 0;
 
-
 	allMapChipData.resize(allStageNum);
 	relationRoomData.resize(allStageNum);
 	allMapChipDrawData.resize(allStageNum);
@@ -173,7 +172,7 @@ StageMgr::StageMgr()
 			{
 				doorCallCount[i] = 0;
 			}
-	
+
 
 			for (int y = 0; y < allMapChipDrawData[stageNum][roomNum].size(); ++y)
 			{
@@ -323,7 +322,7 @@ StageMgr::StageMgr()
 						}
 						else
 						{
-							GimmickLoader::Instance()->SetThwompEndPos(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+							GimmickLoader::Instance()->SetThwompEndPos(stageNum, roomNum, gimmickNumber - 1, Vec2<float>(x * 50.0f, y * 50.0f));
 						}
 						skipFlag = true;
 					}
@@ -788,7 +787,7 @@ StageMgr::StageMgr()
 						}
 
 						if (allMapChipDrawData[stageNum][roomNum][y][x].handle == -1)
-						//if (!allMapChipDrawData[stageNum][roomNum][y][x].handle)
+							//if (!allMapChipDrawData[stageNum][roomNum][y][x].handle)
 						{
 							//ÉGÉâÅ[
 							MapChipDrawData tmp;

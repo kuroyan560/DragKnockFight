@@ -31,8 +31,10 @@ void GimmickLoader::LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const st
 	int gimmickArrayNum = 0;
 
 
+
 	allGimmickData[STAGE_NUM].push_back(std::vector<std::shared_ptr<ThownpeData>>());
 	allBubbleData[STAGE_NUM].push_back({});
+
 
 	// ファイルデータ
 	std::ifstream ifs;
@@ -172,12 +174,12 @@ std::vector<std::shared_ptr<BubbleData>> GimmickLoader::GetBubbleData(const int&
 std::vector<std::shared_ptr<ThownpeData>> GimmickLoader::GetThowpeData(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	//ステージ番号が配列の範囲外なら返さない
-	if (STAGE_NUM < 0 || allGimmickData.size() <= STAGE_NUM)
+	if (STAGE_NUM < 0 || allGimmickData.size() < STAGE_NUM)
 	{
 		return std::vector<std::shared_ptr<ThownpeData>>();
 	}
 	//部屋番号が配列の範囲外なら返さない
-	if (ROOM_NUM < 0 || allGimmickData[STAGE_NUM].size() <= ROOM_NUM)
+	if (ROOM_NUM < 0 || allGimmickData[STAGE_NUM].size() < ROOM_NUM)
 	{
 		return std::vector<std::shared_ptr<ThownpeData>>();
 	}
