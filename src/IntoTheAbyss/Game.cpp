@@ -358,8 +358,6 @@ Game::Game()
 		}
 	}
 
-	StageMgr::Instance()->loadGimmickData->GetThowpeData(0, 0);
-
 	//オーラブロック生成
 	int auraChipNum = 40;//オーラブロックのチップ番号
 	vector<Vec2<float>>usedNum;	//どのマップチップ番号が使われたか
