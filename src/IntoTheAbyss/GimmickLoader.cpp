@@ -1,12 +1,13 @@
 #include "GimmickLoader.h"
 #include"KuroEngine.h"
 
-GimmickLoader::GimmickLoader(const int& STAGE_NUM)
+GimmickLoader::GimmickLoader()
 {
-	allGimmickData.reserve(STAGE_NUM);
-	allGimmickData.resize(STAGE_NUM);
-	allBubbleData.reserve(STAGE_NUM);
-	allBubbleData.resize(STAGE_NUM);
+	int stageNum = 4;
+	allGimmickData.reserve(stageNum);
+	allGimmickData.resize(stageNum);
+	allBubbleData.reserve(stageNum);
+	allBubbleData.resize(stageNum);
 
 	//使用できるギミック名の初期化
 	gimmickName[GIMMCK_NAME_THOWMPE] = "Thwomp";
@@ -22,8 +23,7 @@ GimmickLoader::GimmickLoader(const int& STAGE_NUM)
 	gimmickThowmpeType[GIMMCK_THOWMPE_TYPE_OFF] = "off";;
 	gimmickThowmpeType[GIMMCK_THOWMPE_TYPE_ON_LOW] = "onLow";
 	gimmickThowmpeType[GIMMCK_THOWMPE_TYPE_ON_HIGH] = "onHigh";
-
-}
+};
 
 void GimmickLoader::LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const std::string& FILE_PASS)
 {
@@ -31,7 +31,7 @@ void GimmickLoader::LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const st
 	int gimmickArrayNum = 0;
 
 
-	allGimmickData[STAGE_NUM].push_back({});
+	allGimmickData[STAGE_NUM].push_back(std::vector<std::shared_ptr<ThownpeData>>());
 	allBubbleData[STAGE_NUM].push_back({});
 
 	// ファイルデータ
@@ -107,7 +107,7 @@ void GimmickLoader::LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const st
 
 			bool errorFlag = true;
 			int nameIndex = -1;		//添え字からenumに変換する為に使う変数
-			for (int i = 0; i < gimmickName.size(); ++i)
+			for (int i = 0; i < allGimmickData[STAGE_NUM].size(); ++i)
 			{
 				//読み込んだギミック名が登録されているギミック名なのかどうか判断する
 				if (gimmickName[i] == name)
@@ -142,10 +142,11 @@ void GimmickLoader::LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const st
 		default:
 			break;
 		}
+		allGimmickData[STAGE_NUM][ROOM_NUM] = gimmickData;
 	}
 
-	//探索したデータ分を代入
-	allGimmickData[STAGE_NUM][ROOM_NUM] = gimmickData;
+	bool debug = false;
+	
 }
 
 std::vector<std::shared_ptr<BubbleData>> GimmickLoader::GetBubbleData(const int& STAGE_NUM, const int& ROOM_NUM)

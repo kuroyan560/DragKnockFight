@@ -38,7 +38,8 @@ public:
 	void Init();
 
 	// ¶¬ˆ—
-	void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec);
+	void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const float& par = 1.0f);
+	void GeneratePer(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const float& par = 1.0f, const int& generateCount = 5.0f);
 
 	// XVˆ—
 	void Update();

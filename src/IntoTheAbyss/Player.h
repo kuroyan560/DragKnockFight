@@ -1,6 +1,6 @@
 #pragma once
 #include "Vec.h"
-#include "TimeStopTestBlock.h"
+#include "DossunBlock.h"
 #include "Bubble.h"
 #include <memory>
 #include <vector>
@@ -31,11 +31,13 @@ public:
 	bool isWallRight;				// 右の壁にくっついているか
 	bool isWallLeft;				// 左の壁にくっついているか
 	bool inBubble;					// シャボン玉に入っているかどうか
+	bool isDead;					// 死んだかどうかフラグ
 	int rapidFireTimerLeft;			// 連射タイマー左手
 	int rapidFireTimerRight;		// 連射タイマー右手
 	int gravityInvalidTimer;		// 重力無効化タイマー
 	int handReturnTimer;			// 入力が終わってから腕がデフォルトの位置に戻るまでのタイマー
 	int asSoonAsInputTimer;			// 移動入力が行われてから数フレーム間有効化する処理を作るためにタイマー 主にシャボン玉
+	int firstRecoilParticleTimer;	// 最初のショットのときのパーティクルを出すタイマー
 
 	// 壁ズリフラグ
 	bool isSlippingWall[4];			// 壁ズリパーティクルを出すフラグ
@@ -55,8 +57,9 @@ public:
 	Vec2<float>fromStretch_LU = { 0,0 };	//イージング用スタート値
 	Vec2<float>fromStretch_RB = { 0,0 };	//イージング用スタート値
 	const int STRETCH_RETURN_TIME = 17;	//ストレッチが０になるまでのフレーム数
-	int stretchTimer = STRETCH_RETURN_TIME;	
+	int stretchTimer = STRETCH_RETURN_TIME;
 	const float STRETCH_DIV_RATE = 2.0f;	//ストレッチを弱くするときの割合
+	const int FIRST_SHOT_RECOIL_PARTICLE_TIMER = 10.0f;
 
 	//プレイヤーの向き
 	enum DRAW_DIR{ LEFT, RIGHT, DEFAULT = RIGHT, DIR_NUM }playerDir = DEFAULT;
@@ -129,13 +132,18 @@ public:
 	void Draw(LightManager& LigManager);
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, TimeStopTestBlock& testBlock);
+	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun);
 
 	// 方向ごとのマップチップとの当たり判定関数
 	void HitMapChipTop();
 	void HitMapChipLeft();
 	void HitMapChipRight();
 	void HitMapChipBottom();
+
+	//プレイヤーの入力を禁止する
+	void StopDoorLeftRight();
+	void StopDoorUpDown();
+	bool drawCursorFlag;
 
 	//スクロールなどにも考慮した中心座標
 	Vec2<float> GetCenterDrawPos();
@@ -155,6 +163,13 @@ private:
 	// 壁との押し戻しに関する更新処理
 	void PushBackWall();
 
+	bool stopInputFlag;//入力を禁止するフラグ
+	bool stopMoveFlag;
+
+
+	bool doorMoveLeftRightFlag;
+	bool doorMoveUpDownFlag;
+	bool doorMoveDownFlag;
 	//ストレッチの値を計算
 	void CalculateStretch(const Vec2<float>& Move);
 	//ストレッチ値更新

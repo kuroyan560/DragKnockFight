@@ -42,8 +42,7 @@ struct BubbleData
 class GimmickLoader :public Singleton<GimmickLoader>
 {
 public:
-	GimmickLoader(){};
-	GimmickLoader(const int& STAGE_NUM);
+	GimmickLoader();
 	void LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const std::string& FILE_PASS);
 	std::vector< std::shared_ptr<ThownpeData>> GetThowpeData(const int& STAGE_NUM, const int& ROOM_NUM);
 	std::vector< std::shared_ptr<BubbleData>> GetBubbleData(const int& STAGE_NUM, const int& ROOM_NUM);
@@ -92,4 +91,3 @@ private:
 
 	void LoadThowmpeData(const std::string& KEY, std::istringstream* LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA);
 };
-

@@ -3,6 +3,7 @@
 #include"LightManager.h"
 
 #include"IntoTheAbyss/Game.h"
+#include"SceneCange.h"
 
 class Sprite_Shadow;
 class GaussianBlur;
@@ -15,6 +16,8 @@ class GameScene : public BaseScene
 	std::shared_ptr<RenderTarget>emissiveMap;
 
 	Game game;
+
+	SceneCange *sceneChange;
 public:
 	GameScene();
 	void OnInitialize()override;

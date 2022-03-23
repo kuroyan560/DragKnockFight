@@ -13,7 +13,6 @@ StageMgr::StageMgr()
 	int allRoomNum = 10;
 	int nowStage = 0;
 
-	loadGimmickData = std::make_unique<GimmickLoader>(allStageNum);
 
 	allMapChipData.resize(allStageNum);
 	relationRoomData.resize(allStageNum);
@@ -72,7 +71,7 @@ StageMgr::StageMgr()
 			std::string fileName =
 				roomFileName + std::to_string(roomNum) + "_Gimmick.txt";
 
-			loadGimmickData->LoadData(stageNum, roomNum, filePass + fileName);
+			GimmickLoader::Instance()->LoadData(stageNum, roomNum, filePass + fileName);
 		}
 	}
 
@@ -320,11 +319,11 @@ StageMgr::StageMgr()
 						//偶数なら開始位置、奇数なら終了位置とする
 						if (gimmickNumber % 2 == 0)
 						{
-							loadGimmickData->SetThwompStartPos(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+							GimmickLoader::Instance()->SetThwompStartPos(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
 						}
 						else
 						{
-							loadGimmickData->SetThwompEndPos(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+							GimmickLoader::Instance()->SetThwompEndPos(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
 						}
 						skipFlag = true;
 					}
@@ -333,7 +332,7 @@ StageMgr::StageMgr()
 					if (mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].min <= now && now <= mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].max)
 					{
 						int gimmickNumber = now - mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].min;
-						loadGimmickData->PushBubbleData(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+						GimmickLoader::Instance()->PushBubbleData(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
 						skipFlag = true;
 					}
 

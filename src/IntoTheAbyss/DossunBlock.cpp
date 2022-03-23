@@ -22,6 +22,8 @@ DossunBlock::DossunBlock()
 	isMoveTimer = 0;
 	changeDirTimer = 0;
 	id = {};
+	sightData.pos = &pos;
+	sightData.scale = size;
 
 }
 
@@ -69,6 +71,8 @@ void DossunBlock::Generate(Vec2<float> generatePos, Vec2<float> endPos, const Ve
 	isHitPlayer = false;
 	isMove = false;
 	isReturn = false;
+	isTimeStopPikeAlive = nullptr;
+	sightData = { &pos,size/* * Vec2<float>(2.0f,2.0f)*/ };
 
 }
 
@@ -124,8 +128,7 @@ void DossunBlock::Update()
 	// タイマーが一定以上だったら移動処理を行う。
 	if (isMove) {
 
-		// 移動する。
-		pos += moveDir * Vec2<float>(speed, speed);
+		if (speed <= 1.0f) speed = 1.0f;
 
 		// IDに応じて移動量を加算する。
 		switch (id)
@@ -160,7 +163,15 @@ void DossunBlock::Update()
 			break;
 		}
 
+		if (isTimeStopPikeAlive != nullptr) speed = 0;
+		if (changeDirTimer > 0) speed = 0;
+
+		// 移動する。
+		pos += moveDir * Vec2<float>(speed, speed);
+
 	}
+
+	if (isTimeStopPikeAlive != nullptr && *isTimeStopPikeAlive == false) isTimeStopPikeAlive = nullptr;
 
 }
 
@@ -184,7 +195,7 @@ void DossunBlock::Draw()
 	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(100, 100, 100, 255), true);
 }
 
-void DossunBlock::CheckHit(Player& player, const vector<vector<int>>& mapData)
+void DossunBlock::CheckHit(const vector<vector<int>>& mapData)
 {
 
 	// フラグを初期化。
@@ -195,17 +206,23 @@ void DossunBlock::CheckHit(Player& player, const vector<vector<int>>& mapData)
 
 	// マップチップとドッスンブロックの当たり判定
 
+	float offset = 1.0f;
+
 	if (moveDir.y != 0) {
 		isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
+		pos.y -= offset;
 	}
 	if (moveDir.x != 0) {
 		isDossunRight = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+		pos.x -= offset;
 	}
 	if (moveDir.x != 0) {
 		isDossunLeft = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_LEFT) != INTERSECTED_NONE;
+		pos.x += offset;
 	}
 	if (moveDir.y != 0) {
 		isDossunBottom = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+		pos.y += offset;
 	}
 
 	// どこかしらにぶつかっていれば当たった判定にする。
@@ -219,36 +236,6 @@ void DossunBlock::CheckHit(Player& player, const vector<vector<int>>& mapData)
 
 		// 方向転換タイマーを初期化。
 		changeDirTimer = 0;
-
-	}
-
-	// ドッスンブロックとプレイヤーの当たり判定
-
-	bool isDossunVel = Collider::Instance()->CheckHitVel(player.centerPos, player.prevFrameCenterPos, player.vel + player.gimmickVel, player.PLAYER_HIT_SIZE, pos, size) != INTERSECTED_NONE;
-	isDossunTop = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_HIT_SIZE, pos, size, INTERSECTED_TOP) != INTERSECTED_NONE;
-	isDossunRight = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_HIT_SIZE, pos, size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
-	isDossunLeft = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_HIT_SIZE, pos, size, INTERSECTED_LEFT) != INTERSECTED_NONE;
-	isDossunBottom = Collider::Instance()->CheckHitSize(player.centerPos, player.PLAYER_HIT_SIZE, pos, size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
-
-	// どこかしらにぶつかっていれば当たった判定にする。
-	if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
-
-		// プレイヤーにドッスンブロックの移動量を渡す。
-		player.gimmickVel = Vec2<float>(speed, speed) * moveDir;
-
-		// ドッスンの移動量タイマーを更新。
-		isHitPlayer = true;
-
-		// プレイヤーの移動量をかき消す。
-		player.gravity *= 0.0f;
-		player.vel *= {0.5f, 0.5f};
-
-	}
-	else {
-
-		// ドッスンの移動量タイマーを初期化。
-		isHitPlayer = false;
-		//isMoveTimer = 0;
 
 	}
 

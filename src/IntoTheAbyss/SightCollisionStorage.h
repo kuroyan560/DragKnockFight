@@ -17,6 +17,12 @@ struct SightCollisionData {
 		this->scale = scale;
 
 	}
+	SightCollisionData() {
+
+		this->pos = nullptr;
+		this->scale = {};
+
+	}
 
 };
 

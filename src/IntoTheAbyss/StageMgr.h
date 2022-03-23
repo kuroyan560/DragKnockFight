@@ -130,19 +130,21 @@ public:
 	{
 		RoomMapChipArray tmp = allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
 
+		Vec2<int>mapChipPos;
+		mapChipPos.x = MAPCHIP_POS.x;
+		mapChipPos.y = MAPCHIP_POS.y;
+
 		//Y軸のマップチップが範囲外なら-1を返す
-		if (tmp.size() <= MAPCHIP_POS.y || MAPCHIP_POS.y < 0)
+		if (tmp.size() <= mapChipPos.y || mapChipPos.y < 0)
 		{
 			return -1;
 		}
 		//X軸のマップチップが範囲外なら-1を返す
-		if (tmp[MAPCHIP_POS.y].size() - 1 < MAPCHIP_POS.x || MAPCHIP_POS.x < 0)
+		if (tmp[mapChipPos.y].size() <= mapChipPos.x || mapChipPos.x < 0)
 		{
 			return -1;
 		}
-		int y = MAPCHIP_POS.y;
-		int x = MAPCHIP_POS.x;
-		int result = tmp[y][x];
+		int result = tmp[mapChipPos.y][mapChipPos.x];
 		//指定した場所のマップチップ番号を返す
 		return result;
 	};
@@ -174,8 +176,6 @@ public:
 	}
 
 	std::vector<MapChipAnimationData *> animationData;//マップチップのアニメーション情報の一覧
-	std::unique_ptr<GimmickLoader> loadGimmickData;	  //ギミックに関するデータの読み込み
-
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス

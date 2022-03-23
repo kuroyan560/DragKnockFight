@@ -7,6 +7,7 @@
 #include "MovingBlockMgr.h"
 #include "MovingBlock.h"
 #include "BulletParticleMgr.h"
+#include "Collider.h"
 #include <cmath>
 
 #include"TexHandleMgr.h"
@@ -32,6 +33,10 @@ Player::Player()
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
 
 	this->Init(GetGeneratePos());
+
+
+	isDead = false;
+	firstRecoilParticleTimer = 0;
 }
 
 Player::~Player()
@@ -83,6 +88,8 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	isWallRight = false;
 	isWallLeft = false;
 
+	isDead = false;
+
 	// 壁ズリフラグを初期化。
 	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
 
@@ -105,6 +112,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	//テレポート時の点滅の初期化
 	teleFlashTimer = TELE_FLASH_TIME;
+
+	firstRecoilParticleTimer = 0;
+
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -112,16 +122,33 @@ void Player::Update(const vector<vector<int>> mapData)
 
 	/*===== 入力処理 =====*/
 
-	// 入力に関する更新処理を行う。
-	Input(mapData);
+	if (!doorMoveLeftRightFlag && !doorMoveUpDownFlag)
+	{
+		// 入力に関する更新処理を行う。
+		Input(mapData);
+	}
 
 	/*===== 更新処理 =====*/
+	if (!doorMoveLeftRightFlag && !doorMoveUpDownFlag)
+	{
+		//移動に関する処理
+		Move();
+	}
 
-	// 移動に関する処理
-	Move();
+	ScrollMgr::Instance()->CalucurateScroll(prevFrameCenterPos - centerPos);
+	prevFrameCenterPos = centerPos;
 
-	// 重力に関する更新処理
-	UpdateGravity();
+	if (!doorMoveLeftRightFlag)
+	{
+		// 重力に関する更新処理
+		UpdateGravity();
+	}
+	doorMoveLeftRightFlag = false;
+	doorMoveUpDownFlag = false;
+	doorMoveDownFlag = false;
+
+
+
 
 	// 連射タイマーを更新
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;
@@ -145,6 +172,9 @@ void Player::Update(const vector<vector<int>> mapData)
 	if (mapX >= mapData[0].size()) mapX = mapData[0].size() - 1;
 	if (mapY <= 0) mapY = 1;
 	if (mapY >= mapData.size()) mapY = mapData.size() - 1;
+	if (mapY <= 0) mapY = 1;
+	if (mapX <= 0) mapX = 1;
+	if (mapX >= mapData[mapY].size()) mapX = mapData[mapY].size() - 1;
 
 	// 一個上のマップチップがブロックで、X軸方向の移動量が一定以上だったらパーティクルを生成する。
 	if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
@@ -194,6 +224,27 @@ void Player::Update(const vector<vector<int>> mapData)
 
 	//アニメーション更新
 	anim.Update();
+
+
+	// 最初の一発のタイマーが起動していたらパーティクルを生成する。
+	if (0 < firstRecoilParticleTimer) {
+
+		// 移動している方向を求める。
+		Vec2<float> invForwardVec = -vel;
+
+		// 最高速度からのパーセンテージを求める。
+		float per = (float)firstRecoilParticleTimer / (float)FIRST_SHOT_RECOIL_PARTICLE_TIMER;
+
+		// 正規化する。
+		invForwardVec.Normalize();
+
+		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+		BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+
+		--firstRecoilParticleTimer;
+	}
 
 	//テレポート時のフラッシュのタイマー計測
 	if (teleFlashTimer < TELE_FLASH_TIME)teleFlashTimer++;
@@ -257,10 +308,9 @@ void Player::Draw(LightManager& LigManager)
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
-
 }
 
-void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, TimeStopTestBlock& testBlock)
+void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun)
 {
 
 	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
@@ -317,14 +367,19 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		// 左右に当たった際に壁釣りさせるための処理。
 		int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 		int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		if (yChip <= 0) yChip = 1;
+		if (yChip >= mapData.size()) yChip = mapData.size() - 1;
+		if (xChip <= 0) xChip = 1;
+		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
 		// プレイヤーの左側がマップチップだったら
-		if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
 			HitMapChipLeft();
 		}
 		xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		if (xChip >= mapData[yChip].size() - 1) xChip = mapData[yChip].size() - 1;
+		if (xChip < 0) xChip = 0;
+		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
 		// プレイヤーの右側がマップチップだったら
-		if (yChip > 0 && mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
 			HitMapChipRight();
 		}
 
@@ -456,27 +511,28 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
 		}
 
-		// 時間停止の短槍とテスト用ブロックの当たり判定を行う。
-		if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
-			// 時間停止の短槍の座標
-			Vec2<float> pikePos = lHand->timeStopPike.pos;
-			// ブロックの当たり判定 判定は円で適当です。
-			if (testBlock.pos.Distance(lHand->timeStopPike.pos) <= testBlock.SCALE * 3.0f) {
+		// 時間停止の短槍とドッスンブロックの当たり判定を行う。
+		const int DOSSUN_COUNT = dossun.size();
+		for (int index = 0; index < DOSSUN_COUNT; ++index) {
 
-				// 短槍を止める。
-				lHand->timeStopPike.isHitWall = true;
-				// ブロックを止める。
-				testBlock.isTimeStop = true;
+			if (lHand->timeStopPike.isHitWall) continue;
 
-			}
-			else {
-				// 短槍が消えたら時間停止を解除するため。
-				testBlock.isTimeStop = false;
-			}
-		}
-		else {
-			// 短槍が消えたら時間停止を開場するため。
-			testBlock.isTimeStop = false;
+			// まずは当たっているかをチェックする。
+			if (fabs(lHand->timeStopPike.pos.x - dossun[index].pos.x) > lHand->timeStopPike.SCALE + dossun[index].size.x) continue;
+			if (fabs(lHand->timeStopPike.pos.y - dossun[index].pos.y) > lHand->timeStopPike.SCALE + dossun[index].size.y) continue;
+
+			lHand->timeStopPike.isHitWall = true;
+			lHand->timeStopPike.stopPos = dossun[index].speed;
+			lHand->timeStopPike.stopTargetPos = &dossun[index].speed;
+
+			// この時点でドッスンブロックは1F分移動しちゃっているので、押し戻す。
+			dossun[index].pos -= dossun[index].moveDir * Vec2<float>(dossun[index].speed, dossun[index].speed);
+
+			// ぷれいやーもおしもどす。
+			centerPos -= gimmickVel;
+
+			dossun[index].isTimeStopPikeAlive = &(lHand->timeStopPike.isHitWall);
+
 		}
 
 	}
@@ -532,6 +588,257 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 	}
 
+
+	/*===== プレイヤーとドッスンブロックの当たり判定 =====*/
+
+	const int DOSSUN_COUNT = dossun.size();
+	for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+		bool isDossunVel = Collider::Instance()->CheckHitVel(centerPos, prevFrameCenterPos, vel + gimmickVel, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size) != INTERSECTED_NONE;
+		bool isDossunTop = Collider::Instance()->CheckHitSize(centerPos, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_TOP) != INTERSECTED_NONE;
+		bool isDossunRight = Collider::Instance()->CheckHitSize(centerPos, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+		bool isDossunLeft = Collider::Instance()->CheckHitSize(centerPos, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_LEFT) != INTERSECTED_NONE;
+		bool isDossunBottom = Collider::Instance()->CheckHitSize(centerPos, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+
+		// どこかしらにぶつかっていれば当たった判定にする。
+		if (isDossunVel || isDossunTop || isDossunRight || isDossunLeft || isDossunBottom) {
+
+			// プレイヤーにドッスンブロックの移動量を渡す。
+			gimmickVel = Vec2<float>(dossun[index].speed, dossun[index].speed) * dossun[index].moveDir;
+
+			// ドッスンの移動量タイマーを更新。
+			dossun[index].isHitPlayer = true;
+
+			// プレイヤーの移動量をかき消す。
+			gravity *= 0.0f;
+			vel *= {0.5f, 0.5f};
+
+		}
+		else {
+
+			// ドッスンの移動量タイマーを初期化。
+			dossun[index].isHitPlayer = false;
+			//isMoveTimer = 0;
+
+		}
+
+	}
+
+
+	/*===== プレイヤーがドッスンに挟まれた判定 =====*/
+
+	// プレイヤーの左右がドッスンもしくはマップチップと当たっていたら死亡判定を行う。
+	{
+
+		float offset = 1.0f;
+
+		bool isHitLeft = false;
+		bool isHitRight = false;
+
+		// マップチップとの当たり判定。
+		{
+
+			// プレイヤーの左側のマップチップ番号を求める。
+			int playerChipX = (centerPos.x - PLAYER_HIT_SIZE.x - offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			int playerChipY = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+
+
+			// 求めた番号が範囲外じゃなかったら。
+			if (0 < (centerPos.y - PLAYER_HIT_SIZE.y) && 0 <= playerChipY && playerChipY < mapData.size() && 0 <= playerChipX && playerChipX < mapData[playerChipY].size()) {
+
+				// そのマップチップの番号が1~9の間だったら。
+				if (0 < mapData[playerChipY][playerChipX] && mapData[playerChipY][playerChipX] < 10) {
+
+					// 当たっている
+					isHitLeft = true;
+
+				}
+
+			}
+
+		}
+
+		// ドッスンとの当たり判定
+		{
+
+			Vec2<float> checkPos = { centerPos.x - PLAYER_HIT_SIZE.x - offset, centerPos.y };
+
+			// 全てのドッスンブロックと判定を行う。
+			const int DOSSUN_COUNT = dossun.size();
+			for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+				// 求める座標がドッスンブロックの範囲内にあるかどうかをチェックする。
+				if (checkPos.x < dossun[index].pos.x - dossun[index].size.x || dossun[index].pos.x + dossun[index].size.x < checkPos.x) continue;
+				if (checkPos.y < dossun[index].pos.y - dossun[index].size.y || dossun[index].pos.y + dossun[index].size.y < checkPos.y) continue;
+
+				// ここまでくれば当たっている判定。
+				isHitLeft = true;
+
+			}
+
+		}
+
+		// マップチップとの当たり判定。
+		{
+			// プレイヤーの右側のマップチップ番号を求める。
+			int playerChipX = (centerPos.x + PLAYER_HIT_SIZE.x + offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			int playerChipY = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+
+
+			// 求めた番号が範囲外じゃなかったら。
+			if (0 <= playerChipY && playerChipY < mapData.size() && 0 <= playerChipX && playerChipX < mapData[playerChipY].size()) {
+
+				// そのマップチップの番号が1~9の間だったら。
+				if (0 < mapData[playerChipY][playerChipX] && mapData[playerChipY][playerChipX] < 10) {
+
+					// 当たっている
+					isHitRight = true;
+
+				}
+
+			}
+
+		}
+
+		// ドッスンとの当たり判定
+		{
+
+			Vec2<float> checkPos = { centerPos.x + PLAYER_HIT_SIZE.x + offset, centerPos.y };
+
+			// 全てのドッスンブロックと判定を行う。
+			const int DOSSUN_COUNT = dossun.size();
+			for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+				// 求める座標がドッスンブロックの範囲内にあるかどうかをチェックする。
+				if (checkPos.x < dossun[index].pos.x - dossun[index].size.x || dossun[index].pos.x + dossun[index].size.x < checkPos.x) continue;
+				if (checkPos.y < dossun[index].pos.y - dossun[index].size.y || dossun[index].pos.y + dossun[index].size.y < checkPos.y) continue;
+
+				// ここまでくれば当たっている判定。
+				isHitRight = true;
+
+			}
+
+		}
+
+		// 挟まれていたら死亡
+		if (isHitRight && isHitLeft) {
+
+			isDead = true;
+
+		}
+
+	}
+
+	// プレイヤーの上下がドッスンもしくはマップチップと当たっていたら死亡判定を行う。
+	{
+
+		float offset = 1.0f;
+
+		bool isHitTop = false;
+		bool isHitBottom = false;
+
+		// マップチップとの当たり判定。
+		{
+
+			// プレイヤーの上側のマップチップ番号を求める。
+			int playerChipX = (centerPos.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			int playerChipY = (centerPos.y - PLAYER_HIT_SIZE.y - offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+
+
+
+			// 求めた番号が範囲外じゃなかったら。
+			if (0 <= playerChipY && playerChipY < mapData.size() && 0 <= playerChipX && playerChipX < mapData[playerChipY].size()) {
+
+				// そのマップチップの番号が1~9の間だったら。
+				if (0 < mapData[playerChipY][playerChipX] && mapData[playerChipY][playerChipX] < 10) {
+
+					// 当たっている
+					isHitTop = true;
+
+				}
+
+			}
+
+		}
+
+		// ドッスンとの当たり判定
+		{
+
+			Vec2<float> checkPos = { centerPos.x, centerPos.y - PLAYER_HIT_SIZE.y - offset };
+
+			// 全てのドッスンブロックと判定を行う。
+			const int DOSSUN_COUNT = dossun.size();
+			for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+				// 求める座標がドッスンブロックの範囲内にあるかどうかをチェックする。
+				if (checkPos.x < dossun[index].pos.x - dossun[index].size.x || dossun[index].pos.x + dossun[index].size.x < checkPos.x) continue;
+				if (checkPos.y < dossun[index].pos.y - dossun[index].size.y || dossun[index].pos.y + dossun[index].size.y < checkPos.y) continue;
+
+				// ここまでくれば当たっている判定。
+				isHitTop = true;
+
+			}
+
+		}
+
+		// マップチップとの当たり判定。
+		{
+
+			// プレイヤーの下側のマップチップ番号を求める。
+			int playerChipX = (centerPos.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			int playerChipY = (centerPos.y + PLAYER_HIT_SIZE.y + offset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+
+
+			// 求めた番号が範囲外じゃなかったら。
+			if (0 <= playerChipY && playerChipY < mapData.size() && 0 <= playerChipX && playerChipX < mapData[playerChipY].size()) {
+
+				// そのマップチップの番号が1~9の間だったら。
+				if (0 < mapData[playerChipY][playerChipX] && mapData[playerChipY][playerChipX] < 10) {
+
+					// 当たっている
+					isHitBottom = true;
+
+				}
+
+			}
+
+		}
+
+		// ドッスンとの当たり判定
+		{
+
+			Vec2<float> checkPos = { centerPos.x, centerPos.y + PLAYER_HIT_SIZE.y + offset };
+
+			// 全てのドッスンブロックと判定を行う。
+			const int DOSSUN_COUNT = dossun.size();
+			for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+				// 求める座標がドッスンブロックの範囲内にあるかどうかをチェックする。
+				if (checkPos.x < dossun[index].pos.x - dossun[index].size.x || dossun[index].pos.x + dossun[index].size.x < checkPos.x) continue;
+				if (checkPos.y < dossun[index].pos.y - dossun[index].size.y || dossun[index].pos.y + dossun[index].size.y < checkPos.y) continue;
+
+				// ここまでくれば当たっている判定。
+				isHitBottom = true;
+
+			}
+
+		}
+
+		// 挟まれていたら死亡
+		if (isHitTop && isHitBottom) {
+
+			isDead = true;
+
+		}
+
+	}
+
+	if (isDead) {
+
+		int a = 0;
+
+	}
+
 }
 
 void Player::HitMapChipTop()
@@ -572,6 +879,8 @@ void Player::HitMapChipLeft()
 		vel.y = 0;
 		gravity = 0;
 
+		firstRecoilParticleTimer = 0;
+
 		//摩擦無いときはストレッチを弱くする
 		stretch_RB.y /= STRETCH_DIV_RATE;
 		stretch_LU.y /= STRETCH_DIV_RATE;
@@ -589,6 +898,7 @@ void Player::HitMapChipLeft()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
+
 }
 
 void Player::HitMapChipRight()
@@ -615,6 +925,8 @@ void Player::HitMapChipRight()
 		vel.x = 0;
 		vel.y = 0;
 		gravity = 0;
+
+		firstRecoilParticleTimer = 0;
 
 		//摩擦無いときはストレッチを弱くする
 		stretch_RB.y /= STRETCH_DIV_RATE;
@@ -669,6 +981,8 @@ void Player::HitMapChipBottom()
 		// 重力を無効化する。
 		gravity = 0.5f;
 
+		firstRecoilParticleTimer = 0;
+
 		//摩擦無いときはストレッチを弱くする
 		stretch_RB.x /= STRETCH_DIV_RATE;
 		stretch_LU.x /= STRETCH_DIV_RATE;
@@ -689,6 +1003,17 @@ void Player::HitMapChipBottom()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
+
+}
+
+void Player::StopDoorLeftRight()
+{
+	doorMoveLeftRightFlag = true;
+}
+
+void Player::StopDoorUpDown()
+{
+	doorMoveUpDownFlag = true;
 }
 
 Vec2<float> Player::GetCenterDrawPos()
@@ -789,6 +1114,8 @@ void Player::Input(const vector<vector<int>> mapData)
 			// プレイヤーの腕を動かす。
 			lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), true);
 
+			firstRecoilParticleTimer = FIRST_SHOT_RECOIL_PARTICLE_TIMER;
+
 		}
 		else {
 
@@ -874,6 +1201,8 @@ void Player::Input(const vector<vector<int>> mapData)
 
 			// プレイヤーの腕を動かす。
 			rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), true);
+
+			firstRecoilParticleTimer = FIRST_SHOT_RECOIL_PARTICLE_TIMER;
 
 		}
 		else {
@@ -1003,6 +1332,9 @@ void Player::Input(const vector<vector<int>> mapData)
 		// ビーコンが発射されていたら。
 		else if (lHand->timeStopPike.isActive && (lHand->timeStopPike.isHitWall || lHand->timeStopPike.isHitWindow) && !isPrevFrameShotBeacon) {
 
+			// 止められていたものを動かす。
+			lHand->timeStopPike.MoveAgain();
+
 			// ビーコンを初期化する。
 			lHand->timeStopPike.Init();
 
@@ -1035,14 +1367,14 @@ void Player::Move()
 
 	// スクロール量を更新
 	//ScrollMgr::Instance()->honraiScrollAmount -= prevFrameCenterPos - centerPos;
-	ScrollMgr::Instance()->CalucurateScroll(prevFrameCenterPos - centerPos);
+
 
 	// 移動量を0に近付ける。
 	vel.x -= vel.x / 25.0f;
 	vel.y -= vel.y / 25.0f;
 
 	// 中心座標を保存
-	prevFrameCenterPos = centerPos;
+	//prevFrameCenterPos = centerPos;
 
 	// 移動量が限界を超えないようにする。
 	if (fabs(vel.x) > MAX_RECOIL_AMOUNT) {

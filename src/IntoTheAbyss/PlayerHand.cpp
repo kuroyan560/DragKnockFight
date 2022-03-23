@@ -138,8 +138,10 @@ void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, cons
 		sightPos.y * ScrollMgr::Instance()->zoom + SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
 
 	//照準を描画
-	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), true);
-
+	if (DRAW_CURSOR)
+	{
+		DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), true);
+	}
 }
 
 void PlayerHand::Shot(const Vec2<float>& forwardVec, const bool& isFirstShot)
@@ -265,11 +267,11 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 		// このインデックスのブロックの座標を取得。
 		const Vec2<float>* BLOCK_POS = SightCollisionStorage::Instance()->data[index].pos;
 
-		// ビューポート外にあったら処理を行わない。
-		if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS->x) continue;
-		if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].x + MAP_CHIP_HALF_SIZE < BLOCK_POS->x) continue;
-		if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].y - MAP_CHIP_HALF_SIZE > BLOCK_POS->y) continue;
-		if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN].y + MAP_CHIP_HALF_SIZE < BLOCK_POS->y) continue;
+		//// ビューポート外にあったら処理を行わない。
+		//if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS->x) continue;
+		//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].x + MAP_CHIP_HALF_SIZE < BLOCK_POS->x) continue;
+		//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].y - MAP_CHIP_HALF_SIZE > BLOCK_POS->y) continue;
+		//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN].y + MAP_CHIP_HALF_SIZE < BLOCK_POS->y) continue;
 
 		// 四辺分交点を求める。
 
@@ -277,31 +279,31 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 		vector<Vec2<float>> intersectedPos;
 
 		// 上方向
-		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - MAP_CHIP_HALF_SIZE, BLOCK_POS->y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS->x + MAP_CHIP_HALF_SIZE, BLOCK_POS->y - MAP_CHIP_HALF_SIZE))) {
+		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y))) {
 
 			// 交点を求めて保存する。
-			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - MAP_CHIP_HALF_SIZE, BLOCK_POS->y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS->x + MAP_CHIP_HALF_SIZE, BLOCK_POS->y - MAP_CHIP_HALF_SIZE)));
+			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y)));
 
 		}
 		// 右方向
-		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x + MAP_CHIP_HALF_SIZE, BLOCK_POS->y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS->x + MAP_CHIP_HALF_SIZE, BLOCK_POS->y + MAP_CHIP_HALF_SIZE))) {
+		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y))) {
 
 			// 交点を求めて保存する。
-			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x + MAP_CHIP_HALF_SIZE, BLOCK_POS->y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS->x + MAP_CHIP_HALF_SIZE, BLOCK_POS->y + MAP_CHIP_HALF_SIZE)));
+			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y)));
 
 		}
 		// 下方向
-		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - MAP_CHIP_HALF_SIZE, BLOCK_POS->y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS->x + MAP_CHIP_HALF_SIZE, BLOCK_POS->y + MAP_CHIP_HALF_SIZE))) {
+		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y))) {
 
 			// 交点を求めて保存する。
-			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - MAP_CHIP_HALF_SIZE, BLOCK_POS->y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS->x + MAP_CHIP_HALF_SIZE, BLOCK_POS->y + MAP_CHIP_HALF_SIZE)));
+			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y)));
 
 		}
 		// 左方向
-		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - MAP_CHIP_HALF_SIZE, BLOCK_POS->y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS->x - MAP_CHIP_HALF_SIZE, BLOCK_POS->y + MAP_CHIP_HALF_SIZE))) {
+		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y))) {
 
 			// 交点を求めて保存する。
-			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - MAP_CHIP_HALF_SIZE, BLOCK_POS->y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS->x - MAP_CHIP_HALF_SIZE, BLOCK_POS->y + MAP_CHIP_HALF_SIZE)));
+			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y)));
 
 		}
 
@@ -346,10 +348,10 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 			const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);
 
 			// ビューポート外にあったら処理を行わない。
-			if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS.x) continue;
-			if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].x + MAP_CHIP_HALF_SIZE < BLOCK_POS.x) continue;
-			if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].y - MAP_CHIP_HALF_SIZE > BLOCK_POS.y) continue;
-			if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN].y + MAP_CHIP_HALF_SIZE < BLOCK_POS.y) continue;
+			//if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS.x) continue;
+			//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].x + MAP_CHIP_HALF_SIZE < BLOCK_POS.x) continue;
+			//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].y - MAP_CHIP_HALF_SIZE > BLOCK_POS.y) continue;
+			//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN].y + MAP_CHIP_HALF_SIZE < BLOCK_POS.y) continue;
 
 			// 四辺分交点を求める。
 
@@ -414,33 +416,41 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 
 	}
 
-	// 最後にビューポートとの当たり判定を行う。
+	// 最後にウィンドウとの当たり判定を行う。
+
+	const float WIN_WIDTH = 1280.0f;
+	const float WIN_HEIGHT = 740.0f;
+
+	const Vec2<float> WINDOW_LEFTUP = Vec2<float>(ScrollMgr::Instance()->scrollAmount.x, ScrollMgr::Instance()->scrollAmount.y);
+	const Vec2<float> WINDOW_RIGHTUP = Vec2<float>(ScrollMgr::Instance()->scrollAmount.x + WIN_WIDTH, ScrollMgr::Instance()->scrollAmount.y);
+	const Vec2<float> WINDOW_LEFTDOWN = Vec2<float>(ScrollMgr::Instance()->scrollAmount.x, ScrollMgr::Instance()->scrollAmount.y + WIN_HEIGHT);
+	const Vec2<float> WINDOW_RIGHTDOWN = Vec2<float>(ScrollMgr::Instance()->scrollAmount.x + WIN_WIDTH, ScrollMgr::Instance()->scrollAmount.y + WIN_HEIGHT);
 
 	// 上方向
-	if (IsIntersected(handSegmentStart, handSegmentEnd, ViewPort::Instance()->pointPos[ViewPort::LEFT_UP], ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP])) {
+	if (IsIntersected(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP, WINDOW_RIGHTUP)) {
 		pair<Vec2<float>, float> buff;
-		buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, ViewPort::Instance()->pointPos[ViewPort::LEFT_UP], ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP]);
+		buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP, WINDOW_RIGHTUP);
 		buff.second = Vec2<float>(buff.first - handSegmentStart).Length();
 		shortestPoints.push_back(buff);
 	}
 	// 右方向
-	if (IsIntersected(handSegmentStart, handSegmentEnd, ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP], ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN])) {
+	if (IsIntersected(handSegmentStart, handSegmentEnd, WINDOW_RIGHTUP, WINDOW_RIGHTDOWN)) {
 		pair<Vec2<float>, float> buff;
-		buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP], ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN]);
+		buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, WINDOW_RIGHTUP, WINDOW_RIGHTDOWN);
 		buff.second = Vec2<float>(buff.first - handSegmentStart).Length();
 		shortestPoints.push_back(buff);
 	}
 	// 下方向
-	if (IsIntersected(handSegmentStart, handSegmentEnd, ViewPort::Instance()->pointPos[ViewPort::LEFT_DOWN], ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN])) {
+	if (IsIntersected(handSegmentStart, handSegmentEnd, WINDOW_LEFTDOWN, WINDOW_RIGHTDOWN)) {
 		pair<Vec2<float>, float> buff;
-		buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, ViewPort::Instance()->pointPos[ViewPort::LEFT_DOWN], ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN]);
+		buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, WINDOW_LEFTDOWN, WINDOW_RIGHTDOWN);
 		buff.second = Vec2<float>(buff.first - handSegmentStart).Length();
 		shortestPoints.push_back(buff);
 	}
 	// 左方向
-	if (IsIntersected(handSegmentStart, handSegmentEnd, ViewPort::Instance()->pointPos[ViewPort::LEFT_UP], ViewPort::Instance()->pointPos[ViewPort::LEFT_DOWN])) {
+	if (IsIntersected(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP, WINDOW_LEFTDOWN)) {
 		pair<Vec2<float>, float> buff;
-		buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, ViewPort::Instance()->pointPos[ViewPort::LEFT_UP], ViewPort::Instance()->pointPos[ViewPort::LEFT_DOWN]);
+		buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP,WINDOW_LEFTDOWN);
 		buff.second = Vec2<float>(buff.first - handSegmentStart).Length();
 		shortestPoints.push_back(buff);
 	}

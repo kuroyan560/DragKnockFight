@@ -295,6 +295,12 @@ void ScrollMgr::WarpScroll(Vec2<float> PLAYER_POS, Vec2<float> SIZE)
 
 }
 
+void ScrollMgr::Restart(Vec2<float> VEL)
+{
+	scrollAmount = honraiScrollAmount;
+	warpFlag = true;
+}
+
 void ScrollMgr::StopScroll(const int& DIR)
 {
 	stopScrollData[DIR] = true;
