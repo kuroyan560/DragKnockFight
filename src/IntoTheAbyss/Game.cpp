@@ -1549,10 +1549,12 @@ void Game::Draw()
 		auraBlock[i]->Draw();
 	}
 
+	player.Draw(ligMgr);
+
+
 	if (sceneBlackFlag || sceneLightFlag)
 	{
 		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), true, AlphaBlendMode_Trans);
 	}
 
-	player.Draw(ligMgr);
 }
