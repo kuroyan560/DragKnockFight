@@ -197,12 +197,6 @@ void Player::Draw(LightManager& LigManager)
 	if (vel.x < 0)playerDir = LEFT;
 	if (0 < vel.x)playerDir = RIGHT;
 
-	static const int HAND_GRAPH[DIR_NUM] =
-	{
-		TexHandleMgr::LoadGraph("resource/IntoTheAbyss/hand_L.png"),
-		TexHandleMgr::LoadGraph("resource/IntoTheAbyss/hand_R.png"),
-	};
-
 	/*===== 描画処理 =====*/
 
 	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
@@ -221,11 +215,11 @@ void Player::Draw(LightManager& LigManager)
 
 	if (playerDir == RIGHT)
 	{
-		rHand->Draw(LigManager, expRate, HAND_GRAPH[RIGHT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
 	}
 	else if (playerDir == LEFT)
 	{
-		lHand->Draw(LigManager, expRate, HAND_GRAPH[LEFT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
 	}
 
 	//ストレッチ加算
@@ -234,17 +228,17 @@ void Player::Draw(LightManager& LigManager)
 
 	//胴体
 	const Vec2<float> expRateBody = expRate * ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), expRateBody, 0.0f,
+	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f,
 		TexHandleMgr::GetTexBuffer(anim.GetGraphHandle()), nullptr, nullptr, 0.0f,
 		{ 0.5f,0.5f }, { playerDir != DEFAULT,false });
 
 	if (playerDir == RIGHT)
 	{
-		lHand->Draw(LigManager, expRate, HAND_GRAPH[LEFT], DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
+		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f });
 	}
 	else if (playerDir == LEFT)
 	{
-		rHand->Draw(LigManager, expRate, HAND_GRAPH[RIGHT], DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
+		rHand->Draw(LigManager, expRate, GetHandGraph(RIGHT), DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f });
 	}
 
 	// 弾を描画
@@ -923,18 +917,28 @@ void Player::Input(const vector<vector<int>> mapData)
 		// ビーコンが発射されていたら。
 		else if (rHand->teleportPike.isActive && (rHand->teleportPike.isHitWall || rHand->teleportPike.isHitWindow) && !isPrevFrameShotBeacon) {
 
-
 			auto vec = rHand->teleportPike.pos - centerPos;
 
 			//向き変え
 			if (vec.x < 0)playerDir = LEFT;
 			if (0 < vec.x)playerDir = RIGHT;
 
+			//画像サイズの違いによって壁にくっつかないときがあるので少しめり込むようにする
+			static const float OFFSET = 3.0f;
+			rHand->teleportPike.pos.x += (playerDir == RIGHT) ? OFFSET : -OFFSET;
+			vec = rHand->teleportPike.pos - centerPos;	//移動量更新
+
 			//ストレッチ
 			CalculateStretch(vec);
 
 			//残像エミット
 			afImg.EmitArray(centerPos, rHand->teleportPike.pos, anim.GetGraphHandle(), GetPlayerGraphSize(), { playerDir != DEFAULT,false });
+			Vec2<int>graphSize = TexHandleMgr::GetTexBuffer(GetHandGraph(LEFT))->GetGraphSize();
+			graphSize *= EXT_RATE / 2.0f;
+			lHand->EmitAfterImg(vec, GetHandGraph(LEFT), graphSize.Float(), { false,false });
+			graphSize = TexHandleMgr::GetTexBuffer(GetHandGraph(RIGHT))->GetGraphSize();
+			graphSize *= EXT_RATE / 2.0f;
+			rHand->EmitAfterImg(vec, GetHandGraph(RIGHT), graphSize.Float(), { false,false });
 
 			// プレイヤーを瞬間移動させる。
 			centerPos = rHand->teleportPike.pos;
@@ -1254,4 +1258,15 @@ Vec2<float> Player::GetPlayerGraphSize()
 {
 	//return { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+}
+
+int Player::GetHandGraph(const DRAW_DIR& Dir)
+{
+	static const int HAND_GRAPH[DIR_NUM] =
+	{
+		TexHandleMgr::LoadGraph("resource/IntoTheAbyss/hand_L.png"),
+		TexHandleMgr::LoadGraph("resource/IntoTheAbyss/hand_R.png"),
+	};
+
+	return HAND_GRAPH[Dir];
 }

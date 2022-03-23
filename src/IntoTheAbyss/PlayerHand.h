@@ -6,6 +6,7 @@ using namespace std;
 #include"WinApp.h"
 
 class LightManager;
+#include"AfterImg.h"
 
 // プレイヤーの手クラス
 class PlayerHand {
@@ -26,6 +27,8 @@ public:
 	Beacon teleportPike;	// 瞬間移動の短槍
 	Beacon timeStopPike;	// 時間停止の短槍
 	int pikeCooltime;		// 短槍全般ののクールタイム
+
+	AfterImg afterImg;
 
 	/*-- 定数 --*/
 
@@ -88,6 +91,9 @@ public:
 	// 最初に当たったフラグのゲッタ
 	inline const bool& GetIsFirstShot() { return isFirstShot; }
 
+	//残像を出す
+	void EmitAfterImg(const Vec2<float>& TeleAmount, const int& GraphHandle, const Vec2<float>& GraphSize, const Vec2<bool>& Miror);
+
 private:
 
 	// 切り上げ
@@ -95,4 +101,6 @@ private:
 		return UINT(size + align - 1) & ~(align - 1);
 	}
 
+	//スクロールなどにも考慮した中心座標
+	Vec2<float> GetCenterDrawPos();
 };

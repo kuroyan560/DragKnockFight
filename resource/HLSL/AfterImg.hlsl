@@ -10,6 +10,7 @@ struct VSOutput
     int2 miror : MIROR;
     int srvIdx : SRV_IDX;
     float alpha : ALPHA;
+    float scale : SCALE;
 };
 
 VSOutput VSmain(VSOutput input)
@@ -31,34 +32,44 @@ void GSmain(
 	inout TriangleStream<GSOutput> output
 )
 {
-    float width = input[0].rightBottomPos.x - input[0].leftUpPos.x;
+    float width_h = input[0].rightBottomPos.x - input[0].leftUpPos.x;
+    width_h *= input[0].scale * 0.5f;
+    float height_h = input[0].rightBottomPos.y - input[0].leftUpPos.y;
+    height_h *= input[0].scale * 0.5f;
+    float4 center = input[0].rightBottomPos - float4(width_h, height_h, 0, 0);
     
     GSOutput element;
     element.srvIdx = input[0].srvIdx;
     element.alpha = input[0].alpha;
         
     //ç∂â∫
-    element.pos = input[0].rightBottomPos;
-    element.pos.x -= width;
+    element.pos = center;
+    element.pos.x -= width_h;
+    element.pos.y += height_h;
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(0.0f + input[0].miror.x, 1.0f - input[0].miror.y);
     output.Append(element);
     
     //ç∂è„
-    element.pos = input[0].leftUpPos;
+    element.pos = center;
+    element.pos.x -= width_h;
+    element.pos.y -= height_h;
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(0.0f + input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
     
      //âEâ∫
-    element.pos = input[0].rightBottomPos;
+    element.pos = center;
+    element.pos.x += width_h;
+    element.pos.y += height_h;
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(1.0f - input[0].miror.x, 1.0f - input[0].miror.y);
     output.Append(element);
     
     //âEè„
-    element.pos = input[0].leftUpPos;
-    element.pos.x += width;
+    element.pos = center;
+    element.pos.x += width_h;
+    element.pos.y -= height_h;
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(1.0f - input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
@@ -89,7 +100,8 @@ float4 PSmain(GSOutput input) : SV_TARGET
     if (input.srvIdx == 5)
         color = tex5.Sample(smp, input.uv);
     
-    return float4(COLOR.xyz * input.alpha * color.w, 1.0f);
+    //return float4(COLOR.xyz * input.alpha * color.w, 1.0f);
+    return float4(COLOR.xyz, input.alpha * color.w);
 
 }
 

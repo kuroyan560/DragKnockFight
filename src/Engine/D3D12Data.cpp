@@ -1,4 +1,4 @@
-#include"D3D12Data.h""
+#include"D3D12Data.h"
 
 void GPUResource::Mapping(const size_t& DataSize, const int& ElementNum, void* SendData)
 {

@@ -156,4 +156,7 @@ private:
 	void UpdateStretch();
 	//画像サイズからプレイヤーサイズ取得
 	Vec2<float> GetPlayerGraphSize();
+
+	//プレイヤーの手の画像ハンドル取得
+	int GetHandGraph(const DRAW_DIR& Dir);
 };

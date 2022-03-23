@@ -116,15 +116,16 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 #include"DrawFunc_Shadow.h"
 void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV)
 {
-
 	/*-- ï`âÊèàóù --*/
 	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
 
-	Vec2<float>center = drawPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
+	afterImg.Draw(ScrollMgr::Instance()->zoom, scrollShakeZoom);
+
+
 	//DrawFunc::DrawRotaGraph2D(center, ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle), RotaCenterUV);
-	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, center, ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle,
+	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle,
 		TexHandleMgr::GetTexBuffer(GraphHandle), nullptr, nullptr, 0.0f, RotaCenterUV);
 
 	// ÉrÅ[ÉRÉìÇï`âÊ
@@ -227,6 +228,20 @@ Vec2<float> PlayerHand::CalIntersectPoint(Vec2<float> posA1, Vec2<float> posA2, 
 	double t = d1 / (d1 + d2);
 
 	return Vec2<float>(posA1.x + (posA2.x - posA1.x) * t, posA1.y + (posA2.y - posA1.y) * t);
+}
+
+void PlayerHand::EmitAfterImg(const Vec2<float>& TeleAmount, const int& GraphHandle, const Vec2<float>& GraphSize, const Vec2<bool>& Miror)
+{
+	afterImg.EmitArray(drawPos, drawPos + TeleAmount, GraphHandle, GraphSize, Miror);
+}
+
+Vec2<float> PlayerHand::GetCenterDrawPos()
+{
+	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
+	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
+
+	return drawPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
 }
 
 void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)

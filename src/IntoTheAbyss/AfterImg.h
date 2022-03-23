@@ -8,6 +8,7 @@ class AfterImg
 {
 	static std::shared_ptr<GraphicsPipeline>PIPELINE;
 	static const int MAX_NUM = 100;
+	static const float MAX_ALPHA;
 	class Vertex
 	{
 	public:
@@ -16,8 +17,9 @@ class AfterImg
 		Vec2<int> miror;
 		int srvIdx;
 		float alpha;
-		Vertex(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Vec2<bool>& Miror, const int& SRVIdx, const float& Alpha)
-			:leftUpPos(LeftUpPos), rightBottomPos(RightBottomPos), miror({ Miror.x ? 1 : 0 ,Miror.y ? 1 : 0 }), srvIdx(SRVIdx), alpha(Alpha) {}
+		float scale;
+		Vertex(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Vec2<bool>& Miror, const int& SRVIdx, const float& Alpha, const float& Scale)
+			:leftUpPos(LeftUpPos), rightBottomPos(RightBottomPos), miror({ Miror.x ? 1 : 0 ,Miror.y ? 1 : 0 }), srvIdx(SRVIdx), alpha(Alpha), scale(Scale) {}
 	};
 
 	class Img
@@ -26,7 +28,8 @@ class AfterImg
 		Vec2<float>pos;
 		const int lifeSpan;
 		int life = 0;
-		float alpha = 1.0f;
+		float alpha = MAX_ALPHA;
+		float scale = 1.0f;
 		int handle;
 		Vec2<float>graphSize;
 		Vec2<bool>miror;

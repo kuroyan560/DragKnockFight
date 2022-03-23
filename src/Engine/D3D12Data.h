@@ -4,6 +4,7 @@
 #include <dxgi1_6.h>
 #include<wrl.h>
 #include <cassert>
+#include"Vec.h"
 
 #define ASSERT_MSG(msg) {printf("%s", msg); assert(0);}
 
@@ -334,6 +335,10 @@ public:
 	void CopyTexResource(const ComPtr<ID3D12GraphicsCommandList>& CmdList, TextureBuffer* CopySource);
 	const CD3DX12_RESOURCE_DESC& GetDesc() { return texDesc; }
 	void SetUAVHandles(const DescHandles& UAVHandles) { handles.Initialize(UAV, UAVHandles); }
+	Vec2<int>GetGraphSize()
+	{
+		return Vec2<int>(static_cast<int>(texDesc.Width), static_cast<int>(texDesc.Height));
+	}
 };
 
 //レンダーターゲット

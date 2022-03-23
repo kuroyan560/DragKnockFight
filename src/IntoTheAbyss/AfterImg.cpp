@@ -4,6 +4,7 @@
 #include"KuroMath.h"
 
 std::shared_ptr<GraphicsPipeline>AfterImg::PIPELINE;
+const float AfterImg::MAX_ALPHA = 0.1f;
 
 AfterImg::AfterImg()
 {
@@ -27,7 +28,8 @@ AfterImg::AfterImg()
 			InputLayoutParam("POSITION_R_B",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("MIROR",DXGI_FORMAT_R32G32_SINT),
 			InputLayoutParam("SRV_IDX",DXGI_FORMAT_R32_SINT),
-			InputLayoutParam("ALPHA",DXGI_FORMAT_R32_FLOAT)
+			InputLayoutParam("ALPHA",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("SCALE",DXGI_FORMAT_R32_FLOAT)
 		};
 
 		//ルートパラメータ
@@ -43,7 +45,7 @@ AfterImg::AfterImg()
 		};
 
 		//レンダーターゲット描画先情報
-		std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(), AlphaBlendMode_Add) };
+		std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(), AlphaBlendMode_Trans) };
 
 		//パイプライン生成
 		PIPELINE = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
@@ -59,9 +61,10 @@ AfterImg::AfterImg()
 
 void AfterImg::EmitArray(const Vec2<float>& From, const Vec2<float>& To, const int& GraphHandle, const Vec2<float>& GraphSize, const Vec2<bool>& Miror)
 {
-	static const int LIFE_SPAN_MIN = 30;
-	static const int LIFE_SPAN_MAX = 70;
-	static const float SPAN_DIST = 32.0f;
+	static const int LIFE_SPAN_MIN = 10;
+	static const int LIFE_SPAN_MAX = 60;
+	//static const float SPAN_DIST = 32.0f;
+	static const float SPAN_DIST = 10.0f;
 	const int num = From.Distance(To) / SPAN_DIST;
 	const Vec2<float>span = (To - From) / num;
 
@@ -79,7 +82,8 @@ void AfterImg::Draw(const float& ExtRate, const Vec2<float>& Scroll)
 {
 	for (auto itr = imgs.begin(); itr != imgs.end(); ++itr)
 	{
-		itr->alpha = KuroMath::Ease(Out, Quad, itr->life, itr->lifeSpan, 1.0f, 0.0f);
+		itr->alpha = KuroMath::Ease(Out, Quad, itr->life, itr->lifeSpan, MAX_ALPHA, 0.0f);
+		//itr->scale = KuroMath::Ease(Out, Quad, itr->life, itr->lifeSpan, 1.0f, 0.0f);
 		itr->life++;
 	}
 
@@ -96,7 +100,7 @@ void AfterImg::Draw(const float& ExtRate, const Vec2<float>& Scroll)
 		const Vec2<float>offset = (itr->graphSize * ExtRate).Float();
 		const Vec2<float>leftUp = (itr->pos * ExtRate) - offset - Scroll;
 		const Vec2<float>rightBottom = (itr->pos * ExtRate) + offset - Scroll;
-		vertices.emplace_back(leftUp, rightBottom, itr->miror, itr->handle, itr->alpha);
+		vertices.emplace_back(leftUp, rightBottom, itr->miror, itr->handle, itr->alpha, itr->scale);
 	}
 
 	KuroEngine::Instance().Graphics().SetPipeline(PIPELINE);
