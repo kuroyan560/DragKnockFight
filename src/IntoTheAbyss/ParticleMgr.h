@@ -9,6 +9,10 @@ class VertexBuffer;
 class ComputePipeline;
 class GraphicsPipeline;
 class ConstantBuffer;
+class TextureBuffer;
+class LightManager;
+
+static const enum PARTICLE_TYPE { DASH, FIRST_DASH, BULLET, DOSSUN, HIT_MAP };
 
 class ParticleMgr : public Singleton<ParticleMgr>
 {
@@ -29,10 +33,10 @@ class ParticleMgr : public Singleton<ParticleMgr>
 		float speed;		// 移動速度
 		char isAlive = 0;		// 生存フラグ
 		float scale;
-		Color color;	//色
+		unsigned int texIdx;	//テクスチャ番号
 
 		// 生成処理
-		void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec);
+		void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const int& TexIdx);
 	};
 	struct ZoomAndScroll
 	{
@@ -57,12 +61,20 @@ class ParticleMgr : public Singleton<ParticleMgr>
 	//ズームとスクロールを送信するためのバッファ
 	std::shared_ptr<ConstantBuffer>zoomAndScroll;
 
+	//テクスチャは同じサイズである必要がある
+	static const int TEX_SIZE = 64;
+	static const int SMOKE_NUM = 3;
+	static const enum PARTICLE_TEX { WHITE, SMOKE_0, SMOKE_1, SMOKE_2, TEX_NUM = 9 };
+	std::shared_ptr<TextureBuffer>textures[TEX_NUM];
+
+	int GetTex(const PARTICLE_TYPE& Type);
+
 public:
 	void Init();
 	void Update();
-	void Draw();
+	void Draw(LightManager& LigManager);
 
 	// 生成処理
-	void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const float& par = 1.0f);
-	void GeneratePer(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const float& par = 1.0f, const int& generateCount = 5.0f);
+	void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const PARTICLE_TYPE& Type, const float& par = 1.0f);
+	void GeneratePer(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const PARTICLE_TYPE& Type, const float& par = 1.0f, const int& generateCount = 5.0f);
 };

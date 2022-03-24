@@ -1236,8 +1236,8 @@ void Game::Update()
 			// 弾パーティクルを生成する。
 			//BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
 			//BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
-			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
-			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
+			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec,BULLET);
+			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec,BULLET);
 
 			BulletMgr::Instance()->GetBullet(i)->Init();
 		}
@@ -1564,16 +1564,12 @@ void Game::Draw()
 		auraBlock[i]->Draw();
 	}
 
-	player.Draw(ligMgr);
-
 
 	player.Draw(ligMgr);
-
-	ParticleMgr::Instance()->Draw();
-
-
+	ParticleMgr::Instance()->Draw(ligMgr);
 	if (sceneBlackFlag || sceneLightFlag)
 	{
 		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), true, AlphaBlendMode_Trans);
 	}
+
 }

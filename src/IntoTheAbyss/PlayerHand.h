@@ -19,6 +19,7 @@ public:
 	Vec2<float> vel;				// 弾を打った時の移動量
 	Vec2<float> sightPos;			// 照準座標
 	Vec2<float> drawPos;			// Draw You
+	Vec2<float> muzzlePos;			// 銃口の座標
 	float armDistance;		// プレイヤーの中心からの距離 右手と左手で変えるため
 	float inputAngle;		// 入力された角度
 	bool isFirstShot;		// 最初の一発は強い反動フラグ
