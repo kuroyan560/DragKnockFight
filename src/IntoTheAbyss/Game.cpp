@@ -580,7 +580,7 @@ void Game::Init()
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
-	
+
 	alphaValue = 0;
 
 	ParticleMgr::Instance()->Init();
@@ -808,28 +808,28 @@ void Game::Update()
 					case Game::DOOR_UP_GORIGHT:
 						ScrollMgr::Instance()->WarpScroll(responePos);
 						initJumpFlag = false;
-						player.centerPos = { responePos.x + 50.0f , responePos.y - 50.0f * 2.0f };
+						player.Init({ responePos.x + 50.0f , responePos.y - 50.0f * 2.0f });
 						break;
 
 					case Game::DOOR_UP_GOLEFT:
 						ScrollMgr::Instance()->WarpScroll(responePos);
 						initJumpFlag = false;
-						player.centerPos = { responePos.x + 50.0f , responePos.y - 50.0f * 2.0f };
+						player.Init({ responePos.x + 50.0f , responePos.y - 50.0f * 2.0f });
 						break;
 
 					case Game::DOOR_DOWN:
-						player.centerPos = { responePos.x, responePos.y - 50.0f * 2.0f };
+						player.Init({ responePos.x, responePos.y - 50.0f * 2.0f });
 						ScrollMgr::Instance()->WarpScroll(player.centerPos);
 						break;
 
 					case Game::DOOR_LEFT:
 						ScrollMgr::Instance()->WarpScroll(responePos);
-						player.centerPos = { responePos.x + 50.0f * 3.0f, responePos.y };
+						player.Init({ responePos.x + 50.0f * 3.0f, responePos.y });
 						break;
 
 					case Game::DOOR_RIGHT:
 						ScrollMgr::Instance()->WarpScroll(responePos);
-						player.centerPos = { responePos.x - 50.0f * 3.0f, responePos.y };
+						player.Init({ responePos.x - 50.0f * 3.0f, responePos.y });
 						break;
 
 					case Game::DOOR_Z:
@@ -946,7 +946,7 @@ void Game::Update()
 			else
 			{
 				//ドア座標を入手
-				Vec2<float>doorPos = GetDoorPos(doorNumber, mapData);
+				Vec2<float>doorPos(GetDoorPos(doorNumber, mapData));
 				//プレイヤーがリスポーンする座標を入手
 				responePos = GetPlayerResponePos(stageNum, roomNum, doorNumber, doorPos, &door);
 
@@ -973,6 +973,9 @@ void Game::Update()
 					player.Init(responePos);
 					break;
 				case Game::DOOR_Z:
+					break;
+
+				case Game::DOOR_NONE:
 					break;
 				default:
 					break;
@@ -1011,10 +1014,9 @@ void Game::Update()
 	//シーン遷移-----------------------
 
 
-	if (UsersInput::Instance()->OnTrigger(DIK_U))
+	if (UsersInput::Instance()->OnTrigger(START))
 	{
-		player.isDead = true;
-		sceneBlackFlag = true;
+		SelectStage::Instance()->resetStageFlag = true;
 	}
 
 
@@ -1046,15 +1048,15 @@ void Game::Update()
 
 		// ドッスンを生成。
 		for (int index = 0; index < dossunCount; ++index) {
-
-			DossunBlock dossunBuff;
-			dossunBuff.Generate(dossunData[index]->startPos, dossunData[index]->endPos, dossunData[index]->size, dossunData[index]->type);
-
-			// データを追加。
-			dossunBlock.push_back(dossunBuff);
-
-			SightCollisionStorage::Instance()->data.push_back(dossunBlock[dossunBlock.size() - 1].sightData);
-
+			//始点と終点が一緒なら
+			if (dossunData[index]->startPos != dossunData[index]->endPos)
+			{
+				DossunBlock dossunBuff;
+				dossunBuff.Generate(dossunData[index]->startPos, dossunData[index]->endPos, dossunData[index]->size, dossunData[index]->type);
+				// データを追加。
+				dossunBlock.push_back(dossunBuff);
+				SightCollisionStorage::Instance()->data.push_back(dossunBlock[dossunBlock.size() - 1].sightData);
+			}
 		}
 
 
@@ -1088,7 +1090,7 @@ void Game::Update()
 				{
 					if (mapData[y][x] == MAPCHIP_BLOCK_START)
 					{
-						player.centerPos = { (float)x * 50.0f,(float)y * 50.0f };
+						player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
 						responeFlag = true;
 						break;
 					}
@@ -1104,7 +1106,7 @@ void Game::Update()
 					{
 						if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
 						{
-							player.centerPos = { (float)x * 50.0f,(float)y * 50.0f };
+							player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
 							ScrollMgr::Instance()->WarpScroll(player.centerPos);
 							break;
 						}
@@ -1562,12 +1564,12 @@ void Game::Draw()
 		auraBlock[i]->Draw();
 	}
 
+
+	player.Draw(ligMgr);
+	ParticleMgr::Instance()->Draw(ligMgr);
 	if (sceneBlackFlag || sceneLightFlag)
 	{
 		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), true, AlphaBlendMode_Trans);
 	}
 
-	player.Draw(ligMgr);
-
-	ParticleMgr::Instance()->Draw(ligMgr);
 }

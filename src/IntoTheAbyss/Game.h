@@ -82,6 +82,7 @@ class Game
 	float gravity;
 	E_DOOR_DIR doorDir;
 
+
 	std::vector<DrawMap>drawMap;
 
 	//ライト情報
@@ -94,6 +95,7 @@ class Game
 	const float SPOT_LIG_Z = -20.0f;
 	Light::Spot spotLig;
 	Light::HemiSphere hemiLig;
+
 
 public:
 	int stageNum = 0;//ステージ番号
