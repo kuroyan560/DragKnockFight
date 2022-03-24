@@ -114,7 +114,7 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 
 #include"DrawFunc.h"
 #include"DrawFunc_Shadow.h"
-void PlayerHand::Draw(LightManager &LigManager, const Vec2<float> &ExtRate, const int &GraphHandle, const float &InitAngle, const Vec2<float> &RotaCenterUV, const bool &DRAW_CURSOR)
+void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool& DRAW_CURSOR)
 {
 	/*-- ï`âÊèàóù --*/
 	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
@@ -142,6 +142,7 @@ void PlayerHand::Draw(LightManager &LigManager, const Vec2<float> &ExtRate, cons
 	{
 		DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), true);
 	}
+
 }
 
 void PlayerHand::Shot(const Vec2<float>& forwardVec, const bool& isFirstShot)
@@ -450,7 +451,7 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 	// ç∂ï˚å¸
 	if (IsIntersected(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP, WINDOW_LEFTDOWN)) {
 		pair<Vec2<float>, float> buff;
-		buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP,WINDOW_LEFTDOWN);
+		buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP, WINDOW_LEFTDOWN);
 		buff.second = Vec2<float>(buff.first - handSegmentStart).Length();
 		shortestPoints.push_back(buff);
 	}
