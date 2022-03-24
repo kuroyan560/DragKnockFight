@@ -7,7 +7,7 @@ struct Vertex
     float speed;
     min16int isAlive;
     float scale;
-    float4 color;
+    uint texIdx;
 };
 
 RWStructuredBuffer<Vertex> vertices : register(u0);
@@ -100,15 +100,16 @@ struct VSInput
     float speed : SPEED;
     min16int isAlive : ALIVE;
     float scale : SCALE;
-    float4 color : COLOR;
+    uint texIdx : TEX_IDX;
 };
 
 struct VSOutput
 {
     float4 pos : POSITION;
-    float drawScale : DRAW_SCALE;
-    float4 color : COLOR;
+    float alpha : ALPHA;
     min16int isAlive : ALIVE;
+    float drawScale : DRAW_SCALE;
+    uint texIdx : TEX_IDX;
 };
 
 VSOutput VSmain(VSInput input)
@@ -117,17 +118,19 @@ VSOutput VSmain(VSInput input)
     output.pos = input.pos;
     output.pos *= zoom;
     output.pos.xy -= scroll;
-    output.drawScale = input.scale / 2.0f * zoom;
-    output.color = input.color;
-    //output.color.w = input.alpha / 255.0f;
+    output.alpha = input.alpha;
     output.isAlive = input.isAlive;
+    output.drawScale = input.scale / 2.0f * zoom;
+    output.texIdx = input.texIdx;
     return output;
 }
 
 struct GSOutput
 {
     float4 pos : SV_POSITION;
-    float4 color : COLOR;
+    float2 uv : TEXCOORD;
+    float alpha : ALPHA;
+    uint texIdx : TEX_IDX;
 };
 
 [maxvertexcount(4)]
@@ -140,13 +143,15 @@ void GSmain(
         return;
     
     GSOutput element;
-    element.color = input[0].color;
+    element.alpha = input[0].alpha;
+    element.texIdx = input[0].texIdx;
         
     //ç∂â∫
     element.pos = input[0].pos;
     element.pos.x -= input[0].drawScale;
     element.pos.y += input[0].drawScale;
     element.pos = mul(parallelProjMat, element.pos);
+    element.uv = float2(0.0f, 1.0f);
     output.Append(element);
     
     //ç∂è„
@@ -154,6 +159,7 @@ void GSmain(
     element.pos.x -= input[0].drawScale;
     element.pos.y -= input[0].drawScale;
     element.pos = mul(parallelProjMat, element.pos);
+    element.uv = float2(0.0f, 0.0f);
     output.Append(element);
     
      //âEâ∫
@@ -161,6 +167,7 @@ void GSmain(
     element.pos.x += input[0].drawScale;
     element.pos.y += input[0].drawScale;
     element.pos = mul(parallelProjMat, element.pos);
+    element.uv = float2(1.0f, 1.0f);
     output.Append(element);
     
     //âEè„
@@ -168,12 +175,43 @@ void GSmain(
     element.pos.x += input[0].drawScale;
     element.pos.y -= input[0].drawScale;
     element.pos = mul(parallelProjMat, element.pos);
+    element.uv = float2(1.0f, 0.0f);
     output.Append(element);
 }
 
+Texture2D<float4> tex0 : register(t0);
+Texture2D<float4> tex1 : register(t1);
+Texture2D<float4> tex2 : register(t2);
+Texture2D<float4> tex3 : register(t3);
+Texture2D<float4> tex4 : register(t4);
+Texture2D<float4> tex5 : register(t5);
+Texture2D<float4> tex6 : register(t6);
+Texture2D<float4> tex7 : register(t7);
+Texture2D<float4> tex8 : register(t8);
+SamplerState smp : register(s0);
+
 float4 PSmain(GSOutput input) : SV_TARGET
 {
-    return input.color;
+    float4 color;
+    if (input.texIdx == 0)
+        color = tex0.Sample(smp, input.uv);
+    if (input.texIdx == 1)
+        color = tex1.Sample(smp, input.uv);
+    if (input.texIdx == 2)
+        color = tex2.Sample(smp, input.uv);
+    if (input.texIdx == 3)
+        color = tex3.Sample(smp, input.uv);
+    if (input.texIdx == 4)
+        color = tex4.Sample(smp, input.uv);
+    if (input.texIdx == 5)
+        color = tex5.Sample(smp, input.uv);
+    if (input.texIdx == 6)
+        color = tex6.Sample(smp, input.uv);
+    if (input.texIdx == 7)
+        color = tex7.Sample(smp, input.uv);
+    if (input.texIdx == 8)
+        color = tex8.Sample(smp, input.uv);
+    return float4(color.xyz, input.alpha * color.w);
 }
 
 float4 main(float4 pos : POSITION) : SV_POSITION
