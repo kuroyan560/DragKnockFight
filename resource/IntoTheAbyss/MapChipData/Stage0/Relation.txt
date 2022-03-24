@@ -19,10 +19,10 @@ roomNum 4
 roomNum 5
 
 roomNum 6
-link 0 7
+link 5 7
 
 roomNum 7
-link 0 6
+link 5 6
 link 1 8
 
 roomNum 8

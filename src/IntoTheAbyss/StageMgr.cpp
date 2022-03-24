@@ -23,6 +23,7 @@ StageMgr::StageMgr()
 	mapChipMemoryData[MAPCHIP_TYPE_TOCH] = { 30,39 };
 	mapChipMemoryData[MAPCHIP_TYPE_THOWNP] = { 50,79 };
 	mapChipMemoryData[MAPCHIP_TYPE_BUBBLE] = { 80,89 };
+	mapChipMemoryData[MAPCHIP_TYPE_SECRET_DOOR] = { 90,99 };
 
 
 	//LoadDivGraph("Resource/chip_sheet.png", 18, 6, 3, 32, 32, mapChipGraphHandle.data());
@@ -212,7 +213,7 @@ StageMgr::StageMgr()
 
 
 					bool skipFlag = false;		//ドアをを探索したかどうかを示すフラグ
-					for (int doorNumber = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min; doorNumber < mapChipMemoryData[MAPCHIP_TYPE_DOOR].max; ++doorNumber)
+					for (int doorNumber = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min; doorNumber < mapChipMemoryData[MAPCHIP_TYPE_DOOR].max - 5; ++doorNumber)
 					{
 						int arrayNum = doorNumber - mapChipMemoryData[MAPCHIP_TYPE_DOOR].min;//ドア番号から配列の添え字用に数値を調整
 
@@ -899,7 +900,6 @@ StageMgr::StageMgr()
 const RoomMapChipArray &StageMgr::GetMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	return allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
-
 }
 
 const int &StageMgr::GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER)
@@ -912,6 +912,7 @@ const int &StageMgr::GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NU
 			return relationRoomData[STAGE_NUMBER][ROOM_NUMBER][doorIndex].nextRoomNumber;
 		}
 	}
+	return -1;
 }
 
 const SizeData StageMgr::GetMapChipSizeData(MapChipData TYPE)

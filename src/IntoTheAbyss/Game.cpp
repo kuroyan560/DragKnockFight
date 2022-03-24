@@ -690,86 +690,83 @@ void Game::Update()
 		}
 	}
 
-	/*===== 更新処理 =====*/
 
-	//ドア判定-----------------------
-	SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
-	for (int i = chipMemorySize.min; i < chipMemorySize.max; ++i)
+
 	{
-		//触れているドアによって座標変更-----------------------
-
-		array<Vec2<float>, DOOR_MAX> setPlayerPos;
-		setPlayerPos[DOOR_UP_GORIGHT] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y - 30.0f) / 50.0f);
-		setPlayerPos[DOOR_UP_GOLEFT] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y - 30.0f) / 50.0f);
-
-		setPlayerPos[DOOR_DOWN] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y + 61.0f) / 50.0f);
-		setPlayerPos[DOOR_LEFT] = Vec2<float>((player.centerPos.x - 60.0f) / 50.0f, player.centerPos.y / 50.0f);
-		setPlayerPos[DOOR_RIGHT] = Vec2<float>((player.centerPos.x + 60.0f) / 50.0f, player.centerPos.y / 50.0f);
-		setPlayerPos[DOOR_NONE] = Vec2<float>(player.centerPos.x / 50.0f, player.centerPos.y / 50.0f);
-		//触れているドアによって座標変更-----------------------
-
-		//触れているドアによって、どこの座標を基準にするか変える
-		Vec2<float> playerChip = setPlayerPos[doorDir];
-		if (playerChip.x <= 0.0f)
+		//ドア判定-----------------------
+		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
+		for (int i = chipMemorySize.min; i < chipMemorySize.max; ++i)
 		{
-			playerChip.x = -1.0f;
+			//触れているドアによって座標変更-----------------------
+			array<Vec2<float>, DOOR_MAX> setPlayerPos;
+			setPlayerPos[DOOR_UP_GORIGHT] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y - 30.0f) / 50.0f);
+			setPlayerPos[DOOR_UP_GOLEFT] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y - 30.0f) / 50.0f);
+
+			setPlayerPos[DOOR_DOWN] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y + 61.0f) / 50.0f);
+			setPlayerPos[DOOR_LEFT] = Vec2<float>((player.centerPos.x - 60.0f) / 50.0f, player.centerPos.y / 50.0f);
+			setPlayerPos[DOOR_RIGHT] = Vec2<float>((player.centerPos.x + 60.0f) / 50.0f, player.centerPos.y / 50.0f);
+			setPlayerPos[DOOR_NONE] = Vec2<float>(player.centerPos.x / 50.0f, player.centerPos.y / 50.0f);
+			//触れているドアによって座標変更-----------------------
+
+			//触れているドアによって、どこの座標を基準にするか変える
+			Vec2<float> playerChip = setPlayerPos[doorDir];
+			if (playerChip.x <= 0.0f)
+			{
+				playerChip.x = -1.0f;
+			}
+			if (playerChip.y <= 0.0f)
+			{
+				playerChip.y = -1.0f;
+			}
+
+			int nowChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, playerChip);
+			int prevChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, prevPlayerChipPos);
+
+
+			bool tochDoorFlag = chipMemorySize.min <= giveDoorNumber && giveDoorNumber <= chipMemorySize.max;
+			if (tochDoorFlag)
+			{
+				//ドア座標を入手
+				Vec2<float>doorPos = GetDoorPos(giveDoorNumber, mapData);
+				//プレイヤーがリスポーンする座標を入手
+				GetPlayerResponePos(stageNum, roomNum, giveDoorNumber, doorPos, &doorDir, true);
+			}
+
+			//奥扉判定-----------------------
+			Vec2<float> rightCehck(playerChip.x + 1, playerChip.y);
+			int rightChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, rightCehck);
+			Vec2<float> leftCehck(playerChip.x - 1, playerChip.y);
+			int leftChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, leftCehck);
+			bool zDoorFlag = rightChip == 0 && leftChip == 0;
+			//奥扉判定-----------------------
+
+
+
+			//どのドアに触れたか
+			if (nowChip == i)
+			{
+				giveDoorNumber = i;
+			}
+
+			bool goToNextStageFlag = nowChip == -1;
+			//ドアとの判定
+			//最後に通ったドア番号を保存、シーン遷移開始、プレイヤーのカーソル描画無効
+			if (goToNextStageFlag && !zDoorFlag && !sceneBlackFlag && !sceneLightFlag && tochDoorFlag)
+			{
+				sceneBlackFlag = true;
+				doorNumber = giveDoorNumber;
+				player.drawCursorFlag = false;
+			}
+			else if (goToNextStageFlag && zDoorFlag && UsersInput::Instance()->OnTrigger(XBOX_BUTTON::B) && !sceneBlackFlag && !sceneLightFlag && tochDoorFlag)
+			{
+				sceneBlackFlag = true;
+				doorNumber = giveDoorNumber;
+				player.drawCursorFlag = false;
+			}
+			prevPlayerChipPos = playerChip;
 		}
-		if (playerChip.y <= 0.0f)
-		{
-			playerChip.y = -1.0f;
-		}
-
-		int nowChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, playerChip);
-		int prevChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, prevPlayerChipPos);
-
-
-		bool tochDoorFlag = chipMemorySize.min <= giveDoorNumber && giveDoorNumber <= chipMemorySize.max;
-		if (tochDoorFlag)
-		{
-			//ドア座標を入手
-			Vec2<float>doorPos = GetDoorPos(giveDoorNumber, mapData);
-			//プレイヤーがリスポーンする座標を入手
-			GetPlayerResponePos(stageNum, roomNum, giveDoorNumber, doorPos, &doorDir, true);
-		}
-
-
-
-
-		//どのドアに触れたか
-		if (nowChip == i)
-		{
-			giveDoorNumber = i;
-		}
-
-
-		//奥扉判定-----------------------
-		Vec2<float> rightCehck(playerChip.x + 1, playerChip.y);
-		int rightChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, rightCehck);
-		Vec2<float> leftCehck(playerChip.x - 1, playerChip.y);
-		int leftChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, leftCehck);
-		bool zDoorFlag = rightChip == 0 && leftChip == 0;
-		//奥扉判定-----------------------
-
-
-		bool goToNextStageFlag = nowChip == -1;
-		//ドアとの判定
-		//最後に通ったドア番号を保存、シーン遷移開始、プレイヤーのカーソル描画無効
-		if (goToNextStageFlag && !zDoorFlag && !sceneBlackFlag && !sceneLightFlag && tochDoorFlag)
-		{
-			sceneBlackFlag = true;
-			doorNumber = giveDoorNumber;
-			player.drawCursorFlag = false;
-		}
-		else if (goToNextStageFlag && zDoorFlag && UsersInput::Instance()->OnTrigger(XBOX_BUTTON::B) && !sceneBlackFlag && !sceneLightFlag && tochDoorFlag)
-		{
-			sceneBlackFlag = true;
-			doorNumber = giveDoorNumber;
-			player.drawCursorFlag = false;
-		}
-		prevPlayerChipPos = playerChip;
+		//ドア判定-----------------------
 	}
-	//ドア判定-----------------------
-
 
 
 	//シーン遷移-----------------------
@@ -792,8 +789,11 @@ void Game::Update()
 			{
 				if (!player.isDead)
 				{
+					SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
 					//マップ情報更新
 					int localRoomNum = StageMgr::Instance()->GetRelationData(stageNum, roomNum, doorNumber - chipMemorySize.min);
+
+
 					mapData = StageMgr::Instance()->GetMapChipData(stageNum, localRoomNum);
 					//ドア座標を入手
 					Vec2<float>doorPos = GetDoorPos(doorNumber, mapData);
