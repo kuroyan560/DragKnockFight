@@ -115,6 +115,7 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	teleFlashTimer = TELE_FLASH_TIME;
 
 	firstRecoilParticleTimer = 0;
+	drawCursorFlag = true;
 
 }
 
