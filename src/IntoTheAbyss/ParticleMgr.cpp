@@ -78,6 +78,11 @@ ParticleMgr::ParticleMgr()
 		{
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"平行投影行列定数バッファ"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"ズームとスクロール"),
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"アクティブ中のライト数バッファ"),
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"ディレクションライト情報 (構造化バッファ)"),
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"ポイントライト情報 (構造化バッファ)"),
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"スポットライト情報 (構造化バッファ)"),
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"天球ライト情報 (構造化バッファ)"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 0"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 1"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 2"),
@@ -94,6 +99,8 @@ ParticleMgr::ParticleMgr()
 		{
 			//バックバッファのフォーマット、アルファブレンド
 			RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(),AlphaBlendMode_Trans),
+			//エミッシブ
+			RenderTargetInfo(DXGI_FORMAT_R32G32B32A32_FLOAT,AlphaBlendMode_Trans)
 		};
 
 		//パイプライン生成
@@ -136,7 +143,8 @@ void ParticleMgr::Update()
 
 #include"ScrollMgr.h"
 #include"ShakeMgr.h"
-void ParticleMgr::Draw()
+#include"LightManager.h"
+void ParticleMgr::Draw(LightManager& LigManager)
 {
 	ZoomAndScroll info;
 	info.zoom = ScrollMgr::Instance()->zoom;
@@ -147,11 +155,16 @@ void ParticleMgr::Draw()
 	info.scroll = scrollShakeZoom;
 	zoomAndScroll->Mapping(&info);
 
-	std::vector<DESC_HANDLE_TYPE>descTypes = { CBV,CBV };
+	std::vector<DESC_HANDLE_TYPE>descTypes = { CBV,CBV,CBV,SRV,SRV,SRV,SRV };
 	std::vector<std::shared_ptr<DescriptorData>>descDatas =
 	{
 		KuroEngine::Instance().GetParallelMatProjBuff(),
 		zoomAndScroll,
+		LigManager.GetLigNumInfo(),
+		LigManager.GetLigInfo(Light::DIRECTION),	//ディレクションライト
+		LigManager.GetLigInfo(Light::POINT),	//ポイントライト
+		LigManager.GetLigInfo(Light::SPOT),	//スポットライト
+		LigManager.GetLigInfo(Light::HEMISPHERE),	//天球ライト
 	};
 	for (int i = 0; i < PARTICLE_TEX::TEX_NUM; ++i)
 	{
@@ -162,7 +175,7 @@ void ParticleMgr::Draw()
 	KuroEngine::Instance().Graphics().SetPipeline(gPipeline);
 	KuroEngine::Instance().Graphics().ObjectRender(buff,
 		descDatas,
-		descTypes, 0.0f, true);
+		descTypes, 1.0f, true);
 }
 
 int ParticleMgr::GetTex(const PARTICLE_TYPE& Type)

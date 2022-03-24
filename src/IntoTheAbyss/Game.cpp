@@ -1569,5 +1569,5 @@ void Game::Draw()
 
 	player.Draw(ligMgr);
 
-	ParticleMgr::Instance()->Draw();
+	ParticleMgr::Instance()->Draw(ligMgr);
 }
