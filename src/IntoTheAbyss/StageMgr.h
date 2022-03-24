@@ -194,6 +194,8 @@ private:
 
 	std::vector<StageMapChipDrawData> allMapChipDrawData;//マップチップの描画情報
 
+	static const int SECRET_DOOR_NUMBER = 5;
+
 	array<int, 30> mapChipGraphHandle;
 	enum
 	{
@@ -274,6 +276,7 @@ private:
 	{
 		bool outSideFlag = *CHIP_NUMBER == -1;
 		bool isWallFlag = false;
+		bool doorFlag = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min <= *CHIP_NUMBER && *CHIP_NUMBER <= mapChipMemoryData[MAPCHIP_TYPE_DOOR].max;
 
 		//チップ番号が1から9以下なら壁判定を出す
 		if (1 <= *CHIP_NUMBER && *CHIP_NUMBER <= 9)
@@ -281,7 +284,7 @@ private:
 			isWallFlag = true;
 		}
 
-		if (isWallFlag || outSideFlag)
+		if (isWallFlag || outSideFlag || doorFlag)
 		{
 			*CHIP_NUMBER = 1;
 		}
@@ -291,6 +294,8 @@ private:
 	inline void AlimentSpaceNumber(int *CHIP_NUMBER)
 	{
 		bool isSpaceFlag = false;
+		bool doorFlag = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min <= *CHIP_NUMBER && *CHIP_NUMBER <= mapChipMemoryData[MAPCHIP_TYPE_DOOR].max;
+
 
 		//チップ番号が0もしくは10以上なら空白判定を出す
 		if (*CHIP_NUMBER == 0 || 10 <= *CHIP_NUMBER)
@@ -298,7 +303,8 @@ private:
 			isSpaceFlag = true;
 		}
 
-		if (isSpaceFlag)
+		//ドア番号は壁として扱う為空白にしない
+		if (isSpaceFlag && !doorFlag)
 		{
 			*CHIP_NUMBER = 0;
 		}
