@@ -1234,8 +1234,8 @@ void Game::Update()
 			// 弾パーティクルを生成する。
 			//BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
 			//BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
-			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
-			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
+			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec,BULLET);
+			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec,BULLET);
 
 			BulletMgr::Instance()->GetBullet(i)->Init();
 		}
@@ -1569,5 +1569,5 @@ void Game::Draw()
 
 	player.Draw(ligMgr);
 
-	ParticleMgr::Instance()->Draw();
+	ParticleMgr::Instance()->Draw(ligMgr);
 }

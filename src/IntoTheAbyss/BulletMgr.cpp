@@ -115,7 +115,7 @@ void BulletMgr::CheckHit(const vector<vector<int>>& mapData, vector<Bubble>& bub
 
 			// 弾パーティクルを生成する。
 			//BulletParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec);
-			ParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec);
+			ParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec, BULLET);
 
 			bullets[index]->Init();
 			continue;
@@ -125,7 +125,7 @@ void BulletMgr::CheckHit(const vector<vector<int>>& mapData, vector<Bubble>& bub
 
 			// 弾パーティクルを生成する。
 			//BulletParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec);
-			ParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec);
+			ParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec, BULLET);
 
 			bullets[index]->Init();
 			continue;
@@ -136,7 +136,7 @@ void BulletMgr::CheckHit(const vector<vector<int>>& mapData, vector<Bubble>& bub
 
 			// 弾パーティクルを生成する。
 			//BulletParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec);
-			ParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec);
+			ParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec, BULLET);
 
 			bullets[index]->Init();
 
@@ -167,7 +167,7 @@ void BulletMgr::CheckHit(const vector<vector<int>>& mapData, vector<Bubble>& bub
 
 			// 弾のぱーてぃくるを生成する。
 			//BulletParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec);
-			ParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec);
+			ParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec, BULLET);
 
 			// バブルを動かす。
 			bubble[bubbleIndex].addEasingTimer = 30.0f;

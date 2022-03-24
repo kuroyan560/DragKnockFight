@@ -7,7 +7,7 @@
 class AfterImg
 {
 	static std::shared_ptr<GraphicsPipeline>PIPELINE;
-	static const int MAX_NUM = 100;
+	static const int MAX_NUM = 1000;
 	static const float MAX_ALPHA;
 	class Vertex
 	{
