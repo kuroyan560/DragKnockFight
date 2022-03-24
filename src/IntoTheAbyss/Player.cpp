@@ -6,7 +6,7 @@
 #include "MapChipCollider.h"
 #include "MovingBlockMgr.h"
 #include "MovingBlock.h"
-#include "BulletParticleMgr.h"
+//#include "BulletParticleMgr.h"
 #include "Collider.h"
 #include <cmath>
 
@@ -16,6 +16,7 @@
 #include"DrawFunc_Shadow.h"
 #include"DrawFunc_Color.h"
 #include"WinApp.h"
+#include "ParticleMgr.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -177,13 +178,19 @@ void Player::Update(const vector<vector<int>> mapData)
 	if (mapX >= mapData[mapY].size()) mapX = mapData[mapY].size() - 1;
 
 	// 一個上のマップチップがブロックで、X軸方向の移動量が一定以上だったらパーティクルを生成する。
-	if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
+	//if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
+	if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
 
 	// 壁ズリのパーティクルを生成。
-	if (isSlippingWall[PLAYER_TOP]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
-	if (isSlippingWall[PLAYER_RIGHT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x + GetPlayerGraphSize().x, centerPos.y), Vec2<float>(1, 0));
-	if (isSlippingWall[PLAYER_BOTTOM]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y), Vec2<float>(0, 1));
-	if (isSlippingWall[PLAYER_LEFT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x - GetPlayerGraphSize().x, centerPos.y), Vec2<float>(-1, 0));
+	//if (isSlippingWall[PLAYER_TOP]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
+	//if (isSlippingWall[PLAYER_RIGHT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x + GetPlayerGraphSize().x, centerPos.y), Vec2<float>(1, 0));
+	//if (isSlippingWall[PLAYER_BOTTOM]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y), Vec2<float>(0, 1));
+	//if (isSlippingWall[PLAYER_LEFT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x - GetPlayerGraphSize().x, centerPos.y), Vec2<float>(-1, 0));
+	if (isSlippingWall[PLAYER_TOP]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
+	if (isSlippingWall[PLAYER_RIGHT]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x + GetPlayerGraphSize().x, centerPos.y), Vec2<float>(1, 0));
+	if (isSlippingWall[PLAYER_BOTTOM]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y), Vec2<float>(0, 1));
+	if (isSlippingWall[PLAYER_LEFT]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x - GetPlayerGraphSize().x, centerPos.y), Vec2<float>(-1, 0));
+
 
 	// 壁ズリフラグを初期化。
 	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
@@ -226,25 +233,30 @@ void Player::Update(const vector<vector<int>> mapData)
 	anim.Update();
 
 
-	//// 最初の一発のタイマーが起動していたらパーティクルを生成する。
-	//if (0 < firstRecoilParticleTimer) {
+	// 最初の一発のタイマーが起動していたらパーティクルを生成する。
+	if (0 < firstRecoilParticleTimer) {
 
-	//	// 移動している方向を求める。
-	//	Vec2<float> invForwardVec = -vel;
+		// 移動している方向を求める。
+		Vec2<float> invForwardVec = -vel;
 
-	//	// 最高速度からのパーセンテージを求める。
-	//	float per = (float)firstRecoilParticleTimer / (float)FIRST_SHOT_RECOIL_PARTICLE_TIMER;
+		// 最高速度からのパーセンテージを求める。
+		float per = (float)firstRecoilParticleTimer / (float)FIRST_SHOT_RECOIL_PARTICLE_TIMER;
 
-	//	// 正規化する。
-	//	invForwardVec.Normalize();
+		// 正規化する。
+		invForwardVec.Normalize();
 
-	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
-	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
-	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
-	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
 
-	//	--firstRecoilParticleTimer;
-	//}
+		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+
+		--firstRecoilParticleTimer;
+	}
 
 	//テレポート時のフラッシュのタイマー計測
 	if (teleFlashTimer < TELE_FLASH_TIME)teleFlashTimer++;
@@ -294,8 +306,7 @@ void Player::Draw(LightManager& LigManager)
 	//テレポート時のフラッシュ
 	Color teleFlashCol;
 	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, teleFlashTimer, TELE_FLASH_TIME, 1.0f, 0.0f);
-	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f,
-		bodyTex, teleFlashCol);
+	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
 
 	if (playerDir == RIGHT)
 	{
@@ -472,6 +483,10 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 	/*===== 短槍の当たり判定 =====*/
 
+	// 時間停止の短槍とドッスンブロックが当たっているかを保存する変数
+	bool isHitTeleportPikeDossun = false;
+	int hitTeleportPikeIndex = 0;
+
 	{
 
 		// 瞬間移動の短槍の当たり判定を行う。
@@ -490,6 +505,26 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
 			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_RIGHT);
 			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+
+		}
+
+		// 時間停止の短槍とドッスンブロックの当たり判定を行う。
+		const int DOSSUN_COUNT = dossun.size();
+		for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+			//if (rHand->teleportPike.isHitWall) continue;
+
+			// まずは当たっているかをチェックする。
+			if (fabs(rHand->teleportPike.pos.x - dossun[index].pos.x) > rHand->teleportPike.SCALE + dossun[index].size.x) continue;
+			if (fabs(rHand->teleportPike.pos.y - dossun[index].pos.y) > rHand->teleportPike.SCALE + dossun[index].size.y) continue;
+
+			// 瞬間移動の短槍に壁にあたったフラグを付ける。
+			rHand->teleportPike.isHitWall = true;
+
+			rHand->teleportPike.gimmickVel = dossun[index].moveDir * Vec2<float>(dossun[index].speed, dossun[index].speed);
+
+			isHitTeleportPikeDossun = true;
+			hitTeleportPikeIndex = index;
 
 		}
 
@@ -512,7 +547,6 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		}
 
 		// 時間停止の短槍とドッスンブロックの当たり判定を行う。
-		const int DOSSUN_COUNT = dossun.size();
 		for (int index = 0; index < DOSSUN_COUNT; ++index) {
 
 			if (lHand->timeStopPike.isHitWall) continue;
@@ -619,6 +653,12 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			// 最初の一発フラグを大きくする。
 			lHand->isFirstShot = false;
 			rHand->isFirstShot = false;
+
+		}
+		else if (isHitTeleportPikeDossun && hitTeleportPikeIndex == index) {
+
+			// ドッスンの移動量タイマーを更新。
+			dossun[index].isHitPlayer = true;
 
 		}
 		else {
@@ -1267,7 +1307,7 @@ void Player::Input(const vector<vector<int>> mapData)
 
 		}
 		// ビーコンが発射されていたら。
-		else if (rHand->teleportPike.isActive && (rHand->teleportPike.isHitWall || rHand->teleportPike.isHitWindow) && !isPrevFrameShotBeacon) {
+		else if (rHand->teleportPike.isActive && !isPrevFrameShotBeacon) {
 
 			auto vec = rHand->teleportPike.pos - centerPos;
 

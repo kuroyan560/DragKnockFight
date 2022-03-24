@@ -104,11 +104,13 @@ public:
 	const DXGI_FORMAT& GetBackBuffFormat() { return backBuffFormat; }
 	const std::shared_ptr<RenderTarget>& GetBackBuffRenderTarget() { return swapchain->GetBackBufferRenderTarget(); }
 
+	//ディスクリプタデータヒープのセット(コンピュートシェーダーを利用するときはユーザーからも呼び出せるように)
+	void SetDescHeaps();
 	//レンダリング（D3D12AppUserを継承した KuroEngine 以外では呼び出せない）
 	void Render(D3D12AppUser* User);
 
 	//頂点バッファ生成
-	std::shared_ptr<VertexBuffer>GenerateVertexBuffer(const size_t& VertexSize, const int& VertexNum, void* InitSendData = nullptr, const char* Name = nullptr);
+	std::shared_ptr<VertexBuffer>GenerateVertexBuffer(const size_t& VertexSize, const int& VertexNum, void* InitSendData = nullptr, const char* Name = nullptr, const bool& RWStructuredBuff = false);
 	//インデックスバッファ生成
 	std::shared_ptr<IndexBuffer>GenerateIndexBuffer(const int& IndexNum, void* InitSendData = nullptr, const char* Name = nullptr, const DXGI_FORMAT& IndexFormat = DXGI_FORMAT_R32_UINT);
 

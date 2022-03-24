@@ -3,7 +3,7 @@
 #include "ShakeMgr.h"
 #include "Collider.h"
 #include "MapChipCollider.h"
-#include "BulletParticleMgr.h"
+#include "ParticleMgr.h"
 
 #include"DrawFunc.h"
 
@@ -285,15 +285,15 @@ void DossunBlock::CheckHit(const vector<vector<int>>& mapData)
 
 				for (int index = 0; index < generateCount; ++index) {
 
-					BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y + (index * div)), moveDir);
+					ParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y + (index * div)), moveDir);
 
 				}
 
 				// ã‚Æ‰º‚É¶¬‚·‚éB
-				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y), moveDir + Vec2<float>(0, -1.0f));
-				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, size.y), moveDir + Vec2<float>(0, 1.0f));
-				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y), Vec2<float>(0.0f, -1.0f));
-				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, size.y), Vec2<float>(0.0f, 1.0f));
+				ParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y), moveDir + Vec2<float>(0, -1.0f));
+				ParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, size.y), moveDir + Vec2<float>(0, 1.0f));
+				ParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, -size.y), Vec2<float>(0.0f, -1.0f));
+				ParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x * moveDir.x, size.y), Vec2<float>(0.0f, 1.0f));
 
 			}
 			else if (0 < fabs(moveDir.y)) {
@@ -304,15 +304,15 @@ void DossunBlock::CheckHit(const vector<vector<int>>& mapData)
 
 				for (int index = 0; index < generateCount; ++index) {
 
-					BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x + (index * div), size.y * moveDir.y), moveDir);
+					ParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x + (index * div), size.y * moveDir.y), moveDir);
 
 				}
 
 				// ã‚Æ‰º‚É¶¬‚·‚éB
-				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x, size.y * moveDir.y), moveDir + Vec2<float>(-1.0f, 0.0f));
-				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x, size.y * moveDir.y), moveDir + Vec2<float>(1.0f, 0.0f));
-				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x, size.y * moveDir.y), Vec2<float>(-1.0f, 0.0f));
-				BulletParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x, size.y * moveDir.y), Vec2<float>(1.0f, 0.0f));
+				ParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x, size.y * moveDir.y), moveDir + Vec2<float>(-1.0f, 0.0f));
+				ParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x, size.y * moveDir.y), moveDir + Vec2<float>(1.0f, 0.0f));
+				ParticleMgr::Instance()->Generate(pos + Vec2<float>(-size.x, size.y * moveDir.y), Vec2<float>(-1.0f, 0.0f));
+				ParticleMgr::Instance()->Generate(pos + Vec2<float>(size.x, size.y * moveDir.y), Vec2<float>(1.0f, 0.0f));
 
 			}
 

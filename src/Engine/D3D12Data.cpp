@@ -74,12 +74,12 @@ void TextureBuffer::CopyTexResource(const ComPtr<ID3D12GraphicsCommandList>& Cmd
 	{
 		ASSERT_MSG("シェーダーリソースをコピーしようとしましたが、フォーマットが違います\n");
 	}
-	resource.CopyGPUResource(CmdList, CopySource->resource);
+	resource->CopyGPUResource(CmdList, *CopySource->resource);
 }
 
 void RenderTarget::Clear(const ComPtr<ID3D12GraphicsCommandList>& CmdList)
 {
-	resource.ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	resource->ChangeBarrier(CmdList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	CmdList->ClearRenderTargetView(
 		handles.GetHandle(RTV),
 		&clearValue[0],
