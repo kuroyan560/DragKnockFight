@@ -1,7 +1,6 @@
 #pragma once
 #include"../KuroEngine.h"
 #include"ScrollMgr.h"
-#include"ErrorHelper.h"
 
 class EventBlock
 {

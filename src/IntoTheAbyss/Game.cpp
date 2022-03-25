@@ -19,8 +19,6 @@
 #include"DrawFunc.h"
 #include"ParticleMgr.h"
 
-#include"ErrorHelper.h"
-
 bool Game::CheckUsedData(std::vector<Vec2<float>> DATA, Vec2<float> DATA2)
 {
 	for (int i = 0; i < DATA.size(); ++i)
@@ -1109,7 +1107,8 @@ void Game::Update()
 
 					//エラー処理を書く
 					std::string errorName = stageString + roomString + chipString + checkString;
-					//KazErrorHelper::Error(errorName);
+					MessageBox(NULL, KuroFunc::GetWideStrFromStr(errorName).c_str(), TEXT("イベントチップ被り"), MB_OK);
+					assert(0);
 				}
 			}
 		}

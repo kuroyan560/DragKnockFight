@@ -29,10 +29,10 @@ bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
 		SizeData tmp = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
 		int nowHandle = tmp.min + handle;
 		std::string handleString = "イベントチップ" + std::to_string(handle) + "(チップ番号" + std::to_string(nowHandle) + ")" + "を配置していないのにもかかわらずギミック側で使おうとしています。\n設置をお願いします";
-		KazErrorHelper::Error(handleString);
+		MessageBox(NULL, KuroFunc::GetWideStrFromStr(handleString).c_str(), TEXT("イベントチップ被り"), MB_OK);
+		assert(0);
 		return false;
 	}
-
 
 	bool topHitFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_TOP);
 	bool buttomFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_BOTTOM);
@@ -51,5 +51,4 @@ bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
 
 void EventBlock::Draw()
 {
-
 }
