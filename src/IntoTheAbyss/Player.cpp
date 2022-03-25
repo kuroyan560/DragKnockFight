@@ -333,40 +333,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 	{
 
 		// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
-		INTERSECTED_LINE intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, vel + gimmickVel, PLAYER_HIT_SIZE, onGround, mapData);
-
-		// 当たった位置に応じて処理を分ける。
-		if (intersectedLine == INTERSECTED_TOP) {
-
-			// 下に当たった場合
-			HitMapChipBottom();
-
-		}
-		else if (intersectedLine == INTERSECTED_RIGHT) {
-
-			// 左に当たった場合
-			HitMapChipLeft();
-
-		}
-		else if (intersectedLine == INTERSECTED_BOTTOM) {
-
-			// 上に当たった場合
-			HitMapChipTop();
-
-		}
-		else if (intersectedLine == INTERSECTED_LEFT) {
-
-			// 右に当たった場合
-			HitMapChipRight();
-
-		}
-		else if (intersectedLine == INTERSECTED_RISE) {
-
-			// のし上がりの場所に当たった場合
-			vel.y *= 0.5f;
-			gravity = 0;
-
-		}
+		CheckHitMapChipVel(centerPos, mapData);
 
 		// マップチップとプレイヤーの当たり判定 スケール
 		CheckHitSize(centerPos, mapData);
@@ -1720,55 +1687,140 @@ int Player::GetHandGraph(const DRAW_DIR& Dir)
 	return HAND_GRAPH[Dir];
 }
 
+void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData)
+{
+	// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
+	INTERSECTED_LINE intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f), prevFrameCenterPos, vel + gimmickVel, Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+
+	// 当たった位置に応じて処理を分ける。
+	if (intersectedLine == INTERSECTED_TOP) {
+
+		// 下に当たった場合
+		HitMapChipBottom();
+
+	}
+	else if (intersectedLine == INTERSECTED_RIGHT) {
+
+		// 左に当たった場合
+		HitMapChipLeft();
+
+	}
+	else if (intersectedLine == INTERSECTED_BOTTOM) {
+
+		// 上に当たった場合
+		HitMapChipTop();
+
+	}
+	else if (intersectedLine == INTERSECTED_LEFT) {
+
+		// 右に当たった場合
+		HitMapChipRight();
+
+	}
+	else if (intersectedLine == INTERSECTED_RISE) {
+
+		// のし上がりの場所に当たった場合
+		vel.y *= 0.5f;
+		gravity = 0;
+
+	}
+
+	if (intersectedLine == INTERSECTED_NONE) {
+
+		intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos + Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f), prevFrameCenterPos, vel + gimmickVel, Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+
+		// 当たった位置に応じて処理を分ける。
+		if (intersectedLine == INTERSECTED_TOP) {
+
+			// 下に当たった場合
+			HitMapChipBottom();
+
+		}
+		else if (intersectedLine == INTERSECTED_RIGHT) {
+
+			// 左に当たった場合
+			HitMapChipLeft();
+
+		}
+		else if (intersectedLine == INTERSECTED_BOTTOM) {
+
+			// 上に当たった場合
+			HitMapChipTop();
+
+		}
+		else if (intersectedLine == INTERSECTED_LEFT) {
+
+			// 右に当たった場合
+			HitMapChipRight();
+
+		}
+		else if (intersectedLine == INTERSECTED_RISE) {
+
+			// のし上がりの場所に当たった場合
+			vel.y *= 0.5f;
+			gravity = 0;
+
+		}
+
+	}
+
+}
+
 void Player::CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData)
 {
 
 	// マップチップとプレイヤーの当たり判定 絶対に被せないための処理 中央
-	INTERSECTED_LINE intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_TOP);
+	INTERSECTED_LINE intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_TOP, 0 < gimmickVel.Length());
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_BOTTOM);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_BOTTOM, 0 < gimmickVel.Length());
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_LEFT);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_LEFT, 0 < gimmickVel.Length());
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_RIGHT);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_RIGHT, 0 < gimmickVel.Length());
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
+
+	const float OFFSET = 5.0f;
 
 	// マップチップとプレイヤーの当たり判定 絶対に被せないための処理 上
-	Vec2<float> centerPosBuff = centerPos + Vec2<float>(0, -PLAYER_HIT_SIZE.y + 10.0f);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_LEFT);
+	Vec2<float> centerPosBuff = centerPos + Vec2<float>(0, -PLAYER_HIT_SIZE.y + OFFSET);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_LEFT, 0 < gimmickVel.Length());
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 	centerPos.x = centerPosBuff.x;
-	centerPosBuff = centerPos + Vec2<float>(0, -PLAYER_HIT_SIZE.y + 10.0f);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_RIGHT);
+	centerPos.y = centerPosBuff.y - (-PLAYER_HIT_SIZE.y + OFFSET);
+	centerPosBuff = centerPos + Vec2<float>(0, -PLAYER_HIT_SIZE.y + OFFSET);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_RIGHT, 0 < gimmickVel.Length());
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 	centerPos.x = centerPosBuff.x;
+	centerPos.y = centerPosBuff.y - (-PLAYER_HIT_SIZE.y + OFFSET);
 
 	// マップチップとプレイヤーの当たり判定 絶対に被せないための処理 下
-	centerPosBuff = centerPos + Vec2<float>(0, PLAYER_HIT_SIZE.y - 10.0f);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_LEFT);
+	centerPosBuff = centerPos + Vec2<float>(0, PLAYER_HIT_SIZE.y - OFFSET);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_LEFT, 0 < gimmickVel.Length());
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 	centerPos.x = centerPosBuff.x;
-	centerPosBuff = centerPos + Vec2<float>(0, PLAYER_HIT_SIZE.y - 10.0f);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_RIGHT);
+	centerPos.y = centerPosBuff.y - (PLAYER_HIT_SIZE.y - OFFSET);
+	centerPosBuff = centerPos + Vec2<float>(0, PLAYER_HIT_SIZE.y - OFFSET);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_RIGHT, 0 < gimmickVel.Length());
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 	centerPos.x = centerPosBuff.x;
+	centerPos.y = centerPosBuff.y - (PLAYER_HIT_SIZE.y - OFFSET);
 
 	// マップチップとプレイヤーの当たり判定 絶対に被せないための処理 右
-	centerPosBuff = centerPos + Vec2<float>(PLAYER_HIT_SIZE.x - 10.0f, 0);
+	centerPosBuff = centerPos + Vec2<float>(PLAYER_HIT_SIZE.x - OFFSET, 0);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_TOP);
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 	centerPos.y = centerPosBuff.y;
-	centerPosBuff = centerPos + Vec2<float>(PLAYER_HIT_SIZE.x - 10.0f, 0);
+	centerPosBuff = centerPos + Vec2<float>(PLAYER_HIT_SIZE.x - OFFSET, 0);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_BOTTOM);
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 	centerPos.y = centerPosBuff.y;
 
 	// マップチップとプレイヤーの当たり判定 絶対に被せないための処理 左
-	centerPosBuff = centerPos + Vec2<float>(-PLAYER_HIT_SIZE.x + 10.0f, 0);
+	centerPosBuff = centerPos + Vec2<float>(-PLAYER_HIT_SIZE.x + OFFSET, 0);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_TOP);
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 	centerPos.y = centerPosBuff.y;
-	centerPosBuff = centerPos + Vec2<float>(-PLAYER_HIT_SIZE.x + 10.0f, 0);
+	centerPosBuff = centerPos + Vec2<float>(-PLAYER_HIT_SIZE.x + OFFSET, 0);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPosBuff, PLAYER_HIT_SIZE, mapData, INTERSECTED_BOTTOM);
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 	centerPos.y = centerPosBuff.y;

@@ -190,6 +190,7 @@ private:
 	int GetHandGraph(const DRAW_DIR& Dir);
 
 	// ˆÚ“®—Ê‚Å‚Ì“–‚½‚è”»’è
+	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
 	void CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
 
 };
