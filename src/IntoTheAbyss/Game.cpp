@@ -331,7 +331,7 @@ Vec2<float> Game::GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &
 	return door;
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -340,7 +340,8 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 		{
 			if (MAPCHIP_DATA[y][x] == MAPCHIP_NUM)
 			{
-				++chipNum;
+				*COUNT_CHIP_NUM += 1;
+				*POS = { x * 50.0f,y * 50.0f };
 			}
 		}
 	}
@@ -600,6 +601,16 @@ void Game::Init()
 	alphaValue = 0;
 
 	ParticleMgr::Instance()->Init();
+
+	//イベントブロック生成
+	{
+		eventBlocks.clear();
+		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
+		for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
+		{
+			eventBlocks.push_back(EventBlock());
+		}
+	}
 }
 
 void Game::Update()
@@ -1074,14 +1085,34 @@ void Game::Update()
 
 
 		//イベントブロック生成
-		eventBlocks.clear();
-		auto it = eventBlocks.begin();
-		chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
-		for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
 		{
-			int countChipNum = GetChipNum(mapData, chipNumber);
-			eventBlocks.insert(it, EventBlock());
-			it++;
+			chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
+			for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
+			{
+				int arrayNum = chipNumber - chipMemorySize.min;
+
+				//座標と番号被りの確認
+				Vec2<float>chipPos(-1.0f, -1.0f);
+				int countChipNum = 0;
+				GetChipNum(mapData, chipNumber, &countChipNum, &chipPos);
+
+				if (countChipNum == 1)
+				{
+					eventBlocks[arrayNum].Init(chipPos);
+				}
+				else if (2 <= countChipNum)
+				{
+					std::string stageString = "ステージ" + std::to_string(stageNum) + "の";
+					std::string roomString = "エリア" + std::to_string(roomNum) + "にて";
+					std::string chipString = "イベントチップ" + std::to_string(arrayNum) + "(チップ番号" + std::to_string(chipNumber) + ")" + "が二つ以上使われています。\n";
+					std::string checkString = "使うのは一つまでにして下さい";
+
+					//エラー処理を書く
+					std::string errorName = stageString + roomString + chipString + checkString;
+					MessageBox(NULL, KuroFunc::GetWideStrFromStr(errorName).c_str(), TEXT("イベントチップ被り"), MB_OK);
+					assert(0);
+				}
+			}
 		}
 
 
