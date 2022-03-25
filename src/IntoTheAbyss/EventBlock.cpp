@@ -1,11 +1,19 @@
 #include "EventBlock.h"
 #include"StageMgr.h"
 #include"EventCollider.h"
+#include"DrawFunc.h"
+#include"TexHandleMgr.h"
 
 int EventBlock::arrayNum = 0;
+bool EventBlock::initLoadGraphFlag = false;
 
 EventBlock::EventBlock() :initFlag(false)
 {
+	if (!initLoadGraphFlag)
+	{
+		//TexHandleMgr::LoadDivGraph("resource/.png", 10, Vec2<int>(50, 50), graphHandle.data());
+		initLoadGraphFlag = true;
+	}
 	handle = arrayNum;
 	++arrayNum;
 }
@@ -26,11 +34,11 @@ bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
 	//初期化していないブロックはエラー処理を作る
 	if (!initFlag)
 	{
-		SizeData tmp = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
-		int nowHandle = tmp.min + handle;
-		std::string handleString = "イベントチップ" + std::to_string(handle) + "(チップ番号" + std::to_string(nowHandle) + ")" + "を配置していないのにもかかわらずギミック側で使おうとしています。\n設置をお願いします";
-		MessageBox(NULL, KuroFunc::GetWideStrFromStr(handleString).c_str(), TEXT("イベントチップ被り"), MB_OK);
-		assert(0);
+		//SizeData tmp = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
+		//int nowHandle = tmp.min + handle;
+		//std::string handleString = "イベントチップ" + std::to_string(handle) + "(チップ番号" + std::to_string(nowHandle) + ")" + "を配置していないのにもかかわらずギミック側で使おうとしています。\n設置をお願いします";
+		//MessageBox(NULL, KuroFunc::GetWideStrFromStr(handleString).c_str(), TEXT("イベントチップ被り"), MB_OK);
+		//assert(0);
 		return false;
 	}
 
@@ -51,4 +59,6 @@ bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
 
 void EventBlock::Draw()
 {
+	//デバック用の画像
+	//DrawFunc::DrawRotaGraph2D(pos, Vec2<float>(1.0f, 1.0f), 0.0f, {});
 }

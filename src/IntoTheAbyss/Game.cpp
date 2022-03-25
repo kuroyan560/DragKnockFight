@@ -602,6 +602,24 @@ void Game::Init()
 
 	ParticleMgr::Instance()->Init();
 
+
+
+	SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
+	for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
+	{
+		int arrayNum = chipNumber - chipMemorySize.min;
+
+		//座標と番号被りの確認
+		Vec2<float>chipPos(-1.0f, -1.0f);
+		int countChipNum = 0;
+		GetChipNum(mapData, chipNumber, &countChipNum, &chipPos);
+
+		if (countChipNum == 1)
+		{
+			eventBlocks[arrayNum].Init(chipPos);
+		}
+	}
+
 }
 
 void Game::Update()
@@ -1094,7 +1112,7 @@ void Game::Update()
 				int countChipNum = 0;
 				GetChipNum(mapData, chipNumber, &countChipNum, &chipPos);
 
-				if (countChipNum == 1)
+				if (1 <= countChipNum)
 				{
 					eventBlocks[arrayNum].Init(chipPos);
 				}
@@ -1107,8 +1125,8 @@ void Game::Update()
 
 					//エラー処理を書く
 					std::string errorName = stageString + roomString + chipString + checkString;
-					MessageBox(NULL, KuroFunc::GetWideStrFromStr(errorName).c_str(), TEXT("イベントチップ被り"), MB_OK);
-					assert(0);
+					//MessageBox(NULL, KuroFunc::GetWideStrFromStr(errorName).c_str(), TEXT("イベントチップ被り"), MB_OK);
+					//assert(0);
 				}
 			}
 		}
