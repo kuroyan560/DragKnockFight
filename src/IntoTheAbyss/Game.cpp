@@ -305,7 +305,6 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	{
 		string result = "次につながるドアが見つかりません。\nRalationファイルを確認するか、担当の大石に連絡をください。";
 		MessageBox(NULL, KuroFunc::GetWideStrFromStr(result).c_str(), TEXT("ドアが見つかりません"), MB_OK);
-		assert(0);
 	}
 
 	//失敗
@@ -825,63 +824,84 @@ void Game::Update()
 		{
 			alphaValue = 355;
 			++timer;
+			bool responeErrorFlag = false;
 			if (10 <= timer)
 			{
-				if (!player.isDead)
+				if (!sceneChangeDeadFlag)
 				{
 					SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
 					//マップ情報更新
 					int localRoomNum = StageMgr::Instance()->GetRelationData(stageNum, roomNum, doorNumber - chipMemorySize.min);
 
 
-					mapData = StageMgr::Instance()->GetMapChipData(stageNum, localRoomNum);
+					RoomMapChipArray tmpMapData = StageMgr::Instance()->GetMapChipData(stageNum, localRoomNum);
 					//ドア座標を入手
 					Vec2<float>doorPos = GetDoorPos(doorNumber, mapData);
 					//プレイヤーがリスポーンする座標を入手
 					responePos = GetPlayerResponePos(stageNum, localRoomNum, doorNumber, doorPos, &door);
-					SelectStage::Instance()->SelectRoomNum(localRoomNum);
 
-					sceneChangingFlag = true;
-					//画面外から登場させる
-					switch (door)
+					//リスポーンエラーなら転移しない
+					if (responePos.x != -1.0f && responePos.y != -1.0f)
 					{
-					case Game::DOOR_UP_GORIGHT:
-						ScrollMgr::Instance()->WarpScroll(responePos);
-						initJumpFlag = false;
-						player.Init({ responePos.x + 50.0f , responePos.y - 50.0f * 2.0f });
-						break;
+						mapData = tmpMapData;
+						SelectStage::Instance()->SelectRoomNum(localRoomNum);
 
-					case Game::DOOR_UP_GOLEFT:
-						ScrollMgr::Instance()->WarpScroll(responePos);
-						initJumpFlag = false;
-						player.Init({ responePos.x + 50.0f , responePos.y - 50.0f * 2.0f });
-						break;
 
-					case Game::DOOR_DOWN:
-						player.Init({ responePos.x, responePos.y - 50.0f * 2.0f });
-						ScrollMgr::Instance()->WarpScroll(player.centerPos);
-						break;
+						sceneChangingFlag = true;
+						//画面外から登場させる
+						switch (door)
+						{
+						case Game::DOOR_UP_GORIGHT:
+							ScrollMgr::Instance()->WarpScroll(responePos);
+							initJumpFlag = false;
+							player.Init({ responePos.x + 50.0f , responePos.y - 50.0f * 2.0f });
+							break;
 
-					case Game::DOOR_LEFT:
-						ScrollMgr::Instance()->WarpScroll(responePos);
-						player.Init({ responePos.x + 50.0f * 3.0f, responePos.y });
-						break;
+						case Game::DOOR_UP_GOLEFT:
+							ScrollMgr::Instance()->WarpScroll(responePos);
+							initJumpFlag = false;
+							player.Init({ responePos.x + 50.0f , responePos.y - 50.0f * 2.0f });
+							break;
 
-					case Game::DOOR_RIGHT:
-						ScrollMgr::Instance()->WarpScroll(responePos);
-						player.Init({ responePos.x - 50.0f * 3.0f, responePos.y });
-						break;
+						case Game::DOOR_DOWN:
+							player.Init({ responePos.x, responePos.y - 50.0f * 2.0f });
+							ScrollMgr::Instance()->WarpScroll(player.centerPos);
+							break;
 
-					case Game::DOOR_Z:
-						break;
+						case Game::DOOR_LEFT:
+							ScrollMgr::Instance()->WarpScroll(responePos);
+							player.Init({ responePos.x + 50.0f * 3.0f, responePos.y });
+							break;
 
-					default:
-						break;
+						case Game::DOOR_RIGHT:
+							ScrollMgr::Instance()->WarpScroll(responePos);
+							player.Init({ responePos.x - 50.0f * 3.0f, responePos.y });
+							break;
+
+						case Game::DOOR_Z:
+							break;
+
+						default:
+							break;
+						}
+					}
+					else
+					{
+						responeErrorFlag = true;
 					}
 				}
-				//暗転開始
-				sceneBlackFlag = false;
-				sceneLightFlag = true;
+
+				if (!responeErrorFlag)
+				{
+					//暗転開始
+					sceneBlackFlag = false;
+					sceneLightFlag = true;
+				}
+				else
+				{
+					sceneBlackFlag = false;
+					SelectStage::Instance()->resetStageFlag = true;
+				}
 			}
 		}
 	}
@@ -895,7 +915,7 @@ void Game::Update()
 		//プレイヤーを動かす
 		if (alphaValue <= 250)
 		{
-			if (!player.isDead)
+			if (!sceneChangeDeadFlag)
 			{
 				sceneChangingFlag = false;
 				switch (door)
@@ -982,47 +1002,57 @@ void Game::Update()
 				default:
 					break;
 				}
+
+				ScrollMgr::Instance()->WarpScroll(player.centerPos);
+				ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
+				ScrollMgr::Instance()->Restart();
+
 			}
 			else
 			{
-				//ドア座標を入手
-				Vec2<float>doorPos(GetDoorPos(doorNumber, mapData));
-				//プレイヤーがリスポーンする座標を入手
-				responePos = GetPlayerResponePos(stageNum, roomNum, doorNumber, doorPos, &door);
-
-				//プレイヤーをリスポーンさせる
-				switch (door)
+				if (!initDeadFlag)
 				{
-				case Game::DOOR_UP_GORIGHT:
-					player.Init({ responePos.x + 50.0f * 2,responePos.y });
-					break;
+					//ドア座標を入手
+					Vec2<float>doorPos(GetDoorPos(doorNumber, mapData));
+					//プレイヤーがリスポーンする座標を入手
+					responePos = GetPlayerResponePos(stageNum, roomNum, doorNumber, doorPos, &door);
 
-				case Game::DOOR_UP_GOLEFT:
-					player.Init({ responePos.x - 50.0f * 2,responePos.y });
-					break;
+					//プレイヤーをリスポーンさせる
+					switch (door)
+					{
+					case Game::DOOR_UP_GORIGHT:
+						player.Init({ responePos.x + 50.0f * 2,responePos.y });
+						break;
 
-				case Game::DOOR_DOWN:
-					player.Init({ responePos.x,responePos.y - 80.0f });
-					break;
+					case Game::DOOR_UP_GOLEFT:
+						player.Init({ responePos.x - 50.0f * 2,responePos.y });
+						break;
 
-				case Game::DOOR_LEFT:
-					player.Init(responePos);
-					break;
+					case Game::DOOR_DOWN:
+						player.Init({ responePos.x,responePos.y - 80.0f });
+						break;
 
-				case Game::DOOR_RIGHT:
-					player.Init(responePos);
-					break;
-				case Game::DOOR_Z:
-					break;
+					case Game::DOOR_LEFT:
+						player.Init(responePos);
+						break;
 
-				case Game::DOOR_NONE:
-					break;
-				default:
-					break;
+					case Game::DOOR_RIGHT:
+						player.Init(responePos);
+						break;
+					case Game::DOOR_Z:
+						break;
+
+					case Game::DOOR_NONE:
+						break;
+					default:
+						break;
+					}
+					ScrollMgr::Instance()->WarpScroll(player.centerPos);
+					ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
+					ScrollMgr::Instance()->AlimentScrollAmount();
+					ScrollMgr::Instance()->Restart();
+					initDeadFlag = true;
 				}
-				ScrollMgr::Instance()->WarpScroll(player.centerPos);
-				ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
-				ScrollMgr::Instance()->Restart(player.prevFrameCenterPos - player.centerPos);
 				goFlag = true;
 			}
 		}
@@ -1036,6 +1066,8 @@ void Game::Update()
 		{
 			sceneLightFlag = false;
 			player.drawCursorFlag = true;
+			sceneChangeDeadFlag = false;
+			initDeadFlag = false;
 		}
 	}
 
@@ -1054,9 +1086,12 @@ void Game::Update()
 	//シーン遷移-----------------------
 
 
-	if (UsersInput::Instance()->OnTrigger(DIK_SPACE) || player.isDead)
+	if (UsersInput::Instance()->OnTrigger(DIK_SPACE))
 	{
 		SelectStage::Instance()->resetStageFlag = true;
+		//player.isDead = true;
+		//sceneBlackFlag = true;
+		//sceneChangeDeadFlag = player.isDead;
 	}
 
 
@@ -1066,7 +1101,7 @@ void Game::Update()
 	if ((roomNum != oldRoomNum || stageNum != oldStageNum) || SelectStage::Instance()->resetStageFlag)
 	{
 		giveDoorNumber = 0;
-
+		initDeadFlag = false;
 		debugStageData[0] = stageNum;
 		debugStageData[1] = roomNum;
 
@@ -1096,7 +1131,7 @@ void Game::Update()
 				dossunBuff.Generate(dossunData[index]->startPos, dossunData[index]->endPos, dossunData[index]->size, dossunData[index]->type);
 				// データを追加。
 				dossunBlock.push_back(dossunBuff);
-				if(&dossunBlock[dossunBlock.size() - 1].sightData == nullptr) assert(0); //ドッスンブロックのデータが何故かNullptrです！
+				if (&dossunBlock[dossunBlock.size() - 1].sightData == nullptr) assert(0); //ドッスンブロックのデータが何故かNullptrです！
 				SightCollisionStorage::Instance()->data.push_back(&dossunBlock[dossunBlock.size() - 1].sightData);
 			}
 		}
@@ -1159,34 +1194,43 @@ void Game::Update()
 			bubbleBlock.push_back(bubbleBuff);
 		}
 
+		bool deadFlag = false;
+		if (player.isDead)
+		{
+			deadFlag = true;
+		}
+
+
 		if (SelectStage::Instance()->resetStageFlag)
 		{
 			bool responeFlag = false;
-			//マップ開始時の場所にスポーンさせる
+
 			for (int y = 0; y < mapData.size(); ++y)
 			{
 				for (int x = 0; x < mapData[y].size(); ++x)
 				{
-					if (mapData[y][x] == MAPCHIP_BLOCK_START)
+					if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
 					{
 						player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
-						responeFlag = true;
+						ScrollMgr::Instance()->WarpScroll(player.centerPos);
 						break;
 					}
 				}
 			}
 
-			//マップ開始用の場所からリスポーンしたらこの処理を通さない
+			//デバック開始用の場所からリスポーンしたらこの処理を通さない
 			if (!responeFlag)
 			{
+				//マップ開始時の場所にスポーンさせる
 				for (int y = 0; y < mapData.size(); ++y)
 				{
 					for (int x = 0; x < mapData[y].size(); ++x)
 					{
-						if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
+						if (mapData[y][x] == MAPCHIP_BLOCK_START)
 						{
 							player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
 							ScrollMgr::Instance()->WarpScroll(player.centerPos);
+							responeFlag = true;
 							break;
 						}
 					}
@@ -1194,6 +1238,13 @@ void Game::Update()
 			}
 		}
 
+
+		if (deadFlag)
+		{
+			ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
+			ScrollMgr::Instance()->AlimentScrollAmount();
+			ScrollMgr::Instance()->Restart();
+		}
 		SelectStage::Instance()->resetStageFlag = false;
 	}
 	oldRoomNum = roomNum;

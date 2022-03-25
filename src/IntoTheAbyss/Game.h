@@ -84,8 +84,8 @@ class Game
 	bool initJumpFlag;
 	float gravity;
 	E_DOOR_DIR doorDir;
-
-
+	bool sceneChangeDeadFlag;//プレイヤが死んでいたらフラグを立てシーン遷移中に特殊な処理を入れる
+	bool initDeadFlag;
 
 	std::array<EventBlock,10>eventBlocks;
 
