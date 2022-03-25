@@ -11,7 +11,7 @@
 #include"TexHandleMgr.h"
 #include "WinApp.h"
 
-PlayerHand::PlayerHand()
+PlayerHand::PlayerHand(const int& AimGraphHandle) : aimGraphHandle(AimGraphHandle)
 {
 
 	/*-- コンストラクタ --*/
@@ -127,7 +127,6 @@ void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, cons
 	afterImg.Draw(ScrollMgr::Instance()->zoom, scrollShakeZoom);
 
 
-	//DrawFunc::DrawRotaGraph2D(center, ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle), RotaCenterUV);
 	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle,
 		TexHandleMgr::GetTexBuffer(GraphHandle), nullptr, nullptr, 0.0f, RotaCenterUV);
 
@@ -143,7 +142,8 @@ void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, cons
 	//照準を描画
 	if (DRAW_CURSOR)
 	{
-		DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
+		//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
+		DrawFunc_Shadow::DrawRotaGraph2D(LigManager, sightPos, ExtRate * ScrollMgr::Instance()->zoom, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
 	}
 
 }
@@ -176,7 +176,7 @@ void PlayerHand::CheckHit(const vector<vector<int>>& mapData)
 	/*===== 当たり判定関数 =====*/
 
 	// 照準を描画する最短距離を求める。
-	CheckShortestPoint(mapData);
+	//CheckShortestPoint(mapData);
 
 }
 
