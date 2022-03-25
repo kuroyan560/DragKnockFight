@@ -9,6 +9,7 @@ using namespace std;
 #include "DossunBlock.h"
 #include "Bubble.h"
 #include"GimmickLoader.h"
+#include"EventBlock.h"
 
 #include<memory>
 class TextureBuffer;
@@ -37,6 +38,8 @@ class Game
 	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum);
 	Vec2<float> GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR, const bool &ONLY_GET_DOOR_DIR = false);
 	Vec2<float> GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA);
+	const int &GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS);
+
 
 	int mapBlockGraph;
 	// 動的ブロックの画像。
@@ -83,6 +86,10 @@ class Game
 	E_DOOR_DIR doorDir;
 
 
+
+	std::vector<EventBlock>eventBlocks;
+
+
 	std::vector<DrawMap>drawMap;
 
 	//ライト情報
@@ -110,5 +117,6 @@ public:
 	void Draw(std::weak_ptr<RenderTarget>EmissiveMap);
 
 	LightManager& GetLigManager() { return ligMgr; }
+
 };
 
