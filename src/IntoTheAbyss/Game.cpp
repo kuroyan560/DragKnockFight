@@ -602,15 +602,6 @@ void Game::Init()
 
 	ParticleMgr::Instance()->Init();
 
-	//イベントブロック生成
-	{
-		eventBlocks.clear();
-		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
-		for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
-		{
-			eventBlocks.push_back(EventBlock());
-		}
-	}
 }
 
 void Game::Update()
@@ -1087,6 +1078,12 @@ void Game::Update()
 
 		//イベントブロック生成
 		{
+			//終了処理
+			for (int i = 0; i < eventBlocks.size(); ++i)
+			{
+				eventBlocks[i].Finalize();
+			}
+
 			SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
 			for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
 			{
@@ -1176,6 +1173,9 @@ void Game::Update()
 	oldRoomNum = roomNum;
 	oldStageNum = stageNum;
 
+
+
+	eventBlocks[0].HitBox(player.centerPos, player.PLAYER_HIT_SIZE);
 
 
 	// R or Aが押されたらプレイヤーの位置を初期化する。
@@ -1614,10 +1614,16 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	//ViewPort::Instance()->Draw();
 
-
+	//オーラブロックの描画
 	for (int i = 0; i < auraBlock.size(); ++i)
 	{
 		auraBlock[i]->Draw();
+	}
+
+	//イベントブロック
+	for (int i = 0; i < eventBlocks.size(); ++i)
+	{
+		eventBlocks[i].Draw();
 	}
 
 

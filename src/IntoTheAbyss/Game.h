@@ -87,7 +87,7 @@ class Game
 
 
 
-	std::vector<EventBlock>eventBlocks;
+	std::array<EventBlock,10>eventBlocks;
 
 
 	std::vector<DrawMap>drawMap;
