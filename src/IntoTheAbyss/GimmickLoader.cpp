@@ -20,7 +20,7 @@ GimmickLoader::GimmickLoader()
 	gimmickThowmpeDataName[GIMMCK_THOWMPE_DATA_SIZE] = "size";
 
 	//特定のギミックの種類で使える文字の初期化
-	gimmickThowmpeType[GIMMCK_THOWMPE_TYPE_OFF] = "off";;
+	gimmickThowmpeType[GIMMCK_THOWMPE_TYPE_OFF] = "off";
 	gimmickThowmpeType[GIMMCK_THOWMPE_TYPE_ON_LOW] = "onLow";
 	gimmickThowmpeType[GIMMCK_THOWMPE_TYPE_ON_HIGH] = "onHigh";
 };
