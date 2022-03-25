@@ -27,6 +27,7 @@ public:
 	bool isMove;		// 動き出したかどうか
 	bool isReturn;		// 初期位置に戻っているかどうか
 	bool* isTimeStopPikeAlive;
+	bool isFirstMove;	// isMoveがtrueになってから最初の1F目は移動させないために使用
 	E_GIMMICK id;		// どのドッスンかのID
 
 

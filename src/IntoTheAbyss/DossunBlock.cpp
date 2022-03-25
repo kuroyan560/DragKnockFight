@@ -20,6 +20,7 @@ DossunBlock::DossunBlock()
 	isHitPlayer = false;
 	isMove = false;
 	isReturn = false;
+	isFirstMove = false;
 	isMoveTimer = 0;
 	changeDirTimer = 0;
 	id = {};
@@ -72,6 +73,7 @@ void DossunBlock::Generate(Vec2<float> generatePos, Vec2<float> endPos, const Ve
 	isHitPlayer = false;
 	isMove = false;
 	isReturn = false;
+	isFirstMove = false;
 	isTimeStopPikeAlive = nullptr;
 	sightData = { pos,size/* * Vec2<float>(2.0f,2.0f)*/ };
 	alpha = 1;
@@ -173,7 +175,17 @@ void DossunBlock::Update()
 		if (changeDirTimer > 0) speed = 0;
 
 		// 移動する。
-		pos += moveDir * Vec2<float>(speed, speed);
+		if (isFirstMove) {
+			pos += moveDir * Vec2<float>(speed, speed);
+		}
+
+	}
+
+
+	// 移動する判定になってから最初の1F目は移動させないためのフラグを更新。 プレイヤーが置いていかれるバグを解決するため。
+	if (isMove) {
+
+		isFirstMove = true;
 
 	}
 
@@ -241,7 +253,7 @@ void DossunBlock::CheckHit(const vector<vector<int>>& mapData)
 
 	float offset = 1.0f;
 
-	if (noCheckHitTimer <= 0) {
+	if (noCheckHitTimer <= 0 ) {
 
 		if (moveDir.y != 0) {
 			isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
