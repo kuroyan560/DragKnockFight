@@ -1038,7 +1038,7 @@ void Game::Update()
 	//シーン遷移-----------------------
 
 
-	if (UsersInput::Instance()->OnTrigger(START))
+	if (UsersInput::Instance()->OnTrigger(DIK_SPACE))
 	{
 		SelectStage::Instance()->resetStageFlag = true;
 	}
@@ -1086,7 +1086,7 @@ void Game::Update()
 
 		//イベントブロック生成
 		{
-			chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
+			SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
 			for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
 			{
 				int arrayNum = chipNumber - chipMemorySize.min;
@@ -1179,12 +1179,12 @@ void Game::Update()
 
 	// R or Aが押されたらプレイヤーの位置を初期化する。
 	//if (Input::isKeyTrigger(KEY_INPUT_R) || Input::isJoyBottomTrigger(XINPUT_BUTTON_A))
-	if (UsersInput::Instance()->OnTrigger(DIK_R) || UsersInput::Instance()->OnTrigger(XBOX_BUTTON::A))
-	{
-		player.centerPos = player.GetGeneratePos();
-		ScrollMgr::Instance()->scrollAmount = { -3.0f, 295.0f };
-		ScrollMgr::Instance()->honraiScrollAmount = { 0, 295.0f };
-	}
+	//if (UsersInput::Instance()->OnTrigger(DIK_R) || UsersInput::Instance()->OnTrigger(XBOX_BUTTON::A))
+	//{
+		//player.centerPos = player.GetGeneratePos();
+		//ScrollMgr::Instance()->scrollAmount = { -3.0f, 295.0f };
+		//ScrollMgr::Instance()->honraiScrollAmount = { 0, 295.0f };
+	//}
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
 
