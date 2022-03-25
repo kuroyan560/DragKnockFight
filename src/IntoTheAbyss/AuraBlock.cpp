@@ -41,6 +41,7 @@ void AuraBlock::Update()
 {
 }
 
+#include"D3D12App.h"
 void AuraBlock::Draw()
 {
 	//DrawBox(
@@ -57,5 +58,5 @@ void AuraBlock::Draw()
 	Vec2<float>rightBottom = { (rightDownPos.x - ScrollMgr::Instance()->scrollAmount.x - ShakeMgr::Instance()->shakeAmount.x) * ScrollMgr::Instance()->zoom,
 		(rightDownPos.y - ScrollMgr::Instance()->scrollAmount.y - ShakeMgr::Instance()->shakeAmount.y) * ScrollMgr::Instance()->zoom };
 
-	DrawFunc::DrawBox2D(leftUp, rightBottom, color);
+	DrawFunc::DrawBox2D(leftUp, rightBottom, color, D3D12App::Instance()->GetBackBuffFormat());
 }

@@ -201,6 +201,7 @@ void DossunBlock::Update()
 
 }
 
+#include"D3D12App.h"
 void DossunBlock::Draw()
 {
 
@@ -218,10 +219,10 @@ void DossunBlock::Draw()
 	Vec2<float>rightBottom = { posZoom.x + sizeZoom.x - scrollShakeZoom.x,
 		posZoom.y + sizeZoom.y - scrollShakeZoom.y };
 
-	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(100, 100, 100, 255), true);
+	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(100, 100, 100, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
 
 	// ˆÚ“®‚µŽn‚ß‚é‚Æ‚«‚ÉŒõ‚ç‚¹‚é—p
-	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(255, 255, 255, alpha), true, AlphaBlendMode_Trans);
+	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(255, 255, 255, alpha), D3D12App::Instance()->GetBackBuffFormat(), true, AlphaBlendMode_Trans);
 }
 
 void DossunBlock::CheckHit(const vector<vector<int>>& mapData)

@@ -7,7 +7,7 @@ int DrawFunc::DRAW_LINE_COUNT = 0;
 std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::LINE_VERTEX_BUFF;
 
 //DrawBox
-std::shared_ptr<GraphicsPipeline>DrawFunc::BOX_PIPELINE[AlphaBlendModeNum];
+std::map<DXGI_FORMAT, std::map<AlphaBlendMode, std::shared_ptr<GraphicsPipeline>>>DrawFunc::BOX_PIPELINE;
 int DrawFunc::DRAW_BOX_COUNT = 0;
 std::vector<std::shared_ptr<VertexBuffer>>DrawFunc::BOX_VERTEX_BUFF;
 
@@ -90,7 +90,7 @@ void DrawFunc::DrawLine2D(const Vec2<float>& FromPos, const Vec2<float>& ToPos, 
 	DRAW_LINE_COUNT++;
 }
 
-void DrawFunc::DrawBox2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& BoxColor, const bool& FillFlg, const AlphaBlendMode& BlendMode)
+void DrawFunc::DrawBox2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& BoxColor, const DXGI_FORMAT& Format, const bool& FillFlg, const AlphaBlendMode& BlendMode)
 {
 	if (FillFlg)
 	{
@@ -106,7 +106,7 @@ void DrawFunc::DrawBox2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightB
 		};
 
 		//パイプライン未精製
-		if (!BOX_PIPELINE[0])
+		if (!BOX_PIPELINE[Format][BlendMode])
 		{
 			//パイプライン設定
 			static PipelineInitializeOption PIPELINE_OPTION(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT, D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
@@ -133,15 +133,12 @@ void DrawFunc::DrawBox2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightB
 			};
 
 			//レンダーターゲット描画先情報
-			for (int i = 0; i < AlphaBlendModeNum; ++i)
-			{
-				std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(), (AlphaBlendMode)i) };
-				//パイプライン生成
-				BOX_PIPELINE[i] = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
-			}
+			std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(Format, BlendMode) };
+			//パイプライン生成
+			BOX_PIPELINE[Format][BlendMode] = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
 		}
 
-		KuroEngine::Instance().Graphics().SetPipeline(BOX_PIPELINE[BlendMode]);
+		KuroEngine::Instance().Graphics().SetPipeline(BOX_PIPELINE[Format][BlendMode]);
 
 		if (BOX_VERTEX_BUFF.size() < (DRAW_BOX_COUNT + 1))
 		{
