@@ -46,7 +46,7 @@ void StageSelectScene::OnUpdate()
 	{
 		stageNum = 0;
 	}
-	SelectStage::Instance()->Select(stageNum);
+	SelectStage::Instance()->SelectStageNum(stageNum);
 }
 
 void StageSelectScene::OnDraw()

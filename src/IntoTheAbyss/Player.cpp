@@ -1299,7 +1299,6 @@ void Player::Input(const vector<vector<int>> mapData)
 		const float OFFSET_X = -12.0f;
 
 		float angle = rHand->GetAngle();
-		angle -= 0.261799f;
 
 		BulletMgr::Instance()->Generate(rHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, true);
 
@@ -1352,7 +1351,6 @@ void Player::Input(const vector<vector<int>> mapData)
 				const float OFFSET_X = -12.0f;
 
 				float angle = rHand->GetAngle();
-				angle -= 0.261799f;
 
 				// ’e‚ð”­ŽË‚·‚éˆ—‚ðs‚¤B
 				rHand->teleportPike.Generate(rHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), Vec2<float>(cosf(angle), sinf(angle)), PIKE_TELEPORT);
