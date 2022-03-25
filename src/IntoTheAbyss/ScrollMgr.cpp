@@ -301,7 +301,30 @@ void ScrollMgr::Restart()
 	warpFlag = true;
 }
 
-void ScrollMgr::StopScroll(const int& DIR)
+void ScrollMgr::AlimentScrollAmount()
+{
+	if (honraiScrollAmount.x <= scrollMinValue.x)
+	{
+		honraiScrollAmount.x = scrollMinValue.x;
+	}
+	if (honraiScrollAmount.y <= scrollMinValue.y)
+	{
+		honraiScrollAmount.y = scrollMinValue.y;
+	}
+
+
+	if (scrollMaxValue.x <= honraiScrollAmount.x)
+	{
+		honraiScrollAmount.x = scrollMaxValue.x;
+	}
+	if (scrollMaxValue.y <= honraiScrollAmount.y)
+	{
+		honraiScrollAmount.y = scrollMaxValue.y;
+	}
+
+}
+
+void ScrollMgr::StopScroll(const int &DIR)
 {
 	stopScrollData[DIR] = true;
 }
