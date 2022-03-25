@@ -142,8 +142,8 @@ void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, cons
 	//Æ€‚ğ•`‰æ
 	if (DRAW_CURSOR)
 	{
-		//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
-		DrawFunc_Shadow::DrawRotaGraph2D(LigManager, sightPos, ExtRate * ScrollMgr::Instance()->zoom, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
+		DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
+		//DrawFunc_Shadow::DrawRotaGraph2D(LigManager, sightPos, ExtRate * ScrollMgr::Instance()->zoom, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
 	}
 
 }
@@ -176,7 +176,7 @@ void PlayerHand::CheckHit(const vector<vector<int>>& mapData)
 	/*===== “–‚½‚è”»’èŠÖ” =====*/
 
 	// Æ€‚ğ•`‰æ‚·‚éÅ’Z‹——£‚ğ‹‚ß‚éB
-	//CheckShortestPoint(mapData);
+	CheckShortestPoint(mapData);
 
 }
 
