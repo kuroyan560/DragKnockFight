@@ -1047,7 +1047,7 @@ void Game::Update()
 	//ƒV[ƒ“‘JˆÚ-----------------------
 
 
-	if (UsersInput::Instance()->OnTrigger(DIK_SPACE))
+	if (UsersInput::Instance()->OnTrigger(DIK_SPACE) || player.isDead)
 	{
 		SelectStage::Instance()->resetStageFlag = true;
 	}
