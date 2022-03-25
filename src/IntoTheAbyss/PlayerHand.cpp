@@ -4,6 +4,7 @@
 #include "SightCollisionStorage.h"
 #include "ViewPort.h"
 #include "MapChipCollider.h"
+#include "StageMgr.h"
 
 #include"KuroEngine.h"
 #include"TexHandleMgr.h"
@@ -360,15 +361,18 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 				continue;
 			}
 
-			// ビューポート外にあったら処理を行わない。
-			//if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS.x) continue;
-			//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].x + MAP_CHIP_HALF_SIZE < BLOCK_POS.x) continue;
-			//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].y - MAP_CHIP_HALF_SIZE > BLOCK_POS.y) continue;
-			//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN].y + MAP_CHIP_HALF_SIZE < BLOCK_POS.y) continue;
+			// そのブロックが内包されているブロックだったら処理を飛ばす。
+			//if (StageMgr::Instance()->IsItWallIn())
 
-			// 四辺分交点を求める。
+				// ビューポート外にあったら処理を行わない。
+				//if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS.x) continue;
+				//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].x + MAP_CHIP_HALF_SIZE < BLOCK_POS.x) continue;
+				//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].y - MAP_CHIP_HALF_SIZE > BLOCK_POS.y) continue;
+				//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN].y + MAP_CHIP_HALF_SIZE < BLOCK_POS.y) continue;
 
-			// 交点保存用
+				// 四辺分交点を求める。
+
+				// 交点保存用
 			vector<Vec2<float>> intersectedPos;
 
 			// 上方向

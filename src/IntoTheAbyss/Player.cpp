@@ -1729,3 +1729,17 @@ int Player::GetHandGraph(const DRAW_DIR& Dir)
 
 	return HAND_GRAPH[Dir];
 }
+
+void Player::CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData)
+{
+
+	/*intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(checkPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_TOP);
+	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(checkPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_BOTTOM);
+	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(checkPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_LEFT);
+	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(checkPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_RIGHT);
+	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();*/
+
+}

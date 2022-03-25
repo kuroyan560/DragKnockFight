@@ -132,16 +132,16 @@ public:
 	~Player();
 
 	// 初期化処理
-	void Init(const Vec2<float> &INIT_POS);
+	void Init(const Vec2<float>& INIT_POS);
 
 	// 更新処理
 	void Update(const vector<vector<int>> mapData);
 
 	// 描画処理
-	void Draw(LightManager &LigManager);
+	void Draw(LightManager& LigManager);
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, vector<Bubble> &bubble, vector<DossunBlock> &dossun);
+	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun);
 
 	// 方向ごとのマップチップとの当たり判定関数
 	void HitMapChipTop();
@@ -180,12 +180,16 @@ private:
 	bool doorMoveUpDownFlag;
 	bool doorMoveDownFlag;
 	//ストレッチの値を計算
-	void CalculateStretch(const Vec2<float> &Move);
+	void CalculateStretch(const Vec2<float>& Move);
 	//ストレッチ値更新
 	void UpdateStretch();
 	//画像サイズからプレイヤーサイズ取得
 	Vec2<float> GetPlayerGraphSize();
 
 	//プレイヤーの手の画像ハンドル取得
-	int GetHandGraph(const DRAW_DIR &Dir);
+	int GetHandGraph(const DRAW_DIR& Dir);
+
+	// 移動量での当たり判定
+	void CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
+
 };
