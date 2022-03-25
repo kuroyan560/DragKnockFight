@@ -37,6 +37,7 @@ Player::Player()
 
 
 	isDead = false;
+	isDouji = false;
 	firstRecoilParticleTimer = 0;
 }
 
@@ -88,6 +89,8 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	// 壁フラグを初期化
 	isWallRight = false;
 	isWallLeft = false;
+
+	isDouji = false;
 
 	isDead = false;
 
@@ -1111,7 +1114,11 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// LBが押されたら反動をつける。
+	bool isShotLeft = false;
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+
+		// 撃った判定を保存。
+		isShotLeft = true;
 
 		// 反動をつける。
 		float rHandAngle = lHand->GetAngle();
@@ -1198,7 +1205,11 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// RBが押されたら反動をつける。
+	bool isShotRight = false;
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+
+		// 右側に撃った判定を保存する。
+		isShotRight = true;
 
 		// 反動をつける。
 		float lHandAngle = rHand->GetAngle();
@@ -1282,6 +1293,18 @@ void Player::Input(const vector<vector<int>> mapData)
 
 		//ストレッチ
 		CalculateStretch(vel);
+	}
+
+	// 同時に撃ったフラグを取得する。
+	if (isShotLeft && isShotRight) {
+
+		isDouji = true;
+
+	}
+	else {
+
+		isDouji = false;
+
 	}
 
 	// 移動速度が限界値を超えないようにする。

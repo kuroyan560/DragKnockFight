@@ -11,7 +11,7 @@ public:
 	/*===== メンバ関数 =====*/
 
 	// オブジェクトとオブジェクトの移動量線分を使った当たり判定。
-	INTERSECTED_LINE CheckHitVel(Vec2<float> pushBackPosA, const Vec2<float> prevFramePosA, const Vec2<float>& velA, const Vec2<float>& sizeA, const Vec2<float>& posB, const Vec2<float>& sizeB);
+	INTERSECTED_LINE CheckHitVel(Vec2<float>& pushBackPosA, const Vec2<float> prevFramePosA, const Vec2<float>& velA, const Vec2<float>& sizeA, const Vec2<float>& posB, const Vec2<float>& sizeB);
 
 	// オブジェクトとオブジェクトのサイズを使った当たり判定。
 	INTERSECTED_LINE CheckHitSize(Vec2<float>& posA, const Vec2<float>& sizeA, const Vec2<float>& posB, const Vec2<float>& sizeB, const INTERSECTED_LINE& dir);
