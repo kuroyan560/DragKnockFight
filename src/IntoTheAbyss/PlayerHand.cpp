@@ -377,8 +377,8 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 
 			}
 
-			// レイの方向とブロックの位置関係で処理を飛ばす。
-			float offsetHandPos = 10.0f;
+			// レイの方向とブロックの位置関係で処理を飛ばす。ウィンドウを4分割するやつ
+			float offsetHandPos = MAP_CHIP_SIZE;
 			if (isLeft && handPos.x + offsetHandPos < BLOCK_POS.x) continue;
 			if (!isLeft && BLOCK_POS.x < handPos.x - offsetHandPos) continue;
 			if (isTop && handPos.y + offsetHandPos < BLOCK_POS.y) continue;
