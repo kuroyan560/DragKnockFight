@@ -3,7 +3,7 @@
 
 using namespace std;
 
-INTERSECTED_LINE Collider::CheckHitVel(Vec2<float> pushBackPosA, const Vec2<float> prevFramePosA, const Vec2<float>& velA, const Vec2<float>& sizeA, const Vec2<float>& posB, const Vec2<float>& sizeB)
+INTERSECTED_LINE Collider::CheckHitVel(Vec2<float>& pushBackPosA, const Vec2<float> prevFramePosA, const Vec2<float>& velA, const Vec2<float>& sizeA, const Vec2<float>& posB, const Vec2<float>& sizeB)
 {
 	/*===== 矩形と矩形の移動量を使った押し戻し付き当たり判定 =====*/
 
