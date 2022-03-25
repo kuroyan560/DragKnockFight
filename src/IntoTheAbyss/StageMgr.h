@@ -157,6 +157,19 @@ public:
 	const bool &CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
 
 
+	inline const bool &IsItWallIn(const int &STAGE_NUM,const int &ROOM_NUM,const Vec2<int> &MAPCHIP_POS)
+	{
+		if (allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_POS.y][MAPCHIP_POS.x].handle == mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN])
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	};
+
+
 	/// <summary>
 	/// 指定したステージ番号の小部屋の数を返します
 	/// </summary>

@@ -1192,7 +1192,6 @@ void Game::Update()
 	oldStageNum = stageNum;
 
 
-
 	eventBlocks[0].HitBox(player.centerPos, player.PLAYER_HIT_SIZE);
 
 
