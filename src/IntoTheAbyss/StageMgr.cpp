@@ -23,6 +23,7 @@ StageMgr::StageMgr()
 	mapChipMemoryData[MAPCHIP_TYPE_TOCH] = { 30,39 };
 	mapChipMemoryData[MAPCHIP_TYPE_THOWNP] = { 50,79 };
 	mapChipMemoryData[MAPCHIP_TYPE_BUBBLE] = { 80,89 };
+	mapChipMemoryData[MAPCHIP_TYPE_EVENT] = { 90,99 };
 
 
 	//LoadDivGraph("Resource/chip_sheet.png", 18, 6, 3, 32, 32, mapChipGraphHandle.data());

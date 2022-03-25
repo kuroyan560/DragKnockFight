@@ -331,6 +331,22 @@ Vec2<float> Game::GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &
 	return door;
 }
 
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM)
+{
+	int chipNum = 0;
+	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
+	{
+		for (int x = 0; x < MAPCHIP_DATA[y].size(); ++x)
+		{
+			if (MAPCHIP_DATA[y][x] == MAPCHIP_NUM)
+			{
+				++chipNum;
+			}
+		}
+	}
+	return chipNum;
+}
+
 Game::Game()
 {
 	mapBlockGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Block.png");
@@ -657,10 +673,7 @@ void Game::Update()
 		ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
-	//ImGui::Begin("Stage");
-	//ImGui::Text("StageNumber:%d", debugStageData[0]);
-	//ImGui::Text("RoomNumber:%d", debugStageData[1]);
-	//ImGui::End();
+
 
 	//ゴールに触れたら次のステージに向かう処理
 	{
@@ -1060,6 +1073,17 @@ void Game::Update()
 		}
 
 
+		//イベントブロック生成
+		eventBlocks.clear();
+		auto it = eventBlocks.begin();
+		chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
+		for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
+		{
+			int countChipNum = GetChipNum(mapData, chipNumber);
+			eventBlocks.insert(it, EventBlock());
+			it++;
+		}
+
 
 		// シャボン玉ブロックの情報を取得。
 		vector<shared_ptr<BubbleData>> bubbleData;
@@ -1236,8 +1260,8 @@ void Game::Update()
 			// 弾パーティクルを生成する。
 			//BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
 			//BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
-			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec,BULLET);
-			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec,BULLET);
+			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec, BULLET);
+			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec, BULLET);
 
 			BulletMgr::Instance()->GetBullet(i)->Init();
 		}
@@ -1571,5 +1595,4 @@ void Game::Draw()
 	{
 		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), true, AlphaBlendMode_Trans);
 	}
-
 }
