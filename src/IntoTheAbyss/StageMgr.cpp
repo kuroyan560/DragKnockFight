@@ -190,6 +190,11 @@ StageMgr::StageMgr()
 					int rightUp = GetMapChipBlock(stageNum, roomNum, { (float)x + 1,(float)y - 1 });
 					int rightDown = GetMapChipBlock(stageNum, roomNum, { (float)x + 1,(float)y + 1 });
 
+					if (roomNum == 6 && now == 25)
+					{
+						bool debug = false;
+					}
+
 
 
 
@@ -213,7 +218,7 @@ StageMgr::StageMgr()
 
 
 					bool skipFlag = false;		//ドアをを探索したかどうかを示すフラグ
-					for (int doorNumber = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min; doorNumber < mapChipMemoryData[MAPCHIP_TYPE_DOOR].max; ++doorNumber)
+					for (int doorNumber = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min; doorNumber < mapChipMemoryData[MAPCHIP_TYPE_DOOR].max - SECRET_DOOR_NUMBER; ++doorNumber)
 					{
 						int arrayNum = doorNumber - mapChipMemoryData[MAPCHIP_TYPE_DOOR].min;//ドア番号から配列の添え字用に数値を調整
 
@@ -330,7 +335,6 @@ StageMgr::StageMgr()
 					}
 
 
-
 					//ドッスンの場合
 					if (mapChipMemoryData[MAPCHIP_TYPE_THOWNP].min <= now && now <= mapChipMemoryData[MAPCHIP_TYPE_THOWNP].max)
 					{
@@ -434,7 +438,6 @@ StageMgr::StageMgr()
 								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							}
 						}
-
 
 						{
 							bool checkUpSideFlag =
@@ -900,7 +903,6 @@ StageMgr::StageMgr()
 const RoomMapChipArray &StageMgr::GetMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	return allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
-
 }
 
 const int &StageMgr::GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER)
