@@ -368,7 +368,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			//if (centerY >= HEIGHT) return INTERSECTED_NONE;
 
 			// プレイヤーとの距離が一定以上離れていたら処理を行わない。
-			if (Vec2<float>(centerX - pos.x, centerY - pos.y).Length() >= 100.0f) {
+			if (Vec2<float>(centerX - pos.x, centerY - pos.y).Length() >= 300.0f) {
 				//player.onGround = false;
 				continue;
 			}
@@ -386,104 +386,104 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			// 全ての線分との当たり判定を行う。
 
 			// 上辺
-	//		if (direction == INTERSECTED_BOTTOM) {
-				if (IsIntersected(rightTop, leftTop, pos, checkHitDirection)) {
+			//if (direction == INTERSECTED_BOTTOM) {
+			if (IsIntersected(rightTop, leftTop, pos, checkHitDirection)) {
 
-					// 当たっていたら交点を計算して保存
-					pair<Vec2<float>, INTERSECTED_LINE> buff;
-					buff.first = CalIntersectPoint(rightTop, leftTop, pos, checkHitDirection);
+				// 当たっていたら交点を計算して保存
+				pair<Vec2<float>, INTERSECTED_LINE> buff;
+				buff.first = CalIntersectPoint(rightTop, leftTop, pos, checkHitDirection);
 
-					// そもそも一つ上のインデックスがあるのかどうかをチェックする。
-					if (height - 1 >= 0) {
+				// そもそも一つ上のインデックスがあるのかどうかをチェックする。
+				if (height - 1 >= 0) {
 
-						// 交点の上のマップチップが壁だったら無効化する。
-						if (!(mapChipData[height - 1][width] >= 1 && mapChipData[height - 1][width] <= 9)) {
+					// 交点の上のマップチップが壁だったら無効化する。
+					if (!(mapChipData[height - 1][width] >= 1 && mapChipData[height - 1][width] <= 9)) {
 
-							buff.second = INTERSECTED_TOP;
-							intersectPos.push_back(buff);
-
-						}
+						buff.second = INTERSECTED_TOP;
+						intersectPos.push_back(buff);
 
 					}
 
 				}
-	//		}
+
+			}
+			//		}
 
 			// 右辺
-	//		if (direction == INTERSECTED_LEFT) {
-				if (IsIntersected(rightTop, rightBottom, pos, checkHitDirection)) {
+			//if (direction == INTERSECTED_LEFT) {
+			if (IsIntersected(rightTop, rightBottom, pos, checkHitDirection)) {
 
-					// 当たっていたら交点を計算して保存
-					pair<Vec2<float>, INTERSECTED_LINE> buff;
-					buff.first = CalIntersectPoint(rightTop, rightBottom, pos, checkHitDirection);
+				// 当たっていたら交点を計算して保存
+				pair<Vec2<float>, INTERSECTED_LINE> buff;
+				buff.first = CalIntersectPoint(rightTop, rightBottom, pos, checkHitDirection);
 
-					// そもそも一つ右のインデックスがあるのかどうかをチェックする。
-					if (width + 1 < mapChipData[height].size()) {
+				// そもそも一つ右のインデックスがあるのかどうかをチェックする。
+				if (width + 1 < mapChipData[height].size()) {
 
-						// 交点の右のマップチップが壁だったら無効化する。
-						if (!(mapChipData[height][width + 1] >= 1 && mapChipData[height][width + 1] <= 9)) {
+					// 交点の右のマップチップが壁だったら無効化する。
+					if (!(mapChipData[height][width + 1] >= 1 && mapChipData[height][width + 1] <= 9)) {
 
-							buff.second = INTERSECTED_RIGHT;
-							intersectPos.push_back(buff);
-
-						}
+						buff.second = INTERSECTED_RIGHT;
+						intersectPos.push_back(buff);
 
 					}
 
 				}
-	//		}
+
+			}
+			//		}
 
 			// 下辺
-	//		if (direction == INTERSECTED_TOP) {
-				if (IsIntersected(leftBottom, rightBottom, pos, checkHitDirection)) {
+			//if (direction == INTERSECTED_TOP) {
+			if (IsIntersected(leftBottom, rightBottom, pos, checkHitDirection)) {
 
-					// 当たっていたら交点を計算して保存
-					pair<Vec2<float>, INTERSECTED_LINE> buff;
-					buff.first = CalIntersectPoint(leftBottom, rightBottom, pos, checkHitDirection);
+				// 当たっていたら交点を計算して保存
+				pair<Vec2<float>, INTERSECTED_LINE> buff;
+				buff.first = CalIntersectPoint(leftBottom, rightBottom, pos, checkHitDirection);
 
-					// 交点との距離がプレイヤーの半径+マップ半径より小さかったら保存する。
-					//if (fabs(Vec2<float>(buff.first - player.centerPos).x) < player.PLAYER_SIZE.y + MAP_CHIP_HALF_SIZE &&
-					//	fabs(Vec2<float>(buff.first - player.centerPos).y - MAP_CHIP_HALF_SIZE) < player.PLAYER_SIZE.y + MAP_CHIP_HALF_SIZE) {
+				// 交点との距離がプレイヤーの半径+マップ半径より小さかったら保存する。
+				//if (fabs(Vec2<float>(buff.first - player.centerPos).x) < player.PLAYER_SIZE.y + MAP_CHIP_HALF_SIZE &&
+				//	fabs(Vec2<float>(buff.first - player.centerPos).y - MAP_CHIP_HALF_SIZE) < player.PLAYER_SIZE.y + MAP_CHIP_HALF_SIZE) {
 
-					// そもそも一つ右のインデックスがあるのかどうかをチェックする。
-					if (height + 1 < mapChipData.size()) {
+				// そもそも一つ右のインデックスがあるのかどうかをチェックする。
+				if (height + 1 < mapChipData.size()) {
 
-						// 交点の上のマップチップが壁だったら無効化する。
-						if (!(mapChipData[height + 1][width] >= 1 && mapChipData[height + 1][width] <= 9)) {
+					// 交点の上のマップチップが壁だったら無効化する。
+					if (!(mapChipData[height + 1][width] >= 1 && mapChipData[height + 1][width] <= 9)) {
 
-							buff.second = INTERSECTED_BOTTOM;
-							intersectPos.push_back(buff);
-
-						}
+						buff.second = INTERSECTED_BOTTOM;
+						intersectPos.push_back(buff);
 
 					}
 
 				}
-	//	}
+
+			}
+			//	}
 
 			// 左辺
 			//if (direction == INTERSECTED_RIGHT) {
-				if (IsIntersected(leftBottom, leftTop, pos, checkHitDirection)) {
+			if (IsIntersected(leftBottom, leftTop, pos, checkHitDirection)) {
 
-					// 当たっていたら交点を計算して保存
-					pair<Vec2<float>, INTERSECTED_LINE> buff;
-					buff.first = CalIntersectPoint(leftBottom, leftTop, pos, checkHitDirection);
+				// 当たっていたら交点を計算して保存
+				pair<Vec2<float>, INTERSECTED_LINE> buff;
+				buff.first = CalIntersectPoint(leftBottom, leftTop, pos, checkHitDirection);
 
-					// そもそも一つ上のインデックスがあるのかどうかをチェックする。
-					if (width - 1 >= 0) {
+				// そもそも一つ上のインデックスがあるのかどうかをチェックする。
+				if (width - 1 >= 0) {
 
-						// 交点の左のマップチップが壁だったら無効化する。
-						if (!(mapChipData[height][width - 1] >= 1 && mapChipData[height][width - 1] <= 9)) {
+					// 交点の左のマップチップが壁だったら無効化する。
+					if (!(mapChipData[height][width - 1] >= 1 && mapChipData[height][width - 1] <= 9)) {
 
-							buff.second = INTERSECTED_LEFT;
-							intersectPos.push_back(buff);
-
-						}
+						buff.second = INTERSECTED_LEFT;
+						intersectPos.push_back(buff);
 
 					}
 
 				}
-		//	}
+
+			}
+			//	}
 
 			// 交点が0個だったら次へ
 			if (intersectPos.size() <= 0) continue;

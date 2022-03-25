@@ -220,7 +220,7 @@ void Player::Update(const vector<vector<int>> mapData)
 	}
 
 	// ギミックから与えられる移動量を初期化。
-	gimmickVel = {};
+	//gimmickVel = {};
 
 	// 入力されてから数フレームを取得するタイマーを更新。
 	if (asSoonAsInputTimer > 0) --asSoonAsInputTimer;
@@ -333,7 +333,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 	{
 
 		// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
-		INTERSECTED_LINE intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, vel, PLAYER_HIT_SIZE, onGround, mapData);
+		INTERSECTED_LINE intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, vel + gimmickVel, PLAYER_HIT_SIZE, onGround, mapData);
 
 		// 当たった位置に応じて処理を分ける。
 		if (intersectedLine == INTERSECTED_TOP) {
@@ -632,6 +632,8 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 	/*===== プレイヤーとドッスンブロックの当たり判定 =====*/
 
+	bool isHitDossun = false;
+
 	const int DOSSUN_COUNT = dossun.size();
 	for (int index = 0; index < DOSSUN_COUNT; ++index) {
 
@@ -646,6 +648,8 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 			// プレイヤーにドッスンブロックの移動量を渡す。
 			gimmickVel = Vec2<float>(dossun[index].speed, dossun[index].speed) * dossun[index].moveDir;
+
+			isHitDossun = true;
 
 			// ドッスンの移動量タイマーを更新。
 			dossun[index].isHitPlayer = true;
@@ -674,6 +678,8 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		}
 
 		if (isDossunTop) vel.y /= 2.0f;
+
+		if (!isHitDossun) gimmickVel = {};
 
 	}
 

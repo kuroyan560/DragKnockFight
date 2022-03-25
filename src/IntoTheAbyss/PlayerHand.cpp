@@ -7,6 +7,7 @@
 
 #include"KuroEngine.h"
 #include"TexHandleMgr.h"
+#include "WinApp.h"
 
 PlayerHand::PlayerHand()
 {
@@ -348,7 +349,13 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 			// このインデックスのブロックの座標を取得。
 			const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);
 
-			if (Vec2<float>(BLOCK_POS.x - handPos.x, BLOCK_POS.y - handPos.y).Length() >= 1000.0f) {
+			Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
+
+			bool checkInsideTop = BLOCK_POS.y < handPos.y - windowSize.y;
+			bool checkInsideBottom = handPos.y + windowSize.y > BLOCK_POS.y;
+			bool checkInsideLeft = BLOCK_POS.x < handPos.x + windowSize.x;
+			bool checkInsideRight = handPos.x + windowSize.x > BLOCK_POS.x;
+			if (checkInsideTop && checkInsideBottom && checkInsideLeft && checkInsideRight) {
 				//player.onGround = false;
 				continue;
 			}
