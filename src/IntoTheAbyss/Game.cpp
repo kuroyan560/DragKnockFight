@@ -376,6 +376,9 @@ Game::Game()
 
 void Game::Init()
 {
+	int stageNum = SelectStage::Instance()->GetStageNum();
+	int roomNum = SelectStage::Instance()->GetRoomNum();
+
 	// スクロール量を設定。
 	const float WIN_WIDTH_HALF = WinApp::Instance()->GetWinCenter().x;
 	const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
@@ -626,6 +629,10 @@ void Game::Update()
 {
 	ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 
+	int stageNum = SelectStage::Instance()->GetStageNum();
+	int roomNum = SelectStage::Instance()->GetRoomNum();
+
+
 #pragma region ステージの切り替え
 	stageNum = SelectStage::Instance()->GetStageNum();
 
@@ -673,9 +680,9 @@ void Game::Update()
 
 	if (UsersInput::Instance()->OnTrigger(DIK_RETURN))
 	{
-		stageNum = debugStageData[0];
-		roomNum = debugStageData[1];
-		mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
+		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
+		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
+		mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
 
 		Vec2<float> door;
 		//デバック用のマップチップ番号からスタートする
@@ -832,7 +839,7 @@ void Game::Update()
 					Vec2<float>doorPos = GetDoorPos(doorNumber, mapData);
 					//プレイヤーがリスポーンする座標を入手
 					responePos = GetPlayerResponePos(stageNum, localRoomNum, doorNumber, doorPos, &door);
-					roomNum = localRoomNum;
+					SelectStage::Instance()->SelectRoomNum(localRoomNum);
 
 					sceneChangingFlag = true;
 					//画面外から登場させる
@@ -1605,9 +1612,12 @@ void Game::Update()
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 {
-	/*===== 描画処理 =====*/
+	int stageNum = SelectStage::Instance()->GetStageNum();
+	int roomNum = SelectStage::Instance()->GetRoomNum();
 
-	DrawMapChip(mapData, mapChipDrawData, mapBlockGraph, 0, roomNum);
+	/*===== 描画処理 =====*/
+	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+	DrawMapChip(mapData, mapChipDrawData, mapBlockGraph, stageNum, roomNum);
 
 	MovingBlockMgr::Instance()->Draw(movingBlockGraph);
 

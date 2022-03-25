@@ -4,6 +4,7 @@
 #include"Sprite_Shadow.h"
 #include"GaussianBlur.h"
 #include"IntoTheAbyss/StageMgr.h"
+#include"IntoTheAbyss/SelectStage.h"
 
 GameScene::GameScene()
 {
@@ -53,8 +54,8 @@ void GameScene::OnImguiDebug()
 {
 	ImGui::Begin("StageInfo");
 	ImGui::Text("---Now---");
-	ImGui::Text("StageNumber:%d",game.stageNum);
-	ImGui::Text("RoomNumber:%d\n\n",game.roomNum);
+	ImGui::Text("StageNumber:%d",SelectStage::Instance()->GetStageNum());
+	ImGui::Text("RoomNumber:%d\n\n", SelectStage::Instance()->GetRoomNum());
 	ImGui::Text("---Select---");
 
 	ImGui::Text("StageNumber:%d", game.debugStageData[0]);

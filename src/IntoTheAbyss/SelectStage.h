@@ -6,14 +6,21 @@ class SelectStage:public Singleton<SelectStage>
 public:
 	SelectStage();
 
-	void Select(int STAGE_NUM)
+	void SelectStageNum(const int &STAGE_NUM)
 	{
 		stageNum = STAGE_NUM;
 	};
-	const int &GetStageNum();
+	void SelectRoomNum(const int &ROOM_NUM)
+	{
+		roomNum = ROOM_NUM;
+	};
 
-	bool resetStageFlag;
+	const int &GetStageNum();
+	const int &GetRoomNum();
+
+	bool resetStageFlag;//ステージをリセットする処理
 private:
 	int stageNum;	//ステージ番号
+	int roomNum;	//エリア番号
 };
 

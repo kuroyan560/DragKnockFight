@@ -105,8 +105,6 @@ class Game
 
 
 public:
-	int stageNum = 0;//ステージ番号
-	int roomNum = 0; //部屋番号
 
 	array<int, 2> debugStageData = { 0,0 };//デバック用のステージと部屋番号
 
