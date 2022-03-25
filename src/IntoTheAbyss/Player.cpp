@@ -35,11 +35,6 @@ Player::Player()
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
 
 	this->Init(GetGeneratePos());
-
-
-	isDead = false;
-	isDouji = false;
-	firstRecoilParticleTimer = 0;
 }
 
 Player::~Player()
@@ -116,11 +111,15 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	stretchTimer = STRETCH_RETURN_TIME;
 
 	//テレポート時の点滅の初期化
-	teleFlashTimer = TELE_FLASH_TIME;
+	flashTimer = TELE_FLASH_TIME;
+	flashTotalTime = TELE_FLASH_TIME;
 
 	firstRecoilParticleTimer = 0;
 	drawCursorFlag = true;
 
+	//同時ショット判定タイマーリセット
+	isLeftFirstShotTimer = DOUJI_ALLOWANCE_FRAME;
+	isRightFirstShotTimer = DOUJI_ALLOWANCE_FRAME;
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -183,14 +182,9 @@ void Player::Update(const vector<vector<int>> mapData)
 	if (mapX >= mapData[mapY].size()) mapX = mapData[mapY].size() - 1;
 
 	// 一個上のマップチップがブロックで、X軸方向の移動量が一定以上だったらパーティクルを生成する。
-	//if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
 	if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1), HIT_MAP);
 
 	// 壁ズリのパーティクルを生成。
-	//if (isSlippingWall[PLAYER_TOP]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
-	//if (isSlippingWall[PLAYER_RIGHT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x + GetPlayerGraphSize().x, centerPos.y), Vec2<float>(1, 0));
-	//if (isSlippingWall[PLAYER_BOTTOM]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y), Vec2<float>(0, 1));
-	//if (isSlippingWall[PLAYER_LEFT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x - GetPlayerGraphSize().x, centerPos.y), Vec2<float>(-1, 0));
 	if (isSlippingWall[PLAYER_TOP]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1), HIT_MAP);
 	if (isSlippingWall[PLAYER_RIGHT]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x + GetPlayerGraphSize().x, centerPos.y), Vec2<float>(1, 0), HIT_MAP);
 	if (isSlippingWall[PLAYER_BOTTOM]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y), Vec2<float>(0, 1), HIT_MAP);
@@ -250,21 +244,26 @@ void Player::Update(const vector<vector<int>> mapData)
 		// 正規化する。
 		invForwardVec.Normalize();
 
-		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
-		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
-		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
-		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
-
-		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, FIRST_DASH, per, 2);
-		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, FIRST_DASH, per, 2);
-		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, FIRST_DASH, per, 2);
-		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, FIRST_DASH, per, 2);
+		if (!isDouji)
+		{
+			ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, FIRST_DASH, per, 2);
+			ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, FIRST_DASH, per, 2);
+			ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, FIRST_DASH, per, 2);
+			ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, FIRST_DASH, per, 2);
+		}
+		else
+		{
+			ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, FISRT_DASH_DOUJI, per, 2);
+			ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, FISRT_DASH_DOUJI, per, 2);
+			ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, FISRT_DASH_DOUJI, per, 2);
+			ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, FISRT_DASH_DOUJI, per, 2);
+		}
 
 		--firstRecoilParticleTimer;
 	}
 
 	//テレポート時のフラッシュのタイマー計測
-	if (teleFlashTimer < TELE_FLASH_TIME)teleFlashTimer++;
+	if (flashTimer < flashTotalTime)flashTimer++;
 }
 
 void Player::Draw(LightManager& LigManager)
@@ -310,7 +309,7 @@ void Player::Draw(LightManager& LigManager)
 
 	//テレポート時のフラッシュ
 	Color teleFlashCol;
-	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, teleFlashTimer, TELE_FLASH_TIME, 1.0f, 0.0f);
+	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
 	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
 
 	if (playerDir == RIGHT)
@@ -623,7 +622,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 				// Recovery of recoil
 				rHand->isFirstShot = false;
 				lHand->isFirstShot = false;
-
+				isDouji = false;
 			}
 
 		}
@@ -658,7 +657,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			// 最初の一発フラグを大きくする。
 			lHand->isFirstShot = false;
 			rHand->isFirstShot = false;
-
+			isDouji = false;
 		}
 		else if (isHitTeleportPikeDossun && hitTeleportPikeIndex == index) {
 
@@ -952,7 +951,7 @@ void Player::HitMapChipLeft()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
-
+	isDouji = false;
 }
 
 void Player::HitMapChipRight()
@@ -1001,6 +1000,7 @@ void Player::HitMapChipRight()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
+	isDouji = false;
 }
 
 void Player::HitMapChipBottom()
@@ -1057,7 +1057,7 @@ void Player::HitMapChipBottom()
 	// 最初の一発フラグを初期化
 	lHand->isFirstShot = false;
 	rHand->isFirstShot = false;
-
+	isDouji = false;
 }
 
 void Player::StopDoorLeftRight()
@@ -1080,8 +1080,11 @@ Vec2<float> Player::GetCenterDrawPos()
 
 void Player::Input(const vector<vector<int>> mapData)
 {
-
 	/*===== 入力処理 =====*/
+
+	//同時ショット判定タイマー計測
+	if (isLeftFirstShotTimer < DOUJI_ALLOWANCE_FRAME)isLeftFirstShotTimer++;
+	if (isRightFirstShotTimer < DOUJI_ALLOWANCE_FRAME)isRightFirstShotTimer++;
 
 	const float INPUT_DEAD_LINE = 0.3f;
 
@@ -1115,11 +1118,7 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// LBが押されたら反動をつける。
-	bool isShotLeft = false;
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
-
-		// 撃った判定を保存。
-		isShotLeft = true;
 
 		// 反動をつける。
 		float rHandAngle = lHand->GetAngle();
@@ -1131,6 +1130,9 @@ void Player::Input(const vector<vector<int>> mapData)
 
 		// 移動量を加算
 		if (!lHand->isFirstShot) {
+
+			// 撃った判定を保存。
+			isLeftFirstShotTimer = 0;
 
 			// onGroundがtrueだったら移動量を加算しない。
 			if (!onGround || sinf(rHandAngle) < 0.6f) {
@@ -1190,7 +1192,13 @@ void Player::Input(const vector<vector<int>> mapData)
 		}
 
 		// 弾を生成する。
-		BulletMgr::Instance()->Generate(lHand->GetPos(), lHand->GetAngle(), isFirstShot, false);
+		const float ARM_DISTANCE = 20.0f;
+		const float OFFSET_Y = -14.0f;
+		const float OFFSET_X = 12.0f;
+
+		float angle = lHand->GetAngle();
+
+		BulletMgr::Instance()->Generate(lHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, false);
 
 		// 連射タイマーをセット
 		rapidFireTimerLeft = RAPID_FIRE_TIMER;
@@ -1206,11 +1214,7 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// RBが押されたら反動をつける。
-	bool isShotRight = false;
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
-
-		// 右側に撃った判定を保存する。
-		isShotRight = true;
 
 		// 反動をつける。
 		float lHandAngle = rHand->GetAngle();
@@ -1230,6 +1234,9 @@ void Player::Input(const vector<vector<int>> mapData)
 
 		// 移動量を加算
 		if (!rHand->isFirstShot) {
+
+			// 右側に撃った判定を保存する。
+			isRightFirstShotTimer = 0;
 
 			// onGroundがtrueだったら移動量を加算しない。
 			if (!onGround || sinf(lHandAngle) < 0.6f) {
@@ -1281,7 +1288,14 @@ void Player::Input(const vector<vector<int>> mapData)
 		}
 
 		// 弾を生成する。
-		BulletMgr::Instance()->Generate(rHand->GetPos(), rHand->GetAngle(), isFirstShot, true);
+		const float ARM_DISTANCE = 20.0f;
+		const float OFFSET_Y = -14.0f;
+		const float OFFSET_X = -12.0f;
+
+		float angle = rHand->GetAngle();
+		angle -= 0.261799f;
+
+		BulletMgr::Instance()->Generate(rHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, true);
 
 		// 連射タイマーをセット
 		rapidFireTimerRight = RAPID_FIRE_TIMER;
@@ -1297,15 +1311,14 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// 同時に撃ったフラグを取得する。
-	if (isShotLeft && isShotRight) {
+	if (!isDouji && isLeftFirstShotTimer < DOUJI_ALLOWANCE_FRAME && isRightFirstShotTimer < DOUJI_ALLOWANCE_FRAME) {
 
 		isDouji = true;
 
-	}
-	else {
-
-		isDouji = false;
-
+		//同時ショットエフェクト
+		flashTimer = 0;
+		flashTotalTime = DOUJI_FLASH_TIME;
+		UsersInput::Instance()->ShakeController(1.0f, 10);
 	}
 
 	// 移動速度が限界値を超えないようにする。
@@ -1365,7 +1378,8 @@ void Player::Input(const vector<vector<int>> mapData)
 			rHand->EmitAfterImg(vec, GetHandGraph(RIGHT), graphSize.Float(), { false,false });
 
 			//点滅
-			teleFlashTimer = 0;
+			flashTimer = 0;
+			flashTotalTime = TELE_FLASH_TIME;
 
 			// プレイヤーを瞬間移動させる。
 			centerPos = rHand->teleportPike.pos;
@@ -1438,7 +1452,6 @@ void Player::Input(const vector<vector<int>> mapData)
 		isPrevFrameShotBeacon = false;
 
 	}
-
 }
 
 void Player::Move()
