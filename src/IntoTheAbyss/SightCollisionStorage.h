@@ -8,10 +8,10 @@ using namespace std;
 // データクラス
 struct SightCollisionData {
 
-	Vec2<float>* pos;		// 座標のポインタ
+	Vec2<float> pos;		// 座標のポインタ
 	Vec2<float> scale;		// 大きさ
 
-	SightCollisionData(Vec2<float>* pos, const Vec2<float>& scale) {
+	SightCollisionData(Vec2<float>& pos, const Vec2<float>& scale) {
 
 		this->pos = pos;
 		this->scale = scale;
@@ -19,7 +19,7 @@ struct SightCollisionData {
 	}
 	SightCollisionData() {
 
-		this->pos = nullptr;
+		this->pos = {};
 		this->scale = {};
 
 	}

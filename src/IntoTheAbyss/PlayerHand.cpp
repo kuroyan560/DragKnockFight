@@ -264,9 +264,9 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 	for (int index = 0; index < STORAGE_COUNT; ++index) {
 
 		// このインデックスのブロックのサイズを取得。
-		const Vec2<float> BLOCK_SIZE = {};
+		const Vec2<float> BLOCK_SIZE = SightCollisionStorage::Instance()->data[index]->scale;
 		// このインデックスのブロックの座標を取得。
-		const Vec2<float>* BLOCK_POS = {};
+		const Vec2<float> BLOCK_POS = SightCollisionStorage::Instance()->data[index]->pos;
 
 		//// ビューポート外にあったら処理を行わない。
 		//if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS->x) continue;
@@ -280,31 +280,31 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 		vector<Vec2<float>> intersectedPos;
 
 		// 上方向
-		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y))) {
+		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - BLOCK_SIZE.x, BLOCK_POS.y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS.x + BLOCK_SIZE.x, BLOCK_POS.y - BLOCK_SIZE.y))) {
 
 			// 交点を求めて保存する。
-			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y)));
+			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - BLOCK_SIZE.x, BLOCK_POS.y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS.x + BLOCK_SIZE.x, BLOCK_POS.y - BLOCK_SIZE.y)));
 
 		}
 		// 右方向
-		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y))) {
+		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x + BLOCK_SIZE.x, BLOCK_POS.y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS.x + BLOCK_SIZE.x, BLOCK_POS.y + BLOCK_SIZE.y))) {
 
 			// 交点を求めて保存する。
-			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y)));
+			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x + BLOCK_SIZE.x, BLOCK_POS.y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS.x + BLOCK_SIZE.x, BLOCK_POS.y + BLOCK_SIZE.y)));
 
 		}
 		// 下方向
-		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y))) {
+		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - BLOCK_SIZE.x, BLOCK_POS.y + BLOCK_SIZE.y), Vec2<float>(BLOCK_POS.x + BLOCK_SIZE.x, BLOCK_POS.y + BLOCK_SIZE.y))) {
 
 			// 交点を求めて保存する。
-			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x + BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y)));
+			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - BLOCK_SIZE.x, BLOCK_POS.y + BLOCK_SIZE.y), Vec2<float>(BLOCK_POS.x + BLOCK_SIZE.x, BLOCK_POS.y + BLOCK_SIZE.y)));
 
 		}
 		// 左方向
-		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y))) {
+		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - BLOCK_SIZE.x, BLOCK_POS.y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS.x - BLOCK_SIZE.x, BLOCK_POS.y + BLOCK_SIZE.y))) {
 
 			// 交点を求めて保存する。
-			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS->x - BLOCK_SIZE.x, BLOCK_POS->y + BLOCK_SIZE.y)));
+			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - BLOCK_SIZE.x, BLOCK_POS.y - BLOCK_SIZE.y), Vec2<float>(BLOCK_POS.x - BLOCK_SIZE.x, BLOCK_POS.y + BLOCK_SIZE.y)));
 
 		}
 
