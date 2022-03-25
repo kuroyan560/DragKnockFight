@@ -17,6 +17,7 @@
 #include"DrawFunc_Color.h"
 #include"WinApp.h"
 #include "ParticleMgr.h"
+#include "EventCollider.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
