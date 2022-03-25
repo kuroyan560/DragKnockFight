@@ -250,6 +250,17 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 					// 壁にあたった判定をさせないために戻り値用のIDを無効化する。
 					miniIntersectedPoint.second = INTERSECTED_RISE;
 
+					if (0 < vel.x) {
+
+						pos.x += offset;
+
+					}
+					else if (vel.x < 0) {
+
+						pos.x -= offset;
+
+					}
+
 				}
 				else {
 
@@ -285,6 +296,17 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 
 					// 壁にあたった判定をさせないために戻り値用のIDを無効化する。
 					miniIntersectedPoint.second = INTERSECTED_RISE;
+
+					if (0 < vel.x) {
+
+						pos.x += offset;
+
+					}
+					else if (vel.x < 0) {
+
+						pos.x -= offset;
+
+					}
 
 				}
 				else {
@@ -536,6 +558,8 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 					// 壁にあたった判定をさせないために戻り値用のIDを無効化する。
 					miniIntersectedPoint.second = INTERSECTED_RISE;
 
+					pos.x -= offset;
+
 				}
 				else {
 
@@ -570,6 +594,8 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 					// 壁にあたった判定をさせないために戻り値用のIDを無効化する。
 					miniIntersectedPoint.second = INTERSECTED_RISE;
+
+					pos.x += offset;
 
 				}
 				else {
