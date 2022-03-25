@@ -86,7 +86,6 @@ class Game
 	E_DOOR_DIR doorDir;
 
 
-
 	std::array<EventBlock,10>eventBlocks;
 
 
