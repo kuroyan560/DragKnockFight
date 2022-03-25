@@ -124,6 +124,7 @@ public:
 	//デッドゾーン判定の度合い(1.0fだとデフォルト採用)
 	Vec2<float>GetLeftStickVec(const Vec2<float>& DeadRate = { 1.0f,1.0f });
 	Vec2<float>GetRightStickVec(const Vec2<float>& DeadRate = { 1.0f,1.0f });
+	// "Power" must fit between 0.0f and 1.0f.
 	void ShakeController(const float& Power, const int& Span);
 
 	// 生のスティックのレートが欲しかったので臨時で実装しました。開発が終わったら消してください；；

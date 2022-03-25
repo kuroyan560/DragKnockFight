@@ -72,7 +72,14 @@ public:
 
 	//テレポートしたとき光る
 	const int TELE_FLASH_TIME = 120;
-	int teleFlashTimer;
+	const int DOUJI_FLASH_TIME = 60;
+	int flashTotalTime;
+	int flashTimer;
+
+	//同時ショット判定をとる許容フレーム
+	const int DOUJI_ALLOWANCE_FRAME = 10;
+	int isLeftFirstShotTimer;
+	int isRightFirstShotTimer;
 
 public:
 

@@ -116,6 +116,12 @@ ParticleMgr::ParticleMgr()
 	{
 		textures[SMOKE_0 + i] = smokes[i];
 	}
+
+	auto smokes_enchant = D3D12App::Instance()->GenerateTextureBuffer("resource/IntoTheAbyss/Particle/smoke_enchant.png", SMOKE_NUM, { SMOKE_NUM,1 });
+	for (int i = 0; i < SMOKE_NUM; ++i)
+	{
+		textures[SMOKE_E_0 + i] = smokes_enchant[i];
+	}
 }
 
 void ParticleMgr::Init()
@@ -184,6 +190,10 @@ int ParticleMgr::GetTex(const PARTICLE_TYPE& Type)
 	if (Type == FIRST_DASH)
 	{
 		tex = KuroFunc::GetRand(SMOKE_NUM - 1) + PARTICLE_TEX::SMOKE_0;
+	}
+	else if (Type == FISRT_DASH_DOUJI)
+	{
+		tex = KuroFunc::GetRand(SMOKE_NUM - 1) + PARTICLE_TEX::SMOKE_E_0;
 	}
 	return tex;
 }
