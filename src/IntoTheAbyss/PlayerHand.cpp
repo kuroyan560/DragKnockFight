@@ -359,6 +359,7 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 
 			Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
 
+			// 一定範囲以外だったら処理を飛ばす。
 			bool checkInsideTop = BLOCK_POS.y < handPos.y - windowSize.y;
 			bool checkInsideBottom = handPos.y + windowSize.y > BLOCK_POS.y;
 			bool checkInsideLeft = BLOCK_POS.x < handPos.x + windowSize.x;
@@ -451,45 +452,6 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 		}
 
 	}
-
-	// 最後にウィンドウとの当たり判定を行う。
-
-	//const float WIN_WIDTH = 1280.0f;
-	//const float WIN_HEIGHT = 740.0f;
-
-	//const Vec2<float> WINDOW_LEFTUP = Vec2<float>(ScrollMgr::Instance()->scrollAmount.x, ScrollMgr::Instance()->scrollAmount.y);
-	//const Vec2<float> WINDOW_RIGHTUP = Vec2<float>(ScrollMgr::Instance()->scrollAmount.x + WIN_WIDTH, ScrollMgr::Instance()->scrollAmount.y);
-	//const Vec2<float> WINDOW_LEFTDOWN = Vec2<float>(ScrollMgr::Instance()->scrollAmount.x, ScrollMgr::Instance()->scrollAmount.y + WIN_HEIGHT);
-	//const Vec2<float> WINDOW_RIGHTDOWN = Vec2<float>(ScrollMgr::Instance()->scrollAmount.x + WIN_WIDTH, ScrollMgr::Instance()->scrollAmount.y + WIN_HEIGHT);
-
-	//// 上方向
-	//if (IsIntersected(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP, WINDOW_RIGHTUP)) {
-	//	pair<Vec2<float>, float> buff;
-	//	buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP, WINDOW_RIGHTUP);
-	//	buff.second = Vec2<float>(buff.first - handSegmentStart).Length();
-	//	shortestPoints.push_back(buff);
-	//}
-	//// 右方向
-	//if (IsIntersected(handSegmentStart, handSegmentEnd, WINDOW_RIGHTUP, WINDOW_RIGHTDOWN)) {
-	//	pair<Vec2<float>, float> buff;
-	//	buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, WINDOW_RIGHTUP, WINDOW_RIGHTDOWN);
-	//	buff.second = Vec2<float>(buff.first - handSegmentStart).Length();
-	//	shortestPoints.push_back(buff);
-	//}
-	//// 下方向
-	//if (IsIntersected(handSegmentStart, handSegmentEnd, WINDOW_LEFTDOWN, WINDOW_RIGHTDOWN)) {
-	//	pair<Vec2<float>, float> buff;
-	//	buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, WINDOW_LEFTDOWN, WINDOW_RIGHTDOWN);
-	//	buff.second = Vec2<float>(buff.first - handSegmentStart).Length();
-	//	shortestPoints.push_back(buff);
-	//}
-	//// 左方向
-	//if (IsIntersected(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP, WINDOW_LEFTDOWN)) {
-	//	pair<Vec2<float>, float> buff;
-	//	buff.first = CalIntersectPoint(handSegmentStart, handSegmentEnd, WINDOW_LEFTUP, WINDOW_LEFTDOWN);
-	//	buff.second = Vec2<float>(buff.first - handSegmentStart).Length();
-	//	shortestPoints.push_back(buff);
-	//}
 
 
 	/*-- ここまでの過程で様々な最短を求めることができた。 --*/

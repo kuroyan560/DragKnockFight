@@ -96,7 +96,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			//if (centerY >= HEIGHT) return INTERSECTED_NONE;
 
 			// プレイヤーとの距離が一定以上離れていたら処理を行わない。
-			if (Vec2<float>(centerX - pos.x, centerY - pos.y).Length() >= 100.0f) {
+			if (Vec2<float>(centerX - pos.x, centerY - pos.y).Length() >= MAP_CHIP_SIZE * 2.0f) {
 				onGround = false;
 				continue;
 			}
@@ -394,7 +394,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			//if (centerY >= HEIGHT) return INTERSECTED_NONE;
 
 			// プレイヤーとの距離が一定以上離れていたら処理を行わない。
-			if (Vec2<float>(centerX - pos.x, centerY - pos.y).Length() >= 300.0f) {
+			if (Vec2<float>(centerX - pos.x, centerY - pos.y).Length() >= MAP_CHIP_SIZE * 2.0f) {
 				//player.onGround = false;
 				continue;
 			}
