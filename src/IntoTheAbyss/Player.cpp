@@ -1315,10 +1315,13 @@ void Player::Input(const vector<vector<int>> mapData)
 
 		isDouji = true;
 
-		//同時ショットエフェクト
-		flashTimer = 0;
-		flashTotalTime = DOUJI_FLASH_TIME;
-		UsersInput::Instance()->ShakeController(1.0f, 10);
+		if (isLeftFirstShotTimer == 0 || isRightFirstShotTimer == 0)
+		{
+			//同時ショットエフェクト
+			flashTimer = 0;
+			flashTotalTime = DOUJI_FLASH_TIME;
+			UsersInput::Instance()->ShakeController(1.0f, 10);
+		}
 	}
 
 	// 移動速度が限界値を超えないようにする。

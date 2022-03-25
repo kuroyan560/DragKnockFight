@@ -77,7 +77,7 @@ public:
 	int flashTimer;
 
 	//同時ショット判定をとる許容フレーム
-	const int DOUJI_ALLOWANCE_FRAME = 10;
+	const int DOUJI_ALLOWANCE_FRAME = 22;
 	int isLeftFirstShotTimer;
 	int isRightFirstShotTimer;
 
@@ -87,7 +87,8 @@ public:
 
 	const float ADD_GRAVITY = 0.5f;				// プレイヤーにかける重力
 	const float MAX_GRAVITY = 15.0f;			// プレイヤーにかける重力の最大量
-	const float RECOIL_AMOUNT = 5.0f;			// 弾を撃った際の反動
+	//const float RECOIL_AMOUNT = 5.0f;			// 弾を撃った際の反動
+	const float RECOIL_AMOUNT = 7.0f;			// 弾を撃った際の反動
 	const float FIRST_RECOIL_AMOUNT = 20.0;		// 弾を撃った際の反動
 	const float MAX_RECOIL_AMOUNT = 30.0f;		// 弾を撃った際の反動の最大値
 	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
