@@ -140,7 +140,7 @@ void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, cons
 	//Æ€‚ð•`‰æ
 	if (DRAW_CURSOR)
 	{
-		DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), true);
+		DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
 	}
 
 }

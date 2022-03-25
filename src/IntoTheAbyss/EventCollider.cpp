@@ -1,9 +1,9 @@
-#include "Collider.h"
+#include "EventCollider.h"
 #include <vector>
 
 using namespace std;
 
-INTERSECTED_LINE Collider::CheckHitVel(Vec2<float>& pushBackPosA, const Vec2<float> prevFramePosA, const Vec2<float>& velA, const Vec2<float>& sizeA, const Vec2<float>& posB, const Vec2<float>& sizeB)
+INTERSECTED_LINE EventCpllider::CheckHitVel(Vec2<float> pushBackPosA, const Vec2<float> prevFramePosA, const Vec2<float>& velA, const Vec2<float>& sizeA, const Vec2<float>& posB, const Vec2<float>& sizeB)
 {
 	/*===== 矩形と矩形の移動量を使った押し戻し付き当たり判定 =====*/
 
@@ -148,7 +148,7 @@ INTERSECTED_LINE Collider::CheckHitVel(Vec2<float>& pushBackPosA, const Vec2<flo
 
 }
 
-INTERSECTED_LINE Collider::CheckHitSize(Vec2<float>& posA, const Vec2<float>& sizeA, const Vec2<float>& posB, const Vec2<float>& sizeB, const INTERSECTED_LINE& dir)
+INTERSECTED_LINE EventCpllider::CheckHitSize(Vec2<float> posA, const Vec2<float>& sizeA, const Vec2<float>& posB, const Vec2<float>& sizeB, const INTERSECTED_LINE& dir)
 {
 	/*===== マップチップとプレイヤーの当たり判定 =====*/
 
@@ -327,7 +327,7 @@ INTERSECTED_LINE Collider::CheckHitSize(Vec2<float>& posA, const Vec2<float>& si
 
 }
 
-bool Collider::IsIntersected(const Vec2<float>& posA1, const Vec2<float>& posA2, const Vec2<float>& posB1, const Vec2<float>& posB2)
+bool EventCpllider::IsIntersected(const Vec2<float>& posA1, const Vec2<float>& posA2, const Vec2<float>& posB1, const Vec2<float>& posB2)
 {
 	/*--線分の外積を計算して交差判定を行う--*/
 	//第一回 線分Aから見たBの交差判定
@@ -372,7 +372,7 @@ bool Collider::IsIntersected(const Vec2<float>& posA1, const Vec2<float>& posA2,
 	return false;
 }
 
-Vec2<float> Collider::CalIntersectPoint(Vec2<float> posA1, Vec2<float> posA2, Vec2<float> posB1, Vec2<float> posB2)
+Vec2<float> EventCpllider::CalIntersectPoint(Vec2<float> posA1, Vec2<float> posA2, Vec2<float> posB1, Vec2<float> posB2)
 {
 	//交点を求める この式は資料そのまま
 	Vec2<float> buff = Vec2<float>(posB2.x - posB1.x, posB2.y - posB1.y);

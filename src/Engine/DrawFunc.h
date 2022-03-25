@@ -4,6 +4,7 @@
 #include<vector>
 #include"Vec.h"
 #include"Color.h"
+#include<map>
 
 static class DrawFunc
 {
@@ -13,7 +14,7 @@ static class DrawFunc
 	static std::vector<std::shared_ptr<VertexBuffer>>LINE_VERTEX_BUFF;	//DrawLine用
 
 	//DrawBox
-	static std::shared_ptr<GraphicsPipeline>BOX_PIPELINE[AlphaBlendModeNum];
+	static std::map<DXGI_FORMAT, std::map<AlphaBlendMode, std::shared_ptr<GraphicsPipeline>>>BOX_PIPELINE;
 	static int DRAW_BOX_COUNT;
 	static std::vector<std::shared_ptr<VertexBuffer>>BOX_VERTEX_BUFF;
 
@@ -60,7 +61,7 @@ public:
 	/// <param name="Color">色</param>
 	/// <param name="FillFlg">中を塗りつぶすか</param>
 	/// <param name="BlendMode">ブレンドモード</param>
-	static void DrawBox2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& BoxColor, const bool& FillFlg = false, const AlphaBlendMode& BlendMode = AlphaBlendMode_None);
+	static void DrawBox2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& BoxColor, const DXGI_FORMAT& Format, const bool& FillFlg = false, const AlphaBlendMode& BlendMode = AlphaBlendMode_None);
 
 	/// <summary>
 	/// ２D円の描画

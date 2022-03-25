@@ -87,6 +87,7 @@ void Bullet::Update()
 
 }
 
+#include"D3D12App.h"
 void Bullet::Draw()
 {
 
@@ -117,5 +118,5 @@ void Bullet::Draw()
 	Vec2<float>rightBottom = { pos.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x + MAX_RADIUS * ScrollMgr::Instance()->zoom,
 		pos.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y + MAX_RADIUS * ScrollMgr::Instance()->zoom };
 
-	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(217, 26, 96, (int)alpha), true, AlphaBlendMode_Trans);
+	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(217, 26, 96, (int)alpha), D3D12App::Instance()->GetBackBuffFormat(), true, AlphaBlendMode_Trans);
 }

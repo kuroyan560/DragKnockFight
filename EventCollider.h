@@ -1,10 +1,9 @@
 #pragma once
 #include "Vec.h"
 #include "Singleton.h"
-#include "Intersected.h"
 
-// 当たり判定クラス
-class Collider : public Singleton<Collider> {
+// 押し戻しをしない当たり判定クラス
+class EventCpllider : public Singleton<EventCpllider> {
 
 public:
 

@@ -1585,7 +1585,7 @@ void Game::Update()
 	ParticleMgr::Instance()->Update();
 }
 
-void Game::Draw()
+void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 {
 	/*===== •`‰æˆ— =====*/
 
@@ -1624,6 +1624,12 @@ void Game::Draw()
 	ParticleMgr::Instance()->Draw(ligMgr);
 	if (sceneBlackFlag || sceneLightFlag)
 	{
-		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), true, AlphaBlendMode_Trans);
+		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), D3D12App::Instance()->GetBackBuffFormat(), true, AlphaBlendMode_Trans);
+
+		KuroEngine::Instance().Graphics().SetRenderTargets({ EmissiveMap.lock() });
+
+		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), EmissiveMap.lock()->GetDesc().Format, true, AlphaBlendMode_Trans);
+
+		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),EmissiveMap.lock() });
 	}
 }

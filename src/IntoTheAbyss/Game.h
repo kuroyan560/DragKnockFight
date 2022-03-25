@@ -114,7 +114,7 @@ public:
 	Game();
 	void Init();
 	void Update();
-	void Draw();
+	void Draw(std::weak_ptr<RenderTarget>EmissiveMap);
 
 	LightManager& GetLigManager() { return ligMgr; }
 
