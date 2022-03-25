@@ -127,7 +127,7 @@ void Player::Update(const vector<vector<int>> mapData)
 
 	/*===== 入力処理 =====*/
 
-	if (!doorMoveLeftRightFlag && !doorMoveUpDownFlag)
+	if (!doorMoveLeftRightFlag && !doorMoveUpDownFlag && !isDead)
 	{
 		// 入力に関する更新処理を行う。
 		Input(mapData);
