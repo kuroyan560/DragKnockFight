@@ -31,6 +31,8 @@ public:
 
 	AfterImg afterImg;
 
+	const int aimGraphHandle;
+
 	/*-- 定数 --*/
 
 public:
@@ -47,7 +49,7 @@ public:
 public:
 
 	// コンストラクタ
-	PlayerHand();
+	PlayerHand(const int& AimGraphHandle);
 
 	// 初期化処理
 	void Init(const float& armDistance);

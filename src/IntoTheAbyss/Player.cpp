@@ -28,8 +28,8 @@ Player::Player()
 {
 	/*====== コンストラクタ =====*/
 
-	lHand = make_unique<PlayerHand>();
-	rHand = make_unique<PlayerHand>();
+	lHand = make_unique<PlayerHand>(TexHandleMgr::LoadGraph("resource/IntoTheAbyss/aim_time.png"));
+	rHand = make_unique<PlayerHand>(TexHandleMgr::LoadGraph("resource/IntoTheAbyss/aim_tele.png"));
 
 	// 画像をロード
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
