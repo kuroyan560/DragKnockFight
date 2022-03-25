@@ -43,7 +43,7 @@ void GameScene::OnDraw()
 {
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
 	backGround->Draw(game.GetLigManager());
-	game.Draw();
+	game.Draw(emissiveMap);
 
 	gaussianBlur->Register(emissiveMap);
 	gaussianBlur->DrawResult(AlphaBlendMode_Add);
