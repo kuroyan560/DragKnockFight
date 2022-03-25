@@ -1192,7 +1192,13 @@ void Player::Input(const vector<vector<int>> mapData)
 		}
 
 		// 弾を生成する。
-		BulletMgr::Instance()->Generate(lHand->GetPos(), lHand->GetAngle(), isFirstShot, false);
+		const float ARM_DISTANCE = 20.0f;
+		const float OFFSET_Y = -14.0f;
+		const float OFFSET_X = 12.0f;
+
+		float angle = lHand->GetAngle();
+
+		BulletMgr::Instance()->Generate(lHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, false);
 
 		// 連射タイマーをセット
 		rapidFireTimerLeft = RAPID_FIRE_TIMER;
@@ -1282,7 +1288,14 @@ void Player::Input(const vector<vector<int>> mapData)
 		}
 
 		// 弾を生成する。
-		BulletMgr::Instance()->Generate(rHand->GetPos(), rHand->GetAngle(), isFirstShot, true);
+		const float ARM_DISTANCE = 20.0f;
+		const float OFFSET_Y = -14.0f;
+		const float OFFSET_X = -12.0f;
+
+		float angle = rHand->GetAngle();
+		angle -= 0.261799f;
+
+		BulletMgr::Instance()->Generate(rHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, true);
 
 		// 連射タイマーをセット
 		rapidFireTimerRight = RAPID_FIRE_TIMER;
