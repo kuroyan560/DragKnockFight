@@ -31,7 +31,7 @@ class Game
 		DOOR_RIGHT,	//右に出るドア
 		DOOR_Z,		//真ん中から出るドア
 		DOOR_NONE,		//ドア無し
-		DOOR_MAX		
+		DOOR_MAX
 	};
 
 	bool CheckUsedData(vector<Vec2<float>> DATA, Vec2<float> DATA2);

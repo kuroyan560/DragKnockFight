@@ -348,7 +348,7 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 			// このインデックスのブロックの座標を取得。
 			const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);
 
-			if (Vec2<float>(BLOCK_POS.x - handPos.x, BLOCK_POS.y - handPos.y).Length() >= 100.0f) {
+			if (Vec2<float>(BLOCK_POS.x - handPos.x, BLOCK_POS.y - handPos.y).Length() >= 1000.0f) {
 				//player.onGround = false;
 				continue;
 			}
