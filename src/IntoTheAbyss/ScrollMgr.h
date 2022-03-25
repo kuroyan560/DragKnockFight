@@ -66,7 +66,7 @@ public:
 
 
 	void WarpScroll(Vec2<float> PLAYER_POS, Vec2<float> SIZE = Vec2<float>(1280 / 2.0f, 720 / 2.0f));
-	void Restart(Vec2<float> VEL);
+	void Restart();
 
 	enum { UP, DOWN, LEFT, RIGHT };
 

@@ -295,7 +295,7 @@ void ScrollMgr::WarpScroll(Vec2<float> PLAYER_POS, Vec2<float> SIZE)
 
 }
 
-void ScrollMgr::Restart(Vec2<float> VEL)
+void ScrollMgr::Restart()
 {
 	scrollAmount = honraiScrollAmount;
 	warpFlag = true;

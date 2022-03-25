@@ -1022,7 +1022,7 @@ void Game::Update()
 				}
 				ScrollMgr::Instance()->WarpScroll(player.centerPos);
 				ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
-				ScrollMgr::Instance()->Restart(player.prevFrameCenterPos - player.centerPos);
+				ScrollMgr::Instance()->Restart();
 				goFlag = true;
 			}
 		}
@@ -1170,6 +1170,7 @@ void Game::Update()
 					if (mapData[y][x] == MAPCHIP_BLOCK_START)
 					{
 						player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
+						ScrollMgr::Instance()->WarpScroll(player.centerPos);
 						responeFlag = true;
 						break;
 					}
