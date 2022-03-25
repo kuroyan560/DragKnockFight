@@ -241,26 +241,26 @@ void DossunBlock::CheckHit(const vector<vector<int>>& mapData)
 
 		if (moveDir.y != 0) {
 			isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
-			if (!isDossunTop) isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(-size.x, 0), size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
-			if (!isDossunTop) isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(size.x, 0), size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
+			if (!isDossunTop) isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(-size.x + 10.0f, 0), size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
+			if (!isDossunTop) isDossunTop = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(size.x - 10.0f, 0), size, mapData, INTERSECTED_TOP) != INTERSECTED_NONE;
 			pos.y -= offset;
 		}
 		if (moveDir.x != 0) {
 			isDossunRight = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_RIGHT) != INTERSECTED_NONE;
-			if (!isDossunRight) isDossunRight = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, -size.y), size, mapData, INTERSECTED_RIGHT) != INTERSECTED_NONE;
-			if (!isDossunRight) isDossunRight = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, size.y), size, mapData, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+			if (!isDossunRight) isDossunRight = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, -size.y + 10.0f), size, mapData, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+			if (!isDossunRight) isDossunRight = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, size.y - 10.0f), size, mapData, INTERSECTED_RIGHT) != INTERSECTED_NONE;
 			pos.x -= offset;
 		}
 		if (moveDir.x != 0) {
 			isDossunLeft = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_LEFT) != INTERSECTED_NONE;
-			if (!isDossunLeft) isDossunLeft = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, -size.y), size, mapData, INTERSECTED_LEFT) != INTERSECTED_NONE;
-			if (!isDossunLeft) isDossunLeft = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, size.y), size, mapData, INTERSECTED_LEFT) != INTERSECTED_NONE;
+			if (!isDossunLeft) isDossunLeft = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, -size.y + 10.0f), size, mapData, INTERSECTED_LEFT) != INTERSECTED_NONE;
+			if (!isDossunLeft) isDossunLeft = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(0, size.y - 10.0f), size, mapData, INTERSECTED_LEFT) != INTERSECTED_NONE;
 			pos.x += offset;
 		}
 		if (moveDir.y != 0) {
 			isDossunBottom = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, mapData, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
-			if (!isDossunBottom) isDossunBottom = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(-size.x, 0), size, mapData, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
-			if (!isDossunBottom) isDossunBottom = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(size.x, 0), size, mapData, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+			if (!isDossunBottom) isDossunBottom = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(-size.x + 10.0f, 0), size, mapData, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+			if (!isDossunBottom) isDossunBottom = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos + Vec2<float>(size.x - 10.0f, 0), size, mapData, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
 			pos.y += offset;
 		}
 
