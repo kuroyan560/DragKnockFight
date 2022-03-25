@@ -23,7 +23,7 @@ DossunBlock::DossunBlock()
 	isMoveTimer = 0;
 	changeDirTimer = 0;
 	id = {};
-	sightData.pos = &pos;
+	sightData.pos = pos;
 	sightData.scale = size;
 
 }
@@ -73,7 +73,7 @@ void DossunBlock::Generate(Vec2<float> generatePos, Vec2<float> endPos, const Ve
 	isMove = false;
 	isReturn = false;
 	isTimeStopPikeAlive = nullptr;
-	sightData = { &pos,size/* * Vec2<float>(2.0f,2.0f)*/ };
+	sightData = { pos,size/* * Vec2<float>(2.0f,2.0f)*/ };
 	alpha = 1;
 
 }
@@ -199,7 +199,7 @@ void DossunBlock::Update()
 	}
 
 	// ブロックと照準の判定用のデータを保存。
-	sightData = { &pos,size/* * Vec2<float>(2.0f,2.0f)*/ };
+	sightData = { pos,size/* * Vec2<float>(2.0f,2.0f)*/ };
 
 
 }

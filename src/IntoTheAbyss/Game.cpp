@@ -1072,7 +1072,8 @@ void Game::Update()
 				dossunBuff.Generate(dossunData[index]->startPos, dossunData[index]->endPos, dossunData[index]->size, dossunData[index]->type);
 				// データを追加。
 				dossunBlock.push_back(dossunBuff);
-				//SightCollisionStorage::Instance()->data.push_back(dossunBlock[dossunBlock.size() - 1].sightData);
+				if(&dossunBlock[dossunBlock.size() - 1].sightData == nullptr) assert(0); //ドッスンブロックのデータが何故かNullptrです！
+				SightCollisionStorage::Instance()->data.push_back(&dossunBlock[dossunBlock.size() - 1].sightData);
 			}
 		}
 
