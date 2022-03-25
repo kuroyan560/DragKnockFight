@@ -261,6 +261,12 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 	// 使用する線分を作成する。
 	Vec2<float> handSegmentStart = handPos;
 	Vec2<float> handSegmentEnd = Vec2<float>(handPos.x + cosf(inputAngle) * 1000.0f, handPos.y + sinf(inputAngle) * 1000.0f);
+	Vec2<float> handSegmentDir = { handSegmentEnd - handSegmentStart };
+	handSegmentDir.Normalize();
+
+	// 照準のレイの方向によって当たり判定を無効化する為のフラグをセットする。
+	bool isTop = handSegmentDir.y < 0;
+	bool isLeft = handSegmentDir.x < 0;
 
 	// 保存されているデータの配列数を取得する。
 	const int STORAGE_COUNT = SightCollisionStorage::Instance()->data.size();
@@ -369,6 +375,13 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 				continue;
 
 			}
+
+			// レイの方向とブロックの位置関係で処理を飛ばす。
+			float offsetHandPos = 10.0f;
+			if (isLeft && handPos.x + offsetHandPos < BLOCK_POS.x) continue;
+			if (!isLeft && BLOCK_POS.x < handPos.x - offsetHandPos) continue;
+			if (isTop && handPos.y + offsetHandPos < BLOCK_POS.y) continue;
+			if (!isTop && BLOCK_POS.y < handPos.y - offsetHandPos) continue;
 
 			// ビューポート外にあったら処理を行わない。
 			//if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS.x) continue;
