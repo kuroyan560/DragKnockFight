@@ -1070,6 +1070,7 @@ void Game::Update()
 		debugStageData[0] = stageNum;
 		debugStageData[1] = roomNum;
 
+		mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 		mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 
 		// ドッスンブロックを生成。
