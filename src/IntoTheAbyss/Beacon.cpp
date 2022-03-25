@@ -24,7 +24,7 @@ void Beacon::Init()
 
 	/*===== 初期化処理 =====*/
 
-	pos = {-1000,-1000};
+	pos = { -1000,-1000 };
 	isActive = false;
 	isHitWall = false;
 	isHitWindow = false;
@@ -43,6 +43,7 @@ void Beacon::Generate(const Vec2<float>& generatePos, const Vec2<float>& forwadV
 	isHitWall = false;
 	isHitWindow = false;
 	stopTargetPos = nullptr;
+	gimmickVel = {};
 
 	// 識別IDを設定
 	this->id = id;
@@ -62,19 +63,19 @@ void Beacon::Update()
 
 		pos += Vec2<float>(forwardVec.x * MAX_SPEED, forwardVec.y * MAX_SPEED);
 
-		// 座標が画面外にいったらその場所で止める。
-		const int WIN_WIDTH = WinApp::Instance()->GetWinSize().x;
-		const int WIN_HEIGHT = WinApp::Instance()->GetWinSize().y;
-		if (pos.x - ScrollMgr::Instance()->scrollAmount.x - SCALE * 2.0f <= 0 || pos.x - ScrollMgr::Instance()->scrollAmount.x + SCALE * 2.0f >= WIN_WIDTH ||
-			pos.y - ScrollMgr::Instance()->scrollAmount.y - SCALE * 2.0f <= 0 || pos.y - ScrollMgr::Instance()->scrollAmount.y + SCALE * 2.0f >= WIN_HEIGHT) {
+		//// 座標が画面外にいったらその場所で止める。
+		//const int WIN_WIDTH = WinApp::Instance()->GetWinSize().x;
+		//const int WIN_HEIGHT = WinApp::Instance()->GetWinSize().y;
+		//if (pos.x - ScrollMgr::Instance()->scrollAmount.x - SCALE * 2.0f <= 0 || pos.x - ScrollMgr::Instance()->scrollAmount.x + SCALE * 2.0f >= WIN_WIDTH ||
+		//	pos.y - ScrollMgr::Instance()->scrollAmount.y - SCALE * 2.0f <= 0 || pos.y - ScrollMgr::Instance()->scrollAmount.y + SCALE * 2.0f >= WIN_HEIGHT) {
 
-			isHitWall = true;
-			isHitWindow = true;
+		//	isHitWall = true;
+		//	isHitWindow = true;
 
-			// スクロール量を保存。
-			prevFrameScroll = ScrollMgr::Instance()->scrollAmount;
+		//	// スクロール量を保存。
+		//	prevFrameScroll = ScrollMgr::Instance()->scrollAmount;
 
-		}
+		//}
 
 	}
 
@@ -97,6 +98,9 @@ void Beacon::Update()
 		prevFrameScroll = ScrollMgr::Instance()->scrollAmount;
 
 	}
+
+	pos += gimmickVel;
+	gimmickVel = {};
 
 }
 

@@ -19,6 +19,7 @@ public:
 	Vec2<float> pos;				// 座標
 	Vec2<float> prevFramePos;		// 前フレームの座標
 	Vec2<float> forwardVec;		// 移動方向ベクトル
+	Vec2<float> gimmickVel;
 	Vec2<float> prevFrameScroll;	// 前フレームのウィンドウスクロール量 ウィンドウに刺さったときにウィンドウに合わせて動かすために必要
 	float* stopTargetPos;
 	float stopPos;

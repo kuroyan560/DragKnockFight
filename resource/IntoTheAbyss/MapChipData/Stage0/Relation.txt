@@ -9,3 +9,21 @@ link 0 0
 link 1 0
 link 2 0
 link 3 0
+
+roomNum 2
+
+roomNum 3
+
+roomNum 4
+
+roomNum 5
+
+roomNum 6
+link 0 7
+
+roomNum 7
+link 0 6
+link 1 8
+
+roomNum 8
+link 1 7

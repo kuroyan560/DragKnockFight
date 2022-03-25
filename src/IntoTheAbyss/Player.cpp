@@ -6,7 +6,7 @@
 #include "MapChipCollider.h"
 #include "MovingBlockMgr.h"
 #include "MovingBlock.h"
-#include "BulletParticleMgr.h"
+//#include "BulletParticleMgr.h"
 #include "Collider.h"
 #include <cmath>
 
@@ -16,6 +16,7 @@
 #include"DrawFunc_Shadow.h"
 #include"DrawFunc_Color.h"
 #include"WinApp.h"
+#include "ParticleMgr.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -36,6 +37,7 @@ Player::Player()
 
 
 	isDead = false;
+	isDouji = false;
 	firstRecoilParticleTimer = 0;
 }
 
@@ -88,6 +90,8 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	isWallRight = false;
 	isWallLeft = false;
 
+	isDouji = false;
+
 	isDead = false;
 
 	// 壁ズリフラグを初期化。
@@ -114,6 +118,7 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	teleFlashTimer = TELE_FLASH_TIME;
 
 	firstRecoilParticleTimer = 0;
+	drawCursorFlag = true;
 
 }
 
@@ -177,13 +182,19 @@ void Player::Update(const vector<vector<int>> mapData)
 	if (mapX >= mapData[mapY].size()) mapX = mapData[mapY].size() - 1;
 
 	// 一個上のマップチップがブロックで、X軸方向の移動量が一定以上だったらパーティクルを生成する。
-	if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
+	//if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
+	if (mapData[mapY][mapX] > 0 && mapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1), HIT_MAP);
 
 	// 壁ズリのパーティクルを生成。
-	if (isSlippingWall[PLAYER_TOP]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
-	if (isSlippingWall[PLAYER_RIGHT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x + GetPlayerGraphSize().x, centerPos.y), Vec2<float>(1, 0));
-	if (isSlippingWall[PLAYER_BOTTOM]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y), Vec2<float>(0, 1));
-	if (isSlippingWall[PLAYER_LEFT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x - GetPlayerGraphSize().x, centerPos.y), Vec2<float>(-1, 0));
+	//if (isSlippingWall[PLAYER_TOP]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1));
+	//if (isSlippingWall[PLAYER_RIGHT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x + GetPlayerGraphSize().x, centerPos.y), Vec2<float>(1, 0));
+	//if (isSlippingWall[PLAYER_BOTTOM]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y), Vec2<float>(0, 1));
+	//if (isSlippingWall[PLAYER_LEFT]) BulletParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x - GetPlayerGraphSize().x, centerPos.y), Vec2<float>(-1, 0));
+	if (isSlippingWall[PLAYER_TOP]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1), HIT_MAP);
+	if (isSlippingWall[PLAYER_RIGHT]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x + GetPlayerGraphSize().x, centerPos.y), Vec2<float>(1, 0), HIT_MAP);
+	if (isSlippingWall[PLAYER_BOTTOM]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y), Vec2<float>(0, 1), HIT_MAP);
+	if (isSlippingWall[PLAYER_LEFT]) ParticleMgr::Instance()->Generate(Vec2<float>(centerPos.x - GetPlayerGraphSize().x, centerPos.y), Vec2<float>(-1, 0), HIT_MAP);
+
 
 	// 壁ズリフラグを初期化。
 	for (int index = 0; index < 4; ++index) isSlippingWall[index] = false;
@@ -193,7 +204,7 @@ void Player::Update(const vector<vector<int>> mapData)
 		--handReturnTimer;
 	}
 	// 何かしらの移動量が存在したらNoInputを初期化する。
-	if (vel.x != 0 || vel.y != 0 || gimmickVel.x != 0 || gimmickVel.y != 0) handReturnTimer = DEF_HAND_RETURN_TIMER;
+	if (vel.x != 0 || vel.y != 0 || gimmickVel.x != 0 || gimmickVel.y != 0 || gravity != 0) handReturnTimer = DEF_HAND_RETURN_TIMER;
 	// 0以下になったら
 	if (handReturnTimer <= 0) {
 
@@ -226,25 +237,30 @@ void Player::Update(const vector<vector<int>> mapData)
 	anim.Update();
 
 
-	//// 最初の一発のタイマーが起動していたらパーティクルを生成する。
-	//if (0 < firstRecoilParticleTimer) {
+	// 最初の一発のタイマーが起動していたらパーティクルを生成する。
+	if (0 < firstRecoilParticleTimer) {
 
-	//	// 移動している方向を求める。
-	//	Vec2<float> invForwardVec = -vel;
+		// 移動している方向を求める。
+		Vec2<float> invForwardVec = -vel;
 
-	//	// 最高速度からのパーセンテージを求める。
-	//	float per = (float)firstRecoilParticleTimer / (float)FIRST_SHOT_RECOIL_PARTICLE_TIMER;
+		// 最高速度からのパーセンテージを求める。
+		float per = (float)firstRecoilParticleTimer / (float)FIRST_SHOT_RECOIL_PARTICLE_TIMER;
 
-	//	// 正規化する。
-	//	invForwardVec.Normalize();
+		// 正規化する。
+		invForwardVec.Normalize();
 
-	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
-	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
-	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
-	//	BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
+		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, per, 2);
+		//BulletParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, per, 2);
 
-	//	--firstRecoilParticleTimer;
-	//}
+		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x - GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, FIRST_DASH, per, 2);
+		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y - GetPlayerGraphSize().y / 2.0f), invForwardVec, FIRST_DASH, per, 2);
+		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x + GetPlayerGraphSize().x / 2.0f, centerPos.y), invForwardVec, FIRST_DASH, per, 2);
+		ParticleMgr::Instance()->GeneratePer(Vec2<float>(centerPos.x, centerPos.y + GetPlayerGraphSize().y / 2.0f), invForwardVec, FIRST_DASH, per, 2);
+
+		--firstRecoilParticleTimer;
+	}
 
 	//テレポート時のフラッシュのタイマー計測
 	if (teleFlashTimer < TELE_FLASH_TIME)teleFlashTimer++;
@@ -294,8 +310,7 @@ void Player::Draw(LightManager& LigManager)
 	//テレポート時のフラッシュ
 	Color teleFlashCol;
 	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, teleFlashTimer, TELE_FLASH_TIME, 1.0f, 0.0f);
-	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f,
-		bodyTex, teleFlashCol);
+	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
 
 	if (playerDir == RIGHT)
 	{
@@ -472,6 +487,10 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 	/*===== 短槍の当たり判定 =====*/
 
+	// 時間停止の短槍とドッスンブロックが当たっているかを保存する変数
+	bool isHitTeleportPikeDossun = false;
+	int hitTeleportPikeIndex = 0;
+
 	{
 
 		// 瞬間移動の短槍の当たり判定を行う。
@@ -481,7 +500,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
 
 			// 押し戻し
-			Vec2<float> scale = Vec2<float>(rHand->teleportPike.SCALE * 2.0f, rHand->teleportPike.SCALE * 2.0f);
+			Vec2<float> scale = Vec2<float>(rHand->teleportPike.SCALE * 1.0f, rHand->teleportPike.SCALE * 1.0f);
 			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_BOTTOM);
 			if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
 			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_TOP);
@@ -493,6 +512,26 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 		}
 
+		// 時間停止の短槍とドッスンブロックの当たり判定を行う。
+		const int DOSSUN_COUNT = dossun.size();
+		for (int index = 0; index < DOSSUN_COUNT; ++index) {
+
+			//if (rHand->teleportPike.isHitWall) continue;
+
+			// まずは当たっているかをチェックする。
+			if (fabs(rHand->teleportPike.pos.x - dossun[index].pos.x) > rHand->teleportPike.SCALE + dossun[index].size.x) continue;
+			if (fabs(rHand->teleportPike.pos.y - dossun[index].pos.y) > rHand->teleportPike.SCALE + dossun[index].size.y) continue;
+
+			// 瞬間移動の短槍に壁にあたったフラグを付ける。
+			rHand->teleportPike.isHitWall = true;
+
+			rHand->teleportPike.gimmickVel = dossun[index].moveDir * Vec2<float>(dossun[index].speed, dossun[index].speed);
+
+			isHitTeleportPikeDossun = true;
+			hitTeleportPikeIndex = index;
+
+		}
+
 		// 時間停止の短槍の当たり判定を行う。
 		if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
 			bool onGround = false;
@@ -500,7 +539,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
 
 			// 押し戻し
-			Vec2<float> scale = Vec2<float>(lHand->timeStopPike.SCALE * 2.0f, lHand->timeStopPike.SCALE * 2.0f);
+			Vec2<float> scale = Vec2<float>(lHand->timeStopPike.SCALE * 1.0f, lHand->timeStopPike.SCALE * 1.0f);
 			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_BOTTOM);
 			if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
 			buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_TOP);
@@ -512,7 +551,6 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		}
 
 		// 時間停止の短槍とドッスンブロックの当たり判定を行う。
-		const int DOSSUN_COUNT = dossun.size();
 		for (int index = 0; index < DOSSUN_COUNT; ++index) {
 
 			if (lHand->timeStopPike.isHitWall) continue;
@@ -619,6 +657,12 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 			// 最初の一発フラグを大きくする。
 			lHand->isFirstShot = false;
 			rHand->isFirstShot = false;
+
+		}
+		else if (isHitTeleportPikeDossun && hitTeleportPikeIndex == index) {
+
+			// ドッスンの移動量タイマーを更新。
+			dossun[index].isHitPlayer = true;
 
 		}
 		else {
@@ -1070,7 +1114,11 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// LBが押されたら反動をつける。
+	bool isShotLeft = false;
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+
+		// 撃った判定を保存。
+		isShotLeft = true;
 
 		// 反動をつける。
 		float rHandAngle = lHand->GetAngle();
@@ -1157,7 +1205,11 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// RBが押されたら反動をつける。
+	bool isShotRight = false;
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+
+		// 右側に撃った判定を保存する。
+		isShotRight = true;
 
 		// 反動をつける。
 		float lHandAngle = rHand->GetAngle();
@@ -1243,6 +1295,18 @@ void Player::Input(const vector<vector<int>> mapData)
 		CalculateStretch(vel);
 	}
 
+	// 同時に撃ったフラグを取得する。
+	if (isShotLeft && isShotRight) {
+
+		isDouji = true;
+
+	}
+	else {
+
+		isDouji = false;
+
+	}
+
 	// 移動速度が限界値を超えないようにする。
 	if (vel.x >= MAX_RECOIL_AMOUNT) vel.x = MAX_RECOIL_AMOUNT;
 	if (vel.x <= -MAX_RECOIL_AMOUNT) vel.x = -MAX_RECOIL_AMOUNT;
@@ -1260,14 +1324,21 @@ void Player::Input(const vector<vector<int>> mapData)
 			// クールタイムが0以下だったら
 			if (rHand->pikeCooltime <= 0) {
 
+				const float ARM_DISTANCE = 20.0f;
+				const float OFFSET_Y = -14.0f;
+				const float OFFSET_X = -12.0f;
+
+				float angle = rHand->GetAngle();
+				angle -= 0.261799f;
+
 				// 弾を発射する処理を行う。
-				rHand->teleportPike.Generate(rHand->GetPos(), Vec2<float>(cosf(rHand->GetAngle()), sinf(rHand->GetAngle())), PIKE_TELEPORT);
+				rHand->teleportPike.Generate(rHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), Vec2<float>(cosf(angle), sinf(angle)), PIKE_TELEPORT);
 
 			}
 
 		}
 		// ビーコンが発射されていたら。
-		else if (rHand->teleportPike.isActive && (rHand->teleportPike.isHitWall || rHand->teleportPike.isHitWindow) && !isPrevFrameShotBeacon) {
+		else if (rHand->teleportPike.isActive && !isPrevFrameShotBeacon) {
 
 			auto vec = rHand->teleportPike.pos - centerPos;
 
@@ -1332,14 +1403,20 @@ void Player::Input(const vector<vector<int>> mapData)
 			// クールタイムが0以下だったら
 			if (lHand->pikeCooltime <= 0) {
 
+				const float ARM_DISTANCE = 20.0f;
+				const float OFFSET_Y = -14.0f;
+				const float OFFSET_X = 12.0f;
+
+				float angle = lHand->GetAngle();
+
 				// 弾を発射する処理を行う。
-				lHand->timeStopPike.Generate(lHand->GetPos(), Vec2<float>(cosf(lHand->GetAngle()), sinf(lHand->GetAngle())), PIKE_TIMESTOP);
+				lHand->timeStopPike.Generate(lHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), Vec2<float>(cosf(angle), sinf(angle)), PIKE_TIMESTOP);
 
 			}
 
 		}
 		// ビーコンが発射されていたら。
-		else if (lHand->timeStopPike.isActive && (lHand->timeStopPike.isHitWall || lHand->timeStopPike.isHitWindow) && !isPrevFrameShotBeacon) {
+		else if (lHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
 
 			// 止められていたものを動かす。
 			lHand->timeStopPike.MoveAgain();

@@ -77,6 +77,7 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("Left Right:SelectStageOrRoom");
 	ImGui::Text("B Key:StageSelectScene");
 	ImGui::Text("Return:Done");
+	ImGui::Text("Start:Reset");
 	ImGui::End();
 }
 

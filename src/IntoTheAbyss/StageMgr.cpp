@@ -191,6 +191,26 @@ StageMgr::StageMgr()
 
 
 
+
+					//マップチップの値を0か1に絞る
+					AlimentSpaceNumber(&Up);
+					AlimentSpaceNumber(&Down);
+					AlimentSpaceNumber(&left);
+					AlimentSpaceNumber(&right);
+					AlimentSpaceNumber(&LeftUp);
+					AlimentSpaceNumber(&LeftDown);
+					AlimentSpaceNumber(&rightUp);
+					AlimentSpaceNumber(&rightDown);
+					AlimentWallNumber(&Up);
+					AlimentWallNumber(&Down);
+					AlimentWallNumber(&left);
+					AlimentWallNumber(&right);
+					AlimentWallNumber(&LeftUp);
+					AlimentWallNumber(&LeftDown);
+					AlimentWallNumber(&rightUp);
+					AlimentWallNumber(&rightDown);
+
+
 					bool skipFlag = false;		//ドアをを探索したかどうかを示すフラグ
 					for (int doorNumber = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min; doorNumber < mapChipMemoryData[MAPCHIP_TYPE_DOOR].max; ++doorNumber)
 					{
@@ -234,7 +254,7 @@ StageMgr::StageMgr()
 							tmp.animationFlag = true;
 							tmp.handle = 0;
 							tmp.radian = Radian(0.0f);
-							tmp.offset.x = 2.0f * doorCallCount[arrayNum];
+							tmp.offset.x = 1.2f * doorCallCount[arrayNum];
 							tmp.offset.y = -50.0f;
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
@@ -249,7 +269,7 @@ StageMgr::StageMgr()
 							tmp.animationFlag = true;
 							tmp.handle = 0;
 							tmp.radian = Radian(180.0f);
-							tmp.offset.x = 2.0f * doorCallCount[arrayNum];
+							tmp.offset.x = 1.2f * doorCallCount[arrayNum];
 							tmp.offset.y = 50.0f;
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
@@ -265,7 +285,7 @@ StageMgr::StageMgr()
 							tmp.handle = 0;
 							tmp.radian = Radian(270.0f);
 							tmp.offset.x = -50.0f;
-							tmp.offset.y = 2.0f * doorCallCount[arrayNum];
+							tmp.offset.y = 1.2f * doorCallCount[arrayNum];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
 
@@ -280,7 +300,7 @@ StageMgr::StageMgr()
 							tmp.handle = 0;
 							tmp.radian = Radian(90.0f);
 							tmp.offset.x = 50.0f;
-							tmp.offset.y = 2.0f * doorCallCount[arrayNum];
+							tmp.offset.y = 1.2f * doorCallCount[arrayNum];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
 
@@ -309,23 +329,30 @@ StageMgr::StageMgr()
 					}
 
 
+
 					//ドッスンの場合
 					if (mapChipMemoryData[MAPCHIP_TYPE_THOWNP].min <= now && now <= mapChipMemoryData[MAPCHIP_TYPE_THOWNP].max)
 					{
 						//この番号が開始位置か終了位置か調べる
 						int gimmickNumber = now - mapChipMemoryData[MAPCHIP_TYPE_THOWNP].min;
 
-						//偶数なら開始位置、奇数なら終了位置とする
-						if (gimmickNumber % 2 == 0)
+						bool loadDataFlag = GimmickLoader::Instance()->CanLoadData(stageNum, roomNum, gimmickNumber) || GimmickLoader::Instance()->CanLoadData(stageNum, roomNum, gimmickNumber - 1);
+						if (loadDataFlag)
 						{
-							GimmickLoader::Instance()->SetThwompStartPos(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+							int arrayNumber = GetGimmickNumber(gimmickNumber);
+							//偶数なら開始位置、奇数なら終了位置とする
+							if (gimmickNumber % 2 == 0)
+							{
+								GimmickLoader::Instance()->SetThwompStartPos(stageNum, roomNum, arrayNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+							}
+							else
+							{
+								GimmickLoader::Instance()->SetThwompEndPos(stageNum, roomNum, arrayNumber, Vec2<float>(x * 50.0f, y * 50.0f));
+							}
+							skipFlag = true;
 						}
-						else
-						{
-							GimmickLoader::Instance()->SetThwompEndPos(stageNum, roomNum, gimmickNumber - 1, Vec2<float>(x * 50.0f, y * 50.0f));
-						}
-						skipFlag = true;
 					}
+
 
 					//バブルの場合
 					if (mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].min <= now && now <= mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].max)
@@ -336,24 +363,6 @@ StageMgr::StageMgr()
 					}
 
 
-
-					//マップチップの値を0か1に絞る
-					AlimentSpaceNumber(&Up);
-					AlimentSpaceNumber(&Down);
-					AlimentSpaceNumber(&left);
-					AlimentSpaceNumber(&right);
-					AlimentSpaceNumber(&LeftUp);
-					AlimentSpaceNumber(&LeftDown);
-					AlimentSpaceNumber(&rightUp);
-					AlimentSpaceNumber(&rightDown);
-					AlimentWallNumber(&Up);
-					AlimentWallNumber(&Down);
-					AlimentWallNumber(&left);
-					AlimentWallNumber(&right);
-					AlimentWallNumber(&LeftUp);
-					AlimentWallNumber(&LeftDown);
-					AlimentWallNumber(&rightUp);
-					AlimentWallNumber(&rightDown);
 
 
 					for (int wallChipIndex = 1; wallChipIndex < 10; ++wallChipIndex)
@@ -409,6 +418,18 @@ StageMgr::StageMgr()
 								MapChipDrawData tmp;
 								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CENTRAL];
 								tmp.radian = Radian(90.0f);
+								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							}
+						}
+						//左右が空中の壁
+						{
+							bool checkUpSideFlag =
+								Up == wallChipIndex && Down == wallChipIndex && left == 0 && right == 0;
+							if (checkUpSideFlag)
+							{
+								MapChipDrawData tmp;
+								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CENTRAL];
+								tmp.radian = 0.0f;
 								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							}
 						}
@@ -476,11 +497,8 @@ StageMgr::StageMgr()
 						{
 							bool checkUpSideFlag =
 								Up == 0 && Down == wallChipIndex && left == 0 && right == 0;
-							bool checkObliaueFlag =
-								LeftUp == 0 && LeftDown == 0 && rightUp == 0 && rightDown == 0;
-
 							//上が空間の壁
-							if (checkUpSideFlag && checkObliaueFlag)
+							if (checkUpSideFlag)
 							{
 								MapChipDrawData tmp;
 								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TOP];
@@ -495,12 +513,12 @@ StageMgr::StageMgr()
 							bool checkObliaueFlag =
 								LeftUp == 0 && LeftDown == 0 && rightUp == 0 && rightDown == 0;
 
-							//上が空間の壁
+							//下が空間の壁
 							if (checkUpSideFlag && checkObliaueFlag)
 							{
 								MapChipDrawData tmp;
 								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_BUTTOM];
-								tmp.radian = Radian(90.0f);
+								tmp.radian = Radian(0.0f);
 								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							}
 						}
@@ -758,6 +776,19 @@ StageMgr::StageMgr()
 							}
 						}
 
+						{
+							bool checkUpSideFlag =
+								Up == wallChipIndex && Down == wallChipIndex && left == 0 && right == wallChipIndex;
+							bool checkObliaueFlag =
+								LeftUp == 0 && LeftDown == 0 && rightUp == 0 && rightDown == wallChipIndex;
+							if (checkUpSideFlag && checkObliaueFlag)
+							{
+								MapChipDrawData tmp;
+								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHTDOWN_1PIXEL];
+								tmp.radian = Radian(-90.0f);
+								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							}
+						}
 
 
 						if (Up == 1 && Down == 1 && left == -1 && right == 1)
@@ -768,14 +799,70 @@ StageMgr::StageMgr()
 							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 						}
 
-
-						if (Up == 40 && Down == 1 && left == 1 && right == 0)
 						{
-							MapChipDrawData tmp;
-							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
-							tmp.radian = Radian(180.0f);
-							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							bool checkUpSideFlag =
+								Up == 0 && Down == wallChipIndex && left == 0 && right == wallChipIndex;
+							bool checkObliaueFlag =
+								LeftUp == 0 && rightDown == 0;
+
+							//左上角、1ドット付き
+							if (checkUpSideFlag && checkObliaueFlag)
+							{
+								MapChipDrawData tmp;
+								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
+								tmp.radian = Radian(90.0f);
+								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							}
 						}
+
+						{
+							bool checkUpSideFlag =
+								Up == wallChipIndex && Down == 0 && left == 0 && right == wallChipIndex;
+							bool checkObliaueFlag =
+								LeftUp == 0 && rightUp == 0;
+
+							//左下角、1ドット付き
+							if (checkUpSideFlag && checkObliaueFlag)
+							{
+								MapChipDrawData tmp;
+								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
+								tmp.radian = Radian(0.0f);
+								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							}
+						}
+
+						{
+							bool checkUpSideFlag =
+								Up == 0 && Down == wallChipIndex && left == wallChipIndex && right == 0;
+							bool checkObliaueFlag =
+								LeftDown == 0;
+
+							//右上角、1ドット付き
+							if (checkUpSideFlag && checkObliaueFlag)
+							{
+								MapChipDrawData tmp;
+								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
+								tmp.radian = Radian(180.0f);
+								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							}
+						}
+
+						{
+							bool checkUpSideFlag =
+								Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == 0;
+							bool checkObliaueFlag =
+								LeftUp == 0;
+
+							//右下角、1ドット付き
+							if (checkUpSideFlag && checkObliaueFlag)
+							{
+								MapChipDrawData tmp;
+								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
+								tmp.radian = Radian(270.0f);
+								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							}
+						}
+
 
 						//アニメーションテスト用
 						if (false)
@@ -812,6 +899,7 @@ StageMgr::StageMgr()
 const RoomMapChipArray &StageMgr::GetMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	return allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
+
 }
 
 const int &StageMgr::GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER)
