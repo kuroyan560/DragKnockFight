@@ -264,9 +264,9 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 	for (int index = 0; index < STORAGE_COUNT; ++index) {
 
 		// このインデックスのブロックのサイズを取得。
-		const Vec2<float> BLOCK_SIZE = SightCollisionStorage::Instance()->data[index].scale;
+		const Vec2<float> BLOCK_SIZE = {};
 		// このインデックスのブロックの座標を取得。
-		const Vec2<float>* BLOCK_POS = SightCollisionStorage::Instance()->data[index].pos;
+		const Vec2<float>* BLOCK_POS = {};
 
 		//// ビューポート外にあったら処理を行わない。
 		//if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS->x) continue;
@@ -347,6 +347,11 @@ void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)
 
 			// このインデックスのブロックの座標を取得。
 			const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);
+
+			if (Vec2<float>(BLOCK_POS.x - handPos.x, BLOCK_POS.y - handPos.y).Length() >= 100.0f) {
+				//player.onGround = false;
+				continue;
+			}
 
 			// ビューポート外にあったら処理を行わない。
 			//if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS.x) continue;

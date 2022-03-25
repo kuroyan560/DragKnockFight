@@ -198,6 +198,9 @@ void DossunBlock::Update()
 
 	}
 
+	// ブロックと照準の判定用のデータを保存。
+	sightData = { &pos,size/* * Vec2<float>(2.0f,2.0f)*/ };
+
 
 }
 

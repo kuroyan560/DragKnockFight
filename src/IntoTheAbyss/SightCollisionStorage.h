@@ -33,7 +33,7 @@ public:
 
 	/*===== メンバ変数 =====*/
 
-	vector<SightCollisionData> data;		// 昇順の当たり判定に使用するデータの配列。
+	vector<SightCollisionData*> data;		// 昇順の当たり判定に使用するデータの配列。
 
 
 public:
@@ -44,10 +44,10 @@ public:
 	inline void SetData(Vec2<float>* pos, const Vec2<float>& scale) {
 
 		// nullptrだったら処理を飛ばす。
-		if (pos == nullptr) return;
+		//if (pos == nullptr) return;
 
-		// データを追加。
-		data.push_back(SightCollisionData(pos, scale));
+		//// データを追加。
+		//data.push_back(SightCollisionData(pos, scale));
 
 	}
 
