@@ -29,7 +29,7 @@ void EventBlock::Finalize()
 	initFlag = false;
 }
 
-bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
+bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, const Vec2<float> &PLAYER_VEL, const Vec2<float> &PLAYER_PREV_POS)
 {
 	//初期化していないブロックはエラー処理を作る
 	if (!initFlag)
@@ -41,7 +41,7 @@ bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
 		//assert(0);
 		return false;
 	}
-	//bool isDossunVel = Collider::Instance()->CheckHitVel(centerPos, prevFrameCenterPos, vel + gimmickVel, PLAYER_HIT_SIZE, dossun[index].pos, dossun[index].size) != INTERSECTED_NONE;
+	bool isDossunVel = EventCpllider::Instance()->CheckHitVel(PLAYER_POS, PLAYER_PREV_POS, PLAYER_VEL, SIZE, pos, { 50.0f,50.0f }) != INTERSECTED_NONE;
 	bool topHitFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_TOP);
 	bool buttomFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_BOTTOM);
 	bool leftHitFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_LEFT);

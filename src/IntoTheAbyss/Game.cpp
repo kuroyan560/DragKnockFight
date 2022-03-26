@@ -1251,7 +1251,7 @@ void Game::Update()
 	oldStageNum = stageNum;
 
 
-	eventBlocks[0].HitBox(player.centerPos, player.PLAYER_HIT_SIZE);
+	eventBlocks[0].HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
 
 
 	// R or Aが押されたらプレイヤーの位置を初期化する。

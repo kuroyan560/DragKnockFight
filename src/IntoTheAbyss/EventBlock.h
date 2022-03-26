@@ -8,7 +8,7 @@ public:
 	EventBlock();
 	void Init(const Vec2<float> &POS);
 	void Finalize();
-	bool HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE);
+	bool HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, const Vec2<float> &PLAYER_VEL, const Vec2<float> &PLAYER_PREV_POS);
 	void Draw();
 
 private:
