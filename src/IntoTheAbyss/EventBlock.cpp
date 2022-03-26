@@ -4,18 +4,16 @@
 #include"DrawFunc.h"
 #include"TexHandleMgr.h"
 
-int EventBlock::arrayNum = 0;
 bool EventBlock::initLoadGraphFlag = false;
+std::array<int, 10> EventBlock::graphHandle = {};
 
 EventBlock::EventBlock() :initFlag(false)
 {
 	if (!initLoadGraphFlag)
 	{
-		//TexHandleMgr::LoadDivGraph("resource/.png", 10, Vec2<int>(50, 50), graphHandle.data());
+		//TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/EventBlocks.png", 10, Vec2<int>(10, 1), graphHandle.data());
 		initLoadGraphFlag = true;
 	}
-	handle = arrayNum;
-	++arrayNum;
 }
 
 void EventBlock::Init(const Vec2<float> &POS)
@@ -47,7 +45,7 @@ bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, 
 	bool leftHitFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_LEFT);
 	bool rightHitFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_RIGHT);
 
-	if (topHitFlag || buttomFlag || leftHitFlag || rightHitFlag)
+	if (isDossunVel || topHitFlag || buttomFlag || leftHitFlag || rightHitFlag)
 	{
 		return true;
 	}
@@ -60,5 +58,5 @@ bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, 
 void EventBlock::Draw()
 {
 	//デバック用の画像
-	//DrawFunc::DrawRotaGraph2D(pos, Vec2<float>(1.0f, 1.0f), 0.0f, {});
+	//DrawFunc::DrawRotaGraph2D(pos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(graphHandle[handle]));
 }

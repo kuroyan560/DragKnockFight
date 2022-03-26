@@ -14,10 +14,9 @@ public:
 private:
 	Vec2<float>pos;
 	bool initFlag;
-	static int arrayNum;
 	int handle;
 
 	static bool initLoadGraphFlag;
-	std::array<int, 10>graphHandle;
+	static std::array<int, 10>graphHandle;
 };
 
