@@ -42,6 +42,8 @@ PlayerHand::PlayerHand(const int& AimGraphHandle) : aimGraphHandle(AimGraphHandl
 	//playerHandGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/PlayerHand.png");
 
 	isNoInputTimer = false;
+
+	ptLight.SetInfluenceRange(64.0f);
 }
 
 void PlayerHand::Init(const float& armDistance)
@@ -143,7 +145,8 @@ void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, cons
 	if (DRAW_CURSOR)
 	{
 		//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
-		DrawFunc_Shadow::DrawRotaGraph2D(LigManager, sightPos - scrollShakeZoom, ExtRate * ScrollMgr::Instance()->zoom, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle), nullptr, TexHandleMgr::GetTexBuffer(aimGraphHandle));
+		DrawFunc_Shadow::DrawRotaGraph2D(LigManager, sightPos - scrollShakeZoom, ExtRate * ScrollMgr::Instance()->zoom, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
+		ptLight.SetPos(Vec3<float>(sightPos - scrollShakeZoom, -1.0f));
 	}
 
 }

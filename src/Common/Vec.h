@@ -135,6 +135,7 @@ struct Vec3
 	float Length()const {
 		return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
 	};
+	Vec3(Vec2<T>XY, T Z) :x(XY.x), y(XY.y), z(Z) {};
 	float Distance(const Vec3& To)const {
 		return sqrt(pow(To.x - x, 2) + pow(To.y - y, 2) + pow(To.z - z, 2));
 	};
