@@ -191,5 +191,4 @@ private:
 
 	// ˆÚ“®—Ê‚Å‚Ì“–‚½‚è”»’è
 	void CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
-
 };

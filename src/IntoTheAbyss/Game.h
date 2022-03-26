@@ -95,6 +95,7 @@ class Game
 	//ƒ‰ƒCƒgî•ñ
 	LightManager ligMgr;
 	const float PT_LIG_RANGE = 128.0;
+	const float PT_LIG_BRIGHT = 0.3f;
 	const float PT_LIG_Z = -2.0f;
 	Light::Point ptLig;
 	const float SPOT_LIG_RANGE = 128.0;

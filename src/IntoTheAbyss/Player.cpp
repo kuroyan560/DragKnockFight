@@ -1774,3 +1774,4 @@ void Player::CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>
 	centerPos.y = centerPosBuff.y;
 
 }
+

@@ -8,6 +8,8 @@ using namespace std;
 class LightManager;
 #include"AfterImg.h"
 
+#include"Light.h"
+
 // プレイヤーの手クラス
 class PlayerHand {
 
@@ -32,6 +34,8 @@ public:
 	AfterImg afterImg;
 
 	const int aimGraphHandle;
+	//照準を光らせる
+	Light::Point ptLight;
 
 	/*-- 定数 --*/
 

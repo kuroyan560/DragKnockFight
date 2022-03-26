@@ -348,6 +348,7 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 	return chipNum;
 }
 
+#include"PlayerHand.h"
 Game::Game()
 {
 	mapBlockGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Block.png");
@@ -365,11 +366,14 @@ Game::Game()
 
 	//ƒ‰ƒCƒgî•ñ
 	ptLig.SetInfluenceRange(PT_LIG_RANGE);
+	ptLig.SetColor(Color(PT_LIG_BRIGHT, PT_LIG_BRIGHT, PT_LIG_BRIGHT, 1.0f));
 	spotLig.SetInfluenceRange(SPOT_LIG_RANGE);
 
 	ligMgr.RegisterPointLight(&ptLig);
 	ligMgr.RegisterSpotLight(&spotLig);
 	ligMgr.RegisterHemiSphereLight(&hemiLig);
+	ligMgr.RegisterPointLight(&player.lHand->ptLight);	//Æ€ŒõŒ¹
+	ligMgr.RegisterPointLight(&player.rHand->ptLight);//Æ€ŒõŒ¹
 
 	Init();
 }
