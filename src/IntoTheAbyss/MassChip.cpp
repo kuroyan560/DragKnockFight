@@ -1,11 +1,11 @@
 #include "MassChip.h"
 #include "StageMgr.h"
 
-MassChip::MassChip(const int &CHIP_NUM) :chipNumber(CHIP_NUM)
+MassChip::MassChip()
 {
 }
 
-bool MassChip::Check(const Vec2<int> &MAPCHIP_POS)
+bool MassChip::Check(const Vec2<int> &MAPCHIP_POS, const int &CHIP_NUMBER)
 {
 	for (int i = 0; i < registChipPos.size(); ++i)
 	{
@@ -19,6 +19,11 @@ bool MassChip::Check(const Vec2<int> &MAPCHIP_POS)
 	int stageNum = SelectStage::Instance()->GetStageNum();
 	int roomNum = SelectStage::Instance()->GetRoomNum();
 
+	for (int i = 0; i < registDirChipPos.size(); ++i)
+	{
+		registDirChipPos[i].clear();
+	}
+
 #pragma region è„â∫ç∂âEÇÃíTçı
 	registChipPos.push_back(Vec2<float>(MAPCHIP_POS.x, MAPCHIP_POS.y));
 	//è„Ç…Ç«ÇÍÇ≠ÇÁÇ¢êLÇ—ÇÈÇ©
@@ -26,7 +31,7 @@ bool MassChip::Check(const Vec2<int> &MAPCHIP_POS)
 	{
 		int Y = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>(MAPCHIP_POS.x, MAPCHIP_POS.y - upY));
 
-		if (Y != chipNumber || CheckUsedData(registChipPos, Vec2<float>(MAPCHIP_POS.x, MAPCHIP_POS.y - upY)))
+		if (Y != CHIP_NUMBER || CheckUsedData(registChipPos, Vec2<float>(MAPCHIP_POS.x, MAPCHIP_POS.y - upY)))
 		{
 			break;
 		}
@@ -40,7 +45,7 @@ bool MassChip::Check(const Vec2<int> &MAPCHIP_POS)
 	for (int downY = 1; 1; ++downY)
 	{
 		int Y = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>(MAPCHIP_POS.x, MAPCHIP_POS.y + downY));
-		if (Y != chipNumber || CheckUsedData(registChipPos, Vec2<float>(MAPCHIP_POS.x, MAPCHIP_POS.y + downY)))
+		if (Y != CHIP_NUMBER || CheckUsedData(registChipPos, Vec2<float>(MAPCHIP_POS.x, MAPCHIP_POS.y + downY)))
 		{
 			break;
 		}
@@ -58,7 +63,7 @@ bool MassChip::Check(const Vec2<int> &MAPCHIP_POS)
 		for (int leftX = 1; 1; ++leftX)
 		{
 			int X = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>(MAPCHIP_POS.x - leftX, MAPCHIP_POS.y));
-			if (X != chipNumber || CheckUsedData(registChipPos, Vec2<float>(MAPCHIP_POS.x - leftX, MAPCHIP_POS.y)))
+			if (X != CHIP_NUMBER || CheckUsedData(registChipPos, Vec2<float>(MAPCHIP_POS.x - leftX, MAPCHIP_POS.y)))
 			{
 				break;
 			}
@@ -72,7 +77,7 @@ bool MassChip::Check(const Vec2<int> &MAPCHIP_POS)
 		for (int rightX = 1; 1; ++rightX)
 		{
 			int X = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>(MAPCHIP_POS.x + rightX, MAPCHIP_POS.y));
-			if (X != chipNumber || CheckUsedData(registChipPos, Vec2<float>(MAPCHIP_POS.x + rightX, MAPCHIP_POS.y)))
+			if (X != CHIP_NUMBER || CheckUsedData(registChipPos, Vec2<float>(MAPCHIP_POS.x + rightX, MAPCHIP_POS.y)))
 			{
 				break;
 			}
@@ -178,6 +183,10 @@ bool MassChip::Check(const Vec2<int> &MAPCHIP_POS)
 #pragma endregion
 
 	return true;
+}
+
+void MassChip::Finalize()
+{
 }
 
 const Vec2<float> &MassChip::GetLeftUpPos()

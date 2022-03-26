@@ -18,6 +18,7 @@ class TextureBuffer;
 #include"LightManager.h"
 class RenderTarget;
 #include"MassChip.h"
+#include"DoorBlock.h"
 
 //Œ³ƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚Ìmainˆ—‚ğ‚Ü‚Æ‚ß‚½‚à‚Ì
 class Game
@@ -65,6 +66,9 @@ class Game
 
 	vector<std::unique_ptr<AuraBlock>> auraBlock;
 	vector<vector<MapChipDrawData>> mapChipDrawData;
+
+	std::vector<std::unique_ptr<DoorBlock>> doorBlocks;
+
 	int countStopNum = 0;
 	int countHitNum = 0;
 
@@ -89,7 +93,6 @@ class Game
 
 
 	std::vector<std::unique_ptr<MassChip>> massChipData;
-	
 	std::array<EventBlock,10>eventBlocks;
 
 

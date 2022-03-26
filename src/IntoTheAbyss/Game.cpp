@@ -408,7 +408,7 @@ void Game::Init()
 
 	//オーラブロック生成
 	int auraChipNum = 40;//オーラブロックのチップ番号
-	massChipData.push_back(std::make_unique<MassChip>(auraChipNum));
+	massChipData.push_back(std::make_unique<MassChip>());
 	vector<Vec2<float>>usedNum;	//どのマップチップ番号が使われたか
 
 	for (int y = 0; y < mapData.size(); ++y)
@@ -418,7 +418,7 @@ void Game::Init()
 			if (mapData[y][x] == auraChipNum)
 			{
 				int massDataArrayNum = massChipData.size() - 1;
-				bool sucseedFlag = massChipData[massDataArrayNum]->Check(Vec2<int>(x, y));
+				bool sucseedFlag = massChipData[massDataArrayNum]->Check(Vec2<int>(x, y), auraChipNum);
 				if (!sucseedFlag)
 				{
 					continue;
@@ -436,6 +436,34 @@ void Game::Init()
 				else
 				{
 					auraBlock[auraBlocksArrayNum]->Init(leftUp, rightDown, AURA_DIR_UPORDOWN);
+				}
+			}
+		}
+	}
+
+	massChipData.push_back(std::make_unique<MassChip>());
+	for (int y = 0; y < mapData.size(); ++y)
+	{
+		for (int x = 0; x < mapData[y].size(); ++x)
+		{
+			SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
+			for (int i = chipMemorySize.min; i < chipMemorySize.max; ++i)
+			{
+				if (mapData[y][x] == i)
+				{
+					int massDataArrayNum = massChipData.size() - 1;
+					bool sucseedFlag = massChipData[massDataArrayNum]->Check(Vec2<int>(x, y), i);
+					if (!sucseedFlag)
+					{
+						continue;
+					}
+
+					Vec2<float>leftUp = massChipData[massDataArrayNum]->GetLeftUpPos();
+					Vec2<float>rightDown = massChipData[massDataArrayNum]->GetRightDownPos();
+					//伸びた情報をオーラに渡す
+					doorBlocks.push_back(std::make_unique<DoorBlock>());
+					int auraBlocksArrayNum = doorBlocks.size() - 1;
+					doorBlocks[auraBlocksArrayNum]->Init(leftUp, rightDown, i);
 				}
 			}
 		}
