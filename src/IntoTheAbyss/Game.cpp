@@ -19,19 +19,34 @@
 #include"DrawFunc.h"
 #include"ParticleMgr.h"
 
-bool Game::CheckUsedData(std::vector<Vec2<float>> DATA, Vec2<float> DATA2)
-{
-	for (int i = 0; i < DATA.size(); ++i)
-	{
-		if (DATA[i] == DATA2)
-		{
-			return true;
-		}
-	}
-	return false;
-}
 
 #include<map>
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+{
+	MassChip checkData;
+	std::vector<std::unique_ptr<MassChipData>> data;
+
+	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
+	{
+		for (int x = 0; x < MAPCHIP_DATA[y].size(); ++x)
+		{
+			if (MAPCHIP_DATA[y][x] == CHIP_NUM)
+			{
+				bool sucseedFlag = checkData.Check(Vec2<int>(x, y), CHIP_NUM);
+				if (!sucseedFlag)
+				{
+					continue;
+				}
+
+				//伸びた情報をオーラに渡す
+				data.push_back(std::make_unique<MassChipData>(checkData.GetLeftUpPos(), checkData.GetRightDownPos(), checkData.sideOrUpDownFlag));
+			}
+		}
+	}
+
+	return data;
+}
+
 void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
@@ -406,75 +421,47 @@ void Game::Init()
 		}
 	}
 
-	//オーラブロック生成
-	int auraChipNum = 40;//オーラブロックのチップ番号
-	massChipData.push_back(std::make_unique<MassChip>());
-	vector<Vec2<float>>usedNum;	//どのマップチップ番号が使われたか
 
-	for (int y = 0; y < mapData.size(); ++y)
+	//オーラブロック追加
 	{
-		for (int x = 0; x < mapData[y].size(); ++x)
-		{
-			if (mapData[y][x] == auraChipNum)
-			{
-				int massDataArrayNum = massChipData.size() - 1;
-				bool sucseedFlag = massChipData[massDataArrayNum]->Check(Vec2<int>(x, y), auraChipNum);
-				if (!sucseedFlag)
-				{
-					continue;
-				}
+		int auraChipNum = 40;//オーラブロックのチップ番号
+		std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, auraChipNum);
 
-				Vec2<float>leftUp = massChipData[massDataArrayNum]->GetLeftUpPos();
-				Vec2<float>rightDown = massChipData[massDataArrayNum]->GetRightDownPos();
-				//伸びた情報をオーラに渡す
-				auraBlock.push_back(std::make_unique<AuraBlock>());
-				int auraBlocksArrayNum = auraBlock.size() - 1;
-				if (massChipData[massDataArrayNum]->sideOrUpDownFlag)
-				{
-					auraBlock[auraBlocksArrayNum]->Init(leftUp, rightDown, AURA_DIR_LEFTORRIGHT);
-				}
-				else
-				{
-					auraBlock[auraBlocksArrayNum]->Init(leftUp, rightDown, AURA_DIR_UPORDOWN);
-				}
+		for (int i = 0; i < data.size(); ++i)
+		{
+			auraBlock.push_back(std::make_unique<AuraBlock>());
+			int auraBlocksArrayNum = auraBlock.size() - 1;
+			if (data[i]->sideOrUpDownFlag)
+			{
+				auraBlock[auraBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, AURA_DIR_LEFTORRIGHT);
+			}
+			else
+			{
+				auraBlock[auraBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, AURA_DIR_UPORDOWN);
 			}
 		}
 	}
 
-	massChipData.push_back(std::make_unique<MassChip>());
-	for (int y = 0; y < mapData.size(); ++y)
+	//ドアの追加
 	{
-		for (int x = 0; x < mapData[y].size(); ++x)
+		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
+		for (int doorIndex = chipMemorySize.min; doorIndex < chipMemorySize.max; ++doorIndex)
 		{
-			SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
-			for (int i = chipMemorySize.min; i < chipMemorySize.max; ++i)
+			std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, doorIndex);
+			for (int i = 0; i < data.size(); ++i)
 			{
-				if (mapData[y][x] == i)
-				{
-					int massDataArrayNum = massChipData.size() - 1;
-					bool sucseedFlag = massChipData[massDataArrayNum]->Check(Vec2<int>(x, y), i);
-					if (!sucseedFlag)
-					{
-						continue;
-					}
-
-					Vec2<float>leftUp = massChipData[massDataArrayNum]->GetLeftUpPos();
-					Vec2<float>rightDown = massChipData[massDataArrayNum]->GetRightDownPos();
-					//伸びた情報をオーラに渡す
-					doorBlocks.push_back(std::make_unique<DoorBlock>());
-					int auraBlocksArrayNum = doorBlocks.size() - 1;
-					doorBlocks[auraBlocksArrayNum]->Init(leftUp, rightDown, i);
-				}
+				doorBlocks.push_back(std::make_unique<DoorBlock>());
+				int auraBlocksArrayNum = doorBlocks.size() - 1;
+				doorBlocks[auraBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex);
 			}
 		}
 	}
+
 
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
-
 	alphaValue = 0;
-
 	ParticleMgr::Instance()->Init();
 
 
@@ -613,7 +600,6 @@ void Game::Update()
 		{
 			giveDoorNumber = doorBlocks[doorIndex]->chipNumber;
 		}
-		doorHitFlag = hitFlag;
 
 		//プレイヤーの体を完全に隠すためのオフセット
 		Vec2<float>offset;
@@ -627,11 +613,11 @@ void Game::Update()
 		}
 
 		//現在地取得
-		int nowChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>((player.centerPos + Vec2<float>(0.0f, -25.0f) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
-		int nowChip2 = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>((player.centerPos + Vec2<float>(0.0f, 25.0f) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
+		int nowChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>((player.centerPos + Vec2<float>(0.0f, -MAP_CHIP_HALF_SIZE) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
+		int nowChip2 = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>((player.centerPos + Vec2<float>(0.0f, MAP_CHIP_HALF_SIZE) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
 
 		//ドア移動判定
-		bool outSideFlag = nowChip == -1 && nowChip2 == -1;
+		bool outSideFlag = nowChip == -1 && nowChip2 == -1;//プレイヤーが画面外に出た判定
 		if (outSideFlag)
 		{
 			sceneBlackFlag = true;
@@ -1083,8 +1069,10 @@ void Game::Update()
 	oldStageNum = stageNum;
 
 
-	eventBlocks[0].HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
-
+	for (int i = 0; i < eventBlocks.size(); ++i)
+	{
+		eventBlocks[i].HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
+	}
 
 	// R or Aが押されたらプレイヤーの位置を初期化する。
 	//if (Input::isKeyTrigger(KEY_INPUT_R) || Input::isJoyBottomTrigger(XINPUT_BUTTON_A))

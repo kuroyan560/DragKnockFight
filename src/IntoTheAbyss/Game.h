@@ -20,6 +20,19 @@ class RenderTarget;
 #include"MassChip.h"
 #include"DoorBlock.h"
 
+struct MassChipData
+{
+	Vec2<float>leftUpPos;
+	Vec2<float>rightDownPos;
+	bool sideOrUpDownFlag;
+
+	MassChipData(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DOWN_POS, const bool &SIDE_OR_UPDOWN_FLAG) :
+		leftUpPos(LEFT_UP_POS), rightDownPos(RIGHT_DOWN_POS), sideOrUpDownFlag(SIDE_OR_UPDOWN_FLAG)
+	{
+	}
+};
+
+
 //元ソリューションのmain処理をまとめたもの
 class Game
 {
@@ -35,7 +48,7 @@ class Game
 		DOOR_MAX
 	};
 
-	bool CheckUsedData(vector<Vec2<float>> DATA, Vec2<float> DATA2);
+	std::vector<std::unique_ptr<MassChipData>> AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM);
 	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum);
 	Vec2<float> GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR, const bool &ONLY_GET_DOOR_DIR = false);
 	Vec2<float> GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA);
@@ -90,7 +103,6 @@ class Game
 	E_DOOR_DIR doorDir;
 	bool sceneChangeDeadFlag;//プレイヤが死んでいたらフラグを立てシーン遷移中に特殊な処理を入れる
 	bool initDeadFlag;
-	bool doorHitFlag;
 
 	std::vector<std::unique_ptr<MassChip>> massChipData;
 	std::array<EventBlock,10>eventBlocks;
