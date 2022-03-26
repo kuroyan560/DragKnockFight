@@ -408,189 +408,34 @@ void Game::Init()
 
 	//オーラブロック生成
 	int auraChipNum = 40;//オーラブロックのチップ番号
+	massChipData.push_back(std::make_unique<MassChip>(auraChipNum));
 	vector<Vec2<float>>usedNum;	//どのマップチップ番号が使われたか
+
 	for (int y = 0; y < mapData.size(); ++y)
 	{
 		for (int x = 0; x < mapData[y].size(); ++x)
 		{
 			if (mapData[y][x] == auraChipNum)
 			{
-				//重複したら処理を飛ばす-----------------------
-				bool usedFlag = false;
-				for (int i = 0; i < usedNum.size(); ++i)
+				int massDataArrayNum = massChipData.size() - 1;
+				bool sucseedFlag = massChipData[massDataArrayNum]->Check(Vec2<int>(x, y));
+				if (!sucseedFlag)
 				{
-					if (usedNum[i].x == x && usedNum[i].y == y)
-					{
-						usedFlag = true;
-					}
+					continue;
 				}
-				//重複したら処理を飛ばす-----------------------
 
-				if (!usedFlag)
+				Vec2<float>leftUp = massChipData[massDataArrayNum]->GetLeftUpPos();
+				Vec2<float>rightDown = massChipData[massDataArrayNum]->GetRightDownPos();
+				//伸びた情報をオーラに渡す
+				auraBlock.push_back(std::make_unique<AuraBlock>());
+				int auraBlocksArrayNum = auraBlock.size() - 1;
+				if (massChipData[massDataArrayNum]->sideOrUpDownFlag)
 				{
-#pragma region 上下左右の探索
-					vector<Vec2<float>>left, right, up, down;
-					usedNum.push_back(Vec2<float>(x, y));
-					//上にどれくらい伸びるか
-					for (int upY = 1; 1; ++upY)
-					{
-						int Y = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>(x, y - upY));
-
-						if (Y != auraChipNum || CheckUsedData(usedNum, Vec2<float>(x, y - upY)))
-						{
-							break;
-						}
-						else
-						{
-							usedNum.push_back(Vec2<float>(x, y - upY));
-							up.push_back(Vec2<float>(x, y - upY));
-						}
-					}
-					//下にどれくらい伸びるか
-					for (int downY = 1; 1; ++downY)
-					{
-						int Y = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>(x, y + downY));
-						if (Y != auraChipNum || CheckUsedData(usedNum, Vec2<float>(x, y + downY)))
-						{
-							break;
-						}
-						else
-						{
-							usedNum.push_back(Vec2<float>(x, y + downY));
-							down.push_back(Vec2<float>(x, y + downY));
-						}
-					}
-
-					//上下に伸ばす事が出来たらここの部分を飛ばす-----------------------
-					if (down.size() == 0 && up.size() == 0)
-					{
-						//左にどれくらい伸びるか
-						for (int leftX = 1; 1; ++leftX)
-						{
-							int X = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>(x - leftX, y));
-							if (X != auraChipNum || CheckUsedData(usedNum, Vec2<float>(x - leftX, y)))
-							{
-								break;
-							}
-							else
-							{
-								usedNum.push_back(Vec2<float>(x - leftX, y));
-								left.push_back(Vec2<float>(x - leftX, y));
-							}
-						}
-						//右にどれくらい伸びるか
-						for (int rightX = 1; 1; ++rightX)
-						{
-							int X = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>(x + rightX, y));
-							if (X != auraChipNum || CheckUsedData(usedNum, Vec2<float>(x + rightX, y)))
-							{
-								break;
-							}
-							else
-							{
-								usedNum.push_back(Vec2<float>(x + rightX, y));
-								right.push_back(Vec2<float>(x + rightX, y));
-							}
-						}
-					}
-					//上下に伸ばす事が出来たらここの部分を飛ばす-----------------------
-#pragma endregion
-
-#pragma region ブロックの追加
-
-					//どの方向に伸びたか-----------------------
-					//左右
-					Vec2<float> leftUp, rightDown;
-					bool sideOrUpDownFlag = false;
-					if (left.size() || right.size())
-					{
-						int leftSize = left.size() - 1;
-						int rightSize = right.size() - 1;
-
-						if (leftSize <= 0)
-						{
-							leftSize = 0;
-						}
-						if (rightSize <= 0)
-						{
-							rightSize = 0;
-						}
-
-						//上が0なら
-						if (left.size() == 0)
-						{
-							leftUp = { x * 50.0f,y * 50.0f };
-						}
-						else
-						{
-							leftUp = { left[leftSize].x * 50.0f,left[leftSize].y * 50.0f };
-						}
-						//下が0なら
-						if (right.size() == 0)
-						{
-							rightDown = { x * 50.0f,y * 50.0f };
-						}
-						else
-						{
-							rightDown = { right[rightSize].x * 50.0f,right[rightSize].y * 50.0f };
-						}
-
-						sideOrUpDownFlag = true;
-					}
-					//上下
-					if (up.size() || down.size())
-					{
-						int upSize = up.size() - 1;
-						int downSize = down.size() - 1;
-
-						if (upSize <= 0)
-						{
-							upSize = 0;
-						}
-						if (downSize <= 0)
-						{
-							downSize = 0;
-						}
-
-						//上が0なら
-						if (up.size() == 0)
-						{
-							leftUp = { x * 50.0f,y * 50.0f };
-						}
-						else
-						{
-							leftUp = { up[upSize].x * 50.0f,up[upSize].y * 50.0f };
-						}
-						//下が0なら
-						if (down.size() == 0)
-						{
-							rightDown = { x * 50.0f,y * 50.0f };
-						}
-						else
-						{
-							rightDown = { down[downSize].x * 50.0f,down[downSize].y * 50.0f };
-						}
-						sideOrUpDownFlag = false;
-					}
-
-					//ブロックサイズに合うように調整する
-					leftUp.x -= 25.0f;
-					leftUp.y -= 25.0f;
-					rightDown.x += 25.0f;
-					rightDown.y += 25.0f;
-					//どの方向に伸びたか-----------------------
-
-					//伸びた情報をオーラに渡す
-					auraBlock.push_back(std::make_unique<AuraBlock>());
-					if (sideOrUpDownFlag)
-					{
-						auraBlock[auraBlock.size() - 1]->Init(leftUp, rightDown, AURA_DIR_LEFTORRIGHT);
-					}
-					else
-					{
-						auraBlock[auraBlock.size() - 1]->Init(leftUp, rightDown, AURA_DIR_UPORDOWN);
-					}
-#pragma endregion
+					auraBlock[auraBlocksArrayNum]->Init(leftUp, rightDown, AURA_DIR_LEFTORRIGHT);
+				}
+				else
+				{
+					auraBlock[auraBlocksArrayNum]->Init(leftUp, rightDown, AURA_DIR_UPORDOWN);
 				}
 			}
 		}
@@ -728,7 +573,6 @@ void Game::Update()
 			ScrollMgr::Instance()->WarpScroll(player.centerPos);
 		}
 	}
-
 
 
 	{

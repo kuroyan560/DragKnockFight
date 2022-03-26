@@ -17,7 +17,7 @@ class TextureBuffer;
 #include"DrawMap.h"
 #include"LightManager.h"
 class RenderTarget;
-
+#include"MassChip.h"
 
 //元ソリューションのmain処理をまとめたもの
 class Game
@@ -87,6 +87,9 @@ class Game
 	bool sceneChangeDeadFlag;//プレイヤが死んでいたらフラグを立てシーン遷移中に特殊な処理を入れる
 	bool initDeadFlag;
 
+
+	std::vector<std::unique_ptr<MassChip>> massChipData;
+	
 	std::array<EventBlock,10>eventBlocks;
 
 

@@ -5,13 +5,13 @@ MassChip::MassChip(const int &CHIP_NUM) :chipNumber(CHIP_NUM)
 {
 }
 
-void MassChip::Check(const Vec2<int> &MAPCHIP_POS)
+bool MassChip::Check(const Vec2<int> &MAPCHIP_POS)
 {
 	for (int i = 0; i < registChipPos.size(); ++i)
 	{
 		if (registChipPos[i].x == MAPCHIP_POS.x && registChipPos[i].y == MAPCHIP_POS.y)
 		{
-			return;
+			return false;
 		}
 	}
 	//èdï°ÇµÇΩÇÁèàóùÇîÚÇŒÇ∑-----------------------
@@ -91,7 +91,7 @@ void MassChip::Check(const Vec2<int> &MAPCHIP_POS)
 	//Ç«ÇÃï˚å¸Ç…êLÇ—ÇΩÇ©-----------------------
 	//ç∂âE
 	Vec2<float> leftUp, rightDown;
-	bool sideOrUpDownFlag = false;
+	sideOrUpDownFlag = false;
 	if (registDirChipPos[LEFT].size() || registDirChipPos[RIGHT].size())
 	{
 		int leftSize = registDirChipPos[LEFT].size() - 1;
@@ -176,6 +176,8 @@ void MassChip::Check(const Vec2<int> &MAPCHIP_POS)
 	leftUpPos = leftUp;
 	rightDownPos = rightDown;
 #pragma endregion
+
+	return true;
 }
 
 const Vec2<float> &MassChip::GetLeftUpPos()
