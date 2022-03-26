@@ -17,7 +17,7 @@ static std::vector<RootParam>ROOT_PARAMETER =
 	RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, "テクスチャリソース"),
 };
 
-void DrawFunc_Color::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint)
+void DrawFunc_Color::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint, const Vec2<bool>& Miror)
 {
 	//DrawExtendGraph専用頂点
 	class ExtendGraphVertex
@@ -26,8 +26,9 @@ void DrawFunc_Color::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<
 		Vec2<float>leftUpPos;
 		Vec2<float>rightBottomPos;
 		Color paintColor;
-		ExtendGraphVertex(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& Paint)
-			:leftUpPos(LeftUpPos), rightBottomPos(RightBottomPos), paintColor(Paint) {}
+		Vec2<int> miror;
+		ExtendGraphVertex(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& Paint, const Vec2<bool>& Miror)
+			:leftUpPos(LeftUpPos), rightBottomPos(RightBottomPos), paintColor(Paint), miror({ Miror.x ? 1 : 0 ,Miror.y ? 1 : 0 }) {}
 	};
 
 	//パイプライン未生成
@@ -48,7 +49,8 @@ void DrawFunc_Color::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<
 		{
 			InputLayoutParam("POSITION_L_U",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("POSITION_R_B",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("PAINT_COLOR",DXGI_FORMAT_R32G32B32A32_FLOAT)
+			InputLayoutParam("PAINT_COLOR",DXGI_FORMAT_R32G32B32A32_FLOAT),
+			InputLayoutParam("MIROR",DXGI_FORMAT_R32G32_SINT)
 		};
 
 		//レンダーターゲット描画先情報
@@ -64,7 +66,7 @@ void DrawFunc_Color::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<
 		EXTEND_GRAPH_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(ExtendGraphVertex), 1, nullptr, ("DrawExtendGraph_Color -" + std::to_string(DRAW_EXTEND_GRAPH_COUNT)).c_str()));
 	}
 
-	ExtendGraphVertex vertex(LeftUpPos, RightBottomPos, Paint);
+	ExtendGraphVertex vertex(LeftUpPos, RightBottomPos, Paint, Miror);
 	EXTEND_GRAPH_VERTEX_BUFF[DRAW_EXTEND_GRAPH_COUNT]->Mapping(&vertex);
 
 	KuroEngine::Instance().Graphics().ObjectRender(EXTEND_GRAPH_VERTEX_BUFF[DRAW_EXTEND_GRAPH_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff(),Tex }, { CBV,SRV }, 0.0f, true);
@@ -72,7 +74,7 @@ void DrawFunc_Color::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<
 	DRAW_EXTEND_GRAPH_COUNT++;
 }
 
-void DrawFunc_Color::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian, const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint, const Vec2<float>& RotaCenterUV)
+void DrawFunc_Color::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian, const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint, const Vec2<float>& RotaCenterUV, const Vec2<bool>& Miror)
 {
 	//DrawRotaGraph専用頂点
 	class RotaGraphVertex
@@ -81,11 +83,12 @@ void DrawFunc_Color::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float
 		Vec2<float>center;
 		Vec2<float> extRate;
 		float radian;
-		Vec2<float>rotaCenterUV;
 		Color paintColor;
+		Vec2<float>rotaCenterUV;
+		Vec2<int> miror;
 		RotaGraphVertex(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian,
-			const Vec2<float>& RotaCenterUV, const Color& Paint)
-			:center(Center), extRate(ExtRate), radian(Radian), rotaCenterUV(RotaCenterUV), paintColor(Paint) {}
+			const Color& Paint, const Vec2<float>& RotaCenterUV, const Vec2<bool>& Miror)
+			:center(Center), extRate(ExtRate), radian(Radian), rotaCenterUV(RotaCenterUV), paintColor(Paint), miror({ Miror.x ? 1 : 0,Miror.y ? 1 : 0 }) {}
 	};
 
 	//パイプライン未生成
@@ -107,8 +110,9 @@ void DrawFunc_Color::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float
 			InputLayoutParam("CENTER",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("EXT_RATE",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("RADIAN",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("PAINT_COLOR",DXGI_FORMAT_R32G32B32A32_FLOAT),
 			InputLayoutParam("ROTA_CENTER_UV",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("PAINT_COLOR",DXGI_FORMAT_R32G32B32A32_FLOAT)
+			InputLayoutParam("MIROR",DXGI_FORMAT_R32G32_SINT)
 		};
 
 		//レンダーターゲット描画先情報
@@ -124,7 +128,7 @@ void DrawFunc_Color::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float
 		ROTA_GRAPH_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(RotaGraphVertex), 1, nullptr, ("DrawRotaGraph_Color -" + std::to_string(DRAW_ROTA_GRAPH_COUNT)).c_str()));
 	}
 
-	RotaGraphVertex vertex(Center, ExtRate, Radian, RotaCenterUV, Paint);
+	RotaGraphVertex vertex(Center, ExtRate, Radian, Paint, RotaCenterUV, Miror);
 	ROTA_GRAPH_VERTEX_BUFF[DRAW_ROTA_GRAPH_COUNT]->Mapping(&vertex);
 
 	KuroEngine::Instance().Graphics().ObjectRender(ROTA_GRAPH_VERTEX_BUFF[DRAW_ROTA_GRAPH_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff(),Tex }, { CBV,SRV }, 0.0f, true);

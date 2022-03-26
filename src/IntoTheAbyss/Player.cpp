@@ -310,7 +310,7 @@ void Player::Draw(LightManager& LigManager)
 	//テレポート時のフラッシュ
 	Color teleFlashCol;
 	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
-	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
+	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol, { 0.5f,0.5f }, { playerDir != DEFAULT,false });
 
 	if (playerDir == RIGHT)
 	{
@@ -1826,4 +1826,3 @@ void Player::CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>
 	centerPos.y = centerPosBuff.y;
 
 }
-

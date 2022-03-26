@@ -33,8 +33,8 @@ void GameScene::OnUpdate()
 {
 	game.Update();
 
-
-	if (UsersInput::Instance()->OnTrigger(DIK_B))
+	bool changeInput = UsersInput::Instance()->OnTrigger(DIK_B) || UsersInput::Instance()->OnTrigger(START);
+	if (changeInput)
 	{
 		KuroEngine::Instance().ChangeScene(1, sceneChange);
 	}
@@ -76,9 +76,9 @@ void GameScene::OnImguiDebug()
 
 	ImGui::Text("Up Down:SelectNumber");
 	ImGui::Text("Left Right:SelectStageOrRoom");
-	ImGui::Text("B Key:StageSelectScene");
-	ImGui::Text("Return:Done");
-	ImGui::Text("Space:Reset");
+	ImGui::Text("B Key / Home Button :StageSelectScene");
+	ImGui::Text("Return / A Button:Done");
+	ImGui::Text("Space / Back Button:Reset");
 	ImGui::End();
 }
 

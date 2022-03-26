@@ -8,6 +8,7 @@ struct VSOutput
     float4 leftUpPos : POSITION_L_U;
     float4 rightBottomPos : POSITION_R_B;
     float4 paintColor : PAINT_COLOR;
+    int2 miror : MIROR;
 };
 
 VSOutput VSmain(VSOutput input)
@@ -38,26 +39,26 @@ void GSmain(
     element.pos = input[0].rightBottomPos;
     element.pos.x -= width;
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(0.0f, 1.0f);
+    element.uv = float2(0.0f + input[0].miror.x, 1.0f - input[0].miror.y);
     output.Append(element);
     
     //ç∂è„
     element.pos = input[0].leftUpPos;
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(0.0f, 0.0f);
+    element.uv = float2(0.0f + input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
     
      //âEâ∫
     element.pos = input[0].rightBottomPos;
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(1.0f, 1.0f);
+    element.uv = float2(1.0f - input[0].miror.x, 1.0f - input[0].miror.y);
     output.Append(element);
     
     //âEè„
     element.pos = input[0].leftUpPos;
     element.pos.x += width;
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(1.0f, 0.0f);
+    element.uv = float2(1.0f - input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
 }
 

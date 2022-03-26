@@ -34,7 +34,7 @@ public:
 	/// <param name="Tex">テクスチャ</param>
 	/// <param name="Paint">塗りつぶす色</param>
 	static void DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos,
-		const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint = Color());
+		const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint = Color(), const Vec2<bool>& Miror = { false,false });
 
 	/// <summary>
 	/// ２D画像回転描画
@@ -45,6 +45,6 @@ public:
 	/// <param name="Tex">テクスチャ</param>
 	/// <param name="Paint">塗りつぶす色</param>
 	static void DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian,
-		const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint = Color(), const Vec2<float>& RotaCenterUV = { 0.5f,0.5f });
+		const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint = Color(), const Vec2<float>& RotaCenterUV = { 0.5f,0.5f }, const Vec2<bool>& Miror = { false,false });
 };
 

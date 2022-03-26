@@ -643,12 +643,17 @@ void Game::Update()
 	bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//マップの切り替え
 	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectStageFlag2 && nowSelectNum == 0)
-	if (UsersInput::Instance()->OnTrigger(DIK_UP) && enableToSelectStageFlag2 && nowSelectNum == 0)
+	const bool up = UsersInput::Instance()->OnTrigger(DIK_UP) || UsersInput::Instance()->OnTrigger(DPAD_UP);
+	const bool down = UsersInput::Instance()->OnTrigger(DIK_DOWN) || UsersInput::Instance()->OnTrigger(DPAD_DOWN);
+	const bool left = UsersInput::Instance()->OnTrigger(DIK_LEFT) || UsersInput::Instance()->OnTrigger(DPAD_LEFT);
+	const bool right = UsersInput::Instance()->OnTrigger(DIK_RIGHT) || UsersInput::Instance()->OnTrigger(DPAD_RIGHT);
+
+	if (up && enableToSelectStageFlag2 && nowSelectNum == 0)
 	{
 		++debugStageData[0];
 	}
 	//if (Input::isKeyTrigger(KEY_INPUT_DOWN) && enableToSelectStageFlag && nowSelectNum == 0)
-	if (UsersInput::Instance()->OnTrigger(DIK_DOWN) && enableToSelectStageFlag && nowSelectNum == 0)
+	if (down && enableToSelectStageFlag && nowSelectNum == 0)
 	{
 		--debugStageData[0];
 	}
@@ -658,30 +663,31 @@ void Game::Update()
 	bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
 	//部屋の切り替え
 	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectRoomFlag2 && nowSelectNum == 1)
-	if (UsersInput::Instance()->OnTrigger(DIK_UP) && enableToSelectRoomFlag2 && nowSelectNum == 1)
+	if (up && enableToSelectRoomFlag2 && nowSelectNum == 1)
 	{
 		++debugStageData[1];
 	}
 	//if (Input::isKeyTrigger(KEY_INPUT_DOWN) && enableToSelectRoomFlag && nowSelectNum == 1)
-	if (UsersInput::Instance()->OnTrigger(DIK_DOWN) && enableToSelectRoomFlag && nowSelectNum == 1)
+	if (down && enableToSelectRoomFlag && nowSelectNum == 1)
 	{
 		--debugStageData[1];
 	}
 
 	//部屋か番号に切り替え
 	//if (Input::isKeyTrigger(KEY_INPUT_LEFT) && 0 < nowSelectNum)
-	if (UsersInput::Instance()->OnTrigger(DIK_LEFT) && 0 < nowSelectNum)
+	if (left && 0 < nowSelectNum)
 	{
 		--nowSelectNum;
 		debugStageData[1] = 0;
 	}
-	if (UsersInput::Instance()->OnTrigger(DIK_RIGHT) && nowSelectNum < 1)
+	if (right && nowSelectNum < 1)
 	{
 		++nowSelectNum;
 		debugStageData[1] = 0;
 	}
 
-	if (UsersInput::Instance()->OnTrigger(DIK_RETURN))
+	const bool done = UsersInput::Instance()->OnTrigger(DIK_RETURN) || UsersInput::Instance()->OnTrigger(A);
+	if (done)
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
 		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
@@ -1089,8 +1095,8 @@ void Game::Update()
 	}
 	//シーン遷移-----------------------
 
-
-	if (UsersInput::Instance()->OnTrigger(DIK_SPACE))
+	const bool resetInput = UsersInput::Instance()->OnTrigger(DIK_SPACE) || UsersInput::Instance()->OnTrigger(BACK);
+	if (resetInput)
 	{
 		SelectStage::Instance()->resetStageFlag = true;
 		//player.isDead = true;

@@ -8,8 +8,9 @@ struct VSOutput
     float4 center : CENTER;
     float2 extRate : EXT_RATE;
     float radian : RADIAN;
-    float2 rotaCenterUV : ROTA_CENTER_UV;
     float4 paintColor : PAINT_COLOR;
+    float2 rotaCenterUV : ROTA_CENTER_UV;
+    int2 miror : MIROR;
 };
 
 VSOutput VSmain(VSOutput input)
@@ -59,7 +60,7 @@ void GSmain(
     element.pos.y += height_h;
     element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(0.0f, 1.0f);
+    element.uv = float2(0.0f + input[0].miror.x, 1.0f - input[0].miror.y);
     output.Append(element);
     
     //ç∂è„
@@ -68,7 +69,7 @@ void GSmain(
     element.pos.y -= height_h;
     element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(0.0f, 0.0f);
+    element.uv = float2(0.0f + input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
     
      //âEâ∫
@@ -77,7 +78,7 @@ void GSmain(
     element.pos.y += height_h;
     element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(1.0f, 1.0f);
+    element.uv = float2(1.0f - input[0].miror.x, 1.0f - input[0].miror.y);
     output.Append(element);
     
     //âEè„
@@ -86,7 +87,7 @@ void GSmain(
     element.pos.y -= height_h;
     element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
-    element.uv = float2(1.0f, 0.0f);
+    element.uv = float2(1.0f - input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
 }
 
