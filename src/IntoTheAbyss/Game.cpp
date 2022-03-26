@@ -773,7 +773,6 @@ void Game::Update()
 					//マップ情報更新
 					int localRoomNum = StageMgr::Instance()->GetRelationData(stageNum, roomNum, doorNumber - chipMemorySize.min);
 
-
 					RoomMapChipArray tmpMapData = StageMgr::Instance()->GetMapChipData(stageNum, localRoomNum);
 					//ドア座標を入手
 					Vec2<float>doorPos = GetDoorPos(doorNumber, mapData);
@@ -1054,15 +1053,6 @@ void Game::Update()
 		thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
 	}
 
-	// R or Aが押されたらプレイヤーの位置を初期化する。
-	//if (Input::isKeyTrigger(KEY_INPUT_R) || Input::isJoyBottomTrigger(XINPUT_BUTTON_A))
-	//if (UsersInput::Instance()->OnTrigger(DIK_R) || UsersInput::Instance()->OnTrigger(XBOX_BUTTON::A))
-	//{
-		//player.centerPos = player.GetGeneratePos();
-		//ScrollMgr::Instance()->scrollAmount = { -3.0f, 295.0f };
-		//ScrollMgr::Instance()->honraiScrollAmount = { 0, 295.0f };
-	//}
-
 	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
 
 
@@ -1139,8 +1129,6 @@ void Game::Update()
 
 	// オーラブロックのデータとビューポートの判定を行う。
 	ViewPort::Instance()->SavePrevFlamePos();
-
-
 
 	// 弾とビューポートの当たり判定
 	for (int i = 0; i < BulletMgr::Instance()->bullets.size(); ++i)
