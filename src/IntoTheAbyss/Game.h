@@ -90,7 +90,7 @@ class Game
 	E_DOOR_DIR doorDir;
 	bool sceneChangeDeadFlag;//プレイヤが死んでいたらフラグを立てシーン遷移中に特殊な処理を入れる
 	bool initDeadFlag;
-
+	bool doorHitFlag;
 
 	std::vector<std::unique_ptr<MassChip>> massChipData;
 	std::array<EventBlock,10>eventBlocks;

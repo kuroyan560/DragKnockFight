@@ -603,82 +603,42 @@ void Game::Update()
 	}
 
 
+	for (int doorIndex = 0; doorIndex < doorBlocks.size(); ++doorIndex)
 	{
-		//ドア判定-----------------------
-		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
-		for (int i = chipMemorySize.min; i < chipMemorySize.max; ++i)
+		//当たり判定
+		bool hitFlag = doorBlocks[doorIndex]->Collision(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
+
+		//ドアと当たったら数字を渡す
+		if (hitFlag)
 		{
-			//触れているドアによって座標変更-----------------------
-			array<Vec2<float>, DOOR_MAX> setPlayerPos;
-			setPlayerPos[DOOR_UP_GORIGHT] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y - 30.0f) / 50.0f);
-			setPlayerPos[DOOR_UP_GOLEFT] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y - 30.0f) / 50.0f);
-
-			setPlayerPos[DOOR_DOWN] = Vec2<float>(player.centerPos.x / 50.0f, (player.centerPos.y + 61.0f) / 50.0f);
-			setPlayerPos[DOOR_LEFT] = Vec2<float>((player.centerPos.x - 60.0f) / 50.0f, player.centerPos.y / 50.0f);
-			setPlayerPos[DOOR_RIGHT] = Vec2<float>((player.centerPos.x + 60.0f) / 50.0f, player.centerPos.y / 50.0f);
-			setPlayerPos[DOOR_NONE] = Vec2<float>(player.centerPos.x / 50.0f, player.centerPos.y / 50.0f);
-			//触れているドアによって座標変更-----------------------
-
-			//触れているドアによって、どこの座標を基準にするか変える
-			Vec2<float> playerChip = setPlayerPos[doorDir];
-			if (playerChip.x <= 0.0f)
-			{
-				playerChip.x = -1.0f;
-			}
-			if (playerChip.y <= 0.0f)
-			{
-				playerChip.y = -1.0f;
-			}
-
-			int nowChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, playerChip);
-			int prevChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, prevPlayerChipPos);
-
-
-			bool tochDoorFlag = chipMemorySize.min <= giveDoorNumber && giveDoorNumber <= chipMemorySize.max;
-			if (tochDoorFlag)
-			{
-				//ドア座標を入手
-				Vec2<float>doorPos = GetDoorPos(giveDoorNumber, mapData);
-				//プレイヤーがリスポーンする座標を入手
-				GetPlayerResponePos(stageNum, roomNum, giveDoorNumber, doorPos, &doorDir, true);
-			}
-
-			//奥扉判定-----------------------
-			Vec2<float> rightCehck(playerChip.x + 1, playerChip.y);
-			int rightChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, rightCehck);
-			Vec2<float> leftCehck(playerChip.x - 1, playerChip.y);
-			int leftChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, leftCehck);
-			bool zDoorFlag = rightChip == 0 && leftChip == 0;
-			//奥扉判定-----------------------
-
-
-
-			//どのドアに触れたか
-			if (nowChip == i)
-			{
-				giveDoorNumber = i;
-			}
-
-			bool goToNextStageFlag = nowChip == -1;
-			//ドアとの判定
-			//最後に通ったドア番号を保存、シーン遷移開始、プレイヤーのカーソル描画無効
-			if (goToNextStageFlag && !zDoorFlag && !sceneBlackFlag && !sceneLightFlag && tochDoorFlag)
-			{
-				sceneBlackFlag = true;
-				doorNumber = giveDoorNumber;
-				player.drawCursorFlag = false;
-			}
-			else if (goToNextStageFlag && zDoorFlag && UsersInput::Instance()->OnTrigger(XBOX_BUTTON::B) && !sceneBlackFlag && !sceneLightFlag && tochDoorFlag)
-			{
-				sceneBlackFlag = true;
-				doorNumber = giveDoorNumber;
-				player.drawCursorFlag = false;
-			}
-			prevPlayerChipPos = playerChip;
+			giveDoorNumber = doorBlocks[doorIndex]->chipNumber;
 		}
-		//ドア判定-----------------------
-	}
+		doorHitFlag = hitFlag;
 
+		//プレイヤーの体を完全に隠すためのオフセット
+		Vec2<float>offset;
+		if (player.vel.x <= 0.0f)
+		{
+			offset.x = MAP_CHIP_HALF_SIZE;
+		}
+		else
+		{
+			offset.x = -MAP_CHIP_HALF_SIZE;
+		}
+
+		//現在地取得
+		int nowChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>((player.centerPos + Vec2<float>(0.0f, -25.0f) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
+		int nowChip2 = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>((player.centerPos + Vec2<float>(0.0f, 25.0f) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
+
+		//ドア移動判定
+		bool outSideFlag = nowChip == -1 && nowChip2 == -1;
+		if (outSideFlag)
+		{
+			sceneBlackFlag = true;
+			doorNumber = giveDoorNumber;
+			player.drawCursorFlag = false;
+		}
+	}
 
 	//シーン遷移-----------------------
 	//暗転中
