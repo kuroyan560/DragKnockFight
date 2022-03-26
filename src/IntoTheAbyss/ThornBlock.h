@@ -14,5 +14,6 @@ private:
 	Vec2<float> leftUpPos;
 	Vec2<float> size;
 	Vec2<float>adjValue;//“–‚½‚è”»’è’²®—p
+	Color color;
 };
 

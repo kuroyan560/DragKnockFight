@@ -362,6 +362,208 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 	return chipNum;
 }
 
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
+{
+	int stageNum = STAGE_NUM;
+	int roomNum = ROOM_NUM;
+
+	mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
+	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+
+	// シェイク量を設定。
+	ShakeMgr::Instance()->Init();
+	ParticleMgr::Instance()->Init();
+
+	//オーラブロック追加
+	{
+		const int auraChipNum = MAPCHIP_BLOCK_AURABLOCK;//オーラブロックのチップ番号
+		auraBlock.clear();
+		std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, auraChipNum);
+		for (int i = 0; i < data.size(); ++i)
+		{
+			auraBlock.push_back(std::make_unique<AuraBlock>());
+			int auraBlocksArrayNum = auraBlock.size() - 1;
+			if (data[i]->sideOrUpDownFlag)
+			{
+				auraBlock[auraBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, AURA_DIR_LEFTORRIGHT);
+			}
+			else
+			{
+				auraBlock[auraBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, AURA_DIR_UPORDOWN);
+			}
+		}
+	}
+
+	//ドアの追加
+	{
+		doorBlocks.clear();
+		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
+		for (int doorIndex = chipMemorySize.min; doorIndex < chipMemorySize.max; ++doorIndex)
+		{
+			std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, doorIndex);
+			for (int i = 0; i < data.size(); ++i)
+			{
+				doorBlocks.push_back(std::make_unique<DoorBlock>());
+				int doorBlocksArrayNum = doorBlocks.size() - 1;
+				doorBlocks[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex);
+			}
+		}
+	}
+
+	//棘ブロック
+	{
+		thornBlocks.clear();
+		const int dogeChipNum = MAPCHIP_BLOCK_THOWN;
+		std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, dogeChipNum);
+		for (int i = 0; i < data.size(); ++i)
+		{
+			thornBlocks.push_back(std::make_unique<ThornBlock>());
+			int thornBlocksArrayNum = thornBlocks.size() - 1;
+			thornBlocks[thornBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos);
+		}
+	}
+
+#pragma region ドッスン生成
+	// ドッスンブロックを生成。
+	vector<shared_ptr<ThownpeData>> dossunData;
+
+	// ドッスンブロックデータを取得
+	dossunData = GimmickLoader::Instance()->GetThowpeData(stageNum, roomNum);
+
+	const int dossunCount = dossunData.size();
+
+	// 照準の判定に使用するデータを保存。
+	SightCollisionStorage::Instance()->data.clear();
+
+	// ドッスンブロックを初期化。
+	dossunBlock.clear();
+
+	// ドッスンを生成。
+	for (int index = 0; index < dossunCount; ++index) {
+		//始点と終点が一緒なら
+		if (dossunData[index]->startPos != dossunData[index]->endPos)
+		{
+			DossunBlock dossunBuff;
+			dossunBuff.Generate(dossunData[index]->startPos, dossunData[index]->endPos, dossunData[index]->size, dossunData[index]->type);
+			// データを追加。
+			dossunBlock.push_back(dossunBuff);
+			if (&dossunBlock[dossunBlock.size() - 1].sightData == nullptr) assert(0); //ドッスンブロックのデータが何故かNullptrです！
+			SightCollisionStorage::Instance()->data.push_back(&dossunBlock[dossunBlock.size() - 1].sightData);
+		}
+	}
+#pragma endregion
+
+#pragma region イベントチップ生成
+	//イベントブロック生成
+	{
+		//終了処理
+		for (int i = 0; i < eventBlocks.size(); ++i)
+		{
+			eventBlocks[i].Finalize();
+		}
+
+		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
+		for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
+		{
+			int arrayNum = chipNumber - chipMemorySize.min;
+
+			//座標と番号被りの確認
+			Vec2<float>chipPos(-1.0f, -1.0f);
+			int countChipNum = 0;
+			GetChipNum(mapData, chipNumber, &countChipNum, &chipPos);
+
+
+			eventBlocks[arrayNum].Init(chipPos);
+		}
+	}
+#pragma endregion
+
+#pragma region シャボン玉
+	// シャボン玉ブロックの情報を取得。
+	vector<shared_ptr<BubbleData>> bubbleData;
+	bubbleData = GimmickLoader::Instance()->GetBubbleData(stageNum, roomNum);
+
+	const int bubbleCount = bubbleData.size();
+
+	// シャボン玉ブロックを初期化。
+	bubbleBlock.clear();
+
+	// シャボン玉ブロックを生成。
+	for (int index = 0; index < bubbleCount; ++index) {
+
+		Bubble bubbleBuff;
+		bubbleBuff.Generate(bubbleData[index]->pos);
+
+		// データを追加。
+		bubbleBlock.push_back(bubbleBuff);
+	}
+#pragma endregion
+
+	initDeadFlag = false;
+	giveDoorNumber = 0;
+	debugStageData[0] = stageNum;
+	debugStageData[1] = roomNum;
+
+#pragma region プレイヤー初期化
+	bool deadFlag = false;
+	if (player.isDead)
+	{
+		deadFlag = true;
+	}
+
+
+	bool responeFlag = false;
+
+	for (int y = 0; y < mapData.size(); ++y)
+	{
+		for (int x = 0; x < mapData[y].size(); ++x)
+		{
+			if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
+			{
+				player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
+				ScrollMgr::Instance()->WarpScroll(player.centerPos);
+				responeFlag = true;
+				break;
+			}
+		}
+	}
+
+	//デバック開始用の場所からリスポーンしたらこの処理を通さない
+	if (!responeFlag)
+	{
+		//マップ開始時の場所にスポーンさせる
+		for (int y = 0; y < mapData.size(); ++y)
+		{
+			for (int x = 0; x < mapData[y].size(); ++x)
+			{
+				if (mapData[y][x] == MAPCHIP_BLOCK_START)
+				{
+					player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
+					ScrollMgr::Instance()->WarpScroll(player.centerPos);
+					break;
+				}
+			}
+		}
+	}
+
+
+
+	if (deadFlag)
+	{
+		ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
+		ScrollMgr::Instance()->AlimentScrollAmount();
+		ScrollMgr::Instance()->Restart();
+	}
+#pragma endregion
+
+	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
+
+	sceneBlackFlag = false;
+	sceneLightFlag = false;
+	SelectStage::Instance()->resetStageFlag = false;
+	alphaValue = 0;
+}
+
 Game::Game()
 {
 	mapBlockGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Block.png");
@@ -390,110 +592,13 @@ Game::Game()
 
 void Game::Init()
 {
-	int stageNum = SelectStage::Instance()->GetStageNum();
-	int roomNum = SelectStage::Instance()->GetRoomNum();
-
+	// スクロールマネージャーを初期化。
+	ScrollMgr::Instance()->Init(&mapData);
 	// スクロール量を設定。
 	const float WIN_WIDTH_HALF = WinApp::Instance()->GetWinCenter().x;
 	const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
 	ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 	ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
-
-	// マップチップのデータをロード
-	mapData = StageMgr::Instance()->GetMapChipData(0, 0);
-
-	// スクロールマネージャーを初期化。
-	ScrollMgr::Instance()->Init(&mapData);
-
-	// シェイク量を設定。
-	ShakeMgr::Instance()->Init();
-
-	//マップ開始時の場所にスポーンさせる
-	for (int y = 0; y < mapData.size(); ++y)
-	{
-		for (int x = 0; x < mapData[y].size(); ++x)
-		{
-			if (mapData[y][x] == MAPCHIP_BLOCK_START)
-			{
-				player.centerPos = { (float)x * 50.0f,(float)y * 50.0f };
-				break;
-			}
-		}
-	}
-
-
-	//オーラブロック追加
-	{
-		const int auraChipNum = 40;//オーラブロックのチップ番号
-		std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, auraChipNum);
-
-		for (int i = 0; i < data.size(); ++i)
-		{
-			auraBlock.push_back(std::make_unique<AuraBlock>());
-			int auraBlocksArrayNum = auraBlock.size() - 1;
-			if (data[i]->sideOrUpDownFlag)
-			{
-				auraBlock[auraBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, AURA_DIR_LEFTORRIGHT);
-			}
-			else
-			{
-				auraBlock[auraBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, AURA_DIR_UPORDOWN);
-			}
-		}
-	}
-
-	//ドアの追加
-	{
-		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
-		for (int doorIndex = chipMemorySize.min; doorIndex < chipMemorySize.max; ++doorIndex)
-		{
-			std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, doorIndex);
-			for (int i = 0; i < data.size(); ++i)
-			{
-				doorBlocks.push_back(std::make_unique<DoorBlock>());
-				int doorBlocksArrayNum = doorBlocks.size() - 1;
-				doorBlocks[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex);
-			}
-		}
-	}
-
-	//棘作成
-	{
-		const int dogeChipNum = 100;
-		std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, dogeChipNum);
-		for (int i = 0; i < data.size(); ++i)
-		{
-			thornBlocks.push_back(std::make_unique<ThornBlock>());
-			int thornBlocksArrayNum = doorBlocks.size() - 1;
-			thornBlocks[thornBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos);
-		}
-	}
-
-
-	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
-
-	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
-	alphaValue = 0;
-	ParticleMgr::Instance()->Init();
-
-
-
-	SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
-	for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
-	{
-		int arrayNum = chipNumber - chipMemorySize.min;
-
-		//座標と番号被りの確認
-		Vec2<float>chipPos(-1.0f, -1.0f);
-		int countChipNum = 0;
-		GetChipNum(mapData, chipNumber, &countChipNum, &chipPos);
-
-		if (countChipNum == 1)
-		{
-			eventBlocks[arrayNum].Init(chipPos);
-		}
-	}
-
 }
 
 void Game::Update()
@@ -642,7 +747,7 @@ void Game::Update()
 
 
 
-#pragma region　シーン遷移
+#pragma region シーン遷移
 	//シーン遷移-----------------------
 	//暗転中
 	if (sceneBlackFlag)
@@ -678,9 +783,7 @@ void Game::Update()
 					//リスポーンエラーなら転移しない
 					if (responePos.x != -1.0f && responePos.y != -1.0f)
 					{
-						mapData = tmpMapData;
 						SelectStage::Instance()->SelectRoomNum(localRoomNum);
-
 
 						sceneChangingFlag = true;
 						//画面外から登場させる
@@ -935,152 +1038,7 @@ void Game::Update()
 	//部屋の初期化
 	if ((roomNum != oldRoomNum || stageNum != oldStageNum) || SelectStage::Instance()->resetStageFlag)
 	{
-		giveDoorNumber = 0;
-		initDeadFlag = false;
-		debugStageData[0] = stageNum;
-		debugStageData[1] = roomNum;
-
-		mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
-		mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
-
-		// ドッスンブロックを生成。
-		vector<shared_ptr<ThownpeData>> dossunData;
-
-		// ドッスンブロックデータを取得
-		dossunData = GimmickLoader::Instance()->GetThowpeData(stageNum, roomNum);
-
-		const int dossunCount = dossunData.size();
-
-		// 照準の判定に使用するデータを保存。
-		SightCollisionStorage::Instance()->data.clear();
-
-		// ドッスンブロックを初期化。
-		dossunBlock.clear();
-
-		// ドッスンを生成。
-		for (int index = 0; index < dossunCount; ++index) {
-			//始点と終点が一緒なら
-			if (dossunData[index]->startPos != dossunData[index]->endPos)
-			{
-				DossunBlock dossunBuff;
-				dossunBuff.Generate(dossunData[index]->startPos, dossunData[index]->endPos, dossunData[index]->size, dossunData[index]->type);
-				// データを追加。
-				dossunBlock.push_back(dossunBuff);
-				if (&dossunBlock[dossunBlock.size() - 1].sightData == nullptr) assert(0); //ドッスンブロックのデータが何故かNullptrです！
-				SightCollisionStorage::Instance()->data.push_back(&dossunBlock[dossunBlock.size() - 1].sightData);
-			}
-		}
-
-
-		//イベントブロック生成
-		{
-			//終了処理
-			for (int i = 0; i < eventBlocks.size(); ++i)
-			{
-				eventBlocks[i].Finalize();
-			}
-
-			SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
-			for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
-			{
-				int arrayNum = chipNumber - chipMemorySize.min;
-
-				//座標と番号被りの確認
-				Vec2<float>chipPos(-1.0f, -1.0f);
-				int countChipNum = 0;
-				GetChipNum(mapData, chipNumber, &countChipNum, &chipPos);
-
-				if (1 <= countChipNum)
-				{
-					eventBlocks[arrayNum].Init(chipPos);
-				}
-				else if (2 <= countChipNum)
-				{
-					std::string stageString = "ステージ" + std::to_string(stageNum) + "の";
-					std::string roomString = "エリア" + std::to_string(roomNum) + "にて";
-					std::string chipString = "イベントチップ" + std::to_string(arrayNum) + "(チップ番号" + std::to_string(chipNumber) + ")" + "が二つ以上使われています。\n";
-					std::string checkString = "使うのは一つまでにして下さい";
-
-					//エラー処理を書く
-					std::string errorName = stageString + roomString + chipString + checkString;
-					//MessageBox(NULL, KuroFunc::GetWideStrFromStr(errorName).c_str(), TEXT("イベントチップ被り"), MB_OK);
-					//assert(0);
-				}
-			}
-		}
-
-
-		// シャボン玉ブロックの情報を取得。
-		vector<shared_ptr<BubbleData>> bubbleData;
-		bubbleData = GimmickLoader::Instance()->GetBubbleData(stageNum, roomNum);
-
-		const int bubbleCount = bubbleData.size();
-
-		// シャボン玉ブロックを初期化。
-		bubbleBlock.clear();
-
-		// シャボン玉ブロックを生成。
-		for (int index = 0; index < bubbleCount; ++index) {
-
-			Bubble bubbleBuff;
-			bubbleBuff.Generate(bubbleData[index]->pos);
-
-			// データを追加。
-			bubbleBlock.push_back(bubbleBuff);
-		}
-
-		bool deadFlag = false;
-		if (player.isDead)
-		{
-			deadFlag = true;
-		}
-
-
-		if (SelectStage::Instance()->resetStageFlag)
-		{
-			bool responeFlag = false;
-
-			for (int y = 0; y < mapData.size(); ++y)
-			{
-				for (int x = 0; x < mapData[y].size(); ++x)
-				{
-					if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
-					{
-						player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
-						ScrollMgr::Instance()->WarpScroll(player.centerPos);
-						break;
-					}
-				}
-			}
-
-			//デバック開始用の場所からリスポーンしたらこの処理を通さない
-			if (!responeFlag)
-			{
-				//マップ開始時の場所にスポーンさせる
-				for (int y = 0; y < mapData.size(); ++y)
-				{
-					for (int x = 0; x < mapData[y].size(); ++x)
-					{
-						if (mapData[y][x] == MAPCHIP_BLOCK_START)
-						{
-							player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
-							ScrollMgr::Instance()->WarpScroll(player.centerPos);
-							responeFlag = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-
-
-		if (deadFlag)
-		{
-			ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
-			ScrollMgr::Instance()->AlimentScrollAmount();
-			ScrollMgr::Instance()->Restart();
-		}
-		SelectStage::Instance()->resetStageFlag = false;
+		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	}
 	oldRoomNum = roomNum;
 	oldStageNum = stageNum;

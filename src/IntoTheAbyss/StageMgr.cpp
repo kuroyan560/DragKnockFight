@@ -46,6 +46,7 @@ StageMgr::StageMgr()
 	mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHTDOWN_1PIXEL] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Chip_rightDown1Pixel.png");
 	mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFTDOWN_1PIXEL] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Chip_leftDown1Pixel.png");
 
+	//thowGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Thown.png");
 
 
 	vector<int>tmp(6);
@@ -315,8 +316,6 @@ StageMgr::StageMgr()
 					}
 
 
-
-
 					if (now == MAPCHIP_BLOCK_START)
 					{
 						startChip.push_back(roomNum);
@@ -365,6 +364,50 @@ StageMgr::StageMgr()
 						int gimmickNumber = now - mapChipMemoryData[MAPCHIP_TYPE_BUBBLE].min;
 						GimmickLoader::Instance()->PushBubbleData(stageNum, roomNum, gimmickNumber, Vec2<float>(x * 50.0f, y * 50.0f));
 						skipFlag = true;
+					}
+
+					//êj
+					{
+						//è„
+						bool checkDirFlag =
+							Up == 0 && Down == 1;
+						if (now == MAPCHIP_BLOCK_THOWN && checkDirFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = thowGraphHandle;
+							tmp.radian = 0.0f;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
+						//â∫
+						checkDirFlag =
+							Up == 1 && Down == 0;
+						if (now == MAPCHIP_BLOCK_THOWN && checkDirFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = thowGraphHandle;
+							tmp.radian = Radian(180.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
+						//ç∂
+						checkDirFlag =
+							left == 0 && right == 1;
+						if (now == MAPCHIP_BLOCK_THOWN && checkDirFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = thowGraphHandle;
+							tmp.radian = Radian(270.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
+						//âE
+						checkDirFlag =
+							left == 1 && right == 0;
+						if (now == MAPCHIP_BLOCK_THOWN && checkDirFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = thowGraphHandle;
+							tmp.radian = Radian(90.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
 					}
 
 

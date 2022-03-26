@@ -124,6 +124,8 @@ class Game
 	Light::HemiSphere hemiLig;
 
 
+	void InitGame(const int &STAGE_NUM, const int &ROOM_NUM);
+
 public:
 
 	array<int, 2> debugStageData = { 0,0 };//デバック用のステージと部屋番号
@@ -135,6 +137,7 @@ public:
 	void Draw(std::weak_ptr<RenderTarget>EmissiveMap);
 
 	LightManager& GetLigManager() { return ligMgr; }
+
 
 };
 
