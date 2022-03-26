@@ -20,6 +20,8 @@ class RenderTarget;
 #include"MassChip.h"
 #include"DoorBlock.h"
 
+#include"ThornBlock.h"
+
 struct MassChipData
 {
 	Vec2<float>leftUpPos;
@@ -79,8 +81,8 @@ class Game
 
 	vector<std::unique_ptr<AuraBlock>> auraBlock;
 	vector<vector<MapChipDrawData>> mapChipDrawData;
-
 	std::vector<std::unique_ptr<DoorBlock>> doorBlocks;
+	std::vector<std::unique_ptr<ThornBlock>> thornBlocks;
 
 	int countStopNum = 0;
 	int countHitNum = 0;

@@ -424,7 +424,7 @@ void Game::Init()
 
 	//オーラブロック追加
 	{
-		int auraChipNum = 40;//オーラブロックのチップ番号
+		const int auraChipNum = 40;//オーラブロックのチップ番号
 		std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, auraChipNum);
 
 		for (int i = 0; i < data.size(); ++i)
@@ -451,9 +451,21 @@ void Game::Init()
 			for (int i = 0; i < data.size(); ++i)
 			{
 				doorBlocks.push_back(std::make_unique<DoorBlock>());
-				int auraBlocksArrayNum = doorBlocks.size() - 1;
-				doorBlocks[auraBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex);
+				int doorBlocksArrayNum = doorBlocks.size() - 1;
+				doorBlocks[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex);
 			}
+		}
+	}
+
+	//棘作成
+	{
+		const int dogeChipNum = 100;
+		std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, dogeChipNum);
+		for (int i = 0; i < data.size(); ++i)
+		{
+			thornBlocks.push_back(std::make_unique<ThornBlock>());
+			int thornBlocksArrayNum = doorBlocks.size() - 1;
+			thornBlocks[thornBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos);
 		}
 	}
 
@@ -590,6 +602,7 @@ void Game::Update()
 	}
 
 
+#pragma region ドア移動
 	for (int doorIndex = 0; doorIndex < doorBlocks.size(); ++doorIndex)
 	{
 		//当たり判定
@@ -625,7 +638,11 @@ void Game::Update()
 			player.drawCursorFlag = false;
 		}
 	}
+#pragma endregion
 
+
+
+#pragma region　シーン遷移
 	//シーン遷移-----------------------
 	//暗転中
 	if (sceneBlackFlag)
@@ -902,7 +919,7 @@ void Game::Update()
 		sceneChangingFlag = false;
 	}
 	//シーン遷移-----------------------
-
+#pragma endregion
 
 	if (UsersInput::Instance()->OnTrigger(DIK_SPACE))
 	{
@@ -1072,6 +1089,11 @@ void Game::Update()
 	for (int i = 0; i < eventBlocks.size(); ++i)
 	{
 		eventBlocks[i].HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
+	}
+
+	for (int i = 0; i < thornBlocks.size(); ++i)
+	{
+		thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
 	}
 
 	// R or Aが押されたらプレイヤーの位置を初期化する。
@@ -1523,6 +1545,11 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	for (int i = 0; i < eventBlocks.size(); ++i)
 	{
 		eventBlocks[i].Draw();
+	}
+
+	for (int i = 0; i < thornBlocks.size(); ++i)
+	{
+		thornBlocks[i]->Draw();
 	}
 
 
