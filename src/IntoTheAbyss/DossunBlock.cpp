@@ -4,6 +4,7 @@
 #include "Collider.h"
 #include "MapChipCollider.h"
 #include "ParticleMgr.h"
+#include "SlowMgr.h"
 
 #include"DrawFunc.h"
 
@@ -176,7 +177,7 @@ void DossunBlock::Update()
 
 		// à⁄ìÆÇ∑ÇÈÅB
 		if (isFirstMove) {
-			pos += moveDir * Vec2<float>(speed, speed);
+			pos += moveDir * Vec2<float>(speed * SlowMgr::Instance()->playerDeadSlow, speed * SlowMgr::Instance()->playerDeadSlow);
 		}
 
 	}

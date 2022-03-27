@@ -1,6 +1,7 @@
 #include "Beacon.h"
 #include "ScrollMgr.h"
 #include "ShakeMgr.h"
+#include "SlowMgr.h"
 
 #include"WinApp.h"
 #include"DrawFunc.h"
@@ -61,7 +62,7 @@ void Beacon::Update()
 		// 座標を保存
 		prevFramePos = pos;
 
-		pos += Vec2<float>(forwardVec.x * MAX_SPEED, forwardVec.y * MAX_SPEED);
+		pos += Vec2<float>(forwardVec.x * MAX_SPEED * SlowMgr::Instance()->playerDeadSlow, forwardVec.y * MAX_SPEED * SlowMgr::Instance()->playerDeadSlow);
 
 		//// 座標が画面外にいったらその場所で止める。
 		//const int WIN_WIDTH = WinApp::Instance()->GetWinSize().x;

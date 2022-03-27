@@ -16,7 +16,7 @@ public:
 	bool isBreak;			// states ga break ka
 	int graphHandle;
 	float addEasingTimer;	// イジングタイマーに加算する量。
-	int easingTimer;		// easing timer
+	float easingTimer;		// easing timer
 	bool easingFlag;		// 拡縮はXY軸で行うため、それぞれの軸で拡張と収縮のどちらを行うかを判断するためのフラグ
 	bool isHitBullet;
 

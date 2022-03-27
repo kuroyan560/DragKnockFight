@@ -4,6 +4,7 @@
 #include "ShakeMgr.h"
 #include "TexHandleMgr.h"
 #include "KuroMath.h"
+#include "SlowMgr.h"
 
 Bubble::Bubble()
 {
@@ -78,7 +79,7 @@ void Bubble::Update()
 	radius += (RADIUS - radius) / 10.0f;
 
 	// updateEasingTimer
-	++easingTimer;
+	easingTimer += 1.0f * SlowMgr::Instance()->playerDeadSlow;
 	easingTimer += addEasingTimer;
 	if (easingTimer >= EASING_TIMER) {
 
@@ -115,7 +116,7 @@ void Bubble::Update()
 	// update AddEasingTimer
 	if (addEasingTimer > 0) {
 		//addEasingTimer -= addEasingTimer / 10.0f;
-		--addEasingTimer;
+		addEasingTimer -= 1.0f * SlowMgr::Instance()->playerDeadSlow;
 
 		easingScale.x += (honraiEasingScale.x - easingScale.x) / 1.0f;
 		easingScale.y += (honraiEasingScale.y - easingScale.y) / 1.0f;

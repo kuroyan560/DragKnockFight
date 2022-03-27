@@ -34,6 +34,7 @@ class ParticleMgr : public Singleton<ParticleMgr>
 		char isAlive = 0;		// 生存フラグ
 		float scale;
 		unsigned int texIdx;	//テクスチャ番号
+		Vec4<float> slow;
 
 		// 生成処理
 		void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const int& TexIdx);

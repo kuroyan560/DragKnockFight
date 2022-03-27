@@ -8,6 +8,7 @@ struct Vertex
     min16int isAlive;
     float scale;
     uint texIdx;
+    float4 slow;
 };
 
 RWStructuredBuffer<Vertex> vertices : register(u0);
@@ -29,7 +30,7 @@ void CSmain(uint3 DTid : SV_DispatchThreadID)
     }
     
 	// 移動させる。
-    v.movedVel += float2(v.forwardVec.x * v.speed, v.forwardVec.y * v.speed);
+    v.movedVel += float2(v.forwardVec.x * v.speed * v.slow.x, v.forwardVec.y * v.speed * v.slow.x);
 
 	// 移動した量がサイズを上回ったらサイズを動かす。
     if (abs(v.movedVel.x) >= v.scale)

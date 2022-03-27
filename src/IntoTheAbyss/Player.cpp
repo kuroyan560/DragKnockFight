@@ -18,6 +18,7 @@
 #include"WinApp.h"
 #include "ParticleMgr.h"
 #include "EventCollider.h"
+#include "SlowMgr.h"
 
 Vec2<float> Player::GetGeneratePos()
 {

@@ -1,4 +1,5 @@
 #include "ParticleMgr.h"
+#include "SlowMgr.h"
 #include"KuroEngine.h"
 
 void ParticleMgr::Particle::Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const int& TexIdx)
@@ -28,6 +29,8 @@ void ParticleMgr::Particle::Generate(const Vec2<float>& generatePos, const Vec2<
 
 	// ¶‘¶ƒtƒ‰ƒO‚ğ‰Šú‰»
 	isAlive = 1;
+
+	slow.x = 1.0f;
 
 	texIdx = TexIdx;
 }
@@ -141,6 +144,24 @@ void ParticleMgr::Update()
 	auto cmdList = D3D12App::Instance()->GetCmdList();
 	cPipeline->SetPipeline(cmdList);
 	buff->GetRWStructuredBuff().lock()->SetComputeDescriptorBuffer(cmdList, UAV, 0);
+
+	// If SLOW is changed.
+	//if (SlowMgr::Instance()->playerDeadSlow != SlowMgr::Instance()->prevFramePlayerDeadSlow) {
+
+		////Copy recently particle's status.
+		//memcpy(particles, buff->GetRWStructuredBuff().lock()->GetResource().lock()->GetBuffOnCpu<Particle>(), MAX_NUM * sizeof(Particle));
+
+		//// ¶¬‚·‚é”•ªˆ—‚ğ‰ñ‚·B
+		//for (int index = 0; index < MAX_NUM; ++index) {
+
+			//particles[index].slow.x = SlowMgr::Instance()->playerDeadSlow;
+
+		//}
+
+		////Send particles's info which also contains new particles.
+		//buff->Mapping(particles);
+
+	//}
 
 	static const int THREAD_NUM = 10;
 	const UINT thread = MAX_NUM / THREAD_NUM;

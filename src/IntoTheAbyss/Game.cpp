@@ -11,7 +11,7 @@
 #include"Collider.h"
 #include"SightCollisionStorage.h"
 #include"SelectStage.h"
-
+#include"SlowMgr.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -32,7 +32,7 @@ bool Game::CheckUsedData(std::vector<Vec2<float>> DATA, Vec2<float> DATA2)
 }
 
 #include<map>
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -61,7 +61,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -118,7 +118,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR, const bool &ONLY_GET_DOOR_DIR)
+Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR* DIR, const bool& ONLY_GET_DOOR_DIR)
 {
 	Vec2<float> doorPos;
 	int roopCount = 0;
@@ -312,7 +312,7 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	return Vec2<float>(-1, -1);
 }
 
-Vec2<float> Game::GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA)
+Vec2<float> Game::GetDoorPos(const int& DOOR_NUMBER, const vector<vector<int>>& MAPCHIP_DATA)
 {
 	Vec2<float> door;
 	//次につながるドアを探す
@@ -330,7 +330,7 @@ Vec2<float> Game::GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &
 	return door;
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
+const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -1267,7 +1267,8 @@ void Game::Update()
 
 
 
-
+	if (UsersInput::Instance()->Input(DIK_1)) SlowMgr::Instance()->playerDeadSlow += 0.01f;
+	if (UsersInput::Instance()->Input(DIK_2)) SlowMgr::Instance()->playerDeadSlow -= 0.01f;
 
 	// プレイヤーの更新処理
 	player.Update(mapData);
@@ -1315,6 +1316,9 @@ void Game::Update()
 			bubbleBlock[index].Update();
 		}
 	}
+
+	// スローの更新処理
+	SlowMgr::Instance()->Update();
 
 
 	/*===== 当たり判定 =====*/
