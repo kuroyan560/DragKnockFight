@@ -210,6 +210,7 @@ private:
 	static const int SECRET_DOOR_NUMBER = 5;
 
 	int thowGraphHandle;
+	std::array<int, 12> eventChipHandle;
 
 	array<int, 30> mapChipGraphHandle;
 	enum

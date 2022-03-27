@@ -423,6 +423,24 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		}
 	}
 
+#pragma region イベントチップ生成
+	//イベントブロック生成
+	{
+		eventBlocks.clear();
+		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
+		for (int eventChipIndex = chipMemorySize.min; eventChipIndex < chipMemorySize.max; ++eventChipIndex)
+		{
+			std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, eventChipIndex);
+			for (int i = 0; i < data.size(); ++i)
+			{
+				eventBlocks.push_back(std::make_unique<EventBlock>());
+				int doorBlocksArrayNum = eventBlocks.size() - 1;
+				eventBlocks[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, eventChipIndex);
+			}
+		}
+	}
+#pragma endregion
+
 #pragma region ドッスン生成
 	// ドッスンブロックを生成。
 	vector<shared_ptr<ThownpeData>> dossunData;
@@ -449,31 +467,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 			dossunBlock.push_back(dossunBuff);
 			if (&dossunBlock[dossunBlock.size() - 1].sightData == nullptr) assert(0); //ドッスンブロックのデータが何故かNullptrです！
 			SightCollisionStorage::Instance()->data.push_back(&dossunBlock[dossunBlock.size() - 1].sightData);
-		}
-	}
-#pragma endregion
-
-#pragma region イベントチップ生成
-	//イベントブロック生成
-	{
-		//終了処理
-		for (int i = 0; i < eventBlocks.size(); ++i)
-		{
-			eventBlocks[i].Finalize();
-		}
-
-		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
-		for (int chipNumber = chipMemorySize.min; chipNumber < chipMemorySize.max; ++chipNumber)
-		{
-			int arrayNum = chipNumber - chipMemorySize.min;
-
-			//座標と番号被りの確認
-			Vec2<float>chipPos(-1.0f, -1.0f);
-			int countChipNum = 0;
-			GetChipNum(mapData, chipNumber, &countChipNum, &chipPos);
-
-
-			eventBlocks[arrayNum].Init(chipPos);
 		}
 	}
 #pragma endregion
@@ -607,6 +600,7 @@ void Game::Update()
 
 	int stageNum = SelectStage::Instance()->GetStageNum();
 	int roomNum = SelectStage::Instance()->GetRoomNum();
+
 
 
 #pragma region ステージの切り替え
@@ -1042,15 +1036,21 @@ void Game::Update()
 	oldRoomNum = roomNum;
 	oldStageNum = stageNum;
 
-
+	//イベントブロックとの判定
 	for (int i = 0; i < eventBlocks.size(); ++i)
 	{
-		eventBlocks[i].HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
+		eventBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
 	}
 
+	//棘ブロックとの判定
 	for (int i = 0; i < thornBlocks.size(); ++i)
 	{
-		thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
+		bool hitFlag = thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
+
+		if (hitFlag)
+		{
+			player.isDead = true;
+		}
 	}
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
@@ -1059,25 +1059,18 @@ void Game::Update()
 
 	if (UsersInput::Instance()->Input(DIK_U))
 	{
-		for (int i = 0; i < thornBlocks.size(); ++i)
-		{
-			thornBlocks[i]->adjValue = { 10.0f,10.0f };
-		}
+		thornBlocks[0]->adjValue = { 10.0f,10.0f };
 	}
 	else if (UsersInput::Instance()->Input(DIK_J))
 	{
-		for (int i = 0; i < thornBlocks.size(); ++i)
-		{
-			thornBlocks[i]->adjValue = { -10.0f,-10.0f };
-		}
+		thornBlocks[0]->adjValue = { -10.0f,-10.0f };
 	}
-	else if(UsersInput::Instance()->Input(DIK_N))
+	else if (UsersInput::Instance()->Input(DIK_N))
 	{
-		for (int i = 0; i < thornBlocks.size(); ++i)
-		{
-			thornBlocks[i]->adjValue = { 0.0f,0.0f };
-		}
+		thornBlocks[0]->adjValue = { 0.0f,0.0f };
 	}
+
+
 
 	// プレイヤーの更新処理
 	player.Update(mapData);
@@ -1505,12 +1498,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	for (int i = 0; i < auraBlock.size(); ++i)
 	{
 		auraBlock[i]->Draw();
-	}
-
-	//イベントブロック
-	for (int i = 0; i < eventBlocks.size(); ++i)
-	{
-		eventBlocks[i].Draw();
 	}
 
 	for (int i = 0; i < thornBlocks.size(); ++i)

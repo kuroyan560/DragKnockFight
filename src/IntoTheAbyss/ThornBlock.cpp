@@ -4,6 +4,8 @@
 #include"ScrollMgr.h"
 #include"Collider.h"
 
+Vec2<float> ThornBlock::adjValue = { 0.0f,0.0f };
+
 ThornBlock::ThornBlock()
 {
 }

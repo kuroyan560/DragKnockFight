@@ -49,6 +49,13 @@ StageMgr::StageMgr()
 	//thowGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Thown.png");
 
 
+
+
+
+	//TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/EventBlocks.png", 10, { 10,1 }, eventChipHandle.data());
+
+
+
 	vector<int>tmp(6);
 	TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/gate.png", 6, { 6,1 }, &tmp[0]);
 	//アニメーション情報を読み込み
@@ -410,6 +417,18 @@ StageMgr::StageMgr()
 						}
 					}
 
+					//イベントチップのデバック画像
+					for (int eventChipNum = mapChipMemoryData[MAPCHIP_TYPE_EVENT].min; eventChipNum < mapChipMemoryData[MAPCHIP_TYPE_EVENT].max; ++eventChipNum)
+					{
+						if (now == eventChipNum)
+						{
+							int arrayNum = eventChipNum - mapChipMemoryData[MAPCHIP_TYPE_EVENT].min;
+							MapChipDrawData tmp;
+							tmp.handle = eventChipHandle[arrayNum];
+							tmp.radian = 0.0f;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
+					}
 
 
 
