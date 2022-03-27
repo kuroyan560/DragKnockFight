@@ -20,14 +20,14 @@ void ThornBlock::Finalize()
 
 bool ThornBlock::HitBox(Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, Vec2<float> &PLAYER_VEL, Vec2<float> &PLAYER_PREV_POS)
 {
-	Vec2<float> hitBoxLeftUpPos = leftUpPos;
-	Vec2<float> hitBoxCentralPos = (leftUpPos + size / 2.0f);
+	Vec2<float> hitBoxSize = (size + adjValue) / 2.0f;
+	Vec2<float> hitBoxCentralPos = (leftUpPos + hitBoxSize);
 
-	bool isDossunVel = EventCpllider::Instance()->CheckHitVel(PLAYER_POS, PLAYER_PREV_POS, PLAYER_VEL, SIZE, hitBoxCentralPos, size / 2.0f) != INTERSECTED_NONE;
-	bool topHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_TOP) != INTERSECTED_NONE;
-	bool buttomFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
-	bool leftHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_LEFT) != INTERSECTED_NONE;
-	bool rightHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+	bool isDossunVel = EventCpllider::Instance()->CheckHitVel(PLAYER_POS, PLAYER_PREV_POS, PLAYER_VEL, SIZE, hitBoxCentralPos, hitBoxSize) != INTERSECTED_NONE;
+	bool topHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, hitBoxSize, INTERSECTED_TOP) != INTERSECTED_NONE;
+	bool buttomFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, hitBoxSize, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+	bool leftHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, hitBoxSize, INTERSECTED_LEFT) != INTERSECTED_NONE;
+	bool rightHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, hitBoxSize, INTERSECTED_RIGHT) != INTERSECTED_NONE;
 
 	if (isDossunVel || topHitFlag || buttomFlag || leftHitFlag || rightHitFlag)
 	{
@@ -44,10 +44,10 @@ bool ThornBlock::HitBox(Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, Vec2<f
 void ThornBlock::Draw()
 {
 	Vec2<float>scrollAmount = ScrollMgr::Instance()->scrollAmount;
-	Vec2<float> drawLeftUpPos = leftUpPos - scrollAmount;
-	Vec2<float> drawRightDownPos = (leftUpPos + size) - scrollAmount;
-	drawLeftUpPos += adjValue;
-	drawRightDownPos += adjValue;
+	Vec2<float> drawLeftUpPos = leftUpPos - adjValue;
+	Vec2<float> drawRightDownPos = (leftUpPos + size) + adjValue;
+	drawLeftUpPos -= scrollAmount;
+	drawRightDownPos -= scrollAmount;
 
 	//“–‚½‚è”»’è•`‰æ—p
 	DrawFunc::DrawBox2D(drawLeftUpPos, drawRightDownPos, color, DXGI_FORMAT_R8G8B8A8_UNORM);

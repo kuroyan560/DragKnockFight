@@ -1057,7 +1057,27 @@ void Game::Update()
 
 
 
-
+	if (UsersInput::Instance()->Input(DIK_U))
+	{
+		for (int i = 0; i < thornBlocks.size(); ++i)
+		{
+			thornBlocks[i]->adjValue = { 10.0f,10.0f };
+		}
+	}
+	else if (UsersInput::Instance()->Input(DIK_J))
+	{
+		for (int i = 0; i < thornBlocks.size(); ++i)
+		{
+			thornBlocks[i]->adjValue = { -10.0f,-10.0f };
+		}
+	}
+	else if(UsersInput::Instance()->Input(DIK_N))
+	{
+		for (int i = 0; i < thornBlocks.size(); ++i)
+		{
+			thornBlocks[i]->adjValue = { 0.0f,0.0f };
+		}
+	}
 
 	// プレイヤーの更新処理
 	player.Update(mapData);
