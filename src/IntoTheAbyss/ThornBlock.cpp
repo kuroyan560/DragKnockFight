@@ -2,6 +2,7 @@
 #include"EventCollider.h"
 #include"../Engine/DrawFunc.h"
 #include"ScrollMgr.h"
+#include"Collider.h"
 
 ThornBlock::ThornBlock()
 {
@@ -17,16 +18,16 @@ void ThornBlock::Finalize()
 {
 }
 
-bool ThornBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, const Vec2<float> &PLAYER_VEL, const Vec2<float> &PLAYER_PREV_POS)
+bool ThornBlock::HitBox(Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, Vec2<float> &PLAYER_VEL, Vec2<float> &PLAYER_PREV_POS)
 {
 	Vec2<float> hitBoxLeftUpPos = leftUpPos;
-	Vec2<float> hitBoxRightDownPos = (leftUpPos + size);
+	Vec2<float> hitBoxCentralPos = (leftUpPos + size / 2.0f);
 
-	bool isDossunVel = EventCpllider::Instance()->CheckHitVel(PLAYER_POS, PLAYER_PREV_POS, PLAYER_VEL, SIZE, leftUpPos, size) != INTERSECTED_NONE;
-	bool topHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, size, leftUpPos, SIZE, INTERSECTED_TOP);
-	bool buttomFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, size, leftUpPos, SIZE, INTERSECTED_BOTTOM);
-	bool leftHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, size, leftUpPos , SIZE, INTERSECTED_LEFT);
-	bool rightHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, size, leftUpPos, SIZE, INTERSECTED_RIGHT);
+	bool isDossunVel = EventCpllider::Instance()->CheckHitVel(PLAYER_POS, PLAYER_PREV_POS, PLAYER_VEL, SIZE, hitBoxCentralPos, size / 2.0f) != INTERSECTED_NONE;
+	bool topHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_TOP) != INTERSECTED_NONE;
+	bool buttomFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+	bool leftHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_LEFT) != INTERSECTED_NONE;
+	bool rightHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_RIGHT) != INTERSECTED_NONE;
 
 	if (isDossunVel || topHitFlag || buttomFlag || leftHitFlag || rightHitFlag)
 	{

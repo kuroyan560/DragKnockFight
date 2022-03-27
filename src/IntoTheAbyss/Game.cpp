@@ -1063,11 +1063,11 @@ void Game::Update()
 	player.Update(mapData);
 
 	//if (Input::isKey(KEY_INPUT_RIGHT)) player.centerPos.x += 1.0f;
-	if (UsersInput::Instance()->OnTrigger(DIK_RIGHT)) player.centerPos.x += 1.0f;
+	if (UsersInput::Instance()->Input(DIK_RIGHT)) player.centerPos.x += 1.0f;
 	//if (Input::isKey(KEY_INPUT_P)) player.centerPos.x += 100.0f;
 	if (UsersInput::Instance()->OnTrigger(DIK_P)) player.centerPos.x += 100.0f;
 	//if (Input::isKey(KEY_INPUT_LEFT)) player.centerPos.x -= 1.0f;
-	if (UsersInput::Instance()->OnTrigger(DIK_LEFT)) player.centerPos.x -= 1.0f;
+	if (UsersInput::Instance()->Input(DIK_LEFT)) player.centerPos.x -= 1.0f;
 	//if (Input::isKey(KEY_INPUT_O)) player.centerPos.x -= 100.0f;
 	if (UsersInput::Instance()->OnTrigger(DIK_O)) player.centerPos.x -= 100.0f;
 

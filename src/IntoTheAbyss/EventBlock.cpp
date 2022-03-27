@@ -39,20 +39,25 @@ bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, 
 		//assert(0);
 		return false;
 	}
-	bool isDossunVel = EventCpllider::Instance()->CheckHitVel(PLAYER_POS, PLAYER_PREV_POS, PLAYER_VEL, SIZE, pos, { 50.0f,50.0f }) != INTERSECTED_NONE;
-	bool topHitFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_TOP);
-	bool buttomFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_BOTTOM);
-	bool leftHitFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_LEFT);
-	bool rightHitFlag = EventCpllider::Instance()->CheckHitSize(pos, { 50.0f,50.0f }, PLAYER_POS, SIZE, INTERSECTED_RIGHT);
+	//Vec2<float> hitBoxLeftUpPos = leftUpPos;
+	//Vec2<float> hitBoxCentralPos = (leftUpPos + size / 2.0f);
 
-	if (isDossunVel || topHitFlag || buttomFlag || leftHitFlag || rightHitFlag)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	//bool isDossunVel = EventCpllider::Instance()->CheckHitVel(PLAYER_POS, PLAYER_PREV_POS, PLAYER_VEL, SIZE, hitBoxCentralPos, size / 2.0f) != INTERSECTED_NONE;
+	//bool topHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_TOP) != INTERSECTED_NONE;
+	//bool buttomFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
+	//bool leftHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_LEFT) != INTERSECTED_NONE;
+	//bool rightHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, size / 2.0f, INTERSECTED_RIGHT) != INTERSECTED_NONE;
+
+	//if (isDossunVel || topHitFlag || buttomFlag || leftHitFlag || rightHitFlag)
+	//{
+	//	color = Color(255, 0, 0, 255);
+	//	return true;
+	//}
+	//else
+	//{
+	//	color = Color(255, 255, 255, 255);
+	//	return false;
+	//}
 }
 
 void EventBlock::Draw()
