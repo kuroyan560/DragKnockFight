@@ -83,6 +83,9 @@ StageMgr::StageMgr()
 		}
 	}
 
+	GimmickLoader::Instance()->LoadData(rootFilePass + "GimmickCommonData.txt");
+
+
 	//ステージ毎の小部屋読み込み-----------------------
 	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
 	{

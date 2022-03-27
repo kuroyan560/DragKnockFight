@@ -1042,6 +1042,7 @@ void Game::Update()
 		eventBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
 	}
 
+
 	//™ƒuƒƒbƒN‚Æ‚Ì”»’è
 	for (int i = 0; i < thornBlocks.size(); ++i)
 	{
@@ -1052,6 +1053,10 @@ void Game::Update()
 			player.isDead = true;
 		}
 	}
+
+
+
+
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
 
