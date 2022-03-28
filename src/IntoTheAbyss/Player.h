@@ -81,6 +81,8 @@ public:
 	int isLeftFirstShotTimer;
 	int isRightFirstShotTimer;
 
+	bool isZeroGravity;
+
 public:
 
 	/*-- ’è” --*/

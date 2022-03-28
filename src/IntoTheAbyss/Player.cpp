@@ -120,6 +120,8 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	//同時ショット判定タイマーリセット
 	isLeftFirstShotTimer = DOUJI_ALLOWANCE_FRAME;
 	isRightFirstShotTimer = DOUJI_ALLOWANCE_FRAME;
+
+	isZeroGravity = false;
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -261,6 +263,8 @@ void Player::Update(const vector<vector<int>> mapData)
 
 		--firstRecoilParticleTimer;
 	}
+
+	if (isZeroGravity) gravity = 0;
 
 	//テレポート時のフラッシュのタイマー計測
 	if (flashTimer < flashTotalTime)flashTimer++;
@@ -1046,6 +1050,8 @@ Vec2<float> Player::GetCenterDrawPos()
 void Player::Input(const vector<vector<int>> mapData)
 {
 	/*===== 入力処理 =====*/
+
+	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::Y)) isZeroGravity = isZeroGravity ? false : true;
 
 	//同時ショット判定タイマー計測
 	if (isLeftFirstShotTimer < DOUJI_ALLOWANCE_FRAME)isLeftFirstShotTimer++;
