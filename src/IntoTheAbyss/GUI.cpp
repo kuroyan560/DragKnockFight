@@ -12,5 +12,5 @@ GUI::GUI()
 void GUI::Draw()
 {
 	DrawFunc_Color::DrawGraph({ 0.0f,0.0f }, TexHandleMgr::GetTexBuffer(spearTimeGraph));
-	DrawFunc_Color::DrawGraph({ WinApp::Instance()->GetExpandWinSize().x - 252.0f,0.0f }, TexHandleMgr::GetTexBuffer(spearTimeGraph));
+	DrawFunc_Color::DrawGraph({ WinApp::Instance()->GetExpandWinSize().x - 252.0f,0.0f }, TexHandleMgr::GetTexBuffer(spearTeleGraph));
 }
