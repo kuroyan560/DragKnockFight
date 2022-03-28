@@ -602,13 +602,19 @@ void Game::Init()
 	ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 	ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 
-	bossEnemy.Generate(ENEMY_BOSS);
+	bossEnemy.Generate(ENEMY_BOSS, mapData);
 	for (int index = 0; index < SMALL_ENEMY; ++index) {
 
 		smallEnemy[index].Init();
 
 	}
+	for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
+
+		noMovementEnemy[index].Init();
+
+	}
 	enemyGenerateTimer = 0;
+	nomoveMentTimer = 0;
 
 }
 
@@ -1115,18 +1121,45 @@ void Game::Update()
 
 			if (smallEnemy[index].isActive) continue;
 
-			smallEnemy[index].Generate(ENEMY_SMALL);
+			smallEnemy[index].Generate(ENEMY_SMALL, mapData);
 
 			break;
 
 		}
 
 	}
+
+	// ˆÚ“®‚µ‚È‚¢“G‚Ì¶¬ˆ—
+	++nomoveMentTimer;
+	if (NOMOVEMENT_GENERATE_TIMER <= nomoveMentTimer) {
+
+		nomoveMentTimer = 0;
+
+		for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
+
+			if (noMovementEnemy[index].isActive) continue;
+
+			noMovementEnemy[index].Generate(ENEMY_NOMOVEMENT, mapData);
+
+			break;
+
+		}
+
+	}
+
+	// ¬Œ^“G‚ÌXVˆ—
 	for (int index = 0; index < SMALL_ENEMY; ++index) {
 
 		if (!smallEnemy[index].isActive) continue;
 
 		smallEnemy[index].Update(player.centerPos);
+
+	}
+	for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
+
+		if (!noMovementEnemy[index].isActive) continue;
+
+		noMovementEnemy[index].Update(player.centerPos);
 
 	}
 
@@ -1193,6 +1226,13 @@ void Game::Update()
 		if (!smallEnemy[index].isActive) continue;
 
 		smallEnemy[index].CheckHitBullet();
+
+	}
+	for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
+
+		if (!noMovementEnemy[index].isActive) continue;
+
+		noMovementEnemy[index].CheckHitBullet();
 
 	}
 
@@ -1564,6 +1604,13 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		if (!smallEnemy[index].isActive) continue;
 
 		smallEnemy[index].Draw();
+
+	}
+	for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
+
+		if (!noMovementEnemy[index].isActive) continue;
+
+		noMovementEnemy[index].Draw();
 
 	}
 

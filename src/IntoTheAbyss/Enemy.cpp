@@ -9,6 +9,7 @@
 
 #include"WinApp.h"
 #include"DrawFunc.h"
+#include"KuroFunc.h"
 
 Enemy::Enemy()
 {
@@ -38,7 +39,7 @@ void Enemy::Init()
 
 }
 
-void Enemy::Generate(const ENEMY_ID& id)
+void Enemy::Generate(const ENEMY_ID& id, const vector<vector<int>>& mapData)
 {
 
 	this->id = id;
@@ -53,7 +54,39 @@ void Enemy::Generate(const ENEMY_ID& id)
 		size = SIZE_SMALL;
 
 	}
-	hitPoint = HITPOINT_SMALL;
+
+	// HPをセット
+	if (id == ENEMY_SMALL) {
+		hitPoint = HITPOINT_SMALL;
+	}
+	else {
+		hitPoint = 1;
+	}
+
+	if (id != ENEMY_BOSS) {
+
+		// 空白のブロックにランダムで生成する。
+		const int HEIGHT = mapData.size() - 1;
+		const int WIDTH = mapData[0].size() - 1;
+		const float CHIP_SIZE = 50.0f;
+
+		while (true) {
+
+			int indexX = KuroFunc::GetRand(HEIGHT);
+			int indexY = KuroFunc::GetRand(WIDTH);
+			int mapIndex = mapData[indexX][indexY];
+			if (mapIndex != 0) {
+
+
+				pos = { indexX * CHIP_SIZE - (CHIP_SIZE / 2.0f), indexY * CHIP_SIZE - (CHIP_SIZE / 2.0f) };
+
+				break;
+
+			}
+
+		}
+
+	}
 
 }
 
@@ -92,7 +125,7 @@ void Enemy::Update(const Vec2<float>& playerPos)
 		pos.x += (playerPos.x - pos.x) / 100.0f;
 		pos.y += (playerPos.y - pos.y) / 100.0f;
 	}
-	else {
+	else if (id == ENEMY_SMALL) {
 		pos.x += (playerPos.x - pos.x) / 60.0f;
 		pos.y += (playerPos.y - pos.y) / 60.0f;
 	}
@@ -111,7 +144,7 @@ void Enemy::Draw()
 
 	Color col = Color(229, 128, 128, 255);
 
-	if (id == ENEMY_SMALL) {
+	if (id == ENEMY_SMALL || id == ENEMY_NOMOVEMENT) {
 
 		col = Color(150, 100, 100, 255);
 
@@ -137,6 +170,24 @@ void Enemy::Draw()
 			{ pos.x - size.x + size.x * 2.0f * hitpointPar - ScrollMgr::Instance()->scrollAmount.x - ShakeMgr::Instance()->shakeAmount.x,
 			pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y - ShakeMgr::Instance()->shakeAmount.y },
 			Color(229, 208, 208, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
+
+	}
+	else if (id == ENEMY_NOMOVEMENT) {
+
+		// HP
+		DrawFunc::DrawBox2D({ pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x - ShakeMgr::Instance()->shakeAmount.x,
+			pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y - ShakeMgr::Instance()->shakeAmount.y },
+			{ pos.x + size.x - ScrollMgr::Instance()->scrollAmount.x - ShakeMgr::Instance()->shakeAmount.x,
+			pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y - ShakeMgr::Instance()->shakeAmount.y },
+			col, D3D12App::Instance()->GetBackBuffFormat(), true);
+
+		// 下地
+		float hitpointPar = (float)hitPoint / HITPOINT_SMALL;
+		DrawFunc::DrawBox2D({ pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x - ShakeMgr::Instance()->shakeAmount.x,
+			pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y - ShakeMgr::Instance()->shakeAmount.y },
+			{ pos.x - size.x + size.x * 2.0f * hitpointPar - ScrollMgr::Instance()->scrollAmount.x - ShakeMgr::Instance()->shakeAmount.x,
+			pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y - ShakeMgr::Instance()->shakeAmount.y },
+			Color(229, 168, 168, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
 
 	}
 	else {
@@ -191,10 +242,15 @@ void Enemy::CheckHitBullet()
 
 
 			// ノックバックをつける。
-			if (id == ENEMY_SMALL) {
+			if (id == ENEMY_SMALL || id == ENEMY_NOMOVEMENT) {
 
 				pos += bulletDir * Vec2<float>(KNOCK_BACK, KNOCK_BACK);
 				--hitPoint;
+
+			}
+			else {
+
+				pos += bulletDir * Vec2<float>(KNOCK_BACK_BOSS, KNOCK_BACK_BOSS);
 
 			}
 
