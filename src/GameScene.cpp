@@ -17,7 +17,7 @@ GameScene::GameScene()
 	backGround->mesh.SetZLayer(BACK_GROUND_DEPTH);
 	backGround->mesh.SetSize(WinApp::Instance()->GetExpandWinSize());
 
-	gaussianBlur = std::make_shared<GaussianBlur>(WinApp::Instance()->GetWinSize() , DXGI_FORMAT_R32G32B32A32_FLOAT);
+	gaussianBlur = std::make_shared<GaussianBlur>(WinApp::Instance()->GetWinSize(), DXGI_FORMAT_R32G32B32A32_FLOAT);
 
 	emissiveMap = D3D12App::Instance()->GenerateRenderTarget(DXGI_FORMAT_R32G32B32A32_FLOAT, Color(0.0f, 0.0f, 0.0f, 1.0f),
 		WinApp::Instance()->GetWinSize(), L"EmissiveMap");
@@ -54,7 +54,7 @@ void GameScene::OnImguiDebug()
 {
 	ImGui::Begin("StageInfo");
 	ImGui::Text("---Now---");
-	ImGui::Text("StageNumber:%d",SelectStage::Instance()->GetStageNum());
+	ImGui::Text("StageNumber:%d", SelectStage::Instance()->GetStageNum());
 	ImGui::Text("RoomNumber:%d\n\n", SelectStage::Instance()->GetRoomNum());
 	ImGui::Text("---Select---");
 
@@ -68,7 +68,7 @@ void GameScene::OnImguiDebug()
 
 	ImGui::Text("RoomNumber:%d", game.debugStageData[1]);
 	//‘I‘ð‚Å‚«‚È‚¢•”‰®”Ô†‚È‚ç•\Ž¦‚·‚é
-	if (!StageMgr::Instance()->CheckRoomNum(game.debugStageData[0],game.debugStageData[1]))
+	if (!StageMgr::Instance()->CheckRoomNum(game.debugStageData[0], game.debugStageData[1]))
 	{
 		ImGui::SameLine();
 		ImGui::Text("Don't use");
@@ -83,16 +83,20 @@ void GameScene::OnImguiDebug()
 
 
 	ImGui::Begin("Timer");
+	ImGui::Text("GravityMode");
 	if (game.player.isZeroGravity)
 	{
-		ImGui::Text("GravityMode");
+		ImGui::SameLine();
+		ImGui::Text("  Now!!!");
 	}
-	else
+	ImGui::Text("NoGravityMode");
+	if (!game.player.isZeroGravity)
 	{
-		ImGui::Text("NoGravityMode");
-	}	
-	ImGui::Text("MaxTimer%d",game.player.CHANGE_GRAVITY_TIMER);
-	ImGui::Text("NowTimer%d",game.player.changeGravityTimer);
+		ImGui::SameLine();
+		ImGui::Text("Now!!!");
+	}
+	ImGui::Text("MaxTimer%d", game.player.CHANGE_GRAVITY_TIMER);
+	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
 	ImGui::End();
 }
 
