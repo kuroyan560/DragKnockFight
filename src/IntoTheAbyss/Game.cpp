@@ -602,7 +602,7 @@ void Game::Init()
 	ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 	ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 
-	bossEnemy.Generate(ENEMY_BOSS, mapData);
+	//bossEnemy.Generate(ENEMY_BOSS, mapData);
 	for (int index = 0; index < SMALL_ENEMY; ++index) {
 
 		smallEnemy[index].Init();
@@ -1121,7 +1121,7 @@ void Game::Update()
 
 			if (smallEnemy[index].isActive) continue;
 
-			smallEnemy[index].Generate(ENEMY_SMALL, mapData);
+			//smallEnemy[index].Generate(ENEMY_SMALL, mapData);
 
 			break;
 
