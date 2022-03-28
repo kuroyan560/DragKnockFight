@@ -14,6 +14,7 @@ DebugParameter::DebugParameter()
 
 void DebugParameter::Update()
 {
+	//プリセット選択の制限-----------------------
 	if (playerData.size() < 0)
 	{
 		selectNum = 0;
@@ -22,7 +23,10 @@ void DebugParameter::Update()
 	{
 		selectNum = playerData.size() - 1;
 	}
+	//プリセット選択の制限-----------------------
 
+
+	//プリセット読み込み
 	if (loadPresetFlag)
 	{
 		nowData->ADD_GRAVITY = playerData[selectNum].ADD_GRAVITY;
