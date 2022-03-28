@@ -1,2 +1,2 @@
 name Thown
-hitBox 0 0
+hitBox 10 10

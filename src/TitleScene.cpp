@@ -1,8 +1,10 @@
 #include "TitleScene.h"
+#include"IntoTheAbyss/StageMgr.h"
 
 TitleScene::TitleScene()
 {
 	changeScene = new SceneCange();
+	StageMgr::Instance();
 }
 
 void TitleScene::OnInitialize()
