@@ -94,7 +94,7 @@ public:
 	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 	const Vec2<float> PLAYER_HIT_SIZE = { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 	static Vec2<float>GetGeneratePos();
-	const int RAPID_FIRE_TIMER = 41;			// 連射タイマー
+	const int RAPID_FIRE_TIMER = 21;			// 連射タイマー
 	const int GRAVITY_INVALID_TIMER = 20;		// 重力無効化タイマー
 
 	// コヨーテ的なやつのためのパラメーター
