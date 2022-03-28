@@ -1,10 +1,14 @@
 #pragma once
 #include "Vec.h"
+#include <vector>
+
+using namespace std;
 
 enum ENEMY_ID {
 
 	ENEMY_BOSS,
 	ENEMY_SMALL,
+	ENEMY_NOMOVEMENT,
 
 };
 
@@ -32,6 +36,7 @@ private:
 	const Vec2<float> SIZE_BIG = { 100.0f,100.0f };
 	const Vec2<float> SIZE_SMALL = { 30.0f,30.0f };
 	const float KNOCK_BACK = 30.0f;
+	const float KNOCK_BACK_BOSS = 20.0f;
 	const int HITPOINT_SMALL = 5;
 
 
@@ -46,7 +51,7 @@ public:
 	void Init();
 
 	// ê∂ê¨èàóù
-	void Generate(const ENEMY_ID& id);
+	void Generate(const ENEMY_ID& id, const vector<vector<int>>& mapData);
 
 	// çXêVèàóù
 	void Update(const Vec2<float>& playerPos);

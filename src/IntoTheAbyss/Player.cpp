@@ -131,7 +131,7 @@ void Player::Update(const vector<vector<int>> mapData)
 {
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
-	
+
 	ADD_GRAVITY = data->ADD_GRAVITY;
 	MAX_GRAVITY = data->MAX_GRAVITY;
 	RECOIL_AMOUNT = data->RECOIL_AMOUNT;
@@ -886,6 +886,8 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		int a = 0;
 
 	}
+
+	isDead = false;
 
 }
 

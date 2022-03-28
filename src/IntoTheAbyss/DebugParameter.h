@@ -33,5 +33,6 @@ public:
 
 	std::shared_ptr<PlayerDebugParameterData> nowData;
 	bool loadPresetFlag;
+	int selectNum;
 };
 
