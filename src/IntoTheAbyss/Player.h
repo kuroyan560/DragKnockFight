@@ -82,6 +82,8 @@ public:
 	int isRightFirstShotTimer;
 
 	bool isZeroGravity;
+	int changeGravityTimer;
+	const int CHANGE_GRAVITY_TIMER = 300;
 
 public:
 

@@ -122,6 +122,8 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	isRightFirstShotTimer = DOUJI_ALLOWANCE_FRAME;
 
 	isZeroGravity = false;
+	changeGravityTimer = 0;
+
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -264,7 +266,18 @@ void Player::Update(const vector<vector<int>> mapData)
 		--firstRecoilParticleTimer;
 	}
 
+
+	++changeGravityTimer;
+	if (CHANGE_GRAVITY_TIMER <= changeGravityTimer) {
+
+		isZeroGravity = isZeroGravity ? false : true;
+
+	}
+
 	if (isZeroGravity) gravity = 0;
+
+
+
 
 	//テレポート時のフラッシュのタイマー計測
 	if (flashTimer < flashTotalTime)flashTimer++;
