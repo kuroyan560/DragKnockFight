@@ -270,9 +270,9 @@ void Player::Update(const vector<vector<int>> mapData)
 	++changeGravityTimer;
 	if (CHANGE_GRAVITY_TIMER <= changeGravityTimer) {
 
-		isZeroGravity = isZeroGravity ? false : true;
+		//isZeroGravity = isZeroGravity ? false : true;
 
-		changeGravityTimer = 0;
+		//changeGravityTimer = 0;
 
 	}
 
