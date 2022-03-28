@@ -83,6 +83,7 @@ StageMgr::StageMgr()
 		}
 	}
 
+	//ƒMƒ~ƒbƒN‹¤’Ê‚ÌÝ’è
 	GimmickLoader::Instance()->LoadData(rootFilePass + "GimmickCommonData.txt");
 
 

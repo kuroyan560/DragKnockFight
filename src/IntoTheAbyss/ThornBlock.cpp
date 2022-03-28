@@ -3,11 +3,13 @@
 #include"../Engine/DrawFunc.h"
 #include"ScrollMgr.h"
 #include"Collider.h"
+#include"GimmickLoader.h"
 
 Vec2<float> ThornBlock::adjValue = { 0.0f,0.0f };
 
 ThornBlock::ThornBlock()
 {
+	adjValue = GimmickLoader::Instance()->thownData->adjValue;
 }
 
 void ThornBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DOWN_POS)

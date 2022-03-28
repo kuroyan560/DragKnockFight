@@ -1046,34 +1046,23 @@ void Game::Update()
 	//™ƒuƒƒbƒN‚Æ‚Ì”»’è
 	for (int i = 0; i < thornBlocks.size(); ++i)
 	{
-		bool hitFlag = thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
+		bool hitFlag = false;
+		if (!player.isDead)
+		{
+			hitFlag = thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
+		}
 
 		if (hitFlag)
 		{
 			player.isDead = true;
+			sceneBlackFlag = true;
+			sceneChangeDeadFlag = player.isDead;
+			break;
 		}
 	}
 
-
-
-
-
 	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
 
-
-
-	if (UsersInput::Instance()->Input(DIK_U))
-	{
-		thornBlocks[0]->adjValue = { 10.0f,10.0f };
-	}
-	else if (UsersInput::Instance()->Input(DIK_J))
-	{
-		thornBlocks[0]->adjValue = { -10.0f,-10.0f };
-	}
-	else if (UsersInput::Instance()->Input(DIK_N))
-	{
-		thornBlocks[0]->adjValue = { 0.0f,0.0f };
-	}
 
 
 

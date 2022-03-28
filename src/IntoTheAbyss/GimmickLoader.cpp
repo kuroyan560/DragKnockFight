@@ -144,14 +144,10 @@ void GimmickLoader::LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const st
 
 		allThowmpeData[STAGE_NUM][ROOM_NUM] = gimmickData;
 	}
-
-	bool debug = false;
-	
 }
 
 void GimmickLoader::LoadData(const std::string &FILE_PASS)
 {
-
 	// ファイルデータ
 	std::ifstream ifs;
 	// ファイルを開く。
