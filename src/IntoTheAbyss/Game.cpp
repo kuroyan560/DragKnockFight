@@ -596,6 +596,15 @@ void Game::Init()
 	const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
 	ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 	ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
+
+	bossEnemy.Generate(ENEMY_BOSS);
+	for (int index = 0; index < SMALL_ENEMY; ++index) {
+
+		smallEnemy[index].Init();
+
+	}
+	enemyGenerateTimer = 0;
+
 }
 
 void Game::Update()
@@ -1091,7 +1100,32 @@ void Game::Update()
 	if (UsersInput::Instance()->OnTrigger(DIK_O)) player.centerPos.x -= 100.0f;
 
 	// 敵の更新処理
-	enemy.Update(player.centerPos);
+	bossEnemy.Update(player.centerPos);
+
+	++enemyGenerateTimer;
+	// 生成タイマーが既定値を超えたら
+	if (SMALL_GENERATE_TIMER <= enemyGenerateTimer) {
+
+		enemyGenerateTimer = 0;
+
+		for (int index = 0; index < SMALL_ENEMY; ++index) {
+
+			if (smallEnemy[index].isActive) continue;
+
+			smallEnemy[index].Generate(ENEMY_SMALL);
+
+			break;
+
+		}
+
+	}
+	for (int index = 0; index < SMALL_ENEMY; ++index) {
+
+		if (!smallEnemy[index].isActive) continue;
+
+		smallEnemy[index].Update(player.centerPos);
+
+	}
 
 	// スクロール量の更新処理
 	ScrollMgr::Instance()->Update();
@@ -1150,7 +1184,14 @@ void Game::Update()
 	ViewPort::Instance()->SavePrevFlamePos();
 
 	// 敵と弾の当たり判定
-	enemy.CheckHitBullet();
+	bossEnemy.CheckHitBullet();
+	for (int index = 0; index < SMALL_ENEMY; ++index) {
+
+		if (!smallEnemy[index].isActive) continue;
+
+		smallEnemy[index].CheckHitBullet();
+
+	}
 
 	// 弾とビューポートの当たり判定
 	for (int i = 0; i < BulletMgr::Instance()->bullets.size(); ++i)
@@ -1514,7 +1555,14 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		thornBlocks[i]->Draw();
 	}
 
-	enemy.Draw();
+	bossEnemy.Draw();
+	for (int index = 0; index < SMALL_ENEMY; ++index) {
+
+		if (!smallEnemy[index].isActive) continue;
+
+		smallEnemy[index].Draw();
+
+	}
 
 	player.Draw(ligMgr);
 	ParticleMgr::Instance()->Draw(ligMgr);
