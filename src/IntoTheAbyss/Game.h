@@ -61,8 +61,7 @@ class Game
 	// 動的ブロックの画像。
 	int movingBlockGraph;
 
-	// プレイヤー
-	Player player;
+
 
 	// 敵
 	Enemy enemy;
@@ -128,7 +127,8 @@ class Game
 	void InitGame(const int &STAGE_NUM, const int &ROOM_NUM);
 
 public:
-
+	// プレイヤー
+	Player player;
 	array<int, 2> debugStageData = { 0,0 };//デバック用のステージと部屋番号
 
 

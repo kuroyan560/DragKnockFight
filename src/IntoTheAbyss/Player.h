@@ -81,12 +81,16 @@ public:
 	int isLeftFirstShotTimer;
 	int isRightFirstShotTimer;
 
+	bool isZeroGravity;
+	int changeGravityTimer;
+	const int CHANGE_GRAVITY_TIMER = 300;
+
 public:
 
 	/*-- 定数 --*/
 
-	const float ADD_GRAVITY = 0.5f;				// プレイヤーにかける重力
-	//const float ADD_GRAVITY = 0.0f;				// プレイヤーにかける重力
+	//const float ADD_GRAVITY = 0.5f;				// プレイヤーにかける重力
+	const float ADD_GRAVITY = 0.1f;				// プレイヤーにかける重力
 	const float MAX_GRAVITY = 15.0f;			// プレイヤーにかける重力の最大量
 	const float RECOIL_AMOUNT = 7.0f;			// 弾を撃った際の反動
 	const float FIRST_RECOIL_AMOUNT = 20.0;		// 弾を撃った際の反動

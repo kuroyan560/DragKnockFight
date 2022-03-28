@@ -779,7 +779,7 @@ void Game::Update()
 
 					RoomMapChipArray tmpMapData = StageMgr::Instance()->GetMapChipData(stageNum, localRoomNum);
 					//ドア座標を入手
-					Vec2<float>doorPos = GetDoorPos(doorNumber, mapData);
+					Vec2<float>doorPos = GetDoorPos(doorNumber, tmpMapData);
 					//プレイヤーがリスポーンする座標を入手
 					responePos = GetPlayerResponePos(stageNum, localRoomNum, doorNumber, doorPos, &door);
 

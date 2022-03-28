@@ -120,6 +120,10 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	//同時ショット判定タイマーリセット
 	isLeftFirstShotTimer = DOUJI_ALLOWANCE_FRAME;
 	isRightFirstShotTimer = DOUJI_ALLOWANCE_FRAME;
+
+	isZeroGravity = false;
+	changeGravityTimer = 0;
+
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -261,6 +265,21 @@ void Player::Update(const vector<vector<int>> mapData)
 
 		--firstRecoilParticleTimer;
 	}
+
+
+	++changeGravityTimer;
+	if (CHANGE_GRAVITY_TIMER <= changeGravityTimer) {
+
+		isZeroGravity = isZeroGravity ? false : true;
+
+		changeGravityTimer = 0;
+
+	}
+
+	if (isZeroGravity) gravity = 0;
+
+
+
 
 	//テレポート時のフラッシュのタイマー計測
 	if (flashTimer < flashTotalTime)flashTimer++;
@@ -1048,6 +1067,13 @@ void Player::Input(const vector<vector<int>> mapData)
 {
 	/*===== 入力処理 =====*/
 
+	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LT)) {
+
+		isZeroGravity = isZeroGravity ? false : true;
+		changeGravityTimer = 0;
+
+	}
+
 	//同時ショット判定タイマー計測
 	if (isLeftFirstShotTimer < DOUJI_ALLOWANCE_FRAME)isLeftFirstShotTimer++;
 	if (isRightFirstShotTimer < DOUJI_ALLOWANCE_FRAME)isRightFirstShotTimer++;
@@ -1377,41 +1403,41 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 	else if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LT)) {
 
-		// 時間停止の短槍に関する処理を行う。
+		//// 時間停止の短槍に関する処理を行う。
 
-		// 左腕の弾が発射されていなかったら。
-		if (!lHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
+		//// 左腕の弾が発射されていなかったら。
+		//if (!lHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
 
-			// クールタイムが0以下だったら
-			if (lHand->pikeCooltime <= 0) {
+		//	// クールタイムが0以下だったら
+		//	if (lHand->pikeCooltime <= 0) {
 
-				const float ARM_DISTANCE = 20.0f;
-				const float OFFSET_Y = -14.0f;
-				const float OFFSET_X = 12.0f;
+		//		const float ARM_DISTANCE = 20.0f;
+		//		const float OFFSET_Y = -14.0f;
+		//		const float OFFSET_X = 12.0f;
 
-				float angle = lHand->GetAngle();
+		//		float angle = lHand->GetAngle();
 
-				// 弾を発射する処理を行う。
-				lHand->timeStopPike.Generate(lHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), Vec2<float>(cosf(angle), sinf(angle)), PIKE_TIMESTOP);
+		//		// 弾を発射する処理を行う。
+		//		lHand->timeStopPike.Generate(lHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), Vec2<float>(cosf(angle), sinf(angle)), PIKE_TIMESTOP);
 
-			}
+		//	}
 
-		}
-		// ビーコンが発射されていたら。
-		else if (lHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
+		//}
+		//// ビーコンが発射されていたら。
+		//else if (lHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
 
-			// 止められていたものを動かす。
-			lHand->timeStopPike.MoveAgain();
+		//	// 止められていたものを動かす。
+		//	lHand->timeStopPike.MoveAgain();
 
-			// ビーコンを初期化する。
-			lHand->timeStopPike.Init();
+		//	// ビーコンを初期化する。
+		//	lHand->timeStopPike.Init();
 
-			// ビーコンのクールタイムを設定
-			lHand->pikeCooltime = lHand->PIKE_COOL_TIME;
+		//	// ビーコンのクールタイムを設定
+		//	lHand->pikeCooltime = lHand->PIKE_COOL_TIME;
 
-		}
+		//}
 
-		isPrevFrameShotBeacon = true;
+		//isPrevFrameShotBeacon = true;
 
 	}
 	else {
