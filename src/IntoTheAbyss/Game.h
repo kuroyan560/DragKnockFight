@@ -72,7 +72,7 @@ class Game
 	int enemyGenerateTimer;
 	const int SMALL_GENERATE_TIMER = 60;
 	int nomoveMentTimer;
-	const int NOMOVEMENT_GENERATE_TIMER = 60;
+	const int NOMOVEMENT_GENERATE_TIMER = 120;
 
 	// マップチップのデータ
 	vector<vector<int>> mapData;
