@@ -17,26 +17,8 @@ static std::vector<RootParam>ROOT_PARAMETER =
 	RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, "テクスチャリソース"),
 };
 
-void DrawFunc_Color::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint, const Vec2<bool>& Miror,
-	const Vec2<float>& LeftUpPaintUV, const Vec2<float>& RightBottomPaintUV)
+void DrawFunc_Color::CreateExtendGraphFunc()
 {
-	if (RightBottomPaintUV.x < LeftUpPaintUV.x)assert(0);
-	if (RightBottomPaintUV.y < LeftUpPaintUV.y)assert(0);
-
-	//DrawExtendGraph専用頂点
-	class ExtendGraphVertex
-	{
-	public:
-		Vec2<float>leftUpPos;
-		Vec2<float>rightBottomPos;
-		Color paintColor;
-		Vec2<int> miror;
-		Vec2<float>leftUpPaintUV;
-		Vec2<float>rightBottomPaintUV;
-		ExtendGraphVertex(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& Paint, const Vec2<bool>& Miror, const Vec2<float>& LeftUpPaintUV, const Vec2<float>& RightBottomPaintUV)
-			:leftUpPos(LeftUpPos), rightBottomPos(RightBottomPos), paintColor(Paint), miror({ Miror.x ? 1 : 0 ,Miror.y ? 1 : 0 }), leftUpPaintUV(LeftUpPaintUV), rightBottomPaintUV(RightBottomPaintUV) {}
-	};
-
 	//パイプライン未生成
 	if (!EXTEND_GRAPH_PIPELINE)
 	{
@@ -66,6 +48,37 @@ void DrawFunc_Color::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<
 		//パイプライン生成
 		EXTEND_GRAPH_PIPELINE = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
 	}
+}
+
+void DrawFunc_Color::DrawGraph(const Vec2<float>& LeftUpPos, const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint, const Vec2<bool>& Miror, const Vec2<float>& LeftUpPaintUV, const Vec2<float>& RightBottomPaintUV)
+{
+	CreateExtendGraphFunc();
+
+	KuroEngine::Instance().Graphics().SetPipeline(EXTEND_GRAPH_PIPELINE);
+
+	if (EXTEND_GRAPH_VERTEX_BUFF.size() < (DRAW_EXTEND_GRAPH_COUNT + 1))
+	{
+		EXTEND_GRAPH_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(ExtendGraphVertex), 1, nullptr, ("DrawExtendGraph_Color -" + std::to_string(DRAW_EXTEND_GRAPH_COUNT)).c_str()));
+	}
+
+	auto rightBottomPos = LeftUpPos;
+	rightBottomPos.x += Tex->GetDesc().Width;
+	rightBottomPos.y += Tex->GetDesc().Height;
+	ExtendGraphVertex vertex(LeftUpPos, rightBottomPos, Paint, Miror, LeftUpPaintUV, RightBottomPaintUV);
+	EXTEND_GRAPH_VERTEX_BUFF[DRAW_EXTEND_GRAPH_COUNT]->Mapping(&vertex);
+
+	KuroEngine::Instance().Graphics().ObjectRender(EXTEND_GRAPH_VERTEX_BUFF[DRAW_EXTEND_GRAPH_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff(),Tex }, { CBV,SRV }, 0.0f, true);
+
+	DRAW_EXTEND_GRAPH_COUNT++;
+}
+
+void DrawFunc_Color::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint, const Vec2<bool>& Miror,
+	const Vec2<float>& LeftUpPaintUV, const Vec2<float>& RightBottomPaintUV)
+{
+	if (RightBottomPaintUV.x < LeftUpPaintUV.x)assert(0);
+	if (RightBottomPaintUV.y < LeftUpPaintUV.y)assert(0);
+
+	CreateExtendGraphFunc();
 
 	KuroEngine::Instance().Graphics().SetPipeline(EXTEND_GRAPH_PIPELINE);
 
