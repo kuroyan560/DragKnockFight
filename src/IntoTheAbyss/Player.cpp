@@ -1080,8 +1080,6 @@ void Player::Input(const vector<vector<int>> mapData)
 	// 入力のデッドラインを設ける。
 	if (inputVec.Length() >= 0.9f) {
 
-		if (inputVec.x > 0) inputVec.x = 0;
-
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
 
@@ -1096,8 +1094,6 @@ void Player::Input(const vector<vector<int>> mapData)
 	// 入力のデッドラインを設ける。
 	if (inputVec.Length() >= 0.9f) {
 
-		if (inputVec.x < 0) inputVec.x = 0;
-
 		// 左手の角度を更新
 		rHand->SetAngle(KuroFunc::GetAngle(inputVec));
 
@@ -1107,7 +1103,7 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// LBが押されたら反動をつける。
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
 
 		// 反動をつける。
 		float rHandAngle = lHand->GetAngle();
@@ -1203,7 +1199,7 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// RBが押されたら反動をつける。
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
 
 		// 反動をつける。
 		float lHandAngle = rHand->GetAngle();

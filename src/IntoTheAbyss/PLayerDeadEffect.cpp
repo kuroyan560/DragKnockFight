@@ -88,11 +88,11 @@ void PlayerDeadEffect::Update()
 		}
 
 		// タイマーが最大値に達したらプレイヤーの描画を切って、パーティクルを生成する。
-		if (PLAYER_EXIT_TIMER <= playerExitDelayTimer) {
+		if (PLAYER_EXIT_TIMER <= playerExitDelayTimer && particleStopTimer == 0) {
 
 			isExitPlayer = true;
 
-			ShakeMgr::Instance()->maxShakeAmount = 10.0f;
+			ShakeMgr::Instance()->maxShakeAmount = 20.0f;
 
 		}
 
@@ -108,6 +108,9 @@ void PlayerDeadEffect::Update()
 			++particleStopTimer;
 
 		}
+
+		// 割合を計算
+		particleSpeedPar = 1.0f - ((float)particleStopTimer / PARTICLE_STOP_TIMER);
 
 	}
 
@@ -182,4 +185,46 @@ void PlayerDeadEffect::Draw()
 
 	}
 
+}
+
+
+/*========== 以下死亡パーティクル ==========*/
+
+
+PlayerDeadParticle::PlayerDeadParticle()
+{
+
+	pos = {};
+	this->fowardVec = {};
+	radius = DEF_RADIUS;
+	speed = MAX_SPEED;
+	isActive = false;
+
+}
+
+void PlayerDeadParticle::Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec)
+{
+
+	/*===== 生成処理 =====*/
+
+	pos = generatePos;
+	this->fowardVec = forwardVec;
+	radius = DEF_RADIUS;
+	speed = MAX_SPEED;
+	isActive = true;
+
+}
+
+void PlayerDeadParticle::Update()
+{
+
+	/*===== 更新処理 =====*/
+
+	// 移動させる。
+	
+
+}
+
+void PlayerDeadParticle::Draw()
+{
 }

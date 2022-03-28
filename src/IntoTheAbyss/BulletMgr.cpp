@@ -90,7 +90,7 @@ void BulletMgr::Draw()
 		// –¢¶¬‚¾‚Á‚½‚çˆ—‚ð”ò‚Î‚·B
 		if (!bullets[index]->GetIsActive()) continue;
 
-		bullets[index]->Draw();
+		//bullets[index]->Draw();
 
 	}
 

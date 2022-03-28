@@ -3,7 +3,7 @@
 #include "Singleton.h"
 
 // 死亡時のエフェクトパーティクル
-class PlayerDeadParticle{
+class PlayerDeadParticle {
 
 public:
 
@@ -13,6 +13,7 @@ public:
 	Vec2<float> fowardVec;
 	float radius;
 	float speed;
+	bool isActive;
 
 
 public:
@@ -28,10 +29,16 @@ public:
 	/*===== メンバ関数 =====*/
 
 	// コンストラクタ
-	PlayerDeadParticle(){};
+	PlayerDeadParticle();
 
 	// 生成処理
-	void Generate(){};
+	void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec);
+
+	// 更新処理
+	void Update();
+
+	// 描画処理
+	void Draw();
 
 };
 
@@ -51,6 +58,7 @@ public:
 	bool isExitPlayer;			// プレイヤーの描画を切るか
 
 	int particleStopTimer;		// パーティクルが止まるまでのタイマー
+	float particleSpeedPar;		// パーティクルの移動速度の割合
 
 	int blackOutTimer;			// 暗転するタイマー
 
