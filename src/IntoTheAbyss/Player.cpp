@@ -19,6 +19,7 @@
 #include "ParticleMgr.h"
 #include "EventCollider.h"
 #include "SlowMgr.h"
+#include "PLayerDeadEffect.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -125,6 +126,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 void Player::Update(const vector<vector<int>> mapData)
 {
+
+	// 死亡エフェクトが有効化されていたら更新処理を行わない。
+	if (PlayerDeadEffect::Instance()->isActive) return;
 
 	/*===== 入力処理 =====*/
 
@@ -269,6 +273,11 @@ void Player::Update(const vector<vector<int>> mapData)
 
 void Player::Draw(LightManager& LigManager)
 {
+
+	// プレイヤー死亡エフェクトでプレイヤーの描画を切るフラグが立っていたら処理を飛ばす。
+	if (PlayerDeadEffect::Instance()->isExitPlayer) return;
+
+
 	if (vel.x < 0)playerDir = LEFT;
 	if (0 < vel.x)playerDir = RIGHT;
 
@@ -313,6 +322,13 @@ void Player::Draw(LightManager& LigManager)
 	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
 	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
 
+	// 死亡エフェクト時の白
+	if (PlayerDeadEffect::Instance()->isActive) {
+		Color deadFlashCol;
+		deadFlashCol.Alpha() = 1.0f - PlayerDeadEffect::Instance()->playerWhitePar * 1.0f;
+		DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, deadFlashCol, { 0.5f,0.5f });
+	}
+
 	if (playerDir == RIGHT)
 	{
 		lHand->Draw(LigManager, expRate, GetHandGraph(LEFT), DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
@@ -328,6 +344,8 @@ void Player::Draw(LightManager& LigManager)
 
 void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun)
 {
+
+	if (PlayerDeadEffect::Instance()->isActive) return;
 
 	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
 
@@ -854,7 +872,8 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 	if (isDead) {
 
-		int a = 0;
+		// 死亡エフェクトを有効化する。
+		PlayerDeadEffect::Instance()->Activate(centerPos);
 
 	}
 
@@ -1061,6 +1080,8 @@ void Player::Input(const vector<vector<int>> mapData)
 	// 入力のデッドラインを設ける。
 	if (inputVec.Length() >= 0.9f) {
 
+		if (inputVec.x > 0) inputVec.x = 0;
+
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
 
@@ -1075,6 +1096,8 @@ void Player::Input(const vector<vector<int>> mapData)
 	// 入力のデッドラインを設ける。
 	if (inputVec.Length() >= 0.9f) {
 
+		if (inputVec.x < 0) inputVec.x = 0;
+
 		// 左手の角度を更新
 		rHand->SetAngle(KuroFunc::GetAngle(inputVec));
 
@@ -1084,7 +1107,7 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// LBが押されたら反動をつける。
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+	if (UsersInput::Instance()->Input(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
 
 		// 反動をつける。
 		float rHandAngle = lHand->GetAngle();
@@ -1180,7 +1203,7 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// RBが押されたら反動をつける。
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+	if (UsersInput::Instance()->Input(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
 
 		// 反動をつける。
 		float lHandAngle = rHand->GetAngle();

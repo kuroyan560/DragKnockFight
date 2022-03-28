@@ -6,10 +6,12 @@
 #include "MapChipCollider.h"
 #include "StageMgr.h"
 #include "SelectStage.h"
+#include "PLayerDeadEffect.h"
 
 #include"KuroEngine.h"
 #include"TexHandleMgr.h"
 #include "WinApp.h"
+#include "DrawFunc_Color.h"
 
 PlayerHand::PlayerHand(const int& AimGraphHandle) : aimGraphHandle(AimGraphHandle)
 {
@@ -129,6 +131,16 @@ void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, cons
 
 	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle,
 		TexHandleMgr::GetTexBuffer(GraphHandle), nullptr, nullptr, 0.0f, RotaCenterUV);
+
+	if (PlayerDeadEffect::Instance()->isActive) {
+
+		Color deadFlashCol;
+		deadFlashCol.Alpha() = 1.0f - PlayerDeadEffect::Instance()->playerWhitePar * 1.0f;
+
+		DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle),
+			deadFlashCol, RotaCenterUV);
+
+	}
 
 	// ÉrÅ[ÉRÉìÇï`âÊ
 	if (teleportPike.isActive) teleportPike.Draw();

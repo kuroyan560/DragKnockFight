@@ -12,6 +12,7 @@
 #include"SightCollisionStorage.h"
 #include"SelectStage.h"
 #include"SlowMgr.h"
+#include"PLayerDeadEffect.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -621,6 +622,9 @@ void Game::Init()
 			eventBlocks[arrayNum].Init(chipPos);
 		}
 	}
+
+	// プレイヤー死亡エフェクトクラスを初期化
+	PlayerDeadEffect::Instance()->Init();
 
 }
 
@@ -1317,6 +1321,9 @@ void Game::Update()
 		}
 	}
 
+	// プレイヤー死亡エフェクトクラスの更新処理
+	PlayerDeadEffect::Instance()->Update();
+
 	// スローの更新処理
 	SlowMgr::Instance()->Update();
 
@@ -1722,4 +1729,9 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),EmissiveMap.lock() });
 	}
+
+	// プレイヤー死亡エフェクトの描画処理
+	PlayerDeadEffect::Instance()->Draw();
+
+
 }
