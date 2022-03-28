@@ -89,16 +89,16 @@ public:
 
 	/*-- 定数 --*/
 
-	const float ADD_GRAVITY = 0.5f;				// プレイヤーにかける重力
-	const float MAX_GRAVITY = 15.0f;			// プレイヤーにかける重力の最大量
-	//const float RECOIL_AMOUNT = 5.0f;			// 弾を撃った際の反動
-	const float RECOIL_AMOUNT = 7.0f;			// 弾を撃った際の反動
-	const float FIRST_RECOIL_AMOUNT = 20.0;		// 弾を撃った際の反動
-	const float MAX_RECOIL_AMOUNT = 30.0f;		// 弾を撃った際の反動の最大値
+	float ADD_GRAVITY = 0.5f;				// プレイヤーにかける重力
+	float MAX_GRAVITY = 15.0f;			// プレイヤーにかける重力の最大量	
+	float RECOIL_AMOUNT = 7.0f;			// 弾を撃った際の反動
+	float FIRST_RECOIL_AMOUNT = 20.0;		// 弾を撃った際の反動
+	float MAX_RECOIL_AMOUNT = 30.0f;		// 弾を撃った際の反動の最大値
 	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
+	//const float RECOIL_AMOUNT = 5.0f;			// 弾を撃った際の反動
 	const Vec2<float> PLAYER_HIT_SIZE = { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 	static Vec2<float>GetGeneratePos();
-	const int RAPID_FIRE_TIMER = 21;			// 連射タイマー
+	int RAPID_FIRE_TIMER = 21;			// 連射タイマー
 	const int GRAVITY_INVALID_TIMER = 20;		// 重力無効化タイマー
 
 	// コヨーテ的なやつのためのパラメーター
