@@ -67,8 +67,12 @@ class Game
 	Enemy bossEnemy;
 	static const int SMALL_ENEMY = 100;
 	array<Enemy, SMALL_ENEMY> smallEnemy;
+	static const int NOMOVEMENT_ENEMY = 100;
+	array<Enemy, NOMOVEMENT_ENEMY> noMovementEnemy;
 	int enemyGenerateTimer;
 	const int SMALL_GENERATE_TIMER = 60;
+	int nomoveMentTimer;
+	const int NOMOVEMENT_GENERATE_TIMER = 120;
 
 	// マップチップのデータ
 	vector<vector<int>> mapData;
