@@ -72,10 +72,10 @@ void Enemy::Generate(const ENEMY_ID& id, const vector<vector<int>>& mapData)
 
 		while (true) {
 
-			int indexX = KuroFunc::GetRand(HEIGHT);
-			int indexY = KuroFunc::GetRand(WIDTH);
-			int mapIndex = mapData[indexX][indexY];
-			if (mapIndex != 0) {
+			int indexX = KuroFunc::GetRand(WIDTH);
+			int indexY = KuroFunc::GetRand(HEIGHT);
+			int mapIndex = mapData[indexY][indexX];
+			if (mapIndex == 0) {
 
 
 				pos = { indexX * CHIP_SIZE - (CHIP_SIZE / 2.0f), indexY * CHIP_SIZE - (CHIP_SIZE / 2.0f) };
@@ -185,7 +185,7 @@ void Enemy::Draw()
 		float hitpointPar = (float)hitPoint / HITPOINT_SMALL;
 		DrawFunc::DrawBox2D({ pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x - ShakeMgr::Instance()->shakeAmount.x,
 			pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y - ShakeMgr::Instance()->shakeAmount.y },
-			{ pos.x - size.x + size.x * 2.0f * hitpointPar - ScrollMgr::Instance()->scrollAmount.x - ShakeMgr::Instance()->shakeAmount.x,
+			{ pos.x + size.x - ScrollMgr::Instance()->scrollAmount.x - ShakeMgr::Instance()->shakeAmount.x,
 			pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y - ShakeMgr::Instance()->shakeAmount.y },
 			Color(229, 168, 168, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
 
