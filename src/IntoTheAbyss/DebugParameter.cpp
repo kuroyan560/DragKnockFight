@@ -7,6 +7,7 @@ DebugParameter::DebugParameter()
 
 	//デフォルト
 	nowData = std::make_shared<PlayerDebugParameterData>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+	loadPresetFlag = true;
 }
 
 void DebugParameter::Update()
