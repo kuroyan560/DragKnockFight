@@ -1066,7 +1066,12 @@ void Player::Input(const vector<vector<int>> mapData)
 {
 	/*===== 入力処理 =====*/
 
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LT)) isZeroGravity = isZeroGravity ? false : true;
+	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LT)) {
+
+		isZeroGravity = isZeroGravity ? false : true;
+		changeGravityTimer = 0;
+
+	}
 
 	//同時ショット判定タイマー計測
 	if (isLeftFirstShotTimer < DOUJI_ALLOWANCE_FRAME)isLeftFirstShotTimer++;
