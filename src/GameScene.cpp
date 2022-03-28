@@ -5,6 +5,7 @@
 #include"GaussianBlur.h"
 #include"IntoTheAbyss/StageMgr.h"
 #include"IntoTheAbyss/SelectStage.h"
+#include"IntoTheAbyss/DebugParameter.h"
 
 GameScene::GameScene()
 {
@@ -31,6 +32,7 @@ void GameScene::OnInitialize()
 
 void GameScene::OnUpdate()
 {
+	DebugParameter::Instance()->Update();
 	game.Update();
 
 	bool changeInput = UsersInput::Instance()->OnTrigger(DIK_B) || UsersInput::Instance()->OnTrigger(START);
@@ -98,6 +100,9 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("MaxTimer%d", game.player.CHANGE_GRAVITY_TIMER);
 	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
 	ImGui::End();
+
+	DebugParameter::Instance()->DrawImGui();
+
 }
 
 void GameScene::OnFinalize()
