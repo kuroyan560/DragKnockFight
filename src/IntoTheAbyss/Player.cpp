@@ -912,7 +912,8 @@ void Player::HitMapChipLeft()
 	if (fabs(vel.y + gravity) >= STOP_DEADLINE_Y || fabs(gravity) >= MAX_GRAVITY) {
 
 		// 摩擦をつける。
-		vel.y *= 0.95f;
+		//vel.y *= 0.95f;
+		vel.y *= VEL_MUL_AMOUNT;
 
 		gravity *= 0.8f;
 
@@ -959,7 +960,7 @@ void Player::HitMapChipRight()
 	if (fabs(vel.y + gravity) >= STOP_DEADLINE_Y || fabs(gravity) >= MAX_GRAVITY) {
 
 		// 摩擦をつける。
-		vel.y *= 0.95f;
+		vel.y *= VEL_MUL_AMOUNT;
 
 		gravity *= 0.8f;
 
@@ -1011,8 +1012,8 @@ void Player::HitMapChipBottom()
 	if (fabs(vel.x) >= STOP_DEADLINE_X) {
 
 		// 摩擦をつける。
-		vel.y *= 0.95f;
-		vel.x *= 0.95f;
+		vel.y *= VEL_MUL_AMOUNT;
+		vel.x *= VEL_MUL_AMOUNT;
 
 		// 重力を無効化する。
 		gravity = 0.5f;
@@ -1099,6 +1100,22 @@ void Player::Input(const vector<vector<int>> mapData)
 	// 入力のデッドラインを設ける。
 	if (inputVec.Length() >= 0.9f) {
 
+		if (fabs(inputVec.x) < 0.5f) {
+			inputVec.x = 0;
+		}
+		else
+			if (fabs(inputVec.x) < 1.0f) {
+				inputVec.x = 1.0f * signbit(inputVec.x) ? -1.0f : 1.0f;
+			}
+
+		if (fabs(inputVec.y) < 0.5f) {
+			inputVec.y = 0;
+		}
+		else
+			if (fabs(inputVec.y) < 1.0f) {
+				inputVec.y = 1.0f * signbit(inputVec.y) ? -1.0f : 1.0f;
+			}
+
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
 
@@ -1113,6 +1130,22 @@ void Player::Input(const vector<vector<int>> mapData)
 	// 入力のデッドラインを設ける。
 	if (inputVec.Length() >= 0.9f) {
 
+		if (fabs(inputVec.x) < 0.5f) {
+			inputVec.x = 0;
+		}
+		else
+			if (fabs(inputVec.x) < 1.0f) {
+				inputVec.x = 1.0f * signbit(inputVec.x) ? -1.0f : 1.0f;
+			}
+
+		if (fabs(inputVec.y) < 0.5f) {
+			inputVec.y = 0;
+		}
+		else
+			if (fabs(inputVec.y) < 1.0f) {
+				inputVec.y = 1.0f * signbit(inputVec.y) ? -1.0f : 1.0f;
+			}
+
 		// 左手の角度を更新
 		rHand->SetAngle(KuroFunc::GetAngle(inputVec));
 
@@ -1122,7 +1155,7 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// LBが押されたら反動をつける。
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+	if (UsersInput::Instance()->Input(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
 
 		// 反動をつける。
 		float rHandAngle = lHand->GetAngle();
@@ -1218,7 +1251,7 @@ void Player::Input(const vector<vector<int>> mapData)
 	}
 
 	// RBが押されたら反動をつける。
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+	if (UsersInput::Instance()->Input(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
 
 		// 反動をつける。
 		float lHandAngle = rHand->GetAngle();
