@@ -9,15 +9,16 @@ private:
 	/*-- ƒƒ“ƒo•Ï” --*/
 
 	Vec2<float> pos;
-	Vec2<float> forwardVec;
+	bool isHit;
+	//Vec2<float> forwardVec;
 
 
 private:
 
 	/*-- ’è” --*/
 
-	const float SPEED = 5.0f;
-	const Vec2<float> SIZE = { 20.0f,20.0f };
+	//const float SPEED = 5.0f;
+	const Vec2<float> SIZE = { 100.0f,100.0f };
 
 
 public:
@@ -31,10 +32,13 @@ public:
 	void Init();
 
 	// XVˆ—
-	void Update();
+	void Update(const Vec2<float>& playerPos);
 
 	// •`‰æˆ—
 	void Draw();
+
+	// ’e‚Æ‚Ì“–‚½‚è”»’è
+	void CheckHitBullet();
 
 
 };
