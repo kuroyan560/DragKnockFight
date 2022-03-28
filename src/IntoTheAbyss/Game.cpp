@@ -21,7 +21,7 @@
 
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -47,7 +47,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -76,7 +76,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -133,7 +133,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR, const bool &ONLY_GET_DOOR_DIR)
+Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR* DIR, const bool& ONLY_GET_DOOR_DIR)
 {
 	Vec2<float> doorPos;
 	int roopCount = 0;
@@ -327,7 +327,7 @@ Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_N
 	return Vec2<float>(-1, -1);
 }
 
-Vec2<float> Game::GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA)
+Vec2<float> Game::GetDoorPos(const int& DOOR_NUMBER, const vector<vector<int>>& MAPCHIP_DATA)
 {
 	Vec2<float> door;
 	//次につながるドアを探す
@@ -345,7 +345,7 @@ Vec2<float> Game::GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &
 	return door;
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
+const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -363,7 +363,7 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
+void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
@@ -601,6 +601,15 @@ void Game::Init()
 	const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
 	ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 	ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
+
+	bossEnemy.Generate(ENEMY_BOSS);
+	for (int index = 0; index < SMALL_ENEMY; ++index) {
+
+		smallEnemy[index].Init();
+
+	}
+	enemyGenerateTimer = 0;
+
 }
 
 void Game::Update()
@@ -1094,7 +1103,32 @@ void Game::Update()
 	if (UsersInput::Instance()->OnTrigger(DIK_O)) player.centerPos.x -= 100.0f;
 
 	// 敵の更新処理
-	enemy.Update();
+	bossEnemy.Update(player.centerPos);
+
+	++enemyGenerateTimer;
+	// 生成タイマーが既定値を超えたら
+	if (SMALL_GENERATE_TIMER <= enemyGenerateTimer) {
+
+		enemyGenerateTimer = 0;
+
+		for (int index = 0; index < SMALL_ENEMY; ++index) {
+
+			if (smallEnemy[index].isActive) continue;
+
+			smallEnemy[index].Generate(ENEMY_SMALL);
+
+			break;
+
+		}
+
+	}
+	for (int index = 0; index < SMALL_ENEMY; ++index) {
+
+		if (!smallEnemy[index].isActive) continue;
+
+		smallEnemy[index].Update(player.centerPos);
+
+	}
 
 	// スクロール量の更新処理
 	ScrollMgr::Instance()->Update();
@@ -1151,6 +1185,16 @@ void Game::Update()
 
 	// オーラブロックのデータとビューポートの判定を行う。
 	ViewPort::Instance()->SavePrevFlamePos();
+
+	// 敵と弾の当たり判定
+	bossEnemy.CheckHitBullet();
+	for (int index = 0; index < SMALL_ENEMY; ++index) {
+
+		if (!smallEnemy[index].isActive) continue;
+
+		smallEnemy[index].CheckHitBullet();
+
+	}
 
 	// 弾とビューポートの当たり判定
 	for (int i = 0; i < BulletMgr::Instance()->bullets.size(); ++i)
@@ -1514,6 +1558,14 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		thornBlocks[i]->Draw();
 	}
 
+	bossEnemy.Draw();
+	for (int index = 0; index < SMALL_ENEMY; ++index) {
+
+		if (!smallEnemy[index].isActive) continue;
+
+		smallEnemy[index].Draw();
+
+	}
 
 	player.Draw(ligMgr);
 	ParticleMgr::Instance()->Draw(ligMgr);
