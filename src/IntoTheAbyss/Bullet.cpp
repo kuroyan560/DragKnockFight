@@ -35,6 +35,7 @@ void Bullet::Generate(const Vec2<float>& generatePos, const Vec2<float> forwardV
 
 	// 座標をセット
 	pos = generatePos;
+	prevPos = generatePos;
 
 	// 進行方向ベクトルをセット
 	this->forwardVec = forwardVec;
@@ -73,6 +74,7 @@ void Bullet::Update()
 	// 移動させる。
 
 	if (isFirstFrame) {
+		prevPos = pos;
 		pos += forwardVec * Vec2<float>(speed, speed);
 	}
 
