@@ -1060,6 +1060,9 @@ void Player::Input(const vector<vector<int>> mapData)
 	// 入力のデッドラインを設ける。
 	if (inputVec.Length() >= 0.9f) {
 
+
+		if (inputVec.x > 0) inputVec.x = 0;
+
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
 
@@ -1073,6 +1076,8 @@ void Player::Input(const vector<vector<int>> mapData)
 
 	// 入力のデッドラインを設ける。
 	if (inputVec.Length() >= 0.9f) {
+
+		if (inputVec.x < 0) inputVec.x = 0;
 
 		// 左手の角度を更新
 		rHand->SetAngle(KuroFunc::GetAngle(inputVec));
