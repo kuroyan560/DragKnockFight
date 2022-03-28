@@ -12,7 +12,7 @@ public:
 	Vec2<float> scrollAmount;		//スクロール量
 	Vec2<float> honraiScrollAmount;
 
-	float zoom = 1.0f;			// カメラのズーム量
+	float zoom;			// カメラのズーム量
 
 	const std::vector<std::vector<int>> *mapChipPtr;//マップチップ情報のポインタ
 	std::array<bool, 4> hitData;			//上下左右、どの部分にスクロール管理用のマップチップに引っかかったか
@@ -27,6 +27,7 @@ public:
 
 
 public:
+	ScrollMgr();
 
 	/*===== メンバ関数 =====*/
 	//初期化
