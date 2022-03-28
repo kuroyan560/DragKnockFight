@@ -66,8 +66,8 @@ void Enemy::Generate(const ENEMY_ID& id, const vector<vector<int>>& mapData)
 	if (id != ENEMY_BOSS) {
 
 		// 空白のブロックにランダムで生成する。
-		const int HEIGHT = mapData.size() - 1;
-		const int WIDTH = mapData[0].size() - 1;
+		const int HEIGHT = mapData.size() - 2;
+		const int WIDTH = mapData[0].size() - 2;
 		const float CHIP_SIZE = 50.0f;
 
 		while (true) {
