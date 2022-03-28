@@ -9,6 +9,8 @@ struct VSOutput
     float4 rightBottomPos : POSITION_R_B;
     float4 paintColor : PAINT_COLOR;
     int2 miror : MIROR;
+    float2 leftUpPaintUV : PAINT_UV_L_U;
+    float2 rightBottomPaintUV : PAINT_UV_R_B;
 };
 
 VSOutput VSmain(VSOutput input)
@@ -21,6 +23,8 @@ struct GSOutput
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD;
     float4 paintColor : PAINT_COLOR;
+    float2 leftUpPaintUV : PAINT_UV_L_U;
+    float2 rightBottomPaintUV : PAINT_UV_R_B;
 };
 
 
@@ -34,6 +38,8 @@ void GSmain(
     
     GSOutput element;
     element.paintColor = input[0].paintColor;
+    element.leftUpPaintUV = input[0].leftUpPaintUV;
+    element.rightBottomPaintUV = input[0].rightBottomPaintUV;
         
     //ç∂â∫
     element.pos = input[0].rightBottomPos;
@@ -68,6 +74,24 @@ SamplerState smp : register(s0);
 float4 PSmain(GSOutput input) : SV_TARGET
 {
     float4 texCol = tex.Sample(smp, input.uv);
+    
+    if (input.uv.x < input.leftUpPaintUV.x)
+    {
+        return texCol;
+    }
+    if (input.uv.y < input.leftUpPaintUV.y)
+    {
+        return texCol;
+    }
+    if (input.rightBottomPaintUV.x < input.uv.x)
+    {
+        return texCol;
+    }
+    if (input.rightBottomPaintUV.y < input.uv.y)
+    {
+        return texCol;
+    }
+    
     return float4(input.paintColor.xyz, texCol.w * input.paintColor.w);
 }
 

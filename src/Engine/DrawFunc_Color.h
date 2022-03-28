@@ -33,8 +33,12 @@ public:
 	/// <param name="RightBottomPos">矩形の右上座標</param>
 	/// <param name="Tex">テクスチャ</param>
 	/// <param name="Paint">塗りつぶす色</param>
+	/// <param name="Miror">反転フラグ</param>
+	/// <param name="LeftUpPaintUV">塗りつぶす範囲の左上UV</param>
+	/// <param name="RightBottomPaintUV">塗りつぶす範囲の右下UV</param>
 	static void DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos,
-		const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint = Color(), const Vec2<bool>& Miror = { false,false });
+		const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint = Color(), const Vec2<bool>& Miror = { false,false },
+		const Vec2<float>& LeftUpPaintUV = { 0.0f,0.0f }, const Vec2<float>& RightBottomPaintUV = { 1.0f,1.0f });
 
 	/// <summary>
 	/// ２D画像回転描画
@@ -45,6 +49,7 @@ public:
 	/// <param name="Tex">テクスチャ</param>
 	/// <param name="Paint">塗りつぶす色</param>
 	static void DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian,
-		const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint = Color(), const Vec2<float>& RotaCenterUV = { 0.5f,0.5f }, const Vec2<bool>& Miror = { false,false });
+		const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint = Color(), const Vec2<float>& RotaCenterUV = { 0.5f,0.5f }, const Vec2<bool>& Miror = { false,false },
+		const Vec2<float>& LeftUpPaintUV = { 0.0f,0.0f }, const Vec2<float>& RightBottomPaintUV = { 1.0f,1.0f });
 };
 

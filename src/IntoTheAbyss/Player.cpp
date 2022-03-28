@@ -880,7 +880,8 @@ void Player::HitMapChipLeft()
 	if (fabs(vel.y + gravity) >= STOP_DEADLINE_Y || fabs(gravity) >= MAX_GRAVITY) {
 
 		// 摩擦をつける。
-		vel.y *= 0.95f;
+		//vel.y *= 0.95f;
+		vel.y *= VEL_MUL_AMOUNT;
 
 		gravity *= 0.8f;
 
@@ -927,7 +928,7 @@ void Player::HitMapChipRight()
 	if (fabs(vel.y + gravity) >= STOP_DEADLINE_Y || fabs(gravity) >= MAX_GRAVITY) {
 
 		// 摩擦をつける。
-		vel.y *= 0.95f;
+		vel.y *= VEL_MUL_AMOUNT;
 
 		gravity *= 0.8f;
 
@@ -979,8 +980,8 @@ void Player::HitMapChipBottom()
 	if (fabs(vel.x) >= STOP_DEADLINE_X) {
 
 		// 摩擦をつける。
-		vel.y *= 0.95f;
-		vel.x *= 0.95f;
+		vel.y *= VEL_MUL_AMOUNT;
+		vel.x *= VEL_MUL_AMOUNT;
 
 		// 重力を無効化する。
 		gravity = 0.5f;
