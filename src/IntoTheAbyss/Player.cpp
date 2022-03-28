@@ -18,6 +18,7 @@
 #include"WinApp.h"
 #include "ParticleMgr.h"
 #include "EventCollider.h"
+#include"DebugParameter.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -128,6 +129,16 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 void Player::Update(const vector<vector<int>> mapData)
 {
+	//デバック用の値変更
+	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
+	
+	ADD_GRAVITY = data->ADD_GRAVITY;
+	MAX_GRAVITY = data->MAX_GRAVITY;
+	RECOIL_AMOUNT = data->RECOIL_AMOUNT;
+	FIRST_RECOIL_AMOUNT = data->FIRST_RECOIL_AMOUNT;
+	MAX_RECOIL_AMOUNT = data->MAX_RECOIL_AMOUNT;
+	RAPID_FIRE_TIMER = data->RAPID_FIRE_TIMER;
+
 
 	/*===== 入力処理 =====*/
 

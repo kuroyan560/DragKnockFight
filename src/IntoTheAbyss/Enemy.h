@@ -31,7 +31,7 @@ private:
 	//const float SPEED = 5.0f;
 	const Vec2<float> SIZE_BIG = { 100.0f,100.0f };
 	const Vec2<float> SIZE_SMALL = { 30.0f,30.0f };
-	const float KNOCK_BACK = 10.0f;
+	const float KNOCK_BACK = 30.0f;
 	const int HITPOINT_SMALL = 5;
 
 
