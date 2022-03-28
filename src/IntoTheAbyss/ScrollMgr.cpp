@@ -1,6 +1,10 @@
 #include "ScrollMgr.h"
 #include "ViewPort.h"
 
+ScrollMgr::ScrollMgr():zoom(1.0f)
+{
+}
+
 void ScrollMgr::DetectMapChipForScroll(Vec2<float> PLAYER_POS, Vec2<float> SIZE)
 {
 
