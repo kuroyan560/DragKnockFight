@@ -18,7 +18,7 @@
 #include"TexHandleMgr.h"
 #include"DrawFunc.h"
 #include"ParticleMgr.h"
-
+#include"GUI.h"
 
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
@@ -602,7 +602,7 @@ void Game::Init()
 	ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 	ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 
-	bossEnemy.Generate(ENEMY_BOSS, mapData);
+	//bossEnemy.Generate(ENEMY_BOSS, mapData);
 	for (int index = 0; index < SMALL_ENEMY; ++index) {
 
 		smallEnemy[index].Init();
@@ -1121,7 +1121,7 @@ void Game::Update()
 
 			if (smallEnemy[index].isActive) continue;
 
-			smallEnemy[index].Generate(ENEMY_SMALL, mapData);
+			//smallEnemy[index].Generate(ENEMY_SMALL, mapData);
 
 			break;
 
@@ -1616,6 +1616,9 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	player.Draw(ligMgr);
 	ParticleMgr::Instance()->Draw(ligMgr);
+
+	GUI::Instance()->Draw();
+
 	if (sceneBlackFlag || sceneLightFlag)
 	{
 		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), D3D12App::Instance()->GetBackBuffFormat(), true, AlphaBlendMode_Trans);
