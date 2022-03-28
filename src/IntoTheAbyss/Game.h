@@ -28,7 +28,7 @@ struct MassChipData
 	Vec2<float>rightDownPos;
 	bool sideOrUpDownFlag;
 
-	MassChipData(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DOWN_POS, const bool &SIDE_OR_UPDOWN_FLAG) :
+	MassChipData(const Vec2<float>& LEFT_UP_POS, const Vec2<float>& RIGHT_DOWN_POS, const bool& SIDE_OR_UPDOWN_FLAG) :
 		leftUpPos(LEFT_UP_POS), rightDownPos(RIGHT_DOWN_POS), sideOrUpDownFlag(SIDE_OR_UPDOWN_FLAG)
 	{
 	}
@@ -50,11 +50,11 @@ class Game
 		DOOR_MAX
 	};
 
-	std::vector<std::unique_ptr<MassChipData>> AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM);
-	void DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum);
-	Vec2<float> GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR, const bool &ONLY_GET_DOOR_DIR = false);
-	Vec2<float> GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA);
-	const int &GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS);
+	std::vector<std::unique_ptr<MassChipData>> AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM);
+	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum);
+	Vec2<float> GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR* DIR, const bool& ONLY_GET_DOOR_DIR = false);
+	Vec2<float> GetDoorPos(const int& DOOR_NUMBER, const vector<vector<int>>& MAPCHIP_DATA);
+	const int& GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS);
 
 
 	int mapBlockGraph;
@@ -64,7 +64,11 @@ class Game
 
 
 	// 敵
-	Enemy enemy;
+	Enemy bossEnemy;
+	static const int SMALL_ENEMY = 100;
+	array<Enemy, SMALL_ENEMY> smallEnemy;
+	int enemyGenerateTimer;
+	const int SMALL_GENERATE_TIMER = 60;
 
 	// マップチップのデータ
 	vector<vector<int>> mapData;
@@ -124,7 +128,7 @@ class Game
 	Light::HemiSphere hemiLig;
 
 
-	void InitGame(const int &STAGE_NUM, const int &ROOM_NUM);
+	void InitGame(const int& STAGE_NUM, const int& ROOM_NUM);
 
 public:
 	// プレイヤー
@@ -137,7 +141,7 @@ public:
 	void Update();
 	void Draw(std::weak_ptr<RenderTarget>EmissiveMap);
 
-	LightManager &GetLigManager() { return ligMgr; }
+	LightManager& GetLigManager() { return ligMgr; }
 
 
 };
