@@ -80,6 +80,20 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("Return / A Button:Done");
 	ImGui::Text("Space / Back Button:Reset");
 	ImGui::End();
+
+
+	ImGui::Begin("Timer");
+	if (game.player.isZeroGravity)
+	{
+		ImGui::Text("GravityMode");
+	}
+	else
+	{
+		ImGui::Text("NoGravityMode");
+	}	
+	ImGui::Text("MaxTimer%d",game.player.CHANGE_GRAVITY_TIMER);
+	ImGui::Text("NowTimer%d",game.player.changeGravityTimer);
+	ImGui::End();
 }
 
 void GameScene::OnFinalize()
