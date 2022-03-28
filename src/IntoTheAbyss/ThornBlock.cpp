@@ -1,23 +1,30 @@
-#include "EventBlock.h"
-#include"StageMgr.h"
+#include "ThornBlock.h"
 #include"EventCollider.h"
-#include"DrawFunc.h"
-#include"TexHandleMgr.h"
+#include"../Engine/DrawFunc.h"
+#include"ScrollMgr.h"
+#include"Collider.h"
+#include"GimmickLoader.h"
 
-EventBlock::EventBlock() :chipNumber(-1)
+Vec2<float> ThornBlock::adjValue = { 0.0f,0.0f };
+
+ThornBlock::ThornBlock()
 {
+	adjValue = GimmickLoader::Instance()->thownData->adjValue;
 }
 
-void EventBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DOWN_POS, const int &DOOR_CHIP_NUM)
+void ThornBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DOWN_POS)
 {
 	leftUpPos = LEFT_UP_POS;
 	size = RIGHT_DOWN_POS - leftUpPos;
-	chipNumber = DOOR_CHIP_NUM;
 }
 
-bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, const Vec2<float> &PLAYER_VEL, const Vec2<float> &PLAYER_PREV_POS)
+void ThornBlock::Finalize()
 {
-	Vec2<float> hitBoxSize = size / 2.0f;
+}
+
+bool ThornBlock::HitBox(Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, Vec2<float> &PLAYER_VEL, Vec2<float> &PLAYER_PREV_POS)
+{
+	Vec2<float> hitBoxSize = (size + adjValue) / 2.0f;
 	Vec2<float> hitBoxCentralPos = (leftUpPos + hitBoxSize);
 
 	bool isDossunVel = EventCpllider::Instance()->CheckHitVel(PLAYER_POS, PLAYER_PREV_POS, PLAYER_VEL, SIZE, hitBoxCentralPos, hitBoxSize) != INTERSECTED_NONE;
@@ -28,10 +35,24 @@ bool EventBlock::HitBox(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, 
 
 	if (isDossunVel || topHitFlag || buttomFlag || leftHitFlag || rightHitFlag)
 	{
+		color = Color(255, 0, 0, 255);
 		return true;
 	}
 	else
 	{
+		color = Color(255, 255, 255, 255);
 		return false;
 	}
+}
+
+void ThornBlock::Draw()
+{
+	Vec2<float>scrollAmount = ScrollMgr::Instance()->scrollAmount;
+	Vec2<float> drawLeftUpPos = leftUpPos - adjValue;
+	Vec2<float> drawRightDownPos = (leftUpPos + size) + adjValue;
+	drawLeftUpPos -= scrollAmount;
+	drawRightDownPos -= scrollAmount;
+
+	//“–‚½‚è”»’è•`‰æ—p
+	DrawFunc::DrawBox2D(drawLeftUpPos, drawRightDownPos, color, DXGI_FORMAT_R8G8B8A8_UNORM);
 }

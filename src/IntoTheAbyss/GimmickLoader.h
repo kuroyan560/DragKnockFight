@@ -39,11 +39,21 @@ struct BubbleData
 	};
 };
 
+struct ThownData
+{
+	Vec2<float> adjValue;	//当たり判定調整用の値
+	ThownData(const Vec2<float> &VALUE = Vec2<float>(-1.0f, -1.0f)) :adjValue(VALUE)
+	{
+	};
+};
+
 class GimmickLoader :public Singleton<GimmickLoader>
 {
 public:
 	GimmickLoader();
 	void LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const std::string& FILE_PASS);
+	void LoadData(const std::string& FILE_PASS);
+
 	std::vector< std::shared_ptr<ThownpeData>> GetThowpeData(const int& STAGE_NUM, const int& ROOM_NUM);
 	std::vector< std::shared_ptr<BubbleData>> GetBubbleData(const int& STAGE_NUM, const int& ROOM_NUM);
 
@@ -54,14 +64,17 @@ public:
 
 	const bool &CanLoadData(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER);
 
+	std::shared_ptr<ThownData> thownData;
 private:
-	std::vector<std::vector<std::vector<std::shared_ptr<ThownpeData>>>> allGimmickData;//ドッスンに関する情報
+	std::vector<std::vector<std::vector<std::shared_ptr<ThownpeData>>>> allThowmpeData;//ドッスンに関する情報
 	std::vector<std::vector<std::vector<std::shared_ptr<BubbleData>>>> allBubbleData;//ドッスンに関する情報
+
 
 	enum GimmickName
 	{
 		GIMMCK_NAME_NONE = -1,
 		GIMMCK_NAME_THOWMPE,
+		GIMMCK_NAME_THOWN,
 		GIMMCK_NAME_MAX,
 	};
 
@@ -91,5 +104,8 @@ private:
 	std::array<std::string, GIMMCK_THOWMPE_DATA_MAX>gimmickThowmpeDataName;	//Key値を読み込む際に無効な文字が入ってないか確認する為の比較対象。特定のギミックに使うKey値が格納される
 	std::array<std::string, GIMMCK_THOWMPE_TYPE_MAX>gimmickThowmpeType;		//ギミックの項目を読み込む際に無効な文字が入ってないか確認する為の比較対象
 
+	GimmickName CheckName(const std::string &KEY_NAME, std::istringstream *LINE_STREAM);
+
 	void LoadThowmpeData(const std::string& KEY, std::istringstream* LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA);
+	void LoadThownData(const std::string& KEY, std::istringstream* LINE_STREAM, std::shared_ptr<ThownData> THOWN_DATA);
 };

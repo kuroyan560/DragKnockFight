@@ -52,7 +52,8 @@ enum MapChipBlockData
 	MAPCHIP_BLOCK_START = 30,
 	MAPCHIP_BLOCK_GOAL = 31,
 	MAPCHIP_BLOCK_DEBUG_START = 32,
-	MAPCHIP_BLOCK_AURABLOCK = 40
+	MAPCHIP_BLOCK_AURABLOCK = 40,
+	MAPCHIP_BLOCK_THOWN = 41,
 };
 
 struct MapChipDrawData
@@ -206,8 +207,10 @@ private:
 	std::array<SizeData, MAPCHIP_TYPE_MAX> mapChipMemoryData;//マップチップ番号の領域
 
 	std::vector<StageMapChipDrawData> allMapChipDrawData;//マップチップの描画情報
-
 	static const int SECRET_DOOR_NUMBER = 5;
+
+	int thowGraphHandle;
+	std::array<int, 12> eventChipHandle;
 
 	array<int, 30> mapChipGraphHandle;
 	enum

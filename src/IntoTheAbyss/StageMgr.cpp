@@ -46,6 +46,19 @@ StageMgr::StageMgr()
 	mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHTDOWN_1PIXEL] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Chip_rightDown1Pixel.png");
 	mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFTDOWN_1PIXEL] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Chip_leftDown1Pixel.png");
 
+	//thowGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Thown.png");
+
+
+
+
+	//問題の箇所-----------------------
+
+	//我々はこの問題に立ち向かう橋本を応援します
+	TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/EventBlocks.png", 10, { 10,1 }, eventChipHandle.data());
+
+	//問題の箇所-----------------------
+
+
 
 
 	vector<int>tmp(6);
@@ -74,6 +87,10 @@ StageMgr::StageMgr()
 			GimmickLoader::Instance()->LoadData(stageNum, roomNum, filePass + fileName);
 		}
 	}
+
+	//ギミック共通の設定
+	GimmickLoader::Instance()->LoadData(rootFilePass + "GimmickCommonData.txt");
+
 
 	//ステージ毎の小部屋読み込み-----------------------
 	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
@@ -315,8 +332,6 @@ StageMgr::StageMgr()
 					}
 
 
-
-
 					if (now == MAPCHIP_BLOCK_START)
 					{
 						startChip.push_back(roomNum);
@@ -367,6 +382,62 @@ StageMgr::StageMgr()
 						skipFlag = true;
 					}
 
+					//針
+					{
+						//上
+						bool checkDirFlag =
+							Up == 0 && Down == 1;
+						if (now == MAPCHIP_BLOCK_THOWN && checkDirFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = thowGraphHandle;
+							tmp.radian = 0.0f;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
+						//下
+						checkDirFlag =
+							Up == 1 && Down == 0;
+						if (now == MAPCHIP_BLOCK_THOWN && checkDirFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = thowGraphHandle;
+							tmp.radian = Radian(180.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
+						//左
+						checkDirFlag =
+							left == 0 && right == 1;
+						if (now == MAPCHIP_BLOCK_THOWN && checkDirFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = thowGraphHandle;
+							tmp.radian = Radian(270.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
+						//右
+						checkDirFlag =
+							left == 1 && right == 0;
+						if (now == MAPCHIP_BLOCK_THOWN && checkDirFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = thowGraphHandle;
+							tmp.radian = Radian(90.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
+					}
+
+					//イベントチップのデバック画像
+					for (int eventChipNum = mapChipMemoryData[MAPCHIP_TYPE_EVENT].min; eventChipNum < mapChipMemoryData[MAPCHIP_TYPE_EVENT].max; ++eventChipNum)
+					{
+						if (now == eventChipNum)
+						{
+							int arrayNum = eventChipNum - mapChipMemoryData[MAPCHIP_TYPE_EVENT].min;
+							MapChipDrawData tmp;
+							tmp.handle = eventChipHandle[arrayNum];
+							tmp.radian = 0.0f;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
+					}
 
 
 
