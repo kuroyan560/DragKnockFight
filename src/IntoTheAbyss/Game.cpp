@@ -498,64 +498,69 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	debugStageData[0] = stageNum;
 	debugStageData[1] = roomNum;
 
+	//ドア遷移はプレイヤーを初期化しない
+	if (!sceneLightFlag)
+	{
 #pragma region プレイヤー初期化
-	bool deadFlag = false;
-	if (player.isDead)
-	{
-		deadFlag = true;
-	}
-
-
-	bool responeFlag = false;
-
-	for (int y = 0; y < mapData.size(); ++y)
-	{
-		for (int x = 0; x < mapData[y].size(); ++x)
+		bool deadFlag = false;
+		if (player.isDead)
 		{
-			if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
-			{
-				player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
-				ScrollMgr::Instance()->WarpScroll(player.centerPos);
-				responeFlag = true;
-				break;
-			}
+			deadFlag = true;
 		}
-	}
 
-	//デバック開始用の場所からリスポーンしたらこの処理を通さない
-	if (!responeFlag)
-	{
-		//マップ開始時の場所にスポーンさせる
+
+		bool responeFlag = false;
+
 		for (int y = 0; y < mapData.size(); ++y)
 		{
 			for (int x = 0; x < mapData[y].size(); ++x)
 			{
-				if (mapData[y][x] == MAPCHIP_BLOCK_START)
+				if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
 				{
 					player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
 					ScrollMgr::Instance()->WarpScroll(player.centerPos);
+					responeFlag = true;
 					break;
 				}
 			}
 		}
-	}
+
+		//デバック開始用の場所からリスポーンしたらこの処理を通さない
+		if (!responeFlag)
+		{
+			//マップ開始時の場所にスポーンさせる
+			for (int y = 0; y < mapData.size(); ++y)
+			{
+				for (int x = 0; x < mapData[y].size(); ++x)
+				{
+					if (mapData[y][x] == MAPCHIP_BLOCK_START)
+					{
+						player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
+						ScrollMgr::Instance()->WarpScroll(player.centerPos);
+						break;
+					}
+				}
+			}
+		}
 
 
 
-	if (deadFlag)
-	{
-		ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
-		ScrollMgr::Instance()->AlimentScrollAmount();
-		ScrollMgr::Instance()->Restart();
-	}
+		if (deadFlag)
+		{
+			ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
+			ScrollMgr::Instance()->AlimentScrollAmount();
+			ScrollMgr::Instance()->Restart();
+		}
 #pragma endregion
+		alphaValue = 0;
+	}
 
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
 
 	sceneBlackFlag = false;
-	sceneLightFlag = false;
+	//sceneLightFlag = false;
 	SelectStage::Instance()->resetStageFlag = false;
-	alphaValue = 0;
+
 }
 
 Game::Game()
@@ -602,14 +607,9 @@ void Game::Update()
 {
 	ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 
-	int stageNum = SelectStage::Instance()->GetStageNum();
-	int roomNum = SelectStage::Instance()->GetRoomNum();
-
 
 
 #pragma region ステージの切り替え
-	stageNum = SelectStage::Instance()->GetStageNum();
-
 	bool enableToSelectStageFlag = 0 < debugStageData[0];
 	bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//マップの切り替え
@@ -686,12 +686,12 @@ void Game::Update()
 	{
 		Vec2<float> playerChip((player.centerPos.x + 25.0f) / 50.0f, (player.centerPos.y + 25.0f) / 50.0f);
 		//ゴールに触れたら次のステージに向かう
-		if (StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, playerChip) == MAPCHIP_BLOCK_GOAL)
+		if (StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), playerChip) == MAPCHIP_BLOCK_GOAL)
 		{
-			++stageNum;
-			roomNum = 0;
+			SelectStage::Instance()->SelectStageNum(0);
+			SelectStage::Instance()->SelectRoomNum(0);
 
-			mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
+			mapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 			Vec2<float> door;
 			//ゴール探索
 			for (int y = 0; y < mapData.size(); ++y)
@@ -712,39 +712,42 @@ void Game::Update()
 
 
 #pragma region ドア移動
-	for (int doorIndex = 0; doorIndex < doorBlocks.size(); ++doorIndex)
+	if (!sceneBlackFlag && !sceneLightFlag)
 	{
-		//当たり判定
-		bool hitFlag = doorBlocks[doorIndex]->Collision(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
-
-		//ドアと当たったら数字を渡す
-		if (hitFlag)
+		for (int doorIndex = 0; doorIndex < doorBlocks.size(); ++doorIndex)
 		{
-			giveDoorNumber = doorBlocks[doorIndex]->chipNumber;
-		}
+			//当たり判定
+			bool hitFlag = doorBlocks[doorIndex]->Collision(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
 
-		//プレイヤーの体を完全に隠すためのオフセット
-		Vec2<float>offset;
-		if (player.vel.x <= 0.0f)
-		{
-			offset.x = MAP_CHIP_HALF_SIZE;
-		}
-		else
-		{
-			offset.x = -MAP_CHIP_HALF_SIZE;
-		}
+			//ドアと当たったら数字を渡す
+			if (hitFlag)
+			{
+				giveDoorNumber = doorBlocks[doorIndex]->chipNumber;
+			}
 
-		//現在地取得
-		int nowChip = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>((player.centerPos + Vec2<float>(0.0f, -MAP_CHIP_HALF_SIZE) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
-		int nowChip2 = StageMgr::Instance()->GetMapChipBlock(stageNum, roomNum, Vec2<float>((player.centerPos + Vec2<float>(0.0f, MAP_CHIP_HALF_SIZE) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
+			//プレイヤーの体を完全に隠すためのオフセット
+			Vec2<float>offset;
+			if (player.vel.x <= 0.0f)
+			{
+				offset.x = MAP_CHIP_HALF_SIZE;
+			}
+			else
+			{
+				offset.x = -MAP_CHIP_HALF_SIZE;
+			}
 
-		//ドア移動判定
-		bool outSideFlag = nowChip == -1 && nowChip2 == -1;//プレイヤーが画面外に出た判定
-		if (outSideFlag)
-		{
-			sceneBlackFlag = true;
-			doorNumber = giveDoorNumber;
-			player.drawCursorFlag = false;
+			//現在地取得
+			int nowChip = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), Vec2<float>((player.centerPos + Vec2<float>(0.0f, -MAP_CHIP_HALF_SIZE) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
+			int nowChip2 = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), Vec2<float>((player.centerPos + Vec2<float>(0.0f, MAP_CHIP_HALF_SIZE) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
+
+			//ドア移動判定
+			bool outSideFlag = nowChip == -1 && nowChip2 == -1;//プレイヤーが画面外に出た判定
+			if (outSideFlag)
+			{
+				sceneBlackFlag = true;
+				doorNumber = giveDoorNumber;
+				player.drawCursorFlag = false;
+			}
 		}
 	}
 #pragma endregion
@@ -775,13 +778,13 @@ void Game::Update()
 				{
 					SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
 					//マップ情報更新
-					int localRoomNum = StageMgr::Instance()->GetRelationData(stageNum, roomNum, doorNumber - chipMemorySize.min);
+					int localRoomNum = StageMgr::Instance()->GetRelationData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), doorNumber - chipMemorySize.min);
 
-					RoomMapChipArray tmpMapData = StageMgr::Instance()->GetMapChipData(stageNum, localRoomNum);
+					RoomMapChipArray tmpMapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), localRoomNum);
 					//ドア座標を入手
 					Vec2<float>doorPos = GetDoorPos(doorNumber, tmpMapData);
 					//プレイヤーがリスポーンする座標を入手
-					responePos = GetPlayerResponePos(stageNum, localRoomNum, doorNumber, doorPos, &door);
+					responePos = GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), localRoomNum, doorNumber, doorPos, &door);
 
 					//リスポーンエラーなら転移しない
 					if (responePos.x != -1.0f && responePos.y != -1.0f)
@@ -956,7 +959,7 @@ void Game::Update()
 					//ドア座標を入手
 					Vec2<float>doorPos(GetDoorPos(doorNumber, mapData));
 					//プレイヤーがリスポーンする座標を入手
-					responePos = GetPlayerResponePos(stageNum, roomNum, doorNumber, doorPos, &door);
+					responePos = GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), doorNumber, doorPos, &door);
 
 					//プレイヤーをリスポーンさせる
 					switch (door)
@@ -1041,12 +1044,12 @@ void Game::Update()
 
 	//ステージ毎の切り替え判定
 	//部屋の初期化
-	if ((roomNum != oldRoomNum || stageNum != oldStageNum) || SelectStage::Instance()->resetStageFlag)
+	if ((SelectStage::Instance()->GetRoomNum() != oldRoomNum || SelectStage::Instance()->GetStageNum() != oldStageNum) || SelectStage::Instance()->resetStageFlag)
 	{
 		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	}
-	oldRoomNum = roomNum;
-	oldStageNum = stageNum;
+	oldRoomNum = SelectStage::Instance()->GetRoomNum();
+	oldStageNum = SelectStage::Instance()->GetStageNum();
 
 	//イベントブロックとの判定
 	for (int i = 0; i < eventBlocks.size(); ++i)
