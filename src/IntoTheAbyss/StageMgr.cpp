@@ -51,8 +51,13 @@ StageMgr::StageMgr()
 
 
 
+	//–â‘è‚Ì‰ÓŠ-----------------------
 
-	//TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/EventBlocks.png", 10, { 10,1 }, eventChipHandle.data());
+	//‰äX‚Í‚±‚Ì–â‘è‚É—§‚¿Œü‚©‚¤‹´–{‚ğ‰‰‡‚µ‚Ü‚·
+	TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/EventBlocks.png", 10, { 10,1 }, eventChipHandle.data());
+
+	//–â‘è‚Ì‰ÓŠ-----------------------
+
 
 
 
