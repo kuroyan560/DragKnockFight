@@ -368,8 +368,56 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
 
+
+	//ドアが繋がっているか確認
+	{
+		RoomMapChipArray tmpMap = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
+		std::vector<std::unique_ptr<DoorBlock>> tmpDoor;
+		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
+		for (int doorIndex = chipMemorySize.min; doorIndex < chipMemorySize.max; ++doorIndex)
+		{
+			std::vector<std::unique_ptr<MassChipData>> data = AddData(tmpMap, doorIndex);
+			for (int i = 0; i < data.size(); ++i)
+			{
+				tmpDoor.push_back(std::make_unique<DoorBlock>());
+				int doorBlocksArrayNum = tmpDoor.size() - 1;
+				tmpDoor[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex, data[i]->sideOrUpDownFlag);
+			}
+		}
+
+		bool responeErrorFlag = true;
+		for (int tmpDoorIndex = 0; tmpDoorIndex < tmpDoor.size(); ++tmpDoorIndex)
+		{
+			if (tmpDoor[tmpDoorIndex]->chipNumber == doorNumber)
+			{
+				responeErrorFlag = false;
+			}
+		}
+
+		if (doorBlocks.size() == 0 || tmpDoor.size() == 0)
+		{
+			responeErrorFlag = false;
+		}
+
+
+		if (responeErrorFlag)
+		{
+			string result = "次につながるドアが見つかりません。\nRalationファイルを確認するか、担当の大石に連絡をください。";
+			MessageBox(NULL, KuroFunc::GetWideStrFromStr(result).c_str(), TEXT("ドアが見つかりません"), MB_OK);
+			stageNum = oldStageNum;
+			roomNum = oldRoomNum;
+			SelectStage::Instance()->SelectStageNum(oldStageNum);
+			SelectStage::Instance()->SelectRoomNum(oldRoomNum);
+			sceneLightFlag = false;
+		}
+	}
+
+
 	mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+
+
+
 
 	// シェイク量を設定。
 	ShakeMgr::Instance()->Init();
@@ -497,6 +545,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	//giveDoorNumber = 0;
 	debugStageData[0] = stageNum;
 	debugStageData[1] = roomNum;
+
+
 
 	//ドア遷移はプレイヤーを初期化しない
 	if (!sceneLightFlag)

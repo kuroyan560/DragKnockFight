@@ -41,8 +41,18 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 		StageMgr::Instance()->AlimentSpaceNumber(&buttomRightChipNum);
 		StageMgr::Instance()->AlimentSpaceNumber(&buttomLeftChipNum);
 
+
+		int rightWallCheck = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), bottomBlockPos + Vec2<float>(1.0f, -1.0f));
+		int leftWallCheck = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), topBlockPos + Vec2<float>(-1.0f, -1.0f));
+
+		StageMgr::Instance()->AlimentWallNumber(&leftWallCheck);
+		StageMgr::Instance()->AlimentWallNumber(&rightWallCheck);
+		StageMgr::Instance()->AlimentSpaceNumber(&leftWallCheck);
+		StageMgr::Instance()->AlimentSpaceNumber(&rightWallCheck);
+
+
 		//â∫Ç…ï«Ç™Ç†ÇÈÇ∆îªíËÇµÇΩÇÁ
-		if (topRightChipNum || buttomRightChipNum)
+		if ((topRightChipNum || buttomRightChipNum) && !rightWallCheck)
 		{
 			responePos =
 			{
@@ -56,10 +66,10 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 				bottomBlockPos.y * 50.0f - mapChipSize.y * 2.0f
 			};
 			doorDir = DOOR_UP_GORIGHT;
+			return;
 		}
 
-
-	/*	if (topRightChipNum || buttomRightChipNum)
+		if ((topRightChipNum || buttomRightChipNum) && !leftWallCheck)
 		{
 			responePos =
 			{
@@ -73,7 +83,8 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 				topBlockPos.y * 50.0f - mapChipSize.y * 2.0f
 			};
 			doorDir = DOOR_UP_GOLEFT;
-		}*/
+			return;
+		}
 
 
 		//è„Ç…ï«Ç™Ç†ÇÈÇ∆îªíËÇµÇΩÇÁ
@@ -92,6 +103,7 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 				centralPos.y - mapChipSize.y * 1.4f
 			};
 			doorDir = DOOR_DOWN;
+			return;
 		}
 	}
 
@@ -133,6 +145,7 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 				bottomBlockPos.y * 50.0f
 			};
 			doorDir = DOOR_LEFT;
+			return;
 		}
 
 
@@ -151,6 +164,7 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 				bottomBlockPos.y * 50.0f
 			};
 			doorDir = DOOR_RIGHT;
+			return;
 		}
 	}
 
