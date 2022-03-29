@@ -370,6 +370,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 
 
 	//ドアが繋がっているか確認
+	if (!SelectStage::Instance()->resetStageFlag)
 	{
 		RoomMapChipArray tmpMap = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 		std::vector<std::unique_ptr<DoorBlock>> tmpDoor;
@@ -691,8 +692,8 @@ void Game::Update()
 
 
 #pragma region ステージの切り替え
-	bool enableToSelectStageFlag = 0 < debugStageData[0];
-	bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
+	const bool enableToSelectStageFlag = 0 < debugStageData[0];
+	const bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//マップの切り替え
 	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectStageFlag2 && nowSelectNum == 0)
 	const bool up = UsersInput::Instance()->OnTrigger(DIK_UP) || UsersInput::Instance()->OnTrigger(DPAD_UP);
@@ -711,8 +712,8 @@ void Game::Update()
 	}
 
 
-	bool enableToSelectRoomFlag = 0 < debugStageData[1];
-	bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
+	const bool enableToSelectRoomFlag = 0 < debugStageData[1];
+	const bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
 	//部屋の切り替え
 	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectRoomFlag2 && nowSelectNum == 1)
 	if (up && enableToSelectRoomFlag2 && nowSelectNum == 1)
@@ -743,22 +744,23 @@ void Game::Update()
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
 		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
-		mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
+		SelectStage::Instance()->resetStageFlag = true;
+		//mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
 
-		Vec2<float> door;
-		//デバック用のマップチップ番号からスタートする
-		for (int y = 0; y < mapData.size(); ++y)
-		{
-			for (int x = 0; x < mapData[y].size(); ++x)
-			{
-				if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
-				{
-					door = { (float)x,(float)y };
-				}
-			}
-		}
-		player.Init(door * Vec2<float>(50.0f, 50.0f));
-		ScrollMgr::Instance()->WarpScroll(player.centerPos);
+		//Vec2<float> door;
+		////デバック用のマップチップ番号からスタートする
+		//for (int y = 0; y < mapData.size(); ++y)
+		//{
+		//	for (int x = 0; x < mapData[y].size(); ++x)
+		//	{
+		//		if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
+		//		{
+		//			door = { (float)x,(float)y };
+		//		}
+		//	}
+		//}
+		//player.Init(door * Vec2<float>(50.0f, 50.0f));
+		//ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
 
