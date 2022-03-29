@@ -812,61 +812,10 @@ void Game::Update()
 					int localRoomNum = StageMgr::Instance()->GetRelationData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), doorNumber - chipMemorySize.min);
 
 					RoomMapChipArray tmpMapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), localRoomNum);
-					//ドア座標を入手
-					Vec2<float>doorPos = GetDoorPos(doorNumber, tmpMapData);
-					//プレイヤーがリスポーンする座標を入手
-					responePos = GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), localRoomNum, doorNumber, doorPos, &door);
 
-
-					responePos = doorBlocks[doorArrayNumber]->responePos;
-
-					//リスポーンエラーなら転移しない
-					if (responePos.x != -1.0f && responePos.y != -1.0f)
-					{
-						SelectStage::Instance()->SelectRoomNum(localRoomNum);
-
-						sceneChangingFlag = true;
-						//画面外から登場させる
-						switch (door)
-						{
-						case Game::DOOR_UP_GORIGHT:
-							ScrollMgr::Instance()->WarpScroll(responePos);
-							initJumpFlag = false;
-							player.Init({ responePos.x + 50.0f , responePos.y - 50.0f * 2.0f });
-							break;
-
-						case Game::DOOR_UP_GOLEFT:
-							ScrollMgr::Instance()->WarpScroll(responePos);
-							initJumpFlag = false;
-							player.Init({ responePos.x + 50.0f , responePos.y - 50.0f * 2.0f });
-							break;
-
-						case Game::DOOR_DOWN:
-							player.Init({ responePos.x, responePos.y - 50.0f * 2.0f });
-							ScrollMgr::Instance()->WarpScroll(player.centerPos);
-							break;
-
-						case Game::DOOR_LEFT:
-							ScrollMgr::Instance()->WarpScroll(responePos);
-							player.Init({ responePos.x + 50.0f * 3.0f, responePos.y });
-							break;
-
-						case Game::DOOR_RIGHT:
-							ScrollMgr::Instance()->WarpScroll(responePos);
-							player.Init({ responePos.x - 50.0f * 3.0f, responePos.y });
-							break;
-
-						case Game::DOOR_Z:
-							break;
-
-						default:
-							break;
-						}
-					}
-					else
-					{
-						responeErrorFlag = true;
-					}
+					SelectStage::Instance()->SelectRoomNum(localRoomNum);
+					sceneChangingFlag = true;
+					initJumpFlag = false;
 				}
 
 				if (!responeErrorFlag)
