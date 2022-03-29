@@ -103,6 +103,8 @@ class Game
 	bool sceneChangeDeadFlag;//プレイヤが死んでいたらフラグを立てシーン遷移中に特殊な処理を入れる
 	bool initDeadFlag;
 
+	int restartTimer;//シーン遷移後から何秒経過しているか
+
 	std::vector<std::unique_ptr<MassChip>> massChipData;
 	std::vector<std::unique_ptr<EventBlock>>eventBlocks;
 

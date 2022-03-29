@@ -406,7 +406,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 			{
 				doorBlocks.push_back(std::make_unique<DoorBlock>());
 				int doorBlocksArrayNum = doorBlocks.size() - 1;
-				doorBlocks[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex);
+				doorBlocks[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex, data[i]->sideOrUpDownFlag);
 			}
 		}
 	}
@@ -494,7 +494,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 #pragma endregion
 
 	initDeadFlag = false;
-	giveDoorNumber = 0;
+	//giveDoorNumber = 0;
 	debugStageData[0] = stageNum;
 	debugStageData[1] = roomNum;
 
@@ -576,7 +576,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	sceneBlackFlag = false;
 	//sceneLightFlag = false;
 	SelectStage::Instance()->resetStageFlag = false;
-
+	restartTimer = 0.0f;
 }
 
 Game::Game()
@@ -855,13 +855,8 @@ void Game::Update()
 						gravity = 1.0f;
 						initJumpFlag = true;
 					}
-					player.centerPos.y -= 15.0f * gravity;
+					player.centerPos.y += -15.0f * gravity;
 					gravity -= 0.1f;
-
-					if (gravity <= 0.0f)
-					{
-						gravity = 0.0f;
-					}
 
 					if (!player.onGround)
 					{
@@ -881,17 +876,12 @@ void Game::Update()
 						gravity = 1.0f;
 						initJumpFlag = true;
 					}
-					player.centerPos.y -= 15.0f * gravity;
+					player.centerPos.y += -15.0f * gravity;
 					gravity -= 0.1f;
-
-					if (gravity <= 0.0f)
-					{
-						gravity = 0.0f;
-					}
 
 					if (!player.onGround)
 					{
-						player.centerPos.x -= 6.0f;
+						player.centerPos.x -= 5.0f;
 					}
 					else
 					{
@@ -944,8 +934,6 @@ void Game::Update()
 					Vec2<float>doorPos(GetDoorPos(doorNumber, mapData));
 					//プレイヤーがリスポーンする座標を入手
 					responePos = GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), doorNumber, doorPos, &door);
-
-
 
 
 					//プレイヤーをリスポーンさせる

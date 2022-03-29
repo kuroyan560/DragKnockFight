@@ -7,7 +7,7 @@ DoorBlock::DoorBlock() :chipNumber(-1)
 {
 }
 
-void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DOWN_POS, const int &DOOR_CHIP_NUM)
+void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DOWN_POS, const int &DOOR_CHIP_NUM, const bool &SIDE_OR_UPDOWN_FLAG)
 {
 	leftUpPos = LEFT_UP_POS;
 	size = RIGHT_DOWN_POS - leftUpPos;
@@ -22,8 +22,8 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 
 	//ドアの向き指定
 	//左上座標と右下座標から上下左右どちらに空間があるか調べる
-	//左右に伸びているなら上下チェック
-	if (false)
+		//上下に伸びているなら左右チェック
+	if (SIDE_OR_UPDOWN_FLAG)
 	{
 		int topRightChipNum = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), topBlockPos + Vec2<float>(0.0f, 1.0f));
 		int topLeftChipNum = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), topBlockPos + Vec2<float>(0.0f, -1.0f));
@@ -41,22 +41,65 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 		StageMgr::Instance()->AlimentSpaceNumber(&buttomRightChipNum);
 		StageMgr::Instance()->AlimentSpaceNumber(&buttomLeftChipNum);
 
-		//上に壁があると判定したら
+		//下に壁があると判定したら
 		if (topRightChipNum || buttomRightChipNum)
 		{
+			responePos =
+			{
+				bottomBlockPos.x * 50.0f,
+				bottomBlockPos.y * 50.0f - mapChipSize.y * 2.0f
+			};
 
+			restartPos =
+			{
+				bottomBlockPos.x * 50.0f + mapChipSize.x,
+				bottomBlockPos.y * 50.0f - mapChipSize.y * 2.0f
+			};
+			doorDir = DOOR_UP_GORIGHT;
 		}
-		//下に壁があると判定したら
+
+
+	/*	if (topRightChipNum || buttomRightChipNum)
+		{
+			responePos =
+			{
+				topBlockPos.x * 50.0f,
+				topBlockPos.y * 50.0f - mapChipSize.y * 3.0f
+			};
+
+			restartPos =
+			{
+				topBlockPos.x * 50.0f - mapChipSize.x,
+				topBlockPos.y * 50.0f - mapChipSize.y * 2.0f
+			};
+			doorDir = DOOR_UP_GOLEFT;
+		}*/
+
+
+		//上に壁があると判定したら
 		if (topLeftChipNum || buttomLeftChipNum)
 		{
+			Vec2<float>centralPos = leftUpPos + size / 2.0f;
+			responePos =
+			{
+				centralPos.x,
+				centralPos.y - mapChipSize.y * 1.4f
+			};
 
+			restartPos =
+			{
+				centralPos.x,
+				centralPos.y - mapChipSize.y * 1.4f
+			};
+			doorDir = DOOR_DOWN;
 		}
 	}
 
 
 
-	//上下に伸びているなら左右チェック
-	if (true)
+
+	//左右に伸びているなら上下チェック
+	if (!SIDE_OR_UPDOWN_FLAG)
 	{
 		int topRightChipNum = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), topBlockPos + Vec2<float>(1.0f, 0.0f));
 		int topLeftChipNum = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), topBlockPos + Vec2<float>(-1.0f, 0.0f));
