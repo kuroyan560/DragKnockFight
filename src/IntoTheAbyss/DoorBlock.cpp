@@ -22,7 +22,7 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 
 	//ドアの向き指定
 	//左上座標と右下座標から上下左右どちらに空間があるか調べる
-	//上下に伸びているなら左右チェック
+	//左右に伸びているなら上下チェック
 	if (false)
 	{
 		int topRightChipNum = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), topBlockPos + Vec2<float>(0.0f, 1.0f));
@@ -43,7 +43,7 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 		}
 	}
 
-	//左右に伸びているなら上下チェック
+	//上下に伸びているなら左右チェック
 	if (true)
 	{
 		int topRightChipNum = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), topBlockPos + Vec2<float>(1.0f, 0.0f));
@@ -66,7 +66,10 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 				bottomBlockPos.x * 50.0f + -mapChipSize.x * 1.0f,
 				bottomBlockPos.y * 50.0f
 			};
+			doorDir = DOOR_LEFT;
 		}
+
+
 		//左に壁があると判定したら
 		if (topLeftChipNum || buttomLeftChipNum)
 		{
@@ -81,10 +84,9 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 				bottomBlockPos.x * 50.0f + mapChipSize.x * 1.0f,
 				bottomBlockPos.y * 50.0f
 			};
+			doorDir = DOOR_RIGHT;
 		}
 	}
-
-	//リスポーン座標指定
 
 }
 

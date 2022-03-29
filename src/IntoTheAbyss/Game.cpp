@@ -565,6 +565,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 				restartPos = doorBlocks[i]->restartPos;
 				player.Init(responePos);
 				ScrollMgr::Instance()->WarpScroll(responePos);
+				door = doorBlocks[i]->doorDir;
 				break;
 			}
 		}
@@ -847,7 +848,7 @@ void Game::Update()
 				//sceneChangingFlag = false;
 				switch (door)
 				{
-				case Game::DOOR_UP_GORIGHT:
+				case DOOR_UP_GORIGHT:
 					//ジャンプする
 					if (!initJumpFlag)
 					{
@@ -873,7 +874,7 @@ void Game::Update()
 					break;
 
 
-				case Game::DOOR_UP_GOLEFT:
+				case DOOR_UP_GOLEFT:
 					//ジャンプする
 					if (!initJumpFlag)
 					{
@@ -898,11 +899,11 @@ void Game::Update()
 					}
 					break;
 
-				case Game::DOOR_DOWN:
+				case DOOR_DOWN:
 					goFlag = true;
 					break;
 
-				case Game::DOOR_LEFT:
+				case DOOR_LEFT:
 					if (restartPos.x <= player.centerPos.x)
 					{
 						player.centerPos.x -= 5.0f;
@@ -913,7 +914,7 @@ void Game::Update()
 					}
 					break;
 
-				case Game::DOOR_RIGHT:
+				case DOOR_RIGHT:
 					if (player.centerPos.x <= restartPos.x)
 					{
 						player.centerPos.x += 5.0f;
@@ -924,7 +925,7 @@ void Game::Update()
 					}
 					break;
 
-				case Game::DOOR_Z:
+				case DOOR_Z:
 					break;
 				default:
 					break;
@@ -950,29 +951,29 @@ void Game::Update()
 					//プレイヤーをリスポーンさせる
 					switch (door)
 					{
-					case Game::DOOR_UP_GORIGHT:
+					case DOOR_UP_GORIGHT:
 						player.Init({ responePos.x + 50.0f * 2,responePos.y });
 						break;
 
-					case Game::DOOR_UP_GOLEFT:
+					case DOOR_UP_GOLEFT:
 						player.Init({ responePos.x - 50.0f * 2,responePos.y });
 						break;
 
-					case Game::DOOR_DOWN:
+					case DOOR_DOWN:
 						player.Init({ responePos.x,responePos.y - 80.0f });
 						break;
 
-					case Game::DOOR_LEFT:
+					case DOOR_LEFT:
 						player.Init(restartPos);
 						break;
 
-					case Game::DOOR_RIGHT:
+					case DOOR_RIGHT:
 						player.Init(restartPos);
 						break;
-					case Game::DOOR_Z:
+					case DOOR_Z:
 						break;
 
-					case Game::DOOR_NONE:
+					case DOOR_NONE:
 						break;
 					default:
 						break;
