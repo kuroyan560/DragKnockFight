@@ -395,12 +395,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 			}
 		}
 
-		if (doorBlocks.size() == 0 || tmpDoor.size() == 0)
-		{
-			responeErrorFlag = false;
-		}
-
-
 		if (responeErrorFlag)
 		{
 			string result = "次につながるドアが見つかりません。\nRalationファイルを確認するか、担当の大石に連絡をください。";
@@ -569,7 +563,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 				if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
 				{
 					player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
-					ScrollMgr::Instance()->WarpScroll(player.centerPos);
 					responeFlag = true;
 					break;
 				}
@@ -587,14 +580,14 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 					if (mapData[y][x] == MAPCHIP_BLOCK_START)
 					{
 						player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
-						ScrollMgr::Instance()->WarpScroll(player.centerPos);
 						break;
 					}
 				}
 			}
 		}
 
-
+		ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
+		ScrollMgr::Instance()->WarpScroll(player.centerPos);
 
 		if (deadFlag)
 		{
@@ -615,6 +608,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 				responePos = doorBlocks[i]->responePos;
 				restartPos = doorBlocks[i]->restartPos;
 				player.Init(responePos);
+				ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
 				ScrollMgr::Instance()->WarpScroll(responePos);
 				door = doorBlocks[i]->doorDir;
 				break;
