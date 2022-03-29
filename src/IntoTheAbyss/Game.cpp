@@ -930,42 +930,7 @@ void Game::Update()
 			{
 				if (!initDeadFlag)
 				{
-					//ドア座標を入手
-					Vec2<float>doorPos(GetDoorPos(doorNumber, mapData));
-					//プレイヤーがリスポーンする座標を入手
-					responePos = GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), doorNumber, doorPos, &door);
-
-
-					//プレイヤーをリスポーンさせる
-					switch (door)
-					{
-					case DOOR_UP_GORIGHT:
-						player.Init({ responePos.x + 50.0f * 2,responePos.y });
-						break;
-
-					case DOOR_UP_GOLEFT:
-						player.Init({ responePos.x - 50.0f * 2,responePos.y });
-						break;
-
-					case DOOR_DOWN:
-						player.Init({ responePos.x,responePos.y - 80.0f });
-						break;
-
-					case DOOR_LEFT:
-						player.Init(restartPos);
-						break;
-
-					case DOOR_RIGHT:
-						player.Init(restartPos);
-						break;
-					case DOOR_Z:
-						break;
-
-					case DOOR_NONE:
-						break;
-					default:
-						break;
-					}
+					player.Init(restartPos);
 					ScrollMgr::Instance()->WarpScroll(player.centerPos);
 					ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
 					ScrollMgr::Instance()->AlimentScrollAmount();
