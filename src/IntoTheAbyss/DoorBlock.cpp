@@ -31,6 +31,16 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 		int buttomRightChipNum = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), bottomBlockPos + Vec2<float>(0.0f, 1.0f));
 		int buttomLeftChipNum = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), bottomBlockPos + Vec2<float>(0.0f, -1.0f));
 
+		StageMgr::Instance()->AlimentWallNumber(&topRightChipNum);
+		StageMgr::Instance()->AlimentWallNumber(&topLeftChipNum);
+		StageMgr::Instance()->AlimentWallNumber(&buttomRightChipNum);
+		StageMgr::Instance()->AlimentWallNumber(&buttomLeftChipNum);
+
+		StageMgr::Instance()->AlimentSpaceNumber(&topRightChipNum);
+		StageMgr::Instance()->AlimentSpaceNumber(&topLeftChipNum);
+		StageMgr::Instance()->AlimentSpaceNumber(&buttomRightChipNum);
+		StageMgr::Instance()->AlimentSpaceNumber(&buttomLeftChipNum);
+
 		//上に壁があると判定したら
 		if (topRightChipNum || buttomRightChipNum)
 		{
@@ -43,6 +53,8 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 		}
 	}
 
+
+
 	//上下に伸びているなら左右チェック
 	if (true)
 	{
@@ -51,6 +63,17 @@ void DoorBlock::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DO
 
 		int buttomRightChipNum = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), bottomBlockPos + Vec2<float>(1.0f, 0.0f));
 		int buttomLeftChipNum = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), bottomBlockPos + Vec2<float>(-1.0f, 0.0f));
+
+		StageMgr::Instance()->AlimentWallNumber(&topRightChipNum);
+		StageMgr::Instance()->AlimentWallNumber(&topLeftChipNum);
+		StageMgr::Instance()->AlimentWallNumber(&buttomRightChipNum);
+		StageMgr::Instance()->AlimentWallNumber(&buttomLeftChipNum);
+
+		StageMgr::Instance()->AlimentSpaceNumber(&topRightChipNum);
+		StageMgr::Instance()->AlimentSpaceNumber(&topLeftChipNum);
+		StageMgr::Instance()->AlimentSpaceNumber(&buttomRightChipNum);
+		StageMgr::Instance()->AlimentSpaceNumber(&buttomLeftChipNum);
+
 
 		//右に壁があると判定したら
 		if (topRightChipNum || buttomRightChipNum)
