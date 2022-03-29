@@ -11,6 +11,8 @@ public:
 	bool Collision(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, const Vec2<float> &PLAYER_VEL, const Vec2<float> &PLAYER_PREV_POS);
 
 	int chipNumber;
+	Vec2<float>responePos;
+	Vec2<float>restartPos;
 private:
 	Vec2<float> leftUpPos;
 	Vec2<float> size;

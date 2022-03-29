@@ -103,8 +103,10 @@ class Game
 	int alphaValue;
 	int timer;
 	Vec2<float> responePos;
+	Vec2<float> restartPos;
 	int doorNumber;
 	int giveDoorNumber;
+	int doorArrayNumber;
 	int sceneChangeHandle;//シーン遷移用の画像
 	E_DOOR_DIR door;		//どの方向で出るか
 	bool initJumpFlag;

@@ -21,7 +21,7 @@
 #include"GUI.h"
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -47,7 +47,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -76,7 +76,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -133,7 +133,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR* DIR, const bool& ONLY_GET_DOOR_DIR)
+Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR, const bool &ONLY_GET_DOOR_DIR)
 {
 	Vec2<float> doorPos;
 	int roopCount = 0;
@@ -327,7 +327,7 @@ Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_N
 	return Vec2<float>(-1, -1);
 }
 
-Vec2<float> Game::GetDoorPos(const int& DOOR_NUMBER, const vector<vector<int>>& MAPCHIP_DATA)
+Vec2<float> Game::GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA)
 {
 	Vec2<float> door;
 	//次につながるドアを探す
@@ -345,7 +345,7 @@ Vec2<float> Game::GetDoorPos(const int& DOOR_NUMBER, const vector<vector<int>>& 
 	return door;
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -363,7 +363,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
@@ -554,6 +554,21 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 #pragma endregion
 		alphaValue = 0;
 	}
+	else
+	{
+		//シーン遷移後の初期化
+		for (int i = 0; i < doorBlocks.size(); ++i)
+		{
+			if (doorBlocks[i]->chipNumber == doorNumber)
+			{
+				responePos = doorBlocks[i]->responePos;
+				restartPos = doorBlocks[i]->restartPos;
+				player.Init(responePos);
+				ScrollMgr::Instance()->WarpScroll(responePos);
+				break;
+			}
+		}
+	}
 
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
 
@@ -738,6 +753,7 @@ void Game::Update()
 			if (hitFlag)
 			{
 				giveDoorNumber = doorBlocks[doorIndex]->chipNumber;
+				doorArrayNumber = doorIndex;
 			}
 
 			//プレイヤーの体を完全に隠すためのオフセット
@@ -800,6 +816,9 @@ void Game::Update()
 					Vec2<float>doorPos = GetDoorPos(doorNumber, tmpMapData);
 					//プレイヤーがリスポーンする座標を入手
 					responePos = GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), localRoomNum, doorNumber, doorPos, &door);
+
+
+					responePos = doorBlocks[doorArrayNumber]->responePos;
 
 					//リスポーンエラーなら転移しない
 					if (responePos.x != -1.0f && responePos.y != -1.0f)
@@ -876,7 +895,7 @@ void Game::Update()
 		{
 			if (!sceneChangeDeadFlag)
 			{
-				sceneChangingFlag = false;
+				//sceneChangingFlag = false;
 				switch (door)
 				{
 				case Game::DOOR_UP_GORIGHT:
@@ -935,7 +954,7 @@ void Game::Update()
 					break;
 
 				case Game::DOOR_LEFT:
-					if (responePos.x <= player.centerPos.x)
+					if (restartPos.x <= player.centerPos.x)
 					{
 						player.centerPos.x -= 5.0f;
 					}
@@ -946,7 +965,7 @@ void Game::Update()
 					break;
 
 				case Game::DOOR_RIGHT:
-					if (player.centerPos.x <= responePos.x)
+					if (player.centerPos.x <= restartPos.x)
 					{
 						player.centerPos.x += 5.0f;
 					}
@@ -976,6 +995,9 @@ void Game::Update()
 					//プレイヤーがリスポーンする座標を入手
 					responePos = GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), doorNumber, doorPos, &door);
 
+
+
+
 					//プレイヤーをリスポーンさせる
 					switch (door)
 					{
@@ -992,11 +1014,11 @@ void Game::Update()
 						break;
 
 					case Game::DOOR_LEFT:
-						player.Init(responePos);
+						player.Init(restartPos);
 						break;
 
 					case Game::DOOR_RIGHT:
-						player.Init(responePos);
+						player.Init(restartPos);
 						break;
 					case Game::DOOR_Z:
 						break;
@@ -1062,9 +1084,9 @@ void Game::Update()
 	if ((SelectStage::Instance()->GetRoomNum() != oldRoomNum || SelectStage::Instance()->GetStageNum() != oldStageNum) || SelectStage::Instance()->resetStageFlag)
 	{
 		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+		oldRoomNum = SelectStage::Instance()->GetRoomNum();
+		oldStageNum = SelectStage::Instance()->GetStageNum();
 	}
-	oldRoomNum = SelectStage::Instance()->GetRoomNum();
-	oldStageNum = SelectStage::Instance()->GetStageNum();
 
 	//イベントブロックとの判定
 	for (int i = 0; i < eventBlocks.size(); ++i)
@@ -1073,23 +1095,23 @@ void Game::Update()
 	}
 
 
-	//棘ブロックとの判定
-	for (int i = 0; i < thornBlocks.size(); ++i)
+	//遷移中ではない&&プレイヤーが死亡していな時に棘ブロックとの判定を取る
+	if (!player.isDead && !sceneBlackFlag && !sceneLightFlag)
 	{
-		bool hitFlag = false;
-		if (!player.isDead)
+		//棘ブロックとの判定
+		for (int i = 0; i < thornBlocks.size(); ++i)
 		{
-			hitFlag = thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
-		}
-
-		if (hitFlag)
-		{
-			player.isDead = true;
-			sceneBlackFlag = true;
-			sceneChangeDeadFlag = player.isDead;
-			break;
+			bool hitFlag = thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
+			if (hitFlag)
+			{
+				player.isDead = true;
+				sceneBlackFlag = true;
+				sceneChangeDeadFlag = player.isDead;
+				break;
+			}
 		}
 	}
+
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
 
