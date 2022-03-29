@@ -480,8 +480,8 @@ StageMgr::StageMgr()
 						//ãÛíÜè∞
 						if (Up == 0 && Down == 0 && left == 0 && right == 0 && now != 2)
 						{
-							MapChipDrawData tmp;
-							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN];
+							//MapChipDrawData tmp;
+							//tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN];
 							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 						}
 
@@ -953,7 +953,7 @@ StageMgr::StageMgr()
 						{
 							//ÉGÉâÅ[
 							MapChipDrawData tmp;
-							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_ERROR];
+							//tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_ERROR];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 						}
 

@@ -620,7 +620,7 @@ void Game::Init()
 
 void Game::Update()
 {
-	ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
+	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 
 
 
