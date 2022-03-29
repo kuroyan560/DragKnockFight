@@ -562,7 +562,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 			{
 				if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
 				{
-					player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
+					restartPos = Vec2<float>(x * 50.0f, y * 50.0f);
+					player.Init(restartPos);
 					responeFlag = true;
 					break;
 				}
@@ -579,7 +580,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 				{
 					if (mapData[y][x] == MAPCHIP_BLOCK_START)
 					{
-						player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
+						restartPos = Vec2<float>(x * 50.0f, y * 50.0f);
+						player.Init(restartPos);
 						break;
 					}
 				}
