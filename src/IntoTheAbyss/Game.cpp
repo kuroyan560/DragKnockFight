@@ -133,218 +133,6 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR, const bool &ONLY_GET_DOOR_DIR)
-{
-	Vec2<float> doorPos;
-	int roopCount = 0;
-	//扉の一番下の座標を探索する
-	for (int y = 0; 1; ++y)
-	{
-		Vec2<float> chipData = { DOOR_MAPCHIP_POS.x,DOOR_MAPCHIP_POS.y + y };
-		int chipNum = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, chipData);
-
-		//どんどん下を探索してドアじゃない場所に出たら、一個前が一番下の扉
-		if (chipNum != DOOR_NUMBER)
-		{
-			if (1 <= y)
-			{
-				doorPos = { DOOR_MAPCHIP_POS.x,(DOOR_MAPCHIP_POS.y + y) - 1 };
-			}
-			else
-			{
-				doorPos = { DOOR_MAPCHIP_POS.x,(DOOR_MAPCHIP_POS.y + y) };
-			}
-			break;
-		}
-		//無限ループに入ったらアサートする
-		++roopCount;
-		if (1000 <= roopCount)
-		{
-			assert(0);
-		}
-	}
-
-
-	//左右どちらかの扉から、もしくは奥扉からリスポーンさせる場合-----------------------
-	array<Vec2<float>, 2> checkWall;
-	checkWall[0] = { doorPos.x + 1,doorPos.y };
-	checkWall[1] = { doorPos.x - 1,doorPos.y };
-	int rightChip = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, checkWall[0]);
-	int leftChip = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, checkWall[1]);
-
-	//壁以外は空白として判定を出す
-	if (leftChip <= -2 || 9 <= leftChip)
-	{
-		leftChip = 0;
-	}
-	if (rightChip <= -2 || 9 <= rightChip)
-	{
-		rightChip = 0;
-	}
-
-
-	//右に壁がある場合
-	if ((rightChip == 1 && leftChip == 0) || (rightChip == -1 && leftChip == 0))
-	{
-		*DIR = DOOR_LEFT;
-		//左に2ブロック離れた所にリスポーンさせる
-		return Vec2<float>((doorPos.x - 2) * 50.0f, doorPos.y * 50.0f);
-	}
-	//左に壁がある場合
-	else if ((rightChip == 0 && leftChip == 1) || (rightChip == 0 && leftChip == -1))
-	{
-		*DIR = DOOR_RIGHT;
-		//右に2ブロック離れた所にリスポーンさせる
-		return Vec2<float>((doorPos.x + 2) * 50.0f, doorPos.y * 50.0f);
-	}
-	//左右どちらとも壁が無かった場合
-	else if (rightChip == 0 && leftChip == 0)
-	{
-		*DIR = DOOR_Z;
-		//扉座標にリスポーンさせる
-		return Vec2<float>(doorPos.x * 50.0f, doorPos.y * 50.0f);
-	}
-	//左右どちらかの扉から、もしくは奥扉からリスポーンさせる場合-----------------------
-
-
-	//上下どちらかの扉からリスポーンさせる場合-----------------------
-	//一番左と一番右の扉ブロックを探索する
-	vector<Vec2<float>>doorBlock;//ドアブロックの塊
-	Vec2<float> rightDoor, leftDoor;//一番端の扉座標を探索する
-
-	roopCount = 0;
-	//一番左の扉座標探索
-	for (int i = 0; 1; ++i)
-	{
-		Vec2<float> chipData = { DOOR_MAPCHIP_POS.x - i,DOOR_MAPCHIP_POS.y };
-		int chipNum = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, chipData);
-		if (chipNum != DOOR_NUMBER)
-		{
-			leftDoor = { DOOR_MAPCHIP_POS.x - i + 1,DOOR_MAPCHIP_POS.y };
-			break;
-		}
-
-		//無限ループに入ったらアサートする
-		++roopCount;
-		if (1000 <= roopCount)
-		{
-			assert(0);
-		}
-	}
-
-	roopCount = 0;
-	//一番右の扉座標探索
-	for (int i = 0; 1; ++i)
-	{
-		Vec2<float> chipData = { DOOR_MAPCHIP_POS.x + i,DOOR_MAPCHIP_POS.y };
-		int chipNum = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, chipData);
-		if (chipNum != DOOR_NUMBER)
-		{
-			rightDoor = { DOOR_MAPCHIP_POS.x + i - 1,DOOR_MAPCHIP_POS.y };
-			break;
-		}
-
-		//無限ループに入ったらアサートする
-		++roopCount;
-		if (1000 <= roopCount)
-		{
-			assert(0);
-		}
-	}
-
-	checkWall[0] = { rightDoor.x + 1,rightDoor.y };
-	checkWall[1] = { leftDoor.x - 1,leftDoor.y };
-	rightChip = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, checkWall[0]);
-	leftChip = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, checkWall[1]);
-
-	//上下の壁を調べる
-	array<Vec2<float>, 2> checkTopWall;
-	checkTopWall[0] = { rightDoor.x,rightDoor.y - 1 };
-	checkTopWall[1] = { rightDoor.x,rightDoor.y + 1 };
-	int topWall = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, checkTopWall[0]);
-	int downWall = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, checkTopWall[1]);
-
-
-	//両方とも壁があり、上に空間があるなら
-	if (rightChip != 0 && leftChip != 0 && topWall == 0)
-	{
-		//壁が無い方にリスポーンさせる
-		Vec2<float> check(leftDoor.x - 2, leftDoor.y - 1);
-		Vec2<float> check2(rightDoor.x + 2, rightDoor.y - 1);
-
-		int num = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, check);
-		int num2 = StageMgr::Instance()->GetMapChipBlock(STAGE_NUMBER, ROOM_NUMBER, check2);
-
-
-		//左に行くか右に行くかで変わる
-		//bool leftHaveSpaceFlag = num == 0 && 1 == 1;
-		//bool rightHaveSpaceFlag = num2 == 0 && 1 == 1;
-
-		////どっちかがfalseなら反対側をtrueにする
-		//if (!leftHaveSpaceFlag)
-		//{
-		//	rightHaveSpaceFlag = true;
-		//}
-		//if (!rightHaveSpaceFlag)
-		//{
-		//	leftHaveSpaceFlag = true;
-		//}
-
-
-
-		//左に壁があった場合、右の壁にリスポーンさせる。
-		if (num2 == 0)
-		{
-			*DIR = DOOR_UP_GORIGHT;
-			return Vec2<float>(rightDoor.x * 50.0f, rightDoor.y * 50.0f);
-		}
-		else
-		{
-			*DIR = DOOR_UP_GOLEFT;
-			return Vec2<float>(leftDoor.x * 50.0f, leftDoor.y * 50.0f);
-		}
-	}
-	//両方とも壁があり、下に空間があるなら
-	else if (rightChip != 0 && leftChip != 0 && downWall == 0)
-	{
-		*DIR = DOOR_DOWN;
-		//中心座標にリスポーンさせる	(左右のドアの距離の半分を左ドアチップから足す)
-		Vec2<float>centralPos(leftDoor + (Vec2<float>(rightDoor - leftDoor) / 2.0f));
-		centralPos *= Vec2<float>(50.0f, 50.0f);
-
-		return centralPos;
-	}
-	//上下どちらかの扉からリスポーンさせる場合-----------------------
-
-	if (!ONLY_GET_DOOR_DIR)
-	{
-		string result = "次につながるドアが見つかりません。\nRalationファイルを確認するか、担当の大石に連絡をください。";
-		MessageBox(NULL, KuroFunc::GetWideStrFromStr(result).c_str(), TEXT("ドアが見つかりません"), MB_OK);
-	}
-
-	//失敗
-	*DIR = DOOR_NONE;
-	return Vec2<float>(-1, -1);
-}
-
-Vec2<float> Game::GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA)
-{
-	Vec2<float> door;
-	//次につながるドアを探す
-	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
-	{
-		for (int x = 0; x < MAPCHIP_DATA[y].size(); ++x)
-		{
-			if (MAPCHIP_DATA[y][x] == DOOR_NUMBER)
-			{
-				door = { (float)x,(float)y };
-				break;
-			}
-		}
-	}
-	return door;
-}
-
 const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
@@ -885,6 +673,7 @@ void Game::Update()
 	//明転中
 	if (sceneLightFlag)
 	{
+		player.drawCursorFlag = false;
 		alphaValue -= 10;
 		bool goFlag = false;
 
@@ -1014,6 +803,7 @@ void Game::Update()
 		alphaValue = 0;
 		timer = 0;
 		sceneChangingFlag = false;
+		player.drawCursorFlag = true;
 	}
 	//シーン遷移-----------------------
 #pragma endregion
@@ -1112,7 +902,7 @@ void Game::Update()
 
 			if (noMovementEnemy[index].isActive) continue;
 
-			noMovementEnemy[index].Generate(ENEMY_NOMOVEMENT, mapData);
+			//noMovementEnemy[index].Generate(ENEMY_NOMOVEMENT, mapData);
 
 			break;
 
