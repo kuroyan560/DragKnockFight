@@ -40,8 +40,6 @@ class Game
 {
 	std::vector<std::unique_ptr<MassChipData>> AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM);
 	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum);
-	Vec2<float> GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR* DIR, const bool& ONLY_GET_DOOR_DIR = false);
-	Vec2<float> GetDoorPos(const int& DOOR_NUMBER, const vector<vector<int>>& MAPCHIP_DATA);
 	const int& GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS);
 
 

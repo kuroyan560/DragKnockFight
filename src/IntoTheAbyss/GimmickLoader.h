@@ -26,7 +26,7 @@ struct ThownpeData
 	Vec2<float> size;			//画像の大きさ
 	E_GIMMICK type;		//ギミックの種類
 
-	ThownpeData(const Vec2<float>& SIZE = Vec2<float>(-1.0f, -1.0f), const E_GIMMICK& TYPE = GIMMICK_NONE) :size(SIZE), type(TYPE), startPos(Vec2<float>(0.0f, 0.0f)), endPos(Vec2<float>(0.0f, 0.0f))
+	ThownpeData(const Vec2<float> &SIZE = Vec2<float>(-1.0f, -1.0f), const E_GIMMICK &TYPE = GIMMICK_NONE) :size(SIZE), type(TYPE), startPos(Vec2<float>(-1.0f, -1.0f)), endPos(Vec2<float>(-1.0f, -1.0f))
 	{
 	};
 };
@@ -34,7 +34,7 @@ struct ThownpeData
 struct BubbleData
 {
 	Vec2<float> pos;	//生成座標
-	BubbleData(const Vec2<float>& POS = Vec2<float>(-1.0f, -1.0f)) :pos(POS)
+	BubbleData(const Vec2<float> &POS = Vec2<float>(-1.0f, -1.0f)) :pos(POS)
 	{
 	};
 };
@@ -51,18 +51,20 @@ class GimmickLoader :public Singleton<GimmickLoader>
 {
 public:
 	GimmickLoader();
-	void LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const std::string& FILE_PASS);
-	void LoadData(const std::string& FILE_PASS);
+	void LoadData(const int &STAGE_NUM, const int &ROOM_NUM, const std::string &FILE_PASS);
+	void LoadData(const std::string &FILE_PASS);
 
-	std::vector< std::shared_ptr<ThownpeData>> GetThowpeData(const int& STAGE_NUM, const int& ROOM_NUM);
-	std::vector< std::shared_ptr<BubbleData>> GetBubbleData(const int& STAGE_NUM, const int& ROOM_NUM);
+	std::vector< std::shared_ptr<ThownpeData>> GetThowpeData(const int &STAGE_NUM, const int &ROOM_NUM);
+	std::vector< std::shared_ptr<BubbleData>> GetBubbleData(const int &STAGE_NUM, const int &ROOM_NUM);
 
 
-	void SetThwompStartPos(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS);
-	void SetThwompEndPos(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS);
-	void PushBubbleData(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS);
+	void SetThwompStartPos(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS);
+	void SetThwompEndPos(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS);
+	void PushBubbleData(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS);
 
 	const bool &CanLoadData(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER);
+
+	void ErrorCheck();
 
 	std::shared_ptr<ThownData> thownData;
 private:
@@ -106,6 +108,14 @@ private:
 
 	GimmickName CheckName(const std::string &KEY_NAME, std::istringstream *LINE_STREAM);
 
-	void LoadThowmpeData(const std::string& KEY, std::istringstream* LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA);
-	void LoadThownData(const std::string& KEY, std::istringstream* LINE_STREAM, std::shared_ptr<ThownData> THOWN_DATA);
+	void LoadThowmpeData(const std::string &KEY, std::istringstream *LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA);
+	void LoadThownData(const std::string &KEY, std::istringstream *LINE_STREAM, std::shared_ptr<ThownData> THOWN_DATA);
+
+	void AddErrorStirng(const int &STAGE_NUM, const int ROOM_NUM, const std::string &NAME);
+
+	//エラー文表示
+	std::vector<std::vector<std::vector<std::string>>> errorStrings;
+	std::vector<int>errorCountData;
+	int oldStageNum;
+	int oldRoomNum;
 };

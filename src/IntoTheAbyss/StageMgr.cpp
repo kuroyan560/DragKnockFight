@@ -965,6 +965,8 @@ StageMgr::StageMgr()
 	//•”‰®‚²‚Æ‚Ì•`‰æî•ñ‚ðŠi”[‚·‚é-----------------------
 
 
+	GimmickLoader::Instance()->ErrorCheck();
+
 
 
 	bool debug = false;
