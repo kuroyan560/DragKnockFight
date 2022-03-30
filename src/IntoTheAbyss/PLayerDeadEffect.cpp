@@ -3,7 +3,9 @@
 #include "DrawFunc.h"
 #include "WinApp.h"
 #include "ShakeMgr.h"
+#include "ScrollMgr.h"
 #include "ParticleMgr.h"
+#include "KuroMath.h"
 
 PlayerDeadEffect::PlayerDeadEffect()
 {
@@ -17,6 +19,12 @@ PlayerDeadEffect::PlayerDeadEffect()
 	isActive = false;
 	isExitPlayer = false;
 
+	for (int index = 0; index < PARTICLE_COUNT; ++index) {
+
+		deadParticle[index].Init();
+
+	}
+
 }
 
 void PlayerDeadEffect::Init()
@@ -26,9 +34,16 @@ void PlayerDeadEffect::Init()
 	playerTurnWhiteTimer = 0;
 	playerExitDelayTimer = 0;
 	particleStopTimer = 0;
+	blackOutDelayTimer = 0;
 	blackOutTimer = 0;
 	slowTimer = 0;
 	isActive = false;
+
+	for (int index = 0; index < PARTICLE_COUNT; ++index) {
+
+		deadParticle[index].Init();
+
+	}
 
 }
 
@@ -40,10 +55,17 @@ void PlayerDeadEffect::Activate(Vec2<float>& playerPos)
 	playerTurnWhiteTimer = 0;
 	playerExitDelayTimer = 0;
 	particleStopTimer = 0;
+	blackOutDelayTimer = 0;
 	blackOutTimer = 0;
 	slowTimer = 0;
 	isActive = true;
 	isExitPlayer = false;
+
+	for (int index = 0; index < PARTICLE_COUNT; ++index) {
+
+		deadParticle[index].Init();
+
+	}
 
 }
 
@@ -53,7 +75,12 @@ void PlayerDeadEffect::Update()
 	/*===== 更新処理 =====*/
 
 	// 有効化されていなかったら処理を飛ばす。
-	if (!isActive) return;
+	if (!isActive) {
+
+		isInitStage = false;
+		return;
+
+	}
 
 
 	/*-- SLOWタイマーを更新 --*/
@@ -94,6 +121,12 @@ void PlayerDeadEffect::Update()
 
 			ShakeMgr::Instance()->maxShakeAmount = 20.0f;
 
+
+			deadParticle[0].Generate(playerPos, Vec2<float>(1, -1));
+			deadParticle[1].Generate(playerPos, Vec2<float>(-1, -1));
+			deadParticle[2].Generate(playerPos, Vec2<float>(1, 1));
+			deadParticle[3].Generate(playerPos, Vec2<float>(-1, 1));
+
 		}
 
 	}
@@ -110,7 +143,20 @@ void PlayerDeadEffect::Update()
 		}
 
 		// 割合を計算
-		particleSpeedPar = 1.0f - ((float)particleStopTimer / PARTICLE_STOP_TIMER);
+		particleSpeedPar = (float)particleStopTimer / PARTICLE_STOP_TIMER;
+
+	}
+
+
+	/*-- パーティクルが止まってから暗転するまでの遅延のタイマー --*/
+	{
+
+		// 「タイマーが規定値に達していない」、「パーティクルが止まるまでのタイマーが規定値に達している」
+		if (blackOutDelayTimer < BLACK_OUT_DELAY_TIMER && PARTICLE_STOP_TIMER <= particleStopTimer) {
+
+			++blackOutDelayTimer;
+
+		}
 
 	}
 
@@ -118,10 +164,22 @@ void PlayerDeadEffect::Update()
 	/*-- 暗転タイマーを更新 --*/
 	{
 
-		// 「タイマーが規定値に達していない」、「パーティクルが完全に止まるまでのタイマーが規定値に達している」
-		if (blackOutTimer < BLACK_OUT_TIMER && PARTICLE_STOP_TIMER <= particleStopTimer) {
+		// 「タイマーが規定値に達していない」、「パーティクルが止まってから暗転するまでの遅延タイマーが規定値に達している」
+		if (blackOutTimer < BLACK_OUT_TIMER && BLACK_OUT_DELAY_TIMER <= blackOutDelayTimer) {
 
 			++blackOutTimer;
+
+			// タイマーが半分以上だったら
+			if (BLACK_OUT_TIMER / 2.0f <= blackOutTimer) {
+
+				// パーティクルを初期化
+				for (int index = 0; index < PARTICLE_COUNT; ++index) {
+
+					deadParticle[index].Init();
+
+				}
+
+			}
 
 		}
 
@@ -134,6 +192,18 @@ void PlayerDeadEffect::Update()
 			SlowMgr::Instance()->playerDeadSlow = 1.0f;
 
 		}
+
+	}
+
+
+	/*-- パーティクルの更新処理 --*/
+
+	for (int index = 0; index < PARTICLE_COUNT; ++index) {
+
+		// 生成していなかったら処理を飛ばす。
+		if (!deadParticle[index].isActive) continue;
+
+		deadParticle[index].Update();
 
 	}
 
@@ -151,7 +221,14 @@ void PlayerDeadEffect::Draw()
 	if (PLAYER_EXIT_TIMER <= playerExitDelayTimer)
 	{
 
+		for (int index = 0; index < PARTICLE_COUNT; ++index) {
 
+			// 生成していなかったら処理を飛ばす。
+			if (!deadParticle[index].isActive) continue;
+
+			deadParticle[index].Draw();
+
+		}
 
 	}
 
@@ -161,9 +238,9 @@ void PlayerDeadEffect::Draw()
 		Color cal = {};
 
 		// タイマーが半分以下だったら
-		if (blackOutTimer < BLACK_OUT_TIMER / 2.0f) {
+		if (blackOutTimer < BLACK_OUT_TIMER / 3.0f) {
 
-			float par = ((float)blackOutTimer / (BLACK_OUT_TIMER / 2.0f));
+			float par = ((float)blackOutTimer / (BLACK_OUT_TIMER / 3.0f));
 
 			cal.SetColor({ 0, 0, 0, (int)(par * 255.0f) });
 
@@ -171,15 +248,28 @@ void PlayerDeadEffect::Draw()
 			DrawFunc::DrawBox2D({ 0,0 }, windowSize, cal, DXGI_FORMAT_R8G8B8A8_UNORM, true, AlphaBlendMode_Trans);
 
 		}
+		// タイマーが3/2以上だったら
+		else if (blackOutTimer < BLACK_OUT_TIMER / 3.0f * 2.0f) {
+
+			Vec2<float> windowSize = { 1280,740 };
+			cal.SetColor({ 0, 0, 0, 255 });
+			DrawFunc::DrawBox2D({ 0,0 }, windowSize, cal, DXGI_FORMAT_R8G8B8A8_UNORM, true, AlphaBlendMode_Trans);
+			isInitStage = true;
+
+		}
 		// タイマーが半分以上だったら
 		else {
 
-			float par = 1.0f - ((blackOutTimer / 2.0f) / (BLACK_OUT_TIMER / 2.0f));
+			float blackOutTimerBuff = blackOutTimer - BLACK_OUT_TIMER / 3.0f * 2.0f;
+
+			float par = 1.0f - (blackOutTimerBuff / (BLACK_OUT_TIMER / 3.0f));
 
 			cal.SetColor({ 0, 0, 0, (int)(par * 255.0f) });
 
 			Vec2<float> windowSize = { 1280,740 };
 			DrawFunc::DrawBox2D({ 0,0 }, windowSize, cal, DXGI_FORMAT_R8G8B8A8_UNORM, true, AlphaBlendMode_Trans);
+
+			isInitStage = false;
 
 		}
 
@@ -197,7 +287,20 @@ PlayerDeadParticle::PlayerDeadParticle()
 	pos = {};
 	this->fowardVec = {};
 	radius = DEF_RADIUS;
-	speed = MAX_SPEED;
+	length = 0;
+	isActive = false;
+
+}
+
+void PlayerDeadParticle::Init()
+{
+
+	/*===== 初期化処理 =====*/
+
+	pos = {};
+	this->fowardVec = {};
+	radius = DEF_RADIUS;
+	length = 0;
 	isActive = false;
 
 }
@@ -210,7 +313,8 @@ void PlayerDeadParticle::Generate(const Vec2<float>& generatePos, const Vec2<flo
 	pos = generatePos;
 	this->fowardVec = forwardVec;
 	radius = DEF_RADIUS;
-	speed = MAX_SPEED;
+	length = 0;
+	angle = atan2(forwardVec.y, forwardVec.x);
 	isActive = true;
 
 }
@@ -220,11 +324,29 @@ void PlayerDeadParticle::Update()
 
 	/*===== 更新処理 =====*/
 
+	float par = PlayerDeadEffect::Instance()->particleSpeedPar;
+
+	par = KuroMath::Ease(Out, Sine, par, 0.0f, 1.0f);
+
 	// 移動させる。
-	
+	length = MAX_SPEED * par;
+
+	// 回転させる。
+	angle += 0.15f;
 
 }
 
 void PlayerDeadParticle::Draw()
 {
+
+	/*===== 描画処理 =====*/
+
+	Vec2<float> offsetPos = ScrollMgr::Instance()->scrollAmount;
+	offsetPos += ShakeMgr::Instance()->shakeAmount;
+
+	Vec2<float> anglePos = Vec2<float>(cosf(angle) * length, sinf(angle) * length);
+
+	// パーティクルの描画
+	DrawFunc::DrawCircle2D(pos + anglePos - offsetPos, radius, Color(255, 255, 255, 255), true);
+
 }

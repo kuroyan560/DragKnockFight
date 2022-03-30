@@ -1102,7 +1102,7 @@ void Game::Update()
 
 	//ステージ毎の切り替え判定
 	//部屋の初期化
-	if ((roomNum != oldRoomNum || stageNum != oldStageNum) || SelectStage::Instance()->resetStageFlag)
+	if ((roomNum != oldRoomNum || stageNum != oldStageNum) || SelectStage::Instance()->resetStageFlag || PlayerDeadEffect::Instance()->isInitStage)
 	{
 		giveDoorNumber = 0;
 		initDeadFlag = false;
@@ -1199,7 +1199,7 @@ void Game::Update()
 		}
 
 		bool deadFlag = false;
-		if (player.isDead)
+		if (player.isDead || PlayerDeadEffect::Instance()->isInitStage)
 		{
 			deadFlag = true;
 		}
@@ -1248,6 +1248,7 @@ void Game::Update()
 			ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
 			ScrollMgr::Instance()->AlimentScrollAmount();
 			ScrollMgr::Instance()->Restart();
+			player.isDead = false;
 		}
 		SelectStage::Instance()->resetStageFlag = false;
 	}

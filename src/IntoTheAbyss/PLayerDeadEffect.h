@@ -1,6 +1,7 @@
 #pragma once
 #include "Vec.h"
 #include "Singleton.h"
+#include <array>
 
 // 死亡時のエフェクトパーティクル
 class PlayerDeadParticle {
@@ -11,8 +12,9 @@ public:
 
 	Vec2<float> pos;
 	Vec2<float> fowardVec;
+	float angle;
 	float radius;
-	float speed;
+	float length;
 	bool isActive;
 
 
@@ -20,8 +22,8 @@ public:
 
 	/*===== 定数 =====*/
 
-	const float MAX_SPEED = 10.0f;
-	const float DEF_RADIUS = 10.0f;
+	const float MAX_SPEED = 100.0f;
+	const float DEF_RADIUS = 15.0f;
 
 
 public:
@@ -30,6 +32,9 @@ public:
 
 	// コンストラクタ
 	PlayerDeadParticle();
+
+	// 初期化処理
+	void Init();
 
 	// 生成処理
 	void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec);
@@ -60,11 +65,17 @@ public:
 	int particleStopTimer;		// パーティクルが止まるまでのタイマー
 	float particleSpeedPar;		// パーティクルの移動速度の割合
 
+	int blackOutDelayTimer;		// 暗転するまでの遅延のタイマー
+
 	int blackOutTimer;			// 暗転するタイマー
+	bool isInitStage;			// ステージを初期化するフラグ
 
 	int slowTimer;				// 上のタイマー4つをあわせた、完全に回りが止まるまでのタイマー
 
 	bool isActive;				// 死亡エフェクトが有効化されているか
+
+	static const int PARTICLE_COUNT = 4;
+	std::array<PlayerDeadParticle, PARTICLE_COUNT> deadParticle;
 
 
 public:
@@ -72,8 +83,9 @@ public:
 	/*===== 定数 =====*/
 
 	const int PLAYER_TURN_WHITE_TIMER = 60;		// プレイヤーが白くなるまでのタイマー
-	const int PLAYER_EXIT_TIMER = 60;			// 完全に白くなったプレイヤーが消えるまでのタイマー
-	const int PARTICLE_STOP_TIMER = 60;			// パーティクルが止まるまでのタイマー
+	const int PLAYER_EXIT_TIMER = 30;			// 完全に白くなったプレイヤーが消えるまでのタイマー
+	const int PARTICLE_STOP_TIMER = 10;			// パーティクルが止まるまでのタイマー
+	const int BLACK_OUT_DELAY_TIMER = 30;		// 暗転するまでの遅延のタイマー
 	const int BLACK_OUT_TIMER = 60;				// 暗転時間
 	const int SLOW_TIMER = PLAYER_TURN_WHITE_TIMER + PLAYER_EXIT_TIMER + PARTICLE_STOP_TIMER;	// 周りが完全に止まるまでのタイマー
 
