@@ -19,6 +19,7 @@
 #include "ParticleMgr.h"
 #include "EventCollider.h"
 #include"DebugParameter.h"
+#include"GUI.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -173,6 +174,8 @@ void Player::Update(const vector<vector<int>> mapData)
 	// 連射タイマーを更新
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;
 	if (rapidFireTimerRight > 0) --rapidFireTimerRight;
+	GUI::Instance()->SetSpearTimeRate(1.0f - (float)lHand->pikeCooltime / lHand->PIKE_COOL_TIME);
+	GUI::Instance()->SetSpearTeleRate(1.0f - (float)rHand->pikeCooltime / rHand->PIKE_COOL_TIME);
 
 	// 腕を更新
 	lHand->Update(centerPos + anim.GetHandOffsetLeft());
