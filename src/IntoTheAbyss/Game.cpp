@@ -21,7 +21,7 @@
 #include"GUI.h"
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -47,7 +47,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -76,7 +76,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -133,7 +133,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR* DIR, const bool& ONLY_GET_DOOR_DIR)
+Vec2<float> Game::GetPlayerResponePos(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR *DIR, const bool &ONLY_GET_DOOR_DIR)
 {
 	Vec2<float> doorPos;
 	int roopCount = 0;
@@ -327,7 +327,7 @@ Vec2<float> Game::GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_N
 	return Vec2<float>(-1, -1);
 }
 
-Vec2<float> Game::GetDoorPos(const int& DOOR_NUMBER, const vector<vector<int>>& MAPCHIP_DATA)
+Vec2<float> Game::GetDoorPos(const int &DOOR_NUMBER, const vector<vector<int>> &MAPCHIP_DATA)
 {
 	Vec2<float> door;
 	//次につながるドアを探す
@@ -345,7 +345,7 @@ Vec2<float> Game::GetDoorPos(const int& DOOR_NUMBER, const vector<vector<int>>& 
 	return door;
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -363,13 +363,56 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
 
+
+	//ドアが繋がっているか確認
+	if (!SelectStage::Instance()->resetStageFlag)
+	{
+		RoomMapChipArray tmpMap = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
+		std::vector<std::unique_ptr<DoorBlock>> tmpDoor;
+		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
+		for (int doorIndex = chipMemorySize.min; doorIndex < chipMemorySize.max; ++doorIndex)
+		{
+			std::vector<std::unique_ptr<MassChipData>> data = AddData(tmpMap, doorIndex);
+			for (int i = 0; i < data.size(); ++i)
+			{
+				tmpDoor.push_back(std::make_unique<DoorBlock>());
+				int doorBlocksArrayNum = tmpDoor.size() - 1;
+				tmpDoor[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex, data[i]->sideOrUpDownFlag);
+			}
+		}
+
+		bool responeErrorFlag = true;
+		for (int tmpDoorIndex = 0; tmpDoorIndex < tmpDoor.size(); ++tmpDoorIndex)
+		{
+			if (tmpDoor[tmpDoorIndex]->chipNumber == doorNumber)
+			{
+				responeErrorFlag = false;
+			}
+		}
+
+		if (responeErrorFlag)
+		{
+			string result = "次につながるドアが見つかりません。\nRalationファイルを確認するか、担当の大石に連絡をください。";
+			MessageBox(NULL, KuroFunc::GetWideStrFromStr(result).c_str(), TEXT("ドアが見つかりません"), MB_OK);
+			stageNum = oldStageNum;
+			roomNum = oldRoomNum;
+			SelectStage::Instance()->SelectStageNum(oldStageNum);
+			SelectStage::Instance()->SelectRoomNum(oldRoomNum);
+			sceneLightFlag = false;
+		}
+	}
+
+
 	mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+
+
+
 
 	// シェイク量を設定。
 	ShakeMgr::Instance()->Init();
@@ -406,7 +449,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 			{
 				doorBlocks.push_back(std::make_unique<DoorBlock>());
 				int doorBlocksArrayNum = doorBlocks.size() - 1;
-				doorBlocks[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex);
+				doorBlocks[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex, data[i]->sideOrUpDownFlag);
 			}
 		}
 	}
@@ -494,9 +537,11 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 #pragma endregion
 
 	initDeadFlag = false;
-	giveDoorNumber = 0;
+	//giveDoorNumber = 0;
 	debugStageData[0] = stageNum;
 	debugStageData[1] = roomNum;
+
+
 
 	//ドア遷移はプレイヤーを初期化しない
 	if (!sceneLightFlag)
@@ -517,8 +562,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 			{
 				if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
 				{
-					player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
-					ScrollMgr::Instance()->WarpScroll(player.centerPos);
+					restartPos = Vec2<float>(x * 50.0f, y * 50.0f);
+					player.Init(restartPos);
 					responeFlag = true;
 					break;
 				}
@@ -535,15 +580,16 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 				{
 					if (mapData[y][x] == MAPCHIP_BLOCK_START)
 					{
-						player.Init(Vec2<float>(x * 50.0f, y * 50.0f));
-						ScrollMgr::Instance()->WarpScroll(player.centerPos);
+						restartPos = Vec2<float>(x * 50.0f, y * 50.0f);
+						player.Init(restartPos);
 						break;
 					}
 				}
 			}
 		}
 
-
+		ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
+		ScrollMgr::Instance()->WarpScroll(player.centerPos);
 
 		if (deadFlag)
 		{
@@ -554,13 +600,30 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 #pragma endregion
 		alphaValue = 0;
 	}
+	else
+	{
+		//シーン遷移後の初期化
+		for (int i = 0; i < doorBlocks.size(); ++i)
+		{
+			if (doorBlocks[i]->chipNumber == doorNumber)
+			{
+				responePos = doorBlocks[i]->responePos;
+				restartPos = doorBlocks[i]->restartPos;
+				player.Init(responePos);
+				ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
+				ScrollMgr::Instance()->WarpScroll(responePos);
+				door = doorBlocks[i]->doorDir;
+				break;
+			}
+		}
+	}
 
 	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
 
 	sceneBlackFlag = false;
 	//sceneLightFlag = false;
 	SelectStage::Instance()->resetStageFlag = false;
-
+	restartTimer = 0.0f;
 }
 
 Game::Game()
@@ -620,13 +683,13 @@ void Game::Init()
 
 void Game::Update()
 {
-	ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
+	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 
 
 
 #pragma region ステージの切り替え
-	bool enableToSelectStageFlag = 0 < debugStageData[0];
-	bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
+	const bool enableToSelectStageFlag = 0 < debugStageData[0];
+	const bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//マップの切り替え
 	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectStageFlag2 && nowSelectNum == 0)
 	const bool up = UsersInput::Instance()->OnTrigger(DIK_UP) || UsersInput::Instance()->OnTrigger(DPAD_UP);
@@ -645,8 +708,8 @@ void Game::Update()
 	}
 
 
-	bool enableToSelectRoomFlag = 0 < debugStageData[1];
-	bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
+	const bool enableToSelectRoomFlag = 0 < debugStageData[1];
+	const bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
 	//部屋の切り替え
 	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectRoomFlag2 && nowSelectNum == 1)
 	if (up && enableToSelectRoomFlag2 && nowSelectNum == 1)
@@ -677,22 +740,23 @@ void Game::Update()
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
 		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
-		mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
+		SelectStage::Instance()->resetStageFlag = true;
+		//mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
 
-		Vec2<float> door;
-		//デバック用のマップチップ番号からスタートする
-		for (int y = 0; y < mapData.size(); ++y)
-		{
-			for (int x = 0; x < mapData[y].size(); ++x)
-			{
-				if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
-				{
-					door = { (float)x,(float)y };
-				}
-			}
-		}
-		player.Init(door * Vec2<float>(50.0f, 50.0f));
-		ScrollMgr::Instance()->WarpScroll(player.centerPos);
+		//Vec2<float> door;
+		////デバック用のマップチップ番号からスタートする
+		//for (int y = 0; y < mapData.size(); ++y)
+		//{
+		//	for (int x = 0; x < mapData[y].size(); ++x)
+		//	{
+		//		if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
+		//		{
+		//			door = { (float)x,(float)y };
+		//		}
+		//	}
+		//}
+		//player.Init(door * Vec2<float>(50.0f, 50.0f));
+		//ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
 
@@ -738,6 +802,7 @@ void Game::Update()
 			if (hitFlag)
 			{
 				giveDoorNumber = doorBlocks[doorIndex]->chipNumber;
+				doorArrayNumber = doorIndex;
 			}
 
 			//プレイヤーの体を完全に隠すためのオフセット
@@ -796,58 +861,10 @@ void Game::Update()
 					int localRoomNum = StageMgr::Instance()->GetRelationData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), doorNumber - chipMemorySize.min);
 
 					RoomMapChipArray tmpMapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), localRoomNum);
-					//ドア座標を入手
-					Vec2<float>doorPos = GetDoorPos(doorNumber, tmpMapData);
-					//プレイヤーがリスポーンする座標を入手
-					responePos = GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), localRoomNum, doorNumber, doorPos, &door);
 
-					//リスポーンエラーなら転移しない
-					if (responePos.x != -1.0f && responePos.y != -1.0f)
-					{
-						SelectStage::Instance()->SelectRoomNum(localRoomNum);
-
-						sceneChangingFlag = true;
-						//画面外から登場させる
-						switch (door)
-						{
-						case Game::DOOR_UP_GORIGHT:
-							ScrollMgr::Instance()->WarpScroll(responePos);
-							initJumpFlag = false;
-							player.Init({ responePos.x + 50.0f , responePos.y - 50.0f * 2.0f });
-							break;
-
-						case Game::DOOR_UP_GOLEFT:
-							ScrollMgr::Instance()->WarpScroll(responePos);
-							initJumpFlag = false;
-							player.Init({ responePos.x + 50.0f , responePos.y - 50.0f * 2.0f });
-							break;
-
-						case Game::DOOR_DOWN:
-							player.Init({ responePos.x, responePos.y - 50.0f * 2.0f });
-							ScrollMgr::Instance()->WarpScroll(player.centerPos);
-							break;
-
-						case Game::DOOR_LEFT:
-							ScrollMgr::Instance()->WarpScroll(responePos);
-							player.Init({ responePos.x + 50.0f * 3.0f, responePos.y });
-							break;
-
-						case Game::DOOR_RIGHT:
-							ScrollMgr::Instance()->WarpScroll(responePos);
-							player.Init({ responePos.x - 50.0f * 3.0f, responePos.y });
-							break;
-
-						case Game::DOOR_Z:
-							break;
-
-						default:
-							break;
-						}
-					}
-					else
-					{
-						responeErrorFlag = true;
-					}
+					SelectStage::Instance()->SelectRoomNum(localRoomNum);
+					sceneChangingFlag = true;
+					initJumpFlag = false;
 				}
 
 				if (!responeErrorFlag)
@@ -876,23 +893,18 @@ void Game::Update()
 		{
 			if (!sceneChangeDeadFlag)
 			{
-				sceneChangingFlag = false;
+				//sceneChangingFlag = false;
 				switch (door)
 				{
-				case Game::DOOR_UP_GORIGHT:
+				case DOOR_UP_GORIGHT:
 					//ジャンプする
 					if (!initJumpFlag)
 					{
 						gravity = 1.0f;
 						initJumpFlag = true;
 					}
-					player.centerPos.y -= 15.0f * gravity;
+					player.centerPos.y += -15.0f * gravity;
 					gravity -= 0.1f;
-
-					if (gravity <= 0.0f)
-					{
-						gravity = 0.0f;
-					}
 
 					if (!player.onGround)
 					{
@@ -905,37 +917,17 @@ void Game::Update()
 					break;
 
 
-				case Game::DOOR_UP_GOLEFT:
+				case DOOR_UP_GOLEFT:
 					//ジャンプする
 					if (!initJumpFlag)
 					{
 						gravity = 1.0f;
 						initJumpFlag = true;
 					}
-					player.centerPos.y -= 15.0f * gravity;
+					player.centerPos.y += -15.0f * gravity;
 					gravity -= 0.1f;
 
-					if (gravity <= 0.0f)
-					{
-						gravity = 0.0f;
-					}
-
 					if (!player.onGround)
-					{
-						player.centerPos.x -= 6.0f;
-					}
-					else
-					{
-						goFlag = true;
-					}
-					break;
-
-				case Game::DOOR_DOWN:
-					goFlag = true;
-					break;
-
-				case Game::DOOR_LEFT:
-					if (responePos.x <= player.centerPos.x)
 					{
 						player.centerPos.x -= 5.0f;
 					}
@@ -945,8 +937,23 @@ void Game::Update()
 					}
 					break;
 
-				case Game::DOOR_RIGHT:
-					if (player.centerPos.x <= responePos.x)
+				case DOOR_DOWN:
+					goFlag = true;
+					break;
+
+				case DOOR_LEFT:
+					if (restartPos.x <= player.centerPos.x)
+					{
+						player.centerPos.x -= 5.0f;
+					}
+					else
+					{
+						goFlag = true;
+					}
+					break;
+
+				case DOOR_RIGHT:
+					if (player.centerPos.x <= restartPos.x)
 					{
 						player.centerPos.x += 5.0f;
 					}
@@ -956,7 +963,7 @@ void Game::Update()
 					}
 					break;
 
-				case Game::DOOR_Z:
+				case DOOR_Z:
 					break;
 				default:
 					break;
@@ -971,41 +978,7 @@ void Game::Update()
 			{
 				if (!initDeadFlag)
 				{
-					//ドア座標を入手
-					Vec2<float>doorPos(GetDoorPos(doorNumber, mapData));
-					//プレイヤーがリスポーンする座標を入手
-					responePos = GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), doorNumber, doorPos, &door);
-
-					//プレイヤーをリスポーンさせる
-					switch (door)
-					{
-					case Game::DOOR_UP_GORIGHT:
-						player.Init({ responePos.x + 50.0f * 2,responePos.y });
-						break;
-
-					case Game::DOOR_UP_GOLEFT:
-						player.Init({ responePos.x - 50.0f * 2,responePos.y });
-						break;
-
-					case Game::DOOR_DOWN:
-						player.Init({ responePos.x,responePos.y - 80.0f });
-						break;
-
-					case Game::DOOR_LEFT:
-						player.Init(responePos);
-						break;
-
-					case Game::DOOR_RIGHT:
-						player.Init(responePos);
-						break;
-					case Game::DOOR_Z:
-						break;
-
-					case Game::DOOR_NONE:
-						break;
-					default:
-						break;
-					}
+					player.Init(restartPos);
 					ScrollMgr::Instance()->WarpScroll(player.centerPos);
 					ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
 					ScrollMgr::Instance()->AlimentScrollAmount();
@@ -1062,9 +1035,9 @@ void Game::Update()
 	if ((SelectStage::Instance()->GetRoomNum() != oldRoomNum || SelectStage::Instance()->GetStageNum() != oldStageNum) || SelectStage::Instance()->resetStageFlag)
 	{
 		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+		oldRoomNum = SelectStage::Instance()->GetRoomNum();
+		oldStageNum = SelectStage::Instance()->GetStageNum();
 	}
-	oldRoomNum = SelectStage::Instance()->GetRoomNum();
-	oldStageNum = SelectStage::Instance()->GetStageNum();
 
 	//イベントブロックとの判定
 	for (int i = 0; i < eventBlocks.size(); ++i)
@@ -1073,23 +1046,23 @@ void Game::Update()
 	}
 
 
-	//棘ブロックとの判定
-	for (int i = 0; i < thornBlocks.size(); ++i)
+	//遷移中ではない&&プレイヤーが死亡していな時に棘ブロックとの判定を取る
+	if (!player.isDead && !sceneBlackFlag && !sceneLightFlag)
 	{
-		bool hitFlag = false;
-		if (!player.isDead)
+		//棘ブロックとの判定
+		for (int i = 0; i < thornBlocks.size(); ++i)
 		{
-			hitFlag = thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
-		}
-
-		if (hitFlag)
-		{
-			player.isDead = true;
-			sceneBlackFlag = true;
-			sceneChangeDeadFlag = player.isDead;
-			break;
+			bool hitFlag = thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
+			if (hitFlag)
+			{
+				player.isDead = true;
+				sceneBlackFlag = true;
+				sceneChangeDeadFlag = player.isDead;
+				break;
+			}
 		}
 	}
+
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
 
