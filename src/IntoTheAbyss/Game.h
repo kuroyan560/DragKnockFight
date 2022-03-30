@@ -38,22 +38,8 @@ struct MassChipData
 //元ソリューションのmain処理をまとめたもの
 class Game
 {
-	enum E_DOOR_DIR
-	{
-		DOOR_UP_GORIGHT,		//上に出て右に行くドア
-		DOOR_UP_GOLEFT,	//上に出て左に行くドア
-		DOOR_DOWN,	//下に出るドア
-		DOOR_LEFT,	//左に出るドア
-		DOOR_RIGHT,	//右に出るドア
-		DOOR_Z,		//真ん中から出るドア
-		DOOR_NONE,		//ドア無し
-		DOOR_MAX
-	};
-
 	std::vector<std::unique_ptr<MassChipData>> AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM);
 	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum);
-	Vec2<float> GetPlayerResponePos(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER, Vec2<float> DOOR_MAPCHIP_POS, E_DOOR_DIR* DIR, const bool& ONLY_GET_DOOR_DIR = false);
-	Vec2<float> GetDoorPos(const int& DOOR_NUMBER, const vector<vector<int>>& MAPCHIP_DATA);
 	const int& GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS);
 
 
@@ -103,8 +89,10 @@ class Game
 	int alphaValue;
 	int timer;
 	Vec2<float> responePos;
+	Vec2<float> restartPos;
 	int doorNumber;
 	int giveDoorNumber;
+	int doorArrayNumber;
 	int sceneChangeHandle;//シーン遷移用の画像
 	E_DOOR_DIR door;		//どの方向で出るか
 	bool initJumpFlag;
@@ -112,6 +100,8 @@ class Game
 	E_DOOR_DIR doorDir;
 	bool sceneChangeDeadFlag;//プレイヤが死んでいたらフラグを立てシーン遷移中に特殊な処理を入れる
 	bool initDeadFlag;
+
+	int restartTimer;//シーン遷移後から何秒経過しているか
 
 	std::vector<std::unique_ptr<MassChip>> massChipData;
 	std::vector<std::unique_ptr<EventBlock>>eventBlocks;

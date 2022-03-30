@@ -158,7 +158,7 @@ public:
 	const bool &CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
 
 
-	inline const bool &IsItWallIn(const int &STAGE_NUM,const int &ROOM_NUM,const Vec2<int> &MAPCHIP_POS)
+	inline const bool &IsItWallIn(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_POS)
 	{
 		if (allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_POS.y][MAPCHIP_POS.x].handle == mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN])
 		{
@@ -287,6 +287,8 @@ private:
 		assert(0);
 	}
 
+
+public:
 	//éwíËÇÃî‘çÜÇ™ï«Ç©Ç«Ç§Ç©îªífÇ∑ÇÈ
 	inline void AlimentWallNumber(int *CHIP_NUMBER)
 	{
@@ -326,6 +328,7 @@ private:
 		}
 	};
 
+private:
 	const int &GetGimmickNumber(const int &NUMBER)
 	{
 		int num = NUMBER;

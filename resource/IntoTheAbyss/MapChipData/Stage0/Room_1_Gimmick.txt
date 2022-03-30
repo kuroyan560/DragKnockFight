@@ -5,4 +5,3 @@ size 132 32
 name Thwomp
 type onLow
 size 32 128
-
