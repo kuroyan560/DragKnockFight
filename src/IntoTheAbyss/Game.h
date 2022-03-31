@@ -66,8 +66,6 @@ class Game
 	vector<DossunBlock> dossunBlock;
 	vector<Bubble> bubbleBlock;
 
-	int nowSelectNum = 0;
-
 
 	int oldStageNum = -1;
 	int oldRoomNum = -1;
@@ -128,7 +126,7 @@ public:
 	// プレイヤー
 	Player player;
 	array<int, 2> debugStageData = { 0,0 };//デバック用のステージと部屋番号
-
+	int nowSelectNum = 0;
 
 	Game();
 	void Init();
