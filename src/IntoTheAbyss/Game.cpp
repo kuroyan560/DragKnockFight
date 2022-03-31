@@ -902,7 +902,7 @@ void Game::Update()
 
 			if (noMovementEnemy[index].isActive) continue;
 
-			noMovementEnemy[index].Generate(ENEMY_NOMOVEMENT, mapData);
+			//noMovementEnemy[index].Generate(ENEMY_NOMOVEMENT, mapData);
 
 			break;
 
