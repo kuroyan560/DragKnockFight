@@ -277,7 +277,7 @@ StageMgr::StageMgr()
 							tmp.radian = Radian(0.0f);
 							tmp.offset.x = 1.2f * doorCallCount[arrayNum];
 							tmp.offset.y = -50.0f;
-							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
 
 							++doorCallCount[arrayNum];
@@ -292,7 +292,7 @@ StageMgr::StageMgr()
 							tmp.radian = Radian(180.0f);
 							tmp.offset.x = 1.2f * doorCallCount[arrayNum];
 							tmp.offset.y = 50.0f;
-							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
 
 							++doorCallCount[arrayNum];
@@ -307,7 +307,7 @@ StageMgr::StageMgr()
 							tmp.radian = Radian(270.0f);
 							tmp.offset.x = -50.0f;
 							tmp.offset.y = 1.2f * doorCallCount[arrayNum];
-							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
 
 							++doorCallCount[arrayNum];
@@ -322,7 +322,7 @@ StageMgr::StageMgr()
 							tmp.radian = Radian(90.0f);
 							tmp.offset.x = 50.0f;
 							tmp.offset.y = 1.2f * doorCallCount[arrayNum];
-							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
 
 							++doorCallCount[arrayNum];
@@ -476,6 +476,7 @@ StageMgr::StageMgr()
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TOP];
 							tmp.radian = Radian(90.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -498,6 +499,7 @@ StageMgr::StageMgr()
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CENTRAL];
 							tmp.radian = Radian(90.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 					//左右が空中の壁
@@ -510,6 +512,7 @@ StageMgr::StageMgr()
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CENTRAL];
 							tmp.radian = 0.0f;
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -524,6 +527,7 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_DOWN];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -538,6 +542,7 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_FLOOR];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -553,6 +558,7 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHT];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -568,6 +574,7 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFT];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -581,6 +588,7 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TOP];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -598,6 +606,7 @@ StageMgr::StageMgr()
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_BUTTOM];
 							tmp.radian = Radian(0.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -612,6 +621,7 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHT_UP];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -626,18 +636,23 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHT_DOWN];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
 					{
 						bool checkUpSideFlag =
 							Up == 0 && Down == wallChipIndex && left == 0 && right == wallChipIndex;
+						bool checkObliaueFlag =
+							rightDown == wallChipIndex;
+
 						//左上壁
-						if (checkUpSideFlag)
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFT_UP];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -647,11 +662,12 @@ StageMgr::StageMgr()
 						bool checkObliaueFlag =
 							rightUp == wallChipIndex;
 						//左下壁
-						if (checkUpSideFlag)
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFT_DOWN];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -669,6 +685,7 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -687,6 +704,7 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_LEFT_DOWN];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 					//右下
@@ -704,6 +722,7 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_LEFT_UP];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 					//左上
@@ -712,15 +731,13 @@ StageMgr::StageMgr()
 							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
 						bool checkObliaueFlag =
 							LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == wallChipIndex && rightDown == 0;
-						bool outSideFlag = Up == -1 && Down == wallChipIndex && left == -1 && right == wallChipIndex &&
-							LeftUp == -1 && LeftDown == -1 && rightUp == -1 && rightDown == 0;
 
-
-						if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_RIGHT_DOWN];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 					//左下
@@ -729,14 +746,13 @@ StageMgr::StageMgr()
 							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
 						bool checkObliaueFlag =
 							LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == 0 && rightDown == wallChipIndex;
-						bool outSideFlag = Up == wallChipIndex && Down == -1 && left == -1 && right == wallChipIndex &&
-							LeftUp == -1 && LeftDown == -1 && rightUp == 0 && rightDown == -1;
 
-						if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_RIGHT_UP];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -750,22 +766,24 @@ StageMgr::StageMgr()
 						tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_FLOOR];
 						tmp.radian = 0;
 						allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						continue;
 					}
 
 
 					//上T路地なら壁中の画像を使う
 					{
 						bool checkUpSideFlag =
-							Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == wallChipIndex;
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
 						bool checkObliaueFlag =
 							LeftUp == 0 && rightUp == 0;
 
 						if (checkUpSideFlag && checkObliaueFlag)
 						{
 							MapChipDrawData tmp;
-							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK];
-							tmp.radian = Radian(180.0f);
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK2];
+							tmp.radian = Radian(270.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -782,9 +800,10 @@ StageMgr::StageMgr()
 						if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
 						{
 							MapChipDrawData tmp;
-							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK];
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK2];
 							tmp.radian = 0.0f;
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -792,18 +811,16 @@ StageMgr::StageMgr()
 						bool checkUpSideFlag =
 							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
 						bool checkObliaueFlag =
-							LeftUp == 0 && LeftDown == 0 && rightUp == wallChipIndex && rightDown == wallChipIndex;
-						bool outSideFlag =
-							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == -1 &&
-							LeftUp == 0 && LeftDown == 0 && rightUp == -1 && rightDown == -1;
+							rightUp == wallChipIndex && rightDown == wallChipIndex;
 
 						//右T路地なら壁中の画像を使う
-						if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
 							MapChipDrawData tmp;
-							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK];
-							tmp.radian = Radian(270.0f);
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK2];
+							tmp.radian =0.0f;
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -812,19 +829,38 @@ StageMgr::StageMgr()
 							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
 						bool checkObliaueFlag =
 							LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == 0 && rightDown == 0;
-						bool outSideFlag =
-							Up == wallChipIndex && Down == wallChipIndex && left == -1 && right == wallChipIndex &&
-							LeftUp == -1 && LeftDown == -1 && rightUp == 0 && rightDown == 0;
 
 						//左T路地なら壁中の画像を使う
-						if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK2];
+							tmp.radian = Radian(0.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+					//壁外上T字路
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == 0 && rightUp == 0;
+
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK];
-							tmp.radian = Radian(90.0f);
+							tmp.radian = Radian(180.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
+
+
+
+
 
 
 					{
@@ -837,6 +873,7 @@ StageMgr::StageMgr()
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFTDOWN_1PIXEL];
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -851,6 +888,7 @@ StageMgr::StageMgr()
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFTDOWN_1PIXEL];
 							tmp.radian = Radian(180.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -865,6 +903,7 @@ StageMgr::StageMgr()
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHTDOWN_1PIXEL];
 							tmp.radian = Radian(-90.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -875,6 +914,7 @@ StageMgr::StageMgr()
 						tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK2];
 						tmp.radian = Radian(0.0f);
 						//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						continue;
 					}
 
 					{
@@ -890,6 +930,7 @@ StageMgr::StageMgr()
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
 							tmp.radian = Radian(90.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -906,6 +947,7 @@ StageMgr::StageMgr()
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
 							tmp.radian = Radian(0.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -922,6 +964,7 @@ StageMgr::StageMgr()
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
 							tmp.radian = Radian(180.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -938,6 +981,7 @@ StageMgr::StageMgr()
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
 							tmp.radian = Radian(270.0f);
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
 					}
 
@@ -958,6 +1002,7 @@ StageMgr::StageMgr()
 						MapChipDrawData tmp;
 						//tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_ERROR];
 						allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						continue;
 					}
 
 				}

@@ -294,7 +294,7 @@ public:
 	{
 		bool outSideFlag = *CHIP_NUMBER == -1;
 		bool isWallFlag = false;
-		bool doorFlag = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min <= *CHIP_NUMBER && *CHIP_NUMBER <= mapChipMemoryData[MAPCHIP_TYPE_DOOR].max;
+		//bool doorFlag = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min <= *CHIP_NUMBER && *CHIP_NUMBER <= mapChipMemoryData[MAPCHIP_TYPE_DOOR].max;
 		//bool thownFlag = *CHIP_NUMBER == MAPCHIP_BLOCK_THOWN;
 
 		//チップ番号が1から9以下なら壁判定を出す
@@ -303,7 +303,7 @@ public:
 			isWallFlag = true;
 		}
 
-		if (isWallFlag || outSideFlag || doorFlag)
+		if (isWallFlag || outSideFlag)
 		{
 			*CHIP_NUMBER = 1;
 		}
@@ -313,6 +313,7 @@ public:
 	inline void AlimentSpaceNumber(int *CHIP_NUMBER)
 	{
 		bool isSpaceFlag = false;
+		//ドア番号は空白として扱う
 		bool doorFlag = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min <= *CHIP_NUMBER && *CHIP_NUMBER <= mapChipMemoryData[MAPCHIP_TYPE_DOOR].max;
 
 		//チップ番号が0もしくは10以上なら空白判定を出す
@@ -321,8 +322,7 @@ public:
 			isSpaceFlag = true;
 		}
 
-		//ドア番号は壁として扱う為空白にしない
-		if (isSpaceFlag && !doorFlag)
+		if (isSpaceFlag || doorFlag)
 		{
 			*CHIP_NUMBER = 0;
 		}
