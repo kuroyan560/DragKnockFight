@@ -71,8 +71,10 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 			bool blockFlag = (mapChipData[height][width] >= 1 && mapChipData[height][width] <= 9);
 			bool doorFlag = (mapChipData[height][width] >= doorChipMemorySize.min && mapChipData[height][width] <= doorChipMemorySize.max);
 			bool eventFlag = (mapChipData[height][width] >= eventChipMemorySize.min && mapChipData[height][width] <= eventChipMemorySize.max);
+			bool thownFlag = mapChipData[height][width] == 41;
 
-			if (blockFlag || doorFlag || eventFlag)
+
+			if (blockFlag || doorFlag || eventFlag || thownFlag)
 			{
 				// スクロール量から描画する位置を求める。
 				const float centerX = width * DRAW_MAP_CHIP_SIZE - ScrollMgr::Instance()->scrollAmount.x * ScrollMgr::Instance()->zoom;

@@ -46,7 +46,7 @@ StageMgr::StageMgr()
 	mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHTDOWN_1PIXEL] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Chip_rightDown1Pixel.png");
 	mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFTDOWN_1PIXEL] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Chip_leftDown1Pixel.png");
 
-	//thowGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Thown.png");
+	thowGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Thown.png");
 
 
 
@@ -207,12 +207,10 @@ StageMgr::StageMgr()
 					int rightUp = GetMapChipBlock(stageNum, roomNum, { (float)x + 1,(float)y - 1 });
 					int rightDown = GetMapChipBlock(stageNum, roomNum, { (float)x + 1,(float)y + 1 });
 
-					if (roomNum == 6 && now == 25)
+					if (now == MAPCHIP_BLOCK_THOWN)
 					{
 						bool debug = false;
 					}
-
-
 
 
 					//マップチップの値を0か1に絞る
@@ -384,6 +382,11 @@ StageMgr::StageMgr()
 
 					//針
 					{
+						if (now == MAPCHIP_BLOCK_THOWN)
+						{
+							skipFlag = true;
+						}
+
 						//上
 						bool checkDirFlag =
 							Up == 0 && Down == 1;
