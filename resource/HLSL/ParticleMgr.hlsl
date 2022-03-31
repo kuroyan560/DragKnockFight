@@ -116,7 +116,7 @@ VSOutput VSmain(VSInput input)
 {
     VSOutput output;
     output.pos = input.pos;
-    output.pos *= zoom;
+    output.pos.xy *= zoom;
     output.pos.xy -= scroll;
     output.alpha = input.alpha / 255.0f;
     output.isAlive = input.isAlive;

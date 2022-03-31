@@ -127,7 +127,7 @@ public:
 	//バッファ取得
 	const ComPtr<ID3D12Resource1>& GetBuff() { return buff; }
 	//マッピング
-	void Mapping(const size_t& DataSize, const int& ElementNum, void* SendData);
+	void Mapping(const size_t& DataSize, const int& ElementNum, const void* SendData);
 	//リソースバリアの変更
 	void ChangeBarrier(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const D3D12_RESOURCE_STATES& NewBarrier);
 	//バッファのコピー（インスタンスは別物、引数にコピー元）
@@ -182,7 +182,7 @@ public:
 	{
 		handles.Initialize(CBV, CBVHandles);
 	}
-	void Mapping(void* SendData)
+	void Mapping(const void* SendData)
 	{
 		resource->Mapping(dataSize, elementNum, SendData);
 	}
