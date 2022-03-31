@@ -54,6 +54,11 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	// 描画するチップのサイズ
 	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
 
+	SizeData eventChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
+	SizeData wallChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
+	SizeData doorChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
+
+
 	// マップチップの縦の要素数を取得。
 	const int HEIGHT = mapChipData.size();
 	for (int height = 0; height < HEIGHT; ++height) {
@@ -64,8 +69,10 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 
 			// ブロック以外だったら処理を飛ばす。
 			bool blockFlag = (mapChipData[height][width] >= 1 && mapChipData[height][width] <= 9);
-			bool doorFlag = (mapChipData[height][width] >= 20 && mapChipData[height][width] <= 29);
-			if (blockFlag || doorFlag)
+			bool doorFlag = (mapChipData[height][width] >= doorChipMemorySize.min && mapChipData[height][width] <= doorChipMemorySize.max);
+			bool eventFlag = (mapChipData[height][width] >= eventChipMemorySize.min && mapChipData[height][width] <= eventChipMemorySize.max);
+
+			if (blockFlag || doorFlag || eventFlag)
 			{
 				// スクロール量から描画する位置を求める。
 				const float centerX = width * DRAW_MAP_CHIP_SIZE - ScrollMgr::Instance()->scrollAmount.x * ScrollMgr::Instance()->zoom;
