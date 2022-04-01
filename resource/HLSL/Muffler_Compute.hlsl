@@ -9,6 +9,7 @@ struct Vertex
 cbuffer cbuff0 : register(b0)
 {
     float2 startPoint;
+    float2 oldPoint;
 };
 
 cbuffer cbuff1 : register(b1)
@@ -24,11 +25,11 @@ uint GetIndex(uint x,uint y)
     return y * vertexNum.x + x;
 }
 
-static const float DENSITY = 25.0f; //単位面積あたりの質量密度
+static const float DENSITY = 8.0f; //単位面積あたりの質量密度
 static const float GRAVITY = 0.05f; //重力
-static const float DAMPING = 16.0f;  //ダンピング
+static const float DAMPING = 32.0f;  //ダンピング
  //バネ定数（バネの硬さ、反発力の強さ）
-static const float SPRING_FACTOR = 32.0f;   //上下左右
+static const float SPRING_FACTOR = 28.0f;   //上下左右
 static const float SPRING_FACTOR_SKEW = SPRING_FACTOR * 0.9f; //斜め
 static const float POS_SCALE = 6.0f;
 static const float2 SPRING_LENGTH = { 16.0f, 1.0f };
@@ -56,6 +57,8 @@ void CSmain( uint2 DTid : SV_DispatchThreadID )
     if(idx.y == 0)
     {
         vertices[myIdx].pos = startPoint;
+        const float offset = mufflerSize.x / vertexNum.x * 0.1f;
+        vertices[myIdx].pos.x += -mufflerSize.x / 2.0f * 0.1f + offset;
         return;
     }
     

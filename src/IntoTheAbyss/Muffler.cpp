@@ -2,11 +2,10 @@
 #include"KuroEngine.h"
 
 //static const Vec2<float>MUFFLER_SIZE = { 48.0f,64.0f };
-static const Vec2<float>MUFFLER_SIZE = { 52.0f,32.0f };
+static const Vec2<float>MUFFLER_SIZE = { 32.0f,64.0f };
 static const Vec2<float>OFFSET_FROM_PLAYER_POS = { 0.0f,-32.0f };
 
-//static const int UPDATE_PER_FRAME = 10;
-static const int UPDATE_PER_FRAME = 2;
+static const int UPDATE_PER_FRAME = 1;
 
 unsigned int GetIndex(const int& x, const int& y, const int& numX)
 {

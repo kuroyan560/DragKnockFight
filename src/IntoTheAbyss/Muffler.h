@@ -31,7 +31,7 @@ class Muffler
 	};
 
 	static const int VERTEX_NUM_X = 8;
-	static const int VERTEX_NUM_Y = 32;
+	static const int VERTEX_NUM_Y = 8;
 
 	Vertex vertices[VERTEX_NUM_Y][VERTEX_NUM_X];
 	std::vector<unsigned int>indices;
