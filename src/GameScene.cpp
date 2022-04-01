@@ -67,6 +67,12 @@ void GameScene::OnImguiDebug()
 		ImGui::SameLine();
 		ImGui::Text("Don't use");
 	}
+	if (game.nowSelectNum == 0)
+	{
+		ImGui::SameLine();
+		ImGui::Text("NowSelecting");
+	}
+
 
 	ImGui::Text("RoomNumber:%d", game.debugStageData[1]);
 	//‘I‘ğ‚Å‚«‚È‚¢•”‰®”Ô†‚È‚ç•\¦‚·‚é
@@ -74,6 +80,11 @@ void GameScene::OnImguiDebug()
 	{
 		ImGui::SameLine();
 		ImGui::Text("Don't use");
+	}
+	if (game.nowSelectNum == 1)
+	{
+		ImGui::SameLine();
+		ImGui::Text("NowSelecting");
 	}
 
 	ImGui::Text("Up Down:SelectNumber");
