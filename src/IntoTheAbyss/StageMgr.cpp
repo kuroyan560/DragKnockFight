@@ -277,7 +277,7 @@ StageMgr::StageMgr()
 							tmp.radian = Radian(0.0f);
 							tmp.offset.x = 1.2f * doorCallCount[arrayNum];
 							tmp.offset.y = -50.0f;
-							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
 
 							++doorCallCount[arrayNum];
@@ -292,7 +292,7 @@ StageMgr::StageMgr()
 							tmp.radian = Radian(180.0f);
 							tmp.offset.x = 1.2f * doorCallCount[arrayNum];
 							tmp.offset.y = 50.0f;
-							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
 
 							++doorCallCount[arrayNum];
@@ -307,7 +307,7 @@ StageMgr::StageMgr()
 							tmp.radian = Radian(270.0f);
 							tmp.offset.x = -50.0f;
 							tmp.offset.y = 1.2f * doorCallCount[arrayNum];
-							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
 
 							++doorCallCount[arrayNum];
@@ -322,7 +322,7 @@ StageMgr::StageMgr()
 							tmp.radian = Radian(90.0f);
 							tmp.offset.x = 50.0f;
 							tmp.offset.y = 1.2f * doorCallCount[arrayNum];
-							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							skipFlag = true;
 
 							++doorCallCount[arrayNum];
