@@ -46,7 +46,7 @@ StageMgr::StageMgr()
 	mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHTDOWN_1PIXEL] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Chip_rightDown1Pixel.png");
 	mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFTDOWN_1PIXEL] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Chip_leftDown1Pixel.png");
 
-	//thowGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Thown.png");
+	thowGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Thown.png");
 
 
 
@@ -207,12 +207,10 @@ StageMgr::StageMgr()
 					int rightUp = GetMapChipBlock(stageNum, roomNum, { (float)x + 1,(float)y - 1 });
 					int rightDown = GetMapChipBlock(stageNum, roomNum, { (float)x + 1,(float)y + 1 });
 
-					if (roomNum == 6 && now == 25)
+					if (now == MAPCHIP_BLOCK_THOWN)
 					{
 						bool debug = false;
 					}
-
-
 
 
 					//マップチップの値を0か1に絞る
@@ -235,7 +233,7 @@ StageMgr::StageMgr()
 
 
 					bool skipFlag = false;		//ドアをを探索したかどうかを示すフラグ
-					for (int doorNumber = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min; doorNumber < mapChipMemoryData[MAPCHIP_TYPE_DOOR].max - SECRET_DOOR_NUMBER; ++doorNumber)
+					for (int doorNumber = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min; doorNumber < mapChipMemoryData[MAPCHIP_TYPE_DOOR].max; ++doorNumber)
 					{
 						int arrayNum = doorNumber - mapChipMemoryData[MAPCHIP_TYPE_DOOR].min;//ドア番号から配列の添え字用に数値を調整
 
@@ -263,9 +261,10 @@ StageMgr::StageMgr()
 							}
 						}
 
-						if (now == 22)
+						if (now == doorNumber&&mapChipMemoryData[MAPCHIP_TYPE_DOOR].min + SECRET_DOOR_NUMBER <= doorNumber)
 						{
-							bool debug = false;
+							skipFlag = true;
+							break;
 						}
 
 
@@ -384,6 +383,11 @@ StageMgr::StageMgr()
 
 					//針
 					{
+						if (now == MAPCHIP_BLOCK_THOWN)
+						{
+							skipFlag = true;
+						}
+
 						//上
 						bool checkDirFlag =
 							Up == 0 && Down == 1;
@@ -436,534 +440,581 @@ StageMgr::StageMgr()
 							tmp.handle = eventChipHandle[arrayNum];
 							tmp.radian = 0.0f;
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							skipFlag = true;
 						}
 					}
 
 
 
-					for (int wallChipIndex = 1; wallChipIndex < 10; ++wallChipIndex)
+					//ドアだったらスキップ
+					if (skipFlag)
 					{
+						continue;
+					}
 
-						//ドアだったらスキップ
-						if (skipFlag)
+					int wallChipIndex = 1;
+
+
+					//右だけ壁がある
+					{
+						bool checkUpSideFlag =
+							Up == 0 && Down == 0 && left == 0 && right == wallChipIndex;
+						if (checkUpSideFlag)
 						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TOP];
+							tmp.radian = Radian(270.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						}
+					}
+					//左だけ壁がある
+					{
+						bool checkUpSideFlag =
+							Up == 0 && Down == 0 && left == wallChipIndex && right == 0;
+						if (checkUpSideFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TOP];
+							tmp.radian = Radian(90.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
 							continue;
 						}
+					}
 
 
-						//右だけ壁がある
+					//空中床
+					if (Up == 0 && Down == 0 && left == 0 && right == 0 && now != 2)
+					{
+						//MapChipDrawData tmp;
+						//tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN];
+						//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+					}
+
+					//通常壁
+					{
+						bool checkUpSideFlag =
+							Up == 0 && Down == 0 && left == wallChipIndex && right == wallChipIndex;
+						if (checkUpSideFlag)
 						{
-							bool checkUpSideFlag =
-								Up == 0 && Down == 0 && left == 0 && right == wallChipIndex;
-							if (checkUpSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TOP];
-								tmp.radian = Radian(270.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CENTRAL];
+							tmp.radian = Radian(90.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
-						//左だけ壁がある
+					}
+					//左右が空中の壁
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == 0 && right == 0;
+						if (checkUpSideFlag)
 						{
-							bool checkUpSideFlag =
-								Up == 0 && Down == 0 && left == wallChipIndex && right == 0;
-							if (checkUpSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TOP];
-								tmp.radian = Radian(90.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CENTRAL];
+							tmp.radian = 0.0f;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
+					}
 
-
-						//空中床
-						if (Up == 0 && Down == 0 && left == 0 && right == 0 && now != 2)
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == wallChipIndex && rightUp == wallChipIndex;
+						//上壁
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
-							//MapChipDrawData tmp;
-							//tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN];
-							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_DOWN];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
+					}
 
-						//通常壁
-						{
-							bool checkUpSideFlag =
-								Up == 0 && Down == 0 && left == wallChipIndex && right == wallChipIndex;
-							if (checkUpSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CENTRAL];
-								tmp.radian = Radian(90.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-						//左右が空中の壁
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == 0 && right == 0;
-							if (checkUpSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CENTRAL];
-								tmp.radian = 0.0f;
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == wallChipIndex && rightUp == wallChipIndex;
-							//上壁
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_DOWN];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == 0 && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftDown == wallChipIndex && rightDown == wallChipIndex;
-							//下壁
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_FLOOR];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == 0;
-							bool checkObliaueFlag =
-								LeftUp == wallChipIndex && LeftDown == wallChipIndex;
-
-							//左壁
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHT];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == 0 && right == wallChipIndex;
-							bool checkObliaueFlag =
-								rightUp == wallChipIndex && rightDown == wallChipIndex;
-
-							//右壁
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFT];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-
-						{
-							bool checkUpSideFlag =
-								Up == 0 && Down == wallChipIndex && left == 0 && right == 0;
-							//上が空間の壁
-							if (checkUpSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TOP];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == 0 && left == 0 && right == 0;
-							bool checkObliaueFlag =
-								LeftUp == 0 && LeftDown == 0 && rightUp == 0 && rightDown == 0;
-
-							//下が空間の壁
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_BUTTOM];
-								tmp.radian = Radian(0.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == 0 && Down == wallChipIndex && left == wallChipIndex && right == 0;
-							bool checkObliaueFlag =
-								LeftDown == wallChipIndex;
-							//右上壁
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHT_UP];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == 0;
-							bool checkObliaueFlag =
-								LeftUp == wallChipIndex;
-							//右下壁
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHT_DOWN];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == 0 && Down == wallChipIndex && left == 0 && right == wallChipIndex;
-							//左上壁
-							if (checkUpSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFT_UP];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == 0 && left == 0 && right == wallChipIndex;
-							bool checkObliaueFlag =
-								rightUp == wallChipIndex;
-							//左下壁
-							if (checkUpSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFT_DOWN];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == wallChipIndex && rightDown == wallChipIndex;
-							bool outSideFlag = Up == -1 && Down == -1 && left == -1 && right == -1 &&
-								LeftUp == -1 && LeftDown == -1 && rightUp == -1 && rightDown == -1;
-
-							//壁の中
-							if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-
-						//右上
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == wallChipIndex && LeftDown == 0 && rightUp == wallChipIndex && rightDown == wallChipIndex;
-							bool outSideFlag = Up == -1 && Down == wallChipIndex && left == wallChipIndex && right == -1 &&
-								LeftUp == -1 && LeftDown == 0 && rightUp == -1 && rightDown == -1;
-
-							if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_LEFT_DOWN];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-						//右下
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == 0 && LeftDown == wallChipIndex && rightUp == wallChipIndex && rightDown == wallChipIndex;
-							bool outSideFlag = Up == wallChipIndex && Down == -1 && left == wallChipIndex && right == -1 &&
-								LeftUp == 0 && LeftDown == -1 && rightUp == -1 && rightDown == -1;
-
-
-							if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_LEFT_UP];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-						//左上
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == wallChipIndex && rightDown == 0;
-							bool outSideFlag = Up == -1 && Down == wallChipIndex && left == -1 && right == wallChipIndex &&
-								LeftUp == -1 && LeftDown == -1 && rightUp == -1 && rightDown == 0;
-
-
-							if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_RIGHT_DOWN];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-						//左下
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == 0 && rightDown == wallChipIndex;
-							bool outSideFlag = Up == wallChipIndex && Down == -1 && left == -1 && right == wallChipIndex &&
-								LeftUp == -1 && LeftDown == -1 && rightUp == 0 && rightDown == -1;
-
-							if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_RIGHT_UP];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-
-
-						//専用の処理
-						//左右壁、上にドア、下は空中の場合に下壁を描画する
-						if (Up == 3 && Down == 0 && left != 0 && right != 0)
+					{
+						bool checkUpSideFlag =
+							Up == 0 && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftDown == wallChipIndex && rightDown == wallChipIndex;
+						//下壁
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_FLOOR];
-							tmp.radian = 0;
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
+					}
 
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == 0;
+						bool checkObliaueFlag =
+							LeftUp == wallChipIndex && LeftDown == wallChipIndex;
 
-						//上T路地なら壁中の画像を使う
+						//左壁
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == 0 && rightUp == 0;
-
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK];
-								tmp.radian = Radian(180.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHT];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
+					}
 
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == 0 && right == wallChipIndex;
+						bool checkObliaueFlag =
+							rightUp == wallChipIndex && rightDown == wallChipIndex;
+
+						//右壁
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == wallChipIndex && LeftDown == 0 && rightUp == wallChipIndex && rightDown == 0;
-							bool outSideFlag =
-								Up == -1 && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex &&
-								LeftUp == -1 && LeftDown == 0 && rightUp == -1 && rightDown == 0;
-
-							//下T路地なら壁中の画像を使う
-							if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK];
-								tmp.radian = 0.0f;
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFT];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
+					}
 
+
+					{
+						bool checkUpSideFlag =
+							Up == 0 && Down == wallChipIndex && left == 0 && right == 0;
+						//上が空間の壁
+						if (checkUpSideFlag)
 						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == 0 && LeftDown == 0 && rightUp == wallChipIndex && rightDown == wallChipIndex;
-							bool outSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == -1 &&
-								LeftUp == 0 && LeftDown == 0 && rightUp == -1 && rightDown == -1;
-
-							//右T路地なら壁中の画像を使う
-							if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK];
-								tmp.radian = Radian(270.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TOP];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
+					}
 
+
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == 0 && left == 0 && right == 0;
+						bool checkObliaueFlag =
+							LeftUp == 0 && LeftDown == 0 && rightUp == 0 && rightDown == 0;
+
+						//下が空間の壁
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == 0 && rightDown == 0;
-							bool outSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == -1 && right == wallChipIndex &&
-								LeftUp == -1 && LeftDown == -1 && rightUp == 0 && rightDown == 0;
-
-							//左T路地なら壁中の画像を使う
-							if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK];
-								tmp.radian = Radian(90.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_BUTTOM];
+							tmp.radian = Radian(0.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
+					}
 
-
+					{
+						bool checkUpSideFlag =
+							Up == 0 && Down == wallChipIndex && left == wallChipIndex && right == 0;
+						bool checkObliaueFlag =
+							LeftDown == wallChipIndex;
+						//右上壁
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
-							bool checkUpSideFlag =
-								Up == 0 && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == 0 && LeftDown == 0 && rightUp == 0 && rightDown == wallChipIndex;
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFTDOWN_1PIXEL];
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHT_UP];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
+					}
 
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == 0;
+						bool checkObliaueFlag =
+							LeftUp == wallChipIndex;
+						//右下壁
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == wallChipIndex && LeftDown == 0 && rightUp == 0 && rightDown == 0;
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFTDOWN_1PIXEL];
-								tmp.radian = Radian(180.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHT_DOWN];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
+					}
 
+					{
+						bool checkUpSideFlag =
+							Up == 0 && Down == wallChipIndex && left == 0 && right == wallChipIndex;
+						bool checkObliaueFlag =
+							rightDown == wallChipIndex;
+
+						//左上壁
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == wallChipIndex && left == 0 && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == 0 && LeftDown == 0 && rightUp == 0 && rightDown == wallChipIndex;
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHTDOWN_1PIXEL];
-								tmp.radian = Radian(-90.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFT_UP];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == 0 && left == 0 && right == wallChipIndex;
+						bool checkObliaueFlag =
+							rightUp == wallChipIndex;
+						//左下壁
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFT_DOWN];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == wallChipIndex && rightDown == wallChipIndex;
+						bool outSideFlag = Up == -1 && Down == -1 && left == -1 && right == -1 &&
+							LeftUp == -1 && LeftDown == -1 && rightUp == -1 && rightDown == -1;
+
+						//壁の中
+						if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
 
 
-						if (Up == 1 && Down == 1 && left == -1 && right == 1)
+					//右上
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == wallChipIndex && LeftDown == 0 && rightUp == wallChipIndex && rightDown == wallChipIndex;
+						bool outSideFlag = Up == -1 && Down == wallChipIndex && left == wallChipIndex && right == -1 &&
+							LeftUp == -1 && LeftDown == 0 && rightUp == -1 && rightDown == -1;
+
+						if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_LEFT_DOWN];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+					//右下
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == 0 && LeftDown == wallChipIndex && rightUp == wallChipIndex && rightDown == wallChipIndex;
+						bool outSideFlag = Up == wallChipIndex && Down == -1 && left == wallChipIndex && right == -1 &&
+							LeftUp == 0 && LeftDown == -1 && rightUp == -1 && rightDown == -1;
+
+
+						if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_LEFT_UP];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+					//左上
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == wallChipIndex && rightDown == 0;
+
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_RIGHT_DOWN];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+					//左下
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == 0 && rightDown == wallChipIndex;
+
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN_RIGHT_UP];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+
+
+					//専用の処理
+					//左右壁、上にドア、下は空中の場合に下壁を描画する
+					if (Up == 3 && Down == 0 && left != 0 && right != 0)
+					{
+						MapChipDrawData tmp;
+						tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_FLOOR];
+						tmp.radian = 0;
+						allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						continue;
+					}
+
+
+					//上T路地なら壁中の画像を使う
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == 0 && rightUp == 0;
+
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK2];
+							tmp.radian = Radian(270.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == wallChipIndex && LeftDown == 0 && rightUp == wallChipIndex && rightDown == 0;
+						bool outSideFlag =
+							Up == -1 && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex &&
+							LeftUp == -1 && LeftDown == 0 && rightUp == -1 && rightDown == 0;
+
+						//下T路地なら壁中の画像を使う
+						if ((checkUpSideFlag && checkObliaueFlag) || outSideFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK2];
+							tmp.radian = 0.0f;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							rightUp == wallChipIndex && rightDown == wallChipIndex;
+
+						//右T路地なら壁中の画像を使う
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK2];
+							tmp.radian =0.0f;
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == wallChipIndex && LeftDown == wallChipIndex && rightUp == 0 && rightDown == 0;
+
+						//左T路地なら壁中の画像を使う
+						if (checkUpSideFlag && checkObliaueFlag)
 						{
 							MapChipDrawData tmp;
 							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK2];
 							tmp.radian = Radian(0.0f);
-							//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == 0 && Down == wallChipIndex && left == 0 && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == 0 && rightDown == 0;
-
-							//左上角、1ドット付き
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
-								tmp.radian = Radian(90.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == 0 && left == 0 && right == wallChipIndex;
-							bool checkObliaueFlag =
-								LeftUp == 0 && rightUp == 0;
-
-							//左下角、1ドット付き
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
-								tmp.radian = Radian(0.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == 0 && Down == wallChipIndex && left == wallChipIndex && right == 0;
-							bool checkObliaueFlag =
-								LeftDown == 0;
-
-							//右上角、1ドット付き
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
-								tmp.radian = Radian(180.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-						{
-							bool checkUpSideFlag =
-								Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == 0;
-							bool checkObliaueFlag =
-								LeftUp == 0;
-
-							//右下角、1ドット付き
-							if (checkUpSideFlag && checkObliaueFlag)
-							{
-								MapChipDrawData tmp;
-								tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
-								tmp.radian = Radian(270.0f);
-								allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-							}
-						}
-
-
-						//アニメーションテスト用
-						if (false)
-						{
-							MapChipDrawData tmp;
-							tmp.animationFlag = true;
-							tmp.handle = 0;
 							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
 						}
-
-						if (allMapChipDrawData[stageNum][roomNum][y][x].handle == -1)
-							//if (!allMapChipDrawData[stageNum][roomNum][y][x].handle)
-						{
-							//エラー
-							MapChipDrawData tmp;
-							//tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_ERROR];
-							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
-						}
-
 					}
+
+					//壁外上T字路
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == 0 && rightUp == 0;
+
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK];
+							tmp.radian = Radian(180.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+
+
+
+
+
+					{
+						bool checkUpSideFlag =
+							Up == 0 && Down == wallChipIndex && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == 0 && LeftDown == 0 && rightUp == 0 && rightDown == wallChipIndex;
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFTDOWN_1PIXEL];
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == wallChipIndex && LeftDown == 0 && rightUp == 0 && rightDown == 0;
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_LEFTDOWN_1PIXEL];
+							tmp.radian = Radian(180.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == wallChipIndex && left == 0 && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == 0 && LeftDown == 0 && rightUp == 0 && rightDown == wallChipIndex;
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_RIGHTDOWN_1PIXEL];
+							tmp.radian = Radian(-90.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+
+					if (Up == 1 && Down == 1 && left == -1 && right == 1)
+					{
+						MapChipDrawData tmp;
+						tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_TBLOCK2];
+						tmp.radian = Radian(0.0f);
+						//allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						continue;
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == 0 && Down == wallChipIndex && left == 0 && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == 0 && rightDown == 0;
+
+						//左上角、1ドット付き
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
+							tmp.radian = Radian(90.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == 0 && left == 0 && right == wallChipIndex;
+						bool checkObliaueFlag =
+							LeftUp == 0 && rightUp == 0;
+
+						//左下角、1ドット付き
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
+							tmp.radian = Radian(0.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == 0 && Down == wallChipIndex && left == wallChipIndex && right == 0;
+						bool checkObliaueFlag =
+							LeftDown == 0;
+
+						//右上角、1ドット付き
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
+							tmp.radian = Radian(180.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+					{
+						bool checkUpSideFlag =
+							Up == wallChipIndex && Down == 0 && left == wallChipIndex && right == 0;
+						bool checkObliaueFlag =
+							LeftUp == 0;
+
+						//右下角、1ドット付き
+						if (checkUpSideFlag && checkObliaueFlag)
+						{
+							MapChipDrawData tmp;
+							tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_WALL_CORNER];
+							tmp.radian = Radian(270.0f);
+							allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+							continue;
+						}
+					}
+
+
+					//アニメーションテスト用
+					if (false)
+					{
+						MapChipDrawData tmp;
+						tmp.animationFlag = true;
+						tmp.handle = 0;
+						allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+					}
+
+					if (allMapChipDrawData[stageNum][roomNum][y][x].handle == -1)
+						//if (!allMapChipDrawData[stageNum][roomNum][y][x].handle)
+					{
+						//エラー
+						MapChipDrawData tmp;
+						//tmp.handle = mapChipGraphHandle[MAPCHIP_DRAW_ERROR];
+						allMapChipDrawData[stageNum][roomNum][y][x] = tmp;
+						continue;
+					}
+
 				}
+
 			}
 		}
 	}
 	//部屋ごとの描画情報を格納する-----------------------
 
+
+	GimmickLoader::Instance()->ErrorCheck();
 
 
 

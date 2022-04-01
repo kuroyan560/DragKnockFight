@@ -9,6 +9,9 @@ GimmickLoader::GimmickLoader()
 	allBubbleData.reserve(stageNum);
 	allBubbleData.resize(stageNum);
 
+	errorStrings.resize(stageNum);
+
+
 	//使用できるギミック名の初期化
 	gimmickName[GIMMCK_NAME_THOWMPE] = "Thwomp";
 	gimmickName[GIMMCK_NAME_THOWN] = "Thown";
@@ -26,9 +29,12 @@ GimmickLoader::GimmickLoader()
 	gimmickThowmpeType[GIMMCK_THOWMPE_TYPE_ON_HIGH] = "onHigh";
 
 	thownData = std::make_shared<ThownData>();
+
+	oldStageNum = -1;
+	oldRoomNum = -1;
 };
 
-void GimmickLoader::LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const std::string& FILE_PASS)
+void GimmickLoader::LoadData(const int &STAGE_NUM, const int &ROOM_NUM, const std::string &FILE_PASS)
 {
 	std::vector<std::shared_ptr<ThownpeData>> gimmickData;
 
@@ -37,6 +43,8 @@ void GimmickLoader::LoadData(const int& STAGE_NUM, const int& ROOM_NUM, const st
 	allThowmpeData[STAGE_NUM].push_back(std::vector<std::shared_ptr<ThownpeData>>());
 	allBubbleData[STAGE_NUM].push_back({});
 
+
+	errorStrings[STAGE_NUM].push_back({});
 
 	// ファイルデータ
 	std::ifstream ifs;
@@ -239,7 +247,7 @@ void GimmickLoader::LoadData(const std::string &FILE_PASS)
 	}
 }
 
-std::vector<std::shared_ptr<BubbleData>> GimmickLoader::GetBubbleData(const int& STAGE_NUM, const int& ROOM_NUM)
+std::vector<std::shared_ptr<BubbleData>> GimmickLoader::GetBubbleData(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	//ステージ番号が配列の範囲外なら返さない
 	if (STAGE_NUM < 0 || allBubbleData.size() <= STAGE_NUM)
@@ -259,7 +267,7 @@ std::vector<std::shared_ptr<BubbleData>> GimmickLoader::GetBubbleData(const int&
 	return allBubbleData[STAGE_NUM][ROOM_NUM];
 }
 
-std::vector<std::shared_ptr<ThownpeData>> GimmickLoader::GetThowpeData(const int& STAGE_NUM, const int& ROOM_NUM)
+std::vector<std::shared_ptr<ThownpeData>> GimmickLoader::GetThowpeData(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	//ステージ番号が配列の範囲外なら返さない
 	if (STAGE_NUM < 0 || allThowmpeData.size() < STAGE_NUM)
@@ -279,17 +287,55 @@ std::vector<std::shared_ptr<ThownpeData>> GimmickLoader::GetThowpeData(const int
 	return allThowmpeData[STAGE_NUM][ROOM_NUM];
 }
 
-void GimmickLoader::SetThwompStartPos(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS)
+void GimmickLoader::SetThwompStartPos(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS)
 {
-	allThowmpeData[STAGE_NUM][ROOM_NUM][GIMMICK_NUMBER]->startPos = POS;
+	bool nullCheckFlag = allThowmpeData[STAGE_NUM][ROOM_NUM].size() != 0 && GIMMICK_NUMBER <= allThowmpeData[STAGE_NUM][ROOM_NUM].size();
+
+	if (nullCheckFlag)
+	{
+		allThowmpeData[STAGE_NUM][ROOM_NUM][GIMMICK_NUMBER]->startPos = POS;
+	}
+	else
+	{
+		for (int i = 0; i < errorCountData.size(); ++i)
+		{
+			if (errorCountData[i] == GIMMICK_NUMBER)
+			{
+				return;
+			}
+		}
+		errorCountData.push_back(GIMMICK_NUMBER);
+
+		const std::string gimmickLoadErrorString = gimmickName[GIMMCK_NAME_THOWMPE] + " " + std::to_string(GIMMICK_NUMBER) + " ギミックファイルに情報が書かれていません";
+		AddErrorStirng(STAGE_NUM, ROOM_NUM, gimmickLoadErrorString);
+	}
 }
 
-void GimmickLoader::SetThwompEndPos(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS)
+void GimmickLoader::SetThwompEndPos(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS)
 {
-	allThowmpeData[STAGE_NUM][ROOM_NUM][GIMMICK_NUMBER]->endPos = POS;
+	bool nullCheckFlag = allThowmpeData[STAGE_NUM][ROOM_NUM].size() != 0 && GIMMICK_NUMBER <= allThowmpeData[STAGE_NUM][ROOM_NUM].size();
+
+	if (nullCheckFlag)
+	{
+		allThowmpeData[STAGE_NUM][ROOM_NUM][GIMMICK_NUMBER]->endPos = POS;
+	}
+	else
+	{
+		for (int i = 0; i < errorCountData.size(); ++i)
+		{
+			if (errorCountData[i] == GIMMICK_NUMBER)
+			{
+				return;
+			}
+		}
+		errorCountData.push_back(GIMMICK_NUMBER);
+
+		const std::string gimmickLoadErrorString = gimmickName[GIMMCK_NAME_THOWMPE] + " " + std::to_string(GIMMICK_NUMBER) + " ギミックファイルに情報が書かれていません";
+		AddErrorStirng(STAGE_NUM, ROOM_NUM, gimmickLoadErrorString);
+	}
 }
 
-void GimmickLoader::PushBubbleData(const int& STAGE_NUM, const int& ROOM_NUM, const int& GIMMICK_NUMBER, const Vec2<float>& POS)
+void GimmickLoader::PushBubbleData(const int &STAGE_NUM, const int &ROOM_NUM, const int &GIMMICK_NUMBER, const Vec2<float> &POS)
 {
 	allBubbleData[STAGE_NUM][ROOM_NUM].push_back(std::make_shared<BubbleData>());
 	allBubbleData[STAGE_NUM][ROOM_NUM][GIMMICK_NUMBER]->pos = POS;
@@ -314,6 +360,80 @@ const bool &GimmickLoader::CanLoadData(const int &STAGE_NUM, const int &ROOM_NUM
 	}
 
 	return true;
+}
+
+void GimmickLoader::ErrorCheck()
+{
+	for (int stageNum = 0; stageNum < allThowmpeData.size(); ++stageNum)
+	{
+		for (int roomNum = 0; roomNum < allThowmpeData[stageNum].size(); ++roomNum)
+		{
+			for (int errorNum = 0; errorNum < allThowmpeData[stageNum][roomNum].size(); ++errorNum)
+			{
+				if (allThowmpeData[stageNum][roomNum][errorNum]->startPos.x == -1.0f &&
+					allThowmpeData[stageNum][roomNum][errorNum]->startPos.y == -1.0f)
+				{
+					errorStrings[stageNum][roomNum].push_back(std::string(gimmickName[GIMMCK_NAME_THOWMPE] + " " + std::to_string(errorNum) + " 開始座標を追加してください"));
+				}
+
+				if (allThowmpeData[stageNum][roomNum][errorNum]->endPos.x == -1.0f &&
+					allThowmpeData[stageNum][roomNum][errorNum]->endPos.y == -1.0f)
+				{
+					errorStrings[stageNum][roomNum].push_back(std::string(gimmickName[GIMMCK_NAME_THOWMPE] + " " + std::to_string(errorNum) + " 終了座標を追加してください"));
+				}
+			}
+		}
+	}
+
+
+
+	std::string errorMessageString = "ステージを読み込んだ際に一部のギミックが追加されませんでした。\nマップチップが正しい位置に置かれているか確認してください\n\n";
+	std::string gimmcikIntroString = "ギミックの種類_ギミック番号_解決策の順で表示します\n\n";
+	std::string gimmickListTitleString = "[[追加されなかったギミックリスト]]\n";
+
+	std::string gimmickListString(errorMessageString + gimmcikIntroString + gimmickListTitleString);
+
+	bool checkErrorFlag = false;
+	bool initStageFlag = false;
+	bool initRoomFlag = false;
+	for (int stageNum = 0; stageNum < errorStrings.size(); ++stageNum)
+	{
+		initStageFlag = false;
+		for (int roomNum = 0; roomNum < errorStrings[stageNum].size(); ++roomNum)
+		{
+			initRoomFlag = false;
+			for (int errorNum = 0; errorNum < errorStrings[stageNum][roomNum].size(); ++errorNum)
+			{
+				if (!initStageFlag)
+				{
+					if (stageNum == 0)
+					{
+						gimmickListString += "[ステージ" + std::to_string(stageNum) + "]\n";
+					}
+					else
+					{
+						gimmickListString += "\n[ステージ" + std::to_string(stageNum) + "]\n";
+					}
+					initStageFlag = true;
+
+				}
+
+
+				if (!initRoomFlag)
+				{
+					gimmickListString += "[エリア" + std::to_string(roomNum) + "]\n";
+					initRoomFlag = true;
+				}
+				gimmickListString += errorStrings[stageNum][roomNum][errorNum] + "\n";
+				checkErrorFlag = true;
+			}
+		}
+	}
+
+	if (checkErrorFlag)
+	{
+		MessageBox(NULL, KuroFunc::GetWideStrFromStr(gimmickListString).c_str(), TEXT("ギミック使用不可"), MB_OK);
+	}
 }
 
 GimmickLoader::GimmickName GimmickLoader::CheckName(const std::string &KEY_NAME, std::istringstream *LINE_STREAM)
@@ -354,7 +474,7 @@ GimmickLoader::GimmickName GimmickLoader::CheckName(const std::string &KEY_NAME,
 	return GimmickName(-1);
 }
 
-void GimmickLoader::LoadThowmpeData(const std::string& KEY, std::istringstream* LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA)
+void GimmickLoader::LoadThowmpeData(const std::string &KEY, std::istringstream *LINE_STREAM, std::shared_ptr<ThownpeData> THOWNPE_DATA)
 {
 	//ギミックの種類を判別する
 	if (KEY == gimmickThowmpeDataName[GIMMCK_THOWMPE_DATA_TYPE])
@@ -401,4 +521,10 @@ void GimmickLoader::LoadThownData(const std::string &KEY, std::istringstream *LI
 		*LINE_STREAM >> sizeData.y;
 		THOWN_DATA->adjValue = sizeData;
 	}
+}
+
+void GimmickLoader::AddErrorStirng(const int &STAGE_NUM, const int ROOM_NUM, const std::string &NAME)
+{
+	//どのギミックが間違って読み込まれようとしているか見る
+	errorStrings[STAGE_NUM][ROOM_NUM].push_back(NAME);
 }
