@@ -13,6 +13,7 @@ class PlayerHand;
 #include"PlayerAnimation.h"
 #include"AfterImg.h"
 class LightManager;
+#include"Muffler.h"
 
 // プレイヤークラス
 class Player {
@@ -84,6 +85,8 @@ public:
 	bool isZeroGravity;
 	int changeGravityTimer;
 	const int CHANGE_GRAVITY_TIMER = 300;
+
+	Muffler muffler;
 
 public:
 
