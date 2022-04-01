@@ -22,7 +22,6 @@ class Muffler
 	struct MufflerInfo
 	{
 		Vec2<int>vertexNum;
-		Vec2<float>vertexOffset;  //各頂点のオフセット
 		Vec2<float>mufflerSize;
 	};
 	struct ZoomAndScroll

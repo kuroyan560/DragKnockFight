@@ -43,10 +43,13 @@ struct VSOutput
     float2 uv : TEXCOORD;
 };
 
+static const float POS_SCALE = 6.0f;
+
 //頂点シェーダー
-VSOutput VSmain(VSInput input)
+VSOutput VSmain(VSInput input, uint idx : SV_VertexID)
 {
     VSOutput output;
+    
     float4 pos = float4(input.pos, 0.0f, 1.0f);
     pos.xy *= zoom;
     pos.xy -= scroll;

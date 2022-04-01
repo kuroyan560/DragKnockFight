@@ -14,111 +14,118 @@ cbuffer cbuff0 : register(b0)
 cbuffer cbuff1 : register(b1)
 {
     int2 vertexNum;
-    float2 vertexOffset;  //各頂点のオフセット
     float2 mufflerSize;
 }
 
 RWStructuredBuffer<Vertex> vertices : register(u0);
 
-int GetIndex(int x,int y)
+uint GetIndex(uint x,uint y)
 {
     return y * vertexNum.x + x;
 }
 
+static const float DENSITY = 25.0f; //単位面積あたりの質量密度
+static const float GRAVITY = 0.05f; //重力
+static const float DAMPING = 16.0f;  //ダンピング
+ //バネ定数（バネの硬さ、反発力の強さ）
+static const float SPRING_FACTOR = 32.0f;   //上下左右
+static const float SPRING_FACTOR_SKEW = SPRING_FACTOR * 0.9f; //斜め
+static const float POS_SCALE = 6.0f;
+static const float2 SPRING_LENGTH = { 16.0f, 1.0f };
+
+//static const float TENSION = 15.0f; //張力
+//static const float FRICTION = 3.0f; //減衰力係数
+//static const float DT = 0.01f; //シミュレーションの時間刻み
+
 //１個の隣接質点から受ける力を求める
-float GetForce(float ZSide, float ZCenter, float Tension, float Delta)
+float2 GetForce(const float2 MyPos, const float2 OtherPos, const float SpringLength, const float SpringFactor)
 {
-    return ((ZSide - ZCenter) * Tension / Delta);
+    float2 d = MyPos - OtherPos;
+    float f = (length(d) - SpringLength) * SpringFactor;
+    return normalize(OtherPos - MyPos) * f;
 }
 
-static const float DENSITY = 10.0f; //単位面積あたりの質量密度
-static const float GRAVITY = 0.1f;  //重力
-
-static const float TENSION = 15.0f; //張力
-static const float FRICTION = 3.0f; //減衰力係数
-static const float DT = 0.01f; //シミュレーションの時間刻み
 
 //質点に働く力
 //[numthreads(8, 8, 1)]
 [numthreads(1, 1, 1)]
 void CSmain( uint2 DTid : SV_DispatchThreadID )
 {
-    const float m = DENSITY * mufflerSize.x * mufflerSize.y / ((vertexNum.x + 1) * (vertexNum.y + 1));
-    
-    int idxX = DTid.y;
-    int idxY = DTid.x;
-    int myIdx = GetIndex(idxX, idxY);
-    
-    if (idxY == 0)
+    uint myIdx = GetIndex(DTid.y, DTid.x);
+    uint2 idx = uint2(DTid.y, DTid.x);
+    if(idx.y == 0)
     {
         vertices[myIdx].pos = startPoint;
         return;
     }
     
-    //バネからかかる力
-    float force = 0.0f;
-
+    const float m = DENSITY * mufflerSize.x * mufflerSize.y / ((vertexNum.x + 1) * (vertexNum.y + 1));
+    //const float2 springLength = mufflerSize / vertexNum;
+    const float2 springLength = SPRING_LENGTH;
+    Vertex vert = vertices[myIdx];
+    
+    //力をゼロにする
+    vert.force = float2(0.0f, 0.0f);
+    
+    //重力
+    vert.force.y += m * GRAVITY;
+    
+    //ダンピング
+    vert.force -= vert.vel * DAMPING;
+    
+    
+    //上のバネ
+    if (0 < idx.y)
     {
-	    //自身のZ(高さY)
-        float h = vertices[myIdx].pos.y;
-
-	    //X方向に隣接する質点とのバネからからる力
-        if (idxX != 0)
-        {
-            force += GetForce(vertices[GetIndex(idxX - 1, idxY)].pos.y, h, tension, vertexOffset.x);
-        }
-        else if (idxX != vertexNum.x - 1)
-        {
-            force += GetForce(vertices[GetIndex(idxX + 1, idxY)].pos.y, h, tension, vertexOffset.x);
-        }
-
-		//Y方向に隣接する質点とのバネからからる力
-        if (idxY != 0)
-        {
-            force += GetForce(vertices[GetIndex(idxX, idxY - 1)].pos.y, h, tension, vertexOffset.y);
-        }
-        else if (idxY != vertexNum.y - 1)
-        {
-            force += GetForce(vertices[GetIndex(idxX, idxY + 1)].pos.y, h, tension, vertexOffset.y);
-        }
-
-		//バネからかかる力 + 減衰力 = 質点にかかる力
-        vertices[myIdx].force.y = force - friction * vertices[myIdx].vel.y;
+        vert.force += GetForce(vert.pos, vertices[GetIndex(idx.x, idx.y - 1)].pos, springLength.y, SPRING_FACTOR);
     }
-
-    force = 0.0f;
+        
+     //下のバネ
+    if(idx.y < vertexNum.y - 1)
     {
-	    //自身のZ(高さY)
-        float h = vertices[myIdx].pos.x;
-
-	    //X方向に隣接する質点とのバネからからる力
-        if (idxX != 0)
-        {
-            force += GetForce(vertices[GetIndex(idxX - 1, idxY)].pos.x, h, tension, vertexOffset.x);
-        }
-        else if (idxX != vertexNum.x - 1)
-        {
-            force += GetForce(vertices[GetIndex(idxX + 1, idxY)].pos.x, h, tension, vertexOffset.x);
-        }
-
-		//Y方向に隣接する質点とのバネからからる力
-        if (idxY != 0)
-        {
-            force += GetForce(vertices[GetIndex(idxX, idxY - 1)].pos.x, h, tension, vertexOffset.y);
-        }
-        else if (idxY != vertexNum.y - 1)
-        {
-            force += GetForce(vertices[GetIndex(idxX, idxY + 1)].pos.x, h, tension, vertexOffset.y);
-        }
-
-		//バネからかかる力 + 減衰力 = 質点にかかる力
-        vertices[myIdx].force.x = force - friction * vertices[myIdx].vel.x;
+        vert.force += GetForce(vert.pos, vertices[GetIndex(idx.x, idx.y + 1)].pos, springLength.y, SPRING_FACTOR);
     }
     
-    //速度変化の計算
-    vertices[myIdx].vel.x += vertices[myIdx].force.x / m * dt;
-    vertices[myIdx].vel.y += vertices[myIdx].force.y / m * dt;
-    //座標変化の計算
-    vertices[myIdx].pos.x += vertices[myIdx].vel.x * dt;
-    vertices[myIdx].pos.y += vertices[myIdx].vel.y * dt;
+    //左のバネ
+    if (0 < idx.x)
+    {
+        vert.force += GetForce(vert.pos, vertices[GetIndex(idx.x - 1, idx.y)].pos, springLength.x, SPRING_FACTOR);
+    }
+    
+    //右のバネ
+    if (idx.x < vertexNum.x - 1)
+    {
+        vert.force += GetForce(vert.pos, vertices[GetIndex(idx.x + 1, idx.y)].pos, springLength.x, SPRING_FACTOR);
+    }
+    
+    const float springLengthSkew = length(springLength);
+    
+    //左上のばね
+    if (0 < idx.x && 0 < idx.y)
+    {
+        vert.force += GetForce(vert.pos, vertices[GetIndex(idx.x - 1, idx.y - 1)].pos, springLengthSkew, SPRING_FACTOR_SKEW);
+    }
+    
+     //右上のばね
+    if (idx.x < vertexNum.x - 1 && 0 < idx.y)
+    {
+        vert.force += GetForce(vert.pos, vertices[GetIndex(idx.x + 1, idx.y - 1)].pos, springLengthSkew, SPRING_FACTOR_SKEW);
+    }
+    
+    //左下のばね
+    if (0 < idx.x && idx.y < vertexNum.y - 1)
+    {
+        vert.force += GetForce(vert.pos, vertices[GetIndex(idx.x - 1, idx.y + 1)].pos, springLengthSkew, SPRING_FACTOR_SKEW);
+    }
+    
+    //右下のばね
+    if (idx.x < vertexNum.x - 1 && idx.y < vertexNum.y - 1)
+    {
+        vert.force += GetForce(vert.pos, vertices[GetIndex(idx.x + 1, idx.y + 1)].pos, springLengthSkew, SPRING_FACTOR_SKEW);
+    }
+    
+    vert.vel += vert.force / float2(m, m);
+    vert.pos += vert.vel;
+
+    vertices[myIdx] = vert;
 }
