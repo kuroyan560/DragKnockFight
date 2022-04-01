@@ -335,6 +335,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 	// 当たり判定に使用する線分を生成。
 	Vec2<float> checkHitDirection = {};
+	Vec2<float> checkHitPos = {};
 
 	switch (direction) {
 
@@ -342,6 +343,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 		// 上方向の線分を生成。
 		checkHitDirection = { pos.x, pos.y - size.y };
+		checkHitPos = { pos.x, pos.y + size.y };
 
 		break;
 
@@ -349,6 +351,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 		// 下方向の線分を生成。
 		checkHitDirection = { pos.x, pos.y + size.y };
+		checkHitPos = { pos.x, pos.y - size.y };
 
 		break;
 
@@ -356,6 +359,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 		// 左方向の線分を生成。
 		checkHitDirection = { pos.x - size.x, pos.y };
+		checkHitPos = { pos.x + size.x, pos.y };
 
 		break;
 
@@ -363,6 +367,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 		// 右方向の線分を生成。
 		checkHitDirection = { pos.x + size.x, pos.y };
+		checkHitPos = { pos.x - size.x, pos.y };
 
 		break;
 
@@ -417,11 +422,11 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 			// 上辺
 			//if (direction == INTERSECTED_BOTTOM) {
-			if (IsIntersected(rightTop, leftTop, pos, checkHitDirection)) {
+			if (IsIntersected(rightTop, leftTop, checkHitPos, checkHitDirection)) {
 
 				// 当たっていたら交点を計算して保存
 				pair<Vec2<float>, INTERSECTED_LINE> buff;
-				buff.first = CalIntersectPoint(rightTop, leftTop, pos, checkHitDirection);
+				buff.first = CalIntersectPoint(rightTop, leftTop, checkHitPos, checkHitDirection);
 
 				// そもそも一つ上のインデックスがあるのかどうかをチェックする。
 				if (height - 1 >= 0) {
@@ -441,11 +446,11 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 			// 右辺
 			//if (direction == INTERSECTED_LEFT) {
-			if (IsIntersected(rightTop, rightBottom, pos, checkHitDirection)) {
+			if (IsIntersected(rightTop, rightBottom, checkHitPos, checkHitDirection)) {
 
 				// 当たっていたら交点を計算して保存
 				pair<Vec2<float>, INTERSECTED_LINE> buff;
-				buff.first = CalIntersectPoint(rightTop, rightBottom, pos, checkHitDirection);
+				buff.first = CalIntersectPoint(rightTop, rightBottom, checkHitPos, checkHitDirection);
 
 				// そもそも一つ右のインデックスがあるのかどうかをチェックする。
 				if (width + 1 < mapChipData[height].size()) {
@@ -465,11 +470,11 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 			// 下辺
 			//if (direction == INTERSECTED_TOP) {
-			if (IsIntersected(leftBottom, rightBottom, pos, checkHitDirection)) {
+			if (IsIntersected(leftBottom, rightBottom, checkHitPos, checkHitDirection)) {
 
 				// 当たっていたら交点を計算して保存
 				pair<Vec2<float>, INTERSECTED_LINE> buff;
-				buff.first = CalIntersectPoint(leftBottom, rightBottom, pos, checkHitDirection);
+				buff.first = CalIntersectPoint(leftBottom, rightBottom, checkHitPos, checkHitDirection);
 
 				// 交点との距離がプレイヤーの半径+マップ半径より小さかったら保存する。
 				//if (fabs(Vec2<float>(buff.first - player.centerPos).x) < player.PLAYER_SIZE.y + MAP_CHIP_HALF_SIZE &&
@@ -493,11 +498,11 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 			// 左辺
 			//if (direction == INTERSECTED_RIGHT) {
-			if (IsIntersected(leftBottom, leftTop, pos, checkHitDirection)) {
+			if (IsIntersected(leftBottom, leftTop, checkHitPos, checkHitDirection)) {
 
 				// 当たっていたら交点を計算して保存
 				pair<Vec2<float>, INTERSECTED_LINE> buff;
-				buff.first = CalIntersectPoint(leftBottom, leftTop, pos, checkHitDirection);
+				buff.first = CalIntersectPoint(leftBottom, leftTop, checkHitPos, checkHitDirection);
 
 				// そもそも一つ上のインデックスがあるのかどうかをチェックする。
 				if (width - 1 >= 0) {

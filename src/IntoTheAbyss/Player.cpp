@@ -1854,7 +1854,7 @@ void Player::CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_RIGHT, 0 < gimmickVel.Length());
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 
-	const float OFFSET = 5.0f;
+	const float OFFSET = 1.0f;
 
 	// マップチップとプレイヤーの当たり判定 絶対に被せないための処理 上
 	Vec2<float> centerPosBuff = centerPos + Vec2<float>(0, -PLAYER_HIT_SIZE.y + OFFSET);
