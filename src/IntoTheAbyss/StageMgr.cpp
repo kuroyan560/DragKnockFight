@@ -233,7 +233,7 @@ StageMgr::StageMgr()
 
 
 					bool skipFlag = false;		//ドアをを探索したかどうかを示すフラグ
-					for (int doorNumber = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min; doorNumber < mapChipMemoryData[MAPCHIP_TYPE_DOOR].max - SECRET_DOOR_NUMBER; ++doorNumber)
+					for (int doorNumber = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min; doorNumber < mapChipMemoryData[MAPCHIP_TYPE_DOOR].max; ++doorNumber)
 					{
 						int arrayNum = doorNumber - mapChipMemoryData[MAPCHIP_TYPE_DOOR].min;//ドア番号から配列の添え字用に数値を調整
 
@@ -261,9 +261,10 @@ StageMgr::StageMgr()
 							}
 						}
 
-						if (now == 22)
+						if (now == doorNumber&&mapChipMemoryData[MAPCHIP_TYPE_DOOR].min + SECRET_DOOR_NUMBER <= doorNumber)
 						{
-							bool debug = false;
+							skipFlag = true;
+							break;
 						}
 
 
