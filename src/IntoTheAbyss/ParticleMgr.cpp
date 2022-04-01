@@ -152,16 +152,19 @@ void ParticleMgr::Update()
 #include"LightManager.h"
 void ParticleMgr::Draw(LightManager& LigManager)
 {
-	ZoomAndScroll info;
-	info.zoom = ScrollMgr::Instance()->zoom;
-
 	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-	info.scroll = scrollShakeZoom;
-	zoomAndScroll->Mapping(&info);
 
-	std::vector<DESC_HANDLE_TYPE>descTypes = { CBV,CBV,CBV,SRV,SRV,SRV,SRV };
+	static ZoomAndScroll ZOOM_AND_SCROLL;
+	if (ZOOM_AND_SCROLL.zoom != ScrollMgr::Instance()->zoom || ZOOM_AND_SCROLL.scroll != scrollShakeZoom)
+	{
+		ZOOM_AND_SCROLL.zoom = ScrollMgr::Instance()->zoom;
+		ZOOM_AND_SCROLL.scroll = scrollShakeZoom;
+		zoomAndScroll->Mapping(&ZOOM_AND_SCROLL);
+	}
+
+	static std::vector<DESC_HANDLE_TYPE>descTypes = { CBV,CBV,CBV,SRV,SRV,SRV,SRV };
 	std::vector<std::shared_ptr<DescriptorData>>descDatas =
 	{
 		KuroEngine::Instance().GetParallelMatProjBuff(),

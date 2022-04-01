@@ -33,15 +33,15 @@ class ParticleMgr : public Singleton<ParticleMgr>
 		float speed;		// 移動速度
 		char isAlive = 0;		// 生存フラグ
 		float scale;
-		unsigned int texIdx;	//テクスチャ番号
+		unsigned int texIdx;	//テクスチャ番号k
 
 		// 生成処理
 		void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const int& TexIdx);
 	};
 	struct ZoomAndScroll
 	{
-		float zoom;
-		Vec2<float>scroll;
+		float zoom = 0.0f;
+		Vec2<float>scroll = { 0.0f,0.0f };
 	};
 
 	friend class Singleton<ParticleMgr>;

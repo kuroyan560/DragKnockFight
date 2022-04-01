@@ -1,6 +1,6 @@
 #include"D3D12Data.h"
 
-void GPUResource::Mapping(const size_t& DataSize, const int& ElementNum, void* SendData)
+void GPUResource::Mapping(const size_t& DataSize, const int& ElementNum, const void* SendData)
 {
 	//送るデータがnullなら何もしない
 	if (SendData == nullptr)ASSERT_MSG("データのマッピングに失敗、引数がnullptrです\n");
