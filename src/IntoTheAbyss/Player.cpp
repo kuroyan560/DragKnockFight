@@ -126,6 +126,7 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	isZeroGravity = false;
 	changeGravityTimer = 0;
 
+	muffler.Init(INIT_POS);
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -292,11 +293,10 @@ void Player::Update(const vector<vector<int>> mapData)
 
 	if (isZeroGravity) gravity = 0;
 
-
-
-
 	//テレポート時のフラッシュのタイマー計測
 	if (flashTimer < flashTotalTime)flashTimer++;
+
+	muffler.Update(centerPos);
 }
 
 void Player::Draw(LightManager& LigManager)
@@ -319,6 +319,8 @@ void Player::Draw(LightManager& LigManager)
 
 	//残像描画
 	afImg.Draw(ScrollMgr::Instance()->zoom, scrollShakeZoom);
+
+	muffler.Draw(LigManager);
 
 	if (playerDir == RIGHT)
 	{
