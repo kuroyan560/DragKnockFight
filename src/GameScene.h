@@ -16,6 +16,7 @@ class GameScene : public BaseScene
 	std::shared_ptr<RenderTarget>emissiveMap;
 
 	Game game;
+	float addValue;
 
 	SceneCange *sceneChange;
 public:

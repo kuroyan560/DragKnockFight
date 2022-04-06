@@ -6,6 +6,7 @@
 #include"IntoTheAbyss/StageMgr.h"
 #include"IntoTheAbyss/SelectStage.h"
 #include"IntoTheAbyss/DebugParameter.h"
+#include"IntoTheAbyss/SuperiorityGauge.h"
 
 GameScene::GameScene()
 {
@@ -24,6 +25,8 @@ GameScene::GameScene()
 		WinApp::Instance()->GetWinSize(), L"EmissiveMap");
 
 	sceneChange = new SceneCange();
+
+	addValue = 10.0f;
 }
 
 void GameScene::OnInitialize()
@@ -34,6 +37,16 @@ void GameScene::OnUpdate()
 {
 	DebugParameter::Instance()->Update();
 	game.Update();
+
+
+	if (UsersInput::Instance()->OnTrigger(DIK_Q))
+	{
+		SuperiorityGauge::Instance()->AddPlayerGauge(addValue);
+	}
+	if (UsersInput::Instance()->OnTrigger(DIK_W))
+	{
+		SuperiorityGauge::Instance()->AddEnemyGauge(addValue);
+	}
 
 	bool changeInput = UsersInput::Instance()->OnTrigger(DIK_B) || UsersInput::Instance()->OnTrigger(START);
 	if (changeInput)
@@ -114,6 +127,8 @@ void GameScene::OnImguiDebug()
 
 	DebugParameter::Instance()->DrawImGui();
 
+
+	SuperiorityGauge::Instance()->DebugValue(&addValue);
 }
 
 void GameScene::OnFinalize()

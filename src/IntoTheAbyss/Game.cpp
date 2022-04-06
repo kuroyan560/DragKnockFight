@@ -20,6 +20,8 @@
 #include"ParticleMgr.h"
 #include"GUI.h"
 
+#include"SuperiorityGauge.h"
+
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
@@ -165,6 +167,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
 
+	SuperiorityGauge::Instance()->Init();
 
 	//ドアが繋がっているか確認
 	if (!SelectStage::Instance()->resetStageFlag)
@@ -490,8 +493,6 @@ void Game::Init()
 void Game::Update()
 {
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
-
-
 
 #pragma region ステージの切り替え
 	const bool enableToSelectStageFlag = 0 < debugStageData[0];
@@ -907,6 +908,11 @@ void Game::Update()
 
 	// 動的ブロックの更新処理
 	MovingBlockMgr::Instance()->Update(player.centerPos);
+
+	SuperiorityGauge::Instance()->Update();
+
+	// 弾パーティクルの更新処理
+	//BulletParticleMgr::Instance()->Update();
 
 	// ドッスンブロックの更新処理
 	const int DOSSUN_COUNT = dossunBlock.size();
