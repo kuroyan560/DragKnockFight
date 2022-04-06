@@ -1501,7 +1501,7 @@ void Player::Move()
 	/*===== ˆÚ“®‚ÉŠÖ‚·‚éˆ— =====*/
 
 	// ˆÚ“®ˆ—
-	centerPos += vel;
+	//centerPos += vel;
 
 	// ƒMƒ~ƒbƒN‚©‚ç—^‚¦‚ç‚ê‚éˆÚ“®—Ê‚ğ‰ÁZ
 	centerPos += gimmickVel;

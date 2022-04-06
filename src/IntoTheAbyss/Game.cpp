@@ -21,7 +21,7 @@
 #include"GUI.h"
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -47,7 +47,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -85,7 +85,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -142,7 +142,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
+const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -160,7 +160,7 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
+void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
@@ -475,6 +475,9 @@ void Game::Init()
 	}
 	enemyGenerateTimer = 0;
 	nomoveMentTimer = 0;
+
+	// ボスを生成
+	boss.Generate(player.centerPos + Vec2<float>(100, 0));
 
 }
 
@@ -845,6 +848,7 @@ void Game::Update()
 	}
 
 
+#pragma region 死亡判定
 	//遷移中ではない&&プレイヤーが死亡していな時に棘ブロックとの判定を取る
 	if (!player.isDead && !sceneBlackFlag && !sceneLightFlag)
 	{
@@ -861,6 +865,7 @@ void Game::Update()
 			}
 		}
 	}
+#pragma endregion
 
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
@@ -880,60 +885,11 @@ void Game::Update()
 	//if (Input::isKey(KEY_INPUT_O)) player.centerPos.x -= 100.0f;
 	if (UsersInput::Instance()->OnTrigger(DIK_O)) player.centerPos.x -= 100.0f;
 
-	// 敵の更新処理
-	bossEnemy.Update(player.centerPos);
+	// ボスの更新処理
+	boss.Update();
 
-	++enemyGenerateTimer;
-	// 生成タイマーが既定値を超えたら
-	if (SMALL_GENERATE_TIMER <= enemyGenerateTimer) {
-
-		enemyGenerateTimer = 0;
-
-		for (int index = 0; index < SMALL_ENEMY; ++index) {
-
-			if (smallEnemy[index].isActive) continue;
-
-			//smallEnemy[index].Generate(ENEMY_SMALL, mapData);
-
-			break;
-
-		}
-
-	}
-
-	// 移動しない敵の生成処理
-	++nomoveMentTimer;
-	if (NOMOVEMENT_GENERATE_TIMER <= nomoveMentTimer) {
-
-		nomoveMentTimer = 0;
-
-		for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
-
-			if (noMovementEnemy[index].isActive) continue;
-
-			//noMovementEnemy[index].Generate(ENEMY_NOMOVEMENT, mapData);
-
-			break;
-
-		}
-
-	}
-
-	// 小型敵の更新処理
-	for (int index = 0; index < SMALL_ENEMY; ++index) {
-
-		if (!smallEnemy[index].isActive) continue;
-
-		smallEnemy[index].Update(player.centerPos);
-
-	}
-	for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
-
-		if (!noMovementEnemy[index].isActive) continue;
-
-		noMovementEnemy[index].Update(player.centerPos);
-
-	}
+	// プレイヤーとボスの引っ張り合いの処理
+	Scramble();
 
 	// スクロール量の更新処理
 	ScrollMgr::Instance()->Update();
@@ -941,11 +897,10 @@ void Game::Update()
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();
 
+#pragma region 各ギミックの更新処理
+
 	// 動的ブロックの更新処理
 	MovingBlockMgr::Instance()->Update(player.centerPos);
-
-	// 弾パーティクルの更新処理
-	//BulletParticleMgr::Instance()->Update();
 
 	// ドッスンブロックの更新処理
 	const int DOSSUN_COUNT = dossunBlock.size();
@@ -967,8 +922,12 @@ void Game::Update()
 		}
 	}
 
+#pragma endregion
+
 
 	/*===== 当たり判定 =====*/
+
+#pragma region 当たり判定
 
 	// ドッスンブロックの当たり判定
 	for (int index = 0; index < DOSSUN_COUNT; ++index) {
@@ -1007,6 +966,10 @@ void Game::Update()
 		noMovementEnemy[index].CheckHitBullet();
 
 	}
+
+#pragma endregion
+
+#pragma region 必要のない当たり判定
 
 	// 弾とビューポートの当たり判定
 	for (int i = 0; i < BulletMgr::Instance()->bullets.size(); ++i)
@@ -1316,6 +1279,9 @@ void Game::Update()
 
 
 	}
+
+#pragma endregion
+
 	ViewPort::Instance()->playerPos = player.centerPos;
 	//ライト更新
 	auto pos = player.GetCenterDrawPos();
@@ -1389,6 +1355,9 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	player.Draw(ligMgr);
 	ParticleMgr::Instance()->Draw(ligMgr);
 
+	// プレイヤーとボス間に線を描画
+	DrawFunc::DrawLine2D(player.centerPos, boss.pos, Color());
+
 	GUI::Instance()->Draw();
 
 	if (sceneBlackFlag || sceneLightFlag)
@@ -1401,4 +1370,11 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),EmissiveMap.lock() });
 	}
+}
+
+void Game::Scramble()
+{
+
+	/*===== 引っ張り合いの処理 =====*/
+
 }
