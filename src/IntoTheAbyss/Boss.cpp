@@ -3,6 +3,7 @@
 #include "ScrollMgr.h"
 #include "DrawFunc.h"
 #include "MapChipCollider.h"
+#include "WinApp.h"
 #include"UsersInput.h"
 
 Boss::Boss()
@@ -32,6 +33,7 @@ void Boss::Generate(const Vec2<float>& generatePos)
 	scale = SCALE;
 	vel = { OFFSET_VEL,0 };
 	prevIntersectedLine = INTERSECTED_NONE;
+	stuckWindowTimer = 0;
 
 }
 
@@ -50,6 +52,8 @@ void Boss::Update()
 		vel.x = OFFSET_VEL * 5.0f;
 
 	}
+
+	if (0 < stuckWindowTimer) --stuckWindowTimer;
 
 }
 
@@ -206,34 +210,38 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 
 	}
 
-	/*if (intersectedBuff == INTERSECTED_NONE && prevIntersectedLine != INTERSECTED_NONE) {
+	// マップチップにあたっている状態で画面外に出たら
+	if (isHitMapChip) {
 
-		float offset = 3.0f;
+		Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
 
-		switch (prevIntersectedLine)
-		{
-		case INTERSECTED_TOP:
-			prevPos.y += offset;
-			pos.y += offset;
-			break;
-		case INTERSECTED_RIGHT:
-			prevPos.x += offset;
-			pos.x += offset;
-			break;
-		case INTERSECTED_LEFT:
-			prevPos.x -= offset;
-			pos.x -= offset;
-			break;
-		case INTERSECTED_BOTTOM:
-			prevPos.y -= offset;
-			pos.y -= offset;
-			break;
-		default:
-			break;
+		// ボスとプレイヤーの距離
+		float distanceX = fabs(playerPos.x - pos.x);
+		float disntaceY = fabs(playerPos.y - pos.y);
+
+		// ウィンドウ左右
+		if (windowSize.x <= distanceX) {
+
+			stuckWindowTimer = STRUCK_WINDOW_TIMER;
+			ShakeMgr::Instance()->SetShake(20);
+
+		}
+		// ウィンドウ上下
+		if (windowSize.y <= disntaceY) {
+
+			stuckWindowTimer = STRUCK_WINDOW_TIMER;
+			ShakeMgr::Instance()->SetShake(20);
+
 		}
 
-	}*/
+	}
 
 	prevIntersectedLine = intersectedBuff;
+
+	if (0 < stuckWindowTimer) {
+
+		isHitMapChip = false;
+
+	}
 
 }

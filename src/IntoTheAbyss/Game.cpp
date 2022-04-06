@@ -1511,6 +1511,13 @@ void Game::Scramble()
 
 		addLineLengthBoss -= 5.0f;
 
+		// ウィンドウに挟まったら
+		if (0 < boss.stuckWindowTimer) {
+
+			addLineLengthBoss -= 20.0f;
+
+		}
+
 		if (addLineLengthBoss < 0) addLineLengthBoss = 0;
 
 	}
