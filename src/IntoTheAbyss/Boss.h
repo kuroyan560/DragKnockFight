@@ -1,5 +1,6 @@
 #include "Vec.h"
 #include <vector>
+#include "Intersected.h"
 
 using namespace std;
 
@@ -14,6 +15,7 @@ public:
 	Vec2<float> prevPos;
 	Vec2<float> scale;
 	Vec2<float> vel;
+	INTERSECTED_LINE prevIntersectedLine;
 
 
 public:
@@ -44,6 +46,6 @@ public:
 	void Draw();
 
 	// “–‚½‚è”»’è
-	void CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip);
+	void CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos);
 
 };
