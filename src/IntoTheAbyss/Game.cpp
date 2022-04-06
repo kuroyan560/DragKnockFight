@@ -480,6 +480,8 @@ void Game::Init()
 	boss.Generate(player.centerPos + Vec2<float>(100, 0));
 	lineLength = 0;
 
+	isCatchMapChip = false;
+
 }
 
 void Game::Update()
@@ -944,6 +946,9 @@ void Game::Update()
 	// 弾とマップチップの当たり判定
 	BulletMgr::Instance()->CheckHit(mapData, bubbleBlock);
 
+	// ボスの当たり判定
+	boss.CheckHit(mapData, isCatchMapChip);
+
 	// ビューポートをプレイヤー基準で移動させる。
 	ViewPort::Instance()->SetPlayerPosX(player.centerPos.x);
 	ViewPort::Instance()->SetPlayerPosY(player.centerPos.y);
@@ -1385,31 +1390,30 @@ void Game::Scramble()
 	// 移動量を取得。 優勢ゲージはここで更新。
 	float playerVel = player.vel.Length();
 	Vec2<float> playerVelGauge = player.vel;
-	float bossVel = boss.vel;
+	float bossVel = boss.vel.Length();
+	Vec2<float> bossVelGauge = boss.vel;
 	float subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
 	player.centerPos += playerVelGauge;
-	boss.pos += Vec2<float>(bossVel, bossVel) * boss.forwardVec;
+	boss.pos += bossVelGauge;
+
+	// 線分の長さ
+	float line = 0;
+	float LINE = LINE_LENGTH + lineLength;
 
 	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
 	if (playerVel < bossVel) {
 
 		// ボスの移動量のほうが大きかったら
 
-		// ボスを移動させる。
-		//boss.pos += boss.forwardVec * Vec2<float>(subVel, subVel);
-
-		// 一応プレイヤーも移動させる。
-		//player.centerPos += player.vel;
-
 		// 距離を求める。
-		lineLength = Vec2<float>(player.centerPos).Distance(boss.pos);
+		line = Vec2<float>(player.centerPos).Distance(boss.pos);
 
 		// プレイヤーをボスの方に移動させる。
-		if (LINE_LENGTH < lineLength) {
+		if (LINE < line) {
 
 			// 押し戻し量
-			float moveLength = lineLength - LINE_LENGTH;
+			float moveLength = line - LINE;
 
 			// 押し戻し方向
 			Vec2<float> moveDir = Vec2<float>(boss.pos - player.centerPos);
@@ -1425,22 +1429,14 @@ void Game::Scramble()
 
 		// プレイヤーの移動量のほうが大きかったら
 
-		// プレイヤーを移動させる。
-		//Vec2<float> playerDir = player.vel;
-		//playerDir.Normalize();
-		//player.centerPos += playerDir * Vec2<float>(subVel, subVel);
-
-		// ボスも移動させる。
-		//boss.pos += boss.forwardVec * Vec2<float>(boss.vel, boss.vel);
-
 		// 距離を求める。
-		lineLength = Vec2<float>(player.centerPos).Distance(boss.pos);
+		line = Vec2<float>(player.centerPos).Distance(boss.pos);
 
 		// ボスをプレイヤーの方に移動させる。
-		if (LINE_LENGTH < lineLength) {
+		if (LINE < line) {
 
 			// 押し戻し量
-			float moveLength = lineLength - LINE_LENGTH;
+			float moveLength = line - LINE;
 
 			// 押し戻し方向
 			Vec2<float> moveDir = Vec2<float>(player.centerPos - boss.pos);
@@ -1448,6 +1444,17 @@ void Game::Scramble()
 
 			// 押し戻す。
 			boss.pos += moveDir * Vec2<float>(moveLength, moveLength);
+
+			if (boss.pos.x < boss.prevPos.x) {
+				boss.vel.x -= boss.prevPos.x - boss.pos.x;
+			}
+
+			// ボスの移動量が0を下回らないようにする。
+			if (boss.vel.x < 0) {
+
+				boss.vel.x = 0;
+
+			}
 
 		}
 
@@ -1457,5 +1464,7 @@ void Game::Scramble()
 		return;
 
 	}
+
+	isCatchMapChip = false;
 
 }
