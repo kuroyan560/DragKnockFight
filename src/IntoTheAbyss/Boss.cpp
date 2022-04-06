@@ -126,8 +126,6 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 	// マップチップと当たっていたら
 	if (isHitMapChipBoss) {
 
-		const float HALF_PI = 0.785398f;
-
 		// マップチップと当たっている場所によって、引っかかっているかどうかを調べる。
 
 		// プレイヤーとの角度

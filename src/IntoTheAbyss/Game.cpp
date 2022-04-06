@@ -487,6 +487,7 @@ void Game::Init()
 	addLineLengthBoss = 0;
 
 	isCatchMapChipBoss = false;
+	isCatchMapChipPlayer = false;
 
 }
 
@@ -947,7 +948,7 @@ void Game::Update()
 	}
 
 	// プレイヤーの当たり判定
-	player.CheckHit(mapData, bubbleBlock, dossunBlock);
+	player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer);
 
 	// 動的ブロックの当たり判定
 	MovingBlockMgr::Instance()->CheckHit(mapData);
@@ -1448,6 +1449,13 @@ void Game::Scramble()
 			// 押し戻す。
 			player.centerPos += moveDir * Vec2<float>(moveLength, moveLength);
 
+			// 引っかかり判定だったら
+			if (isCatchMapChipPlayer) {
+
+				addLineLengthPlayer += moveLength;
+
+			}
+
 		}
 
 	}
@@ -1506,7 +1514,15 @@ void Game::Scramble()
 		if (addLineLengthBoss < 0) addLineLengthBoss = 0;
 
 	}
+	if (!isCatchMapChipPlayer && 0 < addLineLengthPlayer) {
+
+		addLineLengthPlayer -= 5.0f;
+
+		if (addLineLengthPlayer < 0) addLineLengthPlayer = 0;
+
+	}
 
 	isCatchMapChipBoss = false;
+	isCatchMapChipPlayer = false;
 
 }

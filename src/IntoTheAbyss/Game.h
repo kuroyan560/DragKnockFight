@@ -66,6 +66,7 @@ class Game
 
 	// ボスorプレイヤーが引っかかっているかのフラグ
 	bool isCatchMapChipBoss;
+	bool isCatchMapChipPlayer;
 
 	// ボスプレイヤー間の線
 	float lineLengthPlayer;

@@ -151,7 +151,7 @@ public:
 	void Draw(LightManager& LigManager);
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun);
+	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip);
 
 	// 方向ごとのマップチップとの当たり判定関数
 	void HitMapChipTop();
@@ -200,7 +200,7 @@ private:
 	int GetHandGraph(const DRAW_DIR& Dir);
 
 	// 移動量での当たり判定
-	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
-	void CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
+	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip);
+	void CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip);
 
 };
