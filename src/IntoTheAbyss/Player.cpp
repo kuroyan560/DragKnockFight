@@ -1503,7 +1503,7 @@ void Player::Move()
 	/*===== 移動に関する処理 =====*/
 
 	// 移動処理
-	centerPos += vel;
+	//centerPos += vel;
 
 	// ギミックから与えられる移動量を加算
 	centerPos += gimmickVel;
@@ -1552,13 +1552,13 @@ void Player::UpdateGravity()
 	/*===== 重力に関する更新処理 =====*/
 
 	// 重力を加算。
-	centerPos.y += gravity;
+	//centerPos.y += gravity;
 
 	// 接地フラグが立ってい且つ重力無効化タイマーが0以下だったらなかったら重力を加算。
 	if (!onGround && gravityInvalidTimer <= 0) {
 
 		// 重力を加算。
-		gravity += ADD_GRAVITY;
+		//gravity += ADD_GRAVITY;
 
 		// 重力が限界を超えないようにする。
 		if (gravity > MAX_GRAVITY) {
@@ -1856,7 +1856,7 @@ void Player::CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(centerPos, PLAYER_HIT_SIZE, mapData, INTERSECTED_RIGHT, 0 < gimmickVel.Length());
 	if (intersectedLine == INTERSECTED_TOP) HitMapChipBottom();
 
-	const float OFFSET = 5.0f;
+	const float OFFSET = 1.0f;
 
 	// マップチップとプレイヤーの当たり判定 絶対に被せないための処理 上
 	Vec2<float> centerPosBuff = centerPos + Vec2<float>(0, -PLAYER_HIT_SIZE.y + OFFSET);

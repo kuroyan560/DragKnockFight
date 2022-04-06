@@ -10,6 +10,7 @@ using namespace std;
 #include "Bubble.h"
 #include"GimmickLoader.h"
 #include"EventBlock.h"
+#include "Boss.h"
 
 #include<memory>
 class TextureBuffer;
@@ -59,6 +60,16 @@ class Game
 	const int SMALL_GENERATE_TIMER = 60;
 	int nomoveMentTimer;
 	const int NOMOVEMENT_GENERATE_TIMER = 30;
+
+	// ボス
+	Boss boss;
+
+	// ボスorプレイヤーが引っかかっているかのフラグ
+	bool isCatchMapChip;
+
+	// ボスプレイヤー間の線
+	float lineLength;
+	const float LINE_LENGTH = 300.0f;
 
 	// マップチップのデータ
 	vector<vector<int>> mapData;
@@ -132,6 +143,7 @@ public:
 	void Init();
 	void Update();
 	void Draw(std::weak_ptr<RenderTarget>EmissiveMap);
+	void Scramble();
 
 	LightManager& GetLigManager() { return ligMgr; }
 

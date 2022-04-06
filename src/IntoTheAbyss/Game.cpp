@@ -23,7 +23,7 @@
 #include"SuperiorityGauge.h"
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -49,7 +49,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -87,7 +87,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -144,7 +144,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
+const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -162,7 +162,7 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
+void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
@@ -478,6 +478,12 @@ void Game::Init()
 	}
 	enemyGenerateTimer = 0;
 	nomoveMentTimer = 0;
+
+	// ボスを生成
+	boss.Generate(player.centerPos + Vec2<float>(100, 0));
+	lineLength = 0;
+
+	isCatchMapChip = false;
 
 }
 
@@ -846,6 +852,7 @@ void Game::Update()
 	}
 
 
+#pragma region 死亡判定
 	//遷移中ではない&&プレイヤーが死亡していな時に棘ブロックとの判定を取る
 	if (!player.isDead && !sceneBlackFlag && !sceneLightFlag)
 	{
@@ -862,6 +869,7 @@ void Game::Update()
 			}
 		}
 	}
+#pragma endregion
 
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
@@ -881,66 +889,19 @@ void Game::Update()
 	//if (Input::isKey(KEY_INPUT_O)) player.centerPos.x -= 100.0f;
 	if (UsersInput::Instance()->OnTrigger(DIK_O)) player.centerPos.x -= 100.0f;
 
-	// 敵の更新処理
-	bossEnemy.Update(player.centerPos);
+	// ボスの更新処理
+	boss.Update();
 
-	++enemyGenerateTimer;
-	// 生成タイマーが既定値を超えたら
-	if (SMALL_GENERATE_TIMER <= enemyGenerateTimer) {
-
-		enemyGenerateTimer = 0;
-
-		for (int index = 0; index < SMALL_ENEMY; ++index) {
-
-			if (smallEnemy[index].isActive) continue;
-
-			//smallEnemy[index].Generate(ENEMY_SMALL, mapData);
-
-			break;
-
-		}
-
-	}
-
-	// 移動しない敵の生成処理
-	++nomoveMentTimer;
-	if (NOMOVEMENT_GENERATE_TIMER <= nomoveMentTimer) {
-
-		nomoveMentTimer = 0;
-
-		for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
-
-			if (noMovementEnemy[index].isActive) continue;
-
-			//noMovementEnemy[index].Generate(ENEMY_NOMOVEMENT, mapData);
-
-			break;
-
-		}
-
-	}
-
-	// 小型敵の更新処理
-	for (int index = 0; index < SMALL_ENEMY; ++index) {
-
-		if (!smallEnemy[index].isActive) continue;
-
-		smallEnemy[index].Update(player.centerPos);
-
-	}
-	for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
-
-		if (!noMovementEnemy[index].isActive) continue;
-
-		noMovementEnemy[index].Update(player.centerPos);
-
-	}
+	// プレイヤーとボスの引っ張り合いの処理
+	Scramble();
 
 	// スクロール量の更新処理
 	ScrollMgr::Instance()->Update();
 
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();
+
+#pragma region 各ギミックの更新処理
 
 	// 動的ブロックの更新処理
 	MovingBlockMgr::Instance()->Update(player.centerPos);
@@ -970,8 +931,12 @@ void Game::Update()
 		}
 	}
 
+#pragma endregion
+
 
 	/*===== 当たり判定 =====*/
+
+#pragma region 当たり判定
 
 	// ドッスンブロックの当たり判定
 	for (int index = 0; index < DOSSUN_COUNT; ++index) {
@@ -986,6 +951,9 @@ void Game::Update()
 
 	// 弾とマップチップの当たり判定
 	BulletMgr::Instance()->CheckHit(mapData, bubbleBlock);
+
+	// ボスの当たり判定
+	boss.CheckHit(mapData, isCatchMapChip);
 
 	// ビューポートをプレイヤー基準で移動させる。
 	ViewPort::Instance()->SetPlayerPosX(player.centerPos.x);
@@ -1010,6 +978,10 @@ void Game::Update()
 		noMovementEnemy[index].CheckHitBullet();
 
 	}
+
+#pragma endregion
+
+#pragma region 必要のない当たり判定
 
 	// 弾とビューポートの当たり判定
 	for (int i = 0; i < BulletMgr::Instance()->bullets.size(); ++i)
@@ -1319,6 +1291,9 @@ void Game::Update()
 
 
 	}
+
+#pragma endregion
+
 	ViewPort::Instance()->playerPos = player.centerPos;
 	//ライト更新
 	auto pos = player.GetCenterDrawPos();
@@ -1392,6 +1367,13 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	player.Draw(ligMgr);
 	ParticleMgr::Instance()->Draw(ligMgr);
 
+	// ボスを描画
+	boss.Draw();
+
+	// プレイヤーとボス間に線を描画
+	Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, boss.pos - scrollShakeAmount, Color());
+
 	GUI::Instance()->Draw();
 
 	if (sceneBlackFlag || sceneLightFlag)
@@ -1404,4 +1386,91 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),EmissiveMap.lock() });
 	}
+}
+
+void Game::Scramble()
+{
+
+	/*===== 引っ張り合いの処理 =====*/
+
+	// 移動量を取得。 優勢ゲージはここで更新。
+	float playerVel = player.vel.Length();
+	Vec2<float> playerVelGauge = player.vel;
+	float bossVel = boss.vel.Length();
+	Vec2<float> bossVelGauge = boss.vel;
+	float subVel = fabs(fabs(playerVel) - fabs(bossVel));
+
+	player.centerPos += playerVelGauge;
+	boss.pos += bossVelGauge;
+
+	// 線分の長さ
+	float line = 0;
+	float LINE = LINE_LENGTH + lineLength;
+
+	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
+	if (playerVel < bossVel) {
+
+		// ボスの移動量のほうが大きかったら
+
+		// 距離を求める。
+		line = Vec2<float>(player.centerPos).Distance(boss.pos);
+
+		// プレイヤーをボスの方に移動させる。
+		if (LINE < line) {
+
+			// 押し戻し量
+			float moveLength = line - LINE;
+
+			// 押し戻し方向
+			Vec2<float> moveDir = Vec2<float>(boss.pos - player.centerPos);
+			moveDir.Normalize();
+
+			// 押し戻す。
+			player.centerPos += moveDir * Vec2<float>(moveLength, moveLength);
+
+		}
+
+	}
+	else if (bossVel < playerVel) {
+
+		// プレイヤーの移動量のほうが大きかったら
+
+		// 距離を求める。
+		line = Vec2<float>(player.centerPos).Distance(boss.pos);
+
+		// ボスをプレイヤーの方に移動させる。
+		if (LINE < line) {
+
+			// 押し戻し量
+			float moveLength = line - LINE;
+
+			// 押し戻し方向
+			Vec2<float> moveDir = Vec2<float>(player.centerPos - boss.pos);
+			moveDir.Normalize();
+
+			// 押し戻す。
+			boss.pos += moveDir * Vec2<float>(moveLength, moveLength);
+
+			if (boss.pos.x < boss.prevPos.x) {
+				boss.vel.x -= boss.prevPos.x - boss.pos.x;
+			}
+
+			// ボスの移動量が0を下回らないようにする。
+			if (boss.vel.x < 0) {
+
+				boss.vel.x = 0;
+
+			}
+
+		}
+
+	}
+	else {
+
+		return;
+
+	}
+
+	isCatchMapChip = false;
+
 }
