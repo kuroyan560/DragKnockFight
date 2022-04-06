@@ -1374,7 +1374,11 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 	DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, boss.pos - scrollShakeAmount, Color());
 
+	SuperiorityGauge::Instance()->Draw();
+	
 	GUI::Instance()->Draw();
+
+
 
 	if (sceneBlackFlag || sceneLightFlag)
 	{
