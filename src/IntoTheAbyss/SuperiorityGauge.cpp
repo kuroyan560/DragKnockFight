@@ -1,6 +1,6 @@
-#include "src\IntoTheAbyss\SuperiorityGauge.h"
+#include "SuperiorityGauge.h"
 #include<math.h>
-#include"src/Engine/ImguiApp.h"
+#include"Engine/ImguiApp.h"
 
 float SuperiorityGauge::GAUGE_MAX_VALUE = 100.0f;
 int SuperiorityGauge::STACK_MAX_TIMER = 120;
