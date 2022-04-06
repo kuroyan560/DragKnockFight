@@ -2,6 +2,7 @@
 #include "ShakeMgr.h"
 #include "ScrollMgr.h"
 #include "DrawFunc.h"
+#include"UsersInput.h"
 
 Boss::Boss()
 {
@@ -41,6 +42,12 @@ void Boss::Update()
 	/*===== XVˆ— =====*/
 
 	vel = OFFSET_VEL;
+
+	if (UsersInput::Instance()->Input(DIK_0)) {
+
+		vel = OFFSET_VEL * 5.0f;
+
+	}
 
 }
 

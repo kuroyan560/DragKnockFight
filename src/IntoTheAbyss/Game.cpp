@@ -1382,10 +1382,14 @@ void Game::Scramble()
 
 	/*===== 引っ張り合いの処理 =====*/
 
-	// 移動量を取得。
+	// 移動量を取得。 優勢ゲージはここで更新。
 	float playerVel = player.vel.Length();
+	Vec2<float> playerVelGauge = player.vel;
 	float bossVel = boss.vel;
 	float subVel = fabs(fabs(playerVel) - fabs(bossVel));
+
+	player.centerPos += playerVelGauge;
+	boss.pos += Vec2<float>(bossVel, bossVel) * boss.forwardVec;
 
 	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
 	if (playerVel < bossVel) {
@@ -1393,10 +1397,13 @@ void Game::Scramble()
 		// ボスの移動量のほうが大きかったら
 
 		// ボスを移動させる。
-		boss.pos += boss.forwardVec * Vec2<float>(subVel, subVel);
+		//boss.pos += boss.forwardVec * Vec2<float>(subVel, subVel);
+
+		// 一応プレイヤーも移動させる。
+		//player.centerPos += player.vel;
 
 		// 距離を求める。
-		lineLength = Vec2<float>(player.centerPos - boss.pos).Length();
+		lineLength = Vec2<float>(player.centerPos).Distance(boss.pos);
 
 		// プレイヤーをボスの方に移動させる。
 		if (LINE_LENGTH < lineLength) {
@@ -1419,14 +1426,17 @@ void Game::Scramble()
 		// プレイヤーの移動量のほうが大きかったら
 
 		// プレイヤーを移動させる。
-		Vec2<float> playerDir = player.vel;
-		playerDir.Normalize();
-		player.centerPos += playerDir * Vec2<float>(subVel, subVel);
+		//Vec2<float> playerDir = player.vel;
+		//playerDir.Normalize();
+		//player.centerPos += playerDir * Vec2<float>(subVel, subVel);
+
+		// ボスも移動させる。
+		//boss.pos += boss.forwardVec * Vec2<float>(boss.vel, boss.vel);
 
 		// 距離を求める。
-		lineLength = Vec2<float>(player.centerPos - boss.pos).Length();
+		lineLength = Vec2<float>(player.centerPos).Distance(boss.pos);
 
-		// プレイヤーをボスの方に移動させる。
+		// ボスをプレイヤーの方に移動させる。
 		if (LINE_LENGTH < lineLength) {
 
 			// 押し戻し量
