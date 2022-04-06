@@ -1552,13 +1552,13 @@ void Player::UpdateGravity()
 	/*===== 重力に関する更新処理 =====*/
 
 	// 重力を加算。
-	centerPos.y += gravity;
+	//centerPos.y += gravity;
 
 	// 接地フラグが立ってい且つ重力無効化タイマーが0以下だったらなかったら重力を加算。
 	if (!onGround && gravityInvalidTimer <= 0) {
 
 		// 重力を加算。
-		gravity += ADD_GRAVITY;
+		//gravity += ADD_GRAVITY;
 
 		// 重力が限界を超えないようにする。
 		if (gravity > MAX_GRAVITY) {

@@ -64,6 +64,10 @@ class Game
 	// ボス
 	Boss boss;
 
+	// ボスプレイヤー間の線
+	float lineLength;
+	const float LINE_LENGTH = 100.0f;
+
 	// マップチップのデータ
 	vector<vector<int>> mapData;
 

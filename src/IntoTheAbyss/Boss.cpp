@@ -1,4 +1,7 @@
 #include "Boss.h"
+#include "ShakeMgr.h"
+#include "ScrollMgr.h"
+#include "DrawFunc.h"
 
 Boss::Boss()
 {
@@ -38,5 +41,16 @@ void Boss::Update()
 	/*===== çXêVèàóù =====*/
 
 	vel = OFFSET_VEL;
+
+}
+
+void Boss::Draw()
+{
+
+	/*===== ï`âÊèàóù =====*/
+
+	Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
+
+	DrawFunc::DrawBox2D(pos - scale / 2.0f - scrollShakeAmount, pos + scale / 2.0f - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
 
 }

@@ -478,6 +478,7 @@ void Game::Init()
 
 	// ボスを生成
 	boss.Generate(player.centerPos + Vec2<float>(100, 0));
+	lineLength = 0;
 
 }
 
@@ -1355,8 +1356,12 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	player.Draw(ligMgr);
 	ParticleMgr::Instance()->Draw(ligMgr);
 
+	// ボスを描画
+	boss.Draw();
+
 	// プレイヤーとボス間に線を描画
-	DrawFunc::DrawLine2D(player.centerPos, boss.pos, Color());
+	Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, boss.pos - scrollShakeAmount, Color());
 
 	GUI::Instance()->Draw();
 
@@ -1376,5 +1381,71 @@ void Game::Scramble()
 {
 
 	/*===== 引っ張り合いの処理 =====*/
+
+	// 移動量を取得。
+	float playerVel = player.vel.Length();
+	float bossVel = boss.vel;
+	float subVel = fabs(fabs(playerVel) - fabs(bossVel));
+
+	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
+	if (playerVel < bossVel) {
+
+		// ボスの移動量のほうが大きかったら
+
+		// ボスを移動させる。
+		boss.pos += boss.forwardVec * Vec2<float>(subVel, subVel);
+
+		// 距離を求める。
+		lineLength = Vec2<float>(player.centerPos - boss.pos).Length();
+
+		// プレイヤーをボスの方に移動させる。
+		if (LINE_LENGTH < lineLength) {
+
+			// 押し戻し量
+			float moveLength = lineLength - LINE_LENGTH;
+
+			// 押し戻し方向
+			Vec2<float> moveDir = Vec2<float>(boss.pos - player.centerPos);
+			moveDir.Normalize();
+
+			// 押し戻す。
+			player.centerPos += moveDir * Vec2<float>(moveLength, moveLength);
+
+		}
+
+	}
+	else if (bossVel < playerVel) {
+
+		// プレイヤーの移動量のほうが大きかったら
+
+		// プレイヤーを移動させる。
+		Vec2<float> playerDir = player.vel;
+		playerDir.Normalize();
+		player.centerPos += playerDir * Vec2<float>(subVel, subVel);
+
+		// 距離を求める。
+		lineLength = Vec2<float>(player.centerPos - boss.pos).Length();
+
+		// プレイヤーをボスの方に移動させる。
+		if (LINE_LENGTH < lineLength) {
+
+			// 押し戻し量
+			float moveLength = lineLength - LINE_LENGTH;
+
+			// 押し戻し方向
+			Vec2<float> moveDir = Vec2<float>(player.centerPos - boss.pos);
+			moveDir.Normalize();
+
+			// 押し戻す。
+			boss.pos += moveDir * Vec2<float>(moveLength, moveLength);
+
+		}
+
+	}
+	else {
+
+		return;
+
+	}
 
 }
