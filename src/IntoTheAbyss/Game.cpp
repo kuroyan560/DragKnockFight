@@ -1416,9 +1416,9 @@ void Game::Scramble()
 
 	// 移動量を取得。 優勢ゲージはここで更新。
 	double playerVel = player.vel.Length();
-	Vec2<float> playerVelGauge = player.vel;
+	Vec2<float> playerVelGauge = player.vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue;
 	double bossVel = boss.vel.Length();
-	Vec2<float> bossVelGauge = boss.vel;
+	Vec2<float> bossVelGauge = boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue;
 	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
 	player.centerPos += playerVelGauge;
