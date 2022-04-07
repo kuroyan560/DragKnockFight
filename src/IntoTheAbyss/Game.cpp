@@ -1457,8 +1457,12 @@ void Game::Scramble()
 	float line = 0;
 	float LINE = (lineLengthBoss + lineLengthPlayer) + (addLineLengthBoss + addLineLengthPlayer);
 
+	// 気にしないでください！
+	bool isBoss = false;
+	bool isPlayer = false;
+
 	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
-	if (playerVel < bossVel) {
+	if (playerVelGauge.Length() < bossVelGauge.Length()) {
 
 		// ボスの移動量のほうが大きかったら
 
@@ -1485,10 +1489,12 @@ void Game::Scramble()
 
 			}
 
+			isBoss = true;
+
 		}
 
 	}
-	else if (bossVel < playerVel) {
+	else if (bossVelGauge.Length() < playerVelGauge.Length()) {
 
 		// プレイヤーの移動量のほうが大きかったら
 
@@ -1526,6 +1532,8 @@ void Game::Scramble()
 
 			}
 
+			isPlayer = true;
+
 		}
 
 	}
@@ -1536,7 +1544,7 @@ void Game::Scramble()
 	}
 
 	// 引っかかり判定じゃなかったらだんだん短くする。
-	if (!isCatchMapChipBoss && 0 < addLineLengthBoss) {
+	if (isBoss || (!isCatchMapChipBoss && 0 < addLineLengthBoss)) {
 
 		addLineLengthBoss -= 5.0f;
 
@@ -1550,7 +1558,7 @@ void Game::Scramble()
 		if (addLineLengthBoss < 0) addLineLengthBoss = 0;
 
 	}
-	if (!isCatchMapChipPlayer && 0 < addLineLengthPlayer) {
+	if (isPlayer || (!isCatchMapChipPlayer && 0 < addLineLengthPlayer)) {
 
 		addLineLengthPlayer -= 5.0f;
 

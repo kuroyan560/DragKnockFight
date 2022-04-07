@@ -374,23 +374,23 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		CheckHitSize(centerPos, mapData, bossPos, isHitMapChip);
 
 		// 左右に当たった際に壁釣りさせるための処理。
-		int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		if (yChip <= 0) yChip = 1;
-		if (yChip >= mapData.size()) yChip = mapData.size() - 1;
-		if (xChip <= 0) xChip = 1;
-		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
-		// プレイヤーの左側がマップチップだったら
-		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
-			HitMapChipLeft();
-		}
-		xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		if (xChip < 0) xChip = 0;
-		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
-		// プレイヤーの右側がマップチップだったら
-		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
-			HitMapChipRight();
-		}
+		//int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		//int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		//if (yChip <= 0) yChip = 1;
+		//if (yChip >= mapData.size()) yChip = mapData.size() - 1;
+		//if (xChip <= 0) xChip = 1;
+		//if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
+		//// プレイヤーの左側がマップチップだったら
+		//if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+		//	HitMapChipLeft();
+		//}
+		//xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		//if (xChip < 0) xChip = 0;
+		//if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
+		//// プレイヤーの右側がマップチップだったら
+		//if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+		//	HitMapChipRight();
+		//}
 
 	}
 
@@ -1735,19 +1735,19 @@ int Player::GetHandGraph(const DRAW_DIR& Dir)
 void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip)
 {
 	// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
-	Vec2<float> upperPlayerPos = centerPos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);
-	Vec2<float> upperPlayerPosBuff = upperPlayerPos;
+	//Vec2<float> upperPlayerPos = centerPos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);
+	//Vec2<float> upperPlayerPosBuff = upperPlayerPos;
 	INTERSECTED_LINE intersectedLine = {};
 
 	// 通常時の当たり判定
-	Vec2<float> moveDir = centerPos - prevFrameCenterPos;
+	Vec2<float> moveDir = prevFrameCenterPos - centerPos;
 	moveDir.Normalize();
 	//intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(upperPlayerPos, prevFrameCenterPos, vel + gimmickVel, Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
-	intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(upperPlayerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+	intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
 
 
 	// 差分(押し戻された値を座標から引く)
-	centerPos += upperPlayerPos - upperPlayerPosBuff;
+	//centerPos += upperPlayerPos - upperPlayerPosBuff;
 
 	// ボスとプレイヤーの角度
 	float bossAngle = atan2(bossPos.y - centerPos.y, bossPos.x - centerPos.x);
@@ -1838,101 +1838,101 @@ void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector
 
 	}
 
-	if (intersectedLine == INTERSECTED_NONE) {
+	//if (intersectedLine == INTERSECTED_NONE) {
 
-		Vec2<float> downnerPlayerPos = centerPos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);
-		Vec2<float> downnerPlayerPosBuff = upperPlayerPos;
-		intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(downnerPlayerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+	//	Vec2<float> downnerPlayerPos = centerPos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);
+	//	Vec2<float> downnerPlayerPosBuff = upperPlayerPos;
+	//	intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(downnerPlayerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
 
-		// 差分(押し戻された値を座標から引く)
-		centerPos += downnerPlayerPos - downnerPlayerPosBuff;
+	//	// 差分(押し戻された値を座標から引く)
+	//	centerPos += downnerPlayerPos - downnerPlayerPosBuff;
 
-		// 当たった位置に応じて処理を分ける。
-		if (intersectedLine == INTERSECTED_TOP) {
+	//	// 当たった位置に応じて処理を分ける。
+	//	if (intersectedLine == INTERSECTED_TOP) {
 
-			// 下に当たった場合
-			HitMapChipBottom();
+	//		// 下に当たった場合
+	//		HitMapChipBottom();
 
-			// マップチップの上にあたっていたということは、ボスが下方向にいればOK！
-			// 下方向の具体的な値は
-			const float MIN_ANGLE = 0.785398f;
-			const float MAX_ANGLE = 2.35619f;
+	//		// マップチップの上にあたっていたということは、ボスが下方向にいればOK！
+	//		// 下方向の具体的な値は
+	//		const float MIN_ANGLE = 0.785398f;
+	//		const float MAX_ANGLE = 2.35619f;
 
-			// 角度がこの値の間だったら
-			if (MIN_ANGLE <= bossAngle && bossAngle <= MAX_ANGLE) {
+	//		// 角度がこの値の間だったら
+	//		if (MIN_ANGLE <= bossAngle && bossAngle <= MAX_ANGLE) {
 
-				// 引っかかっている。
-				isHitMapChip = true;
+	//			// 引っかかっている。
+	//			isHitMapChip = true;
 
-			}
+	//		}
 
-		}
-		else if (intersectedLine == INTERSECTED_RIGHT) {
+	//	}
+	//	else if (intersectedLine == INTERSECTED_RIGHT) {
 
-			// 左に当たった場合
-			HitMapChipLeft();
+	//		// 左に当たった場合
+	//		HitMapChipLeft();
 
-			// マップチップの右にあたっていたということは、ボスが左方向にいればOK！
-			// 左方向の具体的な値は
-			const float MIN_ANGLE = 2.35619f;
-			const float MAX_ANGLE = 3.92699f;
+	//		// マップチップの右にあたっていたということは、ボスが左方向にいればOK！
+	//		// 左方向の具体的な値は
+	//		const float MIN_ANGLE = 2.35619f;
+	//		const float MAX_ANGLE = 3.92699f;
 
-			// 角度がこの値の間だったら
-			if (MIN_ANGLE <= bossAngle && bossAngle <= MAX_ANGLE) {
+	//		// 角度がこの値の間だったら
+	//		if (MIN_ANGLE <= bossAngle && bossAngle <= MAX_ANGLE) {
 
-				// 引っかかっている。
-				isHitMapChip = true;
+	//			// 引っかかっている。
+	//			isHitMapChip = true;
 
-			}
+	//		}
 
-		}
-		else if (intersectedLine == INTERSECTED_BOTTOM) {
+	//	}
+	//	else if (intersectedLine == INTERSECTED_BOTTOM) {
 
-			// 上に当たった場合
-			HitMapChipTop();
+	//		// 上に当たった場合
+	//		HitMapChipTop();
 
-			// マップチップの下にあたっていたということは、プレイヤーが上方向にいればOK！
-			// 上方向の具体的な値は
-			const float MIN_ANGLE = 3.92699f;
-			const float MAX_ANGLE = 5.49779f;
+	//		// マップチップの下にあたっていたということは、プレイヤーが上方向にいればOK！
+	//		// 上方向の具体的な値は
+	//		const float MIN_ANGLE = 3.92699f;
+	//		const float MAX_ANGLE = 5.49779f;
 
-			// 角度がこの値の間だったら
-			if (MIN_ANGLE <= bossAngle && bossAngle <= MAX_ANGLE) {
+	//		// 角度がこの値の間だったら
+	//		if (MIN_ANGLE <= bossAngle && bossAngle <= MAX_ANGLE) {
 
-				// 引っかかっている。
-				isHitMapChip = true;
+	//			// 引っかかっている。
+	//			isHitMapChip = true;
 
-			}
+	//		}
 
-		}
-		else if (intersectedLine == INTERSECTED_LEFT) {
+	//	}
+	//	else if (intersectedLine == INTERSECTED_LEFT) {
 
-			// 右に当たった場合
-			HitMapChipRight();
+	//		// 右に当たった場合
+	//		HitMapChipRight();
 
-			// マップチップの左にあたっていたということは、プレイヤーが右方向にいればOK！
-			// 右方向の具体的な値は
-			const float MIN_ANGLE = 0.785398f;
-			const float MAX_ANGLE = 5.49779f;
+	//		// マップチップの左にあたっていたということは、プレイヤーが右方向にいればOK！
+	//		// 右方向の具体的な値は
+	//		const float MIN_ANGLE = 0.785398f;
+	//		const float MAX_ANGLE = 5.49779f;
 
-			// 角度がこの値の間だったら
-			if (MAX_ANGLE <= bossAngle || bossAngle <= MIN_ANGLE) {
+	//		// 角度がこの値の間だったら
+	//		if (MAX_ANGLE <= bossAngle || bossAngle <= MIN_ANGLE) {
 
-				// 引っかかっている。
-				isHitMapChip = true;
+	//			// 引っかかっている。
+	//			isHitMapChip = true;
 
-			}
+	//		}
 
-		}
-		else if (intersectedLine == INTERSECTED_RISE) {
+	//	}
+	//	else if (intersectedLine == INTERSECTED_RISE) {
 
-			// のし上がりの場所に当たった場合
-			vel.y *= 0.5f;
-			gravity = 0;
+	//		// のし上がりの場所に当たった場合
+	//		vel.y *= 0.5f;
+	//		gravity = 0;
 
-		}
+	//	}
 
-	}
+	//}
 
 }
 
