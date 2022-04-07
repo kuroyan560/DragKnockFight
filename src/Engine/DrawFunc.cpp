@@ -90,6 +90,19 @@ void DrawFunc::DrawLine2D(const Vec2<float>& FromPos, const Vec2<float>& ToPos, 
 	DRAW_LINE_COUNT++;
 }
 
+void DrawFunc::DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const std::shared_ptr<TextureBuffer>& Tex, const int& Thickness, const AlphaBlendMode& BlendMode, const Vec2<bool>& Mirror)
+{
+	float distance = FromPos.Distance(ToPos);
+	Vec2<float> vec = (ToPos - FromPos).GetNormal();
+
+	auto graphSize = Tex->GetGraphSize().Float();
+	Vec2<float>expRate = { distance / graphSize.x,Thickness / graphSize.y };
+	Vec2<float>centerPos = FromPos + vec * distance / 2;
+
+	DrawRotaGraph2D(centerPos, expRate, KuroFunc::GetAngle(vec), Tex, { 0.5f,0.5f }, BlendMode, Mirror);
+}
+
+
 void DrawFunc::DrawBox2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& BoxColor, const DXGI_FORMAT& Format, const bool& FillFlg, const AlphaBlendMode& BlendMode)
 {
 	if (FillFlg)
@@ -239,6 +252,12 @@ void DrawFunc::DrawCircle2D(const Vec2<float>& Center, const float& Radius, cons
 	KuroEngine::Instance().Graphics().ObjectRender(CIRCLE_VERTEX_BUFF[DRAW_CIRCLE_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff() }, { CBV }, 0.0f, true);
 
 	DRAW_CIRCLE_COUNT++;
+}
+
+void DrawFunc::DrawGraph(const Vec2<float>& LeftUpPos, const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode)
+{
+	auto graphSize = Tex->GetGraphSize();
+	DrawExtendGraph2D(LeftUpPos, LeftUpPos + graphSize.Float(), Tex, BlendMode);
 }
 
 void DrawFunc::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode, const Vec2<bool>& Miror)

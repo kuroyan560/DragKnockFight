@@ -6,6 +6,8 @@
 #include "WinApp.h"
 #include"UsersInput.h"
 
+#include"TexHandleMgr.h"
+
 Boss::Boss()
 {
 
@@ -13,6 +15,8 @@ Boss::Boss()
 	scale = {};
 	vel = {};
 
+	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy.png");
+	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy_back.png");
 }
 
 void Boss::Init()
@@ -64,8 +68,11 @@ void Boss::Draw()
 
 	Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 
-	DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
+	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
 
+	DIR dir = FRONT;
+	if (vel.y < 0)dir = BACK;
+	DrawFunc::DrawExtendGraph2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, TexHandleMgr::GetTexBuffer(graphHandle[dir]), AlphaBlendMode_Trans);
 }
 
 void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos)

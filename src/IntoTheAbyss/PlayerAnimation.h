@@ -4,26 +4,21 @@
 
 static const enum PLAYER_ANIM
 {
-	ON_GROUND_WAIT,
-	ON_GROUND_DASH,
-	ON_AIR_DASH_X,
-	ON_AIR_DASH_Y,
-	ON_WALL_WAIT,
-	ON_WALL_DASH,
+	DEFAULT_FRONT,
+	DEFAULT_BACK,
 	PLAYER_ANIM_NUM
 };
 
 class PlayerAnimation
 {
-	PLAYER_ANIM status = ON_GROUND_WAIT;
+	PLAYER_ANIM status = DEFAULT_FRONT;
 	struct Anim
 	{
 		std::vector<int> graph;
 		int interval;
 		Vec2<int>size;
 		bool loop;
-		Vec2<float>handOffsetLeft = { 0,0 };
-		Vec2<float>handOffsetRight = { 0,0 };
+		Vec2<float>handCenterOffset = { 0,0 };
 	};
 	Anim animations[PLAYER_ANIM_NUM];
 
@@ -32,7 +27,7 @@ class PlayerAnimation
 
 public:
 	PlayerAnimation();
-	void Init(const PLAYER_ANIM& AnimStatus = ON_GROUND_WAIT)
+	void Init(const PLAYER_ANIM& AnimStatus = DEFAULT_FRONT)
 	{
 		status = AnimStatus;
 		timer = 0;
@@ -59,13 +54,9 @@ public:
 		return animations[status].size;
 	}
 	
-	const Vec2<float>GetHandOffsetLeft()&
+	const Vec2<float>GetHandCenterOffset()&
 	{
-		return animations[status].handOffsetLeft;
-	}
-	const Vec2<float>GetHandOffsetRight()&
-	{
-		return animations[status].handOffsetRight;
+		return animations[status].handCenterOffset;
 	}
 };
 

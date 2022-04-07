@@ -64,7 +64,7 @@ public:
 	const int FIRST_SHOT_RECOIL_PARTICLE_TIMER = 10.0f;
 
 	//プレイヤーの向き
-	enum DRAW_DIR { LEFT, RIGHT, DEFAULT = RIGHT, DIR_NUM }playerDir = DEFAULT;
+	//enum DRAW_DIR { FRONT, BACK, DIR_NUM, DEFAULT = FRONT }playerDir = DEFAULT;
 	//アニメーション統括
 	PlayerAnimation anim;
 
@@ -86,7 +86,7 @@ public:
 	int changeGravityTimer;
 	const int CHANGE_GRAVITY_TIMER = 300;
 
-	Muffler muffler;
+	//Muffler muffler;
 
 public:
 
@@ -195,9 +195,6 @@ private:
 	void UpdateStretch();
 	//画像サイズからプレイヤーサイズ取得
 	Vec2<float> GetPlayerGraphSize();
-
-	//プレイヤーの手の画像ハンドル取得
-	int GetHandGraph(const DRAW_DIR& Dir);
 
 	// 移動量での当たり判定
 	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip);
