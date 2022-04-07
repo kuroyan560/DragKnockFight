@@ -23,7 +23,7 @@
 #include"SuperiorityGauge.h"
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -49,7 +49,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -87,7 +87,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -144,7 +144,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -162,7 +162,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
@@ -398,14 +398,14 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 		ScrollMgr::Instance()->honraiScrollAmount = { -640.0f,-360.0f };
 		ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-		ScrollMgr::Instance()->WarpScroll(lineCenterPos);
-
-		if (deadFlag)
+		//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
+		if (firstLoadFlag)
 		{
-			ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-			ScrollMgr::Instance()->AlimentScrollAmount();
-			ScrollMgr::Instance()->Restart();
+			//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+			//ScrollMgr::Instance()->AlimentScrollAmount();
+			//ScrollMgr::Instance()->Restart();
 		}
+		firstLoadFlag = true;
 #pragma endregion
 		alphaValue = 0;
 	}
@@ -485,6 +485,11 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		Vec2<float>chipPos(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE);
 		playerHomeBase->Init(playerLeftUpPos - chipPos, playerRightDownPos + chipPos);
 		enemyHomeBase->Init(enemyLeftUpPos - chipPos, enemyRightDownPos + chipPos);
+
+		{
+			float data = ((mapData[0].size() - 1) * MAP_CHIP_SIZE) - 300.0f;
+			miniMap.Init(data);
+		}
 	}
 }
 
@@ -547,7 +552,7 @@ void Game::Init()
 	}
 	enemyGenerateTimer = 0;
 	nomoveMentTimer = 0;
-
+	firstLoadFlag = false;
 }
 
 void Game::Update()
@@ -906,6 +911,15 @@ void Game::Update()
 	}
 
 
+	//ステージ毎の切り替え判定
+	//部屋の初期化
+	if ((SelectStage::Instance()->GetRoomNum() != oldRoomNum || SelectStage::Instance()->GetStageNum() != oldStageNum) || SelectStage::Instance()->resetStageFlag)
+	{
+		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+		oldRoomNum = SelectStage::Instance()->GetRoomNum();
+		oldStageNum = SelectStage::Instance()->GetStageNum();
+	}
+
 	//プレイヤー陣地と敵の判定
 	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag)
 	{
@@ -943,14 +957,7 @@ void Game::Update()
 
 
 
-	//ステージ毎の切り替え判定
-	//部屋の初期化
-	if ((SelectStage::Instance()->GetRoomNum() != oldRoomNum || SelectStage::Instance()->GetStageNum() != oldStageNum) || SelectStage::Instance()->resetStageFlag)
-	{
-		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-		oldRoomNum = SelectStage::Instance()->GetRoomNum();
-		oldStageNum = SelectStage::Instance()->GetStageNum();
-	}
+
 
 	//イベントブロックとの判定
 	for (int i = 0; i < eventBlocks.size(); ++i)
@@ -979,9 +986,12 @@ void Game::Update()
 #pragma endregion
 
 
+	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	// プレイヤーの更新処理
 	player.Update(mapData);
+
+	miniMap.Update();
 
 	//if (Input::isKey(KEY_INPUT_RIGHT)) player.centerPos.x += 1.0f;
 	if (UsersInput::Instance()->Input(DIK_RIGHT)) player.centerPos.x += 1.0f;
@@ -1408,7 +1418,7 @@ void Game::Update()
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
 
-	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos-lineCenterPos);
+	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 
 }
@@ -1510,10 +1520,10 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, boss.pos - scrollShakeAmount, Color());
 
 	SuperiorityGauge::Instance()->Draw();
-	
+
 	GUI::Instance()->Draw();
 
-
+	miniMap.Draw();
 
 	if (sceneBlackFlag || sceneLightFlag)
 	{
