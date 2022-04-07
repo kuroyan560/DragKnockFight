@@ -1124,55 +1124,55 @@ void Player::Input(const vector<vector<int>> mapData)
 		bool isFirstShot = false;
 
 		// 移動量を加算
-		//if (!lHand->isFirstShot) {
+		if (!lHand->isFirstShot) {
 
-		//	// 撃った判定を保存。
-		//	isLeftFirstShotTimer = 0;
+			// 撃った判定を保存。
+			isLeftFirstShotTimer = 0;
 
-		//	// onGroundがtrueだったら移動量を加算しない。
-		//	if (!onGround || sinf(rHandAngle) < 0.6f) {
-		//		vel.x += cosf(rHandAngle) * FIRST_RECOIL_AMOUNT;
-		//	}
+			// onGroundがtrueだったら移動量を加算しない。
+			if (!onGround || sinf(rHandAngle) < 0.6f) {
+				vel.x += cosf(rHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
 
-		//	// プレイヤーのひとつ上のブロックを検索する為の処理。
-		//	int mapX = centerPos.x / MAP_CHIP_SIZE;
-		//	int mapY = centerPos.y / MAP_CHIP_SIZE;
-		//	if (mapX <= 0) mapX = 1;
-		//	if (mapX >= mapData[0].size()) mapX = mapData[0].size() - 1;
-		//	if (mapY <= 0) mapY = 1;
-		//	if (mapY >= mapData.size()) mapY = mapData.size() - 1;
+			// プレイヤーのひとつ上のブロックを検索する為の処理。
+			int mapX = centerPos.x / MAP_CHIP_SIZE;
+			int mapY = centerPos.y / MAP_CHIP_SIZE;
+			if (mapX <= 0) mapX = 1;
+			if (mapX >= mapData[0].size()) mapX = mapData[0].size() - 1;
+			if (mapY <= 0) mapY = 1;
+			if (mapY >= mapData.size()) mapY = mapData.size() - 1;
 
-		//	// 入力を受け付けないフラグが立っていなかったら
-		//	if (!isWallRight && !isWallLeft) {
-		//		vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
-		//	}
-		//	// プレイヤーの一個上のマップチップがブロックだったら最初に一発を大きくするフラグを大きくする。
-		//	else if (mapData[mapY - 1][mapX] > 0 && mapData[mapY - 1][mapX] < 10 && cosf(rHandAngle) < 0.5f && cosf(rHandAngle) > -0.5f) {
-		//		vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
-		//	}
-		//	else if (isWallRight && cosf(rHandAngle) < 0.0f) {
-		//		vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
-		//	}
-		//	else if (isWallLeft && cosf(rHandAngle) > 0.1f) {
-		//		vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
-		//	}
+			// 入力を受け付けないフラグが立っていなかったら
+			if (!isWallRight && !isWallLeft) {
+				vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
+			// プレイヤーの一個上のマップチップがブロックだったら最初に一発を大きくするフラグを大きくする。
+			else if (mapData[mapY - 1][mapX] > 0 && mapData[mapY - 1][mapX] < 10 && cosf(rHandAngle) < 0.5f && cosf(rHandAngle) > -0.5f) {
+				vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
+			else if (isWallRight && cosf(rHandAngle) < 0.0f) {
+				vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
+			else if (isWallLeft && cosf(rHandAngle) > 0.1f) {
+				vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
 
-		//	isFirstShot = true;
+			isFirstShot = true;
 
-		//	firstShot = true;
+			firstShot = true;
 
-		//	lHand->isFirstShot = true;
+			lHand->isFirstShot = true;
 
-		//	// シェイク量を設定
-		//	ShakeMgr::Instance()->SetShake(ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT);
+			// シェイク量を設定
+			ShakeMgr::Instance()->SetShake(ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT);
 
-		//	// プレイヤーの腕を動かす。
-		//	lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), true);
+			// プレイヤーの腕を動かす。
+			lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), true);
 
-		//	firstRecoilParticleTimer = FIRST_SHOT_RECOIL_PARTICLE_TIMER;
+			firstRecoilParticleTimer = FIRST_SHOT_RECOIL_PARTICLE_TIMER;
 
-		//}
-		//else {
+		}
+		else {
 
 			// onGroundがtrueだったら移動量を加算しない。
 			//if (!onGround || sinf(rHandAngle) < 0.5f) {
@@ -1184,7 +1184,7 @@ void Player::Input(const vector<vector<int>> mapData)
 			// プレイヤーの腕を動かす。
 			lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
 
-		//}
+		}
 
 		// 弾を生成する。
 		const float ARM_DISTANCE = 20.0f;
@@ -1228,59 +1228,59 @@ void Player::Input(const vector<vector<int>> mapData)
 		if (mapY >= mapData.size()) mapY = mapData.size() - 1;
 
 		// 移動量を加算
-		//if (!rHand->isFirstShot) {
+		if (!rHand->isFirstShot) {
 
-		//	// 右側に撃った判定を保存する。
-		//	isRightFirstShotTimer = 0;
+			// 右側に撃った判定を保存する。
+			isRightFirstShotTimer = 0;
 
-		//	// onGroundがtrueだったら移動量を加算しない。
-		//	if (!onGround || sinf(lHandAngle) < 0.6f) {
-		//		vel.x += cosf(lHandAngle) * FIRST_RECOIL_AMOUNT;
-		//	}
-
-		//	// 入力を受け付けないフラグが立っていなかったら
-		//	if (!isWallLeft && !isWallRight) {
-		//		vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
-		//	}
-		//	// プレイヤーの一個上のマップチップがブロックだったら最初に一発を大きくするフラグを大きくする。
-		//	else if (mapData[mapY - 1][mapX] > 0 && mapData[mapY - 1][mapX] < 10 && cosf(lHandAngle) < 0.5f && cosf(lHandAngle) > -0.5f) {
-		//		vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
-		//	}
-		//	else if (isWallRight && cosf(lHandAngle) < 0.3f) {
-		//		vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
-		//	}
-		//	else if (isWallLeft && cosf(lHandAngle) > 0.1f) {
-		//		vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
-		//	}
-
-		//	// 最初の一発を撃ったフラグを立てる。
-		//	firstShot = true;
-
-		//	isFirstShot = true;
-
-		//	rHand->isFirstShot = true;
-
-		//	// シェイク量を設定
-		//	ShakeMgr::Instance()->SetShake(ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT);
-
-		//	// プレイヤーの腕を動かす。
-		//	rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), true);
-
-		//	firstRecoilParticleTimer = FIRST_SHOT_RECOIL_PARTICLE_TIMER;
-
-		//}
-		//else {
 			// onGroundがtrueだったら移動量を加算しない。
-			if (!onGround || sinf(lHandAngle) < 0) {
-				vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
+			if (!onGround || sinf(lHandAngle) < 0.6f) {
+				vel.x += cosf(lHandAngle) * FIRST_RECOIL_AMOUNT;
 			}
+
+			// 入力を受け付けないフラグが立っていなかったら
+			if (!isWallLeft && !isWallRight) {
+				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
+			// プレイヤーの一個上のマップチップがブロックだったら最初に一発を大きくするフラグを大きくする。
+			else if (mapData[mapY - 1][mapX] > 0 && mapData[mapY - 1][mapX] < 10 && cosf(lHandAngle) < 0.5f && cosf(lHandAngle) > -0.5f) {
+				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
+			else if (isWallRight && cosf(lHandAngle) < 0.3f) {
+				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
+			else if (isWallLeft && cosf(lHandAngle) > 0.1f) {
+				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+			}
+
+			// 最初の一発を撃ったフラグを立てる。
+			firstShot = true;
+
+			isFirstShot = true;
+
+			rHand->isFirstShot = true;
+
+			// シェイク量を設定
+			ShakeMgr::Instance()->SetShake(ShakeMgr::Instance()->FIRST_SHOT_SHAKE_AMOUNT);
+
+			// プレイヤーの腕を動かす。
+			rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), true);
+
+			firstRecoilParticleTimer = FIRST_SHOT_RECOIL_PARTICLE_TIMER;
+
+		}
+		else {
+			// onGroundがtrueだったら移動量を加算しない。
+			//if (!onGround || sinf(lHandAngle) < 0) {
+				vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
+			//}
 
 			vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
 
 			// プレイヤーの腕を動かす。
 			rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
 
-		//}
+		}
 
 		// 弾を生成する。
 		const float ARM_DISTANCE = 20.0f;

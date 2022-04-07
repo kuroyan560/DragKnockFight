@@ -96,7 +96,7 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 	// ビーコンのクールタイムの更新を行う。
 	if (pikeCooltime > 0) --pikeCooltime;
 
-	isFirstShot = false;
+	//isFirstShot = false;
 
 }
 
