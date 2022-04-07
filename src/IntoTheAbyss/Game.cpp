@@ -481,9 +481,13 @@ void Game::Init()
 
 	// ボスを生成
 	boss.Generate(player.centerPos + Vec2<float>(100, 0));
-	lineLength = 0;
+	lineLengthPlayer = LINE_LENGTH;
+	lineLengthBoss = LINE_LENGTH;
+	addLineLengthPlayer = 0;
+	addLineLengthBoss = 0;
 
-	isCatchMapChip = false;
+	isCatchMapChipBoss = false;
+	isCatchMapChipPlayer = false;
 
 }
 
@@ -944,7 +948,7 @@ void Game::Update()
 	}
 
 	// プレイヤーの当たり判定
-	player.CheckHit(mapData, bubbleBlock, dossunBlock);
+	player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer);
 
 	// 動的ブロックの当たり判定
 	MovingBlockMgr::Instance()->CheckHit(mapData);
@@ -953,7 +957,7 @@ void Game::Update()
 	BulletMgr::Instance()->CheckHit(mapData, bubbleBlock);
 
 	// ボスの当たり判定
-	boss.CheckHit(mapData, isCatchMapChip);
+	boss.CheckHit(mapData, isCatchMapChipBoss, player.centerPos);
 
 	// ビューポートをプレイヤー基準で移動させる。
 	ViewPort::Instance()->SetPlayerPosX(player.centerPos.x);
@@ -1371,8 +1375,25 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	boss.Draw();
 
 	// プレイヤーとボス間に線を描画
-	Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, boss.pos - scrollShakeAmount, Color());
+	{
+		Vec2<float> playerBossDir = boss.pos - player.centerPos;
+		playerBossDir.Normalize();
+		Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
+		Vec2<float> playerDefLength = player.centerPos + playerBossDir * addLineLengthPlayer;
+		DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, playerDefLength - scrollShakeAmount, Color(0, 0, 255, 255));
+		DrawFunc::DrawLine2D(playerDefLength - scrollShakeAmount, playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, Color(255, 255, 255, 255));
+
+		// 線分の中心に円を描画
+		DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
+	}
+	{
+		Vec2<float> bossPlayerDir = player.centerPos - boss.pos;
+		bossPlayerDir.Normalize();
+		Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
+		Vec2<float> bossDefLength = boss.pos + bossPlayerDir * addLineLengthBoss;
+		DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
+		DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
+	}
 
 	GUI::Instance()->Draw();
 
@@ -1394,18 +1415,18 @@ void Game::Scramble()
 	/*===== 引っ張り合いの処理 =====*/
 
 	// 移動量を取得。 優勢ゲージはここで更新。
-	float playerVel = player.vel.Length();
-	Vec2<float> playerVelGauge = player.vel;
-	float bossVel = boss.vel.Length();
-	Vec2<float> bossVelGauge = boss.vel;
-	float subVel = fabs(fabs(playerVel) - fabs(bossVel));
+	double playerVel = player.vel.Length();
+	Vec2<float> playerVelGauge = player.vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue;
+	double bossVel = boss.vel.Length();
+	Vec2<float> bossVelGauge = boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue;
+	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
 	player.centerPos += playerVelGauge;
 	boss.pos += bossVelGauge;
 
 	// 線分の長さ
 	float line = 0;
-	float LINE = LINE_LENGTH + lineLength;
+	float LINE = (lineLengthBoss + lineLengthPlayer) + (addLineLengthBoss + addLineLengthPlayer);
 
 	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
 	if (playerVel < bossVel) {
@@ -1427,6 +1448,13 @@ void Game::Scramble()
 
 			// 押し戻す。
 			player.centerPos += moveDir * Vec2<float>(moveLength, moveLength);
+
+			// 引っかかり判定だったら
+			if (isCatchMapChipPlayer) {
+
+				addLineLengthPlayer += moveLength;
+
+			}
 
 		}
 
@@ -1462,6 +1490,13 @@ void Game::Scramble()
 
 			}
 
+			// 引っかかり判定だったら
+			if (isCatchMapChipBoss) {
+
+				addLineLengthBoss += moveLength;
+
+			}
+
 		}
 
 	}
@@ -1471,6 +1506,30 @@ void Game::Scramble()
 
 	}
 
-	isCatchMapChip = false;
+	// 引っかかり判定じゃなかったらだんだん短くする。
+	if (!isCatchMapChipBoss && 0 < addLineLengthBoss) {
+
+		addLineLengthBoss -= 5.0f;
+
+		// ウィンドウに挟まったら
+		if (0 < boss.stuckWindowTimer) {
+
+			addLineLengthBoss -= 20.0f;
+
+		}
+
+		if (addLineLengthBoss < 0) addLineLengthBoss = 0;
+
+	}
+	if (!isCatchMapChipPlayer && 0 < addLineLengthPlayer) {
+
+		addLineLengthPlayer -= 5.0f;
+
+		if (addLineLengthPlayer < 0) addLineLengthPlayer = 0;
+
+	}
+
+	isCatchMapChipBoss = false;
+	isCatchMapChipPlayer = false;
 
 }

@@ -65,11 +65,15 @@ class Game
 	Boss boss;
 
 	// ボスorプレイヤーが引っかかっているかのフラグ
-	bool isCatchMapChip;
+	bool isCatchMapChipBoss;
+	bool isCatchMapChipPlayer;
 
 	// ボスプレイヤー間の線
-	float lineLength;
-	const float LINE_LENGTH = 300.0f;
+	float lineLengthPlayer;
+	float lineLengthBoss;
+	float addLineLengthPlayer;
+	float addLineLengthBoss;
+	const float LINE_LENGTH = 250.0f;
 
 	// マップチップのデータ
 	vector<vector<int>> mapData;
