@@ -64,7 +64,7 @@ public:
 	const int FIRST_SHOT_RECOIL_PARTICLE_TIMER = 10.0f;
 
 	//プレイヤーの向き
-	enum DRAW_DIR { LEFT, RIGHT, DEFAULT = RIGHT, DIR_NUM }playerDir = DEFAULT;
+	//enum DRAW_DIR { FRONT, BACK, DIR_NUM, DEFAULT = FRONT }playerDir = DEFAULT;
 	//アニメーション統括
 	PlayerAnimation anim;
 
@@ -86,7 +86,7 @@ public:
 	int changeGravityTimer;
 	const int CHANGE_GRAVITY_TIMER = 300;
 
-	Muffler muffler;
+	//Muffler muffler;
 
 public:
 
@@ -151,7 +151,7 @@ public:
 	void Draw(LightManager& LigManager);
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun);
+	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip);
 
 	// 方向ごとのマップチップとの当たり判定関数
 	void HitMapChipTop();
@@ -196,11 +196,8 @@ private:
 	//画像サイズからプレイヤーサイズ取得
 	Vec2<float> GetPlayerGraphSize();
 
-	//プレイヤーの手の画像ハンドル取得
-	int GetHandGraph(const DRAW_DIR& Dir);
-
 	// 移動量での当たり判定
-	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
-	void CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
+	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip);
+	void CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip);
 
 };
