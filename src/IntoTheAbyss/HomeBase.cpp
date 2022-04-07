@@ -24,10 +24,9 @@ void HomeBase::Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DOW
 	leftUpPos = LEFT_UP_POS;
 	rightDownPos = RIGHT_DOWN_POS;
 
-	centerPos = leftUpPos + (rightDownPos / 2.0f);
-
-	hitBox.center = &centerPos;
 	hitBox.size = rightDownPos - leftUpPos;
+	centerPos = leftUpPos + (hitBox.size / 2.0f);
+	hitBox.center = &centerPos;
 }
 
 bool HomeBase::Collision(const Square &OBJ_A)

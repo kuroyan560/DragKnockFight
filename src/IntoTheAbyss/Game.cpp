@@ -453,6 +453,39 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	isCatchMapChipBoss = false;
 	isCatchMapChipPlayer = false;
+
+	{
+		Vec2<float>playerLeftUpPos;
+		Vec2<float>playerRightDownPos;
+		Vec2<float>enemyLeftUpPos;
+		Vec2<float>enemyRightDownPos;
+		for (int y = 0; y < mapData.size(); ++y)
+		{
+			for (int x = 0; x < mapData[y].size(); ++x)
+			{
+				if (mapData[y][x] == 33)
+				{
+					playerLeftUpPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+				}
+				if (mapData[y][x] == 34)
+				{
+					playerRightDownPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+				}
+				if (mapData[y][x] == 35)
+				{
+					enemyLeftUpPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+				}
+				if (mapData[y][x] == 36)
+				{
+					enemyRightDownPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+				}
+			}
+		}
+
+		Vec2<float>chipPos(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE);
+		playerHomeBase->Init(playerLeftUpPos - chipPos, playerRightDownPos + chipPos);
+		enemyHomeBase->Init(enemyLeftUpPos - chipPos, enemyRightDownPos + chipPos);
+	}
 }
 
 Game::Game()

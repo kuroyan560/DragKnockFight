@@ -23,6 +23,7 @@ class RenderTarget;
 
 #include"ThornBlock.h"
 #include"HomeBase.h"
+#include"MapChipCollider.h"
 
 struct MassChipData
 {
