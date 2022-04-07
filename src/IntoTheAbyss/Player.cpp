@@ -20,6 +20,7 @@
 #include "EventCollider.h"
 #include"DebugParameter.h"
 #include"GUI.h"
+#include"SuperiorityGauge.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -125,6 +126,8 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	isZeroGravity = false;
 	changeGravityTimer = 0;
+
+	stuckWindowTimer = 0;
 
 	//muffler.Init(INIT_POS);
 }
@@ -294,6 +297,10 @@ void Player::Update(const vector<vector<int>> mapData)
 	//テレポート時のフラッシュのタイマー計測
 	if (flashTimer < flashTotalTime)flashTimer++;
 
+
+	// ウィンドウに挟まれたタイマーを更新
+	if (0 < stuckWindowTimer) --stuckWindowTimer;
+
 	//muffler.Update(centerPos);
 }
 
@@ -344,74 +351,78 @@ void Player::Draw(LightManager& LigManager)
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
 
-	DrawFunc::DrawBox2D(centerPos - PLAYER_HIT_SIZE - scrollShakeZoom, centerPos + PLAYER_HIT_SIZE - scrollShakeZoom, Color(), DXGI_FORMAT_R8G8B8A8_UNORM, true);
 }
 
-void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip)
+void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip, const Vec2<float>& lineCenterPos)
 {
 
 	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
 
 	{
 
-		// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
-		CheckHitMapChipVel(centerPos, mapData, bossPos, isHitMapChip);
+		// ウィンドウに挟まっていなかったら
+		if (stuckWindowTimer <= 0) {
 
-		// マップチップとプレイヤーの当たり判定 スケール
-		CheckHitSize(centerPos, mapData, bossPos, isHitMapChip);
+			// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
+			CheckHitMapChipVel(centerPos, mapData, bossPos, isHitMapChip);
 
-		// 左右に当たった際に壁釣りさせるための処理。
-		//int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		//int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		//if (yChip <= 0) yChip = 1;
-		//if (yChip >= mapData.size()) yChip = mapData.size() - 1;
-		//if (xChip <= 0) xChip = 1;
-		//if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
-		//// プレイヤーの左側がマップチップだったら
-		//if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
-		//	HitMapChipLeft();
-		//}
-		//xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		//if (xChip < 0) xChip = 0;
-		//if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
-		//// プレイヤーの右側がマップチップだったら
-		//if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
-		//	HitMapChipRight();
-		//}
+			// マップチップとプレイヤーの当たり判定 スケール
+			CheckHitSize(centerPos, mapData, bossPos, isHitMapChip);
 
-		// 引き伸ばし判定の補助のための処理
-		float bossAngle = atan2(bossPos.y - centerPos.y, bossPos.x - centerPos.x);
-		bossAngle = fabs(bossAngle);
-		int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		if (yChip <= 0) yChip = 1;
-		if (yChip >= mapData.size()) yChip = mapData.size() - 1;
-		if (xChip <= 0) xChip = 1;
-		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
-		// プレイヤーの左側がマップチップだったら
-		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
-			// 敵が指定の範囲の中にいたら
-			const float MIN_ANGLE = 2.35619f;
-			const float MAX_ANGLE = 3.92699f;
-			// 角度がこの値の間だったら
-			if (MIN_ANGLE <= bossAngle && bossAngle <= MAX_ANGLE) {
-				// 引っかかっている。
-				isHitMapChip = true;
+			// 左右に当たった際に壁釣りさせるための処理。
+			//int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			//int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			//if (yChip <= 0) yChip = 1;
+			//if (yChip >= mapData.size()) yChip = mapData.size() - 1;
+			//if (xChip <= 0) xChip = 1;
+			//if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
+			//// プレイヤーの左側がマップチップだったら
+			//if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+			//	HitMapChipLeft();
+			//}
+			//xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			//if (xChip < 0) xChip = 0;
+			//if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
+			//// プレイヤーの右側がマップチップだったら
+			//if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+			//	HitMapChipRight();
+			//}
+
+			// 引き伸ばし判定の補助のための処理
+			float bossAngle = atan2(bossPos.y - centerPos.y, bossPos.x - centerPos.x);
+			bossAngle = fabs(bossAngle);
+			int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			if (yChip <= 0) yChip = 1;
+			if (yChip >= mapData.size()) yChip = mapData.size() - 1;
+			if (xChip <= 0) xChip = 1;
+			if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
+			// プレイヤーの左側がマップチップだったら
+			if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+				// 敵が指定の範囲の中にいたら
+				const float MIN_ANGLE = 2.35619f;
+				const float MAX_ANGLE = 3.92699f;
+				// 角度がこの値の間だったら
+				if (MIN_ANGLE <= bossAngle && bossAngle <= MAX_ANGLE) {
+					// 引っかかっている。
+					isHitMapChip = true;
+				}
 			}
-		}
-		xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-		if (xChip < 0) xChip = 0;
-		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
-		// プレイヤーの右側がマップチップだったら
-		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
-			// 敵が指定の範囲の中にいたら
-			const float MIN_ANGLE = 0.785398f;
-			const float MAX_ANGLE = 5.49779f;
-			// 角度がこの値の間だったら
-			if (MAX_ANGLE <= bossAngle || bossAngle <= MIN_ANGLE) {
-				// 引っかかっている。
-				isHitMapChip = true;
+			xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+			if (xChip < 0) xChip = 0;
+			if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
+			// プレイヤーの右側がマップチップだったら
+			if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+				// 敵が指定の範囲の中にいたら
+				const float MIN_ANGLE = 0.785398f;
+				const float MAX_ANGLE = 5.49779f;
+				// 角度がこの値の間だったら
+				if (MAX_ANGLE <= bossAngle || bossAngle <= MIN_ANGLE) {
+					// 引っかかっている。
+					isHitMapChip = true;
+				}
 			}
+
 		}
 
 	}
@@ -915,6 +926,36 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 	}
 
 	isDead = false;
+
+
+	// マップチップにあたっている状態で画面外に出たら
+	if (isHitMapChip) {
+
+		Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
+		windowSize *= Vec2<int>(2, 2);
+
+		// ボスとプレイヤーの距離
+		float distanceX = fabs(lineCenterPos.x - centerPos.x);
+		float disntaceY = fabs(lineCenterPos.y - centerPos.y);
+
+		// ウィンドウ左右
+		if (windowSize.x <= centerPos.x + PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x || centerPos.x - PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
+
+			stuckWindowTimer = STRUCK_WINDOW_TIMER;
+			ShakeMgr::Instance()->SetShake(20);
+			SuperiorityGauge::Instance()->AddEnemyGauge(10);
+
+		}
+		// ウィンドウ上下
+		if (windowSize.y <= centerPos.y + PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y || centerPos.y - PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
+
+			stuckWindowTimer = STRUCK_WINDOW_TIMER;
+			ShakeMgr::Instance()->SetShake(20);
+			SuperiorityGauge::Instance()->AddEnemyGauge(10);
+
+		}
+
+	}
 
 }
 

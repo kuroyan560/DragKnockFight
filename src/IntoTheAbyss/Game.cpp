@@ -1008,7 +1008,7 @@ void Game::Update()
 	}
 
 	// プレイヤーの当たり判定
-	player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer);
+	player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer, lineCenterPos);
 
 	// 動的ブロックの当たり判定
 	MovingBlockMgr::Instance()->CheckHit(mapData);
@@ -1614,6 +1614,13 @@ void Game::Scramble()
 	if (isPlayer || (!isCatchMapChipPlayer && 0 < addLineLengthPlayer)) {
 
 		addLineLengthPlayer -= 5.0f;
+
+		// ウィンドウに挟まったら
+		if (0 < player.stuckWindowTimer) {
+
+			addLineLengthPlayer -= 20.0f;
+
+		}
 
 		if (addLineLengthPlayer < 0) addLineLengthPlayer = 0;
 

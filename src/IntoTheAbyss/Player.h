@@ -44,6 +44,10 @@ public:
 	// 壁ズリフラグ
 	bool isSlippingWall[4];			// 壁ズリパーティクルを出すフラグ
 
+	// ウィンドウに挟まったタイマー
+	int stuckWindowTimer;		// ウィンドウに挟まったタイマー
+	const int STRUCK_WINDOW_TIMER = 120.0f;// ウィンドウに挟まったタイマー
+
 	// プレイヤーの腕
 	unique_ptr<PlayerHand> lHand;	// 左手
 	unique_ptr<PlayerHand> rHand;	// 右手
@@ -151,7 +155,7 @@ public:
 	void Draw(LightManager& LigManager);
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip);
+	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip, const Vec2<float>& lineCenterPos);
 
 	// 方向ごとのマップチップとの当たり判定関数
 	void HitMapChipTop();
