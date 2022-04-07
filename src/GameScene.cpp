@@ -129,6 +129,10 @@ void GameScene::OnImguiDebug()
 
 
 	SuperiorityGauge::Instance()->DebugValue(&addValue);
+
+	game.playerHomeBase->Debug();
+	game.enemyHomeBase->Debug();
+
 }
 
 void GameScene::OnFinalize()

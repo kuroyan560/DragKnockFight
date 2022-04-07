@@ -453,6 +453,9 @@ Game::Game()
 	ligMgr.RegisterPointLight(&player.rHand->ptLight);//照準光源
 
 	Init();
+
+	playerHomeBase = std::make_unique<HomeBase>();
+	enemyHomeBase = std::make_unique<HomeBase>();
 }
 
 void Game::Init()
@@ -873,6 +876,40 @@ void Game::Update()
 
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
+
+	//プレイヤー陣地と敵の判定
+	if (playerHomeBase->Collision({}) && !roundFinishFlag)
+	{
+		//プレイヤー勝利
+		++countRound;
+		++countPlayerWin;
+		roundFinishFlag = true;
+		gameStartFlag = false;
+	}
+
+	//敵陣地とプレイヤーの判定
+	if (enemyHomeBase->Collision({}) && !roundFinishFlag)
+	{
+		//敵勝利
+		++countRound;
+		++countEnemyWin;
+		roundFinishFlag = true;
+		gameStartFlag = false;
+	}
+
+	//ラウンド終了演出開始
+	if (roundFinishFlag)
+	{
+		readyToStartRoundFlag = true;
+		roundFinishFlag = false;
+	}
+
+	//ラウンド開始時の演出開始
+	if (readyToStartRoundFlag)
+	{
+		gameStartFlag = true;
+		readyToStartRoundFlag = false;
+	}
 
 
 
@@ -1363,6 +1400,9 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		noMovementEnemy[index].Draw();
 
 	}
+
+	playerHomeBase->Draw();
+	enemyHomeBase->Draw();
 
 	player.Draw(ligMgr);
 	ParticleMgr::Instance()->Draw(ligMgr);
