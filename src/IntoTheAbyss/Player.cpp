@@ -1254,13 +1254,13 @@ void Player::Input(const vector<vector<int>> mapData)
 
 			// onGroundがtrueだったら移動量を加算しない。
 			//if (!onGround || sinf(rHandAngle) < 0.5f) {
-		vel.x += cosf(rHandAngle) * RECOIL_AMOUNT;
-		//}
+			vel.x += cosf(rHandAngle) * RECOIL_AMOUNT;
+			//}
 
-		vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
+			vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
 
-		// プレイヤーの腕を動かす。
-		lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
+			// プレイヤーの腕を動かす。
+			lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
 
 		}
 
@@ -1349,14 +1349,22 @@ void Player::Input(const vector<vector<int>> mapData)
 		}
 		else {
 			// onGroundがtrueだったら移動量を加算しない。
-			//if (!onGround || sinf(lHandAngle) < 0) {
-				vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
-			//}
+				//if (!onGround || sinf(lHandAngle) < 0) {
+			vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
+			//			//}
 
-		vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
+			{
+				//=======
+				//		if (!onGround || sinf(lHandAngle) < 0) {
+				//			vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
+				//		}
+				//>>>>>>> 繧ｹ繧ｯ繝ｭ繝ｼ繝ｫ縺ｮ荳ｭ蠢・ｒ邱壼・縺ｮ荳ｭ蠢・↓縺吶ｋ縺溘ａ縺ｮ繝・せ繝医ヶ繝ｩ繝ｳ繝・
+			}
 
-		// プレイヤーの腕を動かす。
-		rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
+			vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
+
+			// プレイヤーの腕を動かす。
+			rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
 
 		}
 
