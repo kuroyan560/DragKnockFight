@@ -15,7 +15,7 @@ SuperiorityGauge::SuperiorityGauge()
 	gaugeGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/UI/gauge_flame.png");
 	gaugeVarGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/UI/gauge.png");
 
-	Vec2<float>winHalf(1280.0f / 2.0f, 720.0f / 2.0f);
+	Vec2<float>winHalf(1280.0f / 2.0f, 50.0f);
 	gaguePos = winHalf;
 	gagueVarPos = winHalf;
 
