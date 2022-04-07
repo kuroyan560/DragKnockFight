@@ -5,6 +5,7 @@
 #include "MapChipCollider.h"
 #include "WinApp.h"
 #include"UsersInput.h"
+#include"SuperiorityGauge.h"
 
 #include"TexHandleMgr.h"
 
@@ -99,7 +100,7 @@ void Boss::Draw()
 	DrawFunc::DrawExtendGraph2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, TexHandleMgr::GetTexBuffer(graphHandle[dir]), AlphaBlendMode_Trans);
 }
 
-void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos)
+void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
 {
 
 	/*===== 当たり判定 =====*/
@@ -245,23 +246,26 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 	if (isHitMapChip) {
 
 		Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
+		windowSize *= Vec2<int>(2, 2);
 
 		// ボスとプレイヤーの距離
-		float distanceX = fabs(playerPos.x - pos.x);
-		float disntaceY = fabs(playerPos.y - pos.y);
+		float distanceX = fabs(lineCenterPos.x - pos.x);
+		float disntaceY = fabs(lineCenterPos.y - pos.y);
 
 		// ウィンドウ左右
-		if (windowSize.x <= distanceX) {
+		if (windowSize.x <= pos.x + scale.x - ScrollMgr::Instance()->scrollAmount.x || pos.x - scale.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
 			ShakeMgr::Instance()->SetShake(20);
+			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
 		}
 		// ウィンドウ上下
-		if (windowSize.y <= disntaceY) {
+		if (windowSize.y <= pos.y + scale.y - ScrollMgr::Instance()->scrollAmount.y || pos.y - scale.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
 			ShakeMgr::Instance()->SetShake(20);
+			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
 		}
 

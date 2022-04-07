@@ -904,9 +904,6 @@ void Game::Update()
 	}
 #pragma endregion
 
-
-	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-
 	//プレイヤー陣地と敵の判定
 	if (playerHomeBase->Collision({}) && !roundFinishFlag)
 	{
@@ -1011,7 +1008,7 @@ void Game::Update()
 	}
 
 	// プレイヤーの当たり判定
-	player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer);
+	player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer, lineCenterPos);
 
 	// 動的ブロックの当たり判定
 	MovingBlockMgr::Instance()->CheckHit(mapData);
@@ -1020,7 +1017,7 @@ void Game::Update()
 	BulletMgr::Instance()->CheckHit(mapData, bubbleBlock);
 
 	// ボスの当たり判定
-	boss.CheckHit(mapData, isCatchMapChipBoss, player.centerPos);
+	boss.CheckHit(mapData, isCatchMapChipBoss, player.centerPos, lineCenterPos);
 
 	// ビューポートをプレイヤー基準で移動させる。
 	ViewPort::Instance()->SetPlayerPosX(player.centerPos.x);
@@ -1371,6 +1368,10 @@ void Game::Update()
 
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
+
+	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -1470,7 +1471,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, boss.pos - scrollShakeAmount, Color());
 
 	SuperiorityGauge::Instance()->Draw();
-	
+
 	GUI::Instance()->Draw();
 
 
@@ -1509,8 +1510,12 @@ void Game::Scramble()
 	float line = 0;
 	float LINE = (lineLengthBoss + lineLengthPlayer) + (addLineLengthBoss + addLineLengthPlayer);
 
+	// 気にしないでください！
+	bool isBoss = false;
+	bool isPlayer = false;
+
 	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
-	if (playerVel < bossVel) {
+	if (playerVelGauge.Length() < bossVelGauge.Length()) {
 
 		// ボスの移動量のほうが大きかったら
 
@@ -1537,10 +1542,12 @@ void Game::Scramble()
 
 			}
 
+			isBoss = true;
+
 		}
 
 	}
-	else if (bossVel < playerVel) {
+	else if (bossVelGauge.Length() < playerVelGauge.Length()) {
 
 		// プレイヤーの移動量のほうが大きかったら
 
@@ -1578,6 +1585,8 @@ void Game::Scramble()
 
 			}
 
+			isPlayer = true;
+
 		}
 
 	}
@@ -1588,7 +1597,7 @@ void Game::Scramble()
 	}
 
 	// 引っかかり判定じゃなかったらだんだん短くする。
-	if (!isCatchMapChipBoss && 0 < addLineLengthBoss) {
+	if (isBoss || (!isCatchMapChipBoss && 0 < addLineLengthBoss)) {
 
 		addLineLengthBoss -= 5.0f;
 
@@ -1602,9 +1611,16 @@ void Game::Scramble()
 		if (addLineLengthBoss < 0) addLineLengthBoss = 0;
 
 	}
-	if (!isCatchMapChipPlayer && 0 < addLineLengthPlayer) {
+	if (isPlayer || (!isCatchMapChipPlayer && 0 < addLineLengthPlayer)) {
 
 		addLineLengthPlayer -= 5.0f;
+
+		// ウィンドウに挟まったら
+		if (0 < player.stuckWindowTimer) {
+
+			addLineLengthPlayer -= 20.0f;
+
+		}
 
 		if (addLineLengthPlayer < 0) addLineLengthPlayer = 0;
 

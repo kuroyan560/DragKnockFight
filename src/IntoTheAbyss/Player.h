@@ -44,6 +44,10 @@ public:
 	// 壁ズリフラグ
 	bool isSlippingWall[4];			// 壁ズリパーティクルを出すフラグ
 
+	// ウィンドウに挟まったタイマー
+	int stuckWindowTimer;		// ウィンドウに挟まったタイマー
+	const int STRUCK_WINDOW_TIMER = 120.0f;// ウィンドウに挟まったタイマー
+
 	// プレイヤーの腕
 	unique_ptr<PlayerHand> lHand;	// 左手
 	unique_ptr<PlayerHand> rHand;	// 右手
@@ -101,7 +105,7 @@ public:
 	//const float RECOIL_AMOUNT = FIRST_RECOIL_AMOUNT;			// 弾を撃った際の反動
 	float MAX_RECOIL_AMOUNT = 30.0f;		// 弾を撃った際の反動の最大値
 	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
-	const Vec2<float> PLAYER_HIT_SIZE = { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+	const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 	static Vec2<float>GetGeneratePos();
 	int RAPID_FIRE_TIMER = 4;			// 連射タイマー
 	const int GRAVITY_INVALID_TIMER = 20;		// 重力無効化タイマー
@@ -151,7 +155,7 @@ public:
 	void Draw(LightManager& LigManager);
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip);
+	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip, const Vec2<float>& lineCenterPos);
 
 	// 方向ごとのマップチップとの当たり判定関数
 	void HitMapChipTop();
