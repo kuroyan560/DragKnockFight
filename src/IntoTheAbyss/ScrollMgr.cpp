@@ -5,7 +5,7 @@ ScrollMgr::ScrollMgr():zoom(1.0f)
 {
 }
 
-void ScrollMgr::DetectMapChipForScroll(Vec2<float> PLAYER_POS, Vec2<float> SIZE)
+void ScrollMgr::DetectMapChipForScroll(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
 {
 
 	//プレイヤーの座標を基準に上下左右に検知用の座標を設定する　←　カメラ画角と一緒
@@ -153,7 +153,7 @@ void ScrollMgr::DetectMapChipForScroll(Vec2<float> PLAYER_POS, Vec2<float> SIZE)
 	scrollMinValue = { -adj,-adj };
 }
 
-void ScrollMgr::CalucurateScroll(Vec2<float> SCROLL_DATA)
+void ScrollMgr::CalucurateScroll(const Vec2<float> &SCROLL_DATA)
 {
 	if (!warpFlag)
 	{
@@ -199,7 +199,7 @@ void ScrollMgr::CalucurateScroll(Vec2<float> SCROLL_DATA)
 	}
 }
 
-void ScrollMgr::WarpScroll(Vec2<float> PLAYER_POS, Vec2<float> SIZE)
+void ScrollMgr::WarpScroll(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
 {
 	//プレイヤーの座標を基準に上下左右に検知用の座標を設定する　←　カメラ画角と一緒
 	std::array<Vec2<float>, 4> screenPos;//画角

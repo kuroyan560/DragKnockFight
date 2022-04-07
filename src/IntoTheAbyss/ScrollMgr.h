@@ -61,12 +61,12 @@ public:
 	};
 
 
-	void DetectMapChipForScroll(Vec2<float> PLAYER_POS, Vec2<float> SIZE = Vec2<float>(1280 / 2.0f, 720 / 2.0f));
+	void DetectMapChipForScroll(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE = Vec2<float>(1280 / 2.0f, 720 / 2.0f));
 
-	void CalucurateScroll(Vec2<float> SCROLL_DATA);
+	void CalucurateScroll(const Vec2<float> &SCROLL_DATA);
 
 
-	void WarpScroll(Vec2<float> PLAYER_POS, Vec2<float> SIZE = Vec2<float>(1280 / 2.0f, 720 / 2.0f));
+	void WarpScroll(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE = Vec2<float>(1280 / 2.0f, 720 / 2.0f));
 	void Restart();
 	void AlimentScrollAmount();
 
@@ -75,7 +75,7 @@ public:
 
 	bool warpFlag;
 
-	Vec2<float> CaluStartScrollLine(Vec2<float> SIZE)
+	Vec2<float> CaluStartScrollLine(const Vec2<float> &SIZE)
 	{
 		Vec2<float> distance(detectPos[RIGHT].x, detectPos[DOWN].y);
 		Vec2<float> startPos;
@@ -89,7 +89,7 @@ public:
 	};
 
 
-	Vec2<float> CaluEndScrollLine(Vec2<float> SIZE)
+	Vec2<float> CaluEndScrollLine(const Vec2<float> &SIZE)
 	{
 		Vec2<float> distance(detectPos[RIGHT].x, detectPos[DOWN].y);
 		Vec2<float> endPos;

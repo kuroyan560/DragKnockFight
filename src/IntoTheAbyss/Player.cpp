@@ -43,6 +43,7 @@ Player::Player()
 	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
 
 	this->Init(GetGeneratePos());
+
 }
 
 Player::~Player()
@@ -135,6 +136,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	stuckWindowTimer = 0;
 
 	//muffler.Init(INIT_POS);
+
+	areaHitBox.center = &centerPos;
+	areaHitBox.size = PLAYER_HIT_SIZE;
 }
 
 void Player::Update(const vector<vector<int>> mapData)

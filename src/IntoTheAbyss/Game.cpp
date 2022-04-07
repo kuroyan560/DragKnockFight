@@ -23,7 +23,7 @@
 #include"SuperiorityGauge.h"
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -49,7 +49,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -87,7 +87,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -144,7 +144,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -162,7 +162,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	//AudioApp::Instance()->PlayWave(bgm, true);
 
@@ -398,15 +398,11 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 			}
 		}
 
+		//ScrollMgr::Instance()->honraiScrollAmount = { -1060.0f,-490.0f };
 		ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 		ScrollMgr::Instance()->WarpScroll(lineCenterPos);
+		ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 
-		if (deadFlag)
-		{
-			ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-			ScrollMgr::Instance()->AlimentScrollAmount();
-			ScrollMgr::Instance()->Restart();
-		}
 #pragma endregion
 		alphaValue = 0;
 	}
@@ -442,9 +438,62 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//sceneLightFlag = false;
 	SelectStage::Instance()->resetStageFlag = false;
 	restartTimer = 0.0f;
+
+
+	{
+		Vec2<float>playerLeftUpPos;
+		Vec2<float>playerRightDownPos;
+		Vec2<float>enemyLeftUpPos;
+		Vec2<float>enemyRightDownPos;
+		for (int y = 0; y < mapData.size(); ++y)
+		{
+			for (int x = 0; x < mapData[y].size(); ++x)
+			{
+				if (mapData[y][x] == 33)
+				{
+					playerLeftUpPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+				}
+				if (mapData[y][x] == 34)
+				{
+					playerRightDownPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+				}
+				if (mapData[y][x] == 35)
+				{
+					enemyLeftUpPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+				}
+				if (mapData[y][x] == 36)
+				{
+					enemyRightDownPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+				}
+			}
+		}
+
+		Vec2<float>chipPos(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE);
+		playerHomeBase->Init(playerLeftUpPos - chipPos, playerRightDownPos + chipPos);
+		enemyHomeBase->Init(enemyLeftUpPos - chipPos, enemyRightDownPos + chipPos);
+
+		{
+			float data = ((mapData[0].size() - 1) * MAP_CHIP_SIZE) - 300.0f;
+			miniMap.Init(data);
+		}
+
+
+		// ボスを生成
+		boss.Generate(player.centerPos + Vec2<float>(100, 0));
+		lineLengthPlayer = LINE_LENGTH;
+		lineLengthBoss = LINE_LENGTH;
+		addLineLengthPlayer = 0;
+		addLineLengthBoss = 0;
+		lineCenterPos = {};
+		prevLineCenterPos = {};
+
+		isCatchMapChipBoss = false;
+		isCatchMapChipPlayer = false;
+	}
+
+	firstLoadFlag = false;
 }
 
-#include"AudioApp.h"
 Game::Game()
 {
 	mapBlockGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Block.png");
@@ -481,6 +530,9 @@ Game::Game()
 	playerHomeBase = std::make_unique<HomeBase>();
 	enemyHomeBase = std::make_unique<HomeBase>();
 
+	playerHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
+	enemyHomeBase->Init({ 0.0f,0.0f }, { 800.0f,1000.0f });
+	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
 }
 
 void Game::Init()
@@ -507,18 +559,8 @@ void Game::Init()
 	enemyGenerateTimer = 0;
 	nomoveMentTimer = 0;
 
-	// ボスを生成
-	boss.Generate(player.centerPos + Vec2<float>(100, 0));
-	lineLengthPlayer = LINE_LENGTH;
-	lineLengthBoss = LINE_LENGTH;
-	addLineLengthPlayer = 0;
-	addLineLengthBoss = 0;
-	lineCenterPos = {};
-	prevLineCenterPos = {};
-
-	isCatchMapChipBoss = false;
-	isCatchMapChipPlayer = false;
-
+	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 }
 
 void Game::Update()
@@ -877,7 +919,6 @@ void Game::Update()
 	}
 
 
-
 	//ステージ毎の切り替え判定
 	//部屋の初期化
 	if ((SelectStage::Instance()->GetRoomNum() != oldRoomNum || SelectStage::Instance()->GetStageNum() != oldStageNum) || SelectStage::Instance()->resetStageFlag)
@@ -886,6 +927,45 @@ void Game::Update()
 		oldRoomNum = SelectStage::Instance()->GetRoomNum();
 		oldStageNum = SelectStage::Instance()->GetStageNum();
 	}
+
+	//プレイヤー陣地と敵の判定
+	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag)
+	{
+		//プレイヤー勝利
+		++countRound;
+		++countPlayerWin;
+		roundFinishFlag = true;
+		gameStartFlag = false;
+	}
+
+	//敵陣地とプレイヤーの判定
+	if (enemyHomeBase->Collision(player.areaHitBox) && !roundFinishFlag)
+	{
+		//敵勝利
+		++countRound;
+		++countEnemyWin;
+		roundFinishFlag = true;
+		gameStartFlag = false;
+	}
+
+	//ラウンド終了演出開始
+	if (roundFinishFlag)
+	{
+		readyToStartRoundFlag = true;
+		roundFinishFlag = false;
+	}
+
+	//ラウンド開始時の演出開始
+	if (readyToStartRoundFlag)
+	{
+		gameStartFlag = true;
+		SelectStage::Instance()->resetStageFlag = true;
+		readyToStartRoundFlag = false;
+	}
+
+
+
+
 
 	//イベントブロックとの判定
 	for (int i = 0; i < eventBlocks.size(); ++i)
@@ -913,45 +993,14 @@ void Game::Update()
 	}
 #pragma endregion
 
-	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision({}) && !roundFinishFlag)
-	{
-		//プレイヤー勝利
-		++countRound;
-		++countPlayerWin;
-		roundFinishFlag = true;
-		gameStartFlag = false;
-	}
-
-	//敵陣地とプレイヤーの判定
-	if (enemyHomeBase->Collision({}) && !roundFinishFlag)
-	{
-		//敵勝利
-		++countRound;
-		++countEnemyWin;
-		roundFinishFlag = true;
-		gameStartFlag = false;
-	}
-
-	//ラウンド終了演出開始
-	if (roundFinishFlag)
-	{
-		readyToStartRoundFlag = true;
-		roundFinishFlag = false;
-	}
-
-	//ラウンド開始時の演出開始
-	if (readyToStartRoundFlag)
-	{
-		gameStartFlag = true;
-		readyToStartRoundFlag = false;
-	}
 
 
-
+	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	// プレイヤーの更新処理
 	player.Update(mapData);
+
+	miniMap.Update();
 
 	//if (Input::isKey(KEY_INPUT_RIGHT)) player.centerPos.x += 1.0f;
 	if (UsersInput::Instance()->Input(DIK_RIGHT)) player.centerPos.x += 1.0f;
@@ -967,6 +1016,13 @@ void Game::Update()
 
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
+
+	if (firstLoadFlag)
+	{
+		ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+		ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+	}
+	firstLoadFlag = true;
 
 	// スクロール量の更新処理
 	ScrollMgr::Instance()->Update();
@@ -1378,9 +1434,6 @@ void Game::Update()
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
 
-	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -1483,7 +1536,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	GUI::Instance()->Draw();
 
-
+	miniMap.Draw();
 
 	if (sceneBlackFlag || sceneLightFlag)
 	{
