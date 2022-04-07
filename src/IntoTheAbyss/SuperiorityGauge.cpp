@@ -107,7 +107,7 @@ void SuperiorityGauge::Update()
 void SuperiorityGauge::Draw()
 {
 	DrawFunc::DrawRotaGraph2D(gaguePos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(gaugeGraphHandle));
-	DrawFunc_Color::DrawGraph(gagueVarPos, TexHandleMgr::GetTexBuffer(gaugeVarGraphHandle), Color(255, 126, 204, 255), { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f), Vec2<float>(1.0f, 1.0f));
+	DrawFunc_Color::DrawGraph(gagueVarPos, TexHandleMgr::GetTexBuffer(gaugeVarGraphHandle), Color(239, 1, 144, 255), { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f), Vec2<float>(1.0f, 1.0f));
 }
 
 void SuperiorityGauge::DebugValue(float *ADD_VALUE)
