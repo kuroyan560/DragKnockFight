@@ -49,12 +49,36 @@ void Boss::Update()
 	// 前フレームの座標を保存
 	prevPos = pos;
 
-	vel.x += (OFFSET_VEL - vel.x) / 10.0f;
+	static const int PULL_SPAN_MIN = 30;
+	static const int PULL_SPAN_MAX = 70;
+	static int PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
+	static int PULL_TIMER = 0;
+	static Vec2<float>ACCEL = { 0.0f,0.0f };	//加速度
+	static const float PULL_POWER_MIN = 15.0f;
+	static const float PULL_POWER_MAX = 25.0f;
+
+	if (PULL_TIMER < PULL_SPAN)
+	{
+		PULL_TIMER++;
+		if (PULL_SPAN <= PULL_TIMER)
+		{
+			PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
+			PULL_TIMER = 0;
+
+			auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
+			auto power = KuroFunc::GetRand(PULL_POWER_MIN, PULL_POWER_MAX);
+			ACCEL.x = cos(rad) * power * 1.6f;
+			ACCEL.y = sin(rad) * power;
+		}
+	}
+	vel.x = KuroMath::Lerp(vel.x, OFFSET_VEL, 0.1f);
+	vel.y = KuroMath::Lerp(vel.y, 0.0f, 0.1f);
+	vel += ACCEL;
+
+	ACCEL = KuroMath::Lerp(ACCEL, { 0.0f,0.0f }, 0.8f);
 
 	if (UsersInput::Instance()->Input(DIK_0)) {
-
 		vel.x = OFFSET_VEL * 5.0f;
-
 	}
 
 	if (0 < stuckWindowTimer) --stuckWindowTimer;
