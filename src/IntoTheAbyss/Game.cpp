@@ -1017,7 +1017,7 @@ void Game::Update()
 	BulletMgr::Instance()->CheckHit(mapData, bubbleBlock);
 
 	// ボスの当たり判定
-	boss.CheckHit(mapData, isCatchMapChipBoss, player.centerPos);
+	boss.CheckHit(mapData, isCatchMapChipBoss, player.centerPos, lineCenterPos);
 
 	// ビューポートをプレイヤー基準で移動させる。
 	ViewPort::Instance()->SetPlayerPosX(player.centerPos.x);
@@ -1369,7 +1369,7 @@ void Game::Update()
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
 
-	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos-lineCenterPos);
+	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 
 }
@@ -1471,7 +1471,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, boss.pos - scrollShakeAmount, Color());
 
 	SuperiorityGauge::Instance()->Draw();
-	
+
 	GUI::Instance()->Draw();
 
 

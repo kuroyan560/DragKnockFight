@@ -75,7 +75,7 @@ void Boss::Draw()
 	DrawFunc::DrawExtendGraph2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, TexHandleMgr::GetTexBuffer(graphHandle[dir]), AlphaBlendMode_Trans);
 }
 
-void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos)
+void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
 {
 
 	/*===== 当たり判定 =====*/
@@ -223,8 +223,8 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 		Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
 
 		// ボスとプレイヤーの距離
-		float distanceX = fabs(playerPos.x - pos.x);
-		float disntaceY = fabs(playerPos.y - pos.y);
+		float distanceX = fabs(lineCenterPos.x - pos.x);
+		float disntaceY = fabs(lineCenterPos.y - pos.y);
 
 		// ウィンドウ左右
 		if (windowSize.x <= distanceX) {

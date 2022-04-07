@@ -52,6 +52,6 @@ public:
 	void Draw();
 
 	// “–‚½‚è”»’è
-	void CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos);
+	void CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos);
 
 };

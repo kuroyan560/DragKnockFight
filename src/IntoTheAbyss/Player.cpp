@@ -343,6 +343,8 @@ void Player::Draw(LightManager& LigManager)
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
+
+	DrawFunc::DrawBox2D(centerPos - PLAYER_HIT_SIZE - scrollShakeZoom, centerPos + PLAYER_HIT_SIZE - scrollShakeZoom, Color(), DXGI_FORMAT_R8G8B8A8_UNORM, true);
 }
 
 void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip)
@@ -376,6 +378,41 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		//if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
 		//	HitMapChipRight();
 		//}
+
+		// 引き伸ばし判定の補助のための処理
+		float bossAngle = atan2(bossPos.y - centerPos.y, bossPos.x - centerPos.x);
+		bossAngle = fabs(bossAngle);
+		int yChip = (centerPos.y + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		int xChip = (centerPos.x - PLAYER_HIT_SIZE.x * 1.2f + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		if (yChip <= 0) yChip = 1;
+		if (yChip >= mapData.size()) yChip = mapData.size() - 1;
+		if (xChip <= 0) xChip = 1;
+		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
+		// プレイヤーの左側がマップチップだったら
+		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+			// 敵が指定の範囲の中にいたら
+			const float MIN_ANGLE = 2.35619f;
+			const float MAX_ANGLE = 3.92699f;
+			// 角度がこの値の間だったら
+			if (MIN_ANGLE <= bossAngle && bossAngle <= MAX_ANGLE) {
+				// 引っかかっている。
+				isHitMapChip = true;
+			}
+		}
+		xChip = (centerPos.x + PLAYER_HIT_SIZE.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+		if (xChip < 0) xChip = 0;
+		if (xChip >= mapData[yChip].size()) xChip = mapData[yChip].size() - 1;
+		// プレイヤーの右側がマップチップだったら
+		if (mapData[yChip][xChip] == 1 && mapData[yChip - 1][xChip] != 0) {
+			// 敵が指定の範囲の中にいたら
+			const float MIN_ANGLE = 0.785398f;
+			const float MAX_ANGLE = 5.49779f;
+			// 角度がこの値の間だったら
+			if (MAX_ANGLE <= bossAngle || bossAngle <= MIN_ANGLE) {
+				// 引っかかっている。
+				isHitMapChip = true;
+			}
+		}
 
 	}
 
@@ -470,89 +507,89 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 	bool isHitTeleportPikeDossun = false;
 	int hitTeleportPikeIndex = 0;
 
-	//{
+	{
 
-	//	// 瞬間移動の短槍の当たり判定を行う。
-	//	if (!rHand->teleportPike.isHitWall && rHand->teleportPike.isActive) {
-	//		bool onGround = false;
-	//		INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(rHand->teleportPike.pos, rHand->teleportPike.prevFramePos, rHand->teleportPike.forwardVec, Vec2<float>(rHand->teleportPike.SCALE, rHand->teleportPike.SCALE), onGround, mapData);
-	//		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+		//	// 瞬間移動の短槍の当たり判定を行う。
+		//	if (!rHand->teleportPike.isHitWall && rHand->teleportPike.isActive) {
+		//		bool onGround = false;
+		//		INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(rHand->teleportPike.pos, rHand->teleportPike.prevFramePos, rHand->teleportPike.forwardVec, Vec2<float>(rHand->teleportPike.SCALE, rHand->teleportPike.SCALE), onGround, mapData);
+		//		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
 
-	//		// 押し戻し
-	//		Vec2<float> scale = Vec2<float>(rHand->teleportPike.SCALE * 1.0f, rHand->teleportPike.SCALE * 1.0f);
-	//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_BOTTOM);
-	//		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
-	//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_TOP);
-	//		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
-	//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_LEFT);
-	//		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
-	//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_RIGHT);
-	//		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+		//		// 押し戻し
+		//		Vec2<float> scale = Vec2<float>(rHand->teleportPike.SCALE * 1.0f, rHand->teleportPike.SCALE * 1.0f);
+		//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_BOTTOM);
+		//		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+		//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_TOP);
+		//		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+		//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_LEFT);
+		//		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
+		//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(rHand->teleportPike.pos, scale, mapData, INTERSECTED_RIGHT);
+		//		if (buff != INTERSECTED_NONE) { rHand->teleportPike.isHitWall = true; }
 
-	//	}
+		//	}
 
-	//	// 時間停止の短槍とドッスンブロックの当たり判定を行う。
-	//	const int DOSSUN_COUNT = dossun.size();
-	//	for (int index = 0; index < DOSSUN_COUNT; ++index) {
+		//	// 時間停止の短槍とドッスンブロックの当たり判定を行う。
+		//	const int DOSSUN_COUNT = dossun.size();
+		//	for (int index = 0; index < DOSSUN_COUNT; ++index) {
 
-	//		//if (rHand->teleportPike.isHitWall) continue;
+		//		//if (rHand->teleportPike.isHitWall) continue;
 
-	//		// まずは当たっているかをチェックする。
-	//		if (fabs(rHand->teleportPike.pos.x - dossun[index].pos.x) > rHand->teleportPike.SCALE + dossun[index].size.x) continue;
-	//		if (fabs(rHand->teleportPike.pos.y - dossun[index].pos.y) > rHand->teleportPike.SCALE + dossun[index].size.y) continue;
+		//		// まずは当たっているかをチェックする。
+		//		if (fabs(rHand->teleportPike.pos.x - dossun[index].pos.x) > rHand->teleportPike.SCALE + dossun[index].size.x) continue;
+		//		if (fabs(rHand->teleportPike.pos.y - dossun[index].pos.y) > rHand->teleportPike.SCALE + dossun[index].size.y) continue;
 
-	//		// 瞬間移動の短槍に壁にあたったフラグを付ける。
-	//		rHand->teleportPike.isHitWall = true;
+		//		// 瞬間移動の短槍に壁にあたったフラグを付ける。
+		//		rHand->teleportPike.isHitWall = true;
 
-	//		rHand->teleportPike.gimmickVel = dossun[index].moveDir * Vec2<float>(dossun[index].speed, dossun[index].speed);
+		//		rHand->teleportPike.gimmickVel = dossun[index].moveDir * Vec2<float>(dossun[index].speed, dossun[index].speed);
 
-	//		isHitTeleportPikeDossun = true;
-	//		hitTeleportPikeIndex = index;
+		//		isHitTeleportPikeDossun = true;
+		//		hitTeleportPikeIndex = index;
 
-	//	}
+		//	}
 
-	//	// 時間停止の短槍の当たり判定を行う。
-	//	if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
-	//		bool onGround = false;
-	//		INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(lHand->timeStopPike.pos, lHand->timeStopPike.prevFramePos, lHand->timeStopPike.forwardVec, Vec2<float>(lHand->timeStopPike.SCALE, lHand->timeStopPike.SCALE), onGround, mapData);
-	//		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+		//	// 時間停止の短槍の当たり判定を行う。
+		//	if (!lHand->timeStopPike.isHitWall && lHand->timeStopPike.isActive) {
+		//		bool onGround = false;
+		//		INTERSECTED_LINE buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(lHand->timeStopPike.pos, lHand->timeStopPike.prevFramePos, lHand->timeStopPike.forwardVec, Vec2<float>(lHand->timeStopPike.SCALE, lHand->timeStopPike.SCALE), onGround, mapData);
+		//		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
 
-	//		// 押し戻し
-	//		Vec2<float> scale = Vec2<float>(lHand->timeStopPike.SCALE * 1.0f, lHand->timeStopPike.SCALE * 1.0f);
-	//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_BOTTOM);
-	//		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
-	//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_TOP);
-	//		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
-	//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_LEFT);
-	//		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
-	//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_RIGHT);
-	//		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
-	//	}
+		//		// 押し戻し
+		//		Vec2<float> scale = Vec2<float>(lHand->timeStopPike.SCALE * 1.0f, lHand->timeStopPike.SCALE * 1.0f);
+		//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_BOTTOM);
+		//		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+		//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_TOP);
+		//		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+		//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_LEFT);
+		//		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+		//		buff = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(lHand->timeStopPike.pos, scale, mapData, INTERSECTED_RIGHT);
+		//		if (buff != INTERSECTED_NONE) { lHand->timeStopPike.isHitWall = true; }
+		//	}
 
-	//	// 時間停止の短槍とドッスンブロックの当たり判定を行う。
-	//	for (int index = 0; index < DOSSUN_COUNT; ++index) {
+		//	// 時間停止の短槍とドッスンブロックの当たり判定を行う。
+		//	for (int index = 0; index < DOSSUN_COUNT; ++index) {
 
-	//		if (lHand->timeStopPike.isHitWall) continue;
+		//		if (lHand->timeStopPike.isHitWall) continue;
 
-	//		// まずは当たっているかをチェックする。
-	//		if (fabs(lHand->timeStopPike.pos.x - dossun[index].pos.x) > lHand->timeStopPike.SCALE + dossun[index].size.x) continue;
-	//		if (fabs(lHand->timeStopPike.pos.y - dossun[index].pos.y) > lHand->timeStopPike.SCALE + dossun[index].size.y) continue;
+		//		// まずは当たっているかをチェックする。
+		//		if (fabs(lHand->timeStopPike.pos.x - dossun[index].pos.x) > lHand->timeStopPike.SCALE + dossun[index].size.x) continue;
+		//		if (fabs(lHand->timeStopPike.pos.y - dossun[index].pos.y) > lHand->timeStopPike.SCALE + dossun[index].size.y) continue;
 
-	//		lHand->timeStopPike.isHitWall = true;
-	//		lHand->timeStopPike.stopPos = dossun[index].speed;
-	//		lHand->timeStopPike.stopTargetPos = &dossun[index].speed;
+		//		lHand->timeStopPike.isHitWall = true;
+		//		lHand->timeStopPike.stopPos = dossun[index].speed;
+		//		lHand->timeStopPike.stopTargetPos = &dossun[index].speed;
 
-	//		// この時点でドッスンブロックは1F分移動しちゃっているので、押し戻す。
-	//		dossun[index].pos -= dossun[index].moveDir * Vec2<float>(dossun[index].speed, dossun[index].speed);
+		//		// この時点でドッスンブロックは1F分移動しちゃっているので、押し戻す。
+		//		dossun[index].pos -= dossun[index].moveDir * Vec2<float>(dossun[index].speed, dossun[index].speed);
 
-	//		// ぷれいやーもおしもどす。
-	//		centerPos -= gimmickVel;
+		//		// ぷれいやーもおしもどす。
+		//		centerPos -= gimmickVel;
 
-	//		dossun[index].isTimeStopPikeAlive = &(lHand->timeStopPike.isHitWall);
+		//		dossun[index].isTimeStopPikeAlive = &(lHand->timeStopPike.isHitWall);
 
-	//	}
+		//	}
 
-	//}
+	}
 
 	/*===== 腕の当たり判定 =====*/
 
@@ -1176,13 +1213,13 @@ void Player::Input(const vector<vector<int>> mapData)
 
 			// onGroundがtrueだったら移動量を加算しない。
 			//if (!onGround || sinf(rHandAngle) < 0.5f) {
-			vel.x += cosf(rHandAngle) * RECOIL_AMOUNT;
-			//}
+		vel.x += cosf(rHandAngle) * RECOIL_AMOUNT;
+		//}
 
-			vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
+		vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
 
-			// プレイヤーの腕を動かす。
-			lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
+		// プレイヤーの腕を動かす。
+		lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
 
 		//}
 
@@ -1271,14 +1308,14 @@ void Player::Input(const vector<vector<int>> mapData)
 		//}
 		//else {
 			// onGroundがtrueだったら移動量を加算しない。
-			if (!onGround || sinf(lHandAngle) < 0) {
-				vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
-			}
+		if (!onGround || sinf(lHandAngle) < 0) {
+			vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
+		}
 
-			vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
+		vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
 
-			// プレイヤーの腕を動かす。
-			rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
+		// プレイヤーの腕を動かす。
+		rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
 
 		//}
 
@@ -1717,8 +1754,8 @@ void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector
 	// 通常時の当たり判定
 	Vec2<float> moveDir = prevFrameCenterPos - centerPos;
 	moveDir.Normalize();
-	//intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(upperPlayerPos, prevFrameCenterPos, vel + gimmickVel, Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
-	intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+	//intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, vel + gimmickVel, Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y), onGround, mapData);
+	//intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
 
 
 	// 差分(押し戻された値を座標から引く)
