@@ -1368,32 +1368,37 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	}
 
-	player.Draw(ligMgr);
-	ParticleMgr::Instance()->Draw(ligMgr);
-
-	// ボスを描画
-	boss.Draw();
-
+	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
+	static const int CHAIN_THICKNESS = 4;
 	// プレイヤーとボス間に線を描画
 	{
 		Vec2<float> playerBossDir = boss.pos - player.centerPos;
 		playerBossDir.Normalize();
 		Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 		Vec2<float> playerDefLength = player.centerPos + playerBossDir * addLineLengthPlayer;
-		DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, playerDefLength - scrollShakeAmount, Color(0, 0, 255, 255));
-		DrawFunc::DrawLine2D(playerDefLength - scrollShakeAmount, playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, Color(255, 255, 255, 255));
+		//DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, playerDefLength - scrollShakeAmount, Color(0, 0, 255, 255));
+		//DrawFunc::DrawLine2D(playerDefLength - scrollShakeAmount, playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, Color(255, 255, 255, 255));
+		DrawFunc::DrawLine2DGraph(player.centerPos - scrollShakeAmount, playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS);
 
-		// 線分の中心に円を描画
-		DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
-	}
-	{
 		Vec2<float> bossPlayerDir = player.centerPos - boss.pos;
 		bossPlayerDir.Normalize();
-		Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 		Vec2<float> bossDefLength = boss.pos + bossPlayerDir * addLineLengthBoss;
-		DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
-		DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
+
+		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
+		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
+		DrawFunc::DrawLine2DGraph(boss.pos - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS);
+
+		// 線分の中心に円を描画
+		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
+		DrawFunc::DrawRotaGraph2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, { 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 	}
+
+	player.Draw(ligMgr);
+	ParticleMgr::Instance()->Draw(ligMgr);
+
+	// ボスを描画
+	boss.Draw();
 
 	GUI::Instance()->Draw();
 

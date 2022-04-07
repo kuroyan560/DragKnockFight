@@ -1,7 +1,6 @@
 #include "GameScene.h"
 #include"KuroEngine.h"
 #include"Sprite.h"
-#include"Sprite_Shadow.h"
 #include"GaussianBlur.h"
 #include"IntoTheAbyss/StageMgr.h"
 #include"IntoTheAbyss/SelectStage.h"
@@ -12,10 +11,7 @@ GameScene::GameScene()
 {
 	static const float BACK_GROUND_DEPTH = 7.0f;
 	auto backColor = D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, 255));
-	backGround = std::make_shared<Sprite_Shadow>(backColor, nullptr, nullptr, "BackGround");
-	backGround->SetDepth(BACK_GROUND_DEPTH);
-	backGround->SetSpecularAffect(0.0f);
-	backGround->SetLimAffect(0.0f);
+	backGround = std::make_shared<Sprite>(backColor, "BackGround");
 	backGround->mesh.SetZLayer(BACK_GROUND_DEPTH);
 	backGround->mesh.SetSize(WinApp::Instance()->GetExpandWinSize());
 
@@ -57,8 +53,9 @@ void GameScene::OnUpdate()
 
 void GameScene::OnDraw()
 {
+	emissiveMap->Clear(D3D12App::Instance()->GetCmdList());
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
-	backGround->Draw(game.GetLigManager());
+	backGround->Draw();
 	game.Draw(emissiveMap);
 
 	gaussianBlur->Register(emissiveMap);
@@ -108,7 +105,7 @@ void GameScene::OnImguiDebug()
 	ImGui::End();
 
 
-	ImGui::Begin("Timer");
+	/*ImGui::Begin("Timer");
 	ImGui::Text("GravityMode");
 	if (game.player.isZeroGravity)
 	{
@@ -123,10 +120,9 @@ void GameScene::OnImguiDebug()
 	}
 	ImGui::Text("MaxTimer%d", game.player.CHANGE_GRAVITY_TIMER);
 	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
-	ImGui::End();
+	ImGui::End();*/
 
 	DebugParameter::Instance()->DrawImGui();
-
 
 	SuperiorityGauge::Instance()->DebugValue(&addValue);
 }

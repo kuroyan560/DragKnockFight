@@ -73,7 +73,8 @@ class Game
 	float lineLengthBoss;
 	float addLineLengthPlayer;
 	float addLineLengthBoss;
-	const float LINE_LENGTH = 250.0f;
+	//const float LINE_LENGTH = 250.0f;
+	const float LINE_LENGTH = 130.0f;
 
 	// マップチップのデータ
 	vector<vector<int>> mapData;
