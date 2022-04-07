@@ -1737,7 +1737,14 @@ void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector
 	// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
 	Vec2<float> upperPlayerPos = centerPos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);
 	Vec2<float> upperPlayerPosBuff = upperPlayerPos;
-	INTERSECTED_LINE intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(upperPlayerPos, prevFrameCenterPos, vel + gimmickVel, Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+	INTERSECTED_LINE intersectedLine = {};
+
+	// 通常時の当たり判定
+	Vec2<float> moveDir = centerPos - prevFrameCenterPos;
+	moveDir.Normalize();
+	//intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(upperPlayerPos, prevFrameCenterPos, vel + gimmickVel, Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+	intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(upperPlayerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+
 
 	// 差分(押し戻された値を座標から引く)
 	centerPos += upperPlayerPos - upperPlayerPosBuff;
@@ -1835,7 +1842,7 @@ void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector
 
 		Vec2<float> downnerPlayerPos = centerPos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);
 		Vec2<float> downnerPlayerPosBuff = upperPlayerPos;
-		intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(downnerPlayerPos, prevFrameCenterPos, vel + gimmickVel, Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+		intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(downnerPlayerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
 
 		// 差分(押し戻された値を座標から引く)
 		centerPos += downnerPlayerPos - downnerPlayerPosBuff;
