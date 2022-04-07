@@ -17,6 +17,8 @@ Boss::Boss()
 
 	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy.png");
 	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy_back.png");
+
+	areaHitBox.center = &pos;
 }
 
 void Boss::Init()
@@ -38,8 +40,6 @@ void Boss::Generate(const Vec2<float> &generatePos)
 	vel = { OFFSET_VEL,0 };
 	prevIntersectedLine = INTERSECTED_NONE;
 	stuckWindowTimer = 0;
-
-	areaHitBox.center = &pos;
 	areaHitBox.size = scale;
 }
 

@@ -396,6 +396,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 			}
 		}
 
+		ScrollMgr::Instance()->honraiScrollAmount = { -640.0f,-360.0f };
 		ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 		ScrollMgr::Instance()->WarpScroll(lineCenterPos);
 
@@ -440,6 +441,18 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//sceneLightFlag = false;
 	SelectStage::Instance()->resetStageFlag = false;
 	restartTimer = 0.0f;
+
+	// ボスを生成
+	boss.Generate(player.centerPos + Vec2<float>(100, 0));
+	lineLengthPlayer = LINE_LENGTH;
+	lineLengthBoss = LINE_LENGTH;
+	addLineLengthPlayer = 0;
+	addLineLengthBoss = 0;
+	lineCenterPos = {};
+	prevLineCenterPos = {};
+
+	isCatchMapChipBoss = false;
+	isCatchMapChipPlayer = false;
 }
 
 Game::Game()
@@ -501,18 +514,6 @@ void Game::Init()
 	}
 	enemyGenerateTimer = 0;
 	nomoveMentTimer = 0;
-
-	// ボスを生成
-	boss.Generate(player.centerPos + Vec2<float>(100, 0));
-	lineLengthPlayer = LINE_LENGTH;
-	lineLengthBoss = LINE_LENGTH;
-	addLineLengthPlayer = 0;
-	addLineLengthBoss = 0;
-	lineCenterPos = {};
-	prevLineCenterPos = {};
-
-	isCatchMapChipBoss = false;
-	isCatchMapChipPlayer = false;
 
 }
 
@@ -872,6 +873,42 @@ void Game::Update()
 	}
 
 
+	//プレイヤー陣地と敵の判定
+	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag)
+	{
+		//プレイヤー勝利
+		++countRound;
+		++countPlayerWin;
+		roundFinishFlag = true;
+		gameStartFlag = false;
+	}
+
+	//敵陣地とプレイヤーの判定
+	if (enemyHomeBase->Collision(player.areaHitBox) && !roundFinishFlag)
+	{
+		//敵勝利
+		++countRound;
+		++countEnemyWin;
+		roundFinishFlag = true;
+		gameStartFlag = false;
+	}
+
+	//ラウンド終了演出開始
+	if (roundFinishFlag)
+	{
+		readyToStartRoundFlag = true;
+		roundFinishFlag = false;
+	}
+
+	//ラウンド開始時の演出開始
+	if (readyToStartRoundFlag)
+	{
+		gameStartFlag = true;
+		SelectStage::Instance()->resetStageFlag = true;
+		readyToStartRoundFlag = false;
+	}
+
+
 
 	//ステージ毎の切り替え判定
 	//部屋の初期化
@@ -907,41 +944,6 @@ void Game::Update()
 		}
 	}
 #pragma endregion
-
-	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag)
-	{
-		//プレイヤー勝利
-		++countRound;
-		++countPlayerWin;
-		roundFinishFlag = true;
-		gameStartFlag = false;
-	}
-
-	//敵陣地とプレイヤーの判定
-	if (enemyHomeBase->Collision(player.areaHitBox) && !roundFinishFlag)
-	{
-		//敵勝利
-		++countRound;
-		++countEnemyWin;
-		roundFinishFlag = true;
-		gameStartFlag = false;
-	}
-
-	//ラウンド終了演出開始
-	if (roundFinishFlag)
-	{
-		readyToStartRoundFlag = true;
-		roundFinishFlag = false;
-	}
-
-	//ラウンド開始時の演出開始
-	if (readyToStartRoundFlag)
-	{
-		gameStartFlag = true;
-		readyToStartRoundFlag = false;
-	}
-
 
 
 
