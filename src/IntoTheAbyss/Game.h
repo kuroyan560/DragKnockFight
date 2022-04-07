@@ -23,6 +23,9 @@ class RenderTarget;
 
 #include"ThornBlock.h"
 #include"HomeBase.h"
+#include"MapChipCollider.h"
+
+#include"MiniMap.h"
 
 struct MassChipData
 {
@@ -138,18 +141,22 @@ class Game
 	Light::HemiSphere hemiLig;
 
 
-	//試合関連
-	int countRound;						//ラウンド数
-	int countPlayerWin, countEnemyWin;	//勝利数
 
 	//試合遷移
 	bool roundFinishFlag;		//ラウンド終了時の演出開始用のフラグ
 	bool readyToStartRoundFlag; //ラウンド開始時の演出開始用のフラグ
 	bool gameStartFlag;			//ゲーム開始中のフラグ
 
+	bool firstLoadFlag;
 	void InitGame(const int& STAGE_NUM, const int& ROOM_NUM);
 
+	MiniMap miniMap;
 public:
+	//試合関連
+	int countRound;						//ラウンド数
+	int countPlayerWin, countEnemyWin;	//勝利数
+
+
 	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;
 
 	// プレイヤー
