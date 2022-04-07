@@ -904,9 +904,6 @@ void Game::Update()
 	}
 #pragma endregion
 
-
-	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-
 	//ƒvƒŒƒCƒ„[w’n‚Æ“G‚Ì”»’è
 	if (playerHomeBase->Collision({}) && !roundFinishFlag)
 	{
@@ -1373,6 +1370,7 @@ void Game::Update()
 	ParticleMgr::Instance()->Update();
 
 	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos-lineCenterPos);
+	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 
 }
 
