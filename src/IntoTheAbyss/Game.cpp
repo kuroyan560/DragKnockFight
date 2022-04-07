@@ -164,6 +164,8 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 #include"PlayerHand.h"
 void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
+	//AudioApp::Instance()->PlayWave(bgm, true);
+
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
 
@@ -507,6 +509,9 @@ Game::Game()
 	// 弾パーティクルをセッティング。
 	//BulletParticleMgr::Instance()->Setting();
 
+	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
+	AudioApp::Instance()->ChangeVolume(bgm, 0.1f);
+
 	//ライト情報
 	ptLig.SetInfluenceRange(PT_LIG_RANGE);
 	ptLig.SetColor(Color(PT_LIG_BRIGHT, PT_LIG_BRIGHT, PT_LIG_BRIGHT, 1.0f));
@@ -517,6 +522,8 @@ Game::Game()
 	ligMgr.RegisterHemiSphereLight(&hemiLig);
 	ligMgr.RegisterPointLight(&player.lHand->ptLight);	//照準光源
 	ligMgr.RegisterPointLight(&player.rHand->ptLight);//照準光源
+
+
 
 	Init();
 

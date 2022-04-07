@@ -19,8 +19,10 @@ public:
 	/*-- 定数 --*/
 
 	static const int BULLET_COUNT = 150;	// 弾の最大数
-	const int GENERATE_COUNT = 5;			// 一発で生成する数
-	const float SLIP_ONE_BULLET = 0.1f;		// 一発の角度のズレ
+	//const int GENERATE_COUNT = 5;			// 一発で生成する数
+	const int GENERATE_COUNT = 1;			// 一発で生成する数
+	//const float SLIP_ONE_BULLET = 0.1f;		// 一発の角度のズレ
+	const float SLIP_ONE_BULLET = 0.0f;		// 一発の角度のズレ
 
 
 public:
