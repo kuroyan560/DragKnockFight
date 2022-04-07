@@ -54,6 +54,16 @@ public:
 	static void DrawLine2D(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const Color& LineColor, const AlphaBlendMode& BlendMode = AlphaBlendMode_None);
 
 	/// <summary>
+	/// 直線の描画
+	/// </summary>
+	/// <param name="FromPos">起点座標</param>
+	/// <param name="ToPos">終点座標</param>
+	/// <param name="Tex">テクスチャ</param>
+	/// <param name="Thickness">線の太さ</param>
+	/// <param name="BlendMode">ブレンドモード</param>
+	static void DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const std::shared_ptr<TextureBuffer>& Tex, const int& Thickness, const AlphaBlendMode& BlendMode = AlphaBlendMode_None, const Vec2<bool>& Mirror = { false,false });
+
+	/// <summary>
 	/// 2D四角形の描画
 	/// </summary>
 	/// <param name="LeftUpPos">左上座標</param>
@@ -73,6 +83,14 @@ public:
 	/// <param name="LineThickness">中を塗りつぶさない場合の線の太さ</param>
 	/// <param name="BlendMode">ブレンドモード</param>
 	static void DrawCircle2D(const Vec2<float>& Center, const float& Radius, const Color& CircleColor, const bool& FillFlg = false, const int& LineThickness = 1, const AlphaBlendMode& BlendMode = AlphaBlendMode_None);
+
+	/// <summary>
+	/// 画像描画
+	/// </summary>
+	/// <param name="LeftUpPos">矩形の左上座標</param>
+	/// <param name="Tex">テクスチャ</param>
+	/// <param name="BlendMode">ブレンドモード</param>
+	static void DrawGraph(const Vec2<float>& LeftUpPos, const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode = AlphaBlendMode_None);
 
 	/// <summary>
 	/// 拡大縮小描画

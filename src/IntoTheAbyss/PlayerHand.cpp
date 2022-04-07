@@ -19,9 +19,6 @@ PlayerHand::PlayerHand(const int& AimGraphHandle) : aimGraphHandle(AimGraphHandl
 	// 座標を初期化
 	handPos = {};
 
-	// 移動量を初期化
-	vel = {};
-
 	// 昇順の座標を初期化
 	sightPos = {};
 
@@ -54,9 +51,6 @@ void PlayerHand::Init(const float& armDistance)
 	// 座標を初期化
 	handPos = {};
 
-	// 移動量を初期化
-	vel = {};
-
 	// 昇順の座標を初期化
 	sightPos = {};
 
@@ -71,6 +65,8 @@ void PlayerHand::Init(const float& armDistance)
 
 	isNoInputTimer = false;
 
+	offsetRadiusTimer = OFFSET_RADIUS_TIME;
+
 }
 
 void PlayerHand::Update(const Vec2<float>& playerCenterPos)
@@ -79,34 +75,19 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 	/*-- 更新処理 --*/
 
 	// プレイヤーの中心座標を元に、腕の位置をセット。
-	static const float OFFSET = 4.0f;
-	Vec2<float> honraiHandPos = { playerCenterPos.x + armDistance, playerCenterPos.y + OFFSET };
+	Vec2<float> honraiHandPos = playerCenterPos;
+	static const float RADIUS = 48.0f;
+	honraiHandPos.x += cos(inputAngle) * RADIUS;
+	honraiHandPos.y += sin(inputAngle) * RADIUS;
 
 	// 本来あるべきプレイヤーの手の座標に近付ける。
-	handPos.x += (honraiHandPos.x - handPos.x) / 1.0f;
-	handPos.y += (honraiHandPos.y - handPos.y) / 1.0f;
+	handPos = KuroMath::Lerp(handPos, honraiHandPos, 1.0f);
 
-	// 移動させる。
-	handPos += vel;
-
-	// 移動量を減らす。
-	vel.x -= vel.x / 4.0f;
-	vel.y -= vel.y / 4.0f;
-
-	// 更にそこから角度の方向に移動させる。
-	//handPos += {ARM_RANGE_OF_MOTION* cosf(inputAngle), ARM_RANGE_OF_MOTION* sinf(inputAngle)};
-
-	// No Input Dattara
-	if (isNoInputTimer) {
-
-		drawPos += (handPos - drawPos) / Vec2<float>(10.0f, 10.0f);
-
-	}
-	else {
-
-		drawPos = handPos;
-
-	}
+	static const float OFFSET_RADIUS_MAX = 18.0f;
+	if (offsetRadiusTimer < OFFSET_RADIUS_TIME)offsetRadiusTimer++;
+	float offsetRadius = KuroMath::Ease(Out, Back, offsetRadiusTimer, OFFSET_RADIUS_TIME, OFFSET_RADIUS_MAX, 0.0f);
+	Vec2<float>offset = { cos(inputAngle) * offsetRadius,sin(inputAngle) * offsetRadius };
+	drawPos = handPos + offset;
 
 	// 各短槍の更新処理を行う。
 	if (teleportPike.isActive) teleportPike.Update();
@@ -131,8 +112,7 @@ void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, cons
 	afterImg.Draw(ScrollMgr::Instance()->zoom, scrollShakeZoom);
 
 
-	DrawFunc_Shadow::DrawRotaGraph2D(LigManager, GetCenterDrawPos(), ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle,
-		TexHandleMgr::GetTexBuffer(GraphHandle), nullptr, nullptr, 0.0f, RotaCenterUV);
+	DrawFunc::DrawRotaGraph2D(GetCenterDrawPos(), ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle));
 
 	// ビーコンを描画
 	if (teleportPike.isActive) teleportPike.Draw();
@@ -147,7 +127,7 @@ void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, cons
 	if (DRAW_CURSOR)
 	{
 		//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
-		DrawFunc_Shadow::DrawRotaGraph2D(LigManager, sightPos - scrollShakeZoom, ExtRate * ScrollMgr::Instance()->zoom, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
+		DrawFunc::DrawRotaGraph2D(sightPos - scrollShakeZoom, ExtRate * ScrollMgr::Instance()->zoom, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
 		ptLight.SetPos(Vec3<float>(sightPos - scrollShakeZoom, -1.0f));
 	}
 
@@ -157,22 +137,7 @@ void PlayerHand::Shot(const Vec2<float>& forwardVec, const bool& isFirstShot)
 {
 
 	/*===== 弾を打った時の処理 =====*/
-
-	// 最初の一発目だったら
-	if (isFirstShot) {
-
-		vel.x = forwardVec.x * FIRST_SHOT_VEL;
-		vel.y = forwardVec.y * FIRST_SHOT_VEL;
-
-	}
-	// そうじゃなかったら
-	else {
-
-		vel.x = forwardVec.x * SHOT_VEL;
-		vel.y = forwardVec.y * SHOT_VEL;
-
-	}
-
+	offsetRadiusTimer = 0;
 }
 
 void PlayerHand::CheckHit(const vector<vector<int>>& mapData)

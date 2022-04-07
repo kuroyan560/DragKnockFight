@@ -469,6 +469,9 @@ Game::Game()
 	ligMgr.RegisterPointLight(&player.rHand->ptLight);//照準光源
 
 	Init();
+
+	playerHomeBase = std::make_unique<HomeBase>();
+	enemyHomeBase = std::make_unique<HomeBase>();
 }
 
 void Game::Init()
@@ -901,8 +904,39 @@ void Game::Update()
 	}
 #pragma endregion
 
+	//プレイヤー陣地と敵の判定
+	if (playerHomeBase->Collision({}) && !roundFinishFlag)
+	{
+		//プレイヤー勝利
+		++countRound;
+		++countPlayerWin;
+		roundFinishFlag = true;
+		gameStartFlag = false;
+	}
 
-	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+	//敵陣地とプレイヤーの判定
+	if (enemyHomeBase->Collision({}) && !roundFinishFlag)
+	{
+		//敵勝利
+		++countRound;
+		++countEnemyWin;
+		roundFinishFlag = true;
+		gameStartFlag = false;
+	}
+
+	//ラウンド終了演出開始
+	if (roundFinishFlag)
+	{
+		readyToStartRoundFlag = true;
+		roundFinishFlag = false;
+	}
+
+	//ラウンド開始時の演出開始
+	if (readyToStartRoundFlag)
+	{
+		gameStartFlag = true;
+		readyToStartRoundFlag = false;
+	}
 
 
 
@@ -1334,6 +1368,10 @@ void Game::Update()
 
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
+
+	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos-lineCenterPos);
+	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -1394,6 +1432,34 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	}
 
+	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
+	static const int CHAIN_THICKNESS = 4;
+	// プレイヤーとボス間に線を描画
+	{
+		Vec2<float> playerBossDir = boss.pos - player.centerPos;
+		playerBossDir.Normalize();
+		Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
+		Vec2<float> playerDefLength = player.centerPos + playerBossDir * addLineLengthPlayer;
+		//DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, playerDefLength - scrollShakeAmount, Color(0, 0, 255, 255));
+		//DrawFunc::DrawLine2D(playerDefLength - scrollShakeAmount, playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, Color(255, 255, 255, 255));
+		DrawFunc::DrawLine2DGraph(player.centerPos - scrollShakeAmount, playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS);
+		Vec2<float> bossPlayerDir = player.centerPos - boss.pos;
+		bossPlayerDir.Normalize();
+		Vec2<float> bossDefLength = boss.pos + bossPlayerDir * addLineLengthBoss;
+
+		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
+		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
+		DrawFunc::DrawLine2DGraph(boss.pos - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS);
+
+		// 線分の中心に円を描画
+		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
+		DrawFunc::DrawRotaGraph2D(lineCenterPos - scrollShakeAmount, { 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
+	}
+
+	playerHomeBase->Draw();
+	enemyHomeBase->Draw();
+
 	player.Draw(ligMgr);
 	ParticleMgr::Instance()->Draw(ligMgr);
 
@@ -1401,27 +1467,14 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	boss.Draw();
 
 	// プレイヤーとボス間に線を描画
-	{
-		Vec2<float> playerBossDir = boss.pos - player.centerPos;
-		playerBossDir.Normalize();
-		Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-		Vec2<float> playerDefLength = player.centerPos + playerBossDir * addLineLengthPlayer;
-		DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, playerDefLength - scrollShakeAmount, Color(0, 0, 255, 255));
-		DrawFunc::DrawLine2D(playerDefLength - scrollShakeAmount, playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, Color(255, 255, 255, 255));
+	Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, boss.pos - scrollShakeAmount, Color());
 
-		// 線分の中心に円を描画
-		DrawFunc::DrawCircle2D(lineCenterPos - scrollShakeAmount, 10, Color());
-	}
-	{
-		Vec2<float> bossPlayerDir = player.centerPos - boss.pos;
-		bossPlayerDir.Normalize();
-		Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-		Vec2<float> bossDefLength = boss.pos + bossPlayerDir * addLineLengthBoss;
-		DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
-		DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
-	}
-
+	SuperiorityGauge::Instance()->Draw();
+	
 	GUI::Instance()->Draw();
+
+
 
 	if (sceneBlackFlag || sceneLightFlag)
 	{

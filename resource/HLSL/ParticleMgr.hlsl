@@ -222,94 +222,94 @@ PSOutput PSmain(GSOutput input) : SV_TARGET
 {
     //ポジション
     float3 pos = float3(input.worldPos.xy, DEPTH);
-    float3 normal = float3(0, 0, -1.0f);
-    float3 vnormal = mul(parallelProjMat, float4(normal, 1.0f)).xyz;
+  //  float3 normal = float3(0, 0, -1.0f);
+  //  float3 vnormal = mul(parallelProjMat, float4(normal, 1.0f)).xyz;
     
-      //ライトの影響
-    //float3 ligEffect = { 0.3f, 0.3f, 0.3f };
-    float3 ligEffect = { 0.0f, 0.0f, 0.0f };
+  //    //ライトの影響
+  //  //float3 ligEffect = { 0.3f, 0.3f, 0.3f };
+  //  float3 ligEffect = { 0.0f, 0.0f, 0.0f };
     
-    //ディレクションライト
-    for (int i = 0; i < ligNum.dirLigNum; ++i)
-    {
-        float3 dir = dirLight[i].direction;
-        float3 ligCol = dirLight[i].color.xyz * dirLight[i].color.w;
-        ligEffect += CalcLambertDiffuse(dir, ligCol, normal) * DIFFUSE;
-        ligEffect += CalcPhongSpecular(dir, ligCol, normal, pos, EYE_POS) * SPECULAR;
-        ligEffect += CalcLimLight(dir, ligCol, normal, vnormal) * LIM;
-    }
-    //ポイントライト
-    for (int i = 0; i < ligNum.ptLigNum; ++i)
-    {
-        float3 dir = pos - pointLight[i].pos;
-        dir = normalize(dir);
-        float3 ligCol = pointLight[i].color.xyz * pointLight[i].color.w;
+  //  //ディレクションライト
+  //  for (int i = 0; i < ligNum.dirLigNum; ++i)
+  //  {
+  //      float3 dir = dirLight[i].direction;
+  //      float3 ligCol = dirLight[i].color.xyz * dirLight[i].color.w;
+  //      ligEffect += CalcLambertDiffuse(dir, ligCol, normal) * DIFFUSE;
+  //      ligEffect += CalcPhongSpecular(dir, ligCol, normal, pos, EYE_POS) * SPECULAR;
+  //      ligEffect += CalcLimLight(dir, ligCol, normal, vnormal) * LIM;
+  //  }
+  //  //ポイントライト
+  //  for (int i = 0; i < ligNum.ptLigNum; ++i)
+  //  {
+  //      float3 dir = pos - pointLight[i].pos;
+  //      dir = normalize(dir);
+  //      float3 ligCol = pointLight[i].color.xyz * pointLight[i].color.w;
         
-        //減衰なし状態
-        float3 diffPoint = CalcLambertDiffuse(dir, ligCol, normal);
-        float3 specPoint = CalcPhongSpecular(dir, ligCol, normal, pos, EYE_POS);
+  //      //減衰なし状態
+  //      float3 diffPoint = CalcLambertDiffuse(dir, ligCol, normal);
+  //      float3 specPoint = CalcPhongSpecular(dir, ligCol, normal, pos, EYE_POS);
         
-        //距離による減衰
-        float3 distance = length(pos - pointLight[i].pos);
-		//影響率は距離に比例して小さくなっていく
-        float affect = 1.0f - 1.0f / pointLight[i].influenceRange * distance;
-		//影響力がマイナスにならないように補正をかける
-        if (affect < 0.0f)
-            affect = 0.0f;
-		//影響を指数関数的にする
-        affect = pow(affect, 3.0f);
-        diffPoint *= affect;
-        specPoint *= affect;
+  //      //距離による減衰
+  //      float3 distance = length(pos - pointLight[i].pos);
+		////影響率は距離に比例して小さくなっていく
+  //      float affect = 1.0f - 1.0f / pointLight[i].influenceRange * distance;
+		////影響力がマイナスにならないように補正をかける
+  //      if (affect < 0.0f)
+  //          affect = 0.0f;
+		////影響を指数関数的にする
+  //      affect = pow(affect, 3.0f);
+  //      diffPoint *= affect;
+  //      specPoint *= affect;
         
-        ligEffect += diffPoint * DIFFUSE;
-        ligEffect += specPoint * SPECULAR;
-        ligEffect += CalcLimLight(dir, ligCol, normal, vnormal) * LIM;
-    }
-    //スポットライト
-    for (int i = 0; i < ligNum.spotLigNum; ++i)
-    {
-        float3 ligDir = pos - spotLight[i].pos;
-        ligDir = normalize(ligDir);
-        float3 ligCol = spotLight[i].color.xyz * spotLight[i].color.w;
+  //      ligEffect += diffPoint * DIFFUSE;
+  //      ligEffect += specPoint * SPECULAR;
+  //      ligEffect += CalcLimLight(dir, ligCol, normal, vnormal) * LIM;
+  //  }
+  //  //スポットライト
+  //  for (int i = 0; i < ligNum.spotLigNum; ++i)
+  //  {
+  //      float3 ligDir = pos - spotLight[i].pos;
+  //      ligDir = normalize(ligDir);
+  //      float3 ligCol = spotLight[i].color.xyz * spotLight[i].color.w;
         
-        //減衰なし状態
-        float3 diffSpotLight = CalcLambertDiffuse(ligDir, ligCol, normal);
-        float3 specSpotLight = CalcPhongSpecular(ligDir, ligCol, normal, pos, EYE_POS);
+  //      //減衰なし状態
+  //      float3 diffSpotLight = CalcLambertDiffuse(ligDir, ligCol, normal);
+  //      float3 specSpotLight = CalcPhongSpecular(ligDir, ligCol, normal, pos, EYE_POS);
         
-        //スポットライトとの距離を計算
-        float3 distance = length(pos - spotLight[i].pos);
-       	//影響率は距離に比例して小さくなっていく
-        float affect = 1.0f - 1.0f / spotLight[i].influenceRange * distance;
-        //影響力がマイナスにならないように補正をかける
-        if (affect < 0.0f)
-            affect = 0.0f;
-    //影響を指数関数的にする
-        affect = pow(affect, 3.0f);
-        diffSpotLight *= affect;
-        specSpotLight *= affect;
+  //      //スポットライトとの距離を計算
+  //      float3 distance = length(pos - spotLight[i].pos);
+  //     	//影響率は距離に比例して小さくなっていく
+  //      float affect = 1.0f - 1.0f / spotLight[i].influenceRange * distance;
+  //      //影響力がマイナスにならないように補正をかける
+  //      if (affect < 0.0f)
+  //          affect = 0.0f;
+  //  //影響を指数関数的にする
+  //      affect = pow(affect, 3.0f);
+  //      diffSpotLight *= affect;
+  //      specSpotLight *= affect;
     
-        float3 spotLIM = CalcLimLight(ligDir, ligCol, normal, vnormal) * affect;
+  //      float3 spotLIM = CalcLimLight(ligDir, ligCol, normal, vnormal) * affect;
         
-        float3 dir = normalize(spotLight[i].target - spotLight[i].pos);
-        float angle = dot(ligDir, dir);
-        angle = abs(acos(angle));
-        affect = 1.0f - 1.0f / spotLight[i].angle * angle;
-        if (affect < 0.0f)
-            affect = 0.0f;
-        affect = pow(affect, 0.5f);
+  //      float3 dir = normalize(spotLight[i].target - spotLight[i].pos);
+  //      float angle = dot(ligDir, dir);
+  //      angle = abs(acos(angle));
+  //      affect = 1.0f - 1.0f / spotLight[i].angle * angle;
+  //      if (affect < 0.0f)
+  //          affect = 0.0f;
+  //      affect = pow(affect, 0.5f);
         
-        ligEffect += diffSpotLight * affect * DIFFUSE;
-        ligEffect += specSpotLight * affect * SPECULAR;
-        ligEffect += spotLIM * affect * LIM;
-    }
-    //天球
-    for (int i = 0; i < ligNum.hemiSphereNum; ++i)
-    {
-        float t = dot(normal.xyz, hemiSphereLight[i].groundNormal);
-        t = (t + 1.0f) / 2.0f;
-        float3 hemiLight = lerp(hemiSphereLight[i].groundColor, hemiSphereLight[i].skyColor, t);
-        ligEffect += hemiLight;
-    }
+  //      ligEffect += diffSpotLight * affect * DIFFUSE;
+  //      ligEffect += specSpotLight * affect * SPECULAR;
+  //      ligEffect += spotLIM * affect * LIM;
+  //  }
+  //  //天球
+  //  for (int i = 0; i < ligNum.hemiSphereNum; ++i)
+  //  {
+  //      float t = dot(normal.xyz, hemiSphereLight[i].groundNormal);
+  //      t = (t + 1.0f) / 2.0f;
+  //      float3 hemiLight = lerp(hemiSphereLight[i].groundColor, hemiSphereLight[i].skyColor, t);
+  //      ligEffect += hemiLight;
+  //  }
     
     float4 result;
     if (input.texIdx == 0)
@@ -331,12 +331,12 @@ PSOutput PSmain(GSOutput input) : SV_TARGET
     if (input.texIdx == 8)
         result = tex8.Sample(smp, input.uv);
     
-    result.xyz *= ligEffect;
+    //result.xyz *= ligEffect;
     result.w *= input.alpha;
     
     PSOutput output;
     output.color = result;
-    output.emissive = output.color;
+    //output.emissive = output.color;
     
     //明るさ計算
     //float bright = dot(result.xyz, float3(0.2125f, 0.7154f, 0.0721f));

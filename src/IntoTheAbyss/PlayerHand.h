@@ -18,7 +18,9 @@ public:
 	/*-- ƒƒ“ƒo•Ï” --*/
 
 	Vec2<float> handPos;			// ˜r‚Ì•`‰æÀ•W
-	Vec2<float> vel;				// ’e‚ğ‘Å‚Á‚½‚ÌˆÚ“®—Ê
+	//Vec2<float> vel;				// ’e‚ğ‘Å‚Á‚½‚ÌˆÚ“®—Ê
+	static const int OFFSET_RADIUS_TIME = 30;
+	int offsetRadiusTimer;
 	Vec2<float> sightPos;			// Æ€À•W
 	Vec2<float> drawPos;			// Draw You
 	Vec2<float> muzzlePos;			// eŒû‚ÌÀ•W

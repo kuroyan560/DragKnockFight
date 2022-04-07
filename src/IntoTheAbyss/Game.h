@@ -22,6 +22,7 @@ class RenderTarget;
 #include"DoorBlock.h"
 
 #include"ThornBlock.h"
+#include"HomeBase.h"
 
 struct MassChipData
 {
@@ -137,9 +138,20 @@ class Game
 	Light::HemiSphere hemiLig;
 
 
+	//試合関連
+	int countRound;						//ラウンド数
+	int countPlayerWin, countEnemyWin;	//勝利数
+
+	//試合遷移
+	bool roundFinishFlag;		//ラウンド終了時の演出開始用のフラグ
+	bool readyToStartRoundFlag; //ラウンド開始時の演出開始用のフラグ
+	bool gameStartFlag;			//ゲーム開始中のフラグ
+
 	void InitGame(const int& STAGE_NUM, const int& ROOM_NUM);
 
 public:
+	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;
+
 	// プレイヤー
 	Player player;
 	array<int, 2> debugStageData = { 0,0 };//デバック用のステージと部屋番号

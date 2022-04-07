@@ -1,6 +1,9 @@
 #include "SuperiorityGauge.h"
 #include<math.h>
 #include"Engine/ImguiApp.h"
+#include"../Engine/DrawFunc_Color.h"
+#include"../Engine/DrawFunc.h"
+#include"TexHandleMgr.h"
 
 float SuperiorityGauge::GAUGE_MAX_VALUE = 100.0f;
 int SuperiorityGauge::STACK_MAX_TIMER = 120;
@@ -9,6 +12,15 @@ SuperiorityGauge::SuperiorityGauge()
 {
 	playerGaugeData = std::make_unique<GaugeData>();
 	enemyGaugeData = std::make_unique<GaugeData>();
+	gaugeGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/UI/gauge_flame.png");
+	gaugeVarGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/UI/gauge.png");
+
+	Vec2<float>winHalf(1280.0f / 2.0f, 50.0f);
+	gaguePos = winHalf;
+	gagueVarPos = winHalf;
+
+	gagueVarPos.x -= 1135.0f / 2.0f;
+	gagueVarPos.y -= 25.0f / 2.0f;
 }
 
 void SuperiorityGauge::AddPlayerGauge(const float &VALUE)
@@ -94,6 +106,8 @@ void SuperiorityGauge::Update()
 
 void SuperiorityGauge::Draw()
 {
+	DrawFunc::DrawRotaGraph2D(gaguePos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(gaugeGraphHandle));
+	DrawFunc_Color::DrawGraph(gagueVarPos, TexHandleMgr::GetTexBuffer(gaugeVarGraphHandle), Color(255, 126, 204, 255), { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f), Vec2<float>(1.0f, 1.0f));
 }
 
 void SuperiorityGauge::DebugValue(float *ADD_VALUE)
