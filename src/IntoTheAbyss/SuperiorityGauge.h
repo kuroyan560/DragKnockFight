@@ -1,6 +1,7 @@
 #pragma once
 #include"../Common/Singleton.h"
 #include<memory>
+#include"../Common/Vec.h"
 
 /// <summary>
 /// —D¨ƒQ[ƒW
@@ -64,8 +65,13 @@ private:
 	bool isStackingFlag;	//hR‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©
 	int stackTimer;			//‰½•bhR‚µ‚Ä‚¢‚é‚©
 
-	void LimitGauge();
+	//•`‰æ—p
+	Vec2<float>gaguePos;
+	Vec2<float>gagueVarPos;
+	int gaugeGraphHandle;
+	int gaugeVarGraphHandle;
 
+	void LimitGauge();
 	//ƒfƒoƒbƒN—p
 	float oldMaxGauge;
 };

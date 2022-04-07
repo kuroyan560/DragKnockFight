@@ -18,6 +18,10 @@ public:
 	int stuckWindowTimer;		// ウィンドウに挟まったタイマー
 	INTERSECTED_LINE prevIntersectedLine;
 
+	//画像
+	static const enum DIR { FRONT, BACK, DIR_NUM };
+	int graphHandle[DIR_NUM];
+
 
 public:
 
