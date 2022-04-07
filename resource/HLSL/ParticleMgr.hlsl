@@ -1,19 +1,20 @@
 struct Vertex
 {
     float2 pos;
-    float2 forwardVec;
-    float2 movedVel;
-    float alpha;
+    float2 emitVec;
     float speed;
-    min16int isAlive;
     float scale;
+    float radian;
+    float alpha;
+    int life;
+    int lifeSpan;
+    min16int isAlive;
     uint texIdx;
+    uint type;
 };
 
 RWStructuredBuffer<Vertex> vertices : register(u0);
 
-static const float SCALE = 6.0f;   //CPU側と合わせる必要がある
-//static const float SUB_SPEED = 0.3f;
 static const float SUB_SPEED = 0.1f;
 
 [numthreads(10, 1, 1)]
@@ -28,54 +29,27 @@ void CSmain(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     
-	// 移動させる。
-    v.movedVel += float2(v.forwardVec.x * v.speed, v.forwardVec.y * v.speed);
-
-	// 移動した量がサイズを上回ったらサイズを動かす。
-    if (abs(v.movedVel.x) >= v.scale)
+    if(v.type == 0)
     {
+        float2 vel = float2(0, 0);
+        vel += float2(v.emitVec.x * v.speed, v.emitVec.y * v.speed);
+        v.pos += vel;
 
-		// 符号を取得。
-        float signX = sign(v.movedVel.x);
+        if (v.speed > 0)
+            v.speed -= SUB_SPEED;
 
-		// 座標を動かす。
-        v.pos.x += v.scale * signX;
-
-		// 移動した量を減らす。
-        v.movedVel.x -= v.scale * signX;
-
+	    // スピードが規定値以下になったらアルファ値を下げ始める。
+        if (v.speed <= 0.5f)
+        {
+            v.alpha -= v.alpha / 3.0f;
+        }
     }
-	// 移動した量がサイズを上回ったらサイズを動かす。Yバージョン
-    if (abs(v.movedVel.y) >= v.scale)
+    
+    v.life++;
+    if (v.lifeSpan <= v.life)
     {
-
-		// 符号を取得。
-        float signY = sign(v.movedVel.y);
-
-		// 座標を動かす。
-        v.pos.y += v.scale * signY;
-
-		// 移動した量を減らす。
-        v.movedVel.y -= SCALE * signY;
-
-    }
-
-	// スピードを下げる。
-    if (v.speed > 0)
-        v.speed -= SUB_SPEED;
-
-	// スピードが規定値以下になったらアルファ値を下げ始める。
-    if (v.speed <= 0.5f)
-    {
-        v.alpha -= v.alpha / 3.0f;
-    }
-
-	// アルファ値が一定以下になったら初期化する。
-    if (v.alpha <= 10.0f)
         v.isAlive = 0;
-
-    if (v.alpha <= 123)
-        v.scale = SCALE / 2.0f;
+    }
     
     vertices[i] = v;
 }
@@ -94,18 +68,22 @@ cbuffer cbuff1 : register(b1)
 struct VSInput
 {
     float4 pos : POSITION;
-    float2 forwardVec : FORWARD_VEC;
-    float2 movedVel : MOVED_VEL;
-    float alpha : ALPHA;
+    float2 emitVec : EMIT_VEC;
     float speed : SPEED;
-    min16int isAlive : ALIVE;
     float scale : SCALE;
+    float radian : RADIAN;
+    float alpha : ALPHA;
+    int life : LIFE;
+    int lifeSpan : LIFE_SPAN;
+    min16int isAlive : ALIVE;
     uint texIdx : TEX_IDX;
+    uint type : TYPE;
 };
 
 struct VSOutput
 {
     float4 pos : POSITION;
+    float radian : RADIAN;
     float alpha : ALPHA;
     min16int isAlive : ALIVE;
     float drawScale : DRAW_SCALE;
@@ -118,7 +96,8 @@ VSOutput VSmain(VSInput input)
     output.pos = input.pos;
     output.pos.xy *= zoom;
     output.pos.xy -= scroll;
-    output.alpha = input.alpha / 255.0f;
+    output.radian = input.radian;
+    output.alpha = input.alpha;
     output.isAlive = input.isAlive;
     output.drawScale = input.scale / 2.0f * zoom;
     output.texIdx = input.texIdx;
@@ -133,6 +112,14 @@ struct GSOutput
     float alpha : ALPHA;
     uint texIdx : TEX_IDX;
 };
+
+float2 RotateFloat2(float2 Pos, float Radian)
+{
+    float2 result;
+    result.x = Pos.x * cos(Radian) - Pos.y * sin(Radian);
+    result.y = Pos.y * cos(Radian) + Pos.x * sin(Radian);
+    return result;
+}
 
 [maxvertexcount(4)]
 void GSmain(
@@ -151,6 +138,7 @@ void GSmain(
     element.pos = input[0].pos;
     element.pos.x -= input[0].drawScale;
     element.pos.y += input[0].drawScale;
+    element.pos.xy = input[0].pos.xy + RotateFloat2(element.pos.xy - input[0].pos.xy, input[0].radian);
     element.worldPos = element.pos;
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(0.0f, 1.0f);
@@ -160,6 +148,7 @@ void GSmain(
     element.pos = input[0].pos;
     element.pos.x -= input[0].drawScale;
     element.pos.y -= input[0].drawScale;
+    element.pos.xy = input[0].pos.xy + RotateFloat2(element.pos.xy - input[0].pos.xy, input[0].radian);
     element.worldPos = element.pos;
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(0.0f, 0.0f);
@@ -169,6 +158,7 @@ void GSmain(
     element.pos = input[0].pos;
     element.pos.x += input[0].drawScale;
     element.pos.y += input[0].drawScale;
+    element.pos.xy = input[0].pos.xy + RotateFloat2(element.pos.xy - input[0].pos.xy, input[0].radian);
     element.worldPos = element.pos;
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(1.0f, 1.0f);
@@ -178,6 +168,7 @@ void GSmain(
     element.pos = input[0].pos;
     element.pos.x += input[0].drawScale;
     element.pos.y -= input[0].drawScale;
+    element.pos.xy = input[0].pos.xy + RotateFloat2(element.pos.xy - input[0].pos.xy, input[0].radian);
     element.worldPos = element.pos;
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(1.0f, 0.0f);

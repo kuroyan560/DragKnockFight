@@ -3,33 +3,22 @@
 
 void ParticleMgr::Particle::Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const int& TexIdx)
 {
-	static const float SCALE = 6.0f;	//HLSL側と合わせる必要がある
 	static const float DEF_SPEED = 3.0f;
 
-	// 座標を設定
 	pos = generatePos;
 
-	// 重ならないように切り上げする。
-	pos.x = RoundUp(pos.x, SCALE);
-	pos.y = RoundUp(pos.y, SCALE);
-	scale = SCALE;
+	// 放出方向を設定
+	emitVec = forwardVec;
 
-	// 進行方向を設定
-	this->forwardVec = forwardVec;
-
-	// 移動した量を初期化
-	movedVel = {};
-
-	// アルファ値を初期化
-	alpha = 255.0f;
-
-	// 移動量を初期化
 	speed = KuroFunc::GetRand(DEF_SPEED * 100) / 100.0f;
-
-	// 生存フラグを初期化
+	scale = 12.0f;
+	radian = Angle::ConvertToRadian(45);
+	alpha = 1.0f;
+	life = 0;
+	lifeSpan = 120;
 	isAlive = 1;
-
 	texIdx = TexIdx;
+	type = 0;
 }
 
 ParticleMgr::ParticleMgr()
@@ -64,13 +53,16 @@ ParticleMgr::ParticleMgr()
 		static std::vector<InputLayoutParam>INPUT_LAYOUT =
 		{
 			InputLayoutParam("POSITION",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("FORWARD_VEC",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("MOVED_VEL",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("ALPHA",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("EMIT_VEC",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("SPEED",DXGI_FORMAT_R32_FLOAT),
-			InputLayoutParam("ALIVE",DXGI_FORMAT_R8_SINT),
 			InputLayoutParam("SCALE",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("RADIAN",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("ALPHA",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("LIFE",DXGI_FORMAT_R32_SINT),
+			InputLayoutParam("LIFE_SPAN",DXGI_FORMAT_R32_SINT),
+			InputLayoutParam("ALIVE",DXGI_FORMAT_R8_SINT),
 			InputLayoutParam("TEX_IDX",DXGI_FORMAT_R32_UINT),
+			InputLayoutParam("TYPE",DXGI_FORMAT_R32_UINT),
 		};
 
 		//ルートパラメータ
