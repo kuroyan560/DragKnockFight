@@ -11,7 +11,7 @@
 GameScene::GameScene()
 {
 	static const float BACK_GROUND_DEPTH = 7.0f;
-	auto backColor = D3D12App::Instance()->GenerateTextureBuffer(Color(8, 27, 81, 255));
+	auto backColor = D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, 255));
 	backGround = std::make_shared<Sprite_Shadow>(backColor, nullptr, nullptr, "BackGround");
 	backGround->SetDepth(BACK_GROUND_DEPTH);
 	backGround->SetSpecularAffect(0.0f);

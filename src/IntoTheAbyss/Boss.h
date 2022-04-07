@@ -15,6 +15,10 @@ public:
 	Vec2<float> scale;
 	Vec2<float> vel;
 
+	//‰æ‘œ
+	static const enum DIR { FRONT, BACK, DIR_NUM };
+	int graphHandle[DIR_NUM];
+
 
 public:
 
