@@ -147,6 +147,8 @@ class Game
 	bool readyToStartRoundFlag; //ラウンド開始時の演出開始用のフラグ
 	bool gameStartFlag;			//ゲーム開始中のフラグ
 
+	int bgm;
+
 	void InitGame(const int& STAGE_NUM, const int& ROOM_NUM);
 
 public:

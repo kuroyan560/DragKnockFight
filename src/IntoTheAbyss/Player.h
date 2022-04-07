@@ -92,6 +92,8 @@ public:
 
 	//Muffler muffler;
 
+	int shotSE;
+
 public:
 
 	/*-- ’è” --*/
