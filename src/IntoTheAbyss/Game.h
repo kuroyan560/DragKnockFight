@@ -69,11 +69,13 @@ class Game
 	bool isCatchMapChipPlayer;
 
 	// ボスプレイヤー間の線
-	float lineLengthPlayer;
-	float lineLengthBoss;
-	float addLineLengthPlayer;
-	float addLineLengthBoss;
-	const float LINE_LENGTH = 250.0f;
+	float lineLengthPlayer;				// プレイヤーの紐の長さ
+	float lineLengthBoss;				// ボスの紐の長さ
+	float addLineLengthPlayer;			// プレイヤーが引っかかって伸びた量
+	float addLineLengthBoss;			// ボスが引っかかって伸びた量
+	const float LINE_LENGTH = 150.0f;	// 紐のデフォルトの長さの半分
+	Vec2<float> lineCenterPos;			// 紐の中心点
+	Vec2<float> prevLineCenterPos;		// 前フレームの紐の中心点
 
 	// マップチップのデータ
 	vector<vector<int>> mapData;

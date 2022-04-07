@@ -365,6 +365,14 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 					restartPos = Vec2<float>(x * 50.0f, y * 50.0f);
 					player.Init(restartPos);
 					responeFlag = true;
+
+					// 紐の中心点を計算
+					Vec2<float> bossDir = boss.pos - player.centerPos;
+					bossDir.Normalize();
+					float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
+					lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
+					prevLineCenterPos = lineCenterPos;
+
 					break;
 				}
 			}
@@ -388,12 +396,12 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 			}
 		}
 
-		ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
-		ScrollMgr::Instance()->WarpScroll(player.centerPos);
+		ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+		ScrollMgr::Instance()->WarpScroll(lineCenterPos);
 
 		if (deadFlag)
 		{
-			ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
+			ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 			ScrollMgr::Instance()->AlimentScrollAmount();
 			ScrollMgr::Instance()->Restart();
 		}
@@ -410,8 +418,16 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 				responePos = doorBlocks[i]->responePos;
 				restartPos = doorBlocks[i]->restartPos;
 				player.Init(responePos);
-				ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
-				ScrollMgr::Instance()->WarpScroll(responePos);
+
+				// 紐の中心点を計算
+				Vec2<float> bossDir = boss.pos - player.centerPos;
+				bossDir.Normalize();
+				float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
+				lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
+				prevLineCenterPos = lineCenterPos;
+
+				ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+				ScrollMgr::Instance()->WarpScroll(lineCenterPos);
 				door = doorBlocks[i]->doorDir;
 				break;
 			}
@@ -485,6 +501,8 @@ void Game::Init()
 	lineLengthBoss = LINE_LENGTH;
 	addLineLengthPlayer = 0;
 	addLineLengthBoss = 0;
+	lineCenterPos = {};
+	prevLineCenterPos = {};
 
 	isCatchMapChipBoss = false;
 	isCatchMapChipPlayer = false;
@@ -593,7 +611,7 @@ void Game::Update()
 			}
 			Vec2<float> tmp = { door.x * 50.0f,door.y * 50.0f };
 			player.centerPos = tmp;
-			ScrollMgr::Instance()->WarpScroll(player.centerPos);
+			ScrollMgr::Instance()->WarpScroll(lineCenterPos);
 		}
 	}
 
@@ -778,8 +796,8 @@ void Game::Update()
 					break;
 				}
 
-				ScrollMgr::Instance()->WarpScroll(player.centerPos);
-				ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
+				ScrollMgr::Instance()->WarpScroll(lineCenterPos);
+				ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 				ScrollMgr::Instance()->Restart();
 
 			}
@@ -788,8 +806,16 @@ void Game::Update()
 				if (!initDeadFlag)
 				{
 					player.Init(restartPos);
-					ScrollMgr::Instance()->WarpScroll(player.centerPos);
-					ScrollMgr::Instance()->CalucurateScroll(player.prevFrameCenterPos - player.centerPos);
+
+					// 紐の中心点を計算
+					Vec2<float> bossDir = boss.pos - player.centerPos;
+					bossDir.Normalize();
+					float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
+					lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
+					prevLineCenterPos = lineCenterPos;
+
+					ScrollMgr::Instance()->WarpScroll(lineCenterPos);
+					ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 					ScrollMgr::Instance()->AlimentScrollAmount();
 					ScrollMgr::Instance()->Restart();
 					initDeadFlag = true;
@@ -876,7 +902,7 @@ void Game::Update()
 #pragma endregion
 
 
-	ScrollMgr::Instance()->DetectMapChipForScroll(player.centerPos);
+	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 
 
 
@@ -1384,7 +1410,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		DrawFunc::DrawLine2D(playerDefLength - scrollShakeAmount, playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, Color(255, 255, 255, 255));
 
 		// 線分の中心に円を描画
-		DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
+		DrawFunc::DrawCircle2D(lineCenterPos - scrollShakeAmount, 10, Color());
 	}
 	{
 		Vec2<float> bossPlayerDir = player.centerPos - boss.pos;
@@ -1413,6 +1439,9 @@ void Game::Scramble()
 {
 
 	/*===== 引っ張り合いの処理 =====*/
+
+	// 前フレームの線の中心座標を保存
+	prevLineCenterPos = lineCenterPos;
 
 	// 移動量を取得。 優勢ゲージはここで更新。
 	double playerVel = player.vel.Length();
@@ -1527,6 +1556,14 @@ void Game::Scramble()
 
 		if (addLineLengthPlayer < 0) addLineLengthPlayer = 0;
 
+	}
+
+	// 紐の中心点を計算
+	{
+		Vec2<float> bossDir = boss.pos - player.centerPos;
+		bossDir.Normalize();
+		float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
+		lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
 	}
 
 	isCatchMapChipBoss = false;
