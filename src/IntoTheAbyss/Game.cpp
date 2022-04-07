@@ -396,16 +396,11 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 			}
 		}
 
-		ScrollMgr::Instance()->honraiScrollAmount = { -640.0f,-360.0f };
+		//ScrollMgr::Instance()->honraiScrollAmount = { -1060.0f,-490.0f };
 		ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-		//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
-		if (firstLoadFlag)
-		{
-			//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-			//ScrollMgr::Instance()->AlimentScrollAmount();
-			//ScrollMgr::Instance()->Restart();
-		}
-		firstLoadFlag = true;
+		ScrollMgr::Instance()->WarpScroll(lineCenterPos);
+		ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+
 #pragma endregion
 		alphaValue = 0;
 	}
@@ -442,17 +437,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	SelectStage::Instance()->resetStageFlag = false;
 	restartTimer = 0.0f;
 
-	// ボスを生成
-	boss.Generate(player.centerPos + Vec2<float>(100, 0));
-	lineLengthPlayer = LINE_LENGTH;
-	lineLengthBoss = LINE_LENGTH;
-	addLineLengthPlayer = 0;
-	addLineLengthBoss = 0;
-	lineCenterPos = {};
-	prevLineCenterPos = {};
-
-	isCatchMapChipBoss = false;
-	isCatchMapChipPlayer = false;
 
 	{
 		Vec2<float>playerLeftUpPos;
@@ -490,7 +474,22 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 			float data = ((mapData[0].size() - 1) * MAP_CHIP_SIZE) - 300.0f;
 			miniMap.Init(data);
 		}
+
+
+		// ボスを生成
+		boss.Generate(player.centerPos + Vec2<float>(100, 0));
+		lineLengthPlayer = LINE_LENGTH;
+		lineLengthBoss = LINE_LENGTH;
+		addLineLengthPlayer = 0;
+		addLineLengthBoss = 0;
+		lineCenterPos = {};
+		prevLineCenterPos = {};
+
+		isCatchMapChipBoss = false;
+		isCatchMapChipPlayer = false;
 	}
+
+	firstLoadFlag = false;
 }
 
 Game::Game()
@@ -552,7 +551,9 @@ void Game::Init()
 	}
 	enemyGenerateTimer = 0;
 	nomoveMentTimer = 0;
-	firstLoadFlag = false;
+
+	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 }
 
 void Game::Update()
@@ -986,6 +987,7 @@ void Game::Update()
 #pragma endregion
 
 
+
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	// プレイヤーの更新処理
@@ -1007,6 +1009,13 @@ void Game::Update()
 
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
+
+	if (firstLoadFlag)
+	{
+		ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+		ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+	}
+	firstLoadFlag = true;
 
 	// スクロール量の更新処理
 	ScrollMgr::Instance()->Update();
@@ -1417,9 +1426,6 @@ void Game::Update()
 
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
-
-	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 
 }
 
