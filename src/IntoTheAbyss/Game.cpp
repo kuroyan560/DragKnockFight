@@ -472,6 +472,10 @@ Game::Game()
 
 	playerHomeBase = std::make_unique<HomeBase>();
 	enemyHomeBase = std::make_unique<HomeBase>();
+
+	playerHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
+	enemyHomeBase->Init({ 0.0f,0.0f }, { 800.0f,1000.0f });
+	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
 }
 
 void Game::Init()
@@ -905,7 +909,7 @@ void Game::Update()
 #pragma endregion
 
 	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision({}) && !roundFinishFlag)
+	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag)
 	{
 		//プレイヤー勝利
 		++countRound;
@@ -915,7 +919,7 @@ void Game::Update()
 	}
 
 	//敵陣地とプレイヤーの判定
-	if (enemyHomeBase->Collision({}) && !roundFinishFlag)
+	if (enemyHomeBase->Collision(player.areaHitBox) && !roundFinishFlag)
 	{
 		//敵勝利
 		++countRound;

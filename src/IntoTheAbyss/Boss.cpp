@@ -28,7 +28,7 @@ void Boss::Init()
 
 }
 
-void Boss::Generate(const Vec2<float>& generatePos)
+void Boss::Generate(const Vec2<float> &generatePos)
 {
 
 	/*===== ê∂ê¨èàóù =====*/
@@ -39,6 +39,8 @@ void Boss::Generate(const Vec2<float>& generatePos)
 	prevIntersectedLine = INTERSECTED_NONE;
 	stuckWindowTimer = 0;
 
+	areaHitBox.center = &pos;
+	areaHitBox.size = scale;
 }
 
 void Boss::Update()

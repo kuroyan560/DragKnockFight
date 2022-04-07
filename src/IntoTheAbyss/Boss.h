@@ -1,6 +1,7 @@
 #include "Vec.h"
 #include <vector>
 #include "Intersected.h"
+#include"AreaCollider.h"
 
 using namespace std;
 
@@ -31,7 +32,8 @@ public:
 	const float OFFSET_VEL = 10.0f;
 	const int STRUCK_WINDOW_TIMER = 120.0f;
 
-
+	//w’n‚Æ‚Ì”»’è
+	Square areaHitBox;
 public:
 
 	/*===== ƒƒ“ƒoŠÖ” =====*/

@@ -4,6 +4,7 @@
 #include "Bubble.h"
 #include <memory>
 #include <vector>
+#include"AreaCollider.h"
 
 using namespace std;
 
@@ -132,6 +133,8 @@ public:
 
 	};
 
+	//w’n‚Æ‚Ì”»’è
+	Square areaHitBox;
 
 public:
 

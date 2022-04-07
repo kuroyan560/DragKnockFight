@@ -37,6 +37,7 @@ Player::Player()
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
 
 	this->Init(GetGeneratePos());
+
 }
 
 Player::~Player()
@@ -127,6 +128,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	changeGravityTimer = 0;
 
 	//muffler.Init(INIT_POS);
+
+	areaHitBox.center = &centerPos;
+	areaHitBox.size = PLAYER_HIT_SIZE;
 }
 
 void Player::Update(const vector<vector<int>> mapData)
