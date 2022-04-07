@@ -1371,6 +1371,9 @@ void Game::Update()
 
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
+
+	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos-lineCenterPos);
+
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)

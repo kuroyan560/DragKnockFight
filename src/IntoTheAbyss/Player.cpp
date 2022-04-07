@@ -157,7 +157,7 @@ void Player::Update(const vector<vector<int>> mapData)
 		Move();
 	}
 
-	ScrollMgr::Instance()->CalucurateScroll(prevFrameCenterPos - centerPos);
+	//ScrollMgr::Instance()->CalucurateScroll(prevFrameCenterPos - centerPos);
 	prevFrameCenterPos = centerPos;
 
 	if (!doorMoveLeftRightFlag)
