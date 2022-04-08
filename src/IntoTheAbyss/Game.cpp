@@ -399,10 +399,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		}
 
 		//ScrollMgr::Instance()->honraiScrollAmount = { -1060.0f,-490.0f };
-		ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-		ScrollMgr::Instance()->WarpScroll(lineCenterPos);
-		ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-
 #pragma endregion
 		alphaValue = 0;
 	}
@@ -490,6 +486,19 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		isCatchMapChipBoss = false;
 		isCatchMapChipPlayer = false;
 	}
+
+
+	{
+		Vec2<float> bossDir = boss.pos - player.centerPos;
+		bossDir.Normalize();
+		float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
+		lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
+	}
+
+	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+	ScrollMgr::Instance()->WarpScroll(lineCenterPos);
+	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+
 
 	firstLoadFlag = false;
 }
