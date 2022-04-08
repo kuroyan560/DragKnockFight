@@ -1,20 +1,17 @@
 #include "GameScene.h"
 #include"KuroEngine.h"
 #include"Sprite.h"
-#include"Sprite_Shadow.h"
 #include"GaussianBlur.h"
 #include"IntoTheAbyss/StageMgr.h"
 #include"IntoTheAbyss/SelectStage.h"
 #include"IntoTheAbyss/DebugParameter.h"
+#include"IntoTheAbyss/SuperiorityGauge.h"
 
 GameScene::GameScene()
 {
 	static const float BACK_GROUND_DEPTH = 7.0f;
-	auto backColor = D3D12App::Instance()->GenerateTextureBuffer(Color(8, 27, 81, 255));
-	backGround = std::make_shared<Sprite_Shadow>(backColor, nullptr, nullptr, "BackGround");
-	backGround->SetDepth(BACK_GROUND_DEPTH);
-	backGround->SetSpecularAffect(0.0f);
-	backGround->SetLimAffect(0.0f);
+	auto backColor = D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, 255));
+	backGround = std::make_shared<Sprite>(backColor, "BackGround");
 	backGround->mesh.SetZLayer(BACK_GROUND_DEPTH);
 	backGround->mesh.SetSize(WinApp::Instance()->GetExpandWinSize());
 
@@ -24,6 +21,8 @@ GameScene::GameScene()
 		WinApp::Instance()->GetWinSize(), L"EmissiveMap");
 
 	sceneChange = new SceneCange();
+
+	addValue = 10.0f;
 }
 
 void GameScene::OnInitialize()
@@ -35,6 +34,16 @@ void GameScene::OnUpdate()
 	DebugParameter::Instance()->Update();
 	game.Update();
 
+
+	if (UsersInput::Instance()->OnTrigger(DIK_Q))
+	{
+		SuperiorityGauge::Instance()->AddPlayerGauge(addValue);
+	}
+	if (UsersInput::Instance()->OnTrigger(DIK_W))
+	{
+		SuperiorityGauge::Instance()->AddEnemyGauge(addValue);
+	}
+
 	bool changeInput = UsersInput::Instance()->OnTrigger(DIK_B) || UsersInput::Instance()->OnTrigger(START);
 	if (changeInput)
 	{
@@ -44,8 +53,9 @@ void GameScene::OnUpdate()
 
 void GameScene::OnDraw()
 {
+	emissiveMap->Clear(D3D12App::Instance()->GetCmdList());
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
-	backGround->Draw(game.GetLigManager());
+	backGround->Draw();
 	game.Draw(emissiveMap);
 
 	gaussianBlur->Register(emissiveMap);
@@ -95,7 +105,7 @@ void GameScene::OnImguiDebug()
 	ImGui::End();
 
 
-	ImGui::Begin("Timer");
+	/*ImGui::Begin("Timer");
 	ImGui::Text("GravityMode");
 	if (game.player.isZeroGravity)
 	{
@@ -110,10 +120,19 @@ void GameScene::OnImguiDebug()
 	}
 	ImGui::Text("MaxTimer%d", game.player.CHANGE_GRAVITY_TIMER);
 	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
-	ImGui::End();
+	ImGui::End();*/
 
 	DebugParameter::Instance()->DrawImGui();
 
+	SuperiorityGauge::Instance()->DebugValue(&addValue);
+
+	game.playerHomeBase->Debug();
+	game.enemyHomeBase->Debug();
+
+	ImGui::Begin("Round");
+	ImGui::Text("RoundNum%d", game.countRound);
+	ImGui::Text("PlayerWin:%d,EnemyWin:%d", game.countPlayerWin, game.countEnemyWin);
+	ImGui::End();
 }
 
 void GameScene::OnFinalize()

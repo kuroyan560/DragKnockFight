@@ -1,35 +1,34 @@
 #include "ParticleMgr.h"
 #include"KuroEngine.h"
 
-void ParticleMgr::Particle::Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const int& TexIdx)
+void ParticleMgr::Particle::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx)
 {
-	static const float SCALE = 6.0f;	//HLSL側と合わせる必要がある
-	static const float DEF_SPEED = 3.0f;
-
-	// 座標を設定
-	pos = generatePos;
-
-	// 重ならないように切り上げする。
-	pos.x = RoundUp(pos.x, SCALE);
-	pos.y = RoundUp(pos.y, SCALE);
-	scale = SCALE;
-
-	// 進行方向を設定
-	this->forwardVec = forwardVec;
-
-	// 移動した量を初期化
-	movedVel = {};
-
-	// アルファ値を初期化
-	alpha = 255.0f;
-
-	// 移動量を初期化
-	speed = KuroFunc::GetRand(DEF_SPEED * 100) / 100.0f;
-
-	// 生存フラグを初期化
-	isAlive = 1;
-
+	type = Type;
 	texIdx = TexIdx;
+	if (type == PARTICLE_CUMPUTE_TYPE::EXPLODE)
+	{
+		pos = GeneratePos;
+		emitPos = pos;
+
+		// 放出方向を設定
+		emitVec = EmitVec;
+
+		//爆発の飛距離として扱う
+		speed = KuroFunc::GetRand(20.0f, 46.0f);
+		emitSpeed = speed;
+
+		scale = 29;
+		emitScale = scale;
+		radian = 0.0f;
+		//回転角度の目標値として扱う
+		emitRadian = Angle::ConvertToRadian(KuroFunc::GetRand(0.0f, 360.0f * 2) * KuroFunc::GetRandPlusMinus());
+
+		alpha = 1.0f;
+		life = 0;
+		lifeSpan = KuroFunc::GetRand(25, 35);
+		isAlive = 1;
+		type = 0;
+	}
 }
 
 ParticleMgr::ParticleMgr()
@@ -64,13 +63,20 @@ ParticleMgr::ParticleMgr()
 		static std::vector<InputLayoutParam>INPUT_LAYOUT =
 		{
 			InputLayoutParam("POSITION",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("FORWARD_VEC",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("MOVED_VEL",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("ALPHA",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("EMIT_POSITION",DXGI_FORMAT_R32G32_FLOAT),
+			InputLayoutParam("EMIT_VEC",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("SPEED",DXGI_FORMAT_R32_FLOAT),
-			InputLayoutParam("ALIVE",DXGI_FORMAT_R8_SINT),
+			InputLayoutParam("EMIT_SPEED",DXGI_FORMAT_R32_FLOAT),
 			InputLayoutParam("SCALE",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("EMIT_SCALE",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("RADIAN",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("EMIT_RADIAN",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("ALPHA",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("LIFE",DXGI_FORMAT_R32_SINT),
+			InputLayoutParam("LIFE_SPAN",DXGI_FORMAT_R32_SINT),
+			InputLayoutParam("ALIVE",DXGI_FORMAT_R8_SINT),
 			InputLayoutParam("TEX_IDX",DXGI_FORMAT_R32_UINT),
+			InputLayoutParam("TYPE",DXGI_FORMAT_R32_UINT),
 		};
 
 		//ルートパラメータ
@@ -111,16 +117,10 @@ ParticleMgr::ParticleMgr()
 
 	textures[WHITE] = D3D12App::Instance()->GenerateTextureBuffer(Color(1.0f, 1.0f, 1.0f, 1.0f), DXGI_FORMAT_R32G32B32A32_FLOAT, TEX_SIZE);
 
-	auto smokes = D3D12App::Instance()->GenerateTextureBuffer("resource/IntoTheAbyss/Particle/smoke.png", SMOKE_NUM, { SMOKE_NUM,1 });
+	auto smokes = D3D12App::Instance()->GenerateTextureBuffer("resource/ChainCombat/smoke.png", SMOKE_NUM, { SMOKE_NUM,1 });
 	for (int i = 0; i < SMOKE_NUM; ++i)
 	{
 		textures[SMOKE_0 + i] = smokes[i];
-	}
-
-	auto smokes_enchant = D3D12App::Instance()->GenerateTextureBuffer("resource/IntoTheAbyss/Particle/smoke_enchant.png", SMOKE_NUM, { SMOKE_NUM,1 });
-	for (int i = 0; i < SMOKE_NUM; ++i)
-	{
-		textures[SMOKE_E_0 + i] = smokes_enchant[i];
 	}
 }
 
@@ -187,63 +187,39 @@ void ParticleMgr::Draw(LightManager& LigManager)
 		descTypes, 1.0f, true);
 }
 
-int ParticleMgr::GetTex(const PARTICLE_TYPE& Type)
+void ParticleMgr::EmitParticle(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx)
 {
-	int tex = PARTICLE_TEX::WHITE;
-	if (Type == FIRST_DASH)
-	{
-		tex = KuroFunc::GetRand(SMOKE_NUM - 1) + PARTICLE_TEX::SMOKE_0;
-	}
-	else if (Type == FISRT_DASH_DOUJI)
-	{
-		tex = KuroFunc::GetRand(SMOKE_NUM - 1) + PARTICLE_TEX::SMOKE_E_0;
-	}
-	return tex;
+	particles[idx++].Generate(EmitPos, EmitVec, Type, TexIdx);
+	if (idx == MAX_NUM)idx = 0;
 }
 
-void ParticleMgr::Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const PARTICLE_TYPE& Type, const float& par)
+void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const PARTICLE_TYPE& Type)
 {
 	//Copy recently particle's status.
 	memcpy(particles, buff->GetRWStructuredBuff().lock()->GetResource().lock()->GetBuffOnCpu<Particle>(), MAX_NUM * sizeof(Particle));
 
-	// 生成する数分処理を回す。
-	for (int generateCount = 0; generateCount < GENERATE_PARTICLE * par; ++generateCount) {
+	struct Info
+	{
+		Vec2<float>generatePos;
+		Vec2<float>emitVec;
+	};
 
-		// 生成する位置をランダムにずらす。
-		Vec2<float> pos = generatePos;
-		//pos.x += GetRand(6) - 3;
-		//pos.y += GetRand(6) - 3;
-		pos.x += KuroFunc::GetRand(6) - 3;
-		pos.y += KuroFunc::GetRand(6) - 3;
+	if (Type == BULLET)
+	{
+		static const int EMIT_MAX = 25;
+		static const int EMIT_MIN = 15;
+		const int num = KuroFunc::GetRand(EMIT_MIN, EMIT_MAX);
 
-		// 生成する。
-		particles[idx++].Generate(pos, forwardVec, GetTex(Type));
-		if (idx == MAX_NUM)idx = 0;
+		static const float EMIT_DEGREE = 100;	//放出角度
+		const Vec2<float>startEmitVec = KuroMath::RotateVec2(-EmitVec, Angle::ConvertToRadian(-EMIT_DEGREE / 2.0f));
+
+		for (int i = 0; i < num; ++i)
+		{
+			const Vec2<float>emitVec = KuroMath::RotateVec2(startEmitVec, Angle::ConvertToRadian(KuroFunc::GetRand(EMIT_DEGREE)));
+			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::DEFAULT, PARTICLE_TEX::SMOKE_0 + KuroFunc::GetRand(SMOKE_NUM - 1));
+		}
 	}
-
+	
 	//Send particles's info which also contains new particles.
 	buff->Mapping(particles);
 }
-
-void ParticleMgr::GeneratePer(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const PARTICLE_TYPE& Type, const float& par, const int& generate)
-{
-	//Copy recently particle's status.
-	memcpy(particles, buff->GetRWStructuredBuff().lock()->GetResource().lock()->GetBuffOnCpu<Particle>(), MAX_NUM * sizeof(Particle));
-
-	// 生成する数分処理を回す。
-	for (int generateCount = 0; generateCount < generate * par; ++generateCount) {
-
-		// 生成する位置をランダムにずらす。
-		Vec2<float> pos = generatePos;
-		pos.x += KuroFunc::GetRand(6) - 3;
-		pos.y += KuroFunc::GetRand(6) - 3;
-
-		// 生成する。
-		particles[idx++].Generate(pos, forwardVec, GetTex(Type));
-		if (idx == MAX_NUM)idx = 0;
-	}
-
-	//Send particles's info which also contains new particles.
-	buff->Mapping(particles);
-}
-

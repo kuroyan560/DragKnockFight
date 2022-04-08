@@ -4,6 +4,7 @@
 #include "Bubble.h"
 #include <memory>
 #include <vector>
+#include"AreaCollider.h"
 
 using namespace std;
 
@@ -44,6 +45,10 @@ public:
 	// 壁ズリフラグ
 	bool isSlippingWall[4];			// 壁ズリパーティクルを出すフラグ
 
+	// ウィンドウに挟まったタイマー
+	int stuckWindowTimer;		// ウィンドウに挟まったタイマー
+	const int STRUCK_WINDOW_TIMER = 120.0f;// ウィンドウに挟まったタイマー
+
 	// プレイヤーの腕
 	unique_ptr<PlayerHand> lHand;	// 左手
 	unique_ptr<PlayerHand> rHand;	// 右手
@@ -64,7 +69,7 @@ public:
 	const int FIRST_SHOT_RECOIL_PARTICLE_TIMER = 10.0f;
 
 	//プレイヤーの向き
-	enum DRAW_DIR { LEFT, RIGHT, DEFAULT = RIGHT, DIR_NUM }playerDir = DEFAULT;
+	//enum DRAW_DIR { FRONT, BACK, DIR_NUM, DEFAULT = FRONT }playerDir = DEFAULT;
 	//アニメーション統括
 	PlayerAnimation anim;
 
@@ -86,7 +91,9 @@ public:
 	int changeGravityTimer;
 	const int CHANGE_GRAVITY_TIMER = 300;
 
-	Muffler muffler;
+	//Muffler muffler;
+
+	int shotSE;
 
 public:
 
@@ -95,15 +102,15 @@ public:
 	//const float ADD_GRAVITY = 0.5f;				// プレイヤーにかける重力
 	float ADD_GRAVITY = 0.1f;				// プレイヤーにかける重力
 	float MAX_GRAVITY = 15.0f;			// プレイヤーにかける重力の最大量
-	float RECOIL_AMOUNT = 7.0f;			// 弾を撃った際の反動
-	float FIRST_RECOIL_AMOUNT = 20.0;		// 弾を撃った際の反動
+	float RECOIL_AMOUNT = 30.0f;			// 弾を撃った際の反動
+	float FIRST_RECOIL_AMOUNT = 35.0;		// 弾を撃った際の反動
 	//const float FIRST_RECOIL_AMOUNT = 15.0;		// 弾を撃った際の反動
 	//const float RECOIL_AMOUNT = FIRST_RECOIL_AMOUNT;			// 弾を撃った際の反動
 	float MAX_RECOIL_AMOUNT = 30.0f;		// 弾を撃った際の反動の最大値
 	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
-	const Vec2<float> PLAYER_HIT_SIZE = { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+	const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 	static Vec2<float>GetGeneratePos();
-	int RAPID_FIRE_TIMER = 21;			// 連射タイマー
+	int RAPID_FIRE_TIMER = 4;			// 連射タイマー
 	const int GRAVITY_INVALID_TIMER = 20;		// 重力無効化タイマー
 
 	// コヨーテ的なやつのためのパラメーター
@@ -132,6 +139,8 @@ public:
 
 	};
 
+	//陣地との判定
+	Square areaHitBox;
 
 public:
 
@@ -151,7 +160,7 @@ public:
 	void Draw(LightManager& LigManager);
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun);
+	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip, const Vec2<float>& lineCenterPos);
 
 	// 方向ごとのマップチップとの当たり判定関数
 	void HitMapChipTop();
@@ -196,11 +205,8 @@ private:
 	//画像サイズからプレイヤーサイズ取得
 	Vec2<float> GetPlayerGraphSize();
 
-	//プレイヤーの手の画像ハンドル取得
-	int GetHandGraph(const DRAW_DIR& Dir);
-
 	// 移動量での当たり判定
-	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
-	void CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
+	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip);
+	void CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip);
 
 };

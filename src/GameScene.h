@@ -5,17 +5,18 @@
 #include"IntoTheAbyss/Game.h"
 #include"SceneCange.h"
 
-class Sprite_Shadow;
+class Sprite;
 class GaussianBlur;
 class RenderTarget;
 
 class GameScene : public BaseScene
 {
-	std::shared_ptr<Sprite_Shadow>backGround;
+	std::shared_ptr<Sprite>backGround;
 	std::shared_ptr<GaussianBlur>gaussianBlur;
 	std::shared_ptr<RenderTarget>emissiveMap;
 
 	Game game;
+	float addValue;
 
 	SceneCange *sceneChange;
 public:

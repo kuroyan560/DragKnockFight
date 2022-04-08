@@ -90,6 +90,7 @@ void Bullet::Update()
 }
 
 #include"D3D12App.h"
+#include"TexHandleMgr.h"
 void Bullet::Draw()
 {
 
@@ -120,5 +121,7 @@ void Bullet::Draw()
 	Vec2<float>rightBottom = { pos.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x + MAX_RADIUS * ScrollMgr::Instance()->zoom,
 		pos.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y + MAX_RADIUS * ScrollMgr::Instance()->zoom };
 
-	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(217, 26, 96, (int)alpha), D3D12App::Instance()->GetBackBuffFormat(), true, AlphaBlendMode_Trans);
+	static const int GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/bullet.png");
+	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(GRAPH), AlphaBlendMode_Trans);
+	//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(217, 26, 96, (int)alpha), D3D12App::Instance()->GetBackBuffFormat(), true, AlphaBlendMode_Trans);
 }

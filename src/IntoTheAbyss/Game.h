@@ -10,6 +10,7 @@ using namespace std;
 #include "Bubble.h"
 #include"GimmickLoader.h"
 #include"EventBlock.h"
+#include "Boss.h"
 
 #include<memory>
 class TextureBuffer;
@@ -21,6 +22,10 @@ class RenderTarget;
 #include"DoorBlock.h"
 
 #include"ThornBlock.h"
+#include"HomeBase.h"
+#include"MapChipCollider.h"
+
+#include"MiniMap.h"
 
 struct MassChipData
 {
@@ -39,11 +44,10 @@ struct MassChipData
 class Game
 {
 	std::vector<std::unique_ptr<MassChipData>> AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM);
-	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& mapBlockGraph, const int& stageNum, const int& roomNum);
+	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum);
 	const int& GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS);
 
 
-	int mapBlockGraph;
 	// 動的ブロックの画像。
 	int movingBlockGraph;
 
@@ -59,6 +63,22 @@ class Game
 	const int SMALL_GENERATE_TIMER = 60;
 	int nomoveMentTimer;
 	const int NOMOVEMENT_GENERATE_TIMER = 30;
+
+	// ボス
+	Boss boss;
+
+	// ボスorプレイヤーが引っかかっているかのフラグ
+	bool isCatchMapChipBoss;
+	bool isCatchMapChipPlayer;
+
+	// ボスプレイヤー間の線
+	float lineLengthPlayer;				// プレイヤーの紐の長さ
+	float lineLengthBoss;				// ボスの紐の長さ
+	float addLineLengthPlayer;			// プレイヤーが引っかかって伸びた量
+	float addLineLengthBoss;			// ボスが引っかかって伸びた量
+	const float LINE_LENGTH = 150.0f;	// 紐のデフォルトの長さの半分
+	Vec2<float> lineCenterPos;			// 紐の中心点
+	Vec2<float> prevLineCenterPos;		// 前フレームの紐の中心点
 
 	// マップチップのデータ
 	vector<vector<int>> mapData;
@@ -120,9 +140,26 @@ class Game
 	Light::HemiSphere hemiLig;
 
 
+
+	//試合遷移
+	bool roundFinishFlag;		//ラウンド終了時の演出開始用のフラグ
+	bool readyToStartRoundFlag; //ラウンド開始時の演出開始用のフラグ
+	bool gameStartFlag;			//ゲーム開始中のフラグ
+
+	int bgm;
+
+	bool firstLoadFlag;
 	void InitGame(const int& STAGE_NUM, const int& ROOM_NUM);
 
+	MiniMap miniMap;
 public:
+	//試合関連
+	int countRound;						//ラウンド数
+	int countPlayerWin, countEnemyWin;	//勝利数
+
+
+	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;
+
 	// プレイヤー
 	Player player;
 	array<int, 2> debugStageData = { 0,0 };//デバック用のステージと部屋番号
@@ -132,9 +169,10 @@ public:
 	void Init();
 	void Update();
 	void Draw(std::weak_ptr<RenderTarget>EmissiveMap);
+	void Scramble();
 
 	LightManager& GetLigManager() { return ligMgr; }
 
-
+	Vec2<float>GetStageSize();
 };
 
