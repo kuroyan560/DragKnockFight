@@ -998,7 +998,7 @@ void Game::Update()
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	// プレイヤーの更新処理
-	player.Update(mapData);
+	player.Update(mapData, boss.pos);
 
 	miniMap.Update();
 
