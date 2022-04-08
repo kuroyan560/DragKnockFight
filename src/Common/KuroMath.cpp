@@ -593,12 +593,12 @@ Matrix KuroMath::RotateMat(const Vec3<Angle>& Rotate)
     return XMMatrixRotationRollPitchYaw(Rotate.x, Rotate.y, Rotate.z);
 }
 
-Matrix KuroMath::RotateMat(const Vec3<float>& Axis, const Angle& Angle)
+Matrix KuroMath::RotateMat(const Vec3<float>& Axis, const float& Radian)
 {
     Vec3<float>axis = Axis;
     if (1.0f < axis.Length())axis.Normalize();
     XMVECTOR vec = XMVectorSet(axis.x, axis.y, axis.z, 1.0f);
-    auto result = XMMatrixRotationQuaternion(XMQuaternionRotationAxis(vec, Angle));
+    auto result = XMMatrixRotationQuaternion(XMQuaternionRotationAxis(vec, Radian));
     return result;
 }
 
@@ -638,5 +638,12 @@ Matrix KuroMath::RotateMat(const Vec3<float>& VecA, const Vec3<float>& VecB)
         q.m128_f32[3] = sqrt(0.5f * (1.0f + ip));
     }
     return XMMatrixRotationQuaternion(q);
+}
+Vec2<float> KuroMath::RotateVec2(const Vec2<float>& Vec, const float& Radian)
+{
+    Vec2<float> result;
+    result.x = Vec.x * cos(Radian) - Vec.y * sin(Radian);
+    result.y = Vec.y * cos(Radian) + Vec.x * sin(Radian);
+    return result;
 }
 #pragma endregion

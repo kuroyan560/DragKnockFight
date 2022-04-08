@@ -3,8 +3,8 @@
 #include"../IntoTheAbyss/TexHandleMgr.h"
 MiniMap::MiniMap()
 {
-	lineHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/UI/position_gauge.png");
-	nowPosHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/UI/position_gauge_now.png");
+	lineHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/position_gauge.png");
+	nowPosHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/position_gauge_now.png");
 
 	linePos.x = 1280.0f / 2.0f;
 
@@ -42,6 +42,7 @@ void MiniMap::Update()
 
 void MiniMap::Draw()
 {
-	DrawFunc::DrawRotaGraph2D(linePos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(lineHandle));
-	DrawFunc::DrawRotaGraph2D(nowPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(nowPosHandle));
+	static const Vec2<float>OFFSET = { 0.0f,23.0f };
+	DrawFunc::DrawRotaGraph2D(linePos + OFFSET, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(lineHandle));
+	DrawFunc::DrawRotaGraph2D(nowPos + OFFSET, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(nowPosHandle));
 }

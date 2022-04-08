@@ -12,29 +12,33 @@ class ConstantBuffer;
 class TextureBuffer;
 class LightManager;
 
-static const enum PARTICLE_TYPE { DASH, FIRST_DASH, FISRT_DASH_DOUJI, BULLET, DOSSUN, HIT_MAP };
+static const enum PARTICLE_TYPE { DASH, BULLET, HIT_MAP, FIRST_DASH, FIRST_DASH_DOUJI,DOSSUN };
 
 class ParticleMgr : public Singleton<ParticleMgr>
 {
 	static const int MAX_NUM = 300;
-	const int GENERATE_PARTICLE = 5;							// 生成するパーティクル
 
+	static const enum PARTICLE_CUMPUTE_TYPE { EXPLODE, DEFAULT = EXPLODE };
 	struct Particle
 	{
 		Vec2<float> pos;	//座標
+		Vec2<float>emitPos;
 		Vec2<float>emitVec;	//放出ベクトル
 		float speed;	//スピード
+		float emitSpeed;	//放出直後のスピード
 		float scale;	//スケール
+		float emitScale;	//放出直後のスケール
 		float radian;	//回転角度
+		float emitRadian;	//放出直後の回転角度
 		float alpha;	//アルファ値
 		int life = 0;	//生成されてからのタイマー
 		int lifeSpan;	//寿命
 		char isAlive = 0;		// 生存フラグ
 		unsigned int texIdx;	//テクスチャ番号
-		unsigned int type = 0;	//パーティクル種別
+		unsigned int type = PARTICLE_CUMPUTE_TYPE::DEFAULT;	//パーティクル動き種別
 
 		// 生成処理
-		void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const int& TexIdx);
+		void Generate(const Vec2<float>& GeneratePos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx);
 	};
 	struct ZoomAndScroll
 	{
@@ -61,11 +65,11 @@ class ParticleMgr : public Singleton<ParticleMgr>
 
 	//テクスチャは同じサイズである必要がある
 	static const int TEX_SIZE = 64;
-	static const int SMOKE_NUM = 3;
-	static const enum PARTICLE_TEX { WHITE, SMOKE_0, SMOKE_1, SMOKE_2, SMOKE_E_0, SMOKE_E_1, SMOKE_E_2, TEX_NUM = 9 };
+	static const int SMOKE_NUM = 4;
+	static const enum PARTICLE_TEX { WHITE, SMOKE_0, SMOKE_1, SMOKE_2, SMOKE_3, TEX_NUM = 9 };
 	std::shared_ptr<TextureBuffer>textures[TEX_NUM];
 
-	int GetTex(const PARTICLE_TYPE& Type);
+	void EmitParticle(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx);
 
 public:
 	void Init();
@@ -73,6 +77,5 @@ public:
 	void Draw(LightManager& LigManager);
 
 	// 生成処理
-	void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const PARTICLE_TYPE& Type, const float& par = 1.0f);
-	void GeneratePer(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const PARTICLE_TYPE& Type, const float& par = 1.0f, const int& generateCount = 5.0f);
+	void Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const PARTICLE_TYPE& Type);
 };

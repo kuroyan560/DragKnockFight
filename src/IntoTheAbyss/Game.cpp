@@ -49,7 +49,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &mapBlockGraph, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -496,7 +496,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 
 Game::Game()
 {
-	mapBlockGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Block.png");
 	//mapBlockGraph = D3D12App::Instance()->GenerateTextureBuffer("resource/IntoTheAbyss/Block.png");
 
 	// ’eŠÇ—ƒNƒ‰ƒX‚ğ‰Šú‰»B
@@ -1443,7 +1442,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	/*===== •`‰æˆ— =====*/
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
-	DrawMapChip(mapData, mapChipDrawData, mapBlockGraph, stageNum, roomNum);
+	DrawMapChip(mapData, mapChipDrawData, stageNum, roomNum);
 
 	MovingBlockMgr::Instance()->Draw(movingBlockGraph);
 

@@ -152,7 +152,10 @@ public:
     //x,y,zの角度から回転行列を生成
     static Matrix RotateMat(const Vec3<Angle>& Rotate);
     //軸と角度を指定して回転行列を生成
-    static Matrix RotateMat(const Vec3<float>& Axis, const Angle& Angle);
+    static Matrix RotateMat(const Vec3<float>& Axis, const float& Radian);
     //aをbに向かせる回転行列を求める
     static Matrix RotateMat(const Vec3<float>& VecA, const Vec3<float>& VecB);
+
+    //2Dベクトルを回転させる
+    static Vec2<float>RotateVec2(const Vec2<float>& Vec, const float& Radian);
 };
