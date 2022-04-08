@@ -12,8 +12,8 @@ SuperiorityGauge::SuperiorityGauge()
 {
 	playerGaugeData = std::make_unique<GaugeData>();
 	enemyGaugeData = std::make_unique<GaugeData>();
-	gaugeGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/UI/gauge_flame.png");
-	gaugeVarGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/UI/gauge.png");
+	gaugeGraphHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_flame.png");
+	gaugeVarGraphHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge.png");
 }
 
 void SuperiorityGauge::AddPlayerGauge(const float &VALUE)
@@ -109,8 +109,9 @@ void SuperiorityGauge::Update()
 
 void SuperiorityGauge::Draw()
 {
-	DrawFunc::DrawRotaGraph2D(gaguePos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(gaugeGraphHandle));
-	DrawFunc_Color::DrawGraph(gagueVarPos, TexHandleMgr::GetTexBuffer(gaugeVarGraphHandle), Color(239, 1, 144, 255), { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f), Vec2<float>(1.0f, 1.0f));
+	static const Vec2<float>OFFSET = { 0.0f,23.0f };
+	DrawFunc::DrawRotaGraph2D(gaguePos + OFFSET, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(gaugeGraphHandle));
+	DrawFunc_Color::DrawGraph(gagueVarPos + OFFSET, TexHandleMgr::GetTexBuffer(gaugeVarGraphHandle), Color(239, 1, 144, 255), { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f), Vec2<float>(1.0f, 1.0f));
 }
 
 void SuperiorityGauge::DebugValue(float *ADD_VALUE)

@@ -1,10 +1,15 @@
+#include"Engine/Math.hlsli"
 struct Vertex
 {
     float2 pos;
+    float2 emitPos;
     float2 emitVec;
     float speed;
+    float emitSpeed;
     float scale;
+    float emitScale;
     float radian;
+    float emitRadian;
     float alpha;
     int life;
     int lifeSpan;
@@ -14,8 +19,6 @@ struct Vertex
 };
 
 RWStructuredBuffer<Vertex> vertices : register(u0);
-
-static const float SUB_SPEED = 0.1f;
 
 [numthreads(10, 1, 1)]
 void CSmain(uint3 DTid : SV_DispatchThreadID)
@@ -31,17 +34,19 @@ void CSmain(uint3 DTid : SV_DispatchThreadID)
     
     if(v.type == 0)
     {
-        float2 vel = float2(0, 0);
-        vel += float2(v.emitVec.x * v.speed, v.emitVec.y * v.speed);
-        v.pos += vel;
-
-        if (v.speed > 0)
-            v.speed -= SUB_SPEED;
-
-	    // スピードが規定値以下になったらアルファ値を下げ始める。
-        if (v.speed <= 0.5f)
+        float2 toPos = v.emitPos + v.emitVec * v.speed;
+        v.pos = Easing_Exp_Out(v.life, v.lifeSpan, v.emitPos, toPos);
+        v.radian = Easing_Exp_Out(v.life, v.lifeSpan, 0.0f, v.emitRadian);
+        
+        //寿命が半分以下なら拡縮して消える
+        if(v.lifeSpan / 2.0f <= v.life)
         {
-            v.alpha -= v.alpha / 3.0f;
+            float t = v.life - v.lifeSpan / 2.0f;
+            v.scale = Easing_Circ_In(t, v.lifeSpan / 2.0f, v.emitScale, 0.0f);
+        }
+        else
+        {
+            v.scale = Easing_Back_Out(v.life, v.lifeSpan / 2.0f, 0.0f, v.emitScale);
         }
     }
     
@@ -213,94 +218,6 @@ PSOutput PSmain(GSOutput input) : SV_TARGET
 {
     //ポジション
     float3 pos = float3(input.worldPos.xy, DEPTH);
-  //  float3 normal = float3(0, 0, -1.0f);
-  //  float3 vnormal = mul(parallelProjMat, float4(normal, 1.0f)).xyz;
-    
-  //    //ライトの影響
-  //  //float3 ligEffect = { 0.3f, 0.3f, 0.3f };
-  //  float3 ligEffect = { 0.0f, 0.0f, 0.0f };
-    
-  //  //ディレクションライト
-  //  for (int i = 0; i < ligNum.dirLigNum; ++i)
-  //  {
-  //      float3 dir = dirLight[i].direction;
-  //      float3 ligCol = dirLight[i].color.xyz * dirLight[i].color.w;
-  //      ligEffect += CalcLambertDiffuse(dir, ligCol, normal) * DIFFUSE;
-  //      ligEffect += CalcPhongSpecular(dir, ligCol, normal, pos, EYE_POS) * SPECULAR;
-  //      ligEffect += CalcLimLight(dir, ligCol, normal, vnormal) * LIM;
-  //  }
-  //  //ポイントライト
-  //  for (int i = 0; i < ligNum.ptLigNum; ++i)
-  //  {
-  //      float3 dir = pos - pointLight[i].pos;
-  //      dir = normalize(dir);
-  //      float3 ligCol = pointLight[i].color.xyz * pointLight[i].color.w;
-        
-  //      //減衰なし状態
-  //      float3 diffPoint = CalcLambertDiffuse(dir, ligCol, normal);
-  //      float3 specPoint = CalcPhongSpecular(dir, ligCol, normal, pos, EYE_POS);
-        
-  //      //距離による減衰
-  //      float3 distance = length(pos - pointLight[i].pos);
-		////影響率は距離に比例して小さくなっていく
-  //      float affect = 1.0f - 1.0f / pointLight[i].influenceRange * distance;
-		////影響力がマイナスにならないように補正をかける
-  //      if (affect < 0.0f)
-  //          affect = 0.0f;
-		////影響を指数関数的にする
-  //      affect = pow(affect, 3.0f);
-  //      diffPoint *= affect;
-  //      specPoint *= affect;
-        
-  //      ligEffect += diffPoint * DIFFUSE;
-  //      ligEffect += specPoint * SPECULAR;
-  //      ligEffect += CalcLimLight(dir, ligCol, normal, vnormal) * LIM;
-  //  }
-  //  //スポットライト
-  //  for (int i = 0; i < ligNum.spotLigNum; ++i)
-  //  {
-  //      float3 ligDir = pos - spotLight[i].pos;
-  //      ligDir = normalize(ligDir);
-  //      float3 ligCol = spotLight[i].color.xyz * spotLight[i].color.w;
-        
-  //      //減衰なし状態
-  //      float3 diffSpotLight = CalcLambertDiffuse(ligDir, ligCol, normal);
-  //      float3 specSpotLight = CalcPhongSpecular(ligDir, ligCol, normal, pos, EYE_POS);
-        
-  //      //スポットライトとの距離を計算
-  //      float3 distance = length(pos - spotLight[i].pos);
-  //     	//影響率は距離に比例して小さくなっていく
-  //      float affect = 1.0f - 1.0f / spotLight[i].influenceRange * distance;
-  //      //影響力がマイナスにならないように補正をかける
-  //      if (affect < 0.0f)
-  //          affect = 0.0f;
-  //  //影響を指数関数的にする
-  //      affect = pow(affect, 3.0f);
-  //      diffSpotLight *= affect;
-  //      specSpotLight *= affect;
-    
-  //      float3 spotLIM = CalcLimLight(ligDir, ligCol, normal, vnormal) * affect;
-        
-  //      float3 dir = normalize(spotLight[i].target - spotLight[i].pos);
-  //      float angle = dot(ligDir, dir);
-  //      angle = abs(acos(angle));
-  //      affect = 1.0f - 1.0f / spotLight[i].angle * angle;
-  //      if (affect < 0.0f)
-  //          affect = 0.0f;
-  //      affect = pow(affect, 0.5f);
-        
-  //      ligEffect += diffSpotLight * affect * DIFFUSE;
-  //      ligEffect += specSpotLight * affect * SPECULAR;
-  //      ligEffect += spotLIM * affect * LIM;
-  //  }
-  //  //天球
-  //  for (int i = 0; i < ligNum.hemiSphereNum; ++i)
-  //  {
-  //      float t = dot(normal.xyz, hemiSphereLight[i].groundNormal);
-  //      t = (t + 1.0f) / 2.0f;
-  //      float3 hemiLight = lerp(hemiSphereLight[i].groundColor, hemiSphereLight[i].skyColor, t);
-  //      ligEffect += hemiLight;
-  //  }
     
     float4 result;
     if (input.texIdx == 0)
