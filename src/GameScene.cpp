@@ -129,6 +129,10 @@ void GameScene::OnImguiDebug()
 	game.playerHomeBase->Debug();
 	game.enemyHomeBase->Debug();
 
+	ImGui::Begin("Round");
+	ImGui::Text("RoundNum%d", game.countRound);
+	ImGui::Text("PlayerWin:%d,EnemyWin:%d", game.countPlayerWin, game.countEnemyWin);
+	ImGui::End();
 }
 
 void GameScene::OnFinalize()

@@ -21,19 +21,17 @@ class ParticleMgr : public Singleton<ParticleMgr>
 
 	struct Particle
 	{
-		// 切り上げ
-		static int RoundUp(int size, int align) {
-			return UINT(size + align - 1) & ~(align - 1);
-		}
-
-		Vec2<float> pos;			// 座標
-		Vec2<float> forwardVec;	// 移動方向
-		Vec2<float> movedVel;		// 移動した量
-		float alpha;
-		float speed;		// 移動速度
+		Vec2<float> pos;	//座標
+		Vec2<float>emitVec;	//放出ベクトル
+		float speed;	//スピード
+		float scale;	//スケール
+		float radian;	//回転角度
+		float alpha;	//アルファ値
+		int life = 0;	//生成されてからのタイマー
+		int lifeSpan;	//寿命
 		char isAlive = 0;		// 生存フラグ
-		float scale;
-		unsigned int texIdx;	//テクスチャ番号k
+		unsigned int texIdx;	//テクスチャ番号
+		unsigned int type = 0;	//パーティクル種別
 
 		// 生成処理
 		void Generate(const Vec2<float>& generatePos, const Vec2<float>& forwardVec, const int& TexIdx);

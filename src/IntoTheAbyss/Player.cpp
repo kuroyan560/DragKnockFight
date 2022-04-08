@@ -22,6 +22,8 @@
 #include"GUI.h"
 #include"SuperiorityGauge.h"
 
+#include"AudioApp.h"
+
 Vec2<float> Player::GetGeneratePos()
 {
 	return WinApp::Instance()->GetExpandWinCenter() * Vec2<float>(1.0f, 0.25f);
@@ -37,7 +39,11 @@ Player::Player()
 	// 画像をロード
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
 
+	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav");
+	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
+
 	this->Init(GetGeneratePos());
+
 }
 
 Player::~Player()
@@ -130,6 +136,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	stuckWindowTimer = 0;
 
 	//muffler.Init(INIT_POS);
+
+	areaHitBox.center = &centerPos;
+	areaHitBox.size = PLAYER_HIT_SIZE;
 }
 
 void Player::Update(const vector<vector<int>> mapData)
@@ -1271,6 +1280,7 @@ void Player::Input(const vector<vector<int>> mapData)
 
 		float angle = lHand->GetAngle();
 
+		AudioApp::Instance()->PlayWave(shotSE);
 		BulletMgr::Instance()->Generate(lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, false);
 
 		// 連射タイマーをセット
@@ -1375,6 +1385,7 @@ void Player::Input(const vector<vector<int>> mapData)
 
 		float angle = rHand->GetAngle();
 
+		AudioApp::Instance()->PlayWave(shotSE);
 		BulletMgr::Instance()->Generate(rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, true);
 
 		// 連射タイマーをセット

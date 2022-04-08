@@ -14,13 +14,6 @@ SuperiorityGauge::SuperiorityGauge()
 	enemyGaugeData = std::make_unique<GaugeData>();
 	gaugeGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/UI/gauge_flame.png");
 	gaugeVarGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/UI/gauge.png");
-
-	Vec2<float>winHalf(1280.0f / 2.0f, 50.0f);
-	gaguePos = winHalf;
-	gagueVarPos = winHalf;
-
-	gagueVarPos.x -= 1135.0f / 2.0f;
-	gagueVarPos.y -= 25.0f / 2.0f;
 }
 
 void SuperiorityGauge::AddPlayerGauge(const float &VALUE)
@@ -63,8 +56,18 @@ void SuperiorityGauge::Init()
 	playerGaugeData = std::make_unique<GaugeData>();
 	enemyGaugeData = std::make_unique<GaugeData>();
 
+	Vec2<float>winHalf(1280.0f / 2.0f, 50.0f);
+	gaguePos = winHalf;
+	gagueVarPos = winHalf;
+
+	gagueVarPos.x -= 1135.0f / 2.0f;
+	gagueVarPos.y -= 25.0f / 2.0f;
+
 	playerGaugeData->gaugeValue = GAUGE_MAX_VALUE / 2.0f;
 	enemyGaugeData->gaugeValue = GAUGE_MAX_VALUE / 2.0f;
+
+	playerGaugeData->gaugeDivValue = 0.5f;
+	enemyGaugeData->gaugeDivValue = 0.5f;
 }
 
 void SuperiorityGauge::Update()
