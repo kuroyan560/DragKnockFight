@@ -21,6 +21,7 @@
 #include"GUI.h"
 
 #include"SuperiorityGauge.h"
+#include"BackGround.h"
 
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
@@ -501,6 +502,9 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 
 
 	firstLoadFlag = false;
+
+	//背景に星
+	BackGround::Instance()->Init(GetStageSize());
 }
 
 Game::Game()
@@ -1442,6 +1446,7 @@ void Game::Update()
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
 
+	BackGround::Instance()->Update();
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -1450,6 +1455,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	int roomNum = SelectStage::Instance()->GetRoomNum();
 
 	/*===== 描画処理 =====*/
+	BackGround::Instance()->Draw();
+
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 	DrawMapChip(mapData, mapChipDrawData, stageNum, roomNum);
 
@@ -1707,4 +1714,12 @@ void Game::Scramble()
 	isCatchMapChipBoss = false;
 	isCatchMapChipPlayer = false;
 
+}
+
+Vec2<float> Game::GetStageSize()
+{
+	static const float CHIP_SIZE = 64;
+	int sizeX = mapData[0].size();
+	int sizeY = mapData.size();
+	return Vec2<float>(CHIP_SIZE * sizeX, CHIP_SIZE * sizeY);
 }

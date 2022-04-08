@@ -14,18 +14,18 @@ void ParticleMgr::Particle::Generate(const Vec2<float>& GeneratePos, const Vec2<
 		emitVec = EmitVec;
 
 		//îöî≠ÇÃîÚãóó£Ç∆ÇµÇƒàµÇ§
-		speed = KuroFunc::GetRand(25.0f, 40.0f);
+		speed = KuroFunc::GetRand(20.0f, 46.0f);
 		emitSpeed = speed;
 
 		scale = 29;
 		emitScale = scale;
 		radian = 0.0f;
 		//âÒì]äpìxÇÃñ⁄ïWílÇ∆ÇµÇƒàµÇ§
-		emitRadian = Angle::ConvertToRadian(KuroFunc::GetRand(0.0f, 360.0f * 2));
+		emitRadian = Angle::ConvertToRadian(KuroFunc::GetRand(0.0f, 360.0f * 2) * KuroFunc::GetRandPlusMinus());
 
 		alpha = 1.0f;
 		life = 0;
-		lifeSpan = KuroFunc::GetRand(30, 40);
+		lifeSpan = KuroFunc::GetRand(25, 35);
 		isAlive = 1;
 		type = 0;
 	}
@@ -206,8 +206,8 @@ void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVe
 
 	if (Type == BULLET)
 	{
-		static const int EMIT_MAX = 20;
-		static const int EMIT_MIN = 10;
+		static const int EMIT_MAX = 25;
+		static const int EMIT_MIN = 15;
 		const int num = KuroFunc::GetRand(EMIT_MIN, EMIT_MAX);
 
 		static const float EMIT_DEGREE = 100;	//ï˙èoäpìx
