@@ -3,11 +3,13 @@
 #include<vector>
 #include"../Engine/ImguiApp.h"
 #include"../Common/Vec.h"
+#include<array>
 
 class ScoreManager :public Singleton<ScoreManager>
 {
 public:
 	ScoreManager();
+	~ScoreManager();
 
 	void Init();
 	void Add(const int &ADD_POINT);
@@ -21,7 +23,7 @@ private:
 	float honraiScore;
 
 	std::vector<int>numberHandle;
-	std::vector<int>number;
+	std::array<int, 10> number;
 
 	Vec2<float>scorePos;
 	Vec2<float>texSize;

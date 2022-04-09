@@ -7,8 +7,11 @@ ScoreManager::ScoreManager()
 {
 	scorePos = { 200,200 };
 	texSize = { 44,44 };
-	number.resize(10);
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 10, { 10, 1 }, number.data());
+}
+
+ScoreManager::~ScoreManager()
+{
 }
 
 void ScoreManager::Init()
