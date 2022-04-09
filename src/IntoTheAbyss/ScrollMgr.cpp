@@ -5,9 +5,27 @@ ScrollMgr::ScrollMgr():zoom(1.0f)
 {
 }
 
+void ScrollMgr::Update()
+{
+	if (!stopScrollData[0])
+	{
+		//スクロール計算
+		scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x - Camera::Instance()->scrollAffect.x) / 5.0f;
+		scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y - Camera::Instance()->scrollAffect.y) / 5.0f;
+		//scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x) / 5.0f;
+		//scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y) / 5.0f;
+	}
+
+
+	//毎フレーム、スクロールの停止命令を下ろす
+	for (int i = 0; i < stopScrollData.size(); ++i)
+	{
+		stopScrollData[i] = false;
+	}
+}
+
 void ScrollMgr::DetectMapChipForScroll(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
 {
-
 	//プレイヤーの座標を基準に上下左右に検知用の座標を設定する　←　カメラ画角と一緒
 	std::array<Vec2<float>, 4> screenPos;//画角
 	Vec2<float> upVec, sideVec;											//プレイヤーからどれくらい離れた所に検知用の座標を置くか

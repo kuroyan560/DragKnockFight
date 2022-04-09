@@ -173,6 +173,6 @@ public:
 
 	LightManager& GetLigManager() { return ligMgr; }
 
-
+	Vec2<float>GetStageSize();
 };
 

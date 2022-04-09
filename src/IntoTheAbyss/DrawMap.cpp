@@ -55,8 +55,7 @@ DrawMap::DrawMap()
 		//パイプライン生成
 		PIPELINE = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
 
-		float initExtRate = 1.6f;
-		EXT_RATE_BUFF = D3D12App::Instance()->GenerateConstantBuffer(sizeof(float), 1, &initExtRate, "DrawMap - ExtRate");
+		EXT_RATE_BUFF = D3D12App::Instance()->GenerateConstantBuffer(sizeof(float), 1, nullptr, "DrawMap - ExtRate");
 
 		// (0,0,-1) ノーマルマップ
 		DEFAULT_NORMAL_MAP = D3D12App::Instance()->GenerateTextureBuffer(Color(0.5f, 0.5f, 1.0f, 1.0f));
@@ -78,6 +77,7 @@ void DrawMap::AddChip(const Vec2<float>& Pos, const float& Radian)
 	chipNum++;
 }
 
+#include"ScrollMgr.h"
 void DrawMap::Draw(LightManager& LigManager, const std::shared_ptr<TextureBuffer>& Tex, const std::shared_ptr<TextureBuffer>& NormalMap, const std::shared_ptr<TextureBuffer>& EmissiveMap)
 {
 	KuroEngine::Instance().Graphics().SetPipeline(PIPELINE);
@@ -87,6 +87,9 @@ void DrawMap::Draw(LightManager& LigManager, const std::shared_ptr<TextureBuffer
 
 	auto normalMap = NormalMap ? NormalMap : DEFAULT_NORMAL_MAP;
 	auto emissiveMap = EmissiveMap ? EmissiveMap : DEFAULT_EMISSIVE_MAP;
+
+	float zoom = ScrollMgr::Instance()->zoom * 1.6f;
+	EXT_RATE_BUFF->Mapping(&zoom);
 
 	KuroEngine::Instance().Graphics().ObjectRender(vertexBuff,
 		{

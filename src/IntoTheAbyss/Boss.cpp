@@ -44,6 +44,7 @@ void Boss::Generate(const Vec2<float> &generatePos)
 	areaHitBox.size = scale;
 }
 
+#include"Camera.h"
 void Boss::Update()
 {
 
@@ -51,6 +52,12 @@ void Boss::Update()
 
 	// 前フレームの座標を保存
 	prevPos = pos;
+
+	if (Camera::Instance()->Active())
+	{
+		vel = { 0,0 };
+		return;
+	}
 
 	static const int PULL_SPAN_MIN = 30;
 	static const int PULL_SPAN_MAX = 70;
@@ -93,13 +100,10 @@ void Boss::Draw()
 
 	/*===== 描画処理 =====*/
 
-	Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-
 	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
-
 	DIR dir = FRONT;
 	if (vel.y < 0)dir = BACK;
-	DrawFunc::DrawExtendGraph2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, TexHandleMgr::GetTexBuffer(graphHandle[dir]), AlphaBlendMode_Trans);
+	DrawFunc::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(pos - scale), ScrollMgr::Instance()->Affect(pos + scale), TexHandleMgr::GetTexBuffer(graphHandle[dir]), AlphaBlendMode_Trans);
 }
 
 void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)

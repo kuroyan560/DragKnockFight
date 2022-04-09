@@ -141,7 +141,7 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	areaHitBox.size = PLAYER_HIT_SIZE;
 }
 
-void Player::Update(const vector<vector<int>> mapData)
+void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
 {
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
@@ -159,7 +159,7 @@ void Player::Update(const vector<vector<int>> mapData)
 	if (!doorMoveLeftRightFlag && !doorMoveUpDownFlag && !isDead)
 	{
 		// 入力に関する更新処理を行う。
-		Input(mapData);
+		Input(mapData, bossPos);
 	}
 
 	/*===== 更新処理 =====*/
@@ -322,40 +322,34 @@ void Player::Draw(LightManager& LigManager)
 
 	/*===== 描画処理 =====*/
 
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-
 	// プレイヤーの描画処理
 	//Vec2<float>leftUp = { centerPos.x * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 	//	centerPos.y * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
 	//Vec2<float>rightBottom = { centerPos.x * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 	//	centerPos.y * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	const Vec2<float> expRate = { EXT_RATE * ScrollMgr::Instance()->zoom, EXT_RATE * ScrollMgr::Instance()->zoom };
-
 	//残像描画
-	afImg.Draw(ScrollMgr::Instance()->zoom, scrollShakeZoom);
+	afImg.Draw();
 
 	//muffler.Draw(LigManager);
 
 	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_L.png");
 	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_R.png");
-	rHand->Draw(LigManager, expRate, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
-	lHand->Draw(LigManager, expRate, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
+	rHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
+	lHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 
 	//ストレッチ加算
 	//leftUp += stretch_LU;
 	//rightBottom += stretch_RB;
-
+	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(centerPos);
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
-	const Vec2<float> expRateBody = expRate * ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex);
+	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
+	DrawFunc::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE, 0.0f, bodyTex);
 
 	//テレポート時のフラッシュ
 	Color teleFlashCol;
 	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
-	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
+	DrawFunc_Color::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
@@ -1145,15 +1139,7 @@ void Player::StopDoorUpDown()
 	doorMoveUpDownFlag = true;
 }
 
-Vec2<float> Player::GetCenterDrawPos()
-{
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-	return centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
-}
-
-void Player::Input(const vector<vector<int>> mapData)
+void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
 {
 	/*===== 入力処理 =====*/
 
@@ -1424,120 +1410,156 @@ void Player::Input(const vector<vector<int>> mapData)
 	// RTが押されたら
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RT)) {
 
-		//// 瞬間移動の短槍に関する処理を行う。
+		// 振り回しの処理
 
-		//// 右腕の弾が発射されていなかったら。
-		//if (!rHand->teleportPike.isActive && !isPrevFrameShotBeacon) {
+		// 振り回しのトリガー判定
+		if (!isSwing) {
 
-		//	// クールタイムが0以下だったら
-		//	if (rHand->pikeCooltime <= 0) {
+			// 角度を求める。
+			swingAngle = atan2(bossPos.y - centerPos.y, bossPos.x - centerPos.x);
 
-		//		const float ARM_DISTANCE = 20.0f;
-		//		const float OFFSET_Y = -14.0f;
-		//		const float OFFSET_X = -12.0f;
+		}
 
-		//		float angle = rHand->GetAngle();
+		// 振り回しフラグを有効化する。
+		isSwing = true;
 
-		//		// 弾を発射する処理を行う。
-		//		rHand->teleportPike.Generate(rHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), Vec2<float>(cosf(angle), sinf(angle)), PIKE_TELEPORT);
 
-		//	}
 
-		//}
-		//// ビーコンが発射されていたら。
-		//else if (rHand->teleportPike.isActive && !isPrevFrameShotBeacon) {
+		// 短槍の残骸
+		{
 
-		//	auto vec = rHand->teleportPike.pos - centerPos;
+			//// 瞬間移動の短槍に関する処理を行う。
 
-		//	//向き変え
-		//	if (vec.x < 0)playerDir = LEFT;
-		//	if (0 < vec.x)playerDir = RIGHT;
+			//// 右腕の弾が発射されていなかったら。
+			//if (!rHand->teleportPike.isActive && !isPrevFrameShotBeacon) {
 
-		//	//画像サイズの違いによって壁にくっつかないときがあるので少しめり込むようにする
-		//	static const float OFFSET = 3.0f;
-		//	rHand->teleportPike.pos.x += (playerDir == RIGHT) ? OFFSET : -OFFSET;
-		//	vec = rHand->teleportPike.pos - centerPos;	//移動量更新
+			//	// クールタイムが0以下だったら
+			//	if (rHand->pikeCooltime <= 0) {
 
-		//	//ストレッチ
-		//	CalculateStretch(vec);
+			//		const float ARM_DISTANCE = 20.0f;
+			//		const float OFFSET_Y = -14.0f;
+			//		const float OFFSET_X = -12.0f;
 
-		//	//残像エミット
-		//	afImg.EmitArray(centerPos, rHand->teleportPike.pos, anim.GetGraphHandle(), GetPlayerGraphSize(), { playerDir != DEFAULT,false });
-		//	Vec2<int>graphSize = TexHandleMgr::GetTexBuffer(GetHandGraph(true))->GetGraphSize();
-		//	graphSize *= EXT_RATE / 2.0f;
-		//	lHand->EmitAfterImg(vec, GetHandGraph(true), graphSize.Float(), { false,false });
-		//	graphSize = TexHandleMgr::GetTexBuffer(GetHandGraph(false))->GetGraphSize();
-		//	graphSize *= EXT_RATE / 2.0f;
-		//	rHand->EmitAfterImg(vec, GetHandGraph(false), graphSize.Float(), { false,false });
+			//		float angle = rHand->GetAngle();
 
-		//	//点滅
-		//	flashTimer = 0;
-		//	flashTotalTime = TELE_FLASH_TIME;
+			//		// 弾を発射する処理を行う。
+			//		rHand->teleportPike.Generate(rHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), Vec2<float>(cosf(angle), sinf(angle)), PIKE_TELEPORT);
 
-		//	// プレイヤーを瞬間移動させる。
-		//	centerPos = rHand->teleportPike.pos;
+			//	}
 
-		//	ScrollMgr::Instance()->WarpScroll(centerPos);
+			//}
+			//// ビーコンが発射されていたら。
+			//else if (rHand->teleportPike.isActive && !isPrevFrameShotBeacon) {
 
-		//	// プレイヤーの重力を無効化させる。
-		//	gravity = 0;
+			//	auto vec = rHand->teleportPike.pos - centerPos;
 
-		//	// 移動量を無効化する。
-		//	vel = {};
+			//	//向き変え
+			//	if (vec.x < 0)playerDir = LEFT;
+			//	if (0 < vec.x)playerDir = RIGHT;
 
-		//	// 移動量を無効化する。
-		//	gimmickVel = {};
+			//	//画像サイズの違いによって壁にくっつかないときがあるので少しめり込むようにする
+			//	static const float OFFSET = 3.0f;
+			//	rHand->teleportPike.pos.x += (playerDir == RIGHT) ? OFFSET : -OFFSET;
+			//	vec = rHand->teleportPike.pos - centerPos;	//移動量更新
 
-		//	// 重力無効化タイマーを設定。
-		//	gravityInvalidTimer = GRAVITY_INVALID_TIMER;
+			//	//ストレッチ
+			//	CalculateStretch(vec);
 
-		//	// ビーコンを初期化する。
-		//	rHand->teleportPike.Init();
+			//	//残像エミット
+			//	afImg.EmitArray(centerPos, rHand->teleportPike.pos, anim.GetGraphHandle(), GetPlayerGraphSize(), { playerDir != DEFAULT,false });
+			//	Vec2<int>graphSize = TexHandleMgr::GetTexBuffer(GetHandGraph(true))->GetGraphSize();
+			//	graphSize *= EXT_RATE / 2.0f;
+			//	lHand->EmitAfterImg(vec, GetHandGraph(true), graphSize.Float(), { false,false });
+			//	graphSize = TexHandleMgr::GetTexBuffer(GetHandGraph(false))->GetGraphSize();
+			//	graphSize *= EXT_RATE / 2.0f;
+			//	rHand->EmitAfterImg(vec, GetHandGraph(false), graphSize.Float(), { false,false });
 
-		//	// ビーコンのクールタイムを設定
-		//	rHand->pikeCooltime = rHand->PIKE_COOL_TIME;
-		//}
+			//	//点滅
+			//	flashTimer = 0;
+			//	flashTotalTime = TELE_FLASH_TIME;
 
-		//isPrevFrameShotBeacon = true;
+			//	// プレイヤーを瞬間移動させる。
+			//	centerPos = rHand->teleportPike.pos;
+
+			//	ScrollMgr::Instance()->WarpScroll(centerPos);
+
+			//	// プレイヤーの重力を無効化させる。
+			//	gravity = 0;
+
+			//	// 移動量を無効化する。
+			//	vel = {};
+
+			//	// 移動量を無効化する。
+			//	gimmickVel = {};
+
+			//	// 重力無効化タイマーを設定。
+			//	gravityInvalidTimer = GRAVITY_INVALID_TIMER;
+
+			//	// ビーコンを初期化する。
+			//	rHand->teleportPike.Init();
+
+			//	// ビーコンのクールタイムを設定
+			//	rHand->pikeCooltime = rHand->PIKE_COOL_TIME;
+			//}
+
+			//isPrevFrameShotBeacon = true;
+		}
 
 	}
-	else if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LT)) {
+	else {
 
-		//// 時間停止の短槍に関する処理を行う。
+		// 振り回しフラグを折る。
+		isSwing = false;
 
-		//// 左腕の弾が発射されていなかったら。
-		//if (!lHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
+	}
 
-		//	// クールタイムが0以下だったら
-		//	if (lHand->pikeCooltime <= 0) {
 
-		//		const float ARM_DISTANCE = 20.0f;
-		//		const float OFFSET_Y = -14.0f;
-		//		const float OFFSET_X = 12.0f;
+	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::LT)) {
 
-		//		float angle = lHand->GetAngle();
 
-		//		// 弾を発射する処理を行う。
-		//		lHand->timeStopPike.Generate(lHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), Vec2<float>(cosf(angle), sinf(angle)), PIKE_TIMESTOP);
 
-		//	}
 
-		//}
-		//// ビーコンが発射されていたら。
-		//else if (lHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
 
-		//	// 止められていたものを動かす。
-		//	lHand->timeStopPike.MoveAgain();
 
-		//	// ビーコンを初期化する。
-		//	lHand->timeStopPike.Init();
+		// 短槍の残骸
+		{
 
-		//	// ビーコンのクールタイムを設定
-		//	lHand->pikeCooltime = lHand->PIKE_COOL_TIME;
+			//// 時間停止の短槍に関する処理を行う。
 
-		//}
+			//// 左腕の弾が発射されていなかったら。
+			//if (!lHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
 
-		//isPrevFrameShotBeacon = true;
+			//	// クールタイムが0以下だったら
+			//	if (lHand->pikeCooltime <= 0) {
+
+			//		const float ARM_DISTANCE = 20.0f;
+			//		const float OFFSET_Y = -14.0f;
+			//		const float OFFSET_X = 12.0f;
+
+			//		float angle = lHand->GetAngle();
+
+			//		// 弾を発射する処理を行う。
+			//		lHand->timeStopPike.Generate(lHand->GetPos() + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), Vec2<float>(cosf(angle), sinf(angle)), PIKE_TIMESTOP);
+
+			//	}
+
+			//}
+			//// ビーコンが発射されていたら。
+			//else if (lHand->timeStopPike.isActive && !isPrevFrameShotBeacon) {
+
+			//	// 止められていたものを動かす。
+			//	lHand->timeStopPike.MoveAgain();
+
+			//	// ビーコンを初期化する。
+			//	lHand->timeStopPike.Init();
+
+			//	// ビーコンのクールタイムを設定
+			//	lHand->pikeCooltime = lHand->PIKE_COOL_TIME;
+
+			//}
+
+			//isPrevFrameShotBeacon = true;
+		}
 
 	}
 	else {

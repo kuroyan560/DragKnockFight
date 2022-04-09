@@ -64,7 +64,7 @@ public:
 	void Update(const Vec2<float>& playerCenterPos);
 
 	// 描画処理
-	void Draw(LightManager& LigManager, const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool &DRAW_CURSOR);
+	void Draw(LightManager& LigManager, const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool &DRAW_CURSOR);
 
 	// 弾を打った時の処理
 	void Shot(const Vec2<float>& forwardVec, const bool& isFirstShot);
@@ -109,7 +109,4 @@ private:
 	int RoundUp(int size, int align) {
 		return UINT(size + align - 1) & ~(align - 1);
 	}
-
-	//スクロールなどにも考慮した中心座標
-	Vec2<float> GetCenterDrawPos();
 };
