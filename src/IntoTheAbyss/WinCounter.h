@@ -19,13 +19,21 @@ class WinCounter : public Singleton<WinCounter>
 	int drawCountLeft, drawCountRight;	//勝利数描画数
 
 	// KnockOut 文字のアニメーション
-	int knockOutGraph;
-	int knockOutTimer;
+	Vec2<float>knockOutPos;
 	Vec2<float>knockOutAppearPos;
 	Vec2<float>knockOutDisappearPos;
+	float kncokOutScale;
+	float knockOutRadian;
+	int knockOutSpinVec;
+	int knockOutGraph;
+	int knockOutTimer;
 
 	//勝利数カウント演出
 	bool animation;
+
+	bool gameFinish = false;
+
+	Vec2<float>GetWinCountPos(const bool& Left, const int& Num);
 
 public:
 	void Reset()
@@ -36,6 +44,7 @@ public:
 		drawCountLeft = 0;
 		drawCountRight = 0;
 		animation = false;
+		gameFinish = false;
 	}
 	void Update();
 	void Draw();
@@ -43,6 +52,8 @@ public:
 	const int& GetNowRound() { return countRound + 1; }
 	const int& GetLeftWin() { return countLeftWin; }
 	const int& GetRightWin() { return countRightWin; }
+	const bool& GetNowAnimation() { return animation; }
+	const bool& GetGameFinish() { return gameFinish; }
 
 	void RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsLeft);
 };

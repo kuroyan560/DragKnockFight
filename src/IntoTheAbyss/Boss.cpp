@@ -55,7 +55,6 @@ void Boss::Generate(const Vec2<float>& generatePos)
 #include"Camera.h"
 void Boss::Update()
 {
-
 	/*===== 更新処理 =====*/
 
 	// 前フレームの座標を保存

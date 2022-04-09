@@ -978,8 +978,22 @@ void Game::Update()
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
 	{
-		readyToStartRoundFlag = true;
-		roundFinishFlag = false;
+		//勝利数カウント演出
+		if (!WinCounter::Instance()->GetNowAnimation())
+		{
+			//どちらかが３勝とったらゲーム終了
+			if (WinCounter::Instance()->GetGameFinish())
+			{
+				//とりあえずリセットしとく
+				WinCounter::Instance()->Reset();
+			}
+			//次のラウンドへ
+			else
+			{
+				readyToStartRoundFlag = true;
+				roundFinishFlag = false;
+			}
+		}
 	}
 
 	//ラウンド開始時の演出開始
