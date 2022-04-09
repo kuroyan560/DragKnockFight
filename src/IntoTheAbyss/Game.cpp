@@ -26,6 +26,7 @@
 #include"GameTimer.h"
 #include"ScoreManager.h"
 
+#include"ScrollManager.h"
 
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
