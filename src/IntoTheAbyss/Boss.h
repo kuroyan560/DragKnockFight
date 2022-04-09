@@ -28,7 +28,7 @@ public:
 
 	/*===== íËêî =====*/
 
-	const Vec2<float> SCALE = { 50.0f,50.0f };
+	const Vec2<float> SCALE = { 80.0f,80.0f };
 	const float OFFSET_VEL = 10.0f;
 	const int STRUCK_WINDOW_TIMER = 120.0f;
 
