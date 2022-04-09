@@ -4,6 +4,7 @@
 #include "BulletMgr.h"
 #include"ScrollMgr.h"
 //#include"BulletParticleMgr.h"
+#include "SwingMgr.h"
 #include"AuraBlock.h"
 #include"ViewPort.h"
 #include"MovingBlockMgr.h"
@@ -27,7 +28,7 @@
 #include"FaceIcon.h"
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -89,7 +90,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -146,7 +147,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
+const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -164,7 +165,7 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
+void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	//AudioApp::Instance()->PlayWave(bgm, true);
 
@@ -1071,6 +1072,9 @@ void Game::Update()
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();
 
+	// 振り回し管理クラスの更新処理
+	SwingMgr::Instance()->Update(player.centerPos, boss.pos, lineLengthBoss + lineLengthPlayer + addLineLengthBoss + addLineLengthPlayer);
+
 #pragma region 各ギミックの更新処理
 
 	// 動的ブロックの更新処理
@@ -1617,8 +1621,11 @@ void Game::Scramble()
 	Vec2<float> bossVelGauge = boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue;
 	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
-	player.centerPos += playerVelGauge;
-	boss.pos += bossVelGauge;
+	// 振り回し状態のときは移動させない。
+	if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer)) {
+		player.centerPos += playerVelGauge;
+		boss.pos += bossVelGauge;
+	}
 
 	// 線分の長さ
 	float line = 0;

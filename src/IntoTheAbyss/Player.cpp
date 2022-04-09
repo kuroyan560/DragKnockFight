@@ -6,6 +6,7 @@
 #include "MapChipCollider.h"
 #include "MovingBlockMgr.h"
 #include "MovingBlock.h"
+#include "SwingMgr.h"
 //#include "BulletParticleMgr.h"
 #include "Collider.h"
 #include <cmath>
@@ -138,6 +139,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	areaHitBox.center = &centerPos;
 	areaHitBox.size = PLAYER_HIT_SIZE;
+
+	swingCoolTime = 0;
+
 }
 
 void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
@@ -308,6 +312,9 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPo
 
 	// ウィンドウに挟まれたタイマーを更新
 	if (0 < stuckWindowTimer) --stuckWindowTimer;
+
+	// 振り回しのクールタイムを更新
+	if (0 < swingCoolTime) --swingCoolTime;
 
 	//muffler.Update(centerPos);
 }
@@ -1184,8 +1191,11 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 
 	}
 
+	// 振り回し中及び振り回され中かを判断
+	bool isSwingNow = SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer;
+
 	// LBが押されたら反動をつける。
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+	if (!isSwingNow && UsersInput::Instance()->Input(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
 
 		// 反動をつける。
 		float rHandAngle = lHand->GetAngle();
@@ -1282,7 +1292,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 	}
 
 	// RBが押されたら反動をつける。
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+	if (!isSwingNow && UsersInput::Instance()->Input(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
 
 		// 反動をつける。
 		float lHandAngle = rHand->GetAngle();
@@ -1407,20 +1417,34 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 	if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
 
 	// RTが押されたら
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RT)) {
+	if (swingCoolTime <= 0 && UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RT)) {
 
 		// 振り回しの処理
 
 		// 振り回しのトリガー判定
-		if (!isSwing) {
+		if (!SwingMgr::Instance()->isSwingPlayer) {
 
-			// 角度を求める。
-			swingAngle = atan2(bossPos.y - centerPos.y, bossPos.x - centerPos.x);
+			// 振り回しの開始ベクトルを取得。
+			SwingMgr::Instance()->easingStartVec = bossPos - centerPos;
+			SwingMgr::Instance()->easingStartVec.Normalize();
+			SwingMgr::Instance()->easingNowVec = SwingMgr::Instance()->easingStartVec;
+
+			// 振り回しの終了ベクトルを取得。
+			SwingMgr::Instance()->easingEndVec = (bossPos - centerPos) * Vec2<float>(1.0f, -1.0f);
+			SwingMgr::Instance()->easingEndVec.Normalize();
+
+			// 振り回しフラグを有効化する。
+			SwingMgr::Instance()->isSwingPlayer = true;
+
+			// 各タイマーを初期化。
+			SwingMgr::Instance()->easingTimer = 0;
+			SwingMgr::Instance()->easeAmount = 0;
+			SwingMgr::Instance()->easeChangeAmountY = SwingMgr::Instance()->easingEndVec.y - SwingMgr::Instance()->easingStartVec.y;
+
+			// クールタイムを設定。
+			swingCoolTime = SWING_COOLTIME;
 
 		}
-
-		// 振り回しフラグを有効化する。
-		isSwing = true;
 
 
 
@@ -1505,10 +1529,10 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 		}
 
 	}
-	else {
+	if (!UsersInput::Instance()->Input(XBOX_BUTTON::RT)) {
 
 		// 振り回しフラグを折る。
-		isSwing = false;
+		SwingMgr::Instance()->isSwingPlayer = false;
 
 	}
 
