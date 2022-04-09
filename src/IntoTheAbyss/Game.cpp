@@ -1477,19 +1477,12 @@ void Game::Update()
 
 	if (UsersInput::Instance()->OnTrigger(DIK_M))
 	{
-		if (Camera::Instance()->Active())
-		{
-			Camera::Instance()->Release();
-		}
-		else
-		{
-			Camera::Instance()->Focus(player.centerPos, 2.0f);
-		}
+		FaceIcon::Instance()->Change(LEFT_FACE, DAMAGE);
 	}
 
 	BackGround::Instance()->Update();
 	Camera::Instance()->Update();
-
+	FaceIcon::Instance()->Update();
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
