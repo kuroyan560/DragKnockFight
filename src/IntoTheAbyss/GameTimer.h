@@ -71,7 +71,7 @@ private:
 
 	Vec2<float>  initCountDownPos, countDownPos;
 	float countDownEndPos;
-	Vec2<float> texSize;
+	Vec2<int> texSize;
 	int countDownNum;
 	
 	bool countDownFlag;

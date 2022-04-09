@@ -2,6 +2,7 @@
 #include"../Common/Singleton.h"
 #include<vector>
 #include"../Engine/ImguiApp.h"
+#include"../Common/Vec.h"
 
 class ScoreManager :public Singleton<ScoreManager>
 {
@@ -20,8 +21,14 @@ private:
 	float honraiScore;
 
 	std::vector<int>numberHandle;
+	std::vector<int>number;
 
+	Vec2<float>scorePos;
+	Vec2<float>texSize;
 
+	int moveScoreCount;
+	int moveInterval;
+	float rate;
 
 	std::vector<int> CountNumber(int TIME)
 	{

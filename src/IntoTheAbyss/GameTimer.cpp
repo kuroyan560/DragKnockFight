@@ -2,15 +2,18 @@
 #include"../IntoTheAbyss/TexHandleMgr.h"
 #include"../Engine/DrawFunc.h"
 #include"../Engine/ImguiApp.h"
+#include"../Common/KuroMath.h"
 
 GameTimer::GameTimer()
 {
 	startFlag = false;
 	timer = -1;
 	flame = -1;
-	timerPos = { 0,0 };
+	timerPos = { 400,500 };
 
-	//TexHandleMgr::LoadDivGraph("", 10, {}, number.data());
+	number.resize(10);
+	texSize = { 44,44 };
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 10, { 10, 1 }, number.data());
 
 }
 
@@ -20,8 +23,6 @@ void GameTimer::Init(const Vec2<float> &POS, int TIME, const Vec2<float> &COUNT_
 	timeUpFlag = false;
 	timer = TIME;
 	flame = 0;
-
-	texSize = {};
 
 	initCountDownPos = COUNT_DOWN_START_POS;
 	initCountDownPos.y -= (texSize.y + 10);
@@ -55,7 +56,7 @@ void GameTimer::Init(const Vec2<float> &POS, int TIME, const Vec2<float> &COUNT_
 	p.x = timerPos.x + (size.x / 2);
 	p.y = timerPos.y + (size.y / 2) + 50;
 
-	timerPos = p;
+	//timerPos = p;
 
 	counDownFinishFlag = false;
 
@@ -117,11 +118,22 @@ void GameTimer::Update()
 
 void GameTimer::Draw()
 {
+	Vec2<float>centralPos;
+	int offset = 0;
+	//•ª
+	for (int i = 0; i < minitueHandle.size(); i++)
+	{
+		offset = i;
+		centralPos = { timerPos.x + i * texSize.x, timerPos.y };
+		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(number[minitueHandle[i]]));
+	}
+	++offset;
+	++offset;
 	//•b
 	for (int i = 0; i < timeHandle.size(); i++)
 	{
-		Vec2<float>centralPos(timerPos.x + i * texSize.x, timerPos.y);
-		//DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(number[timeHandle[i]]));
+		centralPos = { timerPos.x + (offset + i) * texSize.x, timerPos.y };
+		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(number[timeHandle[i]]));
 	}
 
 	//float colonPos = timerPos.x + 2 * tex.GetNumTexSize().x;
