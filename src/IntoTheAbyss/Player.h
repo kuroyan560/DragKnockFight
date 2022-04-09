@@ -131,6 +131,10 @@ public:
 	// 入力されてから数フレームを取得するためのタイマーのでフォルチ値
 	const int AS_SOON_AS_INPUT_TIMER = 2;
 
+	// 振り回しのクールタイム
+	int swingCoolTime;
+	const int SWING_COOLTIME = 60;
+
 	// プレイヤーの方向
 	enum PLAYER_DIR {
 

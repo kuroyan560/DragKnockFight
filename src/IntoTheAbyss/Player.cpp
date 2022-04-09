@@ -140,6 +140,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	areaHitBox.center = &centerPos;
 	areaHitBox.size = PLAYER_HIT_SIZE;
+
+	swingCoolTime = 0;
+
 }
 
 void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
@@ -310,6 +313,9 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPo
 
 	// ウィンドウに挟まれたタイマーを更新
 	if (0 < stuckWindowTimer) --stuckWindowTimer;
+
+	// 振り回しのクールタイムを更新
+	if (0 < swingCoolTime) --swingCoolTime;
 
 	//muffler.Update(centerPos);
 }
@@ -1412,7 +1418,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 	if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
 
 	// RTが押されたら
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RT)) {
+	if (swingCoolTime <= 0 && UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RT)) {
 
 		// 振り回しの処理
 
@@ -1435,6 +1441,9 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 			SwingMgr::Instance()->easingTimer = 0;
 			SwingMgr::Instance()->easeAmount = 0;
 			SwingMgr::Instance()->easeChangeAmountY = SwingMgr::Instance()->easingEndVec.y - SwingMgr::Instance()->easingStartVec.y;
+
+			// クールタイムを設定。
+			swingCoolTime = SWING_COOLTIME;
 
 		}
 
