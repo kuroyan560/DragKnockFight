@@ -119,9 +119,9 @@ float4 PSmain(GSOutput input) : SV_TARGET
         return texCol;
     }
     
-    texCol = srcTex.Sample(smp, input.uv);
-    texCol.w *= input.srcAlpha;
-    return texCol;
+    float4 srcCol = srcTex.Sample(smp, input.uv);
+    srcCol.w *= input.srcAlpha * texCol.w;
+    return srcCol;
 }
 
 float4 main(float4 pos : POSITION) : SV_POSITION

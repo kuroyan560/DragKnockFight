@@ -17,6 +17,8 @@ void MiniMap::CalucurateCurrentPos(const Vec2<float> &POS)
 void MiniMap::Init(const float &MAX_VALUE)
 {
 	maxValue = MAX_VALUE;
+
+	nowPos.y = 131.0f;
 }
 
 void MiniMap::Update()
@@ -33,8 +35,7 @@ void MiniMap::Update()
 		nowValue = massDivX;
 	}
 
-	nowPos.x = 0.0f + nowValue * 1185.0f;
-	nowPos.y = 10.0f;
+	nowPos.x = 0.0f + nowValue * 1115.0f;
 }
 
 void MiniMap::Draw()

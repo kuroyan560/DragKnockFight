@@ -7,8 +7,9 @@
 
 class ScoreManager :public Singleton<ScoreManager>
 {
-public:
+	friend class Singleton<ScoreManager>;
 	ScoreManager();
+public:
 	~ScoreManager();
 
 	void Init();
@@ -26,6 +27,7 @@ private:
 	std::array<int, 10> number;
 
 	Vec2<float>scorePos;
+	Vec2<float>basePos;
 	Vec2<float>texSize;
 
 	int moveInterval;

@@ -9,10 +9,10 @@ GameTimer::GameTimer()
 	startFlag = false;
 	timer = -1;
 	flame = -1;
-	timerPos = { 400,500 };
+	timerPos = { 714,62 };
 
 	number.resize(11);
-	texSize = { 44,44 };
+	texSize = { 48,44 };
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 11, { 11, 1 }, number.data());
 
 }
@@ -120,7 +120,7 @@ void GameTimer::Draw()
 {
 	Vec2<float>centralPos;
 	int offset = 0;
-	float size = 0.6f;
+	float size = 0.8f;
 	//•ª
 	for (int i = 0; i < minitueHandle.size(); i++)
 	{

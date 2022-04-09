@@ -69,7 +69,8 @@ private:
 	Vec2<float>gaguePos;
 	Vec2<float>gagueVarPos;
 	int gaugeGraphHandle;
-	int gaugeVarGraphHandle;
+	int gaugeVarGraphPlayer;
+	int gaugeVarGraphEnemy;
 
 	void LimitGauge();
 	//デバック用
