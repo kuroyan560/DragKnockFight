@@ -3,7 +3,6 @@
 #include<vector>
 #include"../Engine/ImguiApp.h"
 #include"../Common/Vec.h"
-#include<array>
 
 class ScoreManager :public Singleton<ScoreManager>
 {
@@ -24,15 +23,12 @@ private:
 	std::vector<int>numberHandle;
 	std::vector<int>number;
 
-	std::array<Vec2<float>, 9>scorePos;
-	std::array<int, 9>oldNum;
-	std::array<bool, 9>moveFlag;
-	std::array<float, 9>rate;
-
+	Vec2<float>scorePos;
 	Vec2<float>texSize;
 
 	int moveScoreCount;
 	int moveInterval;
+	float rate;
 
 	std::vector<int> CountNumber(int TIME)
 	{
