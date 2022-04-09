@@ -27,15 +27,19 @@ public:
 	int graphHandle[DIR_NUM];
 
 
-	//ボスのパターン制御
+	//ボスのパターン制御-----------------------
 	enum E_BossPattern
 	{
 		BOSS_PATTERN_NONE = -1,
-		BOSS_PATTERN_NORMALMOVE
+		BOSS_PATTERN_NORMALMOVE,
+		BOSS_PATTERN_ATTACK
 	};
 	E_BossPattern bossPatternNow;
 	BossPatternData patternData;
 	std::array<std::unique_ptr<IBossPattern>, 2>bossPattern;
+	int patternTimer;
+	bool atackModeFlag;
+	//ボスのパターン制御-----------------------
 
 
 public:

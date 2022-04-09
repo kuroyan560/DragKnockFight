@@ -9,6 +9,7 @@
 
 #include"TexHandleMgr.h"
 #include"BossPatternNormalMove.h"
+#include"BossPatternAttack.h"
 
 Boss::Boss()
 {
@@ -24,7 +25,7 @@ Boss::Boss()
 
 
 	bossPattern[0] = std::make_unique<BossPatternNormalMove>();
-	bossPattern[1] = std::make_unique<BossPatternNormalMove>();
+	bossPattern[1] = std::make_unique<BossPatternAttack>();
 
 
 	//パターンに渡すデータの初期化
@@ -32,6 +33,7 @@ Boss::Boss()
 	patternData.stuckWindowTimer = &stuckWindowTimer;
 
 	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
+	patternTimer = 0;
 
 }
 
@@ -65,6 +67,24 @@ void Boss::Update()
 
 	// 前フレームの座標を保存
 	prevPos = pos;
+
+	++patternTimer;
+
+	if (300 <= patternTimer)
+	{
+		if (atackModeFlag)
+		{
+			bossPatternNow = BOSS_PATTERN_ATTACK;
+		}
+		else
+		{
+			bossPatternNow = BOSS_PATTERN_NORMALMOVE;
+		}
+		atackModeFlag = !atackModeFlag;
+		patternTimer = 0;
+	}
+
+
 	//ボスの挙動
 	bossPattern[bossPatternNow]->Update(&patternData);
 }
