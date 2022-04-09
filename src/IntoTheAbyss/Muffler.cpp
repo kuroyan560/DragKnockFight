@@ -60,7 +60,7 @@ Muffler::Muffler()
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"マフラー基準点"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"マフラー性質"),
 		};
-		cPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParams);
+		cPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParams, WrappedSampler(true, false));
 	}
 	playerPosBuff = D3D12App::Instance()->GenerateConstantBuffer(sizeof(Vec2<float>), 1, nullptr, "Muffler - PlayerPos");
 
@@ -114,7 +114,7 @@ Muffler::Muffler()
 		};
 
 		//パイプライン生成
-		gPipeline = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
+		gPipeline = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO, WrappedSampler(true, false));
 	}
 	zoomAndScroll = D3D12App::Instance()->GenerateConstantBuffer(sizeof(ZoomAndScroll), 1, nullptr, "Muffler - ZoomAndScroll");
 }

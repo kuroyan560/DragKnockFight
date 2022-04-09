@@ -18,11 +18,11 @@ GaussianBlur::GaussianBlur(const Vec2<int>& Size, const DXGI_FORMAT& Format, con
         };
 
         auto cs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/GaussianBlur.hlsl", "XBlur", "cs_5_0");
-        xBlurPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParam);
+        xBlurPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParam, WrappedSampler(false, true));
         cs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/GaussianBlur.hlsl", "YBlur", "cs_5_0");
-        yBlurPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParam);
+        yBlurPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParam, WrappedSampler(false, true));
         cs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/GaussianBlur.hlsl", "Final", "cs_5_0");
-        finalPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParam);
+        finalPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParam, WrappedSampler(false, true));
     }
 
     //テクスチャ情報

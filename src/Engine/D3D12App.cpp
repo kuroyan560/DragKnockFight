@@ -210,7 +210,7 @@ void D3D12App::Initialize(const HWND& Hwnd, const Vec2<int>& ScreenSize, const b
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"分割番号")
 		};
 		//パイプライン生成
-		splitImgPipeline = GenerateComputePipeline(cs, rootParams);
+		splitImgPipeline = GenerateComputePipeline(cs, rootParams, WrappedSampler(true, false));
 	}
 }
 

@@ -515,21 +515,31 @@ public:
 //サンプラー
 class WrappedSampler
 {
-public:
-	D3D12_STATIC_SAMPLER_DESC sampler = {};
-	WrappedSampler(const D3D12_TEXTURE_ADDRESS_MODE& TexAddressMode)
+	void Generate(const D3D12_TEXTURE_ADDRESS_MODE& TexAddressMode, const D3D12_FILTER& Filter)
 	{
 		sampler.AddressU = TexAddressMode;
 		sampler.AddressV = TexAddressMode;
 		sampler.AddressW = TexAddressMode;
 		sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
-		//sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;	//補間しない（ニアレストネイバー）
-		sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;	//補間
+		sampler.Filter = Filter;	//補間
 		sampler.MaxLOD = D3D12_FLOAT32_MAX;	//ミップマップ最大値
 		sampler.MinLOD = 0.0f;	//ミップマップ最小値
 		sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 		sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 		sampler.ShaderRegister = 0;
+	}
+public:
+	D3D12_STATIC_SAMPLER_DESC sampler = {};
+	WrappedSampler(const D3D12_TEXTURE_ADDRESS_MODE& TexAddressMode, const D3D12_FILTER& Filter)
+	{
+		Generate(TexAddressMode, Filter);
+	}
+	//繰り返すか、補間をかけるか
+	WrappedSampler(const bool& Wrap,const bool& Interpolation)
+	{
+		auto addressMode = !Wrap ? D3D12_TEXTURE_ADDRESS_MODE_CLAMP : D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		auto interpolation = Interpolation ? D3D12_FILTER_MIN_MAG_MIP_LINEAR : D3D12_FILTER_MIN_MAG_MIP_POINT;
+		Generate(addressMode, interpolation);
 	}
 };
 

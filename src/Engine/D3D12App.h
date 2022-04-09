@@ -152,20 +152,21 @@ public:
 	/// <param name="InputLayout">頂天レイアウト</param>
 	/// <param name="RootParams">ルートパラメータ（ディスクリプタよりビューが先になるので注意）</param>
 	/// <param name="RenderTargetFormat">描画先レンダーターゲット設定</param>
-	/// <param name="SamplerDesc">サンプラー(デフォルト：繰り返さない)</param>
+	/// <param name="SamplerDesc">サンプラー</param>
 	std::shared_ptr<GraphicsPipeline>GenerateGraphicsPipeline(
 		const PipelineInitializeOption& Option,
 		const Shaders& ShaderInfo,
 		const std::vector<InputLayoutParam>& InputLayout,
 		const std::vector<RootParam>& RootParams,
 		const std::vector<RenderTargetInfo>& RenderTargetFormat,
-		const WrappedSampler& Sampler = WrappedSampler(D3D12_TEXTURE_ADDRESS_MODE_CLAMP));
+		const WrappedSampler& Sampler);
+
 
 	//コンピュートパイプライン生成
 	std::shared_ptr<ComputePipeline>GenerateComputePipeline(
 		const ComPtr<ID3DBlob>& ComputeShader,
 		const std::vector<RootParam>& RootParams,
-		const WrappedSampler& Sampler = WrappedSampler(D3D12_TEXTURE_ADDRESS_MODE_WRAP));
+		const WrappedSampler& Sampler);
 
 	//ビューポートとシザーのセット
 	void SetViewPortsAndScissorRects(const Vec2<float>& Size);
