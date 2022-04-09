@@ -26,6 +26,7 @@
 #include"GameTimer.h"
 #include"ScoreManager.h"
 #include"FaceIcon.h"
+#include"WinCounter.h"
 
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
@@ -563,6 +564,8 @@ Game::Game()
 
 void Game::Init()
 {
+	WinCounter::Instance()->Reset();
+
 	// スクロールマネージャーを初期化。
 	ScrollMgr::Instance()->Init(&mapData);
 	// スクロール量を設定。
@@ -958,8 +961,7 @@ void Game::Update()
 	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag)
 	{
 		//プレイヤー勝利
-		++countRound;
-		++countPlayerWin;
+		WinCounter::Instance()->RoundFinish(lineCenterPos, true);
 		roundFinishFlag = true;
 		gameStartFlag = false;
 	}
@@ -968,8 +970,7 @@ void Game::Update()
 	if (enemyHomeBase->Collision(player.areaHitBox) && !roundFinishFlag)
 	{
 		//敵勝利
-		++countRound;
-		++countEnemyWin;
+		WinCounter::Instance()->RoundFinish(lineCenterPos, false);
 		roundFinishFlag = true;
 		gameStartFlag = false;
 	}
@@ -1487,6 +1488,7 @@ void Game::Update()
 	BackGround::Instance()->Update();
 	Camera::Instance()->Update();
 	FaceIcon::Instance()->Update();
+	WinCounter::Instance()->Update();
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -1594,6 +1596,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	miniMap.Draw();
 
 	FaceIcon::Instance()->Draw();
+
+	WinCounter::Instance()->Draw();
 
 	if (sceneBlackFlag || sceneLightFlag)
 	{

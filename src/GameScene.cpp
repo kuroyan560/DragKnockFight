@@ -8,6 +8,7 @@
 #include"IntoTheAbyss/SuperiorityGauge.h"
 #include"IntoTheAbyss/GameTimer.h"
 #include"IntoTheAbyss/ScoreManager.h"
+#include"IntoTheAbyss/WinCounter.h"
 
 GameScene::GameScene()
 {
@@ -132,8 +133,8 @@ void GameScene::OnImguiDebug()
 	//game.enemyHomeBase->Debug();
 
 	ImGui::Begin("Round");
-	ImGui::Text("RoundNum%d", game.countRound);
-	ImGui::Text("PlayerWin:%d,EnemyWin:%d", game.countPlayerWin, game.countEnemyWin);
+	ImGui::Text("RoundNum%d", WinCounter::Instance()->GetNowRound());
+	ImGui::Text("PlayerWin:%d,EnemyWin:%d", WinCounter::Instance()->GetLeftWin(), WinCounter::Instance()->GetRightWin());
 	ImGui::End();
 
 	//GameTimer::Instance()->Debug();
