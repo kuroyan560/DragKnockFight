@@ -11,9 +11,9 @@ GameTimer::GameTimer()
 	flame = -1;
 	timerPos = { 400,500 };
 
-	number.resize(10);
+	number.resize(11);
 	texSize = { 44,44 };
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 10, { 10, 1 }, number.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 11, { 11, 1 }, number.data());
 
 }
 
@@ -35,7 +35,7 @@ void GameTimer::Init(const Vec2<float> &POS, int TIME, const Vec2<float> &COUNT_
 	int minite = timer;
 	int second = 0;
 	int t = 0;
-	for (; 60<= minite;)
+	for (; 60 <= minite;)
 	{
 		minite /= 60;
 		if (minite <= 60)
@@ -48,7 +48,7 @@ void GameTimer::Init(const Vec2<float> &POS, int TIME, const Vec2<float> &COUNT_
 	minitueHandle = CountNumber(t);
 	timeHandle = CountNumber(second);
 	miriHandle = CountNumber(flame);
-	
+
 	finishTimer = 0;
 
 	const Vec2<float>size = { 600,200 };
@@ -111,7 +111,7 @@ void GameTimer::Update()
 		finishTimer++;
 		if (180 <= finishTimer)
 		{
-			
+
 		}
 	}
 }
@@ -120,20 +120,25 @@ void GameTimer::Draw()
 {
 	Vec2<float>centralPos;
 	int offset = 0;
+	float size = 0.6f;
 	//•ª
 	for (int i = 0; i < minitueHandle.size(); i++)
 	{
 		offset = i;
 		centralPos = { timerPos.x + i * texSize.x, timerPos.y };
-		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(number[minitueHandle[i]]));
+		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[minitueHandle[i]]));
 	}
+
 	++offset;
+	centralPos = { timerPos.x + offset * texSize.x,timerPos.y };
+	DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[10]));
 	++offset;
+
 	//•b
 	for (int i = 0; i < timeHandle.size(); i++)
 	{
 		centralPos = { timerPos.x + (offset + i) * texSize.x, timerPos.y };
-		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(number[timeHandle[i]]));
+		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[timeHandle[i]]));
 	}
 
 	//float colonPos = timerPos.x + 2 * tex.GetNumTexSize().x;

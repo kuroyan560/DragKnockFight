@@ -15,7 +15,6 @@ void ScoreManager::Init()
 {
 	honraiScore = 1000;
 	score = 1000;
-	moveScoreCount = 0;
 }
 
 void ScoreManager::Add(const int &ADD_POINT)
@@ -44,21 +43,10 @@ void ScoreManager::Update()
 		if (moveInterval % 5 == 0)
 		{
 			rate = 0.0f;
-			++moveScoreCount;
-
-			if (moveScoreCount % 2 == 0)
-			{
-				//scorePos.y = 200;
-			}
-			else
-			{
-				//scorePos.y = 210;
-			}
 		}
 	}
 	else
 	{
-		moveScoreCount = 0;
 		scorePos.y = 200;
 	}
 
@@ -81,10 +69,11 @@ void ScoreManager::Update()
 
 void ScoreManager::Draw()
 {
+	float size = 0.6f;
 	for (int i = 0; i < numberHandle.size(); i++)
 	{
 		Vec2<float>centralPos(scorePos.x + i * texSize.x, scorePos.y);
-		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(number[numberHandle[i]]));
+		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[numberHandle[i]]));
 	}
 }
 

@@ -26,7 +26,6 @@ private:
 	Vec2<float>scorePos;
 	Vec2<float>texSize;
 
-	int moveScoreCount;
 	int moveInterval;
 	float rate;
 
