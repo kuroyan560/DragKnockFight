@@ -5,9 +5,11 @@ cbuffer cbuff0 : register(b0)
 
 struct VSOutput
 {
-    float4 leftUpPos : POSITION_L_U;
-    float4 rightBottomPos : POSITION_R_B;
-    float4 paintColor : PAINT_COLOR;
+    float4 center : CENTER;
+    float2 extRate : EXT_RATE;
+    float radian : RADIAN;
+    float2 rotaCenterUV : ROTA_CENTER_UV;
+    float srcAlpha : SRC_ALPHA;
     int2 miror : MIROR;
     float2 leftUpPaintUV : PAINT_UV_L_U;
     float2 rightBottomPaintUV : PAINT_UV_R_B;
@@ -22,11 +24,22 @@ struct GSOutput
 {
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD;
-    float4 paintColor : PAINT_COLOR;
     float2 leftUpPaintUV : PAINT_UV_L_U;
     float2 rightBottomPaintUV : PAINT_UV_R_B;
+    float srcAlpha : SRC_ALPHA;
 };
 
+Texture2D<float4> destTex : register(t0);
+Texture2D<float4> srcTex : register(t1);
+SamplerState smp : register(s0);
+
+float2 RotateFloat2(float2 Pos,float Radian)
+{
+    float2 result;
+    result.x = Pos.x * cos(Radian) - Pos.y * sin(Radian);
+    result.y = Pos.y * cos(Radian) + Pos.x * sin(Radian);
+    return result;
+}
 
 [maxvertexcount(4)]
 void GSmain(
@@ -34,46 +47,60 @@ void GSmain(
 	inout TriangleStream<GSOutput> output
 )
 {
-    float width = input[0].rightBottomPos.x - input[0].leftUpPos.x;
+    uint2 texSize;
+    destTex.GetDimensions(texSize.x, texSize.y);
+    
+    float width_h = texSize.x * input[0].extRate.x / 2.0f;
+    float height_h = texSize.y * input[0].extRate.y / 2.0f;
+    
+    float2 rotateCenter = input[0].center.xy;
+    rotateCenter += texSize.xy * input[0].extRate * (input[0].rotaCenterUV - float2(0.5f, 0.5f));
     
     GSOutput element;
-    element.paintColor = input[0].paintColor;
     element.leftUpPaintUV = input[0].leftUpPaintUV;
     element.rightBottomPaintUV = input[0].rightBottomPaintUV;
+    element.srcAlpha = input[0].srcAlpha;
         
     //ç∂â∫
-    element.pos = input[0].rightBottomPos;
-    element.pos.x -= width;
+    element.pos = input[0].center;
+    element.pos.x -= width_h;
+    element.pos.y += height_h;
+    element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(0.0f + input[0].miror.x, 1.0f - input[0].miror.y);
     output.Append(element);
     
     //ç∂è„
-    element.pos = input[0].leftUpPos;
+    element.pos = input[0].center;
+    element.pos.x -= width_h;
+    element.pos.y -= height_h;
+    element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(0.0f + input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
     
      //âEâ∫
-    element.pos = input[0].rightBottomPos;
+    element.pos = input[0].center;
+    element.pos.x += width_h;
+    element.pos.y += height_h;
+    element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(1.0f - input[0].miror.x, 1.0f - input[0].miror.y);
     output.Append(element);
     
     //âEè„
-    element.pos = input[0].leftUpPos;
-    element.pos.x += width;
+    element.pos = input[0].center;
+    element.pos.x += width_h;
+    element.pos.y -= height_h;
+    element.pos.xy = rotateCenter + RotateFloat2(element.pos.xy - rotateCenter, input[0].radian);
     element.pos = mul(parallelProjMat, element.pos);
     element.uv = float2(1.0f - input[0].miror.x, 0.0f + input[0].miror.y);
     output.Append(element);
 }
 
-Texture2D<float4> tex : register(t0);
-SamplerState smp : register(s0);
-
 float4 PSmain(GSOutput input) : SV_TARGET
 {
-    float4 texCol = tex.Sample(smp, input.uv);
+    float4 texCol = destTex.Sample(smp, input.uv);
     
     if (input.uv.x < input.leftUpPaintUV.x)
     {
@@ -92,7 +119,9 @@ float4 PSmain(GSOutput input) : SV_TARGET
         return texCol;
     }
     
-    return float4(input.paintColor.xyz, texCol.w * input.paintColor.w);
+    texCol = srcTex.Sample(smp, input.uv);
+    texCol.w *= input.srcAlpha;
+    return texCol;
 }
 
 float4 main(float4 pos : POSITION) : SV_POSITION

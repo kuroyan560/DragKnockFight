@@ -66,45 +66,45 @@ void GameScene::OnDraw()
 
 void GameScene::OnImguiDebug()
 {
-	ImGui::Begin("StageInfo");
-	ImGui::Text("---Now---");
-	ImGui::Text("StageNumber:%d", SelectStage::Instance()->GetStageNum());
-	ImGui::Text("RoomNumber:%d\n\n", SelectStage::Instance()->GetRoomNum());
-	ImGui::Text("---Select---");
+	//ImGui::Begin("StageInfo");
+	//ImGui::Text("---Now---");
+	//ImGui::Text("StageNumber:%d", SelectStage::Instance()->GetStageNum());
+	//ImGui::Text("RoomNumber:%d\n\n", SelectStage::Instance()->GetRoomNum());
+	//ImGui::Text("---Select---");
 
-	ImGui::Text("StageNumber:%d", game.debugStageData[0]);
-	//選択できないステージ番号なら表示する
-	if (!StageMgr::Instance()->CheckStageNum(game.debugStageData[0]))
-	{
-		ImGui::SameLine();
-		ImGui::Text("Don't use");
-	}
-	if (game.nowSelectNum == 0)
-	{
-		ImGui::SameLine();
-		ImGui::Text("NowSelecting");
-	}
+	//ImGui::Text("StageNumber:%d", game.debugStageData[0]);
+	////選択できないステージ番号なら表示する
+	//if (!StageMgr::Instance()->CheckStageNum(game.debugStageData[0]))
+	//{
+	//	ImGui::SameLine();
+	//	ImGui::Text("Don't use");
+	//}
+	//if (game.nowSelectNum == 0)
+	//{
+	//	ImGui::SameLine();
+	//	ImGui::Text("NowSelecting");
+	//}
 
 
-	ImGui::Text("RoomNumber:%d", game.debugStageData[1]);
-	//選択できない部屋番号なら表示する
-	if (!StageMgr::Instance()->CheckRoomNum(game.debugStageData[0], game.debugStageData[1]))
-	{
-		ImGui::SameLine();
-		ImGui::Text("Don't use");
-	}
-	if (game.nowSelectNum == 1)
-	{
-		ImGui::SameLine();
-		ImGui::Text("NowSelecting");
-	}
+	//ImGui::Text("RoomNumber:%d", game.debugStageData[1]);
+	////選択できない部屋番号なら表示する
+	//if (!StageMgr::Instance()->CheckRoomNum(game.debugStageData[0], game.debugStageData[1]))
+	//{
+	//	ImGui::SameLine();
+	//	ImGui::Text("Don't use");
+	//}
+	//if (game.nowSelectNum == 1)
+	//{
+	//	ImGui::SameLine();
+	//	ImGui::Text("NowSelecting");
+	//}
 
-	ImGui::Text("Up Down:SelectNumber");
-	ImGui::Text("Left Right:SelectStageOrRoom");
-	ImGui::Text("B Key / Home Button :StageSelectScene");
-	ImGui::Text("Return / A Button:Done");
-	ImGui::Text("Space / Back Button:Reset");
-	ImGui::End();
+	//ImGui::Text("Up Down:SelectNumber");
+	//ImGui::Text("Left Right:SelectStageOrRoom");
+	//ImGui::Text("B Key / Home Button :StageSelectScene");
+	//ImGui::Text("Return / A Button:Done");
+	//ImGui::Text("Space / Back Button:Reset");
+	//ImGui::End();
 
 
 	/*ImGui::Begin("Timer");
@@ -124,20 +124,20 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
 	ImGui::End();*/
 
-	DebugParameter::Instance()->DrawImGui();
+	//DebugParameter::Instance()->DrawImGui();
 
 	SuperiorityGauge::Instance()->DebugValue(&addValue);
 
-	game.playerHomeBase->Debug();
-	game.enemyHomeBase->Debug();
+	//game.playerHomeBase->Debug();
+	//game.enemyHomeBase->Debug();
 
 	ImGui::Begin("Round");
 	ImGui::Text("RoundNum%d", game.countRound);
 	ImGui::Text("PlayerWin:%d,EnemyWin:%d", game.countPlayerWin, game.countEnemyWin);
 	ImGui::End();
 
-	GameTimer::Instance()->Debug();
-	ScoreManager::Instance()->Debug();
+	//GameTimer::Instance()->Debug();
+	//ScoreManager::Instance()->Debug();
 }
 
 void GameScene::OnFinalize()

@@ -14,8 +14,7 @@ public:
 	float miniX;
 	float massX;
 private:
-	Vec2<float>linePos,
-		nowPos;
+	Vec2<float>	nowPos;
 	float maxValue;
 	float nowValue;
 

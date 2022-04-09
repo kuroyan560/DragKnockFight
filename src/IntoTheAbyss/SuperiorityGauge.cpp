@@ -1,7 +1,7 @@
 #include "SuperiorityGauge.h"
 #include<math.h>
 #include"Engine/ImguiApp.h"
-#include"../Engine/DrawFunc_Color.h"
+#include"../Engine/DrawFunc_FillTex.h"
 #include"../Engine/DrawFunc.h"
 #include"TexHandleMgr.h"
 
@@ -56,7 +56,7 @@ void SuperiorityGauge::Init()
 	playerGaugeData = std::make_unique<GaugeData>();
 	enemyGaugeData = std::make_unique<GaugeData>();
 
-	Vec2<float>winHalf(1280.0f / 2.0f, 50.0f);
+	Vec2<float>winHalf(1280.0f / 2.0f, 65.0f);
 	gaguePos = winHalf;
 	gagueVarPos = winHalf;
 
@@ -107,11 +107,14 @@ void SuperiorityGauge::Update()
 	}
 }
 
+#include"D3D12App.h"
 void SuperiorityGauge::Draw()
 {
 	static const Vec2<float>OFFSET = { 0.0f,23.0f };
 	DrawFunc::DrawRotaGraph2D(gaguePos + OFFSET, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(gaugeGraphHandle));
-	DrawFunc_Color::DrawGraph(gagueVarPos + OFFSET, TexHandleMgr::GetTexBuffer(gaugeVarGraphHandle), Color(239, 1, 144, 255), { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f), Vec2<float>(1.0f, 1.0f));
+
+	static auto maskCol = D3D12App::Instance()->GenerateTextureBuffer(Color(239, 1, 144, 255));
+	DrawFunc_FillTex::DrawGraph(gagueVarPos + OFFSET, TexHandleMgr::GetTexBuffer(gaugeVarGraphHandle), maskCol, 1.0f, { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f), Vec2<float>(1.0f, 1.0f));
 }
 
 void SuperiorityGauge::DebugValue(float *ADD_VALUE)

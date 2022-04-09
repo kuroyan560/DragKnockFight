@@ -18,7 +18,6 @@
 #include"TexHandleMgr.h"
 #include"DrawFunc.h"
 #include"ParticleMgr.h"
-#include"GUI.h"
 
 #include"SuperiorityGauge.h"
 #include"BackGround.h"
@@ -1592,8 +1591,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());
 
 	SuperiorityGauge::Instance()->Draw();
-
-	GUI::Instance()->Draw();
 
 	miniMap.Draw();
 

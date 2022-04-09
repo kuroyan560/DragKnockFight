@@ -14,12 +14,11 @@
 #include"UsersInput.h"
 #include"DrawFunc.h"
 #include"DrawFunc_Shadow.h"
-#include"DrawFunc_Color.h"
+#include"DrawFunc_FillTex.h"
 #include"WinApp.h"
 #include "ParticleMgr.h"
 #include "EventCollider.h"
 #include"DebugParameter.h"
-#include"GUI.h"
 #include"SuperiorityGauge.h"
 
 #include"AudioApp.h"
@@ -347,9 +346,9 @@ void Player::Draw(LightManager& LigManager)
 	DrawFunc::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE, 0.0f, bodyTex);
 
 	//テレポート時のフラッシュ
-	Color teleFlashCol;
-	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
-	DrawFunc_Color::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
+	static auto white = D3D12App::Instance()->GenerateTextureBuffer(Color());
+	const float flashAlpha = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, white, flashAlpha);
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
