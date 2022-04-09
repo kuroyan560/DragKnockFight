@@ -44,7 +44,7 @@ ParticleMgr::ParticleMgr()
 		{
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_UAV,"パーティクル配列"),
 		};
-		cPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParams);
+		cPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParams, WrappedSampler(false, false));
 	}
 
 	//グラフィックスパイプライン
@@ -110,7 +110,7 @@ ParticleMgr::ParticleMgr()
 		};
 
 		//パイプライン生成
-		gPipeline = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
+		gPipeline = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO, WrappedSampler(false, false));
 	}
 
 	zoomAndScroll = D3D12App::Instance()->GenerateConstantBuffer(sizeof(ZoomAndScroll), 1, &zoomAndScroll, "ParticleMgr - ZoomAndScroll");
