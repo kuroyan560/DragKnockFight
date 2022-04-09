@@ -4,8 +4,9 @@
 #include "DrawFunc.h"
 #include "MapChipCollider.h"
 #include "WinApp.h"
-#include"UsersInput.h"
-#include"SuperiorityGauge.h"
+#include "UsersInput.h"
+#include "SuperiorityGauge.h"
+#include "SwingMgr.h"
 
 #include"TexHandleMgr.h"
 
@@ -31,7 +32,7 @@ void Boss::Init()
 
 }
 
-void Boss::Generate(const Vec2<float> &generatePos)
+void Boss::Generate(const Vec2<float>& generatePos)
 {
 
 	/*===== 生成処理 =====*/
@@ -48,6 +49,10 @@ void Boss::Update()
 {
 
 	/*===== 更新処理 =====*/
+
+	// 振り回し中か振り回され中だったら更新処理を行わない。　　臨時の実装です。
+	bool isSwingNow = SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer;
+	if (isSwingNow) return;
 
 	// 前フレームの座標を保存
 	prevPos = pos;

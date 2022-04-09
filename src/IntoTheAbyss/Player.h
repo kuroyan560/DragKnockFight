@@ -95,10 +95,6 @@ public:
 
 	int shotSE;
 
-	// U‚è‰ñ‚µŠÖŒW‚Ì•Ï”
-	bool isSwing;			// U‚è‰ñ‚µ‚·‚é‚©‚Ìƒtƒ‰ƒO
-	float swingAngle;		// U‚è‰ñ‚·Šp“x
-
 
 
 public:
