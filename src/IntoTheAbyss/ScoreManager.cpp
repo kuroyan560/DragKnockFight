@@ -5,7 +5,7 @@
 
 ScoreManager::ScoreManager()
 {
-	scorePos = { 200,200 };
+	scorePos = Vec2<float>( 300.0f,200.0f );
 	texSize = { 44,44 };
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 10, { 10, 1 }, number.data());
 }
@@ -50,7 +50,7 @@ void ScoreManager::Update()
 	}
 	else
 	{
-		scorePos.y = 200;
+		scorePos.y = 200.0f;
 	}
 
 
@@ -63,7 +63,8 @@ void ScoreManager::Update()
 		rate = 1.0f;
 	}
 
-	scorePos.y = 210 + 10 * KuroMath::Ease(Out, Back, rate, 0.0f, 1.0f);
+	scorePos.x = 200.0f;
+	scorePos.y = 210.0f + 10.0f * KuroMath::Ease(Out, Back, rate, 0.0f, 1.0f);
 
 
 	//スコア計算

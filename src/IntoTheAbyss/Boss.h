@@ -2,6 +2,9 @@
 #include <vector>
 #include "Intersected.h"
 #include"AreaCollider.h"
+#include"IBossPattern.h"
+#include<array>
+#include<memory>
 
 using namespace std;
 
@@ -22,6 +25,17 @@ public:
 	//画像
 	static const enum DIR { FRONT, BACK, DIR_NUM };
 	int graphHandle[DIR_NUM];
+
+
+	//ボスのパターン制御
+	enum E_BossPattern
+	{
+		BOSS_PATTERN_NONE = -1,
+		BOSS_PATTERN_NORMALMOVE
+	};
+	E_BossPattern bossPatternNow;
+	BossPatternData patternData;
+	std::array<std::unique_ptr<IBossPattern>, 2>bossPattern;
 
 
 public:
@@ -45,7 +59,7 @@ public:
 	void Init();
 
 	// 生成処理
-	void Generate(const Vec2<float>& generatePos);
+	void Generate(const Vec2<float> &generatePos);
 
 	// 更新処理
 	void Update();
@@ -54,6 +68,6 @@ public:
 	void Draw();
 
 	// 当たり判定
-	void CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos);
+	void CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos);
 
 };
