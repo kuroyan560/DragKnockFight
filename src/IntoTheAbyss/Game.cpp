@@ -1031,6 +1031,9 @@ void Game::Update()
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();
 
+	// 振り回し管理クラスの更新処理
+	SwingMgr::Instance()->Update(player.centerPos, boss.pos, lineLengthBoss + lineLengthPlayer + addLineLengthBoss + addLineLengthPlayer);
+
 #pragma region 各ギミックの更新処理
 
 	// 動的ブロックの更新処理

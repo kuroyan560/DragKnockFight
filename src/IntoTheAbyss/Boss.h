@@ -15,8 +15,12 @@ public:
 	Vec2<float> pos;			// 座標
 	Vec2<float> prevPos;		// 前フレームの座標
 	Vec2<float> scale;			// 大きさ
-	Vec2<float> vel;			// 移動量
+	Vec2<float> vel;			// そのフレームの移動量の総量
+	Vec2<float> moveVel;		// 移動量
+	Vec2<float> swingInertiaVec;// 振り回しの慣性の移動方向
+	float swingInertia;			// 振り回しの慣性
 	int stuckWindowTimer;		// ウィンドウに挟まったタイマー
+	int afterSwingDelay;		// 振り回しのあとにボスを少し動けない状態にするためのタイマー
 	INTERSECTED_LINE prevIntersectedLine;
 
 	//画像
@@ -30,10 +34,14 @@ public:
 
 	const Vec2<float> SCALE = { 50.0f,50.0f };
 	const float OFFSET_VEL = 10.0f;
+	const float OFFSET_INERTIA = 30.0f;		// 振り回しの慣性
+	const int AFTER_SWING_DELAY = 15;
 	const int STRUCK_WINDOW_TIMER = 120.0f;
 
 	//陣地との判定
 	Square areaHitBox;
+
+
 public:
 
 	/*===== メンバ関数 =====*/

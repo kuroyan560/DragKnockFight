@@ -1,4 +1,5 @@
 #include "SwingMgr.h"
+#include "KuroMath.h"
 
 SwingMgr::SwingMgr()
 {
@@ -26,9 +27,45 @@ void SwingMgr::Init()
 
 }
 
-void SwingMgr::Update()
+void SwingMgr::Update(const Vec2<float>& playerPos, const Vec2<float>& bossPos, const float& lineLength)
 {
 
 	/*===== 更新処理 =====*/
+
+	// 座標を保存。
+	this->playerPos = playerPos;
+	this->bossPos = bossPos;
+	// 紐の長さを保存。
+	this->lineLength = lineLength;
+
+	// 振り回し中じゃなかったら処理を飛ばす。
+	if (!(isSwingPlayer || isSwingBoss)) return;
+
+	// イージングタイマーが限界を超えたらフラグを折る。
+	if (1.0f <= easingTimer) {
+
+		isSwingPlayer = false;
+		isSwingBoss = false;
+
+	}
+
+	// イージングタイマーを更新する。
+	if (easingTimer < 1.0f) {
+
+		// イージングタイマーを更新する。
+		easingTimer += ADD_EASINGTIMER;
+
+		// 限界値を超えないようにする。
+		if (1.0f <= easingTimer) easingTimer = 1.0f;
+
+		// イージングタイマーから求められるイージング量を求める。
+		easeAmount = KuroMath::Ease(In, Exp, easingTimer, 0.0f, 1.0f);
+
+		// 現在のベクトルを求める。
+		easingNowVec.x = easingStartVec.x;
+		easingNowVec.y = easingStartVec.y + (easeAmount * easeChangeAmountY);
+		easingNowVec.Normalize();
+
+	}
 
 }

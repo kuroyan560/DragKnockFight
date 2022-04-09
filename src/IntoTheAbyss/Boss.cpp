@@ -7,6 +7,7 @@
 #include "UsersInput.h"
 #include "SuperiorityGauge.h"
 #include "SwingMgr.h"
+#include "SuperiorityGauge.h"
 
 #include"TexHandleMgr.h"
 
@@ -16,6 +17,7 @@ Boss::Boss()
 	pos = {};
 	scale = {};
 	vel = {};
+	moveVel = {};
 
 	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy.png");
 	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy_back.png");
@@ -29,6 +31,7 @@ void Boss::Init()
 	pos = {};
 	scale = {};
 	vel = {};
+	moveVel = {};
 
 }
 
@@ -40,6 +43,10 @@ void Boss::Generate(const Vec2<float>& generatePos)
 	pos = generatePos;
 	scale = SCALE;
 	vel = { OFFSET_VEL,0 };
+	moveVel = { OFFSET_VEL,0 };
+	swingInertia = 0;
+	swingInertiaVec = {};
+	afterSwingDelay = 0;
 	prevIntersectedLine = INTERSECTED_NONE;
 	stuckWindowTimer = 0;
 	areaHitBox.size = scale;
@@ -50,46 +57,95 @@ void Boss::Update()
 
 	/*===== 更新処理 =====*/
 
-	// 振り回し中か振り回され中だったら更新処理を行わない。　　臨時の実装です。
-	bool isSwingNow = SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer;
-	if (isSwingNow) return;
-
 	// 前フレームの座標を保存
 	prevPos = pos;
 
-	static const int PULL_SPAN_MIN = 30;
-	static const int PULL_SPAN_MAX = 70;
-	static int PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
-	static int PULL_TIMER = 0;
-	static Vec2<float>ACCEL = { 0.0f,0.0f };	//加速度
-	static const float PULL_POWER_MIN = 15.0f;
-	static const float PULL_POWER_MAX = 25.0f;
-
-	if (PULL_TIMER < PULL_SPAN)
-	{
-		PULL_TIMER++;
-		if (PULL_SPAN <= PULL_TIMER)
-		{
-			PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
-			PULL_TIMER = 0;
-
-			auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
-			auto power = KuroFunc::GetRand(PULL_POWER_MIN, PULL_POWER_MAX);
-			ACCEL.x = cos(rad) * power * 1.6f;
-			ACCEL.y = sin(rad) * power;
-		}
+	// 慣性を更新。
+	if (0 < swingInertia) {
+		swingInertia -= swingInertia / 5.0f;
 	}
-	vel.x = KuroMath::Lerp(vel.x, OFFSET_VEL, 0.1f);
-	vel.y = KuroMath::Lerp(vel.y, 0.0f, 0.1f);
-	vel += ACCEL;
 
-	ACCEL = KuroMath::Lerp(ACCEL, { 0.0f,0.0f }, 0.8f);
+	// 振り回し直後の硬直のタイマーを更新。
+	if (0 < afterSwingDelay) --afterSwingDelay;
 
-	if (UsersInput::Instance()->Input(DIK_0)) {
-		vel.x = OFFSET_VEL * 5.0f;
+
+
+
+	// [振り回し中か振り回され中だったら] 更新処理を行わない。　　臨時の実装です。
+	bool isSwingNow = SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer;
+
+	// 硬直中は動かさない
+	if (0 < afterSwingDelay) {
+		// 何もしない。
+	}
+	else if (isSwingNow) {
+
+		// 振り回し中だったら。
+
+		pos = SwingMgr::Instance()->playerPos + SwingMgr::Instance()->easingNowVec * SwingMgr::Instance()->lineLength;
+
+		// ちょうど終わった瞬間の場合、慣性関係の変数を更新する。
+		if (1.0f <= SwingMgr::Instance()->easingTimer) {
+
+			swingInertiaVec = (pos - prevPos).GetNormal();
+			swingInertia = (prevPos - pos).Length();
+			afterSwingDelay = AFTER_SWING_DELAY;
+
+		}
+
+	}
+	else {
+
+		static const int PULL_SPAN_MIN = 30;
+		static const int PULL_SPAN_MAX = 70;
+		static int PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
+		static int PULL_TIMER = 0;
+		static Vec2<float>ACCEL = { 0.0f,0.0f };	//加速度
+		static const float PULL_POWER_MIN = 15.0f;
+		static const float PULL_POWER_MAX = 25.0f;
+
+		if (PULL_TIMER < PULL_SPAN)
+		{
+			PULL_TIMER++;
+			if (PULL_SPAN <= PULL_TIMER)
+			{
+				PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
+				PULL_TIMER = 0;
+
+				auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
+				auto power = KuroFunc::GetRand(PULL_POWER_MIN, PULL_POWER_MAX);
+				ACCEL.x = cos(rad) * power * 1.6f;
+				ACCEL.y = sin(rad) * power;
+			}
+		}
+		moveVel.x = KuroMath::Lerp(moveVel.x, OFFSET_VEL, 0.1f);
+		moveVel.y = KuroMath::Lerp(moveVel.y, 0.0f, 0.1f);
+		moveVel += ACCEL;
+
+		ACCEL = KuroMath::Lerp(ACCEL, { 0.0f,0.0f }, 0.8f);
+
+		if (UsersInput::Instance()->Input(DIK_0)) {
+			vel.x = OFFSET_VEL * 5.0f;
+		}
+
 	}
 
 	if (0 < stuckWindowTimer) --stuckWindowTimer;
+
+
+	// 移動量の総量を求める。
+
+	if (0 < afterSwingDelay) {
+
+		// 振り回し直後の硬直が残っている場合は、慣性のみを移動量とする。
+		vel = swingInertiaVec * swingInertia;
+
+	}
+	else {
+
+		vel = moveVel + swingInertiaVec * swingInertia;
+
+	}
 
 }
 
@@ -113,7 +169,6 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 	/*===== 当たり判定 =====*/
 
 	// ボスがマップチップと当たっているかのフラグ
-	bool isHitMapChipBoss = false;
 	INTERSECTED_LINE intersectedBuff = {};
 
 	// マップチップ目線でどこに当たったか
@@ -132,42 +187,31 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 	isHitLeft = intersectedLine == INTERSECTED_LEFT;
 	isHitBottom = intersectedLine == INTERSECTED_BOTTOM;
 
-	// 当たり判定を保存。
-	isHitMapChipBoss = intersectedLine != INTERSECTED_NONE;
-
 	// スケールを元にしたマップチップとの当たり判定を行う。
 	float offset = 1.0f;
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_TOP);
-	if (!isHitMapChipBoss && intersectedLine != INTERSECTED_NONE)isHitMapChipBoss = true;
 	if (!isHitTop && intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_TOP);
-	if (!isHitMapChipBoss && intersectedLine != INTERSECTED_NONE)isHitMapChipBoss = true;
 	if (!isHitTop && intersectedLine == INTERSECTED_TOP) isHitTop = true;
 
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_BOTTOM);
-	if (!isHitMapChipBoss && intersectedLine != INTERSECTED_NONE)isHitMapChipBoss = true;
 	if (!isHitBottom && intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_BOTTOM);
-	if (!isHitMapChipBoss && intersectedLine != INTERSECTED_NONE)isHitMapChipBoss = true;
 	if (!isHitBottom && intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
 
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_RIGHT);
-	if (!isHitMapChipBoss && intersectedLine != INTERSECTED_NONE)isHitMapChipBoss = true;
 	if (!isHitRight && intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_RIGHT);
-	if (!isHitMapChipBoss && intersectedLine != INTERSECTED_NONE)isHitMapChipBoss = true;
 	if (!isHitRight && intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
 
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_LEFT);
-	if (!isHitMapChipBoss && intersectedLine != INTERSECTED_NONE)isHitMapChipBoss = true;
 	if (!isHitLeft && intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_LEFT);
-	if (!isHitMapChipBoss && intersectedLine != INTERSECTED_NONE)isHitMapChipBoss = true;
 	if (!isHitLeft && intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
 
 
 	// マップチップと当たっていたら
-	if (isHitMapChipBoss) {
+	if (isHitTop || isHitRight || isHitLeft || isHitBottom) {
 
 		// マップチップと当たっている場所によって、引っかかっているかどうかを調べる。
 
@@ -244,6 +288,15 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 				intersectedBuff = INTERSECTED_LEFT;
 
 			}
+
+		}
+
+		// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
+		if (SwingMgr::Instance()->isSwingPlayer || OFFSET_INERTIA / 2.0f < afterSwingDelay) {
+
+			ShakeMgr::Instance()->SetShake(15);
+			SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
+			SwingMgr::Instance()->isSwingPlayer = false;
 
 		}
 

@@ -1426,7 +1426,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 	if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
 
 	// RTが押されたら
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::RT)) {
+	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RT)) {
 
 		// 振り回しの処理
 
@@ -1436,6 +1436,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 			// 振り回しの開始ベクトルを取得。
 			SwingMgr::Instance()->easingStartVec = bossPos - centerPos;
 			SwingMgr::Instance()->easingStartVec.Normalize();
+			SwingMgr::Instance()->easingNowVec = SwingMgr::Instance()->easingStartVec;
 
 			// 振り回しの終了ベクトルを取得。
 			SwingMgr::Instance()->easingEndVec = (bossPos - centerPos) * Vec2<float>(1.0f, -1.0f);
@@ -1443,6 +1444,11 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 
 			// 振り回しフラグを有効化する。
 			SwingMgr::Instance()->isSwingPlayer = true;
+
+			// 各タイマーを初期化。
+			SwingMgr::Instance()->easingTimer = 0;
+			SwingMgr::Instance()->easeAmount = 0;
+			SwingMgr::Instance()->easeChangeAmountY = SwingMgr::Instance()->easingEndVec.y - SwingMgr::Instance()->easingStartVec.y;
 
 		}
 
@@ -1529,7 +1535,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 		}
 
 	}
-	else {
+	if (!UsersInput::Instance()->Input(XBOX_BUTTON::RT)) {
 
 		// 振り回しフラグを折る。
 		SwingMgr::Instance()->isSwingPlayer = false;
