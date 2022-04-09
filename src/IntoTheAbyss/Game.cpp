@@ -1042,7 +1042,7 @@ void Game::Update()
 
 	if (UsersInput::Instance()->OnTrigger(DIK_J))
 	{
-		ScoreManager::Instance()->Add(100);
+		ScoreManager::Instance()->Add(10000);
 	}
 	if (UsersInput::Instance()->OnTrigger(DIK_K))
 	{
@@ -1552,6 +1552,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	}
 
 	GameTimer::Instance()->Draw();
+	ScoreManager::Instance()->Draw();
 
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
