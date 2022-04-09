@@ -95,6 +95,12 @@ public:
 
 	int shotSE;
 
+	// 振り回し関係の変数
+	bool isSwing;			// 振り回しするかのフラグ
+	float swingAngle;		// 振り回す角度
+
+
+
 public:
 
 	/*-- 定数 --*/
@@ -154,7 +160,7 @@ public:
 	void Init(const Vec2<float>& INIT_POS);
 
 	// 更新処理
-	void Update(const vector<vector<int>> mapData);
+	void Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos);
 
 	// 描画処理
 	void Draw(LightManager& LigManager);
@@ -177,7 +183,7 @@ private:
 	/*-- クラス内で使用する関数 --*/
 
 	// 入力処理
-	void Input(const vector<vector<int>> mapData);
+	void Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos);
 
 	// 移動処理
 	void Move();
