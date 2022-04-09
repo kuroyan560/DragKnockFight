@@ -24,7 +24,7 @@
 #include"Camera.h"
 #include"GameTimer.h"
 #include"ScoreManager.h"
-
+#include"FaceIcon.h"
 
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
@@ -172,6 +172,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	int roomNum = ROOM_NUM;
 
 	SuperiorityGauge::Instance()->Init();
+
+	FaceIcon::Instance()->Init();
 
 	//ドアが繋がっているか確認
 	if (!SelectStage::Instance()->resetStageFlag)
@@ -1593,6 +1595,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	SuperiorityGauge::Instance()->Draw();
 
 	miniMap.Draw();
+
+	FaceIcon::Instance()->Draw();
 
 	if (sceneBlackFlag || sceneLightFlag)
 	{
