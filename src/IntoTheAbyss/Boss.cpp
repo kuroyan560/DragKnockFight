@@ -61,6 +61,12 @@ void Boss::Update()
 	// 前フレームの座標を保存
 	prevPos = pos;
 
+	if (Camera::Instance()->Active())
+	{
+		moveVel = { 0,0 };
+		return;
+	}
+
 	// 慣性を更新。
 	if (0 < swingInertia) {
 		swingInertia -= swingInertia / 5.0f;
@@ -104,19 +110,6 @@ void Boss::Update()
 		static Vec2<float>ACCEL = { 0.0f,0.0f };	//加速度
 		static const float PULL_POWER_MIN = 15.0f;
 		static const float PULL_POWER_MAX = 25.0f;
-	if (Camera::Instance()->Active())
-	{
-		vel = { 0,0 };
-		return;
-	}
-
-	static const int PULL_SPAN_MIN = 30;
-	static const int PULL_SPAN_MAX = 70;
-	static int PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
-	static int PULL_TIMER = 0;
-	static Vec2<float>ACCEL = { 0.0f,0.0f };	//加速度
-	static const float PULL_POWER_MIN = 15.0f;
-	static const float PULL_POWER_MAX = 25.0f;
 
 		if (PULL_TIMER < PULL_SPAN)
 		{
