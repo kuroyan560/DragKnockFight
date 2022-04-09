@@ -14,12 +14,14 @@ MiniMap::MiniMap()
 
 void MiniMap::CalucurateCurrentPos(const Vec2<float> &POS)
 {
-	nowValue = POS.x / maxValue;
+	nowValue = (POS.x - leftWall) / (maxValue - rightWall);
 }
 
 void MiniMap::Init(const float &MAX_VALUE)
 {
 	maxValue = MAX_VALUE;
+	leftWall = 200.0f;
+	rightWall = 200.0f;
 }
 
 void MiniMap::Update()
@@ -36,7 +38,7 @@ void MiniMap::Update()
 		nowValue = massDivX;
 	}
 
-	nowPos.x = 0.0f + nowValue * 1185.0f;
+	nowPos.x = 85.0f + nowValue * 1110.0f;
 	nowPos.y = 10.0f;
 }
 

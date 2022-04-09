@@ -1,21 +1,21 @@
 #include "ScrollManager.h"
 #include"Camera.h"
 
-void ScrollManager::Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE)
+void ScrollManager::Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, const Vec2<float> &ADJ)
 {
 	mapSize = MAP_MAX_SIZE;
-
-	Vec2<float>startPos = CaluStartScrollLine(Vec2<float>(1280 / 2.0f, 720 / 2.0f));
-	Vec2<float>endPos = CaluEndScrollLine(Vec2<float>(1280 / 2.0f, 720 / 2.0f));
-	honraiScrollAmount = endPos - POS;
+	adjLine = ADJ;
+	Vec2<float>startPos = CaluStartScrollLine(Vec2<float>(1280 / 2.0f, 720 / 2.0f - adjLine.y));
+	Vec2<float>endPos = CaluEndScrollLine(Vec2<float>(1280 / 2.0f, 720 / 2.0f + adjLine.y));
+	honraiScrollAmount = (endPos - POS);
 	scrollAmount = honraiScrollAmount;
 	initFlag = true;
 }
 
 void ScrollManager::Update()
 {
-	scrollAmount.x += ((honraiScrollAmount.x - scrollAmount.x) - Camera::Instance()->scrollAffect.x) / 5.0f;
-	scrollAmount.y += ((honraiScrollAmount.y - scrollAmount.y) - Camera::Instance()->scrollAffect.y) / 5.0f;
+	scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x - Camera::Instance()->scrollAffect.x) / 5.0f;
+	scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y - Camera::Instance()->scrollAffect.y) / 5.0f;
 }
 
 void ScrollManager::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS)
@@ -55,7 +55,7 @@ void ScrollManager::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &
 		honraiScrollAmount.y = scrollMinValue.y;
 	}
 
-	const bool getMaxVelFlag = endPos.y <= PLAYER_POS.y;
+	const bool getMaxVelFlag = endPos.y - adjLine.y <= PLAYER_POS.y;
 	if (getMaxVelFlag)
 	{
 		honraiScrollAmount.y = scrollMaxValue.y;

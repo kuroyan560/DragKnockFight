@@ -18,8 +18,12 @@ private:
 		nowPos;
 	float maxValue;
 	float nowValue;
+	float keep;
 
 	int lineHandle;
 	int nowPosHandle;
+
+	int leftWall;
+	int rightWall;
 };
 

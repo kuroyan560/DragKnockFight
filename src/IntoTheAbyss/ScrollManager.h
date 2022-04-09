@@ -12,7 +12,7 @@ class ScrollManager : public Singleton<ScrollManager>
 public:
 	ScrollManager() :zoom(1.0f)
 	{};
-	void Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE);
+	void Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, const Vec2<float>&ADJ);
 	void Update();
 	void CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS);
 	Vec2<float>Affect(const Vec2<float> &Pos);//スクロールとズームを適用させる
@@ -25,7 +25,7 @@ public:
 private:
 
 
-
+	Vec2<float>adjLine;
 	Vec2<float> mapSize;
 	bool initFlag;
 

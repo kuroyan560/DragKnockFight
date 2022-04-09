@@ -470,8 +470,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		enemyHomeBase->Init(enemyLeftUpPos - chipPos, enemyRightDownPos + chipPos);
 
 		{
-			float data = ((mapData[0].size() - 1) * MAP_CHIP_SIZE) - 300.0f;
-			miniMap.Init(data);
+			float size = (mapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
+			miniMap.Init(size);
 		}
 
 
@@ -487,12 +487,15 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	}
 
 
-	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) / 2.0f, (mapData.size() * MAP_CHIP_SIZE) / 2.0f);
+	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) * 0.5f, (mapData.size() * MAP_CHIP_SIZE) * 0.5f);
+	responePos -= 100;
+
 	lineCenterPos = responePos;
 	player.Init(responePos - Vec2<float>(300.0f, 0.0f));
 	//ボスを生成
 	boss.Generate(responePos + Vec2<float>(300.0f, 0.0f));
 
+	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	Camera::Instance()->Init();
 
@@ -509,7 +512,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 
 
 
-	ScrollManager::Instance()->Init(lineCenterPos, Vec2<float>(mapData[0].size() *MAP_CHIP_SIZE, mapData.size() *MAP_CHIP_SIZE));
+	ScrollManager::Instance()->Init(lineCenterPos + cameraBasePos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
 
 
 	GameTimer::Instance()->Init({}, 120, {}, {});
@@ -562,6 +565,8 @@ Game::Game()
 	playerHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
 	enemyHomeBase->Init({ 0.0f,0.0f }, { 800.0f,1000.0f });
 	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
+
+	cameraBasePos = { 0.0f,100.0f };
 }
 
 void Game::Init()
@@ -958,7 +963,7 @@ void Game::Update()
 	}
 
 	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag)
+	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag&&false)
 	{
 		//プレイヤー勝利
 		++countRound;
@@ -1070,7 +1075,7 @@ void Game::Update()
 	}
 	firstLoadFlag = true;
 
-	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos,lineCenterPos);
+	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
 
 
 
@@ -1581,7 +1586,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(bossDefLength + bossPlayerDir * lineLengthBoss), 
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(bossDefLength + bossPlayerDir * lineLengthBoss),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 
 		// 線分の中心に円を描画
