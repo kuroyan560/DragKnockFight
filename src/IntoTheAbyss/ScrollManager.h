@@ -7,27 +7,26 @@
 #include"Camera.h"
 #include"KuroMath.h"
 
-class ScrollManager : public Singleton<ScrollMgr>
+class ScrollManager : public Singleton<ScrollManager>
 {
 public:
-
+	ScrollManager() :zoom(1.0f)
+	{};
 	void Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE);
 	void Update();
-	void CalucurateScroll(const Vec2<float> &VEL);
+	void CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS);
 	Vec2<float>Affect(const Vec2<float> &Pos);//スクロールとズームを適用させる
 
 	void Warp(const Vec2<float> POS);
 
-private:
-	ScrollManager() :zoom(1.0f)
-	{};
-
-
 	Vec2<float> honraiScrollAmount;	//本来スクロール量
 	Vec2<float> scrollAmount;		//スクロール量
-	Vec2<float> mapSize;
 	float zoom;						//ズーム倍率
+private:
 
+
+
+	Vec2<float> mapSize;
 	bool initFlag;
 
 	Vec2<float> CaluStartScrollLine(const Vec2<float> &SIZE)

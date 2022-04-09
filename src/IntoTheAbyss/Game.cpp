@@ -60,7 +60,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	std::map<int, std::vector<ChipData>>datas;
 
 	// 描画するチップのサイズ
-	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
+	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollManager::Instance()->zoom;
 	SizeData eventChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
 	SizeData wallChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 	SizeData doorChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
@@ -84,7 +84,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 			if (blockFlag || doorFlag || eventFlag || thownFlag)
 			{
 				// スクロール量から描画する位置を求める。
-				const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE });
+				const Vec2<float> drawPos = ScrollManager::Instance()->Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE });
 
 				// 画面外だったら描画しない。
 				if (drawPos.x < -DRAW_MAP_CHIP_SIZE || drawPos.x > WinApp::Instance()->GetWinSize().x + DRAW_MAP_CHIP_SIZE) continue;
@@ -506,6 +506,10 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 	ScrollMgr::Instance()->WarpScroll(lineCenterPos);
 	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+
+
+
+	ScrollManager::Instance()->Init(lineCenterPos, Vec2<float>(mapData[0].size() *MAP_CHIP_SIZE, mapData.size() *MAP_CHIP_SIZE));
 
 
 	GameTimer::Instance()->Init({}, 120, {}, {});
@@ -1027,6 +1031,7 @@ void Game::Update()
 
 	miniMap.Update();
 
+
 	GameTimer::Instance()->Update();
 	ScoreManager::Instance()->Update();
 
@@ -1065,8 +1070,13 @@ void Game::Update()
 	}
 	firstLoadFlag = true;
 
+	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos,lineCenterPos);
+
+
+
 	// スクロール量の更新処理
-	ScrollMgr::Instance()->Update();
+	ScrollManager::Instance()->Update();
+	//ScrollMgr::Instance()->Update();
 
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();

@@ -1,6 +1,8 @@
 #pragma once
 #include"Vec.h"
 #include"Singleton.h"
+#include"ScrollManager.h"
+
 class Camera : public Singleton<Camera>
 {
 	friend class Singleton<Camera>;

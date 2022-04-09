@@ -21,6 +21,7 @@
 #include"DebugParameter.h"
 #include"GUI.h"
 #include"SuperiorityGauge.h"
+#include"ScrollManager.h"
 
 #include"AudioApp.h"
 
@@ -340,16 +341,16 @@ void Player::Draw(LightManager& LigManager)
 	//ストレッチ加算
 	//leftUp += stretch_LU;
 	//rightBottom += stretch_RB;
-	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(centerPos);
+	const Vec2<float>drawPos = ScrollManager::Instance()->Affect(centerPos);
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE, 0.0f, bodyTex);
+	DrawFunc::DrawRotaGraph2D(drawPos, expRateBody * ScrollManager::Instance()->zoom * EXT_RATE, 0.0f, bodyTex);
 
 	//テレポート時のフラッシュ
 	Color teleFlashCol;
 	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
-	DrawFunc_Color::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
+	DrawFunc_Color::DrawRotaGraph2D(drawPos, expRateBody * ScrollManager::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
@@ -942,7 +943,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		float disntaceY = fabs(lineCenterPos.y - centerPos.y);
 
 		// ウィンドウ左右
-		if (windowSize.x <= centerPos.x + PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x || centerPos.x - PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
+		if (windowSize.x <= centerPos.x + PLAYER_HIT_SIZE.x - ScrollManager::Instance()->scrollAmount.x || centerPos.x - PLAYER_HIT_SIZE.x - ScrollManager::Instance()->scrollAmount.x <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
 			ShakeMgr::Instance()->SetShake(20);
@@ -950,7 +951,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 
 		}
 		// ウィンドウ上下
-		if (windowSize.y <= centerPos.y + PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y || centerPos.y - PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
+		if (windowSize.y <= centerPos.y + PLAYER_HIT_SIZE.y - ScrollManager::Instance()->scrollAmount.y || centerPos.y - PLAYER_HIT_SIZE.y - ScrollManager::Instance()->scrollAmount.y <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
 			ShakeMgr::Instance()->SetShake(20);
