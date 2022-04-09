@@ -3,15 +3,17 @@
 #include "Singleton.h"
 #include<vector>
 #include<array>
-
+#include"ShakeMgr.h"
+#include"Camera.h"
+#include"KuroMath.h"
 
 class ScrollMgr : public Singleton<ScrollMgr> {
 
 public:
 	/*===== メンバ変数 =====*/
-	Vec2<float> scrollAmount;		//スクロール量
 	Vec2<float> honraiScrollAmount;
 
+	Vec2<float> scrollAmount;		//スクロール量
 	float zoom;			// カメラのズーム量
 
 	const std::vector<std::vector<int>> *mapChipPtr;//マップチップ情報のポインタ
@@ -43,22 +45,7 @@ public:
 		oldHitData[3] = true;
 	};
 
-	inline void Update()
-	{
-		if (!stopScrollData[0])
-		{
-			//スクロール計算
-			scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x) / 5.0f;
-			scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y) / 5.0f;
-		}
-
-
-		//毎フレーム、スクロールの停止命令を下ろす
-		for (int i = 0; i < stopScrollData.size(); ++i)
-		{
-			stopScrollData[i] = false;
-		}
-	};
+	void Update();
 
 
 	void DetectMapChipForScroll(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE = Vec2<float>(1280 / 2.0f, 720 / 2.0f));
@@ -103,4 +90,12 @@ public:
 	};
 
 	void StopScroll(const int &DIR);
+
+	Vec2<float>Affect(const Vec2<float>&Pos)	//スクロールとズームを適用させる
+	{
+		Vec2<float> scrollShakeZoom = scrollAmount + ShakeMgr::Instance()->shakeAmount;
+		scrollShakeZoom.x *= zoom;
+		scrollShakeZoom.y *= zoom;
+		return Pos * zoom - scrollShakeZoom;
+	}
 };

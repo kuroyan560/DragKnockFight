@@ -50,5 +50,5 @@ class AfterImg
 public:
 	AfterImg();
 	void EmitArray(const Vec2<float>& From, const Vec2<float>& To, const int& GraphHandle, const Vec2<float>& GraphSize, const Vec2<bool>& Miror);
-	void Draw(const float& ExtRate, const Vec2<float>& Scroll);
+	void Draw();
 };

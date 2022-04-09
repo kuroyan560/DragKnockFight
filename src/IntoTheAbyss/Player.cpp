@@ -322,40 +322,34 @@ void Player::Draw(LightManager& LigManager)
 
 	/*===== 描画処理 =====*/
 
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-
 	// プレイヤーの描画処理
 	//Vec2<float>leftUp = { centerPos.x * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 	//	centerPos.y * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
 	//Vec2<float>rightBottom = { centerPos.x * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 	//	centerPos.y * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	const Vec2<float> expRate = { EXT_RATE * ScrollMgr::Instance()->zoom, EXT_RATE * ScrollMgr::Instance()->zoom };
-
 	//残像描画
-	afImg.Draw(ScrollMgr::Instance()->zoom, scrollShakeZoom);
+	afImg.Draw();
 
 	//muffler.Draw(LigManager);
 
 	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_L.png");
 	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_R.png");
-	rHand->Draw(LigManager, expRate, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
-	lHand->Draw(LigManager, expRate, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
+	rHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
+	lHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 
 	//ストレッチ加算
 	//leftUp += stretch_LU;
 	//rightBottom += stretch_RB;
-
+	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(centerPos);
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
-	const Vec2<float> expRateBody = expRate * ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex);
+	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
+	DrawFunc::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE, 0.0f, bodyTex);
 
 	//テレポート時のフラッシュ
 	Color teleFlashCol;
 	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
-	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
+	DrawFunc_Color::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
@@ -1144,15 +1138,7 @@ void Player::StopDoorUpDown()
 {
 	doorMoveUpDownFlag = true;
 }
-
-Vec2<float> Player::GetCenterDrawPos()
-{
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-	return centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
-}
-
+ 
 void Player::Input(const vector<vector<int>> mapData)
 {
 	/*===== 入力処理 =====*/

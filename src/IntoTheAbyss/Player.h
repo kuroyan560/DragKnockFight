@@ -173,9 +173,6 @@ public:
 	void StopDoorUpDown();
 	bool drawCursorFlag;
 
-	//スクロールなどにも考慮した中心座標
-	Vec2<float> GetCenterDrawPos();
-
 private:
 	/*-- クラス内で使用する関数 --*/
 

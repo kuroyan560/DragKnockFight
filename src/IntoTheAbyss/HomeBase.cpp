@@ -36,12 +36,8 @@ bool HomeBase::Collision(const Square &OBJ_A)
 
 void HomeBase::Draw()
 {
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-
-	Vec2<float>drawLeftUpPos = leftUpPos - scrollShakeZoom;
-	Vec2<float>drawRightDownPos = rightDownPos - scrollShakeZoom;
+	Vec2<float>drawLeftUpPos = ScrollMgr::Instance()->Affect(leftUpPos);
+	Vec2<float>drawRightDownPos = ScrollMgr::Instance()->Affect(rightDownPos);
 	DrawFunc::DrawBox2D(drawLeftUpPos, drawRightDownPos, Color(255, 255, 255, 255), DXGI_FORMAT_R8G8B8A8_UNORM);
 }
 
