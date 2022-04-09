@@ -6,6 +6,8 @@
 #include"IntoTheAbyss/SelectStage.h"
 #include"IntoTheAbyss/DebugParameter.h"
 #include"IntoTheAbyss/SuperiorityGauge.h"
+#include"IntoTheAbyss/GameTimer.h"
+#include"IntoTheAbyss/ScoreManager.h"
 
 GameScene::GameScene()
 {
@@ -133,6 +135,9 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("RoundNum%d", game.countRound);
 	ImGui::Text("PlayerWin:%d,EnemyWin:%d", game.countPlayerWin, game.countEnemyWin);
 	ImGui::End();
+
+	GameTimer::Instance()->Debug();
+	ScoreManager::Instance()->Debug();
 }
 
 void GameScene::OnFinalize()

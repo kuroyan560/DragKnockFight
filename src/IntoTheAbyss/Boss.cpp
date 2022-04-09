@@ -74,9 +74,9 @@ void Boss::Update()
 			ACCEL.y = sin(rad) * power;
 		}
 	}
-	vel.x = KuroMath::Lerp(vel.x, OFFSET_VEL, 0.1f);
-	vel.y = KuroMath::Lerp(vel.y, 0.0f, 0.1f);
-	vel += ACCEL;
+	//vel.x = KuroMath::Lerp(vel.x, OFFSET_VEL, 0.1f);
+	//vel.y = KuroMath::Lerp(vel.y, 0.0f, 0.1f);
+	//vel += ACCEL;
 
 	ACCEL = KuroMath::Lerp(ACCEL, { 0.0f,0.0f }, 0.8f);
 

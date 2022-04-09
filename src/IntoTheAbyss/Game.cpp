@@ -21,6 +21,9 @@
 #include"GUI.h"
 
 #include"SuperiorityGauge.h"
+#include"GameTimer.h"
+#include"ScoreManager.h"
+
 
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
@@ -212,9 +215,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 
 	mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
-
-
-
 
 	// シェイク量を設定。
 	ShakeMgr::Instance()->Init();
@@ -474,8 +474,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		}
 
 
-		// ボスを生成
-		boss.Generate(player.centerPos + Vec2<float>(100, 0));
 		lineLengthPlayer = LINE_LENGTH;
 		lineLengthBoss = LINE_LENGTH;
 		addLineLengthPlayer = 0;
@@ -488,18 +486,23 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	}
 
 
-	{
-		Vec2<float> bossDir = boss.pos - player.centerPos;
-		bossDir.Normalize();
-		float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
-		lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
-	}
+	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) / 2.0f, (mapData.size() * MAP_CHIP_SIZE) / 2.0f);
+	lineCenterPos = responePos;
+	player.Init(responePos - Vec2<float>(300.0f, 0.0f));
+	//ボスを生成
+	boss.Generate(responePos + Vec2<float>(300.0f, 0.0f));
+
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 	ScrollMgr::Instance()->WarpScroll(lineCenterPos);
 	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 
 
+	GameTimer::Instance()->Init({}, 120, {}, {});
+	GameTimer::Instance()->Start();
+
+
+	ScoreManager::Instance()->Init();
 	firstLoadFlag = false;
 }
 
@@ -1010,6 +1013,10 @@ void Game::Update()
 
 	miniMap.Update();
 
+	GameTimer::Instance()->Update();
+	ScoreManager::Instance()->Update();
+
+
 	//if (Input::isKey(KEY_INPUT_RIGHT)) player.centerPos.x += 1.0f;
 	if (UsersInput::Instance()->Input(DIK_RIGHT)) player.centerPos.x += 1.0f;
 	//if (Input::isKey(KEY_INPUT_P)) player.centerPos.x += 100.0f;
@@ -1018,6 +1025,18 @@ void Game::Update()
 	if (UsersInput::Instance()->Input(DIK_LEFT)) player.centerPos.x -= 1.0f;
 	//if (Input::isKey(KEY_INPUT_O)) player.centerPos.x -= 100.0f;
 	if (UsersInput::Instance()->OnTrigger(DIK_O)) player.centerPos.x -= 100.0f;
+
+
+	if (UsersInput::Instance()->OnTrigger(DIK_J))
+	{
+		ScoreManager::Instance()->Add(100);
+	}
+	if (UsersInput::Instance()->OnTrigger(DIK_K))
+	{
+		ScoreManager::Instance()->Sub(100);
+	}
+
+
 
 	// ボスの更新処理
 	boss.Update();
@@ -1501,6 +1520,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		noMovementEnemy[index].Draw();
 
 	}
+
+	GameTimer::Instance()->Draw();
 
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
