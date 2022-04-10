@@ -566,7 +566,7 @@ Game::Game()
 	enemyHomeBase->Init({ 0.0f,0.0f }, { 800.0f,1000.0f });
 	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
 
-	cameraBasePos = { 0.0f,100.0f };
+	cameraBasePos = { 0.0f,-40.0f };
 }
 
 void Game::Init()
