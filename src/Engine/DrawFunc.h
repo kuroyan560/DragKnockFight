@@ -90,7 +90,7 @@ public:
 	/// <param name="LeftUpPos">矩形の左上座標</param>
 	/// <param name="Tex">テクスチャ</param>
 	/// <param name="BlendMode">ブレンドモード</param>
-	static void DrawGraph(const Vec2<float>& LeftUpPos, const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode = AlphaBlendMode_None);
+	static void DrawGraph(const Vec2<float>& LeftUpPos, const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode = AlphaBlendMode_None, const Vec2<bool>& Miror = { false,false });
 
 	/// <summary>
 	/// 拡大縮小描画

@@ -104,21 +104,16 @@ void MovingBlock::Draw(const int& graphHandle)
 
 	/*===== 描画処理 =====*/
 
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-
 	// ブロックを描画する。
 	//DrawExtendGraph(pos.x * ScrollMgr::Instance()->zoom - SCALE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 	//	pos.y * ScrollMgr::Instance()->zoom - SCALE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y,
 	//	pos.x * ScrollMgr::Instance()->zoom + SCALE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 	//	pos.y * ScrollMgr::Instance()->zoom + SCALE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y,
 	//	graphHandle, FALSE);
-
-	Vec2<float>leftUp = { pos.x * ScrollMgr::Instance()->zoom - SCALE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		pos.y * ScrollMgr::Instance()->zoom - SCALE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	Vec2<float>rightBottom = { pos.x * ScrollMgr::Instance()->zoom + SCALE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		pos.y * ScrollMgr::Instance()->zoom + SCALE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
+	Vec2<float>leftUp = { pos.x - SCALE,pos.y - SCALE };
+	leftUp = ScrollMgr::Instance()->Affect(leftUp);
+	Vec2<float>rightBottom = { pos.x + SCALE,pos.y + SCALE };
+	rightBottom = ScrollMgr::Instance()->Affect(rightBottom);
 
 	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(graphHandle));
 

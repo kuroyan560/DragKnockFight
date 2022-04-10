@@ -7,7 +7,7 @@ struct VSOutput
 {
     float4 leftUpPos : POSITION_L_U;
     float4 rightBottomPos : POSITION_R_B;
-    float4 paintColor : PAINT_COLOR;
+    float srcAlpha : SRC_ALPHA;
     int2 miror : MIROR;
     float2 leftUpPaintUV : PAINT_UV_L_U;
     float2 rightBottomPaintUV : PAINT_UV_R_B;
@@ -22,9 +22,9 @@ struct GSOutput
 {
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD;
-    float4 paintColor : PAINT_COLOR;
     float2 leftUpPaintUV : PAINT_UV_L_U;
     float2 rightBottomPaintUV : PAINT_UV_R_B;
+    float srcAlpha : SRC_ALPHA;
 };
 
 
@@ -37,9 +37,9 @@ void GSmain(
     float width = input[0].rightBottomPos.x - input[0].leftUpPos.x;
     
     GSOutput element;
-    element.paintColor = input[0].paintColor;
     element.leftUpPaintUV = input[0].leftUpPaintUV;
     element.rightBottomPaintUV = input[0].rightBottomPaintUV;
+    element.srcAlpha = input[0].srcAlpha;
         
     //ç∂â∫
     element.pos = input[0].rightBottomPos;
@@ -68,12 +68,13 @@ void GSmain(
     output.Append(element);
 }
 
-Texture2D<float4> tex : register(t0);
+Texture2D<float4> destTex : register(t0);
+Texture2D<float4> srcTex : register(t1);
 SamplerState smp : register(s0);
 
 float4 PSmain(GSOutput input) : SV_TARGET
 {
-    float4 texCol = tex.Sample(smp, input.uv);
+    float4 texCol = destTex.Sample(smp, input.uv);
     
     if (input.uv.x < input.leftUpPaintUV.x)
     {
@@ -92,7 +93,9 @@ float4 PSmain(GSOutput input) : SV_TARGET
         return texCol;
     }
     
-    return float4(input.paintColor.xyz, texCol.w * input.paintColor.w);
+    float4 srcCol = srcTex.Sample(smp, input.uv);
+    srcCol.w *= input.srcAlpha * texCol.w;
+    return srcCol;
 }
 
 float4 main(float4 pos : POSITION) : SV_POSITION

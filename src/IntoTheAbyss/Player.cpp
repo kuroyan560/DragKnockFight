@@ -6,7 +6,9 @@
 #include "MapChipCollider.h"
 #include "MovingBlockMgr.h"
 #include "MovingBlock.h"
+#include "SwingMgr.h"
 //#include "BulletParticleMgr.h"
+#include "StunEffect.h"
 #include "Collider.h"
 #include <cmath>
 
@@ -14,15 +16,15 @@
 #include"UsersInput.h"
 #include"DrawFunc.h"
 #include"DrawFunc_Shadow.h"
-#include"DrawFunc_Color.h"
+#include"DrawFunc_FillTex.h"
 #include"WinApp.h"
 #include "ParticleMgr.h"
 #include "EventCollider.h"
 #include"DebugParameter.h"
-#include"GUI.h"
 #include"SuperiorityGauge.h"
 
 #include"AudioApp.h"
+#include "SlowMgr.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -139,6 +141,9 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	areaHitBox.center = &centerPos;
 	areaHitBox.size = PLAYER_HIT_SIZE;
+
+	swingCoolTime = 0;
+
 }
 
 void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
@@ -310,6 +315,9 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPo
 	// ウィンドウに挟まれたタイマーを更新
 	if (0 < stuckWindowTimer) --stuckWindowTimer;
 
+	// 振り回しのクールタイムを更新
+	if (0 < swingCoolTime) --swingCoolTime;
+
 	//muffler.Update(centerPos);
 }
 
@@ -322,40 +330,34 @@ void Player::Draw(LightManager& LigManager)
 
 	/*===== 描画処理 =====*/
 
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-
 	// プレイヤーの描画処理
 	//Vec2<float>leftUp = { centerPos.x * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 	//	centerPos.y * ScrollMgr::Instance()->zoom - GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
 	//Vec2<float>rightBottom = { centerPos.x * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
 	//	centerPos.y * ScrollMgr::Instance()->zoom + GetPlayerGraphSize().y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	const Vec2<float> expRate = { EXT_RATE * ScrollMgr::Instance()->zoom, EXT_RATE * ScrollMgr::Instance()->zoom };
-
 	//残像描画
-	afImg.Draw(ScrollMgr::Instance()->zoom, scrollShakeZoom);
+	afImg.Draw();
 
 	//muffler.Draw(LigManager);
 
 	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_L.png");
 	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_R.png");
-	rHand->Draw(LigManager, expRate, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
-	lHand->Draw(LigManager, expRate, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
+	rHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
+	lHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 
 	//ストレッチ加算
 	//leftUp += stretch_LU;
 	//rightBottom += stretch_RB;
-
+	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(centerPos);
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
-	const Vec2<float> expRateBody = expRate * ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex);
+	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
+	DrawFunc::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE, 0.0f, bodyTex);
 
 	//テレポート時のフラッシュ
-	Color teleFlashCol;
-	teleFlashCol.Alpha() = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
-	DrawFunc_Color::DrawRotaGraph2D(GetCenterDrawPos(), expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, teleFlashCol);
+	static auto white = D3D12App::Instance()->GenerateTextureBuffer(Color());
+	const float flashAlpha = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, white, flashAlpha);
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
@@ -1145,14 +1147,6 @@ void Player::StopDoorUpDown()
 	doorMoveUpDownFlag = true;
 }
 
-Vec2<float> Player::GetCenterDrawPos()
-{
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-	return centerPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
-}
-
 void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
 {
 	/*===== 入力処理 =====*/
@@ -1163,6 +1157,9 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 	//	changeGravityTimer = 0;
 
 	//}
+
+	// スタン演出中だったら入力を受け付けない。
+	if (StunEffect::Instance()->isActive) return;
 
 	//同時ショット判定タイマー計測
 	if (isLeftFirstShotTimer < DOUJI_ALLOWANCE_FRAME)isLeftFirstShotTimer++;
@@ -1199,8 +1196,11 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 
 	}
 
+	// 振り回し中及び振り回され中かを判断
+	bool isSwingNow = SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer;
+
 	// LBが押されたら反動をつける。
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+	if (!isSwingNow && UsersInput::Instance()->Input(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
 
 		// 反動をつける。
 		float rHandAngle = lHand->GetAngle();
@@ -1297,7 +1297,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 	}
 
 	// RBが押されたら反動をつける。
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+	if (!isSwingNow && UsersInput::Instance()->Input(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
 
 		// 反動をつける。
 		float lHandAngle = rHand->GetAngle();
@@ -1422,20 +1422,34 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 	if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
 
 	// RTが押されたら
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RT)) {
+	if (swingCoolTime <= 0 && UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RT)) {
 
 		// 振り回しの処理
 
 		// 振り回しのトリガー判定
-		if (!isSwing) {
+		if (!SwingMgr::Instance()->isSwingPlayer) {
 
-			// 角度を求める。
-			swingAngle = atan2(bossPos.y - centerPos.y, bossPos.x - centerPos.x);
+			// 振り回しの開始ベクトルを取得。
+			SwingMgr::Instance()->easingStartVec = bossPos - centerPos;
+			SwingMgr::Instance()->easingStartVec.Normalize();
+			SwingMgr::Instance()->easingNowVec = SwingMgr::Instance()->easingStartVec;
+
+			// 振り回しの終了ベクトルを取得。
+			SwingMgr::Instance()->easingEndVec = (bossPos - centerPos) * Vec2<float>(1.0f, -1.0f);
+			SwingMgr::Instance()->easingEndVec.Normalize();
+
+			// 振り回しフラグを有効化する。
+			SwingMgr::Instance()->isSwingPlayer = true;
+
+			// 各タイマーを初期化。
+			SwingMgr::Instance()->easingTimer = 0;
+			SwingMgr::Instance()->easeAmount = 0;
+			SwingMgr::Instance()->easeChangeAmountY = SwingMgr::Instance()->easingEndVec.y - SwingMgr::Instance()->easingStartVec.y;
+
+			// クールタイムを設定。
+			swingCoolTime = SWING_COOLTIME;
 
 		}
-
-		// 振り回しフラグを有効化する。
-		isSwing = true;
 
 
 
@@ -1520,10 +1534,10 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 		}
 
 	}
-	else {
+	if (!UsersInput::Instance()->Input(XBOX_BUTTON::RT)) {
 
 		// 振り回しフラグを折る。
-		isSwing = false;
+		SwingMgr::Instance()->isSwingPlayer = false;
 
 	}
 
@@ -1851,7 +1865,7 @@ void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector
 	Vec2<float> moveDir = prevFrameCenterPos - centerPos;
 	moveDir.Normalize();
 	//intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, vel + gimmickVel, Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y), onGround, mapData);
-	//intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+	intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
 
 
 	// 差分(押し戻された値を座標から引く)

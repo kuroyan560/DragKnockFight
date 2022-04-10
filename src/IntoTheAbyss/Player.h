@@ -95,10 +95,6 @@ public:
 
 	int shotSE;
 
-	// 振り回し関係の変数
-	bool isSwing;			// 振り回しするかのフラグ
-	float swingAngle;		// 振り回す角度
-
 
 
 public:
@@ -134,6 +130,10 @@ public:
 
 	// 入力されてから数フレームを取得するためのタイマーのでフォルチ値
 	const int AS_SOON_AS_INPUT_TIMER = 2;
+
+	// 振り回しのクールタイム
+	int swingCoolTime;
+	const int SWING_COOLTIME = 60;
 
 	// プレイヤーの方向
 	enum PLAYER_DIR {
@@ -178,9 +178,6 @@ public:
 	void StopDoorLeftRight();
 	void StopDoorUpDown();
 	bool drawCursorFlag;
-
-	//スクロールなどにも考慮した中心座標
-	Vec2<float> GetCenterDrawPos();
 
 private:
 	/*-- クラス内で使用する関数 --*/

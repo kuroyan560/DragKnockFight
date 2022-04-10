@@ -14,9 +14,10 @@ private:
 	{
 		float gaugeValue;		//ゲージの値
 		float gaugeDivValue;	//ゲージの割合
+		bool prevOverGaugeFlag;	//1F前の振り切った判定
 		bool overGaugeFlag;		//振り切った判定
 
-		GaugeData() :gaugeValue(0.0f), gaugeDivValue(0.0f), overGaugeFlag(false)
+		GaugeData() :gaugeValue(0.0f), gaugeDivValue(0.0f), overGaugeFlag(false), prevOverGaugeFlag(false)
 		{
 		};
 	};
@@ -69,7 +70,8 @@ private:
 	Vec2<float>gaguePos;
 	Vec2<float>gagueVarPos;
 	int gaugeGraphHandle;
-	int gaugeVarGraphHandle;
+	int gaugeVarGraphPlayer;
+	int gaugeVarGraphEnemy;
 
 	void LimitGauge();
 	//デバック用

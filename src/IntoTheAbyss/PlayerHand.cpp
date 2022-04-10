@@ -102,33 +102,25 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 
 #include"DrawFunc.h"
 #include"DrawFunc_Shadow.h"
-void PlayerHand::Draw(LightManager& LigManager, const Vec2<float>& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool& DRAW_CURSOR)
+void PlayerHand::Draw(LightManager& LigManager, const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool& DRAW_CURSOR)
 {
 	/*-- ï`âÊèàóù --*/
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
+	afterImg.Draw();
 
-	afterImg.Draw(ScrollMgr::Instance()->zoom, scrollShakeZoom);
-
-
-	DrawFunc::DrawRotaGraph2D(GetCenterDrawPos(), ExtRate * ScrollMgr::Instance()->zoom, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle));
+	Vec2<float>ext = { ScrollMgr::Instance()->zoom * ExtRate ,ScrollMgr::Instance()->zoom * ExtRate };
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos), ext, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle));
 
 	// ÉrÅ[ÉRÉìÇï`âÊ
 	if (teleportPike.isActive) teleportPike.Draw();
 	if (timeStopPike.isActive) timeStopPike.Draw();
 
-	Vec2<float>leftUp = { sightPos.x * ScrollMgr::Instance()->zoom - SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		sightPos.y * ScrollMgr::Instance()->zoom - SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-	Vec2<float>rightBottom = { sightPos.x * ScrollMgr::Instance()->zoom + SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.x,
-		sightPos.y * ScrollMgr::Instance()->zoom + SIGHT_SIZE * ScrollMgr::Instance()->zoom - scrollShakeZoom.y };
-
 	//è∆èÄÇï`âÊ
 	if (DRAW_CURSOR)
 	{
+		const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(sightPos);
 		//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
-		DrawFunc::DrawRotaGraph2D(sightPos - scrollShakeZoom, ExtRate * ScrollMgr::Instance()->zoom, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
-		ptLight.SetPos(Vec3<float>(sightPos - scrollShakeZoom, -1.0f));
+		DrawFunc::DrawRotaGraph2D(drawPos, ext, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
+		ptLight.SetPos(Vec3<float>(drawPos, -1.0f));
 	}
 
 }
@@ -209,15 +201,6 @@ Vec2<float> PlayerHand::CalIntersectPoint(Vec2<float> posA1, Vec2<float> posA2, 
 void PlayerHand::EmitAfterImg(const Vec2<float>& TeleAmount, const int& GraphHandle, const Vec2<float>& GraphSize, const Vec2<bool>& Miror)
 {
 	afterImg.EmitArray(drawPos, drawPos + TeleAmount, GraphHandle, GraphSize, Miror);
-}
-
-Vec2<float> PlayerHand::GetCenterDrawPos()
-{
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-
-	return drawPos * ScrollMgr::Instance()->zoom - scrollShakeZoom;
 }
 
 void PlayerHand::CheckShortestPoint(const vector<vector<int>>& mapData)

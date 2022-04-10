@@ -6,7 +6,7 @@
 #include"Color.h"
 #include"DrawFunc.h"
 #include"DrawFunc_Shadow.h"
-#include"DrawFunc_Color.h"
+#include"DrawFunc_FillTex.h"
 #include"TitleScene.h"
 #include"StageSelectScene.h"
 
@@ -59,7 +59,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		DrawFunc::CountReset();
 		DrawFunc_Shadow::CountReset();
-		DrawFunc_Color::CountReset();
+		DrawFunc_FillTex::CountReset();
 
 		//メッセージがある？
 		MSG msg{};

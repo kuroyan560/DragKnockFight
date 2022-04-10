@@ -1,7 +1,7 @@
 #include "SuperiorityGauge.h"
 #include<math.h>
 #include"Engine/ImguiApp.h"
-#include"../Engine/DrawFunc_Color.h"
+#include"../Engine/DrawFunc_FillTex.h"
 #include"../Engine/DrawFunc.h"
 #include"TexHandleMgr.h"
 
@@ -13,10 +13,11 @@ SuperiorityGauge::SuperiorityGauge()
 	playerGaugeData = std::make_unique<GaugeData>();
 	enemyGaugeData = std::make_unique<GaugeData>();
 	gaugeGraphHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_flame.png");
-	gaugeVarGraphHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge.png");
+	gaugeVarGraphPlayer = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_player.png");
+	gaugeVarGraphEnemy = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_enemy.png");
 }
 
-void SuperiorityGauge::AddPlayerGauge(const float &VALUE)
+void SuperiorityGauge::AddPlayerGauge(const float& VALUE)
 {
 	float value = fabs(VALUE);
 	playerGaugeData->gaugeValue += value;
@@ -25,7 +26,7 @@ void SuperiorityGauge::AddPlayerGauge(const float &VALUE)
 	LimitGauge();
 }
 
-void SuperiorityGauge::AddEnemyGauge(const float &VALUE)
+void SuperiorityGauge::AddEnemyGauge(const float& VALUE)
 {
 	float value = fabs(VALUE);
 	playerGaugeData->gaugeValue += -value;
@@ -34,17 +35,17 @@ void SuperiorityGauge::AddEnemyGauge(const float &VALUE)
 	LimitGauge();
 }
 
-const std::unique_ptr<SuperiorityGauge::GaugeData> &SuperiorityGauge::GetPlayerGaugeData()
+const std::unique_ptr<SuperiorityGauge::GaugeData>& SuperiorityGauge::GetPlayerGaugeData()
 {
 	return playerGaugeData;
 }
 
-const std::unique_ptr<SuperiorityGauge::GaugeData> &SuperiorityGauge::GetEnemyGaugeData()
+const std::unique_ptr<SuperiorityGauge::GaugeData>& SuperiorityGauge::GetEnemyGaugeData()
 {
 	return enemyGaugeData;
 }
 
-const bool &SuperiorityGauge::IsStacking()
+const bool& SuperiorityGauge::IsStacking()
 {
 	return isStackingFlag;
 }
@@ -56,12 +57,10 @@ void SuperiorityGauge::Init()
 	playerGaugeData = std::make_unique<GaugeData>();
 	enemyGaugeData = std::make_unique<GaugeData>();
 
-	Vec2<float>winHalf(1280.0f / 2.0f, 50.0f);
+	Vec2<float>winHalf(1280.0f / 2.0f, 65.0f);
 	gaguePos = winHalf;
 	gagueVarPos = winHalf;
-
-	gagueVarPos.x -= 1135.0f / 2.0f;
-	gagueVarPos.y -= 25.0f / 2.0f;
+	gagueVarPos.y = 101.0f;
 
 	playerGaugeData->gaugeValue = GAUGE_MAX_VALUE / 2.0f;
 	enemyGaugeData->gaugeValue = GAUGE_MAX_VALUE / 2.0f;
@@ -79,6 +78,10 @@ void SuperiorityGauge::Update()
 		enemyGaugeData->gaugeValue = GAUGE_MAX_VALUE / 2.0f;
 	}
 	oldMaxGauge = GAUGE_MAX_VALUE;
+
+	//前フレームの振り切りフラグを保存。
+	playerGaugeData->prevOverGaugeFlag = playerGaugeData->overGaugeFlag;
+	enemyGaugeData->prevOverGaugeFlag = enemyGaugeData->overGaugeFlag;
 
 	LimitGauge();
 
@@ -107,14 +110,17 @@ void SuperiorityGauge::Update()
 	}
 }
 
+#include"D3D12App.h"
 void SuperiorityGauge::Draw()
 {
 	static const Vec2<float>OFFSET = { 0.0f,23.0f };
 	DrawFunc::DrawRotaGraph2D(gaguePos + OFFSET, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(gaugeGraphHandle));
-	DrawFunc_Color::DrawGraph(gagueVarPos + OFFSET, TexHandleMgr::GetTexBuffer(gaugeVarGraphHandle), Color(239, 1, 144, 255), { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f), Vec2<float>(1.0f, 1.0f));
+
+	DrawFunc_FillTex::DrawRotaGraph2D(gagueVarPos + OFFSET, { 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(gaugeVarGraphPlayer),
+		TexHandleMgr::GetTexBuffer(gaugeVarGraphEnemy), 1.0f, { 0.5f,0.5f }, { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f));
 }
 
-void SuperiorityGauge::DebugValue(float *ADD_VALUE)
+void SuperiorityGauge::DebugValue(float* ADD_VALUE)
 {
 	ImGui::Begin("Gauge");
 	ImGui::Text("Q...AddPlayerGaugeValue,W...AddEnemyGagueValue");

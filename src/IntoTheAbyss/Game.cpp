@@ -4,6 +4,9 @@
 #include "BulletMgr.h"
 #include"ScrollMgr.h"
 //#include"BulletParticleMgr.h"
+#include "StunEffect.h"
+#include "SlowMgr.h"
+#include "SwingMgr.h"
 #include"AuraBlock.h"
 #include"ViewPort.h"
 #include"MovingBlockMgr.h"
@@ -18,13 +21,17 @@
 #include"TexHandleMgr.h"
 #include"DrawFunc.h"
 #include"ParticleMgr.h"
-#include"GUI.h"
 
 #include"SuperiorityGauge.h"
 #include"BackGround.h"
+#include"Camera.h"
+#include"GameTimer.h"
+#include"ScoreManager.h"
+#include"FaceIcon.h"
+#include"WinCounter.h"
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -50,13 +57,12 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
 	// 描画するチップのサイズ
 	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
-
 	SizeData eventChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
 	SizeData wallChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 	SizeData doorChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
@@ -80,15 +86,14 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 			if (blockFlag || doorFlag || eventFlag || thownFlag)
 			{
 				// スクロール量から描画する位置を求める。
-				const float centerX = width * DRAW_MAP_CHIP_SIZE - ScrollMgr::Instance()->scrollAmount.x * ScrollMgr::Instance()->zoom;
-				const float centerY = height * DRAW_MAP_CHIP_SIZE - ScrollMgr::Instance()->scrollAmount.y * ScrollMgr::Instance()->zoom;
+				const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE });
 
 				// 画面外だったら描画しない。
-				if (centerX < -DRAW_MAP_CHIP_SIZE || centerX > WinApp::Instance()->GetWinSize().x + DRAW_MAP_CHIP_SIZE) continue;
-				if (centerY < -DRAW_MAP_CHIP_SIZE || centerY > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
+				if (drawPos.x < -DRAW_MAP_CHIP_SIZE || drawPos.x > WinApp::Instance()->GetWinSize().x + DRAW_MAP_CHIP_SIZE) continue;
+				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -114,7 +119,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 					handle = mapChipDrawData[height][width].handle;
 				}
 
-				Vec2<float> pos(centerX + ShakeMgr::Instance()->shakeAmount.x * ScrollMgr::Instance()->zoom, centerY + ShakeMgr::Instance()->shakeAmount.y * ScrollMgr::Instance()->zoom);
+				Vec2<float> pos = drawPos;
 				pos += mapChipDrawData[height][width].offset;
 				if (0 <= handle)
 				{
@@ -145,7 +150,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
+const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -163,7 +168,7 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
+void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	//AudioApp::Instance()->PlayWave(bgm, true);
 
@@ -171,6 +176,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	int roomNum = ROOM_NUM;
 
 	SuperiorityGauge::Instance()->Init();
+
+	FaceIcon::Instance()->Init();
 
 	//ドアが繋がっているか確認
 	if (!SelectStage::Instance()->resetStageFlag)
@@ -213,9 +220,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 
 	mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
-
-
-
 
 	// シェイク量を設定。
 	ShakeMgr::Instance()->Init();
@@ -475,8 +479,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		}
 
 
-		// ボスを生成
-		boss.Generate(player.centerPos + Vec2<float>(100, 0));
 		lineLengthPlayer = LINE_LENGTH;
 		lineLengthBoss = LINE_LENGTH;
 		addLineLengthPlayer = 0;
@@ -489,22 +491,37 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	}
 
 
-	{
-		Vec2<float> bossDir = boss.pos - player.centerPos;
-		bossDir.Normalize();
-		float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
-		lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
-	}
+	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) / 2.0f, (mapData.size() * MAP_CHIP_SIZE) / 2.0f);
+	lineCenterPos = responePos;
+	player.Init(responePos - Vec2<float>(300.0f, 0.0f));
+	//ボスを生成
+	boss.Generate(responePos + Vec2<float>(300.0f, 0.0f));
+
+
+	Camera::Instance()->Init();
+
+	ScrollMgr::Instance()->Init(&mapData);
+	// スクロール量を設定。
+	const float WIN_WIDTH_HALF = WinApp::Instance()->GetWinCenter().x;
+	const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
+	ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
+	ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 	ScrollMgr::Instance()->WarpScroll(lineCenterPos);
 	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 
 
+	GameTimer::Instance()->Init({}, 120, {}, {});
+	GameTimer::Instance()->Start();
+
+
+	ScoreManager::Instance()->Init();
 	firstLoadFlag = false;
 
 	//背景に星
 	BackGround::Instance()->Init(GetStageSize());
+
 }
 
 Game::Game()
@@ -549,6 +566,8 @@ Game::Game()
 
 void Game::Init()
 {
+	WinCounter::Instance()->Reset();
+
 	// スクロールマネージャーを初期化。
 	ScrollMgr::Instance()->Init(&mapData);
 	// スクロール量を設定。
@@ -944,8 +963,7 @@ void Game::Update()
 	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag)
 	{
 		//プレイヤー勝利
-		++countRound;
-		++countPlayerWin;
+		WinCounter::Instance()->RoundFinish(lineCenterPos, true);
 		roundFinishFlag = true;
 		gameStartFlag = false;
 	}
@@ -954,8 +972,7 @@ void Game::Update()
 	if (enemyHomeBase->Collision(player.areaHitBox) && !roundFinishFlag)
 	{
 		//敵勝利
-		++countRound;
-		++countEnemyWin;
+		WinCounter::Instance()->RoundFinish(lineCenterPos, false);
 		roundFinishFlag = true;
 		gameStartFlag = false;
 	}
@@ -963,8 +980,22 @@ void Game::Update()
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
 	{
-		readyToStartRoundFlag = true;
-		roundFinishFlag = false;
+		//勝利数カウント演出
+		if (!WinCounter::Instance()->GetNowAnimation())
+		{
+			//どちらかが３勝とったらゲーム終了
+			if (WinCounter::Instance()->GetGameFinish())
+			{
+				//とりあえずリセットしとく
+				WinCounter::Instance()->Reset();
+			}
+			//次のラウンドへ
+			else
+			{
+				readyToStartRoundFlag = true;
+				roundFinishFlag = false;
+			}
+		}
 	}
 
 	//ラウンド開始時の演出開始
@@ -1014,6 +1045,10 @@ void Game::Update()
 
 	miniMap.Update();
 
+	GameTimer::Instance()->Update();
+	ScoreManager::Instance()->Update();
+
+
 	//if (Input::isKey(KEY_INPUT_RIGHT)) player.centerPos.x += 1.0f;
 	if (UsersInput::Instance()->Input(DIK_RIGHT)) player.centerPos.x += 1.0f;
 	//if (Input::isKey(KEY_INPUT_P)) player.centerPos.x += 100.0f;
@@ -1022,6 +1057,18 @@ void Game::Update()
 	if (UsersInput::Instance()->Input(DIK_LEFT)) player.centerPos.x -= 1.0f;
 	//if (Input::isKey(KEY_INPUT_O)) player.centerPos.x -= 100.0f;
 	if (UsersInput::Instance()->OnTrigger(DIK_O)) player.centerPos.x -= 100.0f;
+
+
+	if (UsersInput::Instance()->OnTrigger(DIK_J))
+	{
+		ScoreManager::Instance()->Add(10000);
+	}
+	if (UsersInput::Instance()->OnTrigger(DIK_K))
+	{
+		ScoreManager::Instance()->Sub(100);
+	}
+
+
 
 	// ボスの更新処理
 	boss.Update();
@@ -1042,12 +1089,18 @@ void Game::Update()
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();
 
+	// 振り回し管理クラスの更新処理
+	SwingMgr::Instance()->Update(player.centerPos, boss.pos, lineLengthBoss + lineLengthPlayer + addLineLengthBoss + addLineLengthPlayer);
+
 #pragma region 各ギミックの更新処理
 
 	// 動的ブロックの更新処理
 	MovingBlockMgr::Instance()->Update(player.centerPos);
 
 	SuperiorityGauge::Instance()->Update();
+
+	// スタン演出クラスの更新処理
+	StunEffect::Instance()->Update();
 
 	// 弾パーティクルの更新処理
 	//BulletParticleMgr::Instance()->Update();
@@ -1437,7 +1490,7 @@ void Game::Update()
 
 	ViewPort::Instance()->playerPos = player.centerPos;
 	//ライト更新
-	auto pos = player.GetCenterDrawPos();
+	auto pos = ScrollMgr::Instance()->Affect(player.centerPos);
 	ptLig.SetPos({ pos.x,pos.y,PT_LIG_Z });
 
 	spotLig.SetTarget({ pos.x,pos.y + SPOT_LIG_TARGET_OFFSET_Y,0.0f });
@@ -1446,7 +1499,28 @@ void Game::Update()
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
 
+	if (UsersInput::Instance()->OnTrigger(DIK_M))
+	{
+		FaceIcon::Instance()->Change(LEFT_FACE, DAMAGE);
+	}
+
 	BackGround::Instance()->Update();
+	Camera::Instance()->Update();
+	FaceIcon::Instance()->Update();
+	WinCounter::Instance()->Update();
+
+
+
+	// 優勢ゲージが振り切ったトリガー判定のときにスタン演出を有効化する。
+	if (SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
+		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
+		StunEffect::Instance()->Activate(player.centerPos);
+	}
+	if (SuperiorityGauge::Instance()->GetPlayerGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetPlayerGaugeData()->prevOverGaugeFlag) {
+		// プレイヤーの優勢ゲージが振り切ったということは、敵の優勢ゲージが0だということ。
+		StunEffect::Instance()->Activate(boss.pos);
+	}
+
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -1509,28 +1583,31 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	}
 
+	GameTimer::Instance()->Draw();
+	ScoreManager::Instance()->Draw();
+
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
 	// プレイヤーとボス間に線を描画
 	{
 		Vec2<float> playerBossDir = boss.pos - player.centerPos;
 		playerBossDir.Normalize();
-		Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 		Vec2<float> playerDefLength = player.centerPos + playerBossDir * addLineLengthPlayer;
-		//DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, playerDefLength - scrollShakeAmount, Color(0, 0, 255, 255));
-		//DrawFunc::DrawLine2D(playerDefLength - scrollShakeAmount, playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, Color(255, 255, 255, 255));
-		DrawFunc::DrawLine2DGraph(player.centerPos - scrollShakeAmount, playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS);
+
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(playerDefLength + playerBossDir * lineLengthPlayer),
+			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 		Vec2<float> bossPlayerDir = player.centerPos - boss.pos;
 		bossPlayerDir.Normalize();
 		Vec2<float> bossDefLength = boss.pos + bossPlayerDir * addLineLengthBoss;
 
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
-		DrawFunc::DrawLine2DGraph(boss.pos - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(bossDefLength + bossPlayerDir * lineLengthBoss),
+			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 
 		// 線分の中心に円を描画
 		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
-		DrawFunc::DrawRotaGraph2D(lineCenterPos - scrollShakeAmount, { 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos), { ScrollMgr::Instance()->zoom,ScrollMgr::Instance()->zoom }, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 	}
 
@@ -1544,14 +1621,15 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	boss.Draw();
 
 	// プレイヤーとボス間に線を描画
-	Vec2<float> scrollShakeAmount = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	DrawFunc::DrawLine2D(player.centerPos - scrollShakeAmount, boss.pos - scrollShakeAmount, Color());
+	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());
 
 	SuperiorityGauge::Instance()->Draw();
 
-	GUI::Instance()->Draw();
-
 	miniMap.Draw();
+
+	FaceIcon::Instance()->Draw();
+
+	WinCounter::Instance()->Draw();
 
 	if (sceneBlackFlag || sceneLightFlag)
 	{
@@ -1567,21 +1645,23 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 void Game::Scramble()
 {
-
 	/*===== 引っ張り合いの処理 =====*/
 
 	// 前フレームの線の中心座標を保存
 	prevLineCenterPos = lineCenterPos;
 
 	// 移動量を取得。 優勢ゲージはここで更新。
-	double playerVel = player.vel.Length();
-	Vec2<float> playerVelGauge = player.vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue;
-	double bossVel = boss.vel.Length();
-	Vec2<float> bossVelGauge = boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue;
+	double playerVel = player.vel.Length() * SlowMgr::Instance()->slowAmount;
+	Vec2<float> playerVelGauge = (player.vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	double bossVel = boss.vel.Length() * SlowMgr::Instance()->slowAmount;
+	Vec2<float> bossVelGauge = (boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
-	player.centerPos += playerVelGauge;
-	boss.pos += bossVelGauge;
+	// [振り回し状態のとき] [スタン演出中] は移動させない。
+	if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer || StunEffect::Instance()->isActive)) {
+		player.centerPos += playerVelGauge;
+		boss.pos += bossVelGauge;
+	}
 
 	// 線分の長さ
 	float line = 0;

@@ -2,6 +2,7 @@
 #include "ScrollMgr.h"
 #include "ShakeMgr.h"
 #include "ViewPortCollider.h"
+#include "SlowMgr.h"
 
 #include"KuroFunc.h"
 #include"DrawFunc.h"
@@ -75,7 +76,7 @@ void Bullet::Update()
 
 	if (isFirstFrame) {
 		prevPos = pos;
-		pos += forwardVec * Vec2<float>(speed, speed);
+		pos += forwardVec * Vec2<float>(speed * SlowMgr::Instance()->slowAmount, speed * SlowMgr::Instance()->slowAmount);
 	}
 
 	isFirstFrame = true;
@@ -96,10 +97,6 @@ void Bullet::Draw()
 
 	/*-- ï`âÊèàóù --*/
 
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-
 	//SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
 
 	//// äOë§Çï`âÊ
@@ -116,10 +113,10 @@ void Bullet::Draw()
 
 	//SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
-	Vec2<float>leftUp = { pos.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x - MAX_RADIUS * ScrollMgr::Instance()->zoom,
-		pos.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y - MAX_RADIUS * ScrollMgr::Instance()->zoom };
-	Vec2<float>rightBottom = { pos.x * ScrollMgr::Instance()->zoom - scrollShakeZoom.x + MAX_RADIUS * ScrollMgr::Instance()->zoom,
-		pos.y * ScrollMgr::Instance()->zoom - scrollShakeZoom.y + MAX_RADIUS * ScrollMgr::Instance()->zoom };
+	Vec2<float>leftUp = { pos.x - MAX_RADIUS,pos.y - MAX_RADIUS };
+	leftUp = ScrollMgr::Instance()->Affect(leftUp);
+	Vec2<float>rightBottom = { pos.x + MAX_RADIUS,pos.y + MAX_RADIUS };
+	rightBottom = ScrollMgr::Instance()->Affect(rightBottom);
 
 	static const int GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/bullet.png");
 	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(GRAPH), AlphaBlendMode_Trans);

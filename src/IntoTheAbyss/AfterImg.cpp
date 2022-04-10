@@ -48,7 +48,7 @@ AfterImg::AfterImg()
 		std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(), AlphaBlendMode_Trans) };
 
 		//パイプライン生成
-		PIPELINE = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO);
+		PIPELINE = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO, WrappedSampler(true, false));
 	}
 
 	vertexBuff = D3D12App::Instance()->GenerateVertexBuffer(sizeof(Vertex), MAX_NUM, nullptr, "AfterImg");
@@ -78,7 +78,8 @@ void AfterImg::EmitArray(const Vec2<float>& From, const Vec2<float>& To, const i
 	if (SRV_MAX_IDX < srvIdx)srvIdx = SRV_MIN_IDX;
 }
 
-void AfterImg::Draw(const float& ExtRate, const Vec2<float>& Scroll)
+#include"ScrollMgr.h"
+void AfterImg::Draw()
 {
 	for (auto itr = imgs.begin(); itr != imgs.end(); ++itr)
 	{
@@ -97,9 +98,9 @@ void AfterImg::Draw(const float& ExtRate, const Vec2<float>& Scroll)
 	std::vector<Vertex>vertices;
 	for (auto itr = imgs.begin(); itr != imgs.end(); ++itr)
 	{
-		const Vec2<float>offset = (itr->graphSize * ExtRate).Float();
-		const Vec2<float>leftUp = (itr->pos * ExtRate) - offset - Scroll;
-		const Vec2<float>rightBottom = (itr->pos * ExtRate) + offset - Scroll;
+		const Vec2<float>offset = (itr->graphSize).Float();
+		const Vec2<float>leftUp = ScrollMgr::Instance()->Affect(itr->pos - offset);
+		const Vec2<float>rightBottom = ScrollMgr::Instance()->Affect(itr->pos + offset);
 		vertices.emplace_back(leftUp, rightBottom, itr->miror, itr->handle, itr->alpha, itr->scale);
 	}
 

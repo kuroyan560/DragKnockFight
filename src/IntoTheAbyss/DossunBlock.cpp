@@ -222,17 +222,9 @@ void DossunBlock::Draw()
 
 	/*===== ï`âÊèàóù =====*/
 
-	Vec2<float> scrollShakeZoom = { ScrollMgr::Instance()->scrollAmount.x * ScrollMgr::Instance()->zoom - ShakeMgr::Instance()->shakeAmount.x * ScrollMgr::Instance()->zoom,
-	ScrollMgr::Instance()->scrollAmount.y * ScrollMgr::Instance()->zoom - ShakeMgr::Instance()->shakeAmount.y * ScrollMgr::Instance()->zoom };
 
-	Vec2<float> posZoom = { pos.x * ScrollMgr::Instance()->zoom,pos.y * ScrollMgr::Instance()->zoom };
-
-	Vec2<float> sizeZoom = { size.x * ScrollMgr::Instance()->zoom, size.y * ScrollMgr::Instance()->zoom };
-
-	Vec2<float>leftUp = { posZoom.x - sizeZoom.x - scrollShakeZoom.x,
-		posZoom.y - sizeZoom.y - scrollShakeZoom.y };
-	Vec2<float>rightBottom = { posZoom.x + sizeZoom.x - scrollShakeZoom.x,
-		posZoom.y + sizeZoom.y - scrollShakeZoom.y };
+	Vec2<float>leftUp = ScrollMgr::Instance()->Affect(pos - size);
+	Vec2<float>rightBottom = ScrollMgr::Instance()->Affect(pos + size);
 
 	DrawFunc::DrawBox2D(leftUp, rightBottom, Color(100, 100, 100, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
 

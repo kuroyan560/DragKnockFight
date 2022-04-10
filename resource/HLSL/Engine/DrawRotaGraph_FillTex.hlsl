@@ -8,8 +8,8 @@ struct VSOutput
     float4 center : CENTER;
     float2 extRate : EXT_RATE;
     float radian : RADIAN;
-    float4 paintColor : PAINT_COLOR;
     float2 rotaCenterUV : ROTA_CENTER_UV;
+    float srcAlpha : SRC_ALPHA;
     int2 miror : MIROR;
     float2 leftUpPaintUV : PAINT_UV_L_U;
     float2 rightBottomPaintUV : PAINT_UV_R_B;
@@ -24,12 +24,13 @@ struct GSOutput
 {
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD;
-    float4 paintColor : PAINT_COLOR;
     float2 leftUpPaintUV : PAINT_UV_L_U;
     float2 rightBottomPaintUV : PAINT_UV_R_B;
+    float srcAlpha : SRC_ALPHA;
 };
 
-Texture2D<float4> tex : register(t0);
+Texture2D<float4> destTex : register(t0);
+Texture2D<float4> srcTex : register(t1);
 SamplerState smp : register(s0);
 
 float2 RotateFloat2(float2 Pos,float Radian)
@@ -47,7 +48,7 @@ void GSmain(
 )
 {
     uint2 texSize;
-    tex.GetDimensions(texSize.x, texSize.y);
+    destTex.GetDimensions(texSize.x, texSize.y);
     
     float width_h = texSize.x * input[0].extRate.x / 2.0f;
     float height_h = texSize.y * input[0].extRate.y / 2.0f;
@@ -56,9 +57,9 @@ void GSmain(
     rotateCenter += texSize.xy * input[0].extRate * (input[0].rotaCenterUV - float2(0.5f, 0.5f));
     
     GSOutput element;
-    element.paintColor = input[0].paintColor;
     element.leftUpPaintUV = input[0].leftUpPaintUV;
     element.rightBottomPaintUV = input[0].rightBottomPaintUV;
+    element.srcAlpha = input[0].srcAlpha;
         
     //ç∂â∫
     element.pos = input[0].center;
@@ -99,7 +100,7 @@ void GSmain(
 
 float4 PSmain(GSOutput input) : SV_TARGET
 {
-    float4 texCol = tex.Sample(smp, input.uv);
+    float4 texCol = destTex.Sample(smp, input.uv);
     
     if (input.uv.x < input.leftUpPaintUV.x)
     {
@@ -118,7 +119,9 @@ float4 PSmain(GSOutput input) : SV_TARGET
         return texCol;
     }
     
-    return float4(input.paintColor.xyz, texCol.w * input.paintColor.w);
+    float4 srcCol = srcTex.Sample(smp, input.uv);
+    srcCol.w *= input.srcAlpha * texCol.w;
+    return srcCol;
 }
 
 float4 main(float4 pos : POSITION) : SV_POSITION

@@ -50,30 +50,28 @@ void BackGround::Update()
 }
 
 #include"DrawFunc.h"
-#include"DrawFunc_Color.h"
+#include"DrawFunc_FillTex.h"
 #include"ScrollMgr.h"
 #include"ShakeMgr.h"
 #include"WinApp.h"
+#include"D3D12App.h"
 void BackGround::Draw()
 {
 	static const int GRAPH_RADIUS = 11;
-	static const Color FLASH_COLOR[STAR_NUM] =
-	{
-		Color(162,27,108,255),
-		Color(41,201,180,255),
-		Color(186,196,60,255),
-		Color(42,144,215,255)
-	};
 
-	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
-	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
+	static std::shared_ptr<TextureBuffer>FLASH_COLOR_BUFF[STAR_NUM] =
+	{
+		D3D12App::Instance()->GenerateTextureBuffer(Color(162,27,108,255)),
+		D3D12App::Instance()->GenerateTextureBuffer(Color(41,201,180,255)),
+		D3D12App::Instance()->GenerateTextureBuffer(Color(186,196,60,255)),
+		D3D12App::Instance()->GenerateTextureBuffer(Color(42,144,215,255))
+	};
 
 	const auto winSize = WinApp::Instance()->GetExpandWinSize();
 
 	for (auto& s : stars)
 	{
-		const auto drawPos = s.pos - scrollShakeZoom;
+		const auto drawPos = ScrollMgr::Instance()->Affect(s.pos);
 
 		//‰æ–ÊŠO‚È‚ç•`‰æ‚µ‚È‚¢
 		if (drawPos.x + GRAPH_RADIUS < 0)continue;
@@ -81,12 +79,12 @@ void BackGround::Draw()
 		if (drawPos.y + GRAPH_RADIUS < 0)continue;
 		if (winSize.y < drawPos.y - GRAPH_RADIUS)continue;
 
-		auto flashColor = FLASH_COLOR[s.type];
-		flashColor.Alpha() = sin(s.flashRad);
 		static const float SCALE = 0.25f;
 		static const float SHADOW_SCALE_OFFSET = 0.2f;
-		const Vec2<float>scale = { SCALE + s.scaleOffset,SCALE + s.scaleOffset };
-		DrawFunc_Color::DrawRotaGraph2D(drawPos, { scale.x + SHADOW_SCALE_OFFSET,scale.y + SHADOW_SCALE_OFFSET }, 0.0f, TexHandleMgr::GetTexBuffer(starGraph[s.type]), flashColor);
+		Vec2<float>scale = { SCALE + s.scaleOffset,SCALE + s.scaleOffset };
+		scale *= ScrollMgr::Instance()->zoom;
+		DrawFunc_FillTex::DrawRotaGraph2D(drawPos, { scale.x + SHADOW_SCALE_OFFSET,scale.y + SHADOW_SCALE_OFFSET }, 
+			0.0f, TexHandleMgr::GetTexBuffer(starGraph[s.type]), FLASH_COLOR_BUFF[s.type], sin(s.flashRad));
 		DrawFunc::DrawRotaGraph2D(drawPos, scale, 0.0f, TexHandleMgr::GetTexBuffer(starGraph[s.type]));
 	}
 }

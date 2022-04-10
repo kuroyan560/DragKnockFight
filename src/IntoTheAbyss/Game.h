@@ -153,10 +153,6 @@ class Game
 
 	MiniMap miniMap;
 public:
-	//‡ŠÖ˜A
-	int countRound;						//ƒ‰ƒEƒ“ƒh”
-	int countPlayerWin, countEnemyWin;	//Ÿ—˜”
-
 
 	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;
 
