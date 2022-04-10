@@ -55,6 +55,7 @@ public:
 
 	//w’n‚Æ‚Ì”»’è
 	Square areaHitBox;
+
 public:
 
 	/*===== ƒƒ“ƒoŠÖ” =====*/

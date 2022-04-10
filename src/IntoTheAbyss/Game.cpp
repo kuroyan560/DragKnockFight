@@ -28,6 +28,8 @@
 
 #include"BossBulletManager.h"
 
+#include"BulletCollision.h"
+
 
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
@@ -1153,7 +1155,16 @@ void Game::Update()
 	//ボス弾とプレイヤーの判定
 	for (int index = 0; index < SMALL_ENEMY; ++index)
 	{
-		BossBulletManager::Instance()->GetBullet(index);
+		std::shared_ptr<SphereCollision> bullet = BossBulletManager::Instance()->GetBullet(index)->bulletHitBox;
+		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, *player.bulletHitBox);
+		bool initFlag = BossBulletManager::Instance()->GetBullet(index)->isActive;
+
+		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
+		if (hitFlag && initFlag)
+		{
+			SuperiorityGauge::Instance()->AddEnemyGauge(10.0f);
+			BossBulletManager::Instance()->GetBullet(index)->Init();
+		}
 	}
 
 

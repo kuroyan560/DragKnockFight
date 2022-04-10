@@ -16,6 +16,8 @@ class PlayerHand;
 class LightManager;
 #include"Muffler.h"
 
+#include"../IntoTheAbyss/BulletCollision.h"
+
 // プレイヤークラス
 class Player {
 
@@ -147,6 +149,8 @@ public:
 
 	//陣地との判定
 	Square areaHitBox;
+
+	std::shared_ptr<SphereCollision> bulletHitBox;
 
 public:
 

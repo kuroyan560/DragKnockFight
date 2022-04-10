@@ -16,6 +16,10 @@ Bullet::Bullet()
 	forwardVec = {};
 	isActive = false;
 
+	bulletHitBox = std::make_shared<SphereCollision>();
+	bulletHitBox->center = &pos;
+	bulletHitBox->radius = 10.0f;
+
 }
 
 void Bullet::Init()
@@ -25,7 +29,6 @@ void Bullet::Init()
 
 	// ¶‘¶ƒtƒ‰ƒO‚ğÜ‚éB
 	isActive = false;
-
 }
 
 void Bullet::Generate(const Vec2<float> &generatePos, const Vec2<float> forwardVec, const bool isFirstShot, const SHOT_HAND &id, const float &speed)

@@ -1,6 +1,7 @@
 #pragma once
 #include "Vec.h"
 #include <vector>
+#include"BulletCollision.h"
 
 using namespace std;
 
@@ -38,6 +39,7 @@ public:
 	bool isFirstFrame;
 	SHOT_HAND handID;	// Œ‚‚½‚ê‚½Žè
 
+	std::shared_ptr<SphereCollision> bulletHitBox;
 
 public:
 
