@@ -24,7 +24,8 @@ public:
 	float zoom;						//ÉYÅ[ÉÄî{ó¶
 private:
 
-
+	Vec2<int>windowSize;
+	Vec2<float>windowHalfSize;
 	Vec2<float>adjLine;
 	Vec2<float> mapSize;
 	bool initFlag;

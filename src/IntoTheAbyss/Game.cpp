@@ -512,7 +512,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 
 
 
-	ScrollManager::Instance()->Init(lineCenterPos + cameraBasePos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
+	ScrollManager::Instance()->Init(lineCenterPos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
 
 
 	GameTimer::Instance()->Init({}, 120, {}, {});
