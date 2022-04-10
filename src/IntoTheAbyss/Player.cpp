@@ -8,6 +8,7 @@
 #include "MovingBlock.h"
 #include "SwingMgr.h"
 //#include "BulletParticleMgr.h"
+#include "StunEffect.h"
 #include "Collider.h"
 #include <cmath>
 
@@ -1156,6 +1157,9 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 	//	changeGravityTimer = 0;
 
 	//}
+
+	// スタン演出中だったら入力を受け付けない。
+	if (StunEffect::Instance()->isActive) return;
 
 	//同時ショット判定タイマー計測
 	if (isLeftFirstShotTimer < DOUJI_ALLOWANCE_FRAME)isLeftFirstShotTimer++;

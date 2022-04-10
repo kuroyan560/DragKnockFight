@@ -9,6 +9,7 @@
 #include "SwingMgr.h"
 #include "SuperiorityGauge.h"
 #include "SlowMgr.h"
+#include "StunEffect.h"
 
 #include"TexHandleMgr.h"
 
@@ -81,8 +82,8 @@ void Boss::Update()
 	// [振り回し中か振り回され中だったら] 更新処理を行わない。　　臨時の実装です。
 	bool isSwingNow = SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer;
 
-	// 硬直中は動かさない
-	if (0 < afterSwingDelay) {
+	// [硬直中] [スタン演出中] は動かさない
+	if (0 < afterSwingDelay || StunEffect::Instance()->isActive) {
 		// 何もしない。
 	}
 	else if (isSwingNow) {

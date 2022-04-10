@@ -4,6 +4,7 @@
 #include "BulletMgr.h"
 #include"ScrollMgr.h"
 //#include"BulletParticleMgr.h"
+#include "StunEffect.h"
 #include "SlowMgr.h"
 #include "SwingMgr.h"
 #include"AuraBlock.h"
@@ -1098,6 +1099,9 @@ void Game::Update()
 
 	SuperiorityGauge::Instance()->Update();
 
+	// スタン演出クラスの更新処理
+	StunEffect::Instance()->Update();
+
 	// 弾パーティクルの更新処理
 	//BulletParticleMgr::Instance()->Update();
 
@@ -1505,7 +1509,17 @@ void Game::Update()
 	FaceIcon::Instance()->Update();
 	WinCounter::Instance()->Update();
 
-	if (UsersInput::Instance()->Input(DIK_R)) Camera::Instance()->Focus(boss.pos, 1.7f);
+
+
+	// 優勢ゲージが振り切ったトリガー判定のときにスタン演出を有効化する。
+	if (SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
+		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
+		StunEffect::Instance()->Activate(player.centerPos);
+	}
+	if (SuperiorityGauge::Instance()->GetPlayerGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetPlayerGaugeData()->prevOverGaugeFlag) {
+		// プレイヤーの優勢ゲージが振り切ったということは、敵の優勢ゲージが0だということ。
+		StunEffect::Instance()->Activate(boss.pos);
+	}
 
 }
 
@@ -1643,8 +1657,8 @@ void Game::Scramble()
 	Vec2<float> bossVelGauge = (boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
-	// 振り回し状態のときは移動させない。
-	if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer)) {
+	// [振り回し状態のとき] [スタン演出中] は移動させない。
+	if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer || StunEffect::Instance()->isActive)) {
 		player.centerPos += playerVelGauge;
 		boss.pos += bossVelGauge;
 	}

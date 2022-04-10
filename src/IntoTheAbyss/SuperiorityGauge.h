@@ -14,9 +14,10 @@ private:
 	{
 		float gaugeValue;		//ƒQ[ƒW‚Ì’l
 		float gaugeDivValue;	//ƒQ[ƒW‚ÌŠ„‡
+		bool prevOverGaugeFlag;	//1F‘O‚ÌU‚èØ‚Á‚½”»’è
 		bool overGaugeFlag;		//U‚èØ‚Á‚½”»’è
 
-		GaugeData() :gaugeValue(0.0f), gaugeDivValue(0.0f), overGaugeFlag(false)
+		GaugeData() :gaugeValue(0.0f), gaugeDivValue(0.0f), overGaugeFlag(false), prevOverGaugeFlag(false)
 		{
 		};
 	};
