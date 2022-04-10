@@ -23,6 +23,7 @@
 #include"SuperiorityGauge.h"
 
 #include"AudioApp.h"
+#include "SlowMgr.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -1860,7 +1861,7 @@ void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector
 	Vec2<float> moveDir = prevFrameCenterPos - centerPos;
 	moveDir.Normalize();
 	//intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, vel + gimmickVel, Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y), onGround, mapData);
-	//intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
+	intersectedLine = (INTERSECTED_LINE)MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(centerPos, prevFrameCenterPos, moveDir * Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y), Vec2<float>(PLAYER_HIT_SIZE.x, PLAYER_HIT_SIZE.y / 2.0f), onGround, mapData);
 
 
 	// ç∑ï™(âüÇµñﬂÇ≥ÇÍÇΩílÇç¿ïWÇ©ÇÁà¯Ç≠)

@@ -8,6 +8,7 @@
 #include "SuperiorityGauge.h"
 #include "SwingMgr.h"
 #include "SuperiorityGauge.h"
+#include "SlowMgr.h"
 
 #include"TexHandleMgr.h"
 

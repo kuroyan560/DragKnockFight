@@ -4,6 +4,7 @@
 #include "BulletMgr.h"
 #include"ScrollMgr.h"
 //#include"BulletParticleMgr.h"
+#include "SlowMgr.h"
 #include "SwingMgr.h"
 #include"AuraBlock.h"
 #include"ViewPort.h"
@@ -55,7 +56,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -1503,6 +1504,9 @@ void Game::Update()
 	Camera::Instance()->Update();
 	FaceIcon::Instance()->Update();
 	WinCounter::Instance()->Update();
+
+	if (UsersInput::Instance()->Input(DIK_R)) Camera::Instance()->Focus(boss.pos, 1.7f);
+
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -1584,7 +1588,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(bossDefLength + bossPlayerDir * lineLengthBoss), 
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(bossDefLength + bossPlayerDir * lineLengthBoss),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 
 		// 線分の中心に円を描画
@@ -1633,10 +1637,10 @@ void Game::Scramble()
 	prevLineCenterPos = lineCenterPos;
 
 	// 移動量を取得。 優勢ゲージはここで更新。
-	double playerVel = player.vel.Length();
-	Vec2<float> playerVelGauge = player.vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue;
-	double bossVel = boss.vel.Length();
-	Vec2<float> bossVelGauge = boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue;
+	double playerVel = player.vel.Length() * SlowMgr::Instance()->slowAmount;
+	Vec2<float> playerVelGauge = (player.vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	double bossVel = boss.vel.Length() * SlowMgr::Instance()->slowAmount;
+	Vec2<float> bossVelGauge = (boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
 	// 振り回し状態のときは移動させない。

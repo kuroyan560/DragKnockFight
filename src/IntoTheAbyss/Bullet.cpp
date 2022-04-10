@@ -2,6 +2,7 @@
 #include "ScrollMgr.h"
 #include "ShakeMgr.h"
 #include "ViewPortCollider.h"
+#include "SlowMgr.h"
 
 #include"KuroFunc.h"
 #include"DrawFunc.h"
@@ -75,7 +76,7 @@ void Bullet::Update()
 
 	if (isFirstFrame) {
 		prevPos = pos;
-		pos += forwardVec * Vec2<float>(speed, speed);
+		pos += forwardVec * Vec2<float>(speed * SlowMgr::Instance()->slowAmount, speed * SlowMgr::Instance()->slowAmount);
 	}
 
 	isFirstFrame = true;
