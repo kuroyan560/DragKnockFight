@@ -26,6 +26,8 @@
 #include"GameTimer.h"
 #include"ScoreManager.h"
 
+#include"BossBulletManager.h"
+
 
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
@@ -1147,6 +1149,13 @@ void Game::Update()
 		noMovementEnemy[index].CheckHitBullet();
 
 	}
+
+	//ボス弾とプレイヤーの判定
+	for (int index = 0; index < SMALL_ENEMY; ++index)
+	{
+		BossBulletManager::Instance()->GetBullet(index);
+	}
+
 
 #pragma endregion
 

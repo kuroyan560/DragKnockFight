@@ -50,7 +50,7 @@ public:
 	void Init();
 
 	// ¶¬ˆ—
-	void Generate(const Vec2<float>& generatePos, const Vec2<float> forwardVec, const bool isFirstShot, const SHOT_HAND& id);
+	void Generate(const Vec2<float> &generatePos, const Vec2<float> forwardVec, const bool isFirstShot, const SHOT_HAND &id, const float &speed = 30.0f);
 
 	// XVˆ—
 	void Update();

@@ -11,6 +11,8 @@
 #include"BossPatternNormalMove.h"
 #include"BossPatternAttack.h"
 
+#include"BossBulletManager.h"
+
 Boss::Boss()
 {
 
@@ -68,9 +70,18 @@ void Boss::Update()
 	// 前フレームの座標を保存
 	prevPos = pos;
 
-	++patternTimer;
+	for (int i = 0; i < patternData.bulltData.size(); ++i)
+	{
+		if (patternData.bulltData[i].initFlag)
+		{
+			patternData.bulltData[i].Reset();
+		}
+	}
 
-	if (300 <= patternTimer)
+
+	//ボスのAI-----------------------
+	++patternTimer;
+	if (120 <= patternTimer)
 	{
 		if (atackModeFlag)
 		{
@@ -83,17 +94,35 @@ void Boss::Update()
 		atackModeFlag = !atackModeFlag;
 		patternTimer = 0;
 	}
+	//ボスのAI-----------------------
 
+
+	
 
 	//ボスの挙動
+	if (bossPatternNow != oldBossPattern)
+	{
+		bossPattern[bossPatternNow]->Init();
+	}
 	bossPattern[bossPatternNow]->Update(&patternData);
+	oldBossPattern = bossPatternNow;
+
+	//ボスの弾
+	for (int i = 0; i < patternData.bulltData.size(); ++i)
+	{
+		if (patternData.bulltData[i].initFlag)
+		{
+			BossBulletManager::Instance()->Generate(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
+		}
+	}
+	BossBulletManager::Instance()->Update();
+
 }
 
 void Boss::Draw()
 {
-
 	/*===== 描画処理 =====*/
-
+	BossBulletManager::Instance()->Draw();
 	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
 	DIR dir = FRONT;
 	if (vel.y < 0)dir = BACK;

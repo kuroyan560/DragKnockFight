@@ -5,6 +5,7 @@
 #include"IBossPattern.h"
 #include<array>
 #include<memory>
+#include"Bullet.h"
 
 using namespace std;
 
@@ -34,7 +35,7 @@ public:
 		BOSS_PATTERN_NORMALMOVE,
 		BOSS_PATTERN_ATTACK
 	};
-	E_BossPattern bossPatternNow;
+	E_BossPattern bossPatternNow, oldBossPattern;
 	BossPatternData patternData;
 	std::array<std::unique_ptr<IBossPattern>, 2>bossPattern;
 	int patternTimer;
@@ -49,6 +50,8 @@ public:
 	const Vec2<float> SCALE = { 80.0f,80.0f };
 	const float OFFSET_VEL = 10.0f;
 	const int STRUCK_WINDOW_TIMER = 120.0f;
+
+	std::array<Bullet, 200> bullts;
 
 	//êwínÇ∆ÇÃîªíË
 	Square areaHitBox;

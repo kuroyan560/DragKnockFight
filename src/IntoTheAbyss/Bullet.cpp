@@ -28,7 +28,7 @@ void Bullet::Init()
 
 }
 
-void Bullet::Generate(const Vec2<float>& generatePos, const Vec2<float> forwardVec, const bool isFirstShot, const SHOT_HAND& id)
+void Bullet::Generate(const Vec2<float> &generatePos, const Vec2<float> forwardVec, const bool isFirstShot, const SHOT_HAND &id, const float &speed)
 {
 
 	/*-- ê∂ê¨èàóù --*/
@@ -50,10 +50,10 @@ void Bullet::Generate(const Vec2<float>& generatePos, const Vec2<float> forwardV
 
 	if (isFirstShot) {
 		//speed = GetRand(MAX_SPEED * 0.25f) + MAX_SPEED * 0.75f;
-		speed = KuroFunc::GetRand(MAX_SPEED * 0.25f) + MAX_SPEED * 0.75f;
+		this->speed = KuroFunc::GetRand(MAX_SPEED * 0.25f) + MAX_SPEED * 0.75f;
 	}
 	else {
-		speed = MAX_SPEED;
+		this->speed = speed;
 	}
 
 	deadTimer = DEAD_TIMER;

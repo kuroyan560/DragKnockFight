@@ -1,6 +1,9 @@
 #pragma once
 #include"../IntoTheAbyss/IBossPattern.h"
 
+/// <summary>
+/// ’e–‹‚ğŒ‚‚Âƒpƒ^[ƒ“
+/// </summary>
 class BossPatternAttack:public IBossPattern
 {
 public:
@@ -9,5 +12,8 @@ public:
 
 	void Init()override;
 	void Update(BossPatternData *DATA)override;
+
+private:
+	int shotInterval;
 };
 
