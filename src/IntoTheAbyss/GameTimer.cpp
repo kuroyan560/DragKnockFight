@@ -13,7 +13,7 @@ GameTimer::GameTimer()
 
 	number.resize(11);
 	texSize = { 48,44 };
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 11, { 11, 1 }, number.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, number.data());
 
 }
 
