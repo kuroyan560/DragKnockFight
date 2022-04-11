@@ -1,6 +1,7 @@
 #pragma once
 #include "Vec.h"
 #include <vector>
+#include"BulletCollision.h"
 
 using namespace std;
 
@@ -38,7 +39,9 @@ public:
 	bool isFirstFrame;
 	SHOT_HAND handID;	// Œ‚‚½‚ê‚½è
 
+	std::shared_ptr<SphereCollision> bulletHitBox;
 
+	int graph;
 public:
 
 	/*-- ƒƒ“ƒoŠÖ” --*/
@@ -50,7 +53,7 @@ public:
 	void Init();
 
 	// ¶¬ˆ—
-	void Generate(const Vec2<float>& generatePos, const Vec2<float> forwardVec, const bool isFirstShot, const SHOT_HAND& id);
+	void Generate(const Vec2<float> &generatePos, const Vec2<float> forwardVec, const bool isFirstShot, const SHOT_HAND &id, const float &speed = 30.0f, const int &GRPHA_HANDLE = -1);
 
 	// XVˆ—
 	void Update();

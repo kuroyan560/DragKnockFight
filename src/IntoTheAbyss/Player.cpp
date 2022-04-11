@@ -22,7 +22,6 @@
 #include "EventCollider.h"
 #include"DebugParameter.h"
 #include"SuperiorityGauge.h"
-
 #include"AudioApp.h"
 #include "SlowMgr.h"
 
@@ -144,6 +143,10 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	swingCoolTime = 0;
 
+
+	bulletHitBox = std::make_shared<SphereCollision>();
+	bulletHitBox->center = &centerPos;
+	bulletHitBox->radius = 10.0f;
 }
 
 void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos)

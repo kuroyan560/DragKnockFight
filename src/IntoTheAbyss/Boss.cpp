@@ -12,6 +12,10 @@
 #include "StunEffect.h"
 
 #include"TexHandleMgr.h"
+#include"BossPatternNormalMove.h"
+#include"BossPatternAttack.h"
+
+#include"BossBulletManager.h"
 
 Boss::Boss()
 {
@@ -25,6 +29,19 @@ Boss::Boss()
 	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy_back.png");
 
 	areaHitBox.center = &pos;
+
+
+	bossPattern[0] = std::make_unique<BossPatternNormalMove>();
+	bossPattern[1] = std::make_unique<BossPatternAttack>();
+
+
+	//パターンに渡すデータの初期化
+	patternData.bossPos = &vel;
+	patternData.stuckWindowTimer = &stuckWindowTimer;
+
+	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
+	patternTimer = 0;
+
 }
 
 void Boss::Init()
@@ -37,7 +54,7 @@ void Boss::Init()
 
 }
 
-void Boss::Generate(const Vec2<float>& generatePos)
+void Boss::Generate(const Vec2<float> &generatePos)
 {
 
 	/*===== 生成処理 =====*/
@@ -66,6 +83,14 @@ void Boss::Update()
 	{
 		moveVel = { 0,0 };
 		return;
+	}
+
+	for (int i = 0; i < patternData.bulltData.size(); ++i)
+	{
+		if (patternData.bulltData[i].initFlag)
+		{
+			patternData.bulltData[i].Reset();
+		}
 	}
 
 	// 慣性を更新。
@@ -104,71 +129,76 @@ void Boss::Update()
 	}
 	else {
 
-		static const int PULL_SPAN_MIN = 30;
-		static const int PULL_SPAN_MAX = 70;
-		static int PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
-		static int PULL_TIMER = 0;
-		static Vec2<float>ACCEL = { 0.0f,0.0f };	//加速度
-		static const float PULL_POWER_MIN = 15.0f;
-		static const float PULL_POWER_MAX = 25.0f;
-
-		if (PULL_TIMER < PULL_SPAN)
+		//ボスのAI-----------------------
+		++patternTimer;
+		if (120 <= patternTimer)
 		{
-			PULL_TIMER++;
-			if (PULL_SPAN <= PULL_TIMER)
+			if (atackModeFlag)
 			{
-				PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
-				PULL_TIMER = 0;
-
-				auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
-				auto power = KuroFunc::GetRand(PULL_POWER_MIN, PULL_POWER_MAX);
-				ACCEL.x = cos(rad) * power * 1.6f;
-				ACCEL.y = sin(rad) * power;
+				bossPatternNow = BOSS_PATTERN_ATTACK;
 			}
+			else
+			{
+				bossPatternNow = BOSS_PATTERN_NORMALMOVE;
+			}
+			atackModeFlag = !atackModeFlag;
+			patternTimer = 0;
 		}
-		moveVel.x = KuroMath::Lerp(moveVel.x, OFFSET_VEL, 0.1f);
-		moveVel.y = KuroMath::Lerp(moveVel.y, 0.0f, 0.1f);
-		moveVel += ACCEL;
+		//ボスのAI-----------------------
 
-		ACCEL = KuroMath::Lerp(ACCEL, { 0.0f,0.0f }, 0.8f);
 
+
+
+		//ボスの挙動
+		if (bossPatternNow != oldBossPattern)
+		{
+			bossPattern[bossPatternNow]->Init();
+		}
+		bossPattern[bossPatternNow]->Update(&patternData);
+		oldBossPattern = bossPatternNow;
 		if (UsersInput::Instance()->Input(DIK_0)) {
 			vel.x = OFFSET_VEL * 5.0f;
 		}
 
+		//ボスの弾
+		for (int i = 0; i < patternData.bulltData.size(); ++i)
+		{
+			if (patternData.bulltData[i].initFlag)
+			{
+				BossBulletManager::Instance()->Generate(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
+			}
+		}
+		BossBulletManager::Instance()->Update();
+
+
+		// 移動量の総量を求める。
+
+		if (0 < afterSwingDelay) {
+
+			// 振り回し直後の硬直が残っている場合は、慣性のみを移動量とする。
+			vel = swingInertiaVec * swingInertia;
+
+		}
+		else {
+
+			vel = moveVel + swingInertiaVec * swingInertia;
+
+		}
+
 	}
-
-	if (0 < stuckWindowTimer) --stuckWindowTimer;
-
-
-	// 移動量の総量を求める。
-
-	if (0 < afterSwingDelay) {
-
-		// 振り回し直後の硬直が残っている場合は、慣性のみを移動量とする。
-		vel = swingInertiaVec * swingInertia;
-
-	}
-	else {
-
-		vel = moveVel + swingInertiaVec * swingInertia;
-
-	}
-
 }
 
 void Boss::Draw()
 {
-
 	/*===== 描画処理 =====*/
-
+	BossBulletManager::Instance()->Draw();
 	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
 	DIR dir = FRONT;
 	if (vel.y < 0)dir = BACK;
 	DrawFunc::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(pos - scale), ScrollMgr::Instance()->Affect(pos + scale), TexHandleMgr::GetTexBuffer(graphHandle[dir]), AlphaBlendMode_Trans);
 }
 
-void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
+void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos)
 {
 
 	/*===== 当たり判定 =====*/

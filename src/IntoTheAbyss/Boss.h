@@ -2,6 +2,10 @@
 #include <vector>
 #include "Intersected.h"
 #include"AreaCollider.h"
+#include"IBossPattern.h"
+#include<array>
+#include<memory>
+#include"Bullet.h"
 
 using namespace std;
 
@@ -28,6 +32,21 @@ public:
 	int graphHandle[DIR_NUM];
 
 
+	//ボスのパターン制御-----------------------
+	enum E_BossPattern
+	{
+		BOSS_PATTERN_NONE = -1,
+		BOSS_PATTERN_NORMALMOVE,
+		BOSS_PATTERN_ATTACK
+	};
+	E_BossPattern bossPatternNow, oldBossPattern;
+	BossPatternData patternData;
+	std::array<std::unique_ptr<IBossPattern>, 2>bossPattern;
+	int patternTimer;
+	bool atackModeFlag;
+	//ボスのパターン制御-----------------------
+
+
 public:
 
 	/*===== 定数 =====*/
@@ -37,6 +56,8 @@ public:
 	const float OFFSET_INERTIA = 30.0f;		// 振り回しの慣性
 	const int AFTER_SWING_DELAY = 15;
 	const int STRUCK_WINDOW_TIMER = 120.0f;
+
+	std::array<Bullet, 200> bullts;
 
 	//陣地との判定
 	Square areaHitBox;
@@ -53,7 +74,7 @@ public:
 	void Init();
 
 	// 生成処理
-	void Generate(const Vec2<float>& generatePos);
+	void Generate(const Vec2<float> &generatePos);
 
 	// 更新処理
 	void Update();
@@ -62,6 +83,6 @@ public:
 	void Draw();
 
 	// 当たり判定
-	void CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos);
+	void CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos);
 
 };
