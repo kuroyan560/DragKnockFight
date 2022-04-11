@@ -424,8 +424,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 				lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
 				prevLineCenterPos = lineCenterPos;
 
-				ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-				ScrollMgr::Instance()->WarpScroll(lineCenterPos);
+				//ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+				//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
 				door = doorBlocks[i]->doorDir;
 				break;
 			}
@@ -473,8 +473,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		enemyHomeBase->Init(enemyLeftUpPos - chipPos, enemyRightDownPos + chipPos);
 
 		{
-			float data = ((mapData[0].size() - 1) * MAP_CHIP_SIZE) - 300.0f;
-			miniMap.Init(data);
+			float size = (mapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
+			miniMap.Init(size);
 		}
 
 
@@ -490,25 +490,32 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	}
 
 
-	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) / 2.0f, (mapData.size() * MAP_CHIP_SIZE) / 2.0f);
+	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) * 0.5f, (mapData.size() * MAP_CHIP_SIZE) * 0.5f);
+	responePos -= 100;
+
 	lineCenterPos = responePos;
 	player.Init(responePos - Vec2<float>(300.0f, 0.0f));
 	//ボスを生成
 	boss.Generate(responePos + Vec2<float>(300.0f, 0.0f));
 
+	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	Camera::Instance()->Init();
 
-	ScrollMgr::Instance()->Init(&mapData);
-	// スクロール量を設定。
-	const float WIN_WIDTH_HALF = WinApp::Instance()->GetWinCenter().x;
-	const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
-	ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
-	ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
+	//ScrollMgr::Instance()->Init(&mapData);
+	//// スクロール量を設定。
+	//const float WIN_WIDTH_HALF = WinApp::Instance()->GetWinCenter().x;
+	//const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
+	//ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
+	//ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 
-	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-	ScrollMgr::Instance()->WarpScroll(lineCenterPos);
-	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+	//ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+	//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
+	//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+
+
+
+	ScrollMgr::Instance()->Init(lineCenterPos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
 
 
 	GameTimer::Instance()->Init({}, 120, {}, {});
@@ -561,17 +568,19 @@ Game::Game()
 	playerHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
 	enemyHomeBase->Init({ 0.0f,0.0f }, { 800.0f,1000.0f });
 	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
+
+	cameraBasePos = { 0.0f,-40.0f };
 }
 
 void Game::Init()
 {
 	// スクロールマネージャーを初期化。
-	ScrollMgr::Instance()->Init(&mapData);
-	// スクロール量を設定。
-	const float WIN_WIDTH_HALF = WinApp::Instance()->GetWinCenter().x;
-	const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
-	ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
-	ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
+	//ScrollMgr::Instance()->Init(&mapData);
+	//// スクロール量を設定。
+	//const float WIN_WIDTH_HALF = WinApp::Instance()->GetWinCenter().x;
+	//const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
+	//ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
+	//ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
 
 	//bossEnemy.Generate(ENEMY_BOSS, mapData);
 	for (int index = 0; index < SMALL_ENEMY; ++index) {
@@ -587,8 +596,8 @@ void Game::Init()
 	enemyGenerateTimer = 0;
 	nomoveMentTimer = 0;
 
-	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+	//ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
+	//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
 }
 
 void Game::Update()
@@ -693,7 +702,6 @@ void Game::Update()
 			}
 			Vec2<float> tmp = { door.x * 50.0f,door.y * 50.0f };
 			player.centerPos = tmp;
-			ScrollMgr::Instance()->WarpScroll(lineCenterPos);
 		}
 	}
 
@@ -878,9 +886,9 @@ void Game::Update()
 					break;
 				}
 
-				ScrollMgr::Instance()->WarpScroll(lineCenterPos);
-				ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-				ScrollMgr::Instance()->Restart();
+				//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
+				//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+				//ScrollMgr::Instance()->Restart();
 
 			}
 			else
@@ -896,10 +904,10 @@ void Game::Update()
 					lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
 					prevLineCenterPos = lineCenterPos;
 
-					ScrollMgr::Instance()->WarpScroll(lineCenterPos);
-					ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-					ScrollMgr::Instance()->AlimentScrollAmount();
-					ScrollMgr::Instance()->Restart();
+					//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
+					//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+					//ScrollMgr::Instance()->AlimentScrollAmount();
+					//ScrollMgr::Instance()->Restart();
 					initDeadFlag = true;
 				}
 				goFlag = true;
@@ -957,7 +965,7 @@ void Game::Update()
 	}
 
 	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag)
+	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag&&false)
 	{
 		//プレイヤー勝利
 		++countRound;
@@ -1030,6 +1038,7 @@ void Game::Update()
 
 	miniMap.Update();
 
+
 	GameTimer::Instance()->Update();
 	ScoreManager::Instance()->Update();
 
@@ -1061,14 +1070,13 @@ void Game::Update()
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
 
-	if (firstLoadFlag)
-	{
-		ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-		ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-	}
-	firstLoadFlag = true;
+//	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
+	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
+
+
 
 	// スクロール量の更新処理
+	//ScrollManager::Instance()->Update();
 	ScrollMgr::Instance()->Update();
 
 	// シェイク量の更新処理
@@ -1263,8 +1271,6 @@ void Game::Update()
 				//ViewPort::Instance()->PushBackLine(ViewPort::Instance()->LEFT, biggestBuff.pushBackAmount);
 			}
 
-			// スクロールを止める。
-			ScrollMgr::Instance()->StopScroll(0);
 			++countStopNum;
 
 		}
@@ -1334,7 +1340,6 @@ void Game::Update()
 			ViewPort::Instance()->holdFlags[ViewPort::Instance()->RIGHT] = false;
 			if (countStopNum % 2 != 0)
 			{
-				ScrollMgr::Instance()->StopScroll(0);
 				countHitNum = 0;
 				countStopNum = 0;
 			}
@@ -1402,7 +1407,6 @@ void Game::Update()
 			}
 
 			// スクロールを止める。
-			ScrollMgr::Instance()->StopScroll(0);
 			++countStopNum;
 		}
 		else
@@ -1470,7 +1474,6 @@ void Game::Update()
 			}
 
 			// スクロールを止める。
-			ScrollMgr::Instance()->StopScroll(0);
 			++countStopNum;
 		}
 		else
@@ -1590,7 +1593,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(bossDefLength + bossPlayerDir * lineLengthBoss), 
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(bossDefLength + bossPlayerDir * lineLengthBoss),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 
 		// 線分の中心に円を描画

@@ -6,7 +6,6 @@
 #include "WinApp.h"
 #include"UsersInput.h"
 #include"SuperiorityGauge.h"
-
 #include"TexHandleMgr.h"
 #include"BossPatternNormalMove.h"
 #include"BossPatternAttack.h"

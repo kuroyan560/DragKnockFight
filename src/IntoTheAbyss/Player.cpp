@@ -21,7 +21,6 @@
 #include"DebugParameter.h"
 #include"GUI.h"
 #include"SuperiorityGauge.h"
-
 #include"AudioApp.h"
 
 Vec2<float> Player::GetGeneratePos()
