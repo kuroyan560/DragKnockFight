@@ -1512,11 +1512,11 @@ void Game::Update()
 
 
 	// —D¨ƒQ[ƒW‚ªU‚èØ‚Á‚½ƒgƒŠƒK[”»’è‚Ì‚Æ‚«‚ÉƒXƒ^ƒ“‰‰o‚ð—LŒø‰»‚·‚éB
-	if (UsersInput::Instance()->OnTrigger(DIK_7) || SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
+	if (SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
 		// “G‚Ì—D¨ƒQ[ƒW‚ªU‚èØ‚Á‚½‚Æ‚¢‚¤‚±‚Æ‚ÍAƒvƒŒƒCƒ„[‚Ì—D¨ƒQ[ƒW‚ª0‚¾‚Æ‚¢‚¤‚±‚ÆB
 		StunEffect::Instance()->Activate(player.centerPos, player.centerPos, Vec2<float>(0, 0), false);
 	}
-	if (UsersInput::Instance()->OnTrigger(DIK_8) || SuperiorityGauge::Instance()->GetPlayerGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetPlayerGaugeData()->prevOverGaugeFlag) {
+	if (SuperiorityGauge::Instance()->GetPlayerGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetPlayerGaugeData()->prevOverGaugeFlag) {
 		// ƒvƒŒƒCƒ„[‚Ì—D¨ƒQ[ƒW‚ªU‚èØ‚Á‚½‚Æ‚¢‚¤‚±‚Æ‚ÍA“G‚Ì—D¨ƒQ[ƒW‚ª0‚¾‚Æ‚¢‚¤‚±‚ÆB
 		StunEffect::Instance()->Activate(boss.pos, boss.pos, Vec2<float>(1200, 0), true);
 	}
