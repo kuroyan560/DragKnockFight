@@ -48,6 +48,7 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 
 	if (UsersInput::Instance()->Input(DIK_0)) {
 	//	vel.x = OFFSET_VEL * 5.0f;
+		bool debug = false;
 	}
 
 	if (0 < *DATA->stuckWindowTimer) *DATA->stuckWindowTimer -= 1;

@@ -965,7 +965,7 @@ void Game::Update()
 	}
 
 	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag&&false)
+	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag && false)
 	{
 		//プレイヤー勝利
 		++countRound;
@@ -1070,7 +1070,7 @@ void Game::Update()
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
 
-//	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
+	//	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
 	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
 
 
@@ -1648,6 +1648,7 @@ void Game::Scramble()
 
 	player.centerPos += playerVelGauge;
 	boss.pos += bossVelGauge;
+
 
 	// 線分の長さ
 	float line = 0;
