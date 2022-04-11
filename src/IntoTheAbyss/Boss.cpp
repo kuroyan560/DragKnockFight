@@ -69,6 +69,7 @@ void Boss::Generate(const Vec2<float> &generatePos)
 	prevIntersectedLine = INTERSECTED_NONE;
 	stuckWindowTimer = 0;
 	areaHitBox.size = scale;
+	allowToMoveFlag = false;
 }
 
 #include"Camera.h"
@@ -79,14 +80,34 @@ void Boss::Update()
 	// 前フレームの座標を保存
 	prevPos = pos;
 
-	if (SCALE.x <= scale.x)
+	if (!allowToMoveFlag)
 	{
-		scale.x -= 2.0f;
+		//120フレーム以内に縮小する
+		if (SCALE.x < scale.x)
+		{
+			scale.x -= (SCALE.x * 2.0f) / 120.0f;
+		}
+		else
+		{
+			scale.x = 80.0f;
+		}
+
+		if (SCALE.y < scale.y)
+		{
+			scale.y -= (SCALE.x * 2.0f) / 120.0f;
+		}
+		else
+		{
+			scale.y = 80.0f;
+		}
 	}
-	if (SCALE.y <= scale.y)
+
+	if (scale.x == 80.0f && scale.y == 80.0f)
 	{
-		scale.y -= 2.0f;
+		allowToMoveFlag = true;
 	}
+
+
 
 	//通常サイズになるまで動けない
 	if (scale.x <= SCALE.x && scale.y <= SCALE.y)

@@ -67,6 +67,7 @@ private:
 
 public:
 	bool drawFightFlag;
+	bool initFlag;
 	std::unique_ptr<DrawData> playerReticleData, enemyReticleData;
 };
 

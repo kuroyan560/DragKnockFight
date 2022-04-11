@@ -148,7 +148,9 @@ void Player::Init(const Vec2<float> &INIT_POS)
 	bulletHitBox->center = &centerPos;
 	bulletHitBox->radius = 10.0f;
 
-	size = { 3.0f,3.0f };
+	size = { 120.0f,120.0f };
+	sizeVel = 120.0f;
+	allowToMoveFlag = false;
 }
 
 void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPos)
@@ -156,9 +158,15 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPo
 
 	if (1.0f <= size.x && 1.0f <= size.y)
 	{
-		size.x -= 0.1f;
-		size.y -= 0.1f;
+		size.x = sizeVel / 80.0f;
+		size.y = sizeVel / 80.0f;
+		--sizeVel;
 		doorMoveUpDownFlag = true;
+	}
+	else
+	{
+		size = { 1.0f,1.0f };
+		allowToMoveFlag = true;
 	}
 
 

@@ -3,6 +3,7 @@
 #include"../Engine/DrawFunc.h"
 #include"../Engine/DrawFunc_FillTex.h"
 #include"../IntoTheAbyss/TexHandleMgr.h"
+#include"../IntoTheAbyss/ScrollMgr.h"
 
 RoundChangeEffect::RoundChangeEffect()
 {
@@ -60,11 +61,14 @@ void RoundChangeEffect::Start(const bool &LEFT_OR_RIGHT_FLAG)
 		fightData->size = { 5.0f,5.0f };
 
 
-		playerReticleData->honraiPos = { (1280.0f / 2.0f - 514 / 2.0f) - 50.0f,-100.0f };
-		playerReticleData->pos = { (1280.0f / 2.0f - 514 / 2.0f) - 50.0f,-100.0f };
+		Vec2<float> restartPos = { 860.0f-420.0f,-150.0f };
+		Vec2<float> restartPos2 = { 860.0f-120.0f,-150.0f };
+
+		playerReticleData->honraiPos = restartPos;
+		playerReticleData->pos = restartPos;
 		playerReticleData->size = { 2.0f,2.0f };
-		enemyReticleData->honraiPos = { (1280.0f / 2.0f + 514 / 2.0f) - 50.0f,-100.0f };
-		enemyReticleData->pos = { (1280.0f / 2.0f + 514 / 2.0f) - 50.0f,-100.0f };
+		enemyReticleData->honraiPos = restartPos2;
+		enemyReticleData->pos = restartPos2;
 		enemyReticleData->size = { 2.0f,2.0f };
 
 

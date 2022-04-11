@@ -152,6 +152,8 @@ public:
 
 	std::shared_ptr<SphereCollision> bulletHitBox;
 
+	bool allowToMoveFlag;
+	float sizeVel;
 public:
 
 	/*-- ƒƒ“ƒoŠÖ” --*/

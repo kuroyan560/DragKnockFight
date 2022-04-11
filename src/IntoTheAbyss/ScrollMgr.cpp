@@ -79,6 +79,7 @@ Vec2<float> ScrollMgr::Affect(const Vec2<float> &Pos)
 void ScrollMgr::Warp(const Vec2<float> POS)
 {
 	warpFlag = true;
+	honraiScrollAmount = { 0.0f,0.0f };
 	Vec2<float>startPos = CaluStartScrollLine(windowHalfSize - adjLine);
 	honraiScrollAmount = (POS + adjLine) - startPos;
 }
