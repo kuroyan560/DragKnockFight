@@ -51,9 +51,6 @@ void GameScene::OnUpdate()
 	if (UsersInput::Instance()->OnTrigger(DIK_0)) {
 		KuroEngine::Instance().ChangeScene(3, sceneChange);
 	}
-	{
-		SuperiorityGauge::Instance()->AddEnemyGauge(addValue);
-	}
 
 	bool changeInput = UsersInput::Instance()->OnTrigger(DIK_B) || UsersInput::Instance()->OnTrigger(START);
 	if (changeInput)

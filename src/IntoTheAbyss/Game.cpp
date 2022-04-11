@@ -592,6 +592,8 @@ void Game::Init()
 
 	ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+
+	SuperiorityGauge::Instance()->Init();
 }
 
 void Game::Update()
