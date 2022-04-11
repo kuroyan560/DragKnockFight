@@ -1,15 +1,12 @@
 #pragma once
 #include"Vec.h"
 #include"Singleton.h"
-#include"ScrollManager.h"
 
 class Camera : public Singleton<Camera>
 {
 	friend class Singleton<Camera>;
 	Camera() {}
 	friend class ScrollMgr;
-
-	friend class ScrollManager;
 
 	// If camera focuses on something, it will be active.
 	int active;

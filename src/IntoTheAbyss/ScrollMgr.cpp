@@ -1,352 +1,83 @@
 #include "ScrollMgr.h"
 #include "ViewPort.h"
+#include"../Engine/WinApp.h"
 
-ScrollMgr::ScrollMgr():zoom(1.0f)
+void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, const Vec2<float> &ADJ)
 {
+	mapSize = MAP_MAX_SIZE;
+	adjLine = ADJ;
+
+
+	windowSize = WinApp::Instance()->GetWinSize();
+	windowHalfSize = Vec2<float>(windowSize.x / 2.0f, windowSize.y / 2.0f);
+
+
+
+	Vec2<float>startPos = CaluStartScrollLine(windowHalfSize - adjLine);
+	Vec2<float>endPos = CaluEndScrollLine(windowHalfSize + adjLine);
+	honraiScrollAmount = (POS + adjLine) - startPos;
+	scrollAmount = honraiScrollAmount;
+	initFlag = true;
 }
 
 void ScrollMgr::Update()
 {
-	if (!stopScrollData[0])
-	{
-		//スクロール計算
-		scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x - Camera::Instance()->scrollAffect.x) / 5.0f;
-		scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y - Camera::Instance()->scrollAffect.y) / 5.0f;
-		//scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x) / 5.0f;
-		//scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y) / 5.0f;
-	}
-
-
-	//毎フレーム、スクロールの停止命令を下ろす
-	for (int i = 0; i < stopScrollData.size(); ++i)
-	{
-		stopScrollData[i] = false;
-	}
+	scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x - Camera::Instance()->scrollAffect.x) / 5.0f;
+	scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y - Camera::Instance()->scrollAffect.y) / 5.0f;
 }
 
-void ScrollMgr::DetectMapChipForScroll(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
+void ScrollMgr::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS)
 {
-	//プレイヤーの座標を基準に上下左右に検知用の座標を設定する　←　カメラ画角と一緒
-	std::array<Vec2<float>, 4> screenPos;//画角
-	Vec2<float> upVec, sideVec;											//プレイヤーからどれくらい離れた所に検知用の座標を置くか
-
-	Vec2<float> win = SIZE;
-
-	screenPos[UP] = { PLAYER_POS.x,PLAYER_POS.y - win.y };
-	screenPos[DOWN] = { PLAYER_POS.x,PLAYER_POS.y + win.y };
-	screenPos[LEFT] = { PLAYER_POS.x - win.x,PLAYER_POS.y };
-	screenPos[RIGHT] = { PLAYER_POS.x + win.x,PLAYER_POS.y };
+	//ワープした際は前フレーム計算の影響が出ないように処理を飛ばす
 
 
+	//スクロールの制限
+	Vec2<float>startPos = CaluStartScrollLine(windowHalfSize - adjLine);
+	Vec2<float>endPos = CaluEndScrollLine(windowHalfSize + adjLine);
 
-	const std::vector<std::vector<int>> chipData = *mapChipPtr;
+	//プレイヤー座標よりライン外に出たらスクロール量は変化しない
 
-
-
-	float chipSize = 50.0f;
-	int count = 0;
-	std::array<Vec2<float>, 4>tmpDetect;
-	//スクロール範囲を検知する
-	for (int y = 0; y < chipData.size(); ++y)
+	//if (!initFlag)
 	{
-		for (int x = 0; x < chipData[y].size(); ++x)
-		{
-			if (chipData[y][x] == 2)
-			{
-				tmpDetect[count] = { x * chipSize,y * chipSize };
-				++count;
-			}
-		}
+		honraiScrollAmount -= VEL;
 	}
-
-	{
-		int leftData = 0;
-		int rightData = 0;
-		int upData = 0;
-		int downData = 0;
-		//上下左右どちらにあるのかを整理する
-		for (int i = 0; i < 4; ++i)
-		{
-			//どこが一番上か調べる
-			if (tmpDetect[i].y < tmpDetect[upData].y)
-			{
-				upData = i;
-			}
-			//どこが一番下か調べる
-			if (tmpDetect[downData].y < tmpDetect[i].y)
-			{
-				downData = i;
-			}
-			//どこが一番右か調べる
-			if (tmpDetect[rightData].x < tmpDetect[i].x)
-			{
-				rightData = i;
-			}
-			//どこが一番左か調べる
-			if (tmpDetect[i].x < tmpDetect[leftData].x)
-			{
-				leftData = i;
-			}
-		}
-
-		//上下左右に仕分けする
-		detectPos[UP] = tmpDetect[upData];
-		detectPos[DOWN] = tmpDetect[downData];
-		detectPos[LEFT] = tmpDetect[leftData];
-		detectPos[RIGHT] = tmpDetect[rightData];
-	}
+	initFlag = false;
 
 
+	const float adj = 50.0f / 2.0f;
+	const Vec2<float>scrollMaxValue = (endPos - startPos) - Vec2<float>(adj, adj);
+	const Vec2<float>scrollMinValue = Vec2<float>(-adj, -adj);
 
-
-
-	//どこからどこまでスクロールしていいか決める
-	//上
-	if (screenPos[UP].y < detectPos[UP].y)
-	{
-		hitData[UP] = false;
-
-	}
-	else
-	{
-		hitData[UP] = true;
-	}
-
-
-	//下
-	if (detectPos[DOWN].y < screenPos[DOWN].y)
-	{
-		hitData[DOWN] = false;
-
-	}
-	else
-	{
-		hitData[DOWN] = true;
-	}
-
-
-	//左
-	if (screenPos[LEFT].x < detectPos[LEFT].x)
-	{
-		hitData[LEFT] = false;
-
-	}
-	else
-	{
-		hitData[LEFT] = true;
-	}
-
-
-	//右
-	if (detectPos[RIGHT].x < screenPos[RIGHT].x)
-	{
-		hitData[RIGHT] = false;
-
-	}
-	else
-	{
-		hitData[RIGHT] = true;
-	}
-
-
-	//スクロールの最大値を求める計算式-----------------------
-	Vec2<float> distance(detectPos[RIGHT].x, detectPos[DOWN].y);
-	Vec2<float> startPos, endPos;
-
-	float adj = chipSize / 2.0f;
-
-	startPos.x = (detectPos[LEFT].x + win.x);
-	endPos.x = (distance.x - win.x);
-
-	startPos.y = (detectPos[UP].y + win.y);
-	endPos.y = (distance.y - win.y);
-
-	scrollMaxValue = endPos - startPos;
-	//スクロールの最大値を求める計算式-----------------------
-
-
-	//ブロックサイズ半分ズレいているので調整
-	scrollMaxValue.x += adj;
-	scrollMaxValue.y += adj;
-	scrollMinValue = { -adj,-adj };
-}
-
-void ScrollMgr::CalucurateScroll(const Vec2<float> &SCROLL_DATA)
-{
-	if (!warpFlag)
-	{
-		//上下でスクロール管理用のチップを検知したらスクロールしない
-		//if (hitData[UP] && hitData[DOWN])
-		{
-			honraiScrollAmount.y -= SCROLL_DATA.y;
-		}
-		//左右でスクロール管理用のチップを検知したらスクロールしない
-		//if (hitData[LEFT] && hitData[RIGHT])
-		{
-			honraiScrollAmount.x -= SCROLL_DATA.x;
-		}
-
-		if (!hitData[UP])
-		{
-			honraiScrollAmount.y = scrollMinValue.y;
-		}
-		if (!hitData[DOWN])
-		{
-			honraiScrollAmount.y = scrollMaxValue.y;
-		}
-
-		if (!hitData[LEFT])
-		{
-			honraiScrollAmount.x = scrollMinValue.x;
-		}
-		if (!hitData[RIGHT])
-		{
-			honraiScrollAmount.x = scrollMaxValue.x;
-		}
-
-
-		for (int i = 0; i < 4; ++i)
-		{
-			oldHitData[i] = hitData[i];
-		}
-		oldScrollData = SCROLL_DATA;
-	}
-	else
-	{
-		warpFlag = false;
-	}
-}
-
-void ScrollMgr::WarpScroll(const Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE)
-{
-	//プレイヤーの座標を基準に上下左右に検知用の座標を設定する　←　カメラ画角と一緒
-	std::array<Vec2<float>, 4> screenPos;//画角
-	Vec2<float> win = SIZE;
-
-	screenPos[UP] = { PLAYER_POS.x,PLAYER_POS.y - win.y };
-	screenPos[DOWN] = { PLAYER_POS.x,PLAYER_POS.y + win.y };
-	screenPos[LEFT] = { PLAYER_POS.x - win.x,PLAYER_POS.y };
-	screenPos[RIGHT] = { PLAYER_POS.x + win.x,PLAYER_POS.y };
-
-	//どこからどこまでスクロールしていいか決める
-	//上
-	if (screenPos[UP].y < detectPos[UP].y)
-	{
-		hitData[UP] = false;
-	}
-	else
-	{
-		hitData[UP] = true;
-	}
-
-
-
-	//下
-	if (detectPos[DOWN].y < screenPos[DOWN].y)
-	{
-		hitData[DOWN] = false;
-	}
-	else
-	{
-		hitData[DOWN] = true;
-	}
-
-
-	//左
-
-	if (screenPos[LEFT].x < detectPos[LEFT].x)
-	{
-		hitData[LEFT] = false;
-	}
-	else
-	{
-		hitData[LEFT] = true;
-	}
-
-	//右
-	if (detectPos[RIGHT].x < screenPos[RIGHT].x)
-	{
-		hitData[RIGHT] = false;
-	}
-	else
-	{
-		hitData[RIGHT] = true;
-	}
-
-	//スクロールの最大値を求める計算式-----------------------
-	const std::vector<std::vector<int>> chipData = *mapChipPtr;
-
-	float chipSize = 50.0f;
-	Vec2<float> distance(detectPos[RIGHT].x, detectPos[DOWN].y);
-	Vec2<float> startPos, endPos;
-
-	float adj = chipSize / 2.0f;
-
-	startPos.x = (detectPos[LEFT].x + win.x);
-	endPos.x = (distance.x - win.x);
-
-	startPos.y = (detectPos[UP].y + win.y);
-	endPos.y = (distance.y - win.y);
-	//スクロールの最大値を求める計算式-----------------------
-
-
-	//下、左、右のワープ時のスクロールの値を修正-----------------------
-	if (hitData[DOWN] && !oldHitData[DOWN])
-	{
-		float tmp = endPos.x - PLAYER_POS.x;
-		float tmp2 = endPos.y - PLAYER_POS.y;
-		honraiScrollAmount.x = scrollMaxValue.x - tmp;
-		honraiScrollAmount.y = scrollMaxValue.y - tmp2;
-		warpFlag = true;
-	}
-	if (hitData[LEFT] && !oldHitData[LEFT])
-	{
-		honraiScrollAmount.x = PLAYER_POS.x - startPos.x;
-		honraiScrollAmount.y = PLAYER_POS.y - startPos.y;
-		warpFlag = true;
-	}
-	if (hitData[RIGHT] && !oldHitData[RIGHT])
-	{
-		float tmp = endPos.x - PLAYER_POS.x;
-		float tmp2 = endPos.y - PLAYER_POS.y;
-		honraiScrollAmount.x = scrollMaxValue.x - tmp;
-		honraiScrollAmount.y = scrollMaxValue.y - tmp2;
-		warpFlag = true;
-	}
-	//下、左、右のワープ時のスクロールの値を修正-----------------------
-
-}
-
-void ScrollMgr::Restart()
-{
-	scrollAmount = honraiScrollAmount;
-	warpFlag = true;
-}
-
-void ScrollMgr::AlimentScrollAmount()
-{
-	if (honraiScrollAmount.x <= scrollMinValue.x)
+	if (PLAYER_POS.x <= startPos.x - adjLine.x)
 	{
 		honraiScrollAmount.x = scrollMinValue.x;
 	}
-	if (honraiScrollAmount.y <= scrollMinValue.y)
+	if (endPos.x - adjLine.x - adj <= PLAYER_POS.x)
+	{
+		honraiScrollAmount.x = scrollMaxValue.x;
+	}
+
+	const bool getMinVelFlag = PLAYER_POS.y <= startPos.y - adjLine.y;
+	if (getMinVelFlag)
 	{
 		honraiScrollAmount.y = scrollMinValue.y;
 	}
 
-
-	if (scrollMaxValue.x <= honraiScrollAmount.x)
-	{
-		honraiScrollAmount.x = scrollMaxValue.x;
-	}
-	if (scrollMaxValue.y <= honraiScrollAmount.y)
+	const bool getMaxVelFlag = endPos.y - adjLine.y - adj <= PLAYER_POS.y;
+	if (getMaxVelFlag)
 	{
 		honraiScrollAmount.y = scrollMaxValue.y;
 	}
-
 }
 
-void ScrollMgr::StopScroll(const int &DIR)
+Vec2<float> ScrollMgr::Affect(const Vec2<float> &Pos)
 {
-	stopScrollData[DIR] = true;
+	Vec2<float> scrollShakeZoom = scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	scrollShakeZoom.x *= zoom;
+	scrollShakeZoom.y *= zoom;
+	return Pos * zoom - scrollShakeZoom;
+}
+
+void ScrollMgr::Warp(const Vec2<float> POS)
+{
 }

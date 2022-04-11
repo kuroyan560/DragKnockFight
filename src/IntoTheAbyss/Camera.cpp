@@ -17,7 +17,7 @@ void Camera::Update()
 	if (active)
 	{
 		//•`‰æã‚ÌˆÊ’u‚ð‹‚ß‚é
-		const auto targetOnDraw = ScrollManager::Instance()->Affect(target);
+		const auto targetOnDraw = ScrollMgr::Instance()->Affect(target);
 		//‰æ–Ê’†‰›‚Æ‚Ì·•ª‚ð‹‚ß‚é
 		const auto differ =  targetOnDraw - WinApp::Instance()->GetExpandWinCenter() - scrollAffect;
 
@@ -29,7 +29,7 @@ void Camera::Update()
 		scrollAffect = KuroMath::Lerp(scrollAffect, { 0,0 }, 0.1f);
 	}
 
-	ScrollManager::Instance()->zoom = KuroMath::Lerp(ScrollManager::Instance()->zoom, zoom, 0.1f);
+	ScrollMgr::Instance()->zoom = KuroMath::Lerp(ScrollMgr::Instance()->zoom, zoom, 0.1f);
 }
 
 void Camera::Focus(const Vec2<float>& TargetPos, const float& Zoom)
