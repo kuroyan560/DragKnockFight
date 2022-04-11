@@ -349,15 +349,15 @@ void Player::Draw(LightManager& LigManager)
 	rHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	lHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 
-	static auto white = D3D12App::Instance()->GenerateTextureBuffer(Color());
 	//ストレッチ加算
 	//leftUp += stretch_LU;
 	//rightBottom += stretch_RB;
+	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(centerPos + crashDevice.GetShake());
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE, 0.0f, bodyTex, white, crashDevice.GetFlashAlpha());
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE, 0.0f, bodyTex, CRASH_TEX, crashDevice.GetFlashAlpha());
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
@@ -1449,6 +1449,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 			// クールタイムを設定。
 			swingCoolTime = SWING_COOLTIME;
 
+			SwingMgr::Instance()->PlaySE();
 		}
 
 

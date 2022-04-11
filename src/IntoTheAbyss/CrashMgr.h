@@ -5,7 +5,10 @@ class CrashInterFace;
 class CrashMgr : public Singleton<CrashMgr>
 {
 	friend class Singleton<CrashMgr>;
-	CrashMgr() {}
+	CrashMgr();
+
+	int se;
+
 public:
 	void Crash(const Vec2<float>& Pos, CrashInterFace& CrashDevice);
 };

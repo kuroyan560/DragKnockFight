@@ -173,9 +173,9 @@ void Boss::Draw()
 	if (vel.y < 0)dir = BACK;
 
 	auto drawPos = pos + crashDevice.GetShake();
-	static auto WHITE_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color());
+	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - scale), ScrollMgr::Instance()->Affect(drawPos + scale),
-		TexHandleMgr::GetTexBuffer(graphHandle[dir]), WHITE_TEX, crashDevice.GetFlashAlpha());
+		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, crashDevice.GetFlashAlpha());
 }
 
 void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)

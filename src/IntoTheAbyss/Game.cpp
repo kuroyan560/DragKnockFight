@@ -170,7 +170,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 #include"PlayerHand.h"
 void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
-	//AudioApp::Instance()->PlayWave(bgm, true);
+	AudioApp::Instance()->PlayWave(bgm, true);
 
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
