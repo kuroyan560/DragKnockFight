@@ -158,18 +158,18 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPo
 
 	if (1.0f <= size.x && 1.0f <= size.y)
 	{
-		size.x = sizeVel / 80.0f;
-		size.y = sizeVel / 80.0f;
-		--sizeVel;
+		//size.x = sizeVel / 80.0f;
+		//size.y = sizeVel / 80.0f;
+		//--sizeVel;
 		doorMoveUpDownFlag = true;
 	}
 	else
 	{
-		size = { 1.0f,1.0f };
-		allowToMoveFlag = true;
+		
 	}
-
-
+	allowToMoveFlag = true;
+	size = { 1.0f,1.0f };
+	doorMoveUpDownFlag = false;
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
 

@@ -1598,6 +1598,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	/*===== •`‰æˆ— =====*/
 	BackGround::Instance()->Draw();
 
+	roundChangeEffect.Draw();
+
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 	DrawMapChip(mapData, mapChipDrawData, stageNum, roomNum);
 
@@ -1652,8 +1654,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	GameTimer::Instance()->Draw();
 	ScoreManager::Instance()->Draw();
-
-	roundChangeEffect.Draw();
 
 
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
