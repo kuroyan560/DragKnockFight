@@ -120,8 +120,8 @@ float4 PSmain(GSOutput input) : SV_TARGET
     }
     
     float4 srcCol = srcTex.Sample(smp, input.uv);
-    srcCol.w *= input.srcAlpha * texCol.w;
-    return srcCol;
+    texCol.xyz = texCol.xyz * (1.0f - srcCol.w * input.srcAlpha) + srcCol.xyz * srcCol.w * input.srcAlpha;
+    return texCol;
 }
 
 float4 main(float4 pos : POSITION) : SV_POSITION
