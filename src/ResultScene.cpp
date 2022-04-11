@@ -41,6 +41,8 @@ void ResultScene::OnInitialize()
 	breakEnemyAmount = 0;
 	breakPlayerAmount = 0;
 
+	changeScene = new SceneCange();
+
 }
 
 void ResultScene::OnUpdate()
@@ -123,6 +125,11 @@ void ResultScene::OnUpdate()
 
 		OnInitialize();
 
+	}
+
+	// ƒŠƒUƒ‹ƒg‰æ–Ê‚Ö”ò‚Î‚·
+	if (UsersInput::Instance()->OnTrigger(DIK_0)) {
+		KuroEngine::Instance().ChangeScene(0, changeScene);
 	}
 
 }
