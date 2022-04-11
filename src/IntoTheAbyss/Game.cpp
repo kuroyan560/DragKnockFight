@@ -534,6 +534,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//背景に星
 	BackGround::Instance()->Init(GetStageSize());
 
+	roundChangeEffect.Init();
+
 }
 
 Game::Game()
@@ -990,6 +992,12 @@ void Game::Update()
 		gameStartFlag = false;
 	}
 
+	if (UsersInput::Instance()->OnTrigger(DIK_U))
+	{
+		roundFinishFlag = true;
+	}
+
+
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
 	{
@@ -1014,10 +1022,25 @@ void Game::Update()
 	//ラウンド開始時の演出開始
 	if (readyToStartRoundFlag)
 	{
-		gameStartFlag = true;
-		SelectStage::Instance()->resetStageFlag = true;
-		readyToStartRoundFlag = false;
+		roundChangeEffect.Start(false);
+		Vec2<float>winSize;
+		winSize.x = static_cast<float>(WinApp::Instance()->GetWinSize().x);
+		winSize.y = static_cast<float>(WinApp::Instance()->GetWinSize().y);
+		ScrollMgr::Instance()->Warp(winSize);
+		
+		//プレイヤーと敵の座標初期化
+		if (roundChangeEffect.drawFightFlag)
+		{
+			player.Init(roundChangeEffect.playerReticleData->pos);
+			boss.Generate(roundChangeEffect.enemyReticleData->pos);
+		}
+
+		//gameStartFlag = true;
+		//SelectStage::Instance()->resetStageFlag = true;
+		//readyToStartRoundFlag = false;
 	}
+
+
 
 
 
@@ -1053,11 +1076,19 @@ void Game::Update()
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
-	// プレイヤーの更新処理
-	player.Update(mapData, boss.pos);
+	//ラウンドチェンジ演出中は動かせない
+	if (!readyToStartRoundFlag)
+	{
+		// プレイヤーの更新処理
+		player.Update(mapData, boss.pos);
+		// ボスの更新処理
+		boss.Update();
+	}
+
 
 	miniMap.Update();
 
+	roundChangeEffect.Update();
 
 	GameTimer::Instance()->Update();
 	ScoreManager::Instance()->Update();
@@ -1083,9 +1114,6 @@ void Game::Update()
 	}
 
 
-
-	// ボスの更新処理
-	boss.Update();
 
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
@@ -1609,6 +1637,9 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	GameTimer::Instance()->Draw();
 	ScoreManager::Instance()->Draw();
+
+	roundChangeEffect.Draw();
+
 
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;

@@ -97,7 +97,7 @@ public:
 
 	int shotSE;
 
-
+	Vec2<float>scale;
 
 public:
 
@@ -183,6 +183,7 @@ public:
 	void StopDoorUpDown();
 	bool drawCursorFlag;
 
+	Vec2<float>size;
 private:
 	/*-- クラス内で使用する関数 --*/
 

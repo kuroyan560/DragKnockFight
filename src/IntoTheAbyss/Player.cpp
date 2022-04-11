@@ -51,7 +51,7 @@ Player::~Player()
 {
 }
 
-void Player::Init(const Vec2<float>& INIT_POS)
+void Player::Init(const Vec2<float> &INIT_POS)
 {
 
 	/*===== 初期化処理 =====*/
@@ -147,10 +147,21 @@ void Player::Init(const Vec2<float>& INIT_POS)
 	bulletHitBox = std::make_shared<SphereCollision>();
 	bulletHitBox->center = &centerPos;
 	bulletHitBox->radius = 10.0f;
+
+	size = { 3.0f,3.0f };
 }
 
-void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
+void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPos)
 {
+
+	if (1.0f <= size.x && 1.0f <= size.y)
+	{
+		size.x -= 0.1f;
+		size.y -= 0.1f;
+		doorMoveUpDownFlag = true;
+	}
+
+
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
 
@@ -324,7 +335,7 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPo
 	//muffler.Update(centerPos);
 }
 
-void Player::Draw(LightManager& LigManager)
+void Player::Draw(LightManager &LigManager)
 {
 	//if (vel.y < 0)playerDir = BACK;
 	if (vel.y < 0)anim.ChangeAnim(DEFAULT_BACK);
@@ -345,8 +356,8 @@ void Player::Draw(LightManager& LigManager)
 
 	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_L.png");
 	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_R.png");
-	rHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
-	lHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
+	rHand->Draw(LigManager, EXT_RATE * size.x, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
+	lHand->Draw(LigManager, EXT_RATE * size.y, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 
 	//ストレッチ加算
 	//leftUp += stretch_LU;
@@ -355,7 +366,7 @@ void Player::Draw(LightManager& LigManager)
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE, 0.0f, bodyTex);
+	DrawFunc::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * size, 0.0f, bodyTex);
 
 	//テレポート時のフラッシュ
 	static auto white = D3D12App::Instance()->GenerateTextureBuffer(Color());
@@ -367,7 +378,7 @@ void Player::Draw(LightManager& LigManager)
 
 }
 
-void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip, const Vec2<float>& lineCenterPos)
+void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble> &bubble, vector<DossunBlock> &dossun, const Vec2<float> &bossPos, bool &isHitMapChip, const Vec2<float> &lineCenterPos)
 {
 
 	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
@@ -1150,7 +1161,7 @@ void Player::StopDoorUpDown()
 	doorMoveUpDownFlag = true;
 }
 
-void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
+void Player::Input(const vector<vector<int>> mapData, const Vec2<float> &bossPos)
 {
 	/*===== 入力処理 =====*/
 
@@ -1762,7 +1773,7 @@ void Player::PushBackWall()
 
 }
 
-void Player::CalculateStretch(const Vec2<float>& Move)
+void Player::CalculateStretch(const Vec2<float> &Move)
 {
 	Vec2<float> stretchRate = { abs(Move.x / MAX_RECOIL_AMOUNT),abs(Move.y / MAX_RECOIL_AMOUNT) };
 
@@ -1857,7 +1868,7 @@ Vec2<float> Player::GetPlayerGraphSize()
 	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 }
 
-void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip)
+void Player::CheckHitMapChipVel(const Vec2<float> &checkPos, const vector<vector<int>> &mapData, const Vec2<float> &bossPos, bool &isHitMapChip)
 {
 	// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
 	//Vec2<float> upperPlayerPos = centerPos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);
@@ -2061,7 +2072,7 @@ void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector
 
 }
 
-void Player::CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip)
+void Player::CheckHitSize(const Vec2<float> &checkPos, const vector<vector<int>> &mapData, const Vec2<float> &bossPos, bool &isHitMapChip)
 {
 
 	// マップチップ目線でどこに当たったか
