@@ -36,7 +36,7 @@ Boss::Boss()
 
 
 	//パターンに渡すデータの初期化
-	patternData.bossPos = &vel;
+	patternData.bossPos = &moveVel;
 	patternData.stuckWindowTimer = &stuckWindowTimer;
 
 	bossPatternNow = BOSS_PATTERN_NORMALMOVE;

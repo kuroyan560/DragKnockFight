@@ -38,7 +38,6 @@ void MiniMap::Update()
 	}
 
 	nowPos.x = 85.0f + nowValue * 1110.0f;
-	//nowPos.x = 0.0f + nowValue * 1115.0f;
 }
 
 void MiniMap::Draw()
