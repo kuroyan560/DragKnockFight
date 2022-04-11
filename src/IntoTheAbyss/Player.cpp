@@ -357,7 +357,8 @@ void Player::Draw(LightManager& LigManager)
 	//“·‘Ì
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE, 0.0f, bodyTex, CRASH_TEX, crashDevice.GetFlashAlpha());
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * crashDevice.GetExtRate(),
+		0.0f, bodyTex, CRASH_TEX, crashDevice.GetFlashAlpha());
 
 	// ’e‚ð•`‰æ
 	BulletMgr::Instance()->Draw();
@@ -953,7 +954,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		if (windowSize.x <= centerPos.x + PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x || centerPos.x - PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(centerPos, crashDevice);
+			CrashMgr::Instance()->Crash(centerPos, crashDevice, { false,true });
 			SuperiorityGauge::Instance()->AddEnemyGauge(10);
 
 		}
@@ -961,7 +962,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		if (windowSize.y <= centerPos.y + PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y || centerPos.y - PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(centerPos,crashDevice);
+			CrashMgr::Instance()->Crash(centerPos, crashDevice, { true,false });
 			SuperiorityGauge::Instance()->AddEnemyGauge(10);
 
 		}

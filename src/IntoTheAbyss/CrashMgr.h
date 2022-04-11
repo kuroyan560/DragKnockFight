@@ -10,6 +10,6 @@ class CrashMgr : public Singleton<CrashMgr>
 	int se;
 
 public:
-	void Crash(const Vec2<float>& Pos, CrashInterFace& CrashDevice);
+	void Crash(const Vec2<float>& Pos, CrashInterFace& CrashDevice, const Vec2<bool>& Ext);
 };
 

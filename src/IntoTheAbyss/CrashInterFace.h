@@ -9,6 +9,8 @@ class CrashInterFace
 	Vec2<float>shake;
 	Vec2<int>sign;
 	float flashAlpha;
+	Vec2<float>extRate;
+	Vec2<float>addExtRate;
 	int timer;
 public:
 	void Init();
@@ -16,7 +18,8 @@ public:
 
 	const Vec2<float>GetShake() { return shake; }
 	const float& GetFlashAlpha() { return flashAlpha; }
+	const Vec2<float>& GetExtRate() { return extRate; }
 
-	void Crash();
+	void Crash(const Vec2<bool>& Ext);
 };
 
