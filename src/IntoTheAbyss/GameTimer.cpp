@@ -11,9 +11,9 @@ GameTimer::GameTimer()
 	flame = -1;
 	timerPos = { 714,62 };
 
-	number.resize(11);
+	number.resize(12);
 	texSize = { 48,44 };
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 11, { 11, 1 }, number.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, number.data());
 
 }
 

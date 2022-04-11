@@ -8,6 +8,7 @@
 #include"DrawFunc_Shadow.h"
 #include"DrawFunc_FillTex.h"
 #include"TitleScene.h"
+#include"ResultScene.h"
 #include"StageSelectScene.h"
 
 
@@ -34,11 +35,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//シーンリスト=====================
 
-	std::vector<BaseScene *>sceneList =
+	std::vector<BaseScene*>sceneList =
 	{
 		new TitleScene(),
 		new StageSelectScene(),
-		new GameScene()
+		new GameScene(),
+		new ResultScene(),
 	};
 	int awakeScene = 0;	//開始時のステージ番号
 
