@@ -7,6 +7,7 @@
 #include<memory>
 #include"Bullet.h"
 
+#include"CrashInterFace.h"
 using namespace std;
 
 // プレイヤーと引っ張り合うボスクラス
@@ -30,6 +31,9 @@ public:
 	//画像
 	static const enum DIR { FRONT, BACK, DIR_NUM };
 	int graphHandle[DIR_NUM];
+
+	//クラッシュ演出補助
+	CrashInterFace crashDevice;
 
 
 	//ボスのパターン制御-----------------------

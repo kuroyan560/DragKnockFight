@@ -33,6 +33,7 @@ void StunEffect::Init()
 
 }
 
+#include"AudioApp.h"
 void StunEffect::Activate(Vec2<float>& focusPos, const Vec2<float>& stunPos, const Vec2<float>& iconPos, const bool& isBoss)
 {
 
@@ -116,6 +117,13 @@ void StunEffect::Update()
 			status = StunEffect::STATUS_STOP;
 			breakUITimer = 0;
 
+			static int BREAK_SE = -1;
+			if (BREAK_SE == -1)
+			{
+				BREAK_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/break.wav");
+				AudioApp::Instance()->ChangeVolume(BREAK_SE, 0.45f);
+			}
+			AudioApp::Instance()->PlayWave(BREAK_SE);
 		}
 
 		break;

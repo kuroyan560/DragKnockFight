@@ -41,4 +41,5 @@ public:
 	// XVˆ—
 	void Update(const Vec2<float>& playerPos, const Vec2<float>& bossPos, const float& lineLength);
 
+	void PlaySE();
 };

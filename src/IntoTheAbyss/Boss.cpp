@@ -14,8 +14,8 @@
 #include"TexHandleMgr.h"
 #include"BossPatternNormalMove.h"
 #include"BossPatternAttack.h"
-
 #include"BossBulletManager.h"
+#include"CrashMgr.h"
 
 Boss::Boss()
 {
@@ -51,6 +51,7 @@ void Boss::Init()
 	scale = {};
 	vel = {};
 	moveVel = {};
+	crashDevice.Init();
 
 }
 
@@ -75,6 +76,7 @@ void Boss::Generate(const Vec2<float> &generatePos)
 void Boss::Update()
 {
 	/*===== 更新処理 =====*/
+	crashDevice.Update();
 
 	// 前フレームの座標を保存
 	prevPos = pos;
@@ -188,6 +190,8 @@ void Boss::Update()
 	}
 }
 
+#include"DrawFunc_FillTex.h"
+#include"D3D12App.h"
 void Boss::Draw()
 {
 	/*===== 描画処理 =====*/
@@ -195,7 +199,12 @@ void Boss::Draw()
 	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
 	DIR dir = FRONT;
 	if (vel.y < 0)dir = BACK;
-	DrawFunc::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(pos - scale), ScrollMgr::Instance()->Affect(pos + scale), TexHandleMgr::GetTexBuffer(graphHandle[dir]), AlphaBlendMode_Trans);
+
+	auto drawPos = pos + crashDevice.GetShake();
+	auto drawScale = scale * crashDevice.GetExtRate();
+	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
+	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
+		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, crashDevice.GetFlashAlpha());
 }
 
 void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos)
@@ -329,7 +338,11 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 		// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 		if (SwingMgr::Instance()->isSwingPlayer || OFFSET_INERTIA / 2.0f < afterSwingDelay) {
 
-			ShakeMgr::Instance()->SetShake(15);
+			Vec2<bool>ext = { true,true };
+			if (!isHitLeft && !isHitRight)ext.y = false;
+			if (!isHitTop && !isHitBottom)ext.x = false;
+
+			CrashMgr::Instance()->Crash(pos, crashDevice, ext);
 			SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
 			SwingMgr::Instance()->isSwingPlayer = false;
 
@@ -351,7 +364,7 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 		if (windowSize.x <= pos.x + scale.x - ScrollMgr::Instance()->scrollAmount.x || pos.x - scale.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			ShakeMgr::Instance()->SetShake(20);
+			CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
 			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
 		}
@@ -359,7 +372,7 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 		if (windowSize.y <= pos.y + scale.y - ScrollMgr::Instance()->scrollAmount.y || pos.y - scale.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			ShakeMgr::Instance()->SetShake(20);
+			CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
 			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
 		}

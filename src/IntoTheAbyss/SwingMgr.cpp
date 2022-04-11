@@ -69,3 +69,15 @@ void SwingMgr::Update(const Vec2<float>& playerPos, const Vec2<float>& bossPos, 
 	}
 
 }
+
+#include"AudioApp.h"
+void SwingMgr::PlaySE()
+{
+	static int SE = -1;
+	if (SE == -1)
+	{
+		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/swing.wav");
+		AudioApp::Instance()->ChangeVolume(SE, 0.55f);
+	}
+	AudioApp::Instance()->PlayWave(SE);
+}
