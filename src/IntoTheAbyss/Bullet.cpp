@@ -7,6 +7,8 @@
 #include"KuroFunc.h"
 #include"DrawFunc.h"
 
+#include"TexHandleMgr.h"
+
 Bullet::Bullet()
 {
 
