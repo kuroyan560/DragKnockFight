@@ -6,7 +6,7 @@
 ScoreManager::ScoreManager()
 {
 	texSize = { 35,44 };
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 10, { 10, 1 }, number.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, number.data());
 }
 
 ScoreManager::~ScoreManager()
