@@ -1512,13 +1512,13 @@ void Game::Update()
 
 
 	// —D¨ƒQ[ƒW‚ªU‚èØ‚Á‚½ƒgƒŠƒK[”»’è‚Ì‚Æ‚«‚ÉƒXƒ^ƒ“‰‰o‚ð—LŒø‰»‚·‚éB
-	if (SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
+	if (UsersInput::Instance()->OnTrigger(DIK_7) || SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
 		// “G‚Ì—D¨ƒQ[ƒW‚ªU‚èØ‚Á‚½‚Æ‚¢‚¤‚±‚Æ‚ÍAƒvƒŒƒCƒ„[‚Ì—D¨ƒQ[ƒW‚ª0‚¾‚Æ‚¢‚¤‚±‚ÆB
-		StunEffect::Instance()->Activate(player.centerPos);
+		StunEffect::Instance()->Activate(player.centerPos, player.centerPos, Vec2<float>(0, 0), false);
 	}
-	if (SuperiorityGauge::Instance()->GetPlayerGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetPlayerGaugeData()->prevOverGaugeFlag) {
+	if (UsersInput::Instance()->OnTrigger(DIK_8) || SuperiorityGauge::Instance()->GetPlayerGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetPlayerGaugeData()->prevOverGaugeFlag) {
 		// ƒvƒŒƒCƒ„[‚Ì—D¨ƒQ[ƒW‚ªU‚èØ‚Á‚½‚Æ‚¢‚¤‚±‚Æ‚ÍA“G‚Ì—D¨ƒQ[ƒW‚ª0‚¾‚Æ‚¢‚¤‚±‚ÆB
-		StunEffect::Instance()->Activate(boss.pos);
+		StunEffect::Instance()->Activate(boss.pos, boss.pos, Vec2<float>(1200, 0), true);
 	}
 
 }
@@ -1631,6 +1631,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	WinCounter::Instance()->Draw();
 
+	StunEffect::Instance()->Draw();
+
 	if (sceneBlackFlag || sceneLightFlag)
 	{
 		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), D3D12App::Instance()->GetBackBuffFormat(), true, AlphaBlendMode_Trans);
@@ -1658,7 +1660,7 @@ void Game::Scramble()
 	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
 	// [U‚è‰ñ‚µó‘Ô‚Ì‚Æ‚«] [ƒXƒ^ƒ“‰‰o’†] ‚ÍˆÚ“®‚³‚¹‚È‚¢B
-	if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer || StunEffect::Instance()->isActive)) {
+	if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer)) {
 		player.centerPos += playerVelGauge;
 		boss.pos += bossVelGauge;
 	}
