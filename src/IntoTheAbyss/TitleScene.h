@@ -19,15 +19,28 @@ class TitleScene : public BaseScene
 	int titleHandle;		// タイトルロゴのハンドル
 	int pressStartHandle;	// PRESSSTARTのハンドル
 
+	// イージングに使用するタイマー
+	float easingTimer;
+	bool isUpper;
+	int pressStartTimer;
+	bool isPressStartDraw;
+
 
 private:
 
 	// 初期座標
 	const Vec2<float> WINDOW_SIZE = { 1280.0f,720.0f };
-	const Vec2<float> LUNA_POS = { 0.0f,80.0f };
-	const Vec2<float> LACY_POS = { WINDOW_SIZE.x - 410.0f, 80.0f };
-	const Vec2<float> LUNA_ROBOT_POS = { 160.0f, 300.0f };
-	const Vec2<float> LACY_ROBOT_POS = { WINDOW_SIZE.x / 2.0f, 360.0f };
+	const Vec2<float> LUNA_POS = { 0.0f,120.0f };
+	const Vec2<float> LACY_POS = { WINDOW_SIZE.x - 410.0f, 120.0f };
+	const Vec2<float> LUNA_ROBOT_POS = { 125.0f, 350.0f };
+	const Vec2<float> LACY_ROBOT_POS = { WINDOW_SIZE.x / 2.0f - 50.0f, 340.0f };
+	const Vec2<float> TITLE_POS = { 170,80 };
+	const Vec2<float> PRESS_START_POS = { 270,500 };
+
+	// イージングに使用するタイマー
+	const float ADD_EASING_TIMER = 0.01f;
+	const float EASING_MOVE = 30.0f;
+	const int PERSSSTART_TIMER = 50;
 
 
 public:
