@@ -606,6 +606,7 @@ void Game::Init()
 
 	//ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 	//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+
 }
 
 void Game::Update()
