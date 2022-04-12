@@ -8,7 +8,7 @@
 #include"Bullet.h"
 #include"BulletCollision.h"
 
-#include"CrashInterFace.h"
+#include"StagingInterFace.h"
 using namespace std;
 
 // プレイヤーと引っ張り合うボスクラス
@@ -34,7 +34,7 @@ public:
 	int graphHandle[DIR_NUM];
 
 	//クラッシュ演出補助
-	CrashInterFace crashDevice;
+	StagingInterFace crashDevice;
 
 
 	//ボスのパターン制御-----------------------

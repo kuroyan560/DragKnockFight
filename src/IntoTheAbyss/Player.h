@@ -15,7 +15,7 @@ class PlayerHand;
 #include"AfterImg.h"
 class LightManager;
 #include"Muffler.h"
-#include"CrashInterFace.h"
+#include"StagingInterFace.h"
 
 #include"../IntoTheAbyss/BulletCollision.h"
 
@@ -99,7 +99,7 @@ public:
 	int shotSE;
 
 	//クラッシュ演出補助
-	CrashInterFace crashDevice;
+	StagingInterFace crashDevice;
 
 public:
 
