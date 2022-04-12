@@ -12,7 +12,7 @@ public:
 	void OnImguiDebug()override;
 	void OnFinalize()override;
 
-	SceneCange *changeScene;
+	std::shared_ptr<SceneCange> changeScene;
 
 	int stageNum;
 };

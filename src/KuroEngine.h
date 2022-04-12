@@ -11,6 +11,7 @@
 #include"AudioApp.h"
 #include"ImguiApp.h"
 #include"GraphicsManager.h"
+#include<memory>
 
 class Fps;
 
@@ -100,10 +101,10 @@ private:
 	std::shared_ptr<ConstantBuffer>parallelMatProjBuff;
 
 	//シーンリスト
-	std::vector<BaseScene *>scenes;
+	std::vector<std::shared_ptr<BaseScene>>scenes;
 	int nowScene;	//現在のシーン番号
 	int nextScene = -1;	//次のシーン番号
-	SceneTransition *nowSceneTransition;	//現在セットされているシーン遷移
+	std::shared_ptr<SceneTransition> nowSceneTransition;	//現在セットされているシーン遷移
 
 	//FPS固定
 	std::shared_ptr<Fps>fps;
@@ -115,7 +116,7 @@ private:
 public:
 	~KuroEngine();
 	void Initialize(const EngineOption &Option);
-	void SetSceneList(const std::vector<BaseScene *> &SceneList, const int &AwakeSceneNum);
+	void SetSceneList(const std::vector<std::shared_ptr<BaseScene>> &SceneList, const int &AwakeSceneNum);
 	void Update();
 	void Draw();
 	bool End() { return end; }
@@ -123,7 +124,7 @@ public:
 	//ゲーム終了
 	void GameEnd() { end = true; }
 	//シーンチェンジ
-	void ChangeScene(const int &SceneNum, SceneTransition *SceneTransition)
+	void ChangeScene(const int &SceneNum, std::shared_ptr<SceneTransition> SceneTransition)
 	{
 		nextScene = SceneNum;
 		nowSceneTransition = SceneTransition;
