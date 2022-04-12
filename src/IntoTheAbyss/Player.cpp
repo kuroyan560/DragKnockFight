@@ -374,6 +374,14 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPo
 	if (0 < swingCoolTime) --swingCoolTime;
 
 	//muffler.Update(centerPos);
+
+
+	if (SwingMgr::Instance()->isSwingBoss)
+	{
+		centerPos = SwingMgr::Instance()->bossPos + SwingMgr::Instance()->easingNowVec * SwingMgr::Instance()->lineLength;
+		vel = { 0.0f,0.0f };
+	}
+
 }
 
 void Player::Draw(LightManager &LigManager)
@@ -1212,7 +1220,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float> &bossPos
 	//}
 
 	// スタン演出中だったら入力を受け付けない。
-	if (StunEffect::Instance()->isActive) return;
+	if (StunEffect::Instance()->isActive || SwingMgr::Instance()->isSwingBoss) return;
 
 	//同時ショット判定タイマー計測
 	if (isLeftFirstShotTimer < DOUJI_ALLOWANCE_FRAME)isLeftFirstShotTimer++;
@@ -1504,6 +1512,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float> &bossPos
 
 			SwingMgr::Instance()->PlaySE();
 		}
+
 
 
 
