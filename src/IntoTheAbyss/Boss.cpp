@@ -42,6 +42,7 @@ Boss::Boss()
 	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 	patternTimer = 0;
 
+	Init();
 }
 
 void Boss::Init()

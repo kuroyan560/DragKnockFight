@@ -91,8 +91,17 @@ void WinCounter::Draw()
 	DrawFunc::DrawRotaGraph2D(knockOutPos, { kncokOutScale * KNOCK_OUT_SCALE,kncokOutScale * KNOCK_OUT_SCALE }, knockOutRadian, TexHandleMgr::GetTexBuffer(knockOutGraph));
 }
 
+#include"AudioApp.h"
 void WinCounter::RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsLeft)
 {
+	static int SE = -1;
+	if (SE == -1)
+	{
+		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/knockout.wav");
+		AudioApp::Instance()->ChangeVolume(SE, 0.7f);
+	}
+	AudioApp::Instance()->PlayWave(SE);
+
 	countRound++;
 	if (WinnerIsLeft)
 	{
