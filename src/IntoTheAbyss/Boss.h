@@ -90,4 +90,6 @@ public:
 	// “–‚½‚è”»’è
 	void CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos);
 
+	//ƒ_ƒ[ƒW
+	void Damaged();
 };

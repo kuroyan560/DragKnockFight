@@ -10,6 +10,7 @@ using namespace std;
 
 class BossBulletManager :public Singleton<BossBulletManager>
 {
+	int bulletGraph;
 
 public:
 

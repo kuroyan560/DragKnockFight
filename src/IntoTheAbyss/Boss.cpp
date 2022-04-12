@@ -393,3 +393,7 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 	}
 
 }
+
+void Boss::Damaged()
+{
+}

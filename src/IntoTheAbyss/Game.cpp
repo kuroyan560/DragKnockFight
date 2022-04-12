@@ -1198,6 +1198,7 @@ void Game::Update()
 		{
 			SuperiorityGauge::Instance()->AddEnemyGauge(10.0f);
 			BossBulletManager::Instance()->GetBullet(index)->Init();
+			boss.Damaged();
 		}
 	}
 
