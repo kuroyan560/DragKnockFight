@@ -73,7 +73,7 @@ private:
 	float countDownEndPos;
 	Vec2<int> texSize;
 	int countDownNum;
-	
+
 	bool countDownFlag;
 	int countDownHandle[4], finishHandle;
 
