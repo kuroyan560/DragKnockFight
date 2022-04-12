@@ -4,6 +4,15 @@
 
 class TitleScene : public BaseScene
 {
+
+	int frameHandle;		// 外枠のハンドル
+	int starHandle;			// 星のハンドル
+	int charHandle;			// キャラのハンドル
+	int robotHandle;		// ロボットのハンドル
+	int titleHandle;		// タイトルロゴのハンドル
+	int pressStartHandle;	// PRESSSTARTのハンドル
+
+
 public:
 	TitleScene();
 	void OnInitialize()override;
@@ -12,6 +21,6 @@ public:
 	void OnImguiDebug()override;
 	void OnFinalize()override;
 
-	SceneCange *changeScene;
+	SceneCange* changeScene;
 };
 
