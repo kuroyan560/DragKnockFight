@@ -9,6 +9,7 @@
 #include"IntoTheAbyss/GameTimer.h"
 #include"IntoTheAbyss/ScoreManager.h"
 #include"IntoTheAbyss/WinCounter.h"
+#include"IntoTheAbyss/ResultSceneBackGround.h"
 
 GameScene::GameScene()
 {
@@ -26,6 +27,10 @@ GameScene::GameScene()
 	sceneChange = new SceneCange();
 
 	addValue = 10.0f;
+
+	isSS = false;
+
+	ResultSceneBackGround::Instance()->Init();
 }
 
 void GameScene::OnInitialize()
@@ -46,6 +51,13 @@ void GameScene::OnUpdate()
 	{
 		SuperiorityGauge::Instance()->AddEnemyGauge(addValue);
 	}
+	if (UsersInput::Instance()->OnTrigger(DIK_S))
+	{
+		isSS = true;
+	}
+	else {
+		isSS = false;
+	}
 
 	// ƒŠƒUƒ‹ƒg‰æ–Ê‚Ö”ò‚Î‚·
 	if (UsersInput::Instance()->OnTrigger(DIK_0)) {
@@ -62,12 +74,18 @@ void GameScene::OnUpdate()
 void GameScene::OnDraw()
 {
 	emissiveMap->Clear(D3D12App::Instance()->GetCmdList());
-	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
+	if (isSS) {
+		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap, ResultSceneBackGround::Instance()->backGround });
+	}
+	else {
+		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
+	}
 	backGround->Draw();
 	game.Draw(emissiveMap);
 
 	gaussianBlur->Register(emissiveMap);
 	gaussianBlur->DrawResult(AlphaBlendMode_Add);
+
 }
 
 void GameScene::OnImguiDebug()
