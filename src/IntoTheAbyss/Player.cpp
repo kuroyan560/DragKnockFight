@@ -147,7 +147,7 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	bulletHitBox = std::make_shared<SphereCollision>();
 	bulletHitBox->center = &centerPos;
-	bulletHitBox->radius = 10.0f;
+	bulletHitBox->radius = 20.0f;
 	crashDevice.Init();
 }
 
