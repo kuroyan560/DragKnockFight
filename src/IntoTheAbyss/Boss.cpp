@@ -56,7 +56,7 @@ void Boss::Init()
 	scale = {};
 	vel = {};
 	moveVel = {};
-	crashDevice.Init();
+	stagingDevice.Init();
 
 }
 
@@ -81,7 +81,7 @@ void Boss::Generate(const Vec2<float>& generatePos)
 void Boss::Update()
 {
 	/*===== 更新処理 =====*/
-	crashDevice.Update();
+	stagingDevice.Update();
 
 	// 前フレームの座標を保存
 	prevPos = pos;
@@ -205,11 +205,11 @@ void Boss::Draw()
 	DIR dir = FRONT;
 	if (vel.y < 0)dir = BACK;
 
-	auto drawPos = pos + crashDevice.GetShake();
-	auto drawScale = scale * crashDevice.GetExtRate();
+	auto drawPos = pos + stagingDevice.GetShake();
+	auto drawScale = scale * stagingDevice.GetExtRate();
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, crashDevice.GetFlashAlpha());
+		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
 }
 
 void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
@@ -347,7 +347,7 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 			if (!isHitLeft && !isHitRight)ext.y = false;
 			if (!isHitTop && !isHitBottom)ext.x = false;
 
-			CrashMgr::Instance()->Crash(pos, crashDevice, ext);
+			CrashMgr::Instance()->Crash(pos, stagingDevice, ext);
 			SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
 			SwingMgr::Instance()->isSwingPlayer = false;
 
@@ -369,7 +369,7 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 		if (windowSize.x <= pos.x + scale.x - ScrollMgr::Instance()->scrollAmount.x || pos.x - scale.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
+			CrashMgr::Instance()->Crash(pos, stagingDevice, { false,true });
 			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
 		}
@@ -377,7 +377,7 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 		if (windowSize.y <= pos.y + scale.y - ScrollMgr::Instance()->scrollAmount.y || pos.y - scale.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
+			CrashMgr::Instance()->Crash(pos, stagingDevice, { true,false });
 			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
 		}
@@ -394,6 +394,3 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 
 }
 
-void Boss::Damaged()
-{
-}

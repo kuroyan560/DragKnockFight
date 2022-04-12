@@ -33,8 +33,8 @@ public:
 	static const enum DIR { FRONT, BACK, DIR_NUM };
 	int graphHandle[DIR_NUM];
 
-	//クラッシュ演出補助
-	StagingInterFace crashDevice;
+	//演出補助
+	StagingInterFace stagingDevice;
 
 
 	//ボスのパターン制御-----------------------
@@ -89,7 +89,4 @@ public:
 
 	// 当たり判定
 	void CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos);
-
-	//ダメージ
-	void Damaged();
 };

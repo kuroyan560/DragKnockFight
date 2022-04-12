@@ -1186,6 +1186,9 @@ void Game::Update()
 
 	}
 
+	static const int DAMAGED_SPAN = 15;
+	static const float DAMAGED_FLASH_RATE = 0.6f;
+
 	//ボス弾とプレイヤーの判定
 	for (int index = 0; index < BossBulletManager::Instance()->bullets.size(); ++index)
 	{
@@ -1198,7 +1201,7 @@ void Game::Update()
 		{
 			SuperiorityGauge::Instance()->AddEnemyGauge(10.0f);
 			BossBulletManager::Instance()->GetBullet(index)->Init();
-			boss.Damaged();
+			player.stagingDevice.Flash(DAMAGED_SPAN, DAMAGED_FLASH_RATE);
 		}
 	}
 
@@ -1214,6 +1217,7 @@ void Game::Update()
 		{
 			SuperiorityGauge::Instance()->AddPlayerGauge(10.0f);
 			BulletMgr::Instance()->GetBullet(index)->Init();
+			boss.stagingDevice.Flash(DAMAGED_SPAN, DAMAGED_FLASH_RATE);
 		}
 	}
 

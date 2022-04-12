@@ -99,7 +99,7 @@ public:
 	int shotSE;
 
 	//クラッシュ演出補助
-	StagingInterFace crashDevice;
+	StagingInterFace stagingDevice;
 
 public:
 
