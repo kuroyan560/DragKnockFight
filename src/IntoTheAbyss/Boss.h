@@ -8,7 +8,7 @@
 #include"Bullet.h"
 #include"BulletCollision.h"
 
-#include"StagingInterFace.h"
+#include"CrashInterFace.h"
 using namespace std;
 
 // プレイヤーと引っ張り合うボスクラス
@@ -52,7 +52,10 @@ public:
 	bool atackModeFlag;
 	//ボスのパターン制御-----------------------
 
-
+	bool allowToMoveFlag;
+	bool initPaticleFlag;
+	int moveTimer;
+	Vec2<float>initScale;
 public:
 
 	/*===== 定数 =====*/
@@ -70,7 +73,7 @@ public:
 	std::unique_ptr<SphereCollision> bulletHitBox;
 
 public:
-
+	bool readyToStartRoundEffectFlag;
 	/*===== メンバ関数 =====*/
 
 	// コンストラクタ
@@ -90,4 +93,10 @@ public:
 
 	// 当たり判定
 	void CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos);
+
+
+	bool AllowToMove()
+	{
+		return allowToMoveFlag;
+	};
 };
