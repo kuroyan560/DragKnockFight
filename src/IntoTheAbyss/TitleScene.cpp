@@ -1,10 +1,31 @@
 #include "TitleScene.h"
-#include"StageMgr.h"
+#include "StageMgr.h"
+#include "DrawFunc.h"
+#include "TexHandleMgr.h"
+#include "SceneCange.h"
+#include "KuroMath.h"
 
 TitleScene::TitleScene()
 {
 	changeScene = new SceneCange();
 	StageMgr::Instance();
+
+	// Še‰æ‘œ‚ğƒ[ƒh
+	frameHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/back.png");
+	starHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/star.png");
+	lunaHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/luna.png");
+	lacyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/lacy.png");
+	lunaRobotHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/luna_robo.png");
+	lacyRobotHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/lacy_robo.png");
+	titleHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/title.png");
+	pressStartHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/pressStart.png");
+
+	easingTimer = 0;
+	bool isUpper = true;
+
+	isPressStartDraw = true;
+	pressStartTimer = 0;
+
 }
 
 void TitleScene::OnInitialize()
@@ -18,12 +39,62 @@ void TitleScene::OnUpdate()
 	{
 		KuroEngine::Instance().ChangeScene(1, changeScene);
 	}
+
+	if (isUpper) {
+		easingTimer += ADD_EASING_TIMER;
+	}
+	else {
+		easingTimer -= ADD_EASING_TIMER;
+	}
+	if (1.0f < easingTimer) {
+		easingTimer = 1.0f;
+		isUpper = false;
+	}
+	if (easingTimer < 0) {
+		easingTimer = 0.0f;
+		isUpper = true;
+	}
+
+	++pressStartTimer;
+	if (PERSSSTART_TIMER < pressStartTimer) {
+
+		pressStartTimer = 0;
+		isPressStartDraw = isPressStartDraw ? false : true;
+
+	}
+
 }
 
 void TitleScene::OnDraw()
 {
+
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
+
+	// ˜g‚ğ•`‰æ
+	DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(frameHandle), AlphaBlendMode_Trans);
+
+	float easingAmount = KuroMath::Ease(InOut, Sine, easingTimer, 0.0f, 1.0f);
+
+	// ¯‚ğ•`‰æ
+	DrawFunc::DrawGraph(Vec2<float>(0, 30) + Vec2<float>(0, easingAmount * -EASING_MOVE), TexHandleMgr::GetTexBuffer(starHandle), AlphaBlendMode_Trans);
+
+	// ”wŒiƒLƒƒƒ‰“ñl‚ğ•`‰æ
+	DrawFunc::DrawGraph(LACY_POS + Vec2<float>(0, easingAmount * EASING_MOVE), TexHandleMgr::GetTexBuffer(lacyHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(LUNA_POS + Vec2<float>(0, easingAmount * EASING_MOVE), TexHandleMgr::GetTexBuffer(lunaHandle), AlphaBlendMode_Trans);
+
+	// ”wŒiƒLƒƒƒ‰ƒƒ{ƒbƒg“ñ‘Ì‚ğ•`‰æ
+	DrawFunc::DrawGraph(LACY_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE), TexHandleMgr::GetTexBuffer(lacyRobotHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(LUNA_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE), TexHandleMgr::GetTexBuffer(lunaRobotHandle), AlphaBlendMode_Trans);
+
+	// ƒ^ƒCƒgƒ‹ƒAƒCƒRƒ“‰æ‘œ‚ğ•`‰æ
+	DrawFunc::DrawGraph(TITLE_POS + Vec2<float>(0, easingAmount * -EASING_MOVE), TexHandleMgr::GetTexBuffer(titleHandle), AlphaBlendMode_Trans);
+
+	// PRESSENTER‚Ì‰æ‘œ‚ğ•`‰æ
+	if (isPressStartDraw) {
+		DrawFunc::DrawGraph(PRESS_START_POS, TexHandleMgr::GetTexBuffer(pressStartHandle), AlphaBlendMode_Trans);
+	}
+
 }
 
 void TitleScene::OnImguiDebug()
