@@ -1,6 +1,6 @@
 #pragma once
 #include"KuroEngine.h"
-#include"SceneCange.h"
+#include"IntoTheAbyss/SceneCange.h"
 
 class StageSelectScene : public BaseScene
 {
