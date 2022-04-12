@@ -52,7 +52,7 @@ void GameScene::OnUpdate()
 	{
 		SuperiorityGauge::Instance()->AddEnemyGauge(addValue);
 	}
-	if (UsersInput::Instance()->OnTrigger(DIK_S))
+	if (UsersInput::Instance()->Input(DIK_S))
 	{
 		isSS = true;
 	}
@@ -85,7 +85,7 @@ void GameScene::OnDraw()
 
 	// スクショを保存。
 	if (isSS) {
-		ResultSceneBackGround::Instance()->backGround->CopyTexResource(D3D12App::Instance()->GetCmdList(), D3D12App::Instance()->GetBackBuffRenderTarget().get());
+		KuroEngine::Instance().Graphics().CopyTexture(ResultSceneBackGround::Instance()->backGround, D3D12App::Instance()->GetBackBuffRenderTarget());
 	}
 
 }

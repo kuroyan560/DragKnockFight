@@ -15,7 +15,7 @@ public:
 	/*===== ƒƒ“ƒo•Ï” =====*/
 
 	std::shared_ptr<GaussianBlur>gaussianBlur;
-	std::shared_ptr<TextureBuffer>backGround;
+	std::shared_ptr<RenderTarget>backGround;
 
 	void Init();
 	void Draw();
