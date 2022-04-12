@@ -953,19 +953,31 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		float distanceX = fabs(lineCenterPos.x - centerPos.x);
 		float disntaceY = fabs(lineCenterPos.y - centerPos.y);
 
+		Vec2<float>smokeVec = { 0,0 };
 		// ウィンドウ左右
-		if (windowSize.x <= centerPos.x + PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x || centerPos.x - PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
+		bool winLeft = centerPos.x - PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x <= 0;
+		bool winRight = windowSize.x <= centerPos.x + PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x;
+		if (winRight || winLeft) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(centerPos, stagingDevice, { false,true });
+
+			if (winLeft)smokeVec.x = 1.0f;
+			else smokeVec.x = -1.0f;
+
+			CrashMgr::Instance()->Crash(centerPos, stagingDevice, { false,true }, smokeVec);
 			SuperiorityGauge::Instance()->AddEnemyGauge(10);
 
 		}
 		// ウィンドウ上下
-		if (windowSize.y <= centerPos.y + PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y || centerPos.y - PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
-
+		bool winTop = centerPos.y - PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
+		bool winBottom = windowSize.y <= centerPos.y + PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y;
+		if (winTop || winBottom) {
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(centerPos, stagingDevice, { true,false });
+
+			if (winTop)smokeVec.y = 1.0f;
+			else smokeVec.y = -1.0f;
+
+			CrashMgr::Instance()->Crash(centerPos, stagingDevice, { true,false }, smokeVec);
 			SuperiorityGauge::Instance()->AddEnemyGauge(10);
 
 		}

@@ -32,6 +32,7 @@ void CSmain(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     
+    //NORMAL_SMOKE
     if(v.type == 0)
     {
         float2 toPos = v.emitPos + v.emitVec * v.speed;
@@ -40,6 +41,21 @@ void CSmain(uint3 DTid : SV_DispatchThreadID)
         
         //õ–½‚ª”¼•ªˆÈ‰º‚È‚çŠgk‚µ‚ÄÁ‚¦‚é
         if(v.lifeSpan / 2.0f <= v.life)
+        {
+            float t = v.life - v.lifeSpan / 2.0f;
+            v.scale = Easing_Circ_In(t, v.lifeSpan / 2.0f, v.emitScale, 0.0f);
+            v.alpha = Easing_Circ_In(t, v.lifeSpan / 2.0f, 1.0f, 0.0f);
+        }
+    }
+    //FAST_SMOKE
+    else if(v.type == 1)
+    {
+        float2 toPos = v.emitPos + v.emitVec * v.speed;
+        v.pos = Easing_Circ_Out(v.life, v.lifeSpan, v.emitPos, toPos);
+        v.radian = Easing_Quart_Out(v.life, v.lifeSpan, 0.0f, v.emitRadian);
+        
+        //õ–½‚ª”¼•ªˆÈ‰º‚È‚çŠgk‚µ‚ÄÁ‚¦‚é
+        if (v.lifeSpan / 2.0f <= v.life)
         {
             float t = v.life - v.lifeSpan / 2.0f;
             v.scale = Easing_Circ_In(t, v.lifeSpan / 2.0f, v.emitScale, 0.0f);

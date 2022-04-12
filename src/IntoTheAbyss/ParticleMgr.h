@@ -12,13 +12,13 @@ class ConstantBuffer;
 class TextureBuffer;
 class LightManager;
 
-static const enum PARTICLE_TYPE { DASH, BULLET, HIT_MAP, FIRST_DASH, FIRST_DASH_DOUJI,DOSSUN };
+static const enum PARTICLE_TYPE { DASH, BULLET, HIT_MAP, FIRST_DASH, FIRST_DASH_DOUJI, DOSSUN, CRASH };
 
 class ParticleMgr : public Singleton<ParticleMgr>
 {
 	static const int MAX_NUM = 300;
 
-	static const enum PARTICLE_CUMPUTE_TYPE { EXPLODE, DEFAULT = EXPLODE };
+	static const enum PARTICLE_CUMPUTE_TYPE { NORMAL_SMOKE, FAST_SMOKE, DEFAULT = NORMAL_SMOKE };
 	struct Particle
 	{
 		Vec2<float> pos;	//ç¿ïW

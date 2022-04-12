@@ -347,7 +347,16 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 			if (!isHitLeft && !isHitRight)ext.y = false;
 			if (!isHitTop && !isHitBottom)ext.x = false;
 
-			CrashMgr::Instance()->Crash(pos, stagingDevice, ext);
+			Vec2<float>smokeVec = { 0.0f,0.0f };
+			if (isHitRight)
+			{
+				smokeVec.x = -1.0f;
+			}
+			else if (isHitLeft)smokeVec.x = 1.0f;
+			if (isHitBottom)smokeVec.y = -1.0f;
+			else if (isHitTop)smokeVec.y = 1.0f;
+
+			CrashMgr::Instance()->Crash(pos, stagingDevice, ext, smokeVec);
 			SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
 			SwingMgr::Instance()->isSwingPlayer = false;
 
@@ -365,19 +374,33 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 		float distanceX = fabs(lineCenterPos.x - pos.x);
 		float disntaceY = fabs(lineCenterPos.y - pos.y);
 
+		Vec2<float>smokeVec = { 0,0 };
 		// ウィンドウ左右
-		if (windowSize.x <= pos.x + scale.x - ScrollMgr::Instance()->scrollAmount.x || pos.x - scale.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
+		bool winLeft = pos.x - scale.x - ScrollMgr::Instance()->scrollAmount.x <= 0;
+		bool winRight = windowSize.x <= pos.x + scale.x - ScrollMgr::Instance()->scrollAmount.x;
+		if (winLeft || winRight) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(pos, stagingDevice, { false,true });
+
+			if (winLeft)smokeVec.x = 1.0f;
+			else smokeVec.x = -1.0f;
+
+			CrashMgr::Instance()->Crash(pos, stagingDevice, { false,true }, smokeVec);
 			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
 		}
+
+		bool winTop = pos.y - scale.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
+		bool winBottom = windowSize.y <= pos.y + scale.y - ScrollMgr::Instance()->scrollAmount.y;
 		// ウィンドウ上下
-		if (windowSize.y <= pos.y + scale.y - ScrollMgr::Instance()->scrollAmount.y || pos.y - scale.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
+		if (winTop || winBottom) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(pos, stagingDevice, { true,false });
+
+			if (winTop)smokeVec.y = 1.0f;
+			else smokeVec.y = -1.0f;
+
+			CrashMgr::Instance()->Crash(pos, stagingDevice, { true,false }, smokeVec);
 			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
 		}
