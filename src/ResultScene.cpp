@@ -4,6 +4,7 @@
 #include "WinApp.h"
 #include "KuroMath.h"
 #include "UsersInput.h"
+#include "IntoTheAbyss/ResultSceneBackGround.h"
 
 ResultScene::ResultScene()
 {
@@ -138,6 +139,8 @@ void ResultScene::OnDraw()
 {
 
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
+
+	ResultSceneBackGround::Instance()->Draw();
 
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 	DrawFunc::DrawBox2D(Vec2<float>(0, 0), windowSize, Color(0, 0, 0, 255), DXGI_FORMAT_R8G8B8A8_UNORM);

@@ -35,6 +35,7 @@ GameScene::GameScene()
 
 void GameScene::OnInitialize()
 {
+	ResultSceneBackGround::Instance()->Init();
 }
 
 void GameScene::OnUpdate()
@@ -74,17 +75,18 @@ void GameScene::OnUpdate()
 void GameScene::OnDraw()
 {
 	emissiveMap->Clear(D3D12App::Instance()->GetCmdList());
-	if (isSS) {
-		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap, ResultSceneBackGround::Instance()->backGround });
-	}
-	else {
-		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
-	}
+
+	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
 	backGround->Draw();
 	game.Draw(emissiveMap);
 
 	gaussianBlur->Register(emissiveMap);
 	gaussianBlur->DrawResult(AlphaBlendMode_Add);
+
+	// スクショを保存。
+	if (isSS) {
+		ResultSceneBackGround::Instance()->backGround->CopyTexResource(D3D12App::Instance()->GetCmdList(), D3D12App::Instance()->GetBackBuffRenderTarget().get());
+	}
 
 }
 

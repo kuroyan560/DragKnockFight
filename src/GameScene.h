@@ -18,6 +18,8 @@ class GameScene : public BaseScene
 	Game game;
 	float addValue;
 
+	bool isSS;
+
 	SceneCange *sceneChange;
 public:
 	GameScene();
