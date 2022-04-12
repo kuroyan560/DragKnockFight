@@ -590,6 +590,8 @@ Game::Game()
 
 	GameTimer::Instance()->Init({}, 120, {}, {});
 	ScoreManager::Instance()->Init();
+
+
 }
 
 void Game::Init()
