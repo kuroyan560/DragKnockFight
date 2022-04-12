@@ -66,7 +66,7 @@ void Boss::Generate(const Vec2<float> &generatePos)
 	/*===== 生成処理 =====*/
 
 	pos = generatePos;
-	scale = SCALE * 2.0f;
+	scale = SCALE * 5.0f;
 	vel = { OFFSET_VEL,0 };
 	moveVel = { OFFSET_VEL,0 };
 	swingInertia = 0;
@@ -87,31 +87,16 @@ void Boss::Update()
 	// 前フレームの座標を保存
 	prevPos = pos;
 
-	if (!allowToMoveFlag)
+	if (80.0f < scale.x && 80.0f < scale.y)
 	{
-		//120フレーム以内に縮小する
-		if (SCALE.x < scale.x)
-		{
-			scale.x -= (SCALE.x * 2.0f) / 120.0f;
-		}
-		else
-		{
-			scale.x = 80.0f;
-		}
-
-		if (SCALE.y < scale.y)
-		{
-			scale.y -= (SCALE.x * 2.0f) / 120.0f;
-		}
-		else
-		{
-			scale.y = 80.0f;
-		}
+		float time = 120.0f;
+		scale.x -= 400.0f / time;
+		scale.y -= 400.0f / time;
 	}
-
-	if (scale.x == 80.0f && scale.y == 80.0f)
+	else
 	{
 		allowToMoveFlag = true;
+		scale = { 80.0f,80.0f };
 	}
 
 

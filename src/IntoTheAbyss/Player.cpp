@@ -152,7 +152,7 @@ void Player::Init(const Vec2<float> &INIT_POS)
 	crashDevice.Init();
 	bulletHitBox->radius = 10.0f;
 
-	size = { 120.0f,120.0f };
+	size = { 5.0f,5.0f };
 	sizeVel = 120.0f;
 	allowToMoveFlag = false;
 }
@@ -161,20 +161,21 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPo
 {
 	crashDevice.Update();
 
-	if (1.0f <= size.x && 1.0f <= size.y)
+	//サイズが1.0fになるまで動かない
+	if (1.0f < size.x && 1.0f < size.y)
 	{
-		//size.x = sizeVel / 80.0f;
-		//size.y = sizeVel / 80.0f;
-		//--sizeVel;
+		float time = 120.0f;
+		size.x -= 5.0f / time;
+		size.y -= 5.0f / time;
 		doorMoveUpDownFlag = true;
 	}
 	else
 	{
-		
+		allowToMoveFlag = true;
+		size = { 1.0f,1.0f };
+		doorMoveUpDownFlag = false;
 	}
-	allowToMoveFlag = true;
-	size = { 1.0f,1.0f };
-	doorMoveUpDownFlag = false;
+	
 
 
 	//デバック用の値変更
@@ -382,7 +383,7 @@ void Player::Draw(LightManager &LigManager)
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * crashDevice.GetExtRate(),
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * crashDevice.GetExtRate() * size,
 		0.0f, bodyTex, CRASH_TEX, crashDevice.GetFlashAlpha());
 
 

@@ -23,7 +23,7 @@ RoundChangeEffect::RoundChangeEffect()
 	fightData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/fight.png");
 	playerReticleData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/reticle_player.png");
 	enemyReticleData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/reticle_enemy.png");
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 10, { 10, 1 }, numberHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, numberHandle.data());
 
 	readyData->honraiPos = { 1280.0f / 2.0f,720.0f / 2.0f };
 	readyData->pos = { 1280.0f / 2.0f,720.0f / 2.0f };
