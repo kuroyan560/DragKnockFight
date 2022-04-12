@@ -1187,7 +1187,7 @@ void Game::Update()
 	}
 
 	//ボス弾とプレイヤーの判定
-	for (int index = 0; index < SMALL_ENEMY; ++index)
+	for (int index = 0; index < BossBulletManager::Instance()->bullets.size(); ++index)
 	{
 		std::shared_ptr<SphereCollision> bullet = BossBulletManager::Instance()->GetBullet(index)->bulletHitBox;
 		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, *player.bulletHitBox);
@@ -1198,6 +1198,21 @@ void Game::Update()
 		{
 			SuperiorityGauge::Instance()->AddEnemyGauge(10.0f);
 			BossBulletManager::Instance()->GetBullet(index)->Init();
+		}
+	}
+
+	//プレイヤー弾とボスの判定
+	for (int index = 0; index < BulletMgr::Instance()->bullets.size(); ++index)
+	{
+		std::shared_ptr<SphereCollision> bullet = BulletMgr::Instance()->GetBullet(index)->bulletHitBox;
+		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, *boss.bulletHitBox);
+		bool initFlag = BulletMgr::Instance()->GetBullet(index)->isActive;
+
+		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
+		if (hitFlag && initFlag)
+		{
+			SuperiorityGauge::Instance()->AddPlayerGauge(10.0f);
+			BulletMgr::Instance()->GetBullet(index)->Init();
 		}
 	}
 

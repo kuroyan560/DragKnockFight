@@ -6,6 +6,7 @@
 #include<array>
 #include<memory>
 #include"Bullet.h"
+#include"BulletCollision.h"
 
 #include"CrashInterFace.h"
 using namespace std;
@@ -65,7 +66,7 @@ public:
 
 	//êwínÇ∆ÇÃîªíË
 	Square areaHitBox;
-
+	std::unique_ptr<SphereCollision> bulletHitBox;
 
 public:
 

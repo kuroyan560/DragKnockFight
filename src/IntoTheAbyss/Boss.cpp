@@ -42,6 +42,10 @@ Boss::Boss()
 	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 	patternTimer = 0;
 
+	bulletHitBox = std::make_unique<SphereCollision>();
+	bulletHitBox->center = &pos;
+	bulletHitBox->radius = 40.0f;
+
 	Init();
 }
 
