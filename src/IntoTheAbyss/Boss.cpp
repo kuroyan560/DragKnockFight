@@ -56,7 +56,7 @@ void Boss::Init()
 
 }
 
-void Boss::Generate(const Vec2<float> &generatePos)
+void Boss::Generate(const Vec2<float>& generatePos)
 {
 
 	/*===== ¶¬ˆ— =====*/
@@ -171,7 +171,6 @@ void Boss::Update()
 				BossBulletManager::Instance()->Generate(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
 			}
 		}
-		BossBulletManager::Instance()->Update();
 
 
 		// ˆÚ“®—Ê‚Ì‘—Ê‚ð‹‚ß‚éB
@@ -189,6 +188,7 @@ void Boss::Update()
 		}
 
 	}
+	BossBulletManager::Instance()->Update();
 }
 
 #include"DrawFunc_FillTex.h"
@@ -208,7 +208,7 @@ void Boss::Draw()
 		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, crashDevice.GetFlashAlpha());
 }
 
-void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos)
+void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
 {
 
 	/*===== “–‚½‚è”»’è =====*/
