@@ -52,6 +52,9 @@ public:
 	//ボスのパターン制御-----------------------
 
 	bool allowToMoveFlag;
+	bool initPaticleFlag;
+	int moveTimer;
+	Vec2<float>initScale;
 public:
 
 	/*===== 定数 =====*/
@@ -69,7 +72,7 @@ public:
 	std::unique_ptr<SphereCollision> bulletHitBox;
 
 public:
-
+	bool readyToStartRoundEffectFlag;
 	/*===== メンバ関数 =====*/
 
 	// コンストラクタ

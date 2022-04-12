@@ -157,6 +157,8 @@ public:
 
 	bool allowToMoveFlag;
 	float sizeVel;
+	bool initPaticleFlag;
+	int moveTimer;
 public:
 
 	/*-- メンバ関数 --*/
@@ -189,6 +191,7 @@ public:
 	bool drawCursorFlag;
 
 	Vec2<float>size;
+	Vec2<float>initSize;
 private:
 	/*-- クラス内で使用する関数 --*/
 

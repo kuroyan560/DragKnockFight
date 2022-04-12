@@ -10,7 +10,7 @@ class RoundChangeEffect
 public:
 	RoundChangeEffect();
 	void Init();
-	void Start(const bool &LEFT_OR_RIGHT_FLAG = false);
+	void Start(const int &ROUND_NUMBER, const bool &LEFT_OR_RIGHT_FLAG);
 	void Update();
 	void Draw();
 
@@ -21,6 +21,9 @@ private:
 		Vec2<float>pos;
 		Vec2<float>honraiSize;
 		Vec2<float>size;
+
+		Vec2<float>honraiNumberMaskPos;
+		Vec2<float>numberMaskPos;
 		int handle;
 
 		DrawData()
@@ -31,7 +34,7 @@ private:
 		}
 	};
 
-	std::unique_ptr<DrawData> roundData, readyData, fightData, numberData;
+	std::unique_ptr<DrawData> roundData, readyData, fightData, numberData, nextNumberData;
 	float baseX;
 	Vec2<float>shakeAmount;
 	float maxShakeAmount;
@@ -41,6 +44,7 @@ private:
 	bool oneFlameLateFlag;
 	bool initShakeFlag;
 	float rate;
+	bool initMaskFlag;
 
 	float Lerp(float *HONRAI, float *BASE, const float &DIV)
 	{
@@ -67,6 +71,7 @@ private:
 
 public:
 	bool drawFightFlag;
+	bool readyToInitFlag;
 	bool initFlag;
 	std::unique_ptr<DrawData> playerReticleData, enemyReticleData;
 };

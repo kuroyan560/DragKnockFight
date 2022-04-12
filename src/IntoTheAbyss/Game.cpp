@@ -530,6 +530,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	//背景に星
 	BackGround::Instance()->Init(GetStageSize());
 
+
 }
 
 Game::Game()
@@ -583,6 +584,8 @@ Game::Game()
 	lineCenterPos = responePos;
 	ScrollMgr::Instance()->Init(lineCenterPos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
 
+
+	readyToStartRoundFlag = true;
 }
 
 void Game::Init()
@@ -972,7 +975,8 @@ void Game::Update()
 
 	//ステージ毎の切り替え判定
 	//部屋の初期化
-	if ((SelectStage::Instance()->GetRoomNum() != oldRoomNum || SelectStage::Instance()->GetStageNum() != oldStageNum) || SelectStage::Instance()->resetStageFlag)
+	//if ((SelectStage::Instance()->GetRoomNum() != oldRoomNum || SelectStage::Instance()->GetStageNum() != oldStageNum) || SelectStage::Instance()->resetStageFlag)
+	if(false)
 	{
 		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 		oldRoomNum = SelectStage::Instance()->GetRoomNum();
@@ -985,6 +989,7 @@ void Game::Update()
 		//プレイヤー勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, true);
 		roundFinishFlag = true;
+		playerOrEnemeyWinFlag = true;
 		gameStartFlag = false;
 	}
 
@@ -994,6 +999,7 @@ void Game::Update()
 		//敵勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, false);
 		roundFinishFlag = true;
+		playerOrEnemeyWinFlag = false;
 		gameStartFlag = false;
 	}
 
@@ -1006,6 +1012,9 @@ void Game::Update()
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
 	{
+		BossBulletManager::Instance()->Init();
+
+
 		//勝利数カウント演出
 		if (!WinCounter::Instance()->GetNowAnimation())
 		{
@@ -1018,8 +1027,13 @@ void Game::Update()
 			//次のラウンドへ
 			else
 			{
-				readyToStartRoundFlag = true;
-				roundFinishFlag = false;
+				++roundTimer;
+
+				if (60 <= roundTimer)
+				{
+					readyToStartRoundFlag = true;
+					roundFinishFlag = false;
+				}
 			}
 		}
 	}
@@ -1027,7 +1041,7 @@ void Game::Update()
 	//ラウンド開始時の演出開始
 	if (readyToStartRoundFlag)
 	{
-		roundChangeEffect.Start(false);
+		roundChangeEffect.Start(WinCounter::Instance()->GetNowRound(), playerOrEnemeyWinFlag);
 		Vec2<float>winSize;
 		winSize.x = static_cast<float>(WinApp::Instance()->GetWinSize().x);
 		winSize.y = static_cast<float>(WinApp::Instance()->GetWinSize().y);
@@ -1037,7 +1051,7 @@ void Game::Update()
 		ScrollMgr::Instance()->Warp(responePos);
 
 		//プレイヤーと敵の座標初期化
-		if (roundChangeEffect.drawFightFlag && !roundChangeEffect.initFlag)
+		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initFlag)
 		{
 			InitGame(0, 0);
 			roundChangeEffect.initFlag = true;
@@ -1047,6 +1061,7 @@ void Game::Update()
 		{
 			readyToStartRoundFlag = false;
 			gameStartFlag = true;
+			roundTimer = 0;
 		}
 		//gameStartFlag = true;
 		//SelectStage::Instance()->resetStageFlag = true;
@@ -1089,14 +1104,16 @@ void Game::Update()
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
-	//ラウンドチェンジ演出中は動かせない
-	//if (!readyToStartRoundFlag)
-	{
-		// プレイヤーの更新処理
-		player.Update(mapData, boss.pos);
-		// ボスの更新処理
-		boss.Update();
-	}
+
+
+	// プレイヤーの更新処理
+	player.Update(mapData, boss.pos);
+
+
+	boss.readyToStartRoundEffectFlag = readyToStartRoundFlag;
+	// ボスの更新処理
+	boss.Update();
+
 
 
 	miniMap.Update();
@@ -1613,7 +1630,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	/*===== 描画処理 =====*/
 	BackGround::Instance()->Draw();
 
-	roundChangeEffect.Draw();
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 	DrawMapChip(mapData, mapChipDrawData, stageNum, roomNum);
@@ -1699,11 +1715,14 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	playerHomeBase->Draw();
 	enemyHomeBase->Draw();
 
-	player.Draw(ligMgr);
-	ParticleMgr::Instance()->Draw(ligMgr);
+	roundChangeEffect.Draw();
 
+	player.Draw(ligMgr);
 	// ボスを描画
 	boss.Draw();
+	ParticleMgr::Instance()->Draw(ligMgr);
+
+
 
 	// プレイヤーとボス間に線を描画
 	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());

@@ -17,6 +17,8 @@
 #include"BossBulletManager.h"
 #include"CrashMgr.h"
 
+#include"ParticleMgr.h"
+
 Boss::Boss()
 {
 
@@ -46,18 +48,16 @@ Boss::Boss()
 	bulletHitBox->center = &pos;
 	bulletHitBox->radius = 40.0f;
 
-	Init();
+	//Init();
 }
 
 void Boss::Init()
 {
-
 	pos = {};
 	scale = {};
 	vel = {};
 	moveVel = {};
 	crashDevice.Init();
-
 }
 
 void Boss::Generate(const Vec2<float> &generatePos)
@@ -66,7 +66,8 @@ void Boss::Generate(const Vec2<float> &generatePos)
 	/*===== ê∂ê¨èàóù =====*/
 
 	pos = generatePos;
-	scale = SCALE * 5.0f;
+	initScale = SCALE * 5.0f;
+	scale = initScale;
 	vel = { OFFSET_VEL,0 };
 	moveVel = { OFFSET_VEL,0 };
 	swingInertia = 0;
@@ -76,6 +77,8 @@ void Boss::Generate(const Vec2<float> &generatePos)
 	stuckWindowTimer = 0;
 	areaHitBox.size = scale;
 	allowToMoveFlag = false;
+	moveTimer = 0;
+	initPaticleFlag = false;
 }
 
 #include"Camera.h"
@@ -89,20 +92,39 @@ void Boss::Update()
 
 	if (80.0f < scale.x && 80.0f < scale.y)
 	{
-		float time = 120.0f;
-		scale.x -= 400.0f / time;
-		scale.y -= 400.0f / time;
-	}
-	else
-	{
-		allowToMoveFlag = true;
-		scale = { 80.0f,80.0f };
+		float time = 30.0f;
+		scale -= initScale / time;
 	}
 
+	if (scale.x <= 80.0f && scale.y <= 80.0f)
+	{
+		if (!initPaticleFlag)
+		{
+			Vec2<float>radian(cosf(Angle::ConvertToRadian(0.0f)), sinf(Angle::ConvertToRadian(0.0f)));
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(90.0f)), sinf(Angle::ConvertToRadian(90.0f)) };
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(180.0f)), sinf(Angle::ConvertToRadian(180.0f)) };
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(270.0f)), sinf(Angle::ConvertToRadian(270.0f)) };
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
+			initPaticleFlag = true;
+		}
+
+		scale = { 80.0f,80.0f };
+		++moveTimer;
+	}
+	if (20 <= moveTimer)
+	{
+		allowToMoveFlag = true;
+	}
 
 
 	//í èÌÉTÉCÉYÇ…Ç»ÇÈÇ‹Ç≈ìÆÇØÇ»Ç¢
-	if (scale.x <= SCALE.x && scale.y <= SCALE.y)
+	if (scale.x <= SCALE.x && scale.y <= SCALE.y && !readyToStartRoundEffectFlag)
 	{
 		if (Camera::Instance()->Active())
 		{
@@ -208,6 +230,8 @@ void Boss::Update()
 
 		}
 	}
+
+
 	BossBulletManager::Instance()->Update();
 
 }

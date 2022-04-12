@@ -61,6 +61,7 @@ public:
 		color.x = rhs.color.x;
 		color.y = rhs.color.y;
 		color.z = rhs.color.z;
+		color.w = rhs.color.w;
 	}
 	void operator*=(const float& rhs) {
 		color.x *= rhs;

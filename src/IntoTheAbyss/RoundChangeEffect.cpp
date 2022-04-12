@@ -2,6 +2,7 @@
 #include"../Common/KuroMath.h"
 #include"../Engine/DrawFunc.h"
 #include"../Engine/DrawFunc_FillTex.h"
+#include"../Engine/DrawFunc_Mask.h"
 #include"../IntoTheAbyss/TexHandleMgr.h"
 #include"../IntoTheAbyss/ScrollMgr.h"
 
@@ -14,6 +15,7 @@ RoundChangeEffect::RoundChangeEffect()
 	fightData = std::make_unique<DrawData>();
 	playerReticleData = std::make_unique<DrawData>();
 	enemyReticleData = std::make_unique<DrawData>();
+	nextNumberData = std::make_unique<DrawData>();
 
 	playerReticle = std::make_unique<Sprite>();
 	enemyReticle = std::make_unique<Sprite>();
@@ -25,10 +27,11 @@ RoundChangeEffect::RoundChangeEffect()
 	enemyReticleData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/reticle_enemy.png");
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, numberHandle.data());
 
-	readyData->honraiPos = { 1280.0f / 2.0f,720.0f / 2.0f };
-	readyData->pos = { 1280.0f / 2.0f,720.0f / 2.0f };
+	readyData->honraiPos = { 1280.0f / 2.0f + 25.0f,720.0f / 2.0f - 100.0f };
+	readyData->pos = { 1280.0f / 2.0f + 25.0f,720.0f / 2.0f - 100.0f };
 
 	numberData->handle = numberHandle[0];
+	numberData->size = { 1.5f,1.5f };
 }
 
 void RoundChangeEffect::Init()
@@ -36,7 +39,7 @@ void RoundChangeEffect::Init()
 	startFlag = false;
 }
 
-void RoundChangeEffect::Start(const bool &LEFT_OR_RIGHT_FLAG)
+void RoundChangeEffect::Start(const int &ROUND_NUMBER, const bool &LEFT_OR_RIGHT_FLAG)
 {
 	if (!startFlag)
 	{
@@ -50,19 +53,27 @@ void RoundChangeEffect::Start(const bool &LEFT_OR_RIGHT_FLAG)
 			roundData->honraiPos = { 1280.0f + 100.0f, 720.0f / 2.0f };
 			roundData->pos = { 1280.0f + 100.0f, 720.0f / 2.0f };
 		}
-		numberData->handle = numberHandle[1];
+		roundData->honraiSize = { 1.0f,1.0f };
+		roundData->size = { 1.0f,1.0f };
+		numberData->handle = numberHandle[ROUND_NUMBER - 1];
+		numberData->honraiSize = { 1.5f,1.6f };
+		numberData->size = { 1.5f,1.6f };
+		nextNumberData->handle = numberHandle[ROUND_NUMBER];
+		nextNumberData->honraiSize = numberData->size;
+		nextNumberData->size = numberData->size;
 
 		readyData->honraiSize.y = 0.0f;
 		readyData->size.y = 0.0f;
 
+		drawFightFlag = false;
 		fightData->honraiPos = { 1280.0f / 2.0f,720.0f / 2.0f };
 		fightData->pos = { 1280.0f / 2.0f,720.0f / 2.0f };
 		fightData->honraiSize = { 2.0f,2.0f };
 		fightData->size = { 5.0f,5.0f };
 
 
-		Vec2<float> restartPos = { 860.0f-420.0f,-150.0f };
-		Vec2<float> restartPos2 = { 860.0f-120.0f,-150.0f };
+		Vec2<float> restartPos = { 860.0f - 420.0f,-150.0f };
+		Vec2<float> restartPos2 = { 860.0f - 120.0f,-150.0f };
 
 		playerReticleData->honraiPos = restartPos;
 		playerReticleData->pos = restartPos;
@@ -73,12 +84,16 @@ void RoundChangeEffect::Start(const bool &LEFT_OR_RIGHT_FLAG)
 
 
 		initShakeFlag = false;
+		readyToInitFlag = false;
+		initFlag = false;
 		maxShakeAmount = 25.0f;
 		rate = 0.0f;
 		oneFlameLateFlag = false;
 
 		playerReticleAlpha = 255;
 		enemyReticleAlpha = 255;
+
+		initMaskFlag = false;
 	}
 	startFlag = true;
 
@@ -91,21 +106,43 @@ void RoundChangeEffect::Update()
 
 #pragma region 文字描画
 		float roundDistance = 1.0f;
-		if (roundData->honraiPos.x == 1280.0f / 2.0f)
+		if (roundData->honraiPos.x == 1280.0f / 2.0f && !initMaskFlag)
 		{
 			//陣地に触れた場所の逆から中央に向かって移動する
 			roundDistance = Lerp(&roundData->honraiPos.x, &roundData->pos.x, 0.1f);
-			numberData->honraiPos = roundData->pos + Vec2<float>(130.0f, 0.0f);
+			numberData->pos = roundData->pos + Vec2<float>(280.0f, 0.0f);
+			nextNumberData->pos = numberData->pos;
+
+			numberData->honraiNumberMaskPos = numberData->pos;
+			numberData->numberMaskPos = numberData->pos;
+			nextNumberData->honraiNumberMaskPos = numberData->pos + Vec2<float>(0.0f, -120.0f);
+			nextNumberData->numberMaskPos = numberData->pos + Vec2<float>(0.0f, -120.0f);
 		}
+
+		//数字のマスク処理
+		float numberDistacnce = 1.0f;
+		if (fabs(roundDistance) <= 0.1f || initMaskFlag)
+		{
+			if (!initMaskFlag)
+			{
+				numberData->honraiNumberMaskPos.y += 120.0f;
+				nextNumberData->honraiNumberMaskPos.y += 120.0f;
+				initMaskFlag = true;
+			}
+			Lerp(&numberData->honraiNumberMaskPos.y, &numberData->numberMaskPos.y, 0.1f);
+			numberDistacnce=Lerp(&nextNumberData->honraiNumberMaskPos.y, &nextNumberData->numberMaskPos.y, 0.1f);
+		}
+
+
 
 		float size = 1.0f;
 		//中央に達したら文字のサイズを中央に消えるようにサイズを変える
-		if (fabs(roundDistance) <= 0.1f)
+		if (fabs(numberDistacnce) <= 0.1f)
 		{
 			roundData->honraiSize.y = 0.0f;
-			numberData->honraiSize.y = 0.0f;
+			nextNumberData->honraiSize.y = 0.0f;
 			Lerp(&roundData->honraiSize.y, &roundData->size.y, 0.1f);
-			size = Lerp(&numberData->honraiSize.y, &numberData->size.y, 0.1f);
+			size = Lerp(&nextNumberData->honraiSize.y, &nextNumberData->size.y, 0.1f);
 		}
 
 		bool drawReadyFlag = false;
@@ -151,9 +188,12 @@ void RoundChangeEffect::Update()
 			if (1.0f <= rate)
 			{
 				rate = 1.0f;
+				//終了処理
+				Init();
 			}
 			fightData->pos.y = fightData->honraiPos.y;
 		}
+
 #pragma endregion
 
 
@@ -169,6 +209,11 @@ void RoundChangeEffect::Update()
 		//ファイトが出たらα値で消す
 		if (drawFightFlag)
 		{
+			//5フレーム後に初期化準備
+			if (playerReticleAlpha <= 200)
+			{
+				readyToInitFlag = true;
+			}
 			playerReticleAlpha -= 10;
 			enemyReticleAlpha -= 10;
 
@@ -180,6 +225,10 @@ void RoundChangeEffect::Update()
 			{
 				enemyReticleAlpha = 0;
 			}
+		}
+		else
+		{
+			readyToInitFlag = false;
 		}
 #pragma endregion
 	}
@@ -199,7 +248,10 @@ void RoundChangeEffect::Draw()
 	{
 		//DrawFunc::DrawExtendGraph2D(roundData->GetLeftUpPos(), roundData->GetRightDownPos(), TexHandleMgr::GetTexBuffer(roundData->handle), AlphaBlendMode_None);
 		DrawFunc::DrawRotaGraph2D(roundData->pos, roundData->size, 0.0f, TexHandleMgr::GetTexBuffer(roundData->handle));
-		DrawFunc::DrawRotaGraph2D(numberData->pos, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle));
+		//DrawFunc::DrawRotaGraph2D(numberData->pos, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle));
+
+		DrawFunc_Mask::DrawRotaGraph2D(numberData->pos, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle), numberData->numberMaskPos, Vec2<float>(120.0f, 120.0f));
+		DrawFunc_Mask::DrawRotaGraph2D(nextNumberData->pos, nextNumberData->size, 0.0f, TexHandleMgr::GetTexBuffer(nextNumberData->handle), nextNumberData->numberMaskPos, Vec2<float>(120.0f, 120.0f));
 
 		playerReticle->transform.SetPos(playerReticleData->pos);
 		playerReticle->transform.SetScale(playerReticleData->size);
@@ -222,5 +274,6 @@ void RoundChangeEffect::Draw()
 			DrawFunc::DrawRotaGraph2D(readyData->pos, readyData->size, 0.0f, TexHandleMgr::GetTexBuffer(readyData->handle));
 		}
 	}
+
 
 }

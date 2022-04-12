@@ -148,6 +148,7 @@ class Game
 	bool readyToStartRoundFlag; //ラウンド開始時の演出開始用のフラグ
 	bool gameStartFlag;			//ゲーム開始中のフラグ
 
+	int roundTimer;
 	int bgm;
 
 	bool firstLoadFlag;
@@ -157,6 +158,7 @@ class Game
 	Vec2<float>cameraBasePos;
 
 	RoundChangeEffect roundChangeEffect;
+	bool playerOrEnemeyWinFlag;
 public:
 
 	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;

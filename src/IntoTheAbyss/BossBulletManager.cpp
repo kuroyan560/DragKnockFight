@@ -8,6 +8,14 @@ BossBulletManager::BossBulletManager()
 	}
 }
 
+void BossBulletManager::Init()
+{
+	for (int index = 0; index < BULLET_COUNT; ++index)
+	{
+		bullets[index]->Init();
+	}
+}
+
 void BossBulletManager::Generate(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed)
 {
 	/*-- ¶¬ˆ— --*/

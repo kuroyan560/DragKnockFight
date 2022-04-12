@@ -44,7 +44,13 @@ Player::Player()
 	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav");
 	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
 
-	this->Init(GetGeneratePos());
+	//this->Init(GetGeneratePos());
+	bulletHitBox = std::make_shared<SphereCollision>();
+	bulletHitBox->center = &centerPos;
+
+	areaHitBox.center = &centerPos;
+	areaHitBox.size = PLAYER_HIT_SIZE;
+
 
 }
 
@@ -139,22 +145,21 @@ void Player::Init(const Vec2<float> &INIT_POS)
 
 	//muffler.Init(INIT_POS);
 
-	areaHitBox.center = &centerPos;
-	areaHitBox.size = PLAYER_HIT_SIZE;
 
 	swingCoolTime = 0;
 
 
-	bulletHitBox = std::make_shared<SphereCollision>();
-	bulletHitBox->center = &centerPos;
 
 	bulletHitBox->radius = 20.0f;
 	crashDevice.Init();
 	bulletHitBox->radius = 10.0f;
 
-	size = { 5.0f,5.0f };
+	initSize = { 5.0f,5.0f };
+	size = initSize;
 	sizeVel = 120.0f;
 	allowToMoveFlag = false;
+	initPaticleFlag = false;
+	moveTimer = 0;
 }
 
 void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPos)
@@ -164,18 +169,40 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPo
 	//サイズが1.0fになるまで動かない
 	if (1.0f < size.x && 1.0f < size.y)
 	{
-		float time = 120.0f;
-		size.x -= 5.0f / time;
-		size.y -= 5.0f / time;
+		float time = 30.0f;
+		size -= initSize / time;
 		doorMoveUpDownFlag = true;
 	}
-	else
+
+	if (size.x <= 1.0f && size.y <= 1.0f)
 	{
+		if (!initPaticleFlag)
+		{
+			Vec2<float>radian(cosf(Angle::ConvertToRadian(0.0f)), sinf(Angle::ConvertToRadian(0.0f)));
+			ParticleMgr::Instance()->Generate(centerPos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(90.0f)), sinf(Angle::ConvertToRadian(90.0f)) };
+			ParticleMgr::Instance()->Generate(centerPos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(180.0f)), sinf(Angle::ConvertToRadian(180.0f)) };
+			ParticleMgr::Instance()->Generate(centerPos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(270.0f)), sinf(Angle::ConvertToRadian(270.0f)) };
+			ParticleMgr::Instance()->Generate(centerPos, radian, BULLET);
+			initPaticleFlag = true;
+		}
 		allowToMoveFlag = true;
 		size = { 1.0f,1.0f };
+		++moveTimer;
+	}
+
+	if (20 <= moveTimer)
+	{
 		doorMoveUpDownFlag = false;
 	}
-	
+
+
+
 
 
 	//デバック用の値変更
