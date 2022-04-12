@@ -22,9 +22,9 @@
 #include "EventCollider.h"
 #include"DebugParameter.h"
 #include"SuperiorityGauge.h"
-
 #include"AudioApp.h"
 #include "SlowMgr.h"
+#include"CrashMgr.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -144,10 +144,17 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	swingCoolTime = 0;
 
+
+	bulletHitBox = std::make_shared<SphereCollision>();
+	bulletHitBox->center = &centerPos;
+	bulletHitBox->radius = 20.0f;
+	crashDevice.Init();
 }
 
 void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
 {
+	crashDevice.Update();
+
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
 
@@ -348,16 +355,13 @@ void Player::Draw(LightManager& LigManager)
 	//ストレッチ加算
 	//leftUp += stretch_LU;
 	//rightBottom += stretch_RB;
-	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(centerPos);
+	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
+	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(centerPos + crashDevice.GetShake());
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE, 0.0f, bodyTex);
-
-	//テレポート時のフラッシュ
-	static auto white = D3D12App::Instance()->GenerateTextureBuffer(Color());
-	const float flashAlpha = KuroMath::Ease(Out, Quint, flashTimer, flashTotalTime, 1.0f, 0.0f);
-	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom, 0.0f, bodyTex, white, flashAlpha);
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * crashDevice.GetExtRate(),
+		0.0f, bodyTex, CRASH_TEX, crashDevice.GetFlashAlpha());
 
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
@@ -953,7 +957,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		if (windowSize.x <= centerPos.x + PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x || centerPos.x - PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			ShakeMgr::Instance()->SetShake(20);
+			CrashMgr::Instance()->Crash(centerPos, crashDevice, { false,true });
 			SuperiorityGauge::Instance()->AddEnemyGauge(10);
 
 		}
@@ -961,7 +965,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble,
 		if (windowSize.y <= centerPos.y + PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y || centerPos.y - PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			ShakeMgr::Instance()->SetShake(20);
+			CrashMgr::Instance()->Crash(centerPos, crashDevice, { true,false });
 			SuperiorityGauge::Instance()->AddEnemyGauge(10);
 
 		}
@@ -1449,6 +1453,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 			// クールタイムを設定。
 			swingCoolTime = SWING_COOLTIME;
 
+			SwingMgr::Instance()->PlaySE();
 		}
 
 

@@ -15,6 +15,9 @@ class PlayerHand;
 #include"AfterImg.h"
 class LightManager;
 #include"Muffler.h"
+#include"StagingInterFace.h"
+
+#include"../IntoTheAbyss/BulletCollision.h"
 
 // プレイヤークラス
 class Player {
@@ -95,7 +98,8 @@ public:
 
 	int shotSE;
 
-
+	//クラッシュ演出補助
+	StagingInterFace crashDevice;
 
 public:
 
@@ -147,6 +151,8 @@ public:
 
 	//陣地との判定
 	Square areaHitBox;
+
+	std::shared_ptr<SphereCollision> bulletHitBox;
 
 public:
 

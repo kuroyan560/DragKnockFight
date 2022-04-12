@@ -17,6 +17,7 @@ class GameScene : public BaseScene
 
 	Game game;
 	float addValue;
+	bool isSS;		// スクショを撮るかのフラグ
 
 	SceneCange *sceneChange;
 public:

@@ -24,7 +24,7 @@ private:
 	float honraiScore;
 
 	std::vector<int>numberHandle;
-	std::array<int, 10> number;
+	std::array<int, 12> number;
 
 	Vec2<float>scorePos;
 	Vec2<float>basePos;

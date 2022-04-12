@@ -47,10 +47,10 @@ void WinCounter::Update()
 	}
 	else if (knockOutTimer <= APPEAR_TIME + WAIT_TIME + DISAPPEAR_TIME)
 	{
-		int timer = knockOutTimer - APPEAR_TIME - WAIT_TIME;
-		knockOutPos = KuroMath::Ease(In, Exp, timer, DISAPPEAR_TIME, WinApp::Instance()->GetExpandWinCenter(), knockOutDisappearPos);
-		kncokOutScale = KuroMath::Ease(In, Back, timer, DISAPPEAR_TIME, 1.0f, 0.0f);
-		knockOutRadian = KuroMath::Ease(In, Exp, timer, DISAPPEAR_TIME, toRad, 0.0f);
+		int shakeTimer = knockOutTimer - APPEAR_TIME - WAIT_TIME;
+		knockOutPos = KuroMath::Ease(In, Exp, shakeTimer, DISAPPEAR_TIME, WinApp::Instance()->GetExpandWinCenter(), knockOutDisappearPos);
+		kncokOutScale = KuroMath::Ease(In, Back, shakeTimer, DISAPPEAR_TIME, 1.0f, 0.0f);
+		knockOutRadian = KuroMath::Ease(In, Exp, shakeTimer, DISAPPEAR_TIME, toRad, 0.0f);
 	}
 	else
 	{
@@ -91,8 +91,17 @@ void WinCounter::Draw()
 	DrawFunc::DrawRotaGraph2D(knockOutPos, { kncokOutScale * KNOCK_OUT_SCALE,kncokOutScale * KNOCK_OUT_SCALE }, knockOutRadian, TexHandleMgr::GetTexBuffer(knockOutGraph));
 }
 
+#include"AudioApp.h"
 void WinCounter::RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsLeft)
 {
+	static int SE = -1;
+	if (SE == -1)
+	{
+		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/knockout.wav");
+		AudioApp::Instance()->ChangeVolume(SE, 0.7f);
+	}
+	AudioApp::Instance()->PlayWave(SE);
+
 	countRound++;
 	if (WinnerIsLeft)
 	{

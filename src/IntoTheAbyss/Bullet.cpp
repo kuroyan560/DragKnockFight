@@ -7,6 +7,8 @@
 #include"KuroFunc.h"
 #include"DrawFunc.h"
 
+#include"TexHandleMgr.h"
+
 Bullet::Bullet()
 {
 
@@ -17,6 +19,12 @@ Bullet::Bullet()
 	forwardVec = {};
 	isActive = false;
 
+	bulletHitBox = std::make_shared<SphereCollision>();
+	bulletHitBox->center = &pos;
+	bulletHitBox->radius = 10.0f;
+
+	graph = TexHandleMgr::LoadGraph("resource/ChainCombat/bullet.png");
+
 }
 
 void Bullet::Init()
@@ -26,13 +34,16 @@ void Bullet::Init()
 
 	// 生存フラグを折る。
 	isActive = false;
-
 }
 
-void Bullet::Generate(const Vec2<float>& generatePos, const Vec2<float> forwardVec, const bool isFirstShot, const SHOT_HAND& id)
+void Bullet::Generate(const Vec2<float> &generatePos, const Vec2<float> forwardVec, const bool isFirstShot, const SHOT_HAND &id, const float &speed, const int &GRPHA_HANDLE)
 {
 
 	/*-- 生成処理 --*/
+	if (GRPHA_HANDLE != -1)
+	{
+		graph = GRPHA_HANDLE;
+	}
 
 	// 座標をセット
 	pos = generatePos;
@@ -51,10 +62,10 @@ void Bullet::Generate(const Vec2<float>& generatePos, const Vec2<float> forwardV
 
 	if (isFirstShot) {
 		//speed = GetRand(MAX_SPEED * 0.25f) + MAX_SPEED * 0.75f;
-		speed = KuroFunc::GetRand(MAX_SPEED * 0.25f) + MAX_SPEED * 0.75f;
+		this->speed = KuroFunc::GetRand(MAX_SPEED * 0.25f) + MAX_SPEED * 0.75f;
 	}
 	else {
-		speed = MAX_SPEED;
+		this->speed = speed;
 	}
 
 	deadTimer = DEAD_TIMER;
@@ -118,7 +129,6 @@ void Bullet::Draw()
 	Vec2<float>rightBottom = { pos.x + MAX_RADIUS,pos.y + MAX_RADIUS };
 	rightBottom = ScrollMgr::Instance()->Affect(rightBottom);
 
-	static const int GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/bullet.png");
-	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(GRAPH), AlphaBlendMode_Trans);
+	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(graph), AlphaBlendMode_Trans);
 	//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(217, 26, 96, (int)alpha), D3D12App::Instance()->GetBackBuffFormat(), true, AlphaBlendMode_Trans);
 }

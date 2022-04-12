@@ -152,6 +152,7 @@ class Game
 	void InitGame(const int& STAGE_NUM, const int& ROOM_NUM);
 
 	MiniMap miniMap;
+	Vec2<float>cameraBasePos;
 public:
 
 	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;

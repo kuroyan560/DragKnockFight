@@ -2,7 +2,13 @@
 #include <vector>
 #include "Intersected.h"
 #include"AreaCollider.h"
+#include"IBossPattern.h"
+#include<array>
+#include<memory>
+#include"Bullet.h"
+#include"BulletCollision.h"
 
+#include"StagingInterFace.h"
 using namespace std;
 
 // プレイヤーと引っ張り合うボスクラス
@@ -27,6 +33,24 @@ public:
 	static const enum DIR { FRONT, BACK, DIR_NUM };
 	int graphHandle[DIR_NUM];
 
+	//クラッシュ演出補助
+	StagingInterFace crashDevice;
+
+
+	//ボスのパターン制御-----------------------
+	enum E_BossPattern
+	{
+		BOSS_PATTERN_NONE = -1,
+		BOSS_PATTERN_NORMALMOVE,
+		BOSS_PATTERN_ATTACK
+	};
+	E_BossPattern bossPatternNow, oldBossPattern;
+	BossPatternData patternData;
+	std::array<std::unique_ptr<IBossPattern>, 2>bossPattern;
+	int patternTimer;
+	bool atackModeFlag;
+	//ボスのパターン制御-----------------------
+
 
 public:
 
@@ -38,9 +62,11 @@ public:
 	const int AFTER_SWING_DELAY = 15;
 	const int STRUCK_WINDOW_TIMER = 120.0f;
 
+	std::array<Bullet, 200> bullts;
+
 	//陣地との判定
 	Square areaHitBox;
-
+	std::unique_ptr<SphereCollision> bulletHitBox;
 
 public:
 
@@ -53,7 +79,7 @@ public:
 	void Init();
 
 	// 生成処理
-	void Generate(const Vec2<float>& generatePos);
+	void Generate(const Vec2<float> &generatePos);
 
 	// 更新処理
 	void Update();
@@ -62,6 +88,8 @@ public:
 	void Draw();
 
 	// 当たり判定
-	void CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos);
+	void CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos);
 
+	//ダメージ
+	void Damaged();
 };
