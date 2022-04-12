@@ -7,7 +7,7 @@
 
 TitleScene::TitleScene()
 {
-	changeScene = new SceneCange();
+	changeScene = std::make_shared<SceneCange>();
 	StageMgr::Instance();
 
 	// 各画像をロード
@@ -37,7 +37,7 @@ void TitleScene::OnUpdate()
 	//ステージセレクトに移動する
 	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::A))
 	{
-		KuroEngine::Instance().ChangeScene(1, changeScene);
+		KuroEngine::Instance().ChangeScene(1, changeScene.get());
 	}
 
 	if (isUpper) {
