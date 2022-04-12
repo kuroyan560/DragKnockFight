@@ -27,6 +27,8 @@ class RenderTarget;
 
 #include"MiniMap.h"
 
+#include"RoundChangeEffect.h"
+
 struct MassChipData
 {
 	Vec2<float>leftUpPos;
@@ -146,6 +148,7 @@ class Game
 	bool readyToStartRoundFlag; //ラウンド開始時の演出開始用のフラグ
 	bool gameStartFlag;			//ゲーム開始中のフラグ
 
+	int roundTimer;
 	int bgm;
 
 	bool firstLoadFlag;
@@ -153,6 +156,9 @@ class Game
 
 	MiniMap miniMap;
 	Vec2<float>cameraBasePos;
+
+	RoundChangeEffect roundChangeEffect;
+	bool playerOrEnemeyWinFlag;
 public:
 
 	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;

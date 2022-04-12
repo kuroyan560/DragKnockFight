@@ -27,7 +27,7 @@ private:
 	Vec2<float>windowHalfSize;
 	Vec2<float>adjLine;
 	Vec2<float> mapSize;
-	bool initFlag;
+	bool warpFlag;
 
 public:
 	Vec2<float> CaluStartScrollLine(const Vec2<float> &SIZE)
