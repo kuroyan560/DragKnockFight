@@ -67,7 +67,6 @@ void TitleScene::OnUpdate()
 
 void TitleScene::OnDraw()
 {
-
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 
