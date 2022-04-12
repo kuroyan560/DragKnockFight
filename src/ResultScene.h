@@ -3,7 +3,8 @@
 #include"LightManager.h"
 
 #include"IntoTheAbyss/Game.h"
-#include"SceneCange.h"
+#include"IntoTheAbyss/SceneCange.h"
+#include<memory>
 
 class ResultScene : public BaseScene
 {
