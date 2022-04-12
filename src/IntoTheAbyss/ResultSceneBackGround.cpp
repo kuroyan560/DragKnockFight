@@ -4,16 +4,16 @@
 
 void ResultSceneBackGround::Init()
 {
-	gaussianBlur = std::make_shared<GaussianBlur>(WinApp::Instance()->GetWinSize(), D3D12App::Instance()->GetBackBuffFormat());
+	//gaussianBlur = std::make_shared<GaussianBlur>(WinApp::Instance()->GetWinSize(), D3D12App::Instance()->GetBackBuffFormat());
 
 	//backGround = D3D12App::Instance()->GenerateRenderTarget(DXGI_FORMAT_R32G32B32A32_FLOAT, Color(0.0f, 0.0f, 0.0f, 1.0f),
 	//	WinApp::Instance()->GetWinSize(), L"ResultSceneBackGround");
 
-	backGround = D3D12App::Instance()->GenerateTextureBuffer(WinApp::Instance()->GetWinSize(), D3D12App::Instance()->GetBackBuffFormat(), "ScreenShot");
+	//backGround = D3D12App::Instance()->GenerateTextureBuffer(WinApp::Instance()->GetWinSize(), D3D12App::Instance()->GetBackBuffFormat(), "ScreenShot");
 }
 
 void ResultSceneBackGround::Draw()
 {
-	gaussianBlur->Register(backGround);
-	gaussianBlur->DrawResult(AlphaBlendMode_None);
+	//gaussianBlur->Register(backGround);
+	//gaussianBlur->DrawResult(AlphaBlendMode_None);
 }

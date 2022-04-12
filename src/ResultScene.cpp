@@ -122,6 +122,17 @@ void ResultScene::OnUpdate()
 	scoreEasingAmount = KuroMath::Ease(Out, Cubic, (float)scoreUITimer / SCORE_UI_TIMER, 0.0f, 1.0f);
 	scoreEffectEasingAmount = KuroMath::Ease(Out, Cubic, (float)scoreEffectTimer / SCORE_EFFECT_TIMER, 0.0f, 1.0f);
 
+	// スコアエフェクトのタイマーの割合が0.9を超えたら、一気に全部変える。
+	if (0.9f <= (float)scoreEffectTimer / SCORE_EFFECT_TIMER) {
+
+		scoreEffectTimer = SCORE_EFFECT_TIMER;
+
+		for (int index = 0; index < 10; ++index) {
+			scoreSize[index] = 1.5f;
+		}
+
+	}
+
 	if (UsersInput::Instance()->Input(DIK_R)) {
 
 		OnInitialize();

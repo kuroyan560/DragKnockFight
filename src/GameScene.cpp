@@ -85,7 +85,7 @@ void GameScene::OnDraw()
 
 	// スクショを保存。
 	if (isSS) {
-		ResultSceneBackGround::Instance()->backGround->CopyTexResource(D3D12App::Instance()->GetCmdList(), D3D12App::Instance()->GetBackBuffRenderTarget().get());
+		//ResultSceneBackGround::Instance()->backGround->CopyTexResource(D3D12App::Instance()->GetCmdList(), D3D12App::Instance()->GetBackBuffRenderTarget().get());
 	}
 
 }
