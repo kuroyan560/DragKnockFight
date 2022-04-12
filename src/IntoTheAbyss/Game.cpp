@@ -36,7 +36,7 @@
 
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -62,7 +62,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -98,7 +98,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
@@ -155,7 +155,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -173,7 +173,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	AudioApp::Instance()->PlayWave(bgm, true);
 
@@ -185,7 +185,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	FaceIcon::Instance()->Init();
 
 	//ドアが繋がっているか確認
-	if (!SelectStage::Instance()->resetStageFlag)
+	if (!SelectStage::Instance()->resetStageFlag && false)
 	{
 		RoomMapChipArray tmpMap = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 		std::vector<std::unique_ptr<DoorBlock>> tmpDoor;
@@ -500,9 +500,9 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	responePos -= 100;
 
 	lineCenterPos = responePos;
-	player.Init(responePos - Vec2<float>(300.0f, 0.0f));
+	player.Init(responePos - Vec2<float>(150.0f, 0.0f));
 	//ボスを生成
-	boss.Generate(responePos + Vec2<float>(300.0f, 0.0f));
+	boss.Generate(responePos + Vec2<float>(150.0f, 0.0f));
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
@@ -518,10 +518,6 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 	//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
 	//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-
-
-
-	ScrollMgr::Instance()->Init(lineCenterPos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
 
 
 	GameTimer::Instance()->Init({}, 120, {}, {});
@@ -576,6 +572,17 @@ Game::Game()
 	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
 
 	cameraBasePos = { 0.0f,-40.0f };
+
+	roundChangeEffect.Init();
+
+	mapData = StageMgr::Instance()->GetMapChipData(0, 0);
+	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(0, 0);
+
+	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) * 0.5f, (mapData.size() * MAP_CHIP_SIZE) * 0.5f);
+	responePos -= 100;
+	lineCenterPos = responePos;
+	ScrollMgr::Instance()->Init(lineCenterPos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
+
 }
 
 void Game::Init()
@@ -982,13 +989,19 @@ void Game::Update()
 	}
 
 	//敵陣地とプレイヤーの判定
-	if (enemyHomeBase->Collision(player.areaHitBox) && !roundFinishFlag)
+	if (enemyHomeBase->Collision(player.areaHitBox) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//敵勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, false);
 		roundFinishFlag = true;
 		gameStartFlag = false;
 	}
+
+	if (UsersInput::Instance()->OnTrigger(DIK_U))
+	{
+		roundFinishFlag = true;
+	}
+
 
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
@@ -1014,10 +1027,33 @@ void Game::Update()
 	//ラウンド開始時の演出開始
 	if (readyToStartRoundFlag)
 	{
-		gameStartFlag = true;
-		SelectStage::Instance()->resetStageFlag = true;
-		readyToStartRoundFlag = false;
+		roundChangeEffect.Start(false);
+		Vec2<float>winSize;
+		winSize.x = static_cast<float>(WinApp::Instance()->GetWinSize().x);
+		winSize.y = static_cast<float>(WinApp::Instance()->GetWinSize().y);
+
+		Vec2<float> responePos = Vec2<float>(((mapData[0].size() * MAP_CHIP_SIZE) / 2.0f) - 100.0f, (mapData.size() * MAP_CHIP_SIZE) / 2.0f);
+		responePos.y -= -cameraBasePos.y * 2.0f;
+		ScrollMgr::Instance()->Warp(responePos);
+
+		//プレイヤーと敵の座標初期化
+		if (roundChangeEffect.drawFightFlag && !roundChangeEffect.initFlag)
+		{
+			InitGame(0, 0);
+			roundChangeEffect.initFlag = true;
+		}
+
+		if (player.allowToMoveFlag && boss.AllowToMove() && roundChangeEffect.initFlag)
+		{
+			readyToStartRoundFlag = false;
+			gameStartFlag = true;
+		}
+		//gameStartFlag = true;
+		//SelectStage::Instance()->resetStageFlag = true;
+		//readyToStartRoundFlag = false;
 	}
+
+
 
 
 
@@ -1053,11 +1089,19 @@ void Game::Update()
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
-	// プレイヤーの更新処理
-	player.Update(mapData, boss.pos);
+	//ラウンドチェンジ演出中は動かせない
+	//if (!readyToStartRoundFlag)
+	{
+		// プレイヤーの更新処理
+		player.Update(mapData, boss.pos);
+		// ボスの更新処理
+		boss.Update();
+	}
+
 
 	miniMap.Update();
 
+	roundChangeEffect.Update();
 
 	GameTimer::Instance()->Update();
 	ScoreManager::Instance()->Update();
@@ -1084,11 +1128,10 @@ void Game::Update()
 
 
 
-	// ボスの更新処理
-	boss.Update();
-
 	// プレイヤーとボスの引っ張り合いの処理
+
 	Scramble();
+
 
 	//	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
 	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
@@ -1570,6 +1613,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	/*===== 描画処理 =====*/
 	BackGround::Instance()->Draw();
 
+	roundChangeEffect.Draw();
+
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 	DrawMapChip(mapData, mapChipDrawData, stageNum, roomNum);
 
@@ -1624,6 +1669,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	GameTimer::Instance()->Draw();
 	ScoreManager::Instance()->Draw();
+
 
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
@@ -1691,17 +1737,22 @@ void Game::Scramble()
 	// 前フレームの線の中心座標を保存
 	prevLineCenterPos = lineCenterPos;
 
-	// 移動量を取得。 優勢ゲージはここで更新。
-	double playerVel = player.vel.Length() * SlowMgr::Instance()->slowAmount;
-	Vec2<float> playerVelGauge = (player.vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
-	double bossVel = boss.vel.Length() * SlowMgr::Instance()->slowAmount;
-	Vec2<float> bossVelGauge = (boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
-	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
+	Vec2<float> playerVelGauge;
+	Vec2<float> bossVelGauge;
+	if (player.allowToMoveFlag && boss.AllowToMove())
+	{
+		// 移動量を取得。 優勢ゲージはここで更新。
+		double playerVel = player.vel.Length() * SlowMgr::Instance()->slowAmount;
+		playerVelGauge = (player.vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+		double bossVel = boss.vel.Length() * SlowMgr::Instance()->slowAmount;
+		bossVelGauge = (boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+		double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
-	// [振り回し状態のとき] [スタン演出中] は移動させない。
-	if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer)) {
-		player.centerPos += playerVelGauge;
-		boss.pos += bossVelGauge;
+		// [振り回し状態のとき] [スタン演出中] は移動させない。
+		if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer || StunEffect::Instance()->isActive)) {
+			player.centerPos += playerVelGauge;
+			boss.pos += bossVelGauge;
+		}
 	}
 
 

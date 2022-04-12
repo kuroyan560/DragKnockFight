@@ -100,6 +100,7 @@ public:
 
 	//クラッシュ演出補助
 	CrashInterFace crashDevice;
+	Vec2<float>scale;
 
 public:
 
@@ -154,6 +155,8 @@ public:
 
 	std::shared_ptr<SphereCollision> bulletHitBox;
 
+	bool allowToMoveFlag;
+	float sizeVel;
 public:
 
 	/*-- メンバ関数 --*/
@@ -185,6 +188,7 @@ public:
 	void StopDoorUpDown();
 	bool drawCursorFlag;
 
+	Vec2<float>size;
 private:
 	/*-- クラス内で使用する関数 --*/
 

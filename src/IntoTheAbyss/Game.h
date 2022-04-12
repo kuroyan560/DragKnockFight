@@ -27,6 +27,8 @@ class RenderTarget;
 
 #include"MiniMap.h"
 
+#include"RoundChangeEffect.h"
+
 struct MassChipData
 {
 	Vec2<float>leftUpPos;
@@ -153,6 +155,8 @@ class Game
 
 	MiniMap miniMap;
 	Vec2<float>cameraBasePos;
+
+	RoundChangeEffect roundChangeEffect;
 public:
 
 	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;

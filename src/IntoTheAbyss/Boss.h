@@ -51,7 +51,7 @@ public:
 	bool atackModeFlag;
 	//ボスのパターン制御-----------------------
 
-
+	bool allowToMoveFlag;
 public:
 
 	/*===== 定数 =====*/
@@ -90,4 +90,9 @@ public:
 	// 当たり判定
 	void CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos);
 
+
+	bool AllowToMove()
+	{
+		return allowToMoveFlag;
+	};
 };
