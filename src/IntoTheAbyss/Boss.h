@@ -50,7 +50,6 @@ public:
 	BossPatternData patternData;
 	std::array<std::unique_ptr<IBossPattern>, BOSS_PATTERN_MAX>bossPattern;
 	int patternTimer;
-	bool atackModeFlag;
 	//ボスのパターン制御-----------------------
 
 	bool allowToMoveFlag;
@@ -100,4 +99,6 @@ public:
 	{
 		return allowToMoveFlag;
 	};
+
+	void AiPattern();
 };

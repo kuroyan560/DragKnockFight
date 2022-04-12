@@ -179,20 +179,7 @@ void Boss::Update()
 		else {
 
 			//ボスのAI-----------------------
-			++patternTimer;
-			if (120 <= patternTimer)
-			{
-				if (atackModeFlag)
-				{
-					bossPatternNow = BOSS_PATTERN_SWING;
-				}
-				else
-				{
-					bossPatternNow = BOSS_PATTERN_SWING;
-				}
-				atackModeFlag = !atackModeFlag;
-				patternTimer = 0;
-			}
+			AiPattern();
 			//ボスのAI-----------------------
 
 
@@ -425,6 +412,7 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 
 		}
 
+
 	}
 
 	prevIntersectedLine = intersectedBuff;
@@ -435,4 +423,42 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 
 	}
 
+}
+
+void Boss::AiPattern()
+{
+	//120Flameごとにどの行動パターンを選択するか決める
+
+	++patternTimer;
+	if (120 <= patternTimer)
+	{
+		//プレイヤーとボスとの方向ベクトル確認
+		Vec2<float>dir = SwingMgr::Instance()->playerPos - SwingMgr::Instance()->bossPos;
+		float distance = dir.y - (dir.y * -1.0f);
+
+		const float MAX_DISTANCE = 200.0f;
+		bool allowToSwingFlag = false;
+		if (MAX_DISTANCE <= fabs(distance))
+		{
+			allowToSwingFlag = true;
+		}
+
+
+		//次にどのパターンを選択するか
+		//一部の条件でパターンを選択しないようにする
+		while (1)
+		{
+			int randomPattern = KuroFunc::GetRand(BOSS_PATTERN_MAX - 1);
+
+			//振り回し許可なしで振り回そうとしたらやり直し
+			if (!allowToSwingFlag && randomPattern == BOSS_PATTERN_SWING)
+			{
+				continue;
+			}
+			bossPatternNow = static_cast<E_BossPattern>(randomPattern);
+			break;
+		}
+
+		patternTimer = 0;
+	}
 }
