@@ -7,6 +7,7 @@ BossPatternSwing::BossPatternSwing()
 
 void BossPatternSwing::Init()
 {
+	swingFlag = false;
 }
 
 void BossPatternSwing::Update(BossPatternData *DATA)

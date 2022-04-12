@@ -14,6 +14,7 @@
 #include"TexHandleMgr.h"
 #include"BossPatternNormalMove.h"
 #include"BossPatternAttack.h"
+#include"BossPatternSwing.h"
 #include"BossBulletManager.h"
 #include"CrashMgr.h"
 
@@ -35,6 +36,7 @@ Boss::Boss()
 
 	bossPattern[0] = std::make_unique<BossPatternNormalMove>();
 	bossPattern[1] = std::make_unique<BossPatternAttack>();
+	bossPattern[2] = std::make_unique<BossPatternSwing>();
 
 
 	//パターンに渡すデータの初期化
@@ -158,7 +160,7 @@ void Boss::Update()
 		if (0 < afterSwingDelay || StunEffect::Instance()->isActive) {
 			// 何もしない。
 		}
-		else if (isSwingNow) {
+		else if (isSwingNow && SwingMgr::Instance()->isSwingPlayer) {
 
 			// 振り回し中だったら。
 
@@ -182,11 +184,11 @@ void Boss::Update()
 			{
 				if (atackModeFlag)
 				{
-					bossPatternNow = BOSS_PATTERN_ATTACK;
+					bossPatternNow = BOSS_PATTERN_SWING;
 				}
 				else
 				{
-					bossPatternNow = BOSS_PATTERN_NORMALMOVE;
+					bossPatternNow = BOSS_PATTERN_SWING;
 				}
 				atackModeFlag = !atackModeFlag;
 				patternTimer = 0;
