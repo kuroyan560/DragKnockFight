@@ -34,6 +34,8 @@
 
 #include"BulletCollision.h"
 
+#include"CrashMgr.h"
+
 
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
@@ -175,6 +177,8 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 #include"PlayerHand.h"
 void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
+	CrashMgr::Instance()->Init();
+
 	AudioApp::Instance()->PlayWave(bgm, true);
 
 	int stageNum = STAGE_NUM;
@@ -1631,6 +1635,7 @@ void Game::Update()
 		StunEffect::Instance()->Activate(boss.pos, boss.pos, Vec2<float>(1200, 0), true);
 	}
 
+	CrashMgr::Instance()->Update();
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -1694,9 +1699,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	}
 
-	GameTimer::Instance()->Draw();
-	ScoreManager::Instance()->Draw();
-
 
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
@@ -1731,9 +1733,12 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	player.Draw(ligMgr);
 	// ボスを描画
 	boss.Draw();
+
 	ParticleMgr::Instance()->Draw(ligMgr);
+	CrashMgr::Instance()->Draw();
 
-
+	GameTimer::Instance()->Draw();
+	ScoreManager::Instance()->Draw();
 
 	// プレイヤーとボス間に線を描画
 	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());
