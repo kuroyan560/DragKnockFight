@@ -527,10 +527,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	ScoreManager::Instance()->Init();
 	firstLoadFlag = false;
 
-	//背景に星
-	BackGround::Instance()->Init(GetStageSize());
-
-
 }
 
 Game::Game()
@@ -584,8 +580,16 @@ Game::Game()
 	lineCenterPos = responePos;
 	ScrollMgr::Instance()->Init(lineCenterPos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
 
+	Camera::Instance()->Init();
+	SuperiorityGauge::Instance()->Init();
 
 	readyToStartRoundFlag = true;
+
+	//背景に星
+	BackGround::Instance()->Init(GetStageSize());
+
+	GameTimer::Instance()->Init({}, 120, {}, {});
+	ScoreManager::Instance()->Init();
 }
 
 void Game::Init()
@@ -1106,14 +1110,16 @@ void Game::Update()
 
 
 
-	// プレイヤーの更新処理
-	player.Update(mapData, boss.pos);
+	if (roundChangeEffect.initFlag)
+	{
+		// プレイヤーの更新処理
+		player.Update(mapData, boss.pos);
 
 
-	boss.readyToStartRoundEffectFlag = readyToStartRoundFlag;
-	// ボスの更新処理
-	boss.Update();
-
+		boss.readyToStartRoundEffectFlag = readyToStartRoundFlag;
+		// ボスの更新処理
+		boss.Update();
+	}
 
 
 	miniMap.Update();
@@ -1210,8 +1216,11 @@ void Game::Update()
 		dossunBlock[index].CheckHit(mapData);
 	}
 
-	// プレイヤーの当たり判定
-	player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer, lineCenterPos);
+	if (roundChangeEffect.initFlag)
+	{
+		// プレイヤーの当たり判定
+		player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer, lineCenterPos);
+	}
 
 	// 動的ブロックの当たり判定
 	MovingBlockMgr::Instance()->CheckHit(mapData);

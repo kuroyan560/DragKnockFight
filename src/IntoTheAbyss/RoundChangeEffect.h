@@ -45,7 +45,7 @@ private:
 	bool initShakeFlag;
 	float rate;
 	bool initMaskFlag;
-
+	bool firstRoundFlag;
 	float Lerp(float *HONRAI, float *BASE, const float &DIV)
 	{
 		float distance = *HONRAI - *BASE;

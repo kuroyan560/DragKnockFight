@@ -94,6 +94,12 @@ void RoundChangeEffect::Start(const int &ROUND_NUMBER, const bool &LEFT_OR_RIGHT
 		enemyReticleAlpha = 255;
 
 		initMaskFlag = false;
+
+		firstRoundFlag = ROUND_NUMBER == 1;
+		if (firstRoundFlag)
+		{
+			numberData->handle = numberHandle[1];
+		}
 	}
 	startFlag = true;
 
@@ -119,31 +125,42 @@ void RoundChangeEffect::Update()
 			nextNumberData->numberMaskPos = numberData->pos + Vec2<float>(0.0f, -120.0f);
 		}
 
+
 		//数字のマスク処理
 		float numberDistacnce = 1.0f;
-		if (fabs(roundDistance) <= 0.1f || initMaskFlag)
+		if (!firstRoundFlag)
 		{
-			if (!initMaskFlag)
+			if (fabs(roundDistance) <= 0.1f || initMaskFlag)
 			{
-				numberData->honraiNumberMaskPos.y += 120.0f;
-				nextNumberData->honraiNumberMaskPos.y += 120.0f;
-				initMaskFlag = true;
+				if (!initMaskFlag)
+				{
+					numberData->honraiNumberMaskPos.y += 120.0f;
+					nextNumberData->honraiNumberMaskPos.y += 120.0f;
+					initMaskFlag = true;
+				}
+				Lerp(&numberData->honraiNumberMaskPos.y, &numberData->numberMaskPos.y, 0.1f);
+				numberDistacnce = Lerp(&nextNumberData->honraiNumberMaskPos.y, &nextNumberData->numberMaskPos.y, 0.1f);
 			}
-			Lerp(&numberData->honraiNumberMaskPos.y, &numberData->numberMaskPos.y, 0.1f);
-			numberDistacnce=Lerp(&nextNumberData->honraiNumberMaskPos.y, &nextNumberData->numberMaskPos.y, 0.1f);
 		}
-
-
 
 		float size = 1.0f;
 		//中央に達したら文字のサイズを中央に消えるようにサイズを変える
-		if (fabs(numberDistacnce) <= 0.1f)
+		if (fabs(numberDistacnce) <= 0.1f && !firstRoundFlag)
 		{
 			roundData->honraiSize.y = 0.0f;
 			nextNumberData->honraiSize.y = 0.0f;
 			Lerp(&roundData->honraiSize.y, &roundData->size.y, 0.1f);
 			size = Lerp(&nextNumberData->honraiSize.y, &nextNumberData->size.y, 0.1f);
 		}
+		else if(firstRoundFlag && fabs(roundDistance) <= 0.1f)
+		{
+			roundData->honraiSize.y = 0.0f;
+			numberData->honraiSize.y = 0.0f;
+			Lerp(&roundData->honraiSize.y, &roundData->size.y, 0.1f);
+			size = Lerp(&numberData->honraiSize.y, &numberData->size.y, 0.1f);
+		}
+
+
 
 		bool drawReadyFlag = false;
 		float readySize = 1.0f;
@@ -251,8 +268,10 @@ void RoundChangeEffect::Draw()
 		//DrawFunc::DrawRotaGraph2D(numberData->pos, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle));
 
 		DrawFunc_Mask::DrawRotaGraph2D(numberData->pos, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle), numberData->numberMaskPos, Vec2<float>(120.0f, 120.0f));
-		DrawFunc_Mask::DrawRotaGraph2D(nextNumberData->pos, nextNumberData->size, 0.0f, TexHandleMgr::GetTexBuffer(nextNumberData->handle), nextNumberData->numberMaskPos, Vec2<float>(120.0f, 120.0f));
-
+		if (!firstRoundFlag)
+		{
+			DrawFunc_Mask::DrawRotaGraph2D(nextNumberData->pos, nextNumberData->size, 0.0f, TexHandleMgr::GetTexBuffer(nextNumberData->handle), nextNumberData->numberMaskPos, Vec2<float>(120.0f, 120.0f));
+		}
 		playerReticle->transform.SetPos(playerReticleData->pos);
 		playerReticle->transform.SetScale(playerReticleData->size);
 		playerReticle->SetTexture(TexHandleMgr::GetTexBuffer(playerReticleData->handle));

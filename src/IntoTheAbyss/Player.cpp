@@ -50,8 +50,6 @@ Player::Player()
 
 	areaHitBox.center = &centerPos;
 	areaHitBox.size = PLAYER_HIT_SIZE;
-
-
 }
 
 Player::~Player()
