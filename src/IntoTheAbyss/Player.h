@@ -15,7 +15,7 @@ class PlayerHand;
 #include"AfterImg.h"
 class LightManager;
 #include"Muffler.h"
-#include"StagingInterFace.h"
+#include"CrashInterFace.h"
 
 #include"../IntoTheAbyss/BulletCollision.h"
 
@@ -154,6 +154,10 @@ public:
 
 	std::shared_ptr<SphereCollision> bulletHitBox;
 
+	bool allowToMoveFlag;
+	float sizeVel;
+	bool initPaticleFlag;
+	int moveTimer;
 public:
 
 	/*-- メンバ関数 --*/
@@ -185,6 +189,8 @@ public:
 	void StopDoorUpDown();
 	bool drawCursorFlag;
 
+	Vec2<float>size;
+	Vec2<float>initSize;
 private:
 	/*-- クラス内で使用する関数 --*/
 

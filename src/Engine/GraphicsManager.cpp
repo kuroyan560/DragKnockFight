@@ -103,11 +103,6 @@ void GraphicsManager::ExcutePostEffect(PostEffect* PostEffect, const std::shared
 	gCommands.emplace_back(std::make_shared<SetPostEffect>(PostEffect, SourceTex));
 }
 
-void GraphicsManager::CopyTexture(const std::shared_ptr<TextureBuffer>& DestTex, const std::shared_ptr<TextureBuffer>& SrcTex)
-{
-	gCommands.emplace_back(std::make_shared<CopyTex>(DestTex, SrcTex));
-}
-
 void GraphicsManager::ObjectRender(const std::shared_ptr<VertexBuffer>& VertexBuff, const std::vector<std::shared_ptr<DescriptorData>>& DescDatas,
 	const std::vector<DESC_HANDLE_TYPE>& DescHandleTypes,
 	const float& Depth, const bool& TransFlg, const int& InstanceNum)
@@ -172,9 +167,4 @@ void GraphicsManager::CommandsExcute(const Microsoft::WRL::ComPtr<ID3D12Graphics
 	//コマンドリストクリア
 	gCommands.clear();
 	recentPipelineHandle = -1;
-}
-
-void GraphicsManager::CopyTex::Excute(const ComPtr<ID3D12GraphicsCommandList>& CmdList)
-{
-	destTex.lock()->CopyTexResource(CmdList, srcTex.lock().get());
 }

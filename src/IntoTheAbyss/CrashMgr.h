@@ -1,7 +1,7 @@
 #pragma once
 #include"Singleton.h"
 #include"Vec.h"
-class StagingInterFace;
+class CrashInterFace;
 class CrashMgr : public Singleton<CrashMgr>
 {
 	friend class Singleton<CrashMgr>;
@@ -12,7 +12,6 @@ class CrashMgr : public Singleton<CrashMgr>
 	static const int CRASH_DISAPPEAR_TIME = 30;
 	static const int CRASH_LIFE_SPAN = CRASH_APPEAR_TIME + CRASH_WAIT_TIME + CRASH_DISAPPEAR_TIME;
 	int se;
-	int crashGraph;
 
 	struct CrashDrawInfo
 	{

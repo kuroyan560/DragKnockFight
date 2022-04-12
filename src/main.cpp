@@ -35,12 +35,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//シーンリスト=====================
 
-	std::vector<shared_ptr<BaseScene>>sceneList =
+	std::vector<BaseScene*>sceneList =
 	{
-		make_shared<TitleScene>(),
-		make_shared<StageSelectScene>(),
-		make_shared<GameScene>(),
-		make_shared<ResultScene>(),
+		new TitleScene(),
+		new StageSelectScene(),
+		new GameScene(),
+		new ResultScene(),
 	};
 	int awakeScene = 0;	//開始時のステージ番号
 

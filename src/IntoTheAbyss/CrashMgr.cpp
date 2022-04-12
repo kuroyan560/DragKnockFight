@@ -1,15 +1,12 @@
 #include "CrashMgr.h"
 #include"ShakeMgr.h"
-#include"StagingInterFace.h"
+#include"CrashInterFace.h"
 #include"AudioApp.h"
-#include"TexHandleMgr.h"
 
 CrashMgr::CrashMgr()
 {
 	se = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/crash.wav");
 	AudioApp::Instance()->ChangeVolume(se, 0.27f);
-
-	crashGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/crash.png");
 }
 
 void CrashMgr::Init()
@@ -89,6 +86,7 @@ void CrashMgr::Crash(const Vec2<float>& Pos, StagingInterFace& CrashDevice, cons
 	CrashDevice.Flash(CRASH_SPAN, FLASH_RATE);
 
 	ShakeMgr::Instance()->SetShake(15);
+	CrashDevice.Crash(Ext);
 	AudioApp::Instance()->PlayWave(se);
 
 	for (auto& info : crashInfo)

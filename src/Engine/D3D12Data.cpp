@@ -72,7 +72,7 @@ void TextureBuffer::CopyTexResource(const ComPtr<ID3D12GraphicsCommandList>& Cmd
 {
 	if (texDesc != CopySource->texDesc)
 	{
-		//ASSERT_MSG("シェーダーリソースをコピーしようとしましたが、フォーマットが違います\n");
+		ASSERT_MSG("シェーダーリソースをコピーしようとしましたが、フォーマットが違います\n");
 	}
 	resource->CopyGPUResource(CmdList, *CopySource->resource);
 }

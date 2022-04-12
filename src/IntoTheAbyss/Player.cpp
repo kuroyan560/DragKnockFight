@@ -44,15 +44,19 @@ Player::Player()
 	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav");
 	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
 
-	this->Init(GetGeneratePos());
+	//this->Init(GetGeneratePos());
+	bulletHitBox = std::make_shared<SphereCollision>();
+	bulletHitBox->center = &centerPos;
 
+	areaHitBox.center = &centerPos;
+	areaHitBox.size = PLAYER_HIT_SIZE;
 }
 
 Player::~Player()
 {
 }
 
-void Player::Init(const Vec2<float>& INIT_POS)
+void Player::Init(const Vec2<float> &INIT_POS)
 {
 
 	/*===== 初期化処理 =====*/
@@ -139,21 +143,66 @@ void Player::Init(const Vec2<float>& INIT_POS)
 
 	//muffler.Init(INIT_POS);
 
-	areaHitBox.center = &centerPos;
-	areaHitBox.size = PLAYER_HIT_SIZE;
 
 	swingCoolTime = 0;
 
 
-	bulletHitBox = std::make_shared<SphereCollision>();
-	bulletHitBox->center = &centerPos;
+
 	bulletHitBox->radius = 20.0f;
+	crashDevice.Init();
+	bulletHitBox->radius = 10.0f;
+
+	initSize = { 5.0f,5.0f };
+	size = initSize;
+	sizeVel = 120.0f;
+	allowToMoveFlag = false;
+	initPaticleFlag = false;
+	moveTimer = 0;
 	stagingDevice.Init();
 }
 
-void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
+void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPos)
 {
 	stagingDevice.Update();
+
+	//サイズが1.0fになるまで動かない
+	if (1.0f < size.x && 1.0f < size.y)
+	{
+		float time = 30.0f;
+		size -= initSize / time;
+		doorMoveUpDownFlag = true;
+	}
+
+	if (size.x <= 1.0f && size.y <= 1.0f)
+	{
+		if (!initPaticleFlag)
+		{
+			Vec2<float>radian(cosf(Angle::ConvertToRadian(0.0f)), sinf(Angle::ConvertToRadian(0.0f)));
+			ParticleMgr::Instance()->Generate(centerPos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(90.0f)), sinf(Angle::ConvertToRadian(90.0f)) };
+			ParticleMgr::Instance()->Generate(centerPos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(180.0f)), sinf(Angle::ConvertToRadian(180.0f)) };
+			ParticleMgr::Instance()->Generate(centerPos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(270.0f)), sinf(Angle::ConvertToRadian(270.0f)) };
+			ParticleMgr::Instance()->Generate(centerPos, radian, BULLET);
+			initPaticleFlag = true;
+		}
+		allowToMoveFlag = true;
+		size = { 1.0f,1.0f };
+		++moveTimer;
+	}
+
+	if (20 <= moveTimer)
+	{
+		doorMoveUpDownFlag = false;
+	}
+
+
+
+
 
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
@@ -328,7 +377,7 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPo
 	//muffler.Update(centerPos);
 }
 
-void Player::Draw(LightManager& LigManager)
+void Player::Draw(LightManager &LigManager)
 {
 	//if (vel.y < 0)playerDir = BACK;
 	if (vel.y < 0)anim.ChangeAnim(DEFAULT_BACK);
@@ -349,8 +398,8 @@ void Player::Draw(LightManager& LigManager)
 
 	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_L.png");
 	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_R.png");
-	rHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
-	lHand->Draw(LigManager, EXT_RATE, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
+	rHand->Draw(LigManager, EXT_RATE * size.x, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
+	lHand->Draw(LigManager, EXT_RATE * size.y, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 
 	//ストレッチ加算
 	//leftUp += stretch_LU;
@@ -363,12 +412,13 @@ void Player::Draw(LightManager& LigManager)
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate(),
 		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha());
 
+
 	// 弾を描画
 	BulletMgr::Instance()->Draw();
 
 }
 
-void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip, const Vec2<float>& lineCenterPos)
+void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble> &bubble, vector<DossunBlock> &dossun, const Vec2<float> &bossPos, bool &isHitMapChip, const Vec2<float> &lineCenterPos)
 {
 
 	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
@@ -1163,7 +1213,7 @@ void Player::StopDoorUpDown()
 	doorMoveUpDownFlag = true;
 }
 
-void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos)
+void Player::Input(const vector<vector<int>> mapData, const Vec2<float> &bossPos)
 {
 	/*===== 入力処理 =====*/
 
@@ -1776,7 +1826,7 @@ void Player::PushBackWall()
 
 }
 
-void Player::CalculateStretch(const Vec2<float>& Move)
+void Player::CalculateStretch(const Vec2<float> &Move)
 {
 	Vec2<float> stretchRate = { abs(Move.x / MAX_RECOIL_AMOUNT),abs(Move.y / MAX_RECOIL_AMOUNT) };
 
@@ -1871,7 +1921,7 @@ Vec2<float> Player::GetPlayerGraphSize()
 	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 }
 
-void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip)
+void Player::CheckHitMapChipVel(const Vec2<float> &checkPos, const vector<vector<int>> &mapData, const Vec2<float> &bossPos, bool &isHitMapChip)
 {
 	// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
 	//Vec2<float> upperPlayerPos = centerPos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);
@@ -2075,7 +2125,7 @@ void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector
 
 }
 
-void Player::CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip)
+void Player::CheckHitSize(const Vec2<float> &checkPos, const vector<vector<int>> &mapData, const Vec2<float> &bossPos, bool &isHitMapChip)
 {
 
 	// マップチップ目線でどこに当たったか

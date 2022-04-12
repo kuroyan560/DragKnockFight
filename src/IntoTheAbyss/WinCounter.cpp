@@ -47,10 +47,10 @@ void WinCounter::Update()
 	}
 	else if (knockOutTimer <= APPEAR_TIME + WAIT_TIME + DISAPPEAR_TIME)
 	{
-		int shakeTimer = knockOutTimer - APPEAR_TIME - WAIT_TIME;
-		knockOutPos = KuroMath::Ease(In, Exp, shakeTimer, DISAPPEAR_TIME, WinApp::Instance()->GetExpandWinCenter(), knockOutDisappearPos);
-		kncokOutScale = KuroMath::Ease(In, Back, shakeTimer, DISAPPEAR_TIME, 1.0f, 0.0f);
-		knockOutRadian = KuroMath::Ease(In, Exp, shakeTimer, DISAPPEAR_TIME, toRad, 0.0f);
+		int timer = knockOutTimer - APPEAR_TIME - WAIT_TIME;
+		knockOutPos = KuroMath::Ease(In, Exp, timer, DISAPPEAR_TIME, WinApp::Instance()->GetExpandWinCenter(), knockOutDisappearPos);
+		kncokOutScale = KuroMath::Ease(In, Back, timer, DISAPPEAR_TIME, 1.0f, 0.0f);
+		knockOutRadian = KuroMath::Ease(In, Exp, timer, DISAPPEAR_TIME, toRad, 0.0f);
 	}
 	else
 	{

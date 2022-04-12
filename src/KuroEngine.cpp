@@ -60,10 +60,10 @@ KuroEngine::~KuroEngine()
 	FreeLibrary(xaudioLib);
 
 	//シーンの削除
-	/*for (int i = 0; i < scenes.size(); ++i)
+	for (int i = 0; i < scenes.size(); ++i)
 	{
 		delete scenes[i];
-	}*/
+	}
 
 	printf("KuroEngineシャットダウン\n");
 }
@@ -103,7 +103,7 @@ void KuroEngine::Initialize(const EngineOption& Option)
 
 
 	//平行投影行列定数バッファ生成
-	parallelMatProjBuff = d3d12App->GenerateConstantBuffer(sizeof(XMMATRIX), 1,
+	parallelMatProjBuff = d3d12App->GenerateConstantBuffer(sizeof(XMMATRIX), 1, 
 		&XMMATRIX(DirectX::XMMatrixOrthographicOffCenterLH(0.0f, winApp->GetExpandWinSize().x, winApp->GetExpandWinSize().y, 0.0f, 0.0f, 1.0f)));
 
 	printf("KuroEngine起動成功\n");
@@ -111,7 +111,7 @@ void KuroEngine::Initialize(const EngineOption& Option)
 
 }
 
-void KuroEngine::SetSceneList(const std::vector<std::shared_ptr<BaseScene>> &SceneList, const int& AwakeSceneNum)
+void KuroEngine::SetSceneList(const std::vector<BaseScene*>& SceneList, const int& AwakeSceneNum)
 {
 	//シーンリスト移動
 	scenes = SceneList;
