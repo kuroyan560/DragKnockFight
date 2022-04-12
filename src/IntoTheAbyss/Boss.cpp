@@ -20,6 +20,8 @@
 
 #include"ParticleMgr.h"
 
+#include"DebugParameter.h"
+
 Boss::Boss()
 {
 
@@ -378,7 +380,7 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 			if (!isHitTop && !isHitBottom)ext.x = false;
 
 			CrashMgr::Instance()->Crash(pos, crashDevice, ext);
-			SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
+			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
 			SwingMgr::Instance()->isSwingPlayer = false;
 
 		}
@@ -400,15 +402,14 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
 			CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
-			SuperiorityGauge::Instance()->AddPlayerGauge(10);
-
+			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
 		}
 		// ウィンドウ上下
 		if (windowSize.y <= pos.y + scale.y - ScrollMgr::Instance()->scrollAmount.y || pos.y - scale.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
 			CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
-			SuperiorityGauge::Instance()->AddPlayerGauge(10);
+			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
 
 		}
 
@@ -437,7 +438,7 @@ void Boss::AiPattern()
 		float distance = dir.y - (dir.y * -1.0f);
 
 		bool allowToSwingFlag = false;
-		if (MAX_DISTANCE <= fabs(distance))
+		if (SWING_DISTANCE_DEADLINE <= fabs(distance))
 		{
 			allowToSwingFlag = true;
 		}

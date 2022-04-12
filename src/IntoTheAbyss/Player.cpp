@@ -1015,7 +1015,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble> &bubble,
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
 			CrashMgr::Instance()->Crash(centerPos, crashDevice, { false,true });
-			SuperiorityGauge::Instance()->AddEnemyGauge(10);
+			SuperiorityGauge::Instance()->AddEnemyGauge(DebugParameter::Instance()->gaugeData->playerClashDamageValue);
 
 		}
 		// ウィンドウ上下
@@ -1023,7 +1023,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble> &bubble,
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
 			CrashMgr::Instance()->Crash(centerPos, crashDevice, { true,false });
-			SuperiorityGauge::Instance()->AddEnemyGauge(10);
+			SuperiorityGauge::Instance()->AddEnemyGauge(DebugParameter::Instance()->gaugeData->playerClashDamageValue);
 
 		}
 
