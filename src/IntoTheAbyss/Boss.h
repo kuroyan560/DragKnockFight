@@ -14,6 +14,7 @@ using namespace std;
 // プレイヤーと引っ張り合うボスクラス
 class Boss {
 
+	void Crash(const Vec2<float>& Vec);
 public:
 
 	/*===== メンバ変数 =====*/

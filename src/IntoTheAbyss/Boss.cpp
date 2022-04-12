@@ -17,6 +17,39 @@
 #include"BossBulletManager.h"
 #include"CrashMgr.h"
 
+void Boss::Crash(const Vec2<float>& Vec)
+{
+	Vec2<float>smokeVec = { 0.0f,0.0f };
+	Vec2<float>offset = { 0.0f,0.0f };
+	auto drawScale = scale * stagingDevice.GetExtRate() * ScrollMgr::Instance()->zoom / 3.0f;
+
+	if (Vec.x == -1.0f)
+	{
+		smokeVec.x = 1.0f;
+		offset.x = -drawScale.x;
+	}
+	else if (Vec.x == 1.0f)
+	{
+		smokeVec.x = 1.0f;
+		offset.x = drawScale.x;
+	}
+	if (Vec.y == 1.0f)
+	{
+		smokeVec.y = -1.0f;
+		offset.y = drawScale.y;
+	}
+	else if (Vec.y == -1.0f)
+	{
+		smokeVec.y = 1.0f;
+		offset.y = -drawScale.y;
+	}
+	Vec2<bool>ext = { true,true };
+	if (Vec.x == 0.0f)ext.y = false;
+	if (Vec.y == 0.0f)ext.x = false;
+
+	CrashMgr::Instance()->Crash(pos - offset, stagingDevice, ext, -smokeVec);
+}
+
 Boss::Boss()
 {
 
@@ -343,23 +376,15 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 		// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 		if (SwingMgr::Instance()->isSwingPlayer || OFFSET_INERTIA / 2.0f < afterSwingDelay) {
 
-			Vec2<bool>ext = { true,true };
-			if (!isHitLeft && !isHitRight)ext.y = false;
-			if (!isHitTop && !isHitBottom)ext.x = false;
+			Vec2<float>vec = { 0,0 };
+			if (isHitLeft)vec.x = -1.0f;
+			else if (isHitRight)vec.x = 1.0f;
+			if (isHitTop)vec.y = -1.0f;
+			else if (isHitBottom)vec.y = 1.0f;
 
-			Vec2<float>smokeVec = { 0.0f,0.0f };
-			if (isHitRight)
-			{
-				smokeVec.x = -1.0f;
-			}
-			else if (isHitLeft)smokeVec.x = 1.0f;
-			if (isHitBottom)smokeVec.y = -1.0f;
-			else if (isHitTop)smokeVec.y = 1.0f;
-
-			CrashMgr::Instance()->Crash(pos, stagingDevice, ext, smokeVec);
+			Crash(vec);
 			SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
 			SwingMgr::Instance()->isSwingPlayer = false;
-
 		}
 
 	}
@@ -381,10 +406,8 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 		if (winLeft || winRight) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-
-			if (winLeft)smokeVec.x = 1.0f;
-			else smokeVec.x = -1.0f;
-
+			
+			Crash({ winLeft ? -1.0f : 1.0f,0.0f });
 			CrashMgr::Instance()->Crash(pos, stagingDevice, { false,true }, smokeVec);
 			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
@@ -397,12 +420,8 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
 
-			if (winTop)smokeVec.y = 1.0f;
-			else smokeVec.y = -1.0f;
-
-			CrashMgr::Instance()->Crash(pos, stagingDevice, { true,false }, smokeVec);
+			Crash({ 0.0f,winTop ? -1.0f : 1.0f });
 			SuperiorityGauge::Instance()->AddPlayerGauge(10);
-
 		}
 
 	}

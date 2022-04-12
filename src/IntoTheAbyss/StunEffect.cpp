@@ -38,7 +38,6 @@ void StunEffect::Activate(Vec2<float>& focusPos, const Vec2<float>& stunPos, con
 {
 
 	/*===== 生成処理 =====*/
-
 	//focusTime = FOCUS_TIME;
 	this->focusPos = &focusPos;
 	this->iconPos = iconPos;
@@ -64,7 +63,6 @@ void StunEffect::Activate(Vec2<float>& focusPos, const Vec2<float>& stunPos, con
 
 void StunEffect::Update()
 {
-
 	/*===== 更新処理 =====*/
 
 	// 有効化されていなかったら処理を飛ばす。

@@ -28,6 +28,8 @@ void CrashMgr::Update()
 		//Ž€–S‚µ‚Ä‚¢‚é
 		if (CRASH_LIFE_SPAN < info.life)continue;
 
+		if (info.life == 0)Sleep(15);
+
 		int timer = info.life;
 		int totalTime = CRASH_APPEAR_TIME;
 

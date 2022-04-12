@@ -25,6 +25,9 @@ class CrashMgr : public Singleton<CrashMgr>
 	static const int CRASH_MAX_NUM = 10;
 	CrashDrawInfo crashInfo[CRASH_MAX_NUM];
 
+	static const int HIT_STOP = 30;
+	int hitStopTimer;
+
 public:
 	void Init();
 	void Update();

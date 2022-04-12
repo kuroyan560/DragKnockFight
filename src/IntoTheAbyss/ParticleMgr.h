@@ -18,7 +18,7 @@ class ParticleMgr : public Singleton<ParticleMgr>
 {
 	static const int MAX_NUM = 300;
 
-	static const enum PARTICLE_CUMPUTE_TYPE { NORMAL_SMOKE, FAST_SMOKE, DEFAULT = NORMAL_SMOKE };
+	static const enum PARTICLE_CUMPUTE_TYPE { NORMAL_SMOKE, FAST_SMOKE, EMIT_STAR, DEFAULT = NORMAL_SMOKE };
 	struct Particle
 	{
 		Vec2<float> pos;	//座標
@@ -40,10 +40,11 @@ class ParticleMgr : public Singleton<ParticleMgr>
 		// 生成処理
 		void Generate(const Vec2<float>& GeneratePos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx);
 	};
-	struct ZoomAndScroll
+	struct GameInfo
 	{
 		float zoom = 0.0f;
 		Vec2<float>scroll = { 0.0f,0.0f };
+		float gameSpeed = 1.0f;
 	};
 
 	friend class Singleton<ParticleMgr>;
@@ -66,7 +67,7 @@ class ParticleMgr : public Singleton<ParticleMgr>
 	//テクスチャは同じサイズである必要がある
 	static const int TEX_SIZE = 64;
 	static const int SMOKE_NUM = 4;
-	static const enum PARTICLE_TEX { WHITE, SMOKE_0, SMOKE_1, SMOKE_2, SMOKE_3, TEX_NUM = 9 };
+	static const enum PARTICLE_TEX { WHITE, SMOKE_0, SMOKE_1, SMOKE_2, SMOKE_3, STAR, TEX_NUM = 9 };
 	std::shared_ptr<TextureBuffer>textures[TEX_NUM];
 
 	void EmitParticle(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx);

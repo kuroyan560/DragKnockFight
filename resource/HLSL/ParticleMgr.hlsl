@@ -19,6 +19,12 @@ struct Vertex
 };
 
 RWStructuredBuffer<Vertex> vertices : register(u0);
+cbuffer cbuff1 : register(b1)
+{
+    float zoom;
+    float2 scroll;
+    float gameSpeed;
+};
 
 [numthreads(10, 1, 1)]
 void CSmain(uint3 DTid : SV_DispatchThreadID)
@@ -62,6 +68,21 @@ void CSmain(uint3 DTid : SV_DispatchThreadID)
             v.alpha = Easing_Circ_In(t, v.lifeSpan / 2.0f, 1.0f, 0.0f);
         }
     }
+    //EMIT_STAR
+    else if (v.type == 2)
+    {
+        float2 toPos = v.emitPos + v.emitVec * v.speed;
+        v.pos = Easing_Circ_Out(v.life, v.lifeSpan, v.emitPos, toPos);
+        v.radian = Easing_Quart_Out(v.life, v.lifeSpan, 0.0f, v.emitRadian);
+        
+        //õ–½‚ª”¼•ªˆÈ‰º‚È‚çŠgk‚µ‚ÄÁ‚¦‚é
+        if (v.lifeSpan / 2.0f <= v.life)
+        {
+            float t = v.life - v.lifeSpan / 2.0f;
+            v.scale = Easing_Circ_In(t, v.lifeSpan / 2.0f, v.emitScale, 0.0f);
+            //v.alpha = Easing_Circ_In(t, v.lifeSpan / 2.0f, 1.0f, 0.0f);
+        }
+    }
     
     v.life++;
     if (v.lifeSpan <= v.life)
@@ -75,12 +96,6 @@ void CSmain(uint3 DTid : SV_DispatchThreadID)
 cbuffer cbuff0 : register(b0)
 {
     matrix parallelProjMat; //•½s“Š‰es—ñ
-};
-
-cbuffer cbuff1 : register(b1)
-{
-    float zoom;
-    float2 scroll;
 };
 
 struct VSInput
