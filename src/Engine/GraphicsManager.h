@@ -115,7 +115,21 @@ class GraphicsManager
 
 		void Excute(const ComPtr<ID3D12GraphicsCommandList>& CmdList)override;
 	};
+
+	//テクスチャのコピー
+	class CopyTex : public GraphicsCommandBase
+	{
+		std::weak_ptr<TextureBuffer>destTex;
+		std::weak_ptr<TextureBuffer>srcTex;
+	public:
+		CopyTex(const std::weak_ptr<TextureBuffer>& DestTex, const std::weak_ptr<TextureBuffer>& SrcTex)
+			:destTex(DestTex), srcTex(SrcTex) {}
+
+		void Excute(const ComPtr<ID3D12GraphicsCommandList>& CmdList)override;
+	};
+
 #pragma endregion
+
 
 private:
 	//グラフィックスコマンドリスト
@@ -157,6 +171,9 @@ public:
 
 	//ポストエフェクトコマンド積み上げ
 	void ExcutePostEffect(PostEffect* PostEffect, const std::shared_ptr<TextureBuffer>& SourceTex);
+
+	//テクスチャコピーコマンド積み上げ
+	void CopyTexture(const std::shared_ptr<TextureBuffer>& DestTex, const std::shared_ptr<TextureBuffer>& SrcTex);
 
 	//オブジェクトのレンダリングコマンド積み上げ（インデックスなし）
 	void ObjectRender(const std::shared_ptr<VertexBuffer>& VertexBuff,
