@@ -436,7 +436,6 @@ void Boss::AiPattern()
 		Vec2<float>dir = SwingMgr::Instance()->playerPos - SwingMgr::Instance()->bossPos;
 		float distance = dir.y - (dir.y * -1.0f);
 
-		const float MAX_DISTANCE = 200.0f;
 		bool allowToSwingFlag = false;
 		if (MAX_DISTANCE <= fabs(distance))
 		{

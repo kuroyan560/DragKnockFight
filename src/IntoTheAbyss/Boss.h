@@ -66,6 +66,8 @@ public:
 	const int AFTER_SWING_DELAY = 15;
 	const int STRUCK_WINDOW_TIMER = 120.0f;
 
+	const float SWING_DISTANCE_DEADLINE = 200.0f;	//プレイヤーを振り回す距離のデットライン
+
 	std::array<Bullet, 200> bullts;
 
 	//陣地との判定
