@@ -9,6 +9,7 @@ void ResultSceneBackGround::Init()
 	//backGround = D3D12App::Instance()->GenerateRenderTarget(DXGI_FORMAT_R32G32B32A32_FLOAT, Color(0.0f, 0.0f, 0.0f, 1.0f),
 	//	WinApp::Instance()->GetWinSize(), L"ResultSceneBackGround");
 
+
 	auto backBuff = D3D12App::Instance()->GetBackBuffRenderTarget();
 	backGround = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(0.0f, 0.0f, 0.0f, 1.0f), backBuff->GetGraphSize(), L"ScreenShot");
 }
