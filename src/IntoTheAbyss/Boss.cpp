@@ -17,6 +17,8 @@
 #include"BossBulletManager.h"
 #include"CrashMgr.h"
 
+#include"ParticleMgr.h"
+
 Boss::Boss()
 {
 
@@ -46,27 +48,26 @@ Boss::Boss()
 	bulletHitBox->center = &pos;
 	bulletHitBox->radius = 40.0f;
 
-	Init();
+	//Init();
 }
 
 void Boss::Init()
 {
-
 	pos = {};
 	scale = {};
 	vel = {};
 	moveVel = {};
 	crashDevice.Init();
-
 }
 
-void Boss::Generate(const Vec2<float>& generatePos)
+void Boss::Generate(const Vec2<float> &generatePos)
 {
 
 	/*===== 生成処理 =====*/
 
 	pos = generatePos;
-	scale = SCALE;
+	initScale = SCALE * 5.0f;
+	scale = initScale;
 	vel = { OFFSET_VEL,0 };
 	moveVel = { OFFSET_VEL,0 };
 	swingInertia = 0;
@@ -75,6 +76,9 @@ void Boss::Generate(const Vec2<float>& generatePos)
 	prevIntersectedLine = INTERSECTED_NONE;
 	stuckWindowTimer = 0;
 	areaHitBox.size = scale;
+	allowToMoveFlag = false;
+	moveTimer = 0;
+	initPaticleFlag = false;
 }
 
 #include"Camera.h"
@@ -86,97 +90,132 @@ void Boss::Update()
 	// 前フレームの座標を保存
 	prevPos = pos;
 
-	if (Camera::Instance()->Active())
+	if (80.0f < scale.x && 80.0f < scale.y)
 	{
-		moveVel = { 0,0 };
-		return;
+		float time = 30.0f;
+		scale -= initScale / time;
 	}
 
-	for (int i = 0; i < patternData.bulltData.size(); ++i)
+	if (scale.x <= 80.0f && scale.y <= 80.0f)
 	{
-		if (patternData.bulltData[i].initFlag)
+		if (!initPaticleFlag)
 		{
-			patternData.bulltData[i].Reset();
-		}
-	}
+			Vec2<float>radian(cosf(Angle::ConvertToRadian(0.0f)), sinf(Angle::ConvertToRadian(0.0f)));
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
 
-	// 慣性を更新。
-	if (0 < swingInertia) {
-		swingInertia -= swingInertia / 5.0f;
-	}
+			radian = { cosf(Angle::ConvertToRadian(90.0f)), sinf(Angle::ConvertToRadian(90.0f)) };
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
 
-	// 振り回し直後の硬直のタイマーを更新。
-	if (0 < afterSwingDelay) --afterSwingDelay;
+			radian = { cosf(Angle::ConvertToRadian(180.0f)), sinf(Angle::ConvertToRadian(180.0f)) };
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
 
-
-
-
-	// [振り回し中か振り回され中だったら] 更新処理を行わない。　　臨時の実装です。
-	bool isSwingNow = SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer;
-
-	// [硬直中] [スタン演出中] は動かさない
-	if (0 < afterSwingDelay || StunEffect::Instance()->isActive) {
-		// 何もしない。
-	}
-	else if (isSwingNow) {
-
-		// 振り回し中だったら。
-
-		pos = SwingMgr::Instance()->playerPos + SwingMgr::Instance()->easingNowVec * SwingMgr::Instance()->lineLength;
-
-		// ちょうど終わった瞬間の場合、慣性関係の変数を更新する。
-		if (1.0f <= SwingMgr::Instance()->easingTimer) {
-
-			swingInertiaVec = (pos - prevPos).GetNormal();
-			swingInertia = (prevPos - pos).Length();
-			afterSwingDelay = AFTER_SWING_DELAY;
-
+			radian = { cosf(Angle::ConvertToRadian(270.0f)), sinf(Angle::ConvertToRadian(270.0f)) };
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
+			initPaticleFlag = true;
 		}
 
+		scale = { 80.0f,80.0f };
+		++moveTimer;
 	}
-	else {
+	if (20 <= moveTimer)
+	{
+		allowToMoveFlag = true;
+	}
 
-		//ボスのAI-----------------------
-		++patternTimer;
-		if (120 <= patternTimer)
+
+	//通常サイズになるまで動けない
+	if (scale.x <= SCALE.x && scale.y <= SCALE.y && !readyToStartRoundEffectFlag)
+	{
+		if (Camera::Instance()->Active())
 		{
-			if (atackModeFlag)
-			{
-				bossPatternNow = BOSS_PATTERN_ATTACK;
-			}
-			else
-			{
-				bossPatternNow = BOSS_PATTERN_NORMALMOVE;
-			}
-			atackModeFlag = !atackModeFlag;
-			patternTimer = 0;
-		}
-		//ボスのAI-----------------------
-
-
-
-
-		//ボスの挙動
-		if (bossPatternNow != oldBossPattern)
-		{
-			bossPattern[bossPatternNow]->Init();
-		}
-		bossPattern[bossPatternNow]->Update(&patternData);
-		oldBossPattern = bossPatternNow;
-		if (UsersInput::Instance()->Input(DIK_0)) {
-			vel.x = OFFSET_VEL * 5.0f;
+			moveVel = { 0,0 };
+			return;
 		}
 
-		//ボスの弾
 		for (int i = 0; i < patternData.bulltData.size(); ++i)
 		{
 			if (patternData.bulltData[i].initFlag)
 			{
-				BossBulletManager::Instance()->Generate(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
+				patternData.bulltData[i].Reset();
 			}
 		}
 
+		// 慣性を更新。
+		if (0 < swingInertia) {
+			swingInertia -= swingInertia / 5.0f;
+		}
 
+		// 振り回し直後の硬直のタイマーを更新。
+		if (0 < afterSwingDelay) --afterSwingDelay;
+
+
+
+
+		// [振り回し中か振り回され中だったら] 更新処理を行わない。　　臨時の実装です。
+		bool isSwingNow = SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer;
+
+		// [硬直中] [スタン演出中] は動かさない
+		if (0 < afterSwingDelay || StunEffect::Instance()->isActive) {
+			// 何もしない。
+		}
+		else if (isSwingNow) {
+
+			// 振り回し中だったら。
+
+			pos = SwingMgr::Instance()->playerPos + SwingMgr::Instance()->easingNowVec * SwingMgr::Instance()->lineLength;
+
+			// ちょうど終わった瞬間の場合、慣性関係の変数を更新する。
+			if (1.0f <= SwingMgr::Instance()->easingTimer) {
+
+				swingInertiaVec = (pos - prevPos).GetNormal();
+				swingInertia = (prevPos - pos).Length();
+				afterSwingDelay = AFTER_SWING_DELAY;
+
+			}
+
+		}
+		else {
+
+			//ボスのAI-----------------------
+			++patternTimer;
+			if (120 <= patternTimer)
+			{
+				if (atackModeFlag)
+				{
+					bossPatternNow = BOSS_PATTERN_ATTACK;
+				}
+				else
+				{
+					bossPatternNow = BOSS_PATTERN_NORMALMOVE;
+				}
+				atackModeFlag = !atackModeFlag;
+				patternTimer = 0;
+			}
+			//ボスのAI-----------------------
+
+
+
+
+			//ボスの挙動
+			if (bossPatternNow != oldBossPattern)
+			{
+				bossPattern[bossPatternNow]->Init();
+			}
+			bossPattern[bossPatternNow]->Update(&patternData);
+			oldBossPattern = bossPatternNow;
+			if (UsersInput::Instance()->Input(DIK_0)) {
+				vel.x = OFFSET_VEL * 5.0f;
+			}
+
+			//ボスの弾
+			for (int i = 0; i < patternData.bulltData.size(); ++i)
+			{
+				if (patternData.bulltData[i].initFlag)
+				{
+					BossBulletManager::Instance()->Generate(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
+				}
+			}
+		}
 		// 移動量の総量を求める。
 
 		if (0 < afterSwingDelay) {
@@ -190,9 +229,11 @@ void Boss::Update()
 			vel = moveVel + swingInertiaVec * swingInertia;
 
 		}
-
 	}
+
+
 	BossBulletManager::Instance()->Update();
+
 }
 
 #include"DrawFunc_FillTex.h"
@@ -212,7 +253,7 @@ void Boss::Draw()
 		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, crashDevice.GetFlashAlpha());
 }
 
-void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
+void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos)
 {
 
 	/*===== 当たり判定 =====*/
@@ -392,8 +433,4 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 
 	}
 
-}
-
-void Boss::Damaged()
-{
 }

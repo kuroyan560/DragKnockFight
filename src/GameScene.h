@@ -3,7 +3,8 @@
 #include"LightManager.h"
 
 #include"IntoTheAbyss/Game.h"
-#include"SceneCange.h"
+#include"IntoTheAbyss/SceneCange.h"
+#include<memory>
 
 class Sprite;
 class GaussianBlur;
@@ -18,8 +19,6 @@ class GameScene : public BaseScene
 	Game game;
 	float addValue;
 	bool isSS;		// スクショを撮るかのフラグ
-
-	bool isSS;
 
 	SceneCange *sceneChange;
 public:
