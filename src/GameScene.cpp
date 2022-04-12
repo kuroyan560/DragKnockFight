@@ -24,7 +24,7 @@ GameScene::GameScene()
 	emissiveMap = D3D12App::Instance()->GenerateRenderTarget(DXGI_FORMAT_R32G32B32A32_FLOAT, Color(0.0f, 0.0f, 0.0f, 1.0f),
 		WinApp::Instance()->GetWinSize(), L"EmissiveMap");
 
-	sceneChange = new SceneCange();
+	sceneChange = std::make_shared<SceneCange>();
 
 	addValue = 10.0f;
 
@@ -85,7 +85,7 @@ void GameScene::OnDraw()
 
 	// スクショを保存。
 	if (isSS) {
-		KuroEngine::Instance().Graphics().CopyTexture(ResultSceneBackGround::Instance()->backGround, D3D12App::Instance()->GetBackBuffRenderTarget());
+		//KuroEngine::Instance().Graphics().CopyTexture(ResultSceneBackGround::Instance()->backGround, D3D12App::Instance()->GetBackBuffRenderTarget());
 	}
 
 }

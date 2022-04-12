@@ -1,10 +1,24 @@
 #include "TitleScene.h"
-#include"StageMgr.h"
+#include "StageMgr.h"
+#include "DrawFunc.h"
+#include "TexHandleMgr.h"
+#include "SceneCange.h"
 
 TitleScene::TitleScene()
 {
-	changeScene = new SceneCange();
+	changeScene = std::make_shared<SceneCange>();
 	StageMgr::Instance();
+
+	// Še‰æ‘œ‚ğƒ[ƒh
+	frameHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/back.png");
+	starHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/star.png");
+	lunaHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/luna.png");
+	lacyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/lacy.png");
+	lunaRobotHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/luna_robo.png");
+	lacyRobotHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/lacy_robo.png");
+	titleHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/star.png");
+	pressStartHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/star.png");
+
 }
 
 void TitleScene::OnInitialize()
@@ -22,8 +36,26 @@ void TitleScene::OnUpdate()
 
 void TitleScene::OnDraw()
 {
+
+
+
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
+
+	// ˜g‚ğ•`‰æ
+	DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(frameHandle), AlphaBlendMode_Trans);
+
+	// ¯‚ğ•`‰æ
+	DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(starHandle), AlphaBlendMode_Trans);
+
+	// ”wŒiƒLƒƒƒ‰“ñl‚ğ•`‰æ
+	DrawFunc::DrawGraph(LUNA_POS, TexHandleMgr::GetTexBuffer(lunaHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(LACY_POS, TexHandleMgr::GetTexBuffer(lacyHandle), AlphaBlendMode_Trans);
+
+	// ”wŒiƒLƒƒƒ‰ƒƒ{ƒbƒg“ñ‘Ì‚ğ•`‰æ
+	DrawFunc::DrawGraph(LUNA_ROBOT_POS, TexHandleMgr::GetTexBuffer(lunaRobotHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(LACY_ROBOT_POS, TexHandleMgr::GetTexBuffer(lacyRobotHandle), AlphaBlendMode_Trans);
+
 }
 
 void TitleScene::OnImguiDebug()

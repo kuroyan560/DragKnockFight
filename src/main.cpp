@@ -7,7 +7,7 @@
 #include"DrawFunc.h"
 #include"DrawFunc_Shadow.h"
 #include"DrawFunc_FillTex.h"
-#include"TitleScene.h"
+#include"IntoTheAbyss/TitleScene.h"
 #include"ResultScene.h"
 #include"StageSelectScene.h"
 
@@ -35,12 +35,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//シーンリスト=====================
 
-	std::vector<BaseScene*>sceneList =
+	std::vector<shared_ptr<BaseScene>>sceneList =
 	{
-		new TitleScene(),
-		new StageSelectScene(),
-		new GameScene(),
-		new ResultScene(),
+		make_shared<TitleScene>(),
+		make_shared<StageSelectScene>(),
+		make_shared<GameScene>(),
+		make_shared<ResultScene>(),
 	};
 	int awakeScene = 0;	//開始時のステージ番号
 

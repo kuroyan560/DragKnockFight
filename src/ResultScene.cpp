@@ -8,6 +8,7 @@
 
 ResultScene::ResultScene()
 {
+	changeScene = make_shared<SceneCange>();
 }
 
 void ResultScene::OnInitialize()
@@ -41,8 +42,6 @@ void ResultScene::OnInitialize()
 
 	breakEnemyAmount = 0;
 	breakPlayerAmount = 0;
-
-	changeScene = new SceneCange();
 
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 #include"KuroEngine.h"
-#include"SceneCange.h"
+#include"IntoTheAbyss/SceneCange.h"
 
 class StageSelectScene : public BaseScene
 {
@@ -12,7 +12,7 @@ public:
 	void OnImguiDebug()override;
 	void OnFinalize()override;
 
-	SceneCange *changeScene;
+	std::shared_ptr<SceneCange> changeScene;
 
 	int stageNum;
 };
