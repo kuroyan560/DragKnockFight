@@ -1699,6 +1699,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	}
 
+	playerHomeBase->Draw();
+	enemyHomeBase->Draw();
 
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
@@ -1725,9 +1727,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 	}
 
-	playerHomeBase->Draw();
-	enemyHomeBase->Draw();
-
 	roundChangeEffect.Draw();
 
 	player.Draw(ligMgr);
@@ -1741,7 +1740,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	ScoreManager::Instance()->Draw();
 
 	// プレイヤーとボス間に線を描画
-	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());
+	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());
 
 	SuperiorityGauge::Instance()->Draw();
 

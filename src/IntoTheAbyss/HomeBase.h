@@ -1,6 +1,7 @@
 #pragma once
 #include"../KuroEngine.h"
 #include"../IntoTheAbyss/AreaCollider.h"
+#include<vector>
 
 class HomeBase
 {
@@ -20,4 +21,8 @@ private:
 	Square hitBox;
 
 	bool leftPlayer;
+	
+	static const int BORDER_GRAPH_HEIGHT = 720;
+	static const int BORDER_GRAPH_WIDTH = 25;
+	std::vector<float> borderHeight;
 };

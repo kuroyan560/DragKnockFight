@@ -81,5 +81,20 @@ public:
 	static void DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian, const std::shared_ptr<TextureBuffer>& Tex,
 		const Vec2<float>& MaskCenterPos, const Vec2<float>& MaskSize,
 		const Vec2<float>& RotaCenterUV = { 0.5f,0.5f }, const Vec2<bool>& Miror = { false,false }, const float& MaskAlpha = 0.0f);
+
+	/// <summary>
+	/// 直線の描画（画像）
+	/// </summary>
+	/// <param name="FromPos">起点座標</param>
+	/// <param name="ToPos">終点座標</param>
+	/// <param name="Tex">テクスチャ</param>
+	/// <param name="Thickness">線の太さ</param>
+	/// <param name="MaskLeftUpPos">マスク範囲の左上座標</param>
+	/// <param name="MaskRightBottomPos">マスク範囲の右下座標</param>
+	/// <param name="BlendMode">ブレンドモード</param>
+	/// <param name="Miror">反転フラグ</param>
+	static void DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const std::shared_ptr<TextureBuffer>& Tex, const int& Thickness,
+		const Vec2<float>& MaskLeftUpPos, const Vec2<float>& MaskRightBottomPos, const Vec2<bool>& Mirror = { false,false });
+
 };
 

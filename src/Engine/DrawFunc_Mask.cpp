@@ -162,3 +162,19 @@ void DrawFunc_Mask::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>
 
 	DRAW_ROTA_GRAPH_COUNT++;
 }
+
+#include"KuroMath.h"
+void DrawFunc_Mask::DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const std::shared_ptr<TextureBuffer>& Tex, const int& Thickness, const Vec2<float>& MaskLeftUpPos, const Vec2<float>& MaskRightBottomPos, const Vec2<bool>& Mirror)
+{
+	float distance = FromPos.Distance(ToPos);
+	Vec2<float> vec = (ToPos - FromPos).GetNormal();
+
+	auto graphSize = Tex->GetGraphSize().Float();
+	Vec2<float>expRate = { distance / graphSize.x,Thickness / graphSize.y };
+	Vec2<float>centerPos = FromPos + vec * distance / 2;
+
+	Vec2<float>maskSize = MaskRightBottomPos - MaskLeftUpPos;
+	Vec2<float>maskCenterPos = KuroMath::Liner(MaskLeftUpPos, MaskRightBottomPos, 0.5f);
+
+	DrawRotaGraph2D(centerPos, expRate, KuroFunc::GetAngle(vec), Tex, maskCenterPos,maskSize, { 0.5f,0.5f }, Mirror);
+}
