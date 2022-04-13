@@ -530,6 +530,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 
 	ScoreManager::Instance()->Init();
 	firstLoadFlag = false;
+	lineExtendScale = lineExtendMaxScale;
 
 }
 
@@ -1721,16 +1722,26 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		bossPlayerDir.Normalize();
 		Vec2<float> bossDefLength = boss.pos + bossPlayerDir * addLineLengthBoss;
 
+		float time = 30.0f;
+		if (1.0f < lineExtendScale)
+		{
+			lineExtendScale -= lineExtendMaxScale / time;
+		}
+		else
+		{
+			lineExtendScale = 1.0f;
+		}
+
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
 		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(bossDefLength + bossPlayerDir * lineLengthBoss),
-			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom * lineExtendScale);
 
 		// ü•ª‚Ì’†S‚É‰~‚ð•`‰æ
 		if (roundChangeEffect.drawFightFlag)
 		{
 			static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
-			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos), { ScrollMgr::Instance()->zoom,ScrollMgr::Instance()->zoom }, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos), Vec2<float>(ScrollMgr::Instance()->zoom, ScrollMgr::Instance()->zoom) * lineExtendScale, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 		}
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 	}

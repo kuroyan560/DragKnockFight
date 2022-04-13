@@ -148,6 +148,10 @@ class Game
 	bool readyToStartRoundFlag; //ラウンド開始時の演出開始用のフラグ
 	bool gameStartFlag;			//ゲーム開始中のフラグ
 
+	float lineExtendScale;
+	const float lineExtendMaxScale=10.0f;
+
+
 	int roundTimer;
 	int bgm;
 
