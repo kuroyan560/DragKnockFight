@@ -102,8 +102,8 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 
 				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
-				if (height < 0 && mapChipDrawData.size() <= height) continue;
-				if (width < 0 && mapChipDrawData[height].size() <= width) continue;
+				if (height < 0 || mapChipDrawData.size() <= height) continue;
+				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
 				if (mapChipDrawData[height][width].animationFlag)
 				{

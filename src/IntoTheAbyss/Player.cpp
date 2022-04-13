@@ -1485,12 +1485,15 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float> &bossPos
 
 		// 振り回しの処理
 
+		// 振り回しにデッドラインを設ける。
+		Vec2<float> dir = bossPos - centerPos;
+		dir.Normalize();
+
 		// 振り回しのトリガー判定
-		if (!SwingMgr::Instance()->isSwingPlayer) {
+		if (0.3f < fabs(dir.y) && !SwingMgr::Instance()->isSwingPlayer) {
 
 			// 振り回しの開始ベクトルを取得。
-			SwingMgr::Instance()->easingStartVec = bossPos - centerPos;
-			SwingMgr::Instance()->easingStartVec.Normalize();
+			SwingMgr::Instance()->easingStartVec = dir;
 			SwingMgr::Instance()->easingNowVec = SwingMgr::Instance()->easingStartVec;
 
 			// 振り回しの終了ベクトルを取得。
