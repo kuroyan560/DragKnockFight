@@ -1,4 +1,5 @@
 #include "BossBulletManager.h"
+#include"TexHandleMgr.h"
 
 BossBulletManager::BossBulletManager()
 {
@@ -6,6 +7,7 @@ BossBulletManager::BossBulletManager()
 	{
 		bullets[index] = make_shared<Bullet>();
 	}
+	graph = TexHandleMgr::LoadGraph("resource/ChainCombat/bullet_enemy.png");
 }
 
 void BossBulletManager::Init()
@@ -29,7 +31,7 @@ void BossBulletManager::Generate(const Vec2<float> &generatePos, const float &fo
 		Vec2<float> generateForwardVec = { cosf(forwardAngle), sinf(forwardAngle) };
 
 		// ¶¬‚·‚éB
-		bullets[index]->Generate(generatePos, generateForwardVec, false, true ? Bullet::R_HAND : Bullet::L_HAND, speed);
+		bullets[index]->Generate(generatePos, generateForwardVec, false, true ? Bullet::R_HAND : Bullet::L_HAND, speed, graph);
 
 		break;
 	}

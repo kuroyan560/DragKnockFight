@@ -19,13 +19,25 @@
 
 #include"ParticleMgr.h"
 
+void Boss::Crash(const Vec2<float>& MyVec)
+{
+	Vec2<bool>ext = { true,true };
+	if (MyVec.x == 0.0f)ext.y = false;
+	if (MyVec.y == 0.0f)ext.x = false;
+
+	Vec2<float>smokeVec;
+	smokeVec = { 0,0 };
+
+	if (0.0f < MyVec.x)smokeVec.x = -1.0f;
+	else if (MyVec.x < 0.0f)smokeVec.x = 1.0f;
+	if (0.0f < MyVec.y)smokeVec.y = -1.0f;
+	else if (MyVec.y < 0.0f)smokeVec.y = 1.0f;
+
+	CrashMgr::Instance()->Crash(pos, stagingDevice, ext, smokeVec);
+}
+
 Boss::Boss()
 {
-
-	pos = {};
-	scale = {};
-	vel = {};
-	moveVel = {};
 
 	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy.png");
 	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy_back.png");
@@ -48,7 +60,7 @@ Boss::Boss()
 	bulletHitBox->center = &pos;
 	bulletHitBox->radius = 40.0f;
 
-	//Init();
+	Init();
 }
 
 void Boss::Init()
@@ -57,7 +69,7 @@ void Boss::Init()
 	scale = {};
 	vel = {};
 	moveVel = {};
-	crashDevice.Init();
+	stagingDevice.Init();
 }
 
 void Boss::Generate(const Vec2<float> &generatePos)
@@ -85,7 +97,7 @@ void Boss::Generate(const Vec2<float> &generatePos)
 void Boss::Update()
 {
 	/*===== 更新処理 =====*/
-	crashDevice.Update();
+	stagingDevice.Update();
 
 	// 前フレームの座標を保存
 	prevPos = pos;
@@ -246,11 +258,11 @@ void Boss::Draw()
 	DIR dir = FRONT;
 	if (vel.y < 0)dir = BACK;
 
-	auto drawPos = pos + crashDevice.GetShake();
-	auto drawScale = scale * crashDevice.GetExtRate();
+	auto drawPos = pos + stagingDevice.GetShake();
+	auto drawScale = scale * stagingDevice.GetExtRate();
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, crashDevice.GetFlashAlpha());
+		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
 }
 
 void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos)
@@ -382,13 +394,16 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 		}
 
 		// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
+		Vec2<float>vec = { 0,0 };
 		if (SwingMgr::Instance()->isSwingPlayer || OFFSET_INERTIA / 2.0f < afterSwingDelay) {
 
-			Vec2<bool>ext = { true,true };
-			if (!isHitLeft && !isHitRight)ext.y = false;
-			if (!isHitTop && !isHitBottom)ext.x = false;
+			if (isHitLeft)vec.x = -1.0f;
+			else if (isHitRight)vec.x = 1.0f;
+			if (isHitTop)vec.y = -1.0f;
+			else if (isHitBottom)vec.y = 1.0f;
 
-			CrashMgr::Instance()->Crash(pos, crashDevice, ext);
+			Crash(vec);
+
 			SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
 			SwingMgr::Instance()->isSwingPlayer = false;
 
@@ -407,18 +422,22 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 		float disntaceY = fabs(lineCenterPos.y - pos.y);
 
 		// ウィンドウ左右
-		if (windowSize.x <= pos.x + scale.x - ScrollMgr::Instance()->scrollAmount.x || pos.x - scale.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
+		bool winLeft = pos.x - scale.x - ScrollMgr::Instance()->scrollAmount.x <= 0;
+		bool winRight = windowSize.x <= pos.x + scale.x - ScrollMgr::Instance()->scrollAmount.x;
+		if (winRight|| winLeft) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
+			Crash({ winRight ? 1.0f : -1.0f , 0.0f });
 			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
 		}
 		// ウィンドウ上下
-		if (windowSize.y <= pos.y + scale.y - ScrollMgr::Instance()->scrollAmount.y || pos.y - scale.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
+		bool winTop = pos.y - scale.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
+		bool winBottom = windowSize.y <= pos.y + scale.y - ScrollMgr::Instance()->scrollAmount.y;
+		if (winBottom || winTop) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
+			Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
 			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
 		}

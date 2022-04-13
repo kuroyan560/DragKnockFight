@@ -3,16 +3,18 @@
 
 void ParticleMgr::Particle::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx)
 {
+	pos = GeneratePos;
+	emitPos = pos;
+	// 放出方向を設定
+	emitVec = EmitVec;
 	type = Type;
 	texIdx = TexIdx;
-	if (type == PARTICLE_CUMPUTE_TYPE::EXPLODE)
+	isAlive = 1;
+	life = 0;
+	alpha = 1.0f;
+
+	if (type == PARTICLE_CUMPUTE_TYPE::NORMAL_SMOKE)
 	{
-		pos = GeneratePos;
-		emitPos = pos;
-
-		// 放出方向を設定
-		emitVec = EmitVec;
-
 		//爆発の飛距離として扱う
 		speed = KuroFunc::GetRand(20.0f, 46.0f);
 		emitSpeed = speed;
@@ -23,11 +25,35 @@ void ParticleMgr::Particle::Generate(const Vec2<float>& GeneratePos, const Vec2<
 		//回転角度の目標値として扱う
 		emitRadian = Angle::ConvertToRadian(KuroFunc::GetRand(0.0f, 360.0f * 2) * KuroFunc::GetRandPlusMinus());
 
-		alpha = 1.0f;
-		life = 0;
 		lifeSpan = KuroFunc::GetRand(25, 35);
-		isAlive = 1;
-		type = 0;
+	}
+	else if (type == PARTICLE_CUMPUTE_TYPE::FAST_SMOKE)
+	{
+		//爆発の飛距離として扱う
+		speed = KuroFunc::GetRand(150.0f, 200.0f);
+		emitSpeed = speed;
+
+		scale = 29;
+		emitScale = scale;
+		radian = 0.0f;
+		//回転角度の目標値として扱う
+		emitRadian = Angle::ConvertToRadian(KuroFunc::GetRand(0.0f, 360.0f * 2) * KuroFunc::GetRandPlusMinus());
+
+		lifeSpan = KuroFunc::GetRand(35, 45);
+	}
+	else if (type == PARTICLE_CUMPUTE_TYPE::EMIT_STAR)
+	{
+		//爆発の飛距離として扱う
+		speed = KuroFunc::GetRand(150.0f, 200.0f);
+		emitSpeed = speed;
+
+		scale = KuroFunc::GetRand(50.0f, 70.0f);
+		emitScale = scale;
+		radian = 0.0f;
+		//回転角度の目標値として扱う
+		emitRadian = Angle::ConvertToRadian(KuroFunc::GetRand(0.0f, 360.0f * 2) * KuroFunc::GetRandPlusMinus());
+
+		lifeSpan = KuroFunc::GetRand(35, 45);
 	}
 }
 
@@ -43,6 +69,7 @@ ParticleMgr::ParticleMgr()
 		std::vector<RootParam>rootParams =
 		{
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_UAV,"パーティクル配列"),
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"ズームとスクロールとスロー")
 		};
 		cPipeline = D3D12App::Instance()->GenerateComputePipeline(cs, rootParams, WrappedSampler(false, false));
 	}
@@ -83,7 +110,7 @@ ParticleMgr::ParticleMgr()
 		static std::vector<RootParam>ROOT_PARAMETER =
 		{
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"平行投影行列定数バッファ"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"ズームとスクロール"),
+			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"ズームとスクロールとスロー"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"アクティブ中のライト数バッファ"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"ディレクションライト情報 (構造化バッファ)"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"ポイントライト情報 (構造化バッファ)"),
@@ -113,7 +140,7 @@ ParticleMgr::ParticleMgr()
 		gPipeline = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO, WrappedSampler(false, false));
 	}
 
-	zoomAndScroll = D3D12App::Instance()->GenerateConstantBuffer(sizeof(ZoomAndScroll), 1, &zoomAndScroll, "ParticleMgr - ZoomAndScroll");
+	zoomAndScroll = D3D12App::Instance()->GenerateConstantBuffer(sizeof(GameInfo), 1, &zoomAndScroll, "ParticleMgr - ZoomAndScroll");
 
 	textures[WHITE] = D3D12App::Instance()->GenerateTextureBuffer(Color(1.0f, 1.0f, 1.0f, 1.0f), DXGI_FORMAT_R32G32B32A32_FLOAT, TEX_SIZE);
 
@@ -122,6 +149,8 @@ ParticleMgr::ParticleMgr()
 	{
 		textures[SMOKE_0 + i] = smokes[i];
 	}
+
+	textures[STAR] = D3D12App::Instance()->GenerateTextureBuffer("resource/ChainCombat/star.png");
 }
 
 void ParticleMgr::Init()
@@ -150,17 +179,19 @@ void ParticleMgr::Update()
 #include"ScrollMgr.h"
 #include"ShakeMgr.h"
 #include"LightManager.h"
+#include"SlowMgr.h"
 void ParticleMgr::Draw(LightManager& LigManager)
 {
 	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
 
-	static ZoomAndScroll ZOOM_AND_SCROLL;
-	if (ZOOM_AND_SCROLL.zoom != ScrollMgr::Instance()->zoom || ZOOM_AND_SCROLL.scroll != scrollShakeZoom)
+	static GameInfo ZOOM_AND_SCROLL;
+	if (ZOOM_AND_SCROLL.zoom != ScrollMgr::Instance()->zoom || ZOOM_AND_SCROLL.scroll != scrollShakeZoom || ZOOM_AND_SCROLL.gameSpeed != SlowMgr::Instance()->slowAmount)
 	{
 		ZOOM_AND_SCROLL.zoom = ScrollMgr::Instance()->zoom;
 		ZOOM_AND_SCROLL.scroll = scrollShakeZoom;
+		ZOOM_AND_SCROLL.gameSpeed = SlowMgr::Instance()->slowAmount;
 		zoomAndScroll->Mapping(&ZOOM_AND_SCROLL);
 	}
 
@@ -198,12 +229,6 @@ void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVe
 	//Copy recently particle's status.
 	memcpy(particles, buff->GetRWStructuredBuff().lock()->GetResource().lock()->GetBuffOnCpu<Particle>(), MAX_NUM * sizeof(Particle));
 
-	struct Info
-	{
-		Vec2<float>generatePos;
-		Vec2<float>emitVec;
-	};
-
 	if (Type == BULLET)
 	{
 		static const int EMIT_MAX = 25;
@@ -216,7 +241,34 @@ void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVe
 		for (int i = 0; i < num; ++i)
 		{
 			const Vec2<float>emitVec = KuroMath::RotateVec2(startEmitVec, Angle::ConvertToRadian(KuroFunc::GetRand(EMIT_DEGREE)));
-			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::DEFAULT, PARTICLE_TEX::SMOKE_0 + KuroFunc::GetRand(SMOKE_NUM - 1));
+			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::NORMAL_SMOKE, PARTICLE_TEX::SMOKE_0 + KuroFunc::GetRand(SMOKE_NUM - 1));
+		}
+	}
+	else if (Type == CRASH)
+	{
+		static const int SMOKE_EMIT_MAX = 25;
+		static const int SMOKE_EMIT_MIN = 15;
+		const int smokeNum = KuroFunc::GetRand(SMOKE_EMIT_MIN, SMOKE_EMIT_MAX);
+
+		static const float SMOKE_EMIT_DEGREE = 45;
+		const Vec2<float>smokeStartEmitVec = KuroMath::RotateVec2(-EmitVec, Angle::ConvertToRadian(-SMOKE_EMIT_DEGREE / 2.0f));
+
+		Vec2<float>emitVec;
+		for (int i = 0; i < smokeNum; ++i)
+		{
+			emitVec = KuroMath::RotateVec2(smokeStartEmitVec, Angle::ConvertToRadian(KuroFunc::GetRand(SMOKE_EMIT_DEGREE)));
+			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::FAST_SMOKE, PARTICLE_TEX::SMOKE_0 + KuroFunc::GetRand(SMOKE_NUM - 1));
+		}
+
+		static const int STAR_EMIT_MAX = 5;
+		static const int STAR_EMIT_MIN = 2;
+		const int starNum = KuroFunc::GetRand(STAR_EMIT_MIN, STAR_EMIT_MAX);
+		const float starRadianUint = SMOKE_EMIT_DEGREE / starNum;
+
+		for (int i = 0; i < starNum; ++i)
+		{
+			emitVec = KuroMath::RotateVec2(smokeStartEmitVec, Angle::ConvertToRadian(starRadianUint * i));
+			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::EMIT_STAR, PARTICLE_TEX::STAR);
 		}
 	}
 	
