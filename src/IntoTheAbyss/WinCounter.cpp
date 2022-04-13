@@ -98,7 +98,7 @@ void WinCounter::RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsL
 	if (SE == -1)
 	{
 		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/knockout.wav");
-		AudioApp::Instance()->ChangeVolume(SE, 0.7f);
+		AudioApp::Instance()->ChangeVolume(SE, 0.25f);
 	}
 	AudioApp::Instance()->PlayWave(SE);
 
