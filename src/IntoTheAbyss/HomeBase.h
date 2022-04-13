@@ -7,7 +7,7 @@ class HomeBase
 public:
 	HomeBase();
 
-	void Init(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DOWN_POS);
+	void Init(const Vec2<float>& LEFT_UP_POS, const Vec2<float>& RIGHT_DOWN_POS, const bool& LeftPlayer);
 	bool Collision(const Square &OBJ_A);
 	void Draw();
 	void Debug();
@@ -18,4 +18,6 @@ private:
 	std::string name;
 
 	Square hitBox;
+
+	bool leftPlayer;
 };

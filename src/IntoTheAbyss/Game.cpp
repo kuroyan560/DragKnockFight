@@ -479,8 +479,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		}
 
 		Vec2<float>chipPos(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE);
-		playerHomeBase->Init(playerLeftUpPos - chipPos, playerRightDownPos + chipPos);
-		enemyHomeBase->Init(enemyLeftUpPos - chipPos, enemyRightDownPos + chipPos);
+		playerHomeBase->Init(playerLeftUpPos - chipPos, playerRightDownPos + chipPos, true);
+		enemyHomeBase->Init(enemyLeftUpPos - chipPos, enemyRightDownPos + chipPos, false);
 
 		{
 			float size = (mapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
@@ -548,7 +548,7 @@ Game::Game()
 	//BulletParticleMgr::Instance()->Setting();
 
 	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
-	AudioApp::Instance()->ChangeVolume(bgm, 0.1f);
+	AudioApp::Instance()->ChangeVolume(bgm, 0.07f);
 
 	//ÉâÉCÉgèÓïÒ
 	ptLig.SetInfluenceRange(PT_LIG_RANGE);
@@ -568,8 +568,8 @@ Game::Game()
 	playerHomeBase = std::make_unique<HomeBase>();
 	enemyHomeBase = std::make_unique<HomeBase>();
 
-	playerHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
-	enemyHomeBase->Init({ 0.0f,0.0f }, { 800.0f,1000.0f });
+	playerHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f }, true);
+	enemyHomeBase->Init({ 0.0f,0.0f }, { 800.0f,1000.0f }, false);
 	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
 
 	cameraBasePos = { 0.0f,-40.0f };
