@@ -14,6 +14,7 @@ public:
 	float easeAmount;				// タイマーから求められるイージング量
 	float easeChangeAmountY;		// Y軸の変化量
 	float lineLength;				// 紐の長さの総量
+	float addEasingTimer;			// イージングタイマーに加算する量
 	Vec2<float> easingStartVec;		// 振り回しイージングの開始地点
 	Vec2<float> easingEndVec;		// 振り回しイージングの終了地点
 	Vec2<float> easingNowVec;		// 振り回しイージングの今の値
@@ -25,7 +26,8 @@ public:
 
 	/*===== 定数 =====*/
 
-	const float ADD_EASINGTIMER = 0.05f;	// イージングタイマーに加算する量
+	const float ADD_EASINGTIMER_MINIMUM = 0.025f;	// イージングタイマーに加算する量 最小値
+	const float ADD_EASINGTIMER_MAX = 0.05f;	// イージングタイマーに加算する量 最大値
 
 
 public:
