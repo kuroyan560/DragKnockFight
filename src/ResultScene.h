@@ -46,6 +46,11 @@ class ResultScene : public BaseScene
 	float scoreEasingAmount;		// SCOREの画像のイージング量
 	float scoreEffectEasingAmount;	// スコアのガラガラ表示するために使用するタイマー
 
+	//キャラの画像
+	int lunaWinGraph;
+	int lacyWinGraph;
+	int winnerGraph;
+
 
 public:
 

@@ -8,10 +8,6 @@
 
 ResultScene::ResultScene()
 {
-}
-
-void ResultScene::OnInitialize()
-{
 	backGroundHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/star.png");
 	winnerFrameHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/winnerFrame.png");
 	resultHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/result.png");
@@ -21,10 +17,14 @@ void ResultScene::OnInitialize()
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, blueNumberHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_yellow.png", 12, { 12, 1 }, goldNumberHandle.data());
 
-	int buff = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/num.png");
-	Vec2<int> sizeBuff = TexHandleMgr::GetTexBuffer(buff)->GetGraphSize();
-	Vec2<int> sizeDivBuff = TexHandleMgr::GetTexBuffer(blueNumberHandle[1])->GetGraphSize();
+	changeScene = new SceneCange();
 
+	lunaWinGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/luna.png");
+	lacyWinGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
+}
+
+void ResultScene::OnInitialize()
+{
 	resultUITimer = 0;
 	breakEnemyUITimer = 0;
 	breakPlayerUITimer = 0;
@@ -42,14 +42,13 @@ void ResultScene::OnInitialize()
 	breakEnemyAmount = 0;
 	breakPlayerAmount = 0;
 
-	changeScene = new SceneCange();
-
+	winnerGraph = lunaWinGraph;
 }
 
 void ResultScene::OnUpdate()
 {
 
-	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
+	Vec2<float> windowSize = WinApp::Instance()->GetWinSize().Float();
 
 	// 遅延タイマーが既定値以下だったらインクリメントする。
 	if (delayTimer < DELAY_TIMER) ++delayTimer;
@@ -156,6 +155,7 @@ void ResultScene::OnDraw()
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 	//DrawFunc::DrawBox2D(Vec2<float>(0, 0), windowSize, Color(0, 0, 0, 255), DXGI_FORMAT_R8G8B8A8_UNORM);
 	DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(winnerFrameHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph({ 25.0f,30.0f }, TexHandleMgr::GetTexBuffer(winnerGraph), AlphaBlendMode_Trans);
 
 	// [RESULT] と [BREAK]の描画処理
 	{
