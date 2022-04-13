@@ -37,7 +37,7 @@ void GameTimer::Init(const Vec2<float> &POS, int TIME, const Vec2<float> &COUNT_
 	int t = 0;
 	for (; 60 <= minite;)
 	{
-		minite /= 60;
+		minite -= 60;
 		if (minite <= 60)
 		{
 			second = minite;
@@ -92,7 +92,7 @@ void GameTimer::Update()
 		int t = 0;
 		for (; 60 <= minite;)
 		{
-			minite /= 60;
+			minite -= 60;
 			++t;
 		}
 		//•ª

@@ -1043,6 +1043,7 @@ void Game::Update()
 				{
 					readyToStartRoundFlag = true;
 					roundFinishFlag = false;
+					SuperiorityGauge::Instance()->Init();
 				}
 			}
 		}
@@ -1076,6 +1077,9 @@ void Game::Update()
 		//gameStartFlag = true;
 		//SelectStage::Instance()->resetStageFlag = true;
 		//readyToStartRoundFlag = false;
+
+		float size = (mapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
+		miniMap.Init(size);
 	}
 
 
@@ -1111,9 +1115,10 @@ void Game::Update()
 #pragma endregion
 
 
-
-	miniMap.CalucurateCurrentPos(lineCenterPos);
-
+	if (!readyToStartRoundFlag)
+	{
+		miniMap.CalucurateCurrentPos(lineCenterPos);
+	}
 
 
 	if (roundChangeEffect.initFlag)
@@ -1722,8 +1727,11 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 
 		// ü•ª‚Ì’†S‚É‰~‚ð•`‰æ
-		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos), { ScrollMgr::Instance()->zoom,ScrollMgr::Instance()->zoom }, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+		if (roundChangeEffect.drawFightFlag)
+		{
+			static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos), { ScrollMgr::Instance()->zoom,ScrollMgr::Instance()->zoom }, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+		}
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 	}
 
