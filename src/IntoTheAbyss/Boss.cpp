@@ -198,7 +198,7 @@ void Boss::Update()
 				}
 				else
 				{
-					bossPatternNow = BOSS_PATTERN_ATTACK;
+					bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 				}
 				atackModeFlag = !atackModeFlag;
 				patternTimer = 0;
