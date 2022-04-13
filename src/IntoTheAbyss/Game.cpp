@@ -1127,7 +1127,7 @@ void Game::Update()
 	if (roundChangeEffect.initFlag)
 	{
 		// プレイヤーの更新処理
-		player.Update(mapData, boss.pos);
+		player.Update(mapData, boss.pos, roundFinishFlag);
 
 
 		boss.readyToStartRoundEffectFlag = readyToStartRoundFlag;
@@ -1805,8 +1805,8 @@ void Game::Scramble()
 		bossVelGauge = (boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 		double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
-		// [振り回し状態のとき] [スタン演出中] は移動させない。
-		if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer || StunEffect::Instance()->isActive)) {
+		// [振り回し状態のとき] [スタン演出中] [BREAK中] は移動させない。
+		if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer || StunEffect::Instance()->isActive || roundFinishFlag)) {
 			player.centerPos += playerVelGauge;
 			boss.pos += bossVelGauge;
 		}

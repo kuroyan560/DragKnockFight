@@ -56,7 +56,7 @@ Player::~Player()
 {
 }
 
-void Player::Init(const Vec2<float> &INIT_POS)
+void Player::Init(const Vec2<float>& INIT_POS)
 {
 
 	/*===== 初期化処理 =====*/
@@ -160,7 +160,7 @@ void Player::Init(const Vec2<float> &INIT_POS)
 	moveTimer = 0;
 }
 
-void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPos)
+void Player::Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos, const bool& isFinish)
 {
 	stagingDevice.Update();
 
@@ -219,7 +219,7 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPo
 	if (!doorMoveLeftRightFlag && !doorMoveUpDownFlag && !isDead)
 	{
 		// 入力に関する更新処理を行う。
-		Input(mapData, bossPos);
+		Input(mapData, bossPos, isFinish);
 	}
 
 	/*===== 更新処理 =====*/
@@ -376,7 +376,7 @@ void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPo
 	//muffler.Update(centerPos);
 }
 
-void Player::Draw(LightManager &LigManager)
+void Player::Draw(LightManager& LigManager)
 {
 	//if (vel.y < 0)playerDir = BACK;
 	if (vel.y < 0)anim.ChangeAnim(DEFAULT_BACK);
@@ -417,7 +417,7 @@ void Player::Draw(LightManager &LigManager)
 
 }
 
-void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble> &bubble, vector<DossunBlock> &dossun, const Vec2<float> &bossPos, bool &isHitMapChip, const Vec2<float> &lineCenterPos)
+void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip, const Vec2<float>& lineCenterPos)
 {
 
 	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
@@ -1005,7 +1005,7 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble> &bubble,
 		// ウィンドウ左右
 		bool winLeft = centerPos.x - PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x <= 0;
 		bool winRight = windowSize.x <= centerPos.x + PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x;
-		if (winRight|| winLeft) {
+		if (winRight || winLeft) {
 
 			Vec2<float>smokeVec = { winRight ? -1.0f : 1.0f,0.0f };
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
@@ -1206,7 +1206,7 @@ void Player::StopDoorUpDown()
 	doorMoveUpDownFlag = true;
 }
 
-void Player::Input(const vector<vector<int>> mapData, const Vec2<float> &bossPos)
+void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos, const bool& isFinish)
 {
 	/*===== 入力処理 =====*/
 
@@ -1339,8 +1339,11 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float> &bossPos
 
 		float angle = lHand->GetAngle();
 
-		AudioApp::Instance()->PlayWave(shotSE);
-		BulletMgr::Instance()->Generate(lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, false);
+		// ラウンド終了演出中だったら弾を出さない。
+		if (!isFinish) {
+			AudioApp::Instance()->PlayWave(shotSE);
+			BulletMgr::Instance()->Generate(lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, false);
+		}
 
 		// 連射タイマーをセット
 		rapidFireTimerLeft = RAPID_FIRE_TIMER;
@@ -1444,8 +1447,11 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float> &bossPos
 
 		float angle = rHand->GetAngle();
 
-		AudioApp::Instance()->PlayWave(shotSE);
-		BulletMgr::Instance()->Generate(rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, true);
+		// ラウンド終了演出中だったら弾を出さない。
+		if (!isFinish) {
+			AudioApp::Instance()->PlayWave(shotSE);
+			BulletMgr::Instance()->Generate(rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, true);
+		}
 
 		// 連射タイマーをセット
 		rapidFireTimerRight = RAPID_FIRE_TIMER;
@@ -1822,7 +1828,7 @@ void Player::PushBackWall()
 
 }
 
-void Player::CalculateStretch(const Vec2<float> &Move)
+void Player::CalculateStretch(const Vec2<float>& Move)
 {
 	Vec2<float> stretchRate = { abs(Move.x / MAX_RECOIL_AMOUNT),abs(Move.y / MAX_RECOIL_AMOUNT) };
 
@@ -1917,7 +1923,7 @@ Vec2<float> Player::GetPlayerGraphSize()
 	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 }
 
-void Player::CheckHitMapChipVel(const Vec2<float> &checkPos, const vector<vector<int>> &mapData, const Vec2<float> &bossPos, bool &isHitMapChip)
+void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip)
 {
 	// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
 	//Vec2<float> upperPlayerPos = centerPos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);
@@ -2121,7 +2127,7 @@ void Player::CheckHitMapChipVel(const Vec2<float> &checkPos, const vector<vector
 
 }
 
-void Player::CheckHitSize(const Vec2<float> &checkPos, const vector<vector<int>> &mapData, const Vec2<float> &bossPos, bool &isHitMapChip)
+void Player::CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip)
 {
 
 	// マップチップ目線でどこに当たったか

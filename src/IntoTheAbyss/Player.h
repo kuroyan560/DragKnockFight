@@ -171,7 +171,7 @@ public:
 	void Init(const Vec2<float>& INIT_POS);
 
 	// 更新処理
-	void Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos);
+	void Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos, const bool& isFinish);
 
 	// 描画処理
 	void Draw(LightManager& LigManager);
@@ -196,7 +196,7 @@ private:
 	/*-- クラス内で使用する関数 --*/
 
 	// 入力処理
-	void Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos);
+	void Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos, const bool& isFinish);
 
 	// 移動処理
 	void Move();
