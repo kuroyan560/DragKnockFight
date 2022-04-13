@@ -264,7 +264,6 @@ void Boss::Draw()
 	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
 		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
 
-	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(drawPos - scale), ScrollMgr::Instance()->Affect(drawPos + scale), Color(), DXGI_FORMAT_R8G8B8A8_UNORM);
 }
 
 void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
