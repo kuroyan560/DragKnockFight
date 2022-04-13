@@ -9,6 +9,8 @@ DebugParameter::DebugParameter()
 
 	//デフォルト
 	nowData = std::make_shared<PlayerDebugParameterData>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+
+	gaugeData = std::make_shared<GaugeDebugParameterData>();
 	loadPresetFlag = true;
 }
 
@@ -40,7 +42,7 @@ void DebugParameter::Update()
 
 void DebugParameter::DrawImGui()
 {
-	ImGui::Begin("Parameter");
+	/*ImGui::Begin("Parameter");
 	ImGui::InputFloat("ADD_GRAVITY", &nowData->ADD_GRAVITY);
 	ImGui::InputFloat("MAX_GRAVITY", &nowData->MAX_GRAVITY);
 	ImGui::InputFloat("FIRST_RECOIL_AMOUNT", &nowData->FIRST_RECOIL_AMOUNT);
@@ -49,5 +51,13 @@ void DebugParameter::DrawImGui()
 	ImGui::InputInt("RAPID_FIRE_TIMER", &nowData->RAPID_FIRE_TIMER);
 	ImGui::InputInt("SelectPreset", &selectNum);
 	loadPresetFlag = ImGui::Button("LoadPreset");
+	ImGui::End();*/
+
+	ImGui::Begin("Parameter");
+	ImGui::InputFloat("playerBulletAddGuaugeValue", &gaugeData->playerBulletAddGuaugeValue);
+	ImGui::InputFloat("enemyBulletAddGuaugeValue", &gaugeData->enemyBulletAddGuaugeValue);
+	ImGui::InputFloat("swingDamageValue", &gaugeData->swingDamageValue);
+	ImGui::InputFloat("playerClashDamageValue", &gaugeData->playerClashDamageValue);
+	ImGui::InputFloat("enemyClashDamageValue", &gaugeData->enemyClashDamageValue);
 	ImGui::End();
 }

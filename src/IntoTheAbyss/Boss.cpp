@@ -14,10 +14,13 @@
 #include"TexHandleMgr.h"
 #include"BossPatternNormalMove.h"
 #include"BossPatternAttack.h"
+#include"BossPatternSwing.h"
 #include"BossBulletManager.h"
 #include"CrashMgr.h"
 
 #include"ParticleMgr.h"
+
+#include"DebugParameter.h"
 
 void Boss::Crash(const Vec2<float>& MyVec)
 {
@@ -47,10 +50,11 @@ Boss::Boss()
 
 	bossPattern[0] = std::make_unique<BossPatternNormalMove>();
 	bossPattern[1] = std::make_unique<BossPatternAttack>();
+	bossPattern[2] = std::make_unique<BossPatternSwing>();
 
 
 	//パターンに渡すデータの初期化
-	patternData.bossPos = &moveVel;
+	patternData.moveVel = &moveVel;
 	patternData.stuckWindowTimer = &stuckWindowTimer;
 
 	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
@@ -170,7 +174,7 @@ void Boss::Update()
 		if (0 < afterSwingDelay || StunEffect::Instance()->isActive) {
 			// 何もしない。
 		}
-		else if (isSwingNow) {
+		else if (isSwingNow && SwingMgr::Instance()->isSwingPlayer) {
 
 			// 振り回し中だったら。
 
@@ -189,20 +193,7 @@ void Boss::Update()
 		else {
 
 			//ボスのAI-----------------------
-			++patternTimer;
-			if (120 <= patternTimer)
-			{
-				if (atackModeFlag)
-				{
-					bossPatternNow = BOSS_PATTERN_ATTACK;
-				}
-				else
-				{
-					bossPatternNow = BOSS_PATTERN_NORMALMOVE;
-				}
-				atackModeFlag = !atackModeFlag;
-				patternTimer = 0;
-			}
+			AiPattern();
 			//ボスのAI-----------------------
 
 
@@ -403,8 +394,8 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 			else if (isHitBottom)vec.y = 1.0f;
 
 			Crash(vec);
-
-			SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
+			//CrashMgr::Instance()->Crash(pos, crashDevice, ext);
+			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
 			SwingMgr::Instance()->isSwingPlayer = false;
 
 		}
@@ -427,9 +418,11 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 		if (winRight|| winLeft) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			Crash({ winRight ? 1.0f : -1.0f , 0.0f });
-			SuperiorityGauge::Instance()->AddPlayerGauge(10);
 
+
+			//CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
+			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
+			Crash({ winRight ? 1.0f : -1.0f , 0.0f });
 		}
 		// ウィンドウ上下
 		bool winTop = pos.y - scale.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
@@ -437,11 +430,11 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 		if (winBottom || winTop) {
 
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
+
+			//CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
+			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
 			Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
-			SuperiorityGauge::Instance()->AddPlayerGauge(10);
-
 		}
-
 	}
 
 	prevIntersectedLine = intersectedBuff;
@@ -452,4 +445,41 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 
 	}
 
+}
+
+void Boss::AiPattern()
+{
+	//120Flameごとにどの行動パターンを選択するか決める
+
+	++patternTimer;
+	if (120 <= patternTimer)
+	{
+		//プレイヤーとボスとの方向ベクトル確認
+		Vec2<float>dir = SwingMgr::Instance()->playerPos - SwingMgr::Instance()->bossPos;
+		float distance = dir.y - (dir.y * -1.0f);
+
+		bool allowToSwingFlag = false;
+		if (SWING_DISTANCE_DEADLINE <= fabs(distance))
+		{
+			allowToSwingFlag = true;
+		}
+
+
+		//次にどのパターンを選択するか
+		//一部の条件でパターンを選択しないようにする
+		while (1)
+		{
+			int randomPattern = KuroFunc::GetRand(BOSS_PATTERN_MAX - 1);
+
+			//振り回し許可なしで振り回そうとしたらやり直し
+			if (!allowToSwingFlag && randomPattern == BOSS_PATTERN_SWING)
+			{
+				continue;
+			}
+			bossPatternNow = static_cast<E_BossPattern>(randomPattern);
+			break;
+		}
+
+		patternTimer = 0;
+	}
 }

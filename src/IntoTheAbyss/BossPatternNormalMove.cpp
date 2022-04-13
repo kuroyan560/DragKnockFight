@@ -14,7 +14,7 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 {
 	if (Camera::Instance()->Active())
 	{
-		*DATA->bossPos = { 0,0 };
+		*DATA->moveVel = { 0,0 };
 		return;
 	}
 
@@ -40,9 +40,9 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 			ACCEL.y = sin(rad) * power;
 		}
 	}
-	DATA->bossPos->x = KuroMath::Lerp(DATA->bossPos->x, 10.0f, 0.1f);
-	DATA->bossPos->y = KuroMath::Lerp(DATA->bossPos->y, 0.0f, 0.1f);
-	*DATA->bossPos += ACCEL;
+	DATA->moveVel->x = KuroMath::Lerp(DATA->moveVel->x, 10.0f, 0.1f);
+	DATA->moveVel->y = KuroMath::Lerp(DATA->moveVel->y, 0.0f, 0.1f);
+	*DATA->moveVel += ACCEL;
 
 	ACCEL = KuroMath::Lerp(ACCEL, { 0.0f,0.0f }, 0.8f);
 

@@ -61,7 +61,7 @@ void GameScene::OnUpdate()
 	}
 
 	// ƒŠƒUƒ‹ƒg‰æ–Ê‚Ö”ò‚Î‚·
-	if (UsersInput::Instance()->OnTrigger(DIK_0)) {
+	if (UsersInput::Instance()->OnTrigger(DIK_R)) {
 		KuroEngine::Instance().ChangeScene(3, sceneChange);
 	}
 
@@ -150,7 +150,6 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
 	ImGui::End();*/
 
-	//DebugParameter::Instance()->DrawImGui();
 
 	SuperiorityGauge::Instance()->DebugValue(&addValue);
 
@@ -161,6 +160,9 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("RoundNum%d", WinCounter::Instance()->GetNowRound());
 	ImGui::Text("PlayerWin:%d,EnemyWin:%d", WinCounter::Instance()->GetLeftWin(), WinCounter::Instance()->GetRightWin());
 	ImGui::End();
+
+	DebugParameter::Instance()->DrawImGui();
+
 
 	//GameTimer::Instance()->Debug();
 	//ScoreManager::Instance()->Debug();

@@ -38,6 +38,9 @@
 
 
 #include<map>
+
+#include"DebugParameter.h"
+
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
@@ -1271,7 +1274,7 @@ void Game::Update()
 		//‰Šú‰»‚³‚ê‚Ä‚¢‚é&&ƒvƒŒƒCƒ„[‚Æ”»’è‚ðŽæ‚Á‚½‚ç—D¨ƒQ[ƒW‚Ì•Î‚è‚ª•Ï‚í‚èA’e‚Í‰Šú‰»‚³‚ê‚é
 		if (hitFlag && initFlag)
 		{
-			SuperiorityGauge::Instance()->AddEnemyGauge(10.0f);
+			SuperiorityGauge::Instance()->AddEnemyGauge(DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
 			BossBulletManager::Instance()->GetBullet(index)->Init();
 		}
 	}
@@ -1286,7 +1289,7 @@ void Game::Update()
 		//‰Šú‰»‚³‚ê‚Ä‚¢‚é&&ƒvƒŒƒCƒ„[‚Æ”»’è‚ðŽæ‚Á‚½‚ç—D¨ƒQ[ƒW‚Ì•Î‚è‚ª•Ï‚í‚èA’e‚Í‰Šú‰»‚³‚ê‚é
 		if (hitFlag && initFlag)
 		{
-			SuperiorityGauge::Instance()->AddPlayerGauge(10.0f);
+			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
 			BulletMgr::Instance()->GetBullet(index)->Init();
 		}
 	}
