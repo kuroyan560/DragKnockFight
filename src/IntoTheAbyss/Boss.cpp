@@ -399,6 +399,7 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 	}
 	// 左
 	sarchChipY = pos.y / MAP_CHIP_SIZE;
+	if (sarchChipY < 0) sarchChipY = 0;
 	sarchChipX = (pos.x - scale.x - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 	if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
 	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
@@ -406,6 +407,7 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 	}
 	// 右
 	sarchChipY = pos.y / MAP_CHIP_SIZE;
+	if (sarchChipY < 0) sarchChipY = 0;
 	sarchChipX = (pos.x + scale.x + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
 	if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
 	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
@@ -494,19 +496,47 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 
 		}
 
-		// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
-		Vec2<float>vec = { 0,0 };
-		if (SwingMgr::Instance()->isSwingPlayer || OFFSET_INERTIA / 2.0f < afterSwingDelay) {
+		// Swingのフレームが全く経過していなかったら処理を飛ばす。
+		if (SwingMgr::Instance()->easingTimer <= 0.05f) {
 
-			if (isHitLeft)vec.x = -1.0f;
-			else if (isHitRight)vec.x = 1.0f;
-			if (isHitTop)vec.y = -1.0f;
-			else if (isHitBottom)vec.y = 1.0f;
+		}
+		// 一定以下だったらダメージを与えない。
+		if (SwingMgr::Instance()->easingTimer <= 0.15f) {
 
-			Crash(vec);
+			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
+			Vec2<float>vec = { 0,0 };
+			if (SwingMgr::Instance()->isSwingPlayer || OFFSET_INERTIA / 2.0f < afterSwingDelay) {
 
-			SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
-			SwingMgr::Instance()->isSwingPlayer = false;
+				if (isHitLeft)vec.x = -1.0f;
+				else if (isHitRight)vec.x = 1.0f;
+				if (isHitTop)vec.y = -1.0f;
+				else if (isHitBottom)vec.y = 1.0f;
+
+				/*Crash(vec);
+
+				SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);*/
+				SwingMgr::Instance()->isSwingPlayer = false;
+
+			}
+
+		}
+		else {
+
+			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
+			Vec2<float>vec = { 0,0 };
+			if (SwingMgr::Instance()->isSwingPlayer || OFFSET_INERTIA / 2.0f < afterSwingDelay) {
+
+				if (isHitLeft)vec.x = -1.0f;
+				else if (isHitRight)vec.x = 1.0f;
+				if (isHitTop)vec.y = -1.0f;
+				else if (isHitBottom)vec.y = 1.0f;
+
+				Crash(vec);
+
+				SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
+				SwingMgr::Instance()->isSwingPlayer = false;
+
+			}
 
 		}
 
