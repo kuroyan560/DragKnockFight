@@ -21,6 +21,27 @@ struct PlayerDebugParameterData
 	}
 };
 
+struct RoundDebugData
+{
+	float maxTimer;
+	float maskMaxTimer;
+	float sizeMaxTimer;
+	RoundDebugData() :maxTimer(120.0f), maskMaxTimer(120.0f), sizeMaxTimer(120.0f)
+	{
+	}
+};
+
+struct RoundParameterData
+{
+	RoundDebugData roundData, readyData, fightData, numberData, nextNumberData;
+
+	RoundParameterData()
+	{
+
+	}
+};
+
+
 class DebugParameter :public Singleton<DebugParameter>
 {
 public:
@@ -34,5 +55,7 @@ public:
 	std::shared_ptr<PlayerDebugParameterData> nowData;
 	bool loadPresetFlag;
 	int selectNum;
+
+	std::shared_ptr<RoundParameterData> data;
 };
 
