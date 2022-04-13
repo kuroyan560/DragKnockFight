@@ -8,11 +8,13 @@
 #include"Bullet.h"
 #include"BulletCollision.h"
 
-#include"CrashInterFace.h"
+#include"StagingInterFace.h"
 using namespace std;
 
 // プレイヤーと引っ張り合うボスクラス
 class Boss {
+
+	void Crash(const Vec2<float>& MyVec);
 
 public:
 
@@ -34,7 +36,7 @@ public:
 	int graphHandle[DIR_NUM];
 
 	//クラッシュ演出補助
-	CrashInterFace crashDevice;
+	StagingInterFace stagingDevice;
 
 
 	//ボスのパターン制御-----------------------

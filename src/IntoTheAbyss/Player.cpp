@@ -149,7 +149,7 @@ void Player::Init(const Vec2<float> &INIT_POS)
 
 
 	bulletHitBox->radius = 20.0f;
-	crashDevice.Init();
+	stagingDevice.Init();
 	bulletHitBox->radius = 10.0f;
 
 	initSize = { 5.0f,5.0f };
@@ -162,7 +162,7 @@ void Player::Init(const Vec2<float> &INIT_POS)
 
 void Player::Update(const vector<vector<int>> mapData, const Vec2<float> &bossPos)
 {
-	crashDevice.Update();
+	stagingDevice.Update();
 
 	//サイズが1.0fになるまで動かない
 	if (1.0f < size.x && 1.0f < size.y)
@@ -412,12 +412,12 @@ void Player::Draw(LightManager &LigManager)
 	//leftUp += stretch_LU;
 	//rightBottom += stretch_RB;
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
-	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(centerPos + crashDevice.GetShake());
+	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(centerPos + stagingDevice.GetShake());
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * crashDevice.GetExtRate() * size,
-		0.0f, bodyTex, CRASH_TEX, crashDevice.GetFlashAlpha());
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
+		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha());
 
 
 	// 弾を描画
@@ -1011,20 +1011,26 @@ void Player::CheckHit(const vector<vector<int>> mapData, vector<Bubble> &bubble,
 		float disntaceY = fabs(lineCenterPos.y - centerPos.y);
 
 		// ウィンドウ左右
-		if (windowSize.x <= centerPos.x + PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x || centerPos.x - PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x <= 0) {
+		bool winLeft = centerPos.x - PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x <= 0;
+		bool winRight = windowSize.x <= centerPos.x + PLAYER_HIT_SIZE.x - ScrollMgr::Instance()->scrollAmount.x;
+		if (winRight|| winLeft) {
 
+			Vec2<float>smokeVec = { winRight ? -1.0f : 1.0f,0.0f };
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(centerPos, crashDevice, { false,true });
-			SuperiorityGauge::Instance()->AddEnemyGauge(DebugParameter::Instance()->gaugeData->playerClashDamageValue);
 
+			SuperiorityGauge::Instance()->AddEnemyGauge(DebugParameter::Instance()->gaugeData->playerClashDamageValue);
+			CrashMgr::Instance()->Crash(centerPos, stagingDevice, { false,true }, smokeVec);
 		}
 		// ウィンドウ上下
-		if (windowSize.y <= centerPos.y + PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y || centerPos.y - PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y <= 0) {
+		bool winTop = centerPos.y - PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
+		bool winBottom = windowSize.y <= centerPos.y + PLAYER_HIT_SIZE.y - ScrollMgr::Instance()->scrollAmount.y;
+		if (winBottom || winTop) {
 
+			Vec2<float>smokeVec = { 0.0f,winBottom ? -1.0f : 1.0f };
 			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			CrashMgr::Instance()->Crash(centerPos, crashDevice, { true,false });
-			SuperiorityGauge::Instance()->AddEnemyGauge(DebugParameter::Instance()->gaugeData->playerClashDamageValue);
 
+			SuperiorityGauge::Instance()->AddEnemyGauge(DebugParameter::Instance()->gaugeData->playerClashDamageValue);
+			CrashMgr::Instance()->Crash(centerPos, stagingDevice, { true,false }, smokeVec);
 		}
 
 	}

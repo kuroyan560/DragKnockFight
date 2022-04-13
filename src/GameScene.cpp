@@ -9,6 +9,7 @@
 #include"IntoTheAbyss/GameTimer.h"
 #include"IntoTheAbyss/ScoreManager.h"
 #include"IntoTheAbyss/WinCounter.h"
+#include"IntoTheAbyss/ResultSceneBackGround.h"
 
 GameScene::GameScene()
 {
@@ -26,10 +27,15 @@ GameScene::GameScene()
 	sceneChange = new SceneCange();
 
 	addValue = 10.0f;
+
+	isSS = false;
+
+	ResultSceneBackGround::Instance()->Init();
 }
 
 void GameScene::OnInitialize()
 {
+	ResultSceneBackGround::Instance()->Init();
 }
 
 void GameScene::OnUpdate()
@@ -46,14 +52,18 @@ void GameScene::OnUpdate()
 	{
 		SuperiorityGauge::Instance()->AddEnemyGauge(addValue);
 	}
+	if (UsersInput::Instance()->Input(DIK_S))
+	{
+		isSS = true;
+	}
+	else {
+		isSS = false;
+	}
 
 	// リザルト画面へ飛ばす
 	if (UsersInput::Instance()->OnTrigger(DIK_R)) {
 		KuroEngine::Instance().ChangeScene(3, sceneChange);
 	}
-	//{
-	//	SuperiorityGauge::Instance()->AddEnemyGauge(addValue);
-	//}
 
 	bool changeInput = UsersInput::Instance()->OnTrigger(DIK_B) || UsersInput::Instance()->OnTrigger(START);
 	if (changeInput)
@@ -65,12 +75,19 @@ void GameScene::OnUpdate()
 void GameScene::OnDraw()
 {
 	emissiveMap->Clear(D3D12App::Instance()->GetCmdList());
+
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
 	backGround->Draw();
 	game.Draw(emissiveMap);
 
 	gaussianBlur->Register(emissiveMap);
 	gaussianBlur->DrawResult(AlphaBlendMode_Add);
+
+	// スクショを保存。
+	if (isSS) {
+		KuroEngine::Instance().Graphics().CopyTexture(ResultSceneBackGround::Instance()->backGround, D3D12App::Instance()->GetBackBuffRenderTarget());
+	}
+
 }
 
 void GameScene::OnImguiDebug()

@@ -10,7 +10,7 @@ using namespace std;
 
 class BossBulletManager :public Singleton<BossBulletManager>
 {
-
+	int graph;
 public:
 
 	/*-- ’è” --*/
