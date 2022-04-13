@@ -18,6 +18,7 @@ private:
 	bool changeAngleFlag;
 	const float SHOT_BULLET_MAX;//ˆê“x‚ÉŒ‚‚Â’e‚Ì‘”
 	const float MAX_SPEED;//ˆê“x‚ÉŒ‚‚Â’e‚Ì‘”
-	const float SHOT_INTERVAL_MAX;//’e‚ğŒ‚‚ÂŠÔŠu
+	const int SHOT_INTERVAL_MAX;//’e‚ğŒ‚‚ÂŠÔŠu
+
 };
 

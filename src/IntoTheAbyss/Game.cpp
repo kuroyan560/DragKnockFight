@@ -1043,6 +1043,7 @@ void Game::Update()
 				{
 					readyToStartRoundFlag = true;
 					roundFinishFlag = false;
+					SuperiorityGauge::Instance()->Init();
 				}
 			}
 		}
@@ -1076,6 +1077,9 @@ void Game::Update()
 		//gameStartFlag = true;
 		//SelectStage::Instance()->resetStageFlag = true;
 		//readyToStartRoundFlag = false;
+
+		float size = (mapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
+		miniMap.Init(size);
 	}
 
 
@@ -1111,9 +1115,10 @@ void Game::Update()
 #pragma endregion
 
 
-
-	miniMap.CalucurateCurrentPos(lineCenterPos);
-
+	if (!readyToStartRoundFlag)
+	{
+		miniMap.CalucurateCurrentPos(lineCenterPos);
+	}
 
 
 	if (roundChangeEffect.initFlag)
