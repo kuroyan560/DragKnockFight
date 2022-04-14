@@ -11,6 +11,7 @@
 #include"IntoTheAbyss/ScoreManager.h"
 #include"IntoTheAbyss/WinCounter.h"
 #include"IntoTheAbyss/ResultTransfer.h"
+#include"IntoTheAbyss/DebugKeyManager.h"
 
 GameScene::GameScene()
 {
@@ -148,6 +149,8 @@ void GameScene::OnImguiDebug()
 	ImGui::End();
 
 	DebugParameter::Instance()->DrawImGui();
+
+	DebugKeyManager::Instance()->DrawImGui();
 
 
 	//GameTimer::Instance()->Debug();

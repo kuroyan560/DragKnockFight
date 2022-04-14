@@ -43,6 +43,8 @@
 
 #include"DebugParameter.h"
 
+#include"DebugKeyManager.h"
+
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
@@ -69,7 +71,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -105,7 +107,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				if (height < 0 || mapChipDrawData.size() <= height) continue;
 				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
@@ -164,7 +166,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -182,7 +184,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -710,6 +712,13 @@ void Game::Update()
 		//ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
+	DebugKeyManager::Instance()->CountReset();
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_A, "UseForStopPlayer", TO_STRING(DIK_A)))
+	{
+		bool debug = false;
+	}
+	DebugKeyManager::Instance()->DebugKeyTrigger(DIK_B, "Stop", TO_STRING(DIK_B));
+	DebugKeyManager::Instance()->DebugKeyTrigger(DIK_C, "Move", TO_STRING(DIK_C));
 
 
 	//ゴールに触れたら次のステージに向かう処理
@@ -979,15 +988,6 @@ void Game::Update()
 #pragma endregion
 
 
-	const bool resetInput = UsersInput::Instance()->OnTrigger(DIK_SPACE) || UsersInput::Instance()->OnTrigger(BACK);
-	if (resetInput)
-	{
-		SelectStage::Instance()->resetStageFlag = true;
-		//player.isDead = true;
-		//sceneBlackFlag = true;
-		//sceneChangeDeadFlag = player.isDead;
-	}
-
 
 	//ステージ毎の切り替え判定
 	//部屋の初期化
@@ -1017,11 +1017,6 @@ void Game::Update()
 		roundFinishFlag = true;
 		playerOrEnemeyWinFlag = false;
 		gameStartFlag = false;
-	}
-
-	if (UsersInput::Instance()->OnTrigger(DIK_U))
-	{
-		roundFinishFlag = true;
 	}
 
 
@@ -1070,13 +1065,13 @@ void Game::Update()
 		ScrollMgr::Instance()->Warp(responePos);
 
 		//プレイヤーと敵の座標初期化
-		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initFlag)
+		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initGameFlag)
 		{
 			InitGame(0, 0);
-			roundChangeEffect.initFlag = true;
+			roundChangeEffect.initGameFlag = true;
 		}
 
-		if (player.allowToMoveFlag && boss.AllowToMove() && roundChangeEffect.initFlag)
+		if (player.allowToMoveFlag && boss.AllowToMove() && roundChangeEffect.initGameFlag)
 		{
 			readyToStartRoundFlag = false;
 			gameStartFlag = true;
@@ -1129,7 +1124,7 @@ void Game::Update()
 	}
 
 
-	if (roundChangeEffect.initFlag)
+	if (roundChangeEffect.initGameFlag)
 	{
 		// プレイヤーの更新処理
 		player.Update(mapData, boss.pos, roundFinishFlag);
@@ -1149,30 +1144,9 @@ void Game::Update()
 	ScoreManager::Instance()->Update();
 
 
-	//if (Input::isKey(KEY_INPUT_RIGHT)) player.centerPos.x += 1.0f;
-	if (UsersInput::Instance()->Input(DIK_RIGHT)) player.centerPos.x += 1.0f;
-	//if (Input::isKey(KEY_INPUT_P)) player.centerPos.x += 100.0f;
-	if (UsersInput::Instance()->OnTrigger(DIK_P)) player.centerPos.x += 100.0f;
-	//if (Input::isKey(KEY_INPUT_LEFT)) player.centerPos.x -= 1.0f;
-	if (UsersInput::Instance()->Input(DIK_LEFT)) player.centerPos.x -= 1.0f;
-	//if (Input::isKey(KEY_INPUT_O)) player.centerPos.x -= 100.0f;
-	if (UsersInput::Instance()->OnTrigger(DIK_O)) player.centerPos.x -= 100.0f;
-
-
-	if (UsersInput::Instance()->OnTrigger(DIK_J))
-	{
-		ScoreManager::Instance()->Add(10000);
-	}
-	if (UsersInput::Instance()->OnTrigger(DIK_K))
-	{
-		ScoreManager::Instance()->Sub(100);
-	}
-
-
-
 	// プレイヤーとボスの引っ張り合いの処理
-
 	Scramble();
+
 
 
 	//	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
@@ -1235,7 +1209,7 @@ void Game::Update()
 		dossunBlock[index].CheckHit(mapData);
 	}
 
-	if (roundChangeEffect.initFlag && !readyToStartRoundFlag)
+	if (roundChangeEffect.initGameFlag && !readyToStartRoundFlag)
 	{
 		// プレイヤーの当たり判定
 		player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer, lineCenterPos);
@@ -1628,10 +1602,10 @@ void Game::Update()
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
 
-	if (UsersInput::Instance()->OnTrigger(DIK_M))
+	/*if (UsersInput::Instance()->OnTrigger(DIK_M))
 	{
 		FaceIcon::Instance()->Change(LEFT_FACE, DAMAGE);
-	}
+	}*/
 
 	BackGround::Instance()->Update();
 	Camera::Instance()->Update();
