@@ -70,9 +70,7 @@ public:
 	bool loadPresetFlag;
 	int selectNum;
 
-
+	std::shared_ptr<RoundParameterData> roundData;
 	std::shared_ptr<GaugeDebugParameterData> gaugeData;
-
-	std::shared_ptr<RoundParameterData> data;
 };
 

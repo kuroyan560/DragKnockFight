@@ -22,7 +22,7 @@
 
 #include"DebugParameter.h"
 
-void Boss::Crash(const Vec2<float>& MyVec)
+void Boss::Crash(const Vec2<float> &MyVec)
 {
 	Vec2<bool>ext = { true,true };
 	if (MyVec.x == 0.0f)ext.y = false;
@@ -65,7 +65,7 @@ Boss::Boss()
 	bulletHitBox->radius = 40.0f;
 }
 
-void Boss::Init(const Vec2<float>& generatePos)
+void Boss::Init(const Vec2<float> &generatePos)
 {
 	/*===== 生成処理 =====*/
 
@@ -243,7 +243,7 @@ void Boss::Draw()
 
 }
 
-void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
+void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos)
 {
 
 	/*===== 当たり判定 =====*/
@@ -361,35 +361,35 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 	const int MAP_HEIGHT = mapData.size();
 
 	// 上
-	sarchChipY = (pos.y - scale.y - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
-	sarchChipX = pos.x / MAP_CHIP_SIZE;
-	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-		isHitTop = true;
-	}
-	// 下
-	sarchChipY = (pos.y + scale.y + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
-	sarchChipX = pos.x / MAP_CHIP_SIZE;
-	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-		isHitBottom = true;
-	}
-	// 左
-	sarchChipY = pos.y / MAP_CHIP_SIZE;
-	if (sarchChipY < 0) sarchChipY = 0;
-	sarchChipX = (pos.x - scale.x - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
-	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-		isHitRight = true;
-	}
-	// 右
-	sarchChipY = pos.y / MAP_CHIP_SIZE;
-	if (sarchChipY < 0) sarchChipY = 0;
-	sarchChipX = (pos.x + scale.x + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
-	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-		isHitLeft = true;
-	}
+	//sarchChipY = (pos.y - scale.y - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	//if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
+	//sarchChipX = pos.x / MAP_CHIP_SIZE;
+	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+	//	isHitTop = true;
+	//}
+	//// 下
+	//sarchChipY = (pos.y + scale.y + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	//if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
+	//sarchChipX = pos.x / MAP_CHIP_SIZE;
+	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+	//	isHitBottom = true;
+	//}
+	//// 左
+	//sarchChipY = pos.y / MAP_CHIP_SIZE;
+	//if (sarchChipY < 0) sarchChipY = 0;
+	//sarchChipX = (pos.x - scale.x - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	//if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
+	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+	//	isHitRight = true;
+	//}
+	//// 右
+	//sarchChipY = pos.y / MAP_CHIP_SIZE;
+	//if (sarchChipY < 0) sarchChipY = 0;
+	//sarchChipX = (pos.x + scale.x + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	//if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
+	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+	//	isHitLeft = true;
+	//}
 
 
 	// マップチップと当たっていたら
@@ -508,13 +508,11 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 				if (isHitTop)vec.y = -1.0f;
 				else if (isHitBottom)vec.y = 1.0f;
 
-			Crash(vec);
-			//CrashMgr::Instance()->Crash(pos, crashDevice, ext);
-			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
-			SwingMgr::Instance()->isSwingPlayer = false;
-
+				Crash(vec);
+				//CrashMgr::Instance()->Crash(pos, crashDevice, ext);
+				SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
+				SwingMgr::Instance()->isSwingPlayer = false;
 			}
-
 		}
 
 	}
@@ -562,7 +560,6 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 		--stuckWindowTimer;
 
 	}
-
 }
 
 void Boss::AiPattern()

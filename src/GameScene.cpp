@@ -51,14 +51,6 @@ void GameScene::OnUpdate()
 		}
 		isSS = true;
 	}
-	else {
-		isSS = false;
-	}
-
-	// ƒŠƒUƒ‹ƒg‰æ–Ê‚Ö”ò‚Î‚·
-	if (UsersInput::Instance()->OnTrigger(DIK_R)) {
-		KuroEngine::Instance().ChangeScene(3, sceneChange);
-	}
 
 	bool changeInput = UsersInput::Instance()->OnTrigger(DIK_B) || UsersInput::Instance()->OnTrigger(START);
 	if (changeInput)
@@ -144,8 +136,6 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("MaxTimer%d", game.player.CHANGE_GRAVITY_TIMER);
 	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
 	ImGui::End();*/
-
-	DebugParameter::Instance()->DrawImGui();
 
 	SuperiorityGauge::Instance()->DebugValue(&addValue);
 
