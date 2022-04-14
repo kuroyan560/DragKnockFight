@@ -28,7 +28,6 @@ class RenderTarget;
 #include"MiniMap.h"
 
 #include"RoundChangeEffect.h"
-#include"CharacterManager.h"
 
 struct MassChipData
 {
