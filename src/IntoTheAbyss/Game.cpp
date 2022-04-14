@@ -720,6 +720,7 @@ void Game::Update()
 	DebugKeyManager::Instance()->DebugKeyTrigger(DIK_B, "Stop", TO_STRING(DIK_B));
 	DebugKeyManager::Instance()->DebugKeyTrigger(DIK_C, "Move", TO_STRING(DIK_C));
 
+
 	//ゴールに触れたら次のステージに向かう処理
 	{
 		Vec2<float> playerChip((player.centerPos.x + 25.0f) / 50.0f, (player.centerPos.y + 25.0f) / 50.0f);
@@ -1064,13 +1065,13 @@ void Game::Update()
 		ScrollMgr::Instance()->Warp(responePos);
 
 		//プレイヤーと敵の座標初期化
-		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initFlag)
+		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initGameFlag)
 		{
 			InitGame(0, 0);
-			roundChangeEffect.initFlag = true;
+			roundChangeEffect.initGameFlag = true;
 		}
 
-		if (player.allowToMoveFlag && boss.AllowToMove() && roundChangeEffect.initFlag)
+		if (player.allowToMoveFlag && boss.AllowToMove() && roundChangeEffect.initGameFlag)
 		{
 			readyToStartRoundFlag = false;
 			gameStartFlag = true;
@@ -1123,7 +1124,7 @@ void Game::Update()
 	}
 
 
-	if (roundChangeEffect.initFlag)
+	if (roundChangeEffect.initGameFlag)
 	{
 		// プレイヤーの更新処理
 		player.Update(mapData, boss.pos);
@@ -1208,7 +1209,7 @@ void Game::Update()
 		dossunBlock[index].CheckHit(mapData);
 	}
 
-	if (roundChangeEffect.initFlag && !readyToStartRoundFlag)
+	if (roundChangeEffect.initGameFlag && !readyToStartRoundFlag)
 	{
 		// プレイヤーの当たり判定
 		player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer, lineCenterPos);

@@ -9,6 +9,13 @@ void DebugKeyManager::CountReset()
 	{
 		coundKyeUsedNum[i] = 0;
 	}
+
+
+	for (int i = 0; i < errorName.size(); ++i)
+	{
+		std::string name = "DIK_" + std::to_string(i);
+		errorName[i] = name;
+	}
 }
 
 bool DebugKeyManager::DebugKeyTrigger(int KEY, const std::string &KEY_NAME, const std::string &KEY_NUM)
@@ -39,13 +46,14 @@ void DebugKeyManager::DrawImGui()
 		ImGui::Text(drawSting.c_str());
 	}
 	ImGui::End();
-#endif  _DEBUG
+#endif //  DEBUG
 }
 
 void DebugKeyManager::CheckKey(int KEY, const std::string &KEY_NAME, const std::string &KEY_NUM)
 {
 	if (debugKeyStorage.size() == 0)
 	{
+		CheckErrorNumber(KEY_NUM);
 		debugKeyStorage.push_back(KEY);
 		debugStringData.push_back(std::make_shared<DebugData>(KEY_NUM, KEY_NAME));
 		coundKyeUsedNum.push_back(0);
@@ -63,6 +71,7 @@ void DebugKeyManager::CheckKey(int KEY, const std::string &KEY_NAME, const std::
 	}
 	if (!findFlag)
 	{
+		CheckErrorNumber(KEY_NUM);
 		debugKeyStorage.push_back(KEY);
 		debugStringData.push_back(std::make_shared<DebugData>(KEY_NUM, KEY_NAME));
 		coundKyeUsedNum.push_back(0);
