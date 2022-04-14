@@ -43,6 +43,8 @@
 
 #include"DebugParameter.h"
 
+#include"DebugKeyManager.h"
+
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
@@ -710,7 +712,13 @@ void Game::Update()
 		//ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
-
+	DebugKeyManager::Instance()->CountReset();
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_A, "UseForStopPlayer", TO_STRING(DIK_A)))
+	{
+		bool debug = false;
+	}
+	DebugKeyManager::Instance()->DebugKeyTrigger(DIK_B, "Stop", TO_STRING(DIK_B));
+	DebugKeyManager::Instance()->DebugKeyTrigger(DIK_C, "Move", TO_STRING(DIK_C));
 
 	//ゴールに触れたら次のステージに向かう処理
 	{
@@ -979,15 +987,6 @@ void Game::Update()
 #pragma endregion
 
 
-	const bool resetInput = UsersInput::Instance()->OnTrigger(DIK_SPACE) || UsersInput::Instance()->OnTrigger(BACK);
-	if (resetInput)
-	{
-		SelectStage::Instance()->resetStageFlag = true;
-		//player.isDead = true;
-		//sceneBlackFlag = true;
-		//sceneChangeDeadFlag = player.isDead;
-	}
-
 
 	//ステージ毎の切り替え判定
 	//部屋の初期化
@@ -1017,11 +1016,6 @@ void Game::Update()
 		roundFinishFlag = true;
 		playerOrEnemeyWinFlag = false;
 		gameStartFlag = false;
-	}
-
-	if (UsersInput::Instance()->OnTrigger(DIK_U))
-	{
-		roundFinishFlag = true;
 	}
 
 
@@ -1147,27 +1141,6 @@ void Game::Update()
 
 	GameTimer::Instance()->Update();
 	ScoreManager::Instance()->Update();
-
-
-	//if (Input::isKey(KEY_INPUT_RIGHT)) player.centerPos.x += 1.0f;
-	if (UsersInput::Instance()->Input(DIK_RIGHT)) player.centerPos.x += 1.0f;
-	//if (Input::isKey(KEY_INPUT_P)) player.centerPos.x += 100.0f;
-	if (UsersInput::Instance()->OnTrigger(DIK_P)) player.centerPos.x += 100.0f;
-	//if (Input::isKey(KEY_INPUT_LEFT)) player.centerPos.x -= 1.0f;
-	if (UsersInput::Instance()->Input(DIK_LEFT)) player.centerPos.x -= 1.0f;
-	//if (Input::isKey(KEY_INPUT_O)) player.centerPos.x -= 100.0f;
-	if (UsersInput::Instance()->OnTrigger(DIK_O)) player.centerPos.x -= 100.0f;
-
-
-	if (UsersInput::Instance()->OnTrigger(DIK_J))
-	{
-		ScoreManager::Instance()->Add(10000);
-	}
-	if (UsersInput::Instance()->OnTrigger(DIK_K))
-	{
-		ScoreManager::Instance()->Sub(100);
-	}
-
 
 
 	// プレイヤーとボスの引っ張り合いの処理
@@ -1628,10 +1601,10 @@ void Game::Update()
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
 
-	if (UsersInput::Instance()->OnTrigger(DIK_M))
+	/*if (UsersInput::Instance()->OnTrigger(DIK_M))
 	{
 		FaceIcon::Instance()->Change(LEFT_FACE, DAMAGE);
-	}
+	}*/
 
 	BackGround::Instance()->Update();
 	Camera::Instance()->Update();
