@@ -78,6 +78,7 @@ void DebugParameter::DrawImGui()
 	ImGui::InputFloat("ChangeNumberTimer_NowNumber", &roundData->numberData.maskMaxTimer);
 	ImGui::Text("NextNumberTextParam");
 	ImGui::InputFloat("ChangeNumberTimer_NextNumber", &roundData->nextNumberData.maskMaxTimer);
+	ImGui::End();
 
 	ImGui::Begin("GaugeParameter");
 	ImGui::InputFloat("playerBulletAddGuaugeValue", &gaugeData->playerBulletAddGuaugeValue);
