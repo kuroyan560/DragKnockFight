@@ -88,7 +88,7 @@ public:
 	Vec2<float> prevPos;		// 前フレームの座標
 
 	void RegisterSetPartner(const std::shared_ptr<CharacterInterFace>Partner) { partner = Partner; }
-	void Init(const Vec2<float>& GeneratePos);	//ラウンド開始時に呼び出される
+	void Init(const Vec2<float>& GeneratePos, const Vec2<float>& Size);	//ラウンド開始時に呼び出される
 	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
 	void Draw();
 

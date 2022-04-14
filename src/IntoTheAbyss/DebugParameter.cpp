@@ -5,10 +5,10 @@ DebugParameter::DebugParameter()
 	//プリセット1
 	playerData.push_back(PlayerDebugParameterData(0.5f, 15.0f, 7.0f, 20.0f, 30.0f, 21));
 	//プリセット2
-	playerData.push_back(PlayerDebugParameterData(1.0f, 10.0f, 1.0f, 10.0f, 0.0f, 1));
+	playerData.push_back(PlayerDebugParameterData(1.0f, 10.0f, 7.0f, 10.0f, 0.0f, 1));
 
 	//デフォルト
-	nowData = std::make_shared<PlayerDebugParameterData>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+	nowData = std::make_shared<PlayerDebugParameterData>(0.0f, 0.0f, 7.0f, 0.0f, 0.0f, 0);
 	loadPresetFlag = true;
 
 	data = std::make_shared<RoundParameterData>();

@@ -146,10 +146,11 @@ void CharacterInterFace::SwingPartner()
 	nowSwing = true;
 }
 
-void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
+void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const Vec2<float>& Size)
 {
 	pos = GeneratePos;
 	vel = { 0,0 };
+	size = Size;
 
 	stuckWindowTimer = 0;
 
