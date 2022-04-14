@@ -997,7 +997,7 @@ void Game::Update()
 	}
 
 	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag && false)
+	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//プレイヤー勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, true);
@@ -1283,7 +1283,7 @@ void Game::Update()
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
 		if (hitFlag && initFlag)
 		{
-			SuperiorityGauge::Instance()->AddEnemyGauge(10.0f);
+			SuperiorityGauge::Instance()->AddEnemyGauge(1.0f);
 			BossBulletManager::Instance()->GetBullet(index)->Init();
 		}
 	}
@@ -1298,7 +1298,7 @@ void Game::Update()
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
 		if (hitFlag && initFlag)
 		{
-			SuperiorityGauge::Instance()->AddPlayerGauge(10.0f);
+			SuperiorityGauge::Instance()->AddPlayerGauge(1.0f);
 			BulletMgr::Instance()->GetBullet(index)->Init();
 		}
 	}

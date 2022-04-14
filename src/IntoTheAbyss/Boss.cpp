@@ -210,7 +210,7 @@ void Boss::Update()
 			{
 				if (patternData.bulltData[i].initFlag)
 				{
-					//BossBulletManager::Instance()->Generate(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
+					BossBulletManager::Instance()->Generate(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
 				}
 			}
 		}
@@ -519,7 +519,7 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 
 				Crash(vec);
 
-				SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);
+				SuperiorityGauge::Instance()->AddPlayerGauge(10.0f);
 				SwingMgr::Instance()->isSwingPlayer = false;
 
 			}
