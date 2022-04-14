@@ -27,6 +27,7 @@ private:
 		STATUS_GENERATE,		// 生成して中央に向かうシーン
 		STATUS_STOP,			// 中央について止まっているシーン
 		STATUS_ICON,			// 中心からアイコンに向かっていくシーン
+		STATUS_STUN_END
 	};
 	BREAK_UI_STATUS status;
 

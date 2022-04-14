@@ -277,12 +277,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 				//else {
 
 					// 押し戻す。
-					if (isPlayer) {
-						pos.x = miniIntersectedPoint.first.x + size.x + offset;
-					}
-					else {
-						pos.x = miniIntersectedPoint.first.x + size.x + offset + offset;
-					}
+				if (isPlayer) {
+					pos.x = miniIntersectedPoint.first.x + size.x + offset;
+				}
+				else {
+					pos.x = miniIntersectedPoint.first.x + size.x - offset;
+				}
 
 				//}
 
@@ -329,12 +329,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 				//else {
 
 					// 押し戻す。
-					if (isPlayer) {
-						pos.x = miniIntersectedPoint.first.x - size.x - offset;
-					}
-					else {
-						pos.x = miniIntersectedPoint.first.x - size.x - offset - offset;
-					}
+				if (isPlayer) {
+					pos.x = miniIntersectedPoint.first.x - size.x - offset;
+				}
+				else {
+					pos.x = miniIntersectedPoint.first.x - size.x + offset;
+				}
 
 				//}
 
@@ -560,7 +560,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			}
 
 			// ピッタリ押し戻したら不都合なことが起こるので、多少オフセット値を設ける。
-			float pushBackOffset = -1.0f;
+			float pushBackOffset = 1.0f;
 
 			// 最小の交点の種類によって処理を分ける。
 			if (miniIntersectedPoint.second == INTERSECTED_TOP) {
@@ -595,7 +595,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 				//else {
 
 					// 押し戻す。
-					pos.x = miniIntersectedPoint.first.x + size.x + pushBackOffset;
+				pos.x = miniIntersectedPoint.first.x + size.x + pushBackOffset;
 
 				//}
 
@@ -632,7 +632,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 				//else {
 
 					// 押し戻す。
-					pos.x = miniIntersectedPoint.first.x - size.x - pushBackOffset;
+				pos.x = miniIntersectedPoint.first.x - size.x - pushBackOffset;
 
 				//}
 

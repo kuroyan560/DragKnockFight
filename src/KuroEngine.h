@@ -103,7 +103,7 @@ private:
 	std::vector<BaseScene *>scenes;
 	int nowScene;	//現在のシーン番号
 	int nextScene = -1;	//次のシーン番号
-	SceneTransition *nowSceneTransition;	//現在セットされているシーン遷移
+	std::weak_ptr<SceneTransition>nowSceneTransition;	//現在セットされているシーン遷移
 
 	//FPS固定
 	std::shared_ptr<Fps>fps;
@@ -123,11 +123,11 @@ public:
 	//ゲーム終了
 	void GameEnd() { end = true; }
 	//シーンチェンジ
-	void ChangeScene(const int &SceneNum, SceneTransition *SceneTransition)
+	void ChangeScene(const int& SceneNum, const std::shared_ptr< SceneTransition>& SceneTransition)
 	{
 		nextScene = SceneNum;
 		nowSceneTransition = SceneTransition;
-		nowSceneTransition->Start();
+		SceneTransition->Start();
 	}
 
 	//グラフィックスマネージャゲッタ

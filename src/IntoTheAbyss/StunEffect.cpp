@@ -176,10 +176,10 @@ void StunEffect::Update()
 			isActive = false;
 
 			if(isBoss){
-				FaceIcon::Instance()->Change(WHICH_FACE::RIGHT_FACE, FACE_STATUS::DAMAGE);
+				FaceIcon::Instance()->Change(WHICH_FACE::RIGHT_FACE, FACE_STATUS::BREAK);
 			}
 			else{
-				FaceIcon::Instance()->Change(WHICH_FACE::LEFT_FACE, FACE_STATUS::DAMAGE);
+				FaceIcon::Instance()->Change(WHICH_FACE::LEFT_FACE, FACE_STATUS::BREAK);
 			}
 
 		}

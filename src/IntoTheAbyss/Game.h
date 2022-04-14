@@ -28,6 +28,7 @@ class RenderTarget;
 #include"MiniMap.h"
 
 #include"RoundChangeEffect.h"
+#include"CharacterManager.h"
 
 struct MassChipData
 {
@@ -148,6 +149,10 @@ class Game
 	bool readyToStartRoundFlag; //ラウンド開始時の演出開始用のフラグ
 	bool gameStartFlag;			//ゲーム開始中のフラグ
 
+	float lineExtendScale;
+	const float lineExtendMaxScale=10.0f;
+
+
 	int roundTimer;
 	int bgm;
 
@@ -159,6 +164,9 @@ class Game
 
 	RoundChangeEffect roundChangeEffect;
 	bool playerOrEnemeyWinFlag;
+
+	bool turnResultScene = false;
+
 public:
 
 	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;
@@ -177,5 +185,6 @@ public:
 	LightManager& GetLigManager() { return ligMgr; }
 
 	Vec2<float>GetStageSize();
+	const bool& TurnResultScene() { return turnResultScene; }
 };
 
