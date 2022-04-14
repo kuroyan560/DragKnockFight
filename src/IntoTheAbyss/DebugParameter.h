@@ -17,7 +17,22 @@ struct PlayerDebugParameterData
 		ADD_GRAVITY(ADD_GRAVITY), MAX_GRAVITY(MAX_GRAVITY), RECOIL_AMOUNT(RECOIL_AMOUNT), FIRST_RECOIL_AMOUNT(FIRST_RECOIL_AMOUNT),
 		MAX_RECOIL_AMOUNT(MAX_RECOIL_AMOUNT), RAPID_FIRE_TIMER(RAPID_FIRE_TIMER)
 	{
+	}
+};
 
+
+struct GaugeDebugParameterData
+{
+	float playerBulletAddGuaugeValue;
+	float enemyBulletAddGuaugeValue;
+	float playerClashDamageValue;
+	float enemyClashDamageValue;
+	float swingDamageValue;
+
+	GaugeDebugParameterData() :playerBulletAddGuaugeValue(10.0f), enemyBulletAddGuaugeValue(10.0f), 
+		playerClashDamageValue(10.0f), enemyClashDamageValue(10.0f),
+		swingDamageValue(5.0f)
+	{
 	}
 };
 
@@ -51,11 +66,11 @@ public:
 	void DrawImGui();
 
 	std::vector<PlayerDebugParameterData> playerData;
-
 	std::shared_ptr<PlayerDebugParameterData> nowData;
 	bool loadPresetFlag;
 	int selectNum;
 
-	std::shared_ptr<RoundParameterData> data;
+	std::shared_ptr<RoundParameterData> roundData;
+	std::shared_ptr<GaugeDebugParameterData> gaugeData;
 };
 

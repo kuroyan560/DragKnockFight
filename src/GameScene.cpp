@@ -137,8 +137,6 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
 	ImGui::End();*/
 
-	DebugParameter::Instance()->DrawImGui();
-
 	SuperiorityGauge::Instance()->DebugValue(&addValue);
 
 	//game.playerHomeBase->Debug();
@@ -148,6 +146,9 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("RoundNum%d", WinCounter::Instance()->GetNowRound());
 	ImGui::Text("PlayerWin:%d,EnemyWin:%d", WinCounter::Instance()->GetLeftWin(), WinCounter::Instance()->GetRightWin());
 	ImGui::End();
+
+	DebugParameter::Instance()->DrawImGui();
+
 
 	//GameTimer::Instance()->Debug();
 	//ScoreManager::Instance()->Debug();

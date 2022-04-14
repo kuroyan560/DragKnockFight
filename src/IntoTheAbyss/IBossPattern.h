@@ -27,7 +27,7 @@ struct BossBulletData
 /// </summary>
 struct BossPatternData
 {
-	Vec2<float>*bossPos;
+	Vec2<float>*moveVel;
 	int *stuckWindowTimer;
 	
 	std::array<BossBulletData, 100>bulltData;

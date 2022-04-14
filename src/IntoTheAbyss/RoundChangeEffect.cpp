@@ -124,23 +124,23 @@ void RoundChangeEffect::Update()
 {
 	if (startFlag)
 	{
-		roundData->maxTimer = DebugParameter::Instance()->data->roundData.maxTimer;
-		roundData->sizeMaxTimer = DebugParameter::Instance()->data->roundData.sizeMaxTimer;
+		roundData->maxTimer = DebugParameter::Instance()->roundData->roundData.maxTimer;
+		roundData->sizeMaxTimer = DebugParameter::Instance()->roundData->roundData.sizeMaxTimer;
 
-		readyData->maxTimer = DebugParameter::Instance()->data->readyData.maxTimer;
-		readyData->sizeMaxTimer = DebugParameter::Instance()->data->readyData.sizeMaxTimer;
+		readyData->maxTimer = DebugParameter::Instance()->roundData->readyData.maxTimer;
+		readyData->sizeMaxTimer = DebugParameter::Instance()->roundData->readyData.sizeMaxTimer;
 
-		fightData->maxTimer = DebugParameter::Instance()->data->fightData.maxTimer;
-		fightData->sizeMaxTimer = DebugParameter::Instance()->data->fightData.sizeMaxTimer;
+		fightData->maxTimer = DebugParameter::Instance()->roundData->fightData.maxTimer;
+		fightData->sizeMaxTimer = DebugParameter::Instance()->roundData->fightData.sizeMaxTimer;
 
-		numberData->maskMaxTimer = DebugParameter::Instance()->data->numberData.maskMaxTimer;
-		numberData->sizeMaxTimer = DebugParameter::Instance()->data->roundData.sizeMaxTimer;
+		numberData->maskMaxTimer = DebugParameter::Instance()->roundData->numberData.maskMaxTimer;
+		numberData->sizeMaxTimer = DebugParameter::Instance()->roundData->roundData.sizeMaxTimer;
 
-		nextNumberData->maskMaxTimer = DebugParameter::Instance()->data->nextNumberData.maskMaxTimer;
-		nextNumberData->sizeMaxTimer = DebugParameter::Instance()->data->roundData.sizeMaxTimer;
+		nextNumberData->maskMaxTimer = DebugParameter::Instance()->roundData->nextNumberData.maskMaxTimer;
+		nextNumberData->sizeMaxTimer = DebugParameter::Instance()->roundData->roundData.sizeMaxTimer;
 
-		playerReticleData->maxTimer = DebugParameter::Instance()->data->readyData.sizeMaxTimer;
-		enemyReticleData->maxTimer = DebugParameter::Instance()->data->readyData.sizeMaxTimer;
+		playerReticleData->maxTimer = DebugParameter::Instance()->roundData->readyData.sizeMaxTimer;
+		enemyReticleData->maxTimer = DebugParameter::Instance()->roundData->readyData.sizeMaxTimer;
 
 #pragma region •¶Žš•`‰æ
 		if (startFlag)
