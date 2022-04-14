@@ -39,13 +39,16 @@ bool DebugKeyManager::DebugKeyState(int KEY, const std::string &KEY_NAME, const 
 void DebugKeyManager::DrawImGui()
 {
 #ifdef  _DEBUG
-	ImGui::Begin("DebugKey");
-	for (int i = 0; i < debugStringData.size(); ++i)
+	if (DebugImGuiManager::Instance()->DrawFlag(imguiHandle))
 	{
-		std::string drawSting = debugStringData[i]->keyName + ":" + debugStringData[i]->keyNumber;
-		ImGui::Text(drawSting.c_str());
+		ImGui::Begin("DebugKey");
+		for (int i = 0; i < debugStringData.size(); ++i)
+		{
+			std::string drawSting = debugStringData[i]->keyName + ":" + debugStringData[i]->keyNumber;
+			ImGui::Text(drawSting.c_str());
+		}
+		ImGui::End();
 	}
-	ImGui::End();
 #endif //  DEBUG
 }
 
