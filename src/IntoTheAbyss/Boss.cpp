@@ -10,6 +10,7 @@
 #include "SuperiorityGauge.h"
 #include "SlowMgr.h"
 #include "StunEffect.h"
+#include "DebugKeyManager.h"
 
 #include"TexHandleMgr.h"
 #include"BossPatternNormalMove.h"
@@ -22,7 +23,7 @@
 
 #include"DebugParameter.h"
 
-void Boss::Crash(const Vec2<float> &MyVec)
+void Boss::Crash(const Vec2<float>& MyVec)
 {
 	Vec2<bool>ext = { true,true };
 	if (MyVec.x == 0.0f)ext.y = false;
@@ -65,7 +66,7 @@ Boss::Boss()
 	bulletHitBox->radius = 40.0f;
 }
 
-void Boss::Init(const Vec2<float> &generatePos)
+void Boss::Init(const Vec2<float>& generatePos)
 {
 	/*===== 生成処理 =====*/
 
@@ -223,6 +224,14 @@ void Boss::Update()
 
 	BossBulletManager::Instance()->Update();
 
+
+	// デバッグ
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_S, "BOSS SWING", TO_STRING(DIK_S))) {
+
+		bossPatternNow = static_cast<E_BossPattern>(BOSS_PATTERN_SWING);
+
+	}
+
 }
 
 #include"DrawFunc_FillTex.h"
@@ -243,7 +252,7 @@ void Boss::Draw()
 
 }
 
-void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, const Vec2<float> &playerPos, const Vec2<float> &lineCenterPos)
+void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
 {
 
 	/*===== 当たり判定 =====*/

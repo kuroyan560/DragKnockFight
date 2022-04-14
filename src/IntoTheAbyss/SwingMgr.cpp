@@ -76,10 +76,10 @@ void SwingMgr::Update(const Vec2<float>& playerPos, const Vec2<float>& bossPos, 
 		easingNowVec.Normalize();
 		easingNowVec.y = easingStartVec.y + (easeAmount * easeChangeAmountY);
 		if (easingNowVec.y < 0) {
-			easingNowVec.x = 1.0f + easingNowVec.y;
+			easingNowVec.x = (1.0f + easingNowVec.y) * (signbit(easingStartVec.x) ? -1.0f : 1.0f);
 		}
 		else {
-			easingNowVec.x = 1.0f - easingNowVec.y;
+			easingNowVec.x = (1.0f - easingNowVec.y) * (signbit(easingStartVec.x) ? -1.0f : 1.0f);
 		}
 		easingNowVec.Normalize();
 

@@ -53,8 +53,8 @@ void GameScene::OnUpdate()
 		isSS = true;
 	}
 
-	bool changeInput = UsersInput::Instance()->OnTrigger(DIK_B) || UsersInput::Instance()->OnTrigger(START);
-	if (changeInput)
+	//bool changeInput = UsersInput::Instance()->OnTrigger(DIK_B) || UsersInput::Instance()->OnTrigger(START);
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_B, "SCENE CHANGE", TO_STRING(DIK_B)))
 	{
 		KuroEngine::Instance().ChangeScene(1, sceneChange);
 	}
@@ -64,8 +64,8 @@ void GameScene::OnDraw()
 {
 	emissiveMap->Clear(D3D12App::Instance()->GetCmdList());
 
-	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
-	backGround->Draw();
+		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
+		backGround->Draw();
 	game.Draw(emissiveMap);
 
 	gaussianBlur->Register(emissiveMap);
