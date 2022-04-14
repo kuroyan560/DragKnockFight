@@ -76,18 +76,18 @@ void TitleScene::OnDraw()
 	float easingAmount = KuroMath::Ease(InOut, Sine, easingTimer, 0.0f, 1.0f);
 
 	// 星を描画
-	DrawFunc::DrawGraph(Vec2<float>(0, 30) + Vec2<float>(0, easingAmount * -EASING_MOVE), TexHandleMgr::GetTexBuffer(starHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(Vec2<float>(0, 30) + Vec2<float>(0, easingAmount * -EASING_MOVE_STAR), TexHandleMgr::GetTexBuffer(starHandle), AlphaBlendMode_Trans);
 
 	// 背景キャラ二人を描画
-	DrawFunc::DrawGraph(LACY_POS + Vec2<float>(0, easingAmount * EASING_MOVE), TexHandleMgr::GetTexBuffer(lacyHandle), AlphaBlendMode_Trans);
-	DrawFunc::DrawGraph(LUNA_POS + Vec2<float>(0, easingAmount * EASING_MOVE), TexHandleMgr::GetTexBuffer(lunaHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(LACY_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lacyHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(LUNA_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lunaHandle), AlphaBlendMode_Trans);
 
 	// 背景キャラロボット二体を描画
-	DrawFunc::DrawGraph(LACY_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE), TexHandleMgr::GetTexBuffer(lacyRobotHandle), AlphaBlendMode_Trans);
-	DrawFunc::DrawGraph(LUNA_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE), TexHandleMgr::GetTexBuffer(lunaRobotHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(LACY_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lacyRobotHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(LUNA_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lunaRobotHandle), AlphaBlendMode_Trans);
 
 	// タイトルアイコン画像を描画
-	DrawFunc::DrawGraph(TITLE_POS + Vec2<float>(0, easingAmount * -EASING_MOVE), TexHandleMgr::GetTexBuffer(titleHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(TITLE_POS + Vec2<float>(0, easingAmount * -EASING_MOVE_TITLE), TexHandleMgr::GetTexBuffer(titleHandle), AlphaBlendMode_Trans);
 
 	// PRESSENTERの画像を描画
 	if (isPressStartDraw) {
