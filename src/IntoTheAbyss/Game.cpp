@@ -712,14 +712,6 @@ void Game::Update()
 		//ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
-	DebugKeyManager::Instance()->CountReset();
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_A, "UseForStopPlayer", TO_STRING(DIK_A)))
-	{
-		bool debug = false;
-	}
-	DebugKeyManager::Instance()->DebugKeyTrigger(DIK_B, "Stop", TO_STRING(DIK_B));
-	DebugKeyManager::Instance()->DebugKeyTrigger(DIK_C, "Move", TO_STRING(DIK_C));
-
 
 	//ゴールに触れたら次のステージに向かう処理
 	{
