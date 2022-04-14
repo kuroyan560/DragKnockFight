@@ -260,6 +260,7 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 	bool onGround = false;
 	// 移動量を元にしたマップチップとの当たり判定を行う。
 	Vec2<float> moveDir = pos - prevPos;
+	float velOffset = 3.0f;
 	moveDir.Normalize();
 	INTERSECTED_LINE intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(pos, prevPos, moveDir * scale, scale, onGround, mapData, false);
 	isHitTop = intersectedLine == INTERSECTED_TOP;
@@ -268,36 +269,36 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 	isHitBottom = intersectedLine == INTERSECTED_BOTTOM;
 
 	// 左上
-	Vec2<float> velPosBuff = pos - scale;
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos - scale, {}, {}, onGround, mapData, false);
-	pos = velPosBuff + scale;
+	Vec2<float> velPosBuff = pos - scale + Vec2<float>(velOffset, velOffset);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos - scale + Vec2<float>(velOffset, velOffset), {}, {}, onGround, mapData, false);
+	pos = velPosBuff + scale - Vec2<float>(velOffset, velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
 	if (intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
 	if (intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
 
 	// 右上
-	velPosBuff = pos + Vec2<float>(scale.x, -scale.y);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(scale.x, -scale.y), {}, {}, onGround, mapData, false);
-	pos = velPosBuff - Vec2<float>(scale.x, -scale.y);
+	velPosBuff = pos + Vec2<float>(scale.x, -scale.y) + Vec2<float>(-velOffset, velOffset);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(scale.x, -scale.y) + Vec2<float>(-velOffset, velOffset), {}, {}, onGround, mapData, false);
+	pos = velPosBuff - Vec2<float>(scale.x, -scale.y) - Vec2<float>(-velOffset, velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
 	if (intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
 	if (intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
 
 	// 右下
-	velPosBuff = pos + scale;
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + scale, {}, {}, onGround, mapData, false);
-	pos = velPosBuff - scale;
+	velPosBuff = pos + scale + Vec2<float>(-velOffset, -velOffset);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + scale + Vec2<float>(-velOffset, -velOffset), {}, {}, onGround, mapData, false);
+	pos = velPosBuff - scale - Vec2<float>(-velOffset, -velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
 	if (intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
 	if (intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
 
 	// 左下
-	velPosBuff = pos + Vec2<float>(-scale.x, scale.y);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(-scale.x, scale.y), {}, {}, onGround, mapData, false);
-	pos = velPosBuff - Vec2<float>(-scale.x, scale.y);
+	velPosBuff = pos + Vec2<float>(-scale.x, scale.y) + Vec2<float>(velOffset, -velOffset);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(-scale.x, scale.y) + Vec2<float>(velOffset, -velOffset), {}, {}, onGround, mapData, false);
+	pos = velPosBuff - Vec2<float>(-scale.x, scale.y) - Vec2<float>(velOffset, -velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
 	if (intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
@@ -361,35 +362,35 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 	const int MAP_HEIGHT = mapData.size();
 
 	// 上
-	//sarchChipY = (pos.y - scale.y - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	//if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
-	//sarchChipX = pos.x / MAP_CHIP_SIZE;
-	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-	//	isHitTop = true;
-	//}
-	//// 下
-	//sarchChipY = (pos.y + scale.y + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	//if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
-	//sarchChipX = pos.x / MAP_CHIP_SIZE;
-	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-	//	isHitBottom = true;
-	//}
-	//// 左
-	//sarchChipY = pos.y / MAP_CHIP_SIZE;
-	//if (sarchChipY < 0) sarchChipY = 0;
-	//sarchChipX = (pos.x - scale.x - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	//if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
-	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-	//	isHitRight = true;
-	//}
-	//// 右
-	//sarchChipY = pos.y / MAP_CHIP_SIZE;
-	//if (sarchChipY < 0) sarchChipY = 0;
-	//sarchChipX = (pos.x + scale.x + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	//if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
-	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-	//	isHitLeft = true;
-	//}
+	sarchChipY = (pos.y - scale.y - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
+	sarchChipX = pos.x / MAP_CHIP_SIZE;
+	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+		isHitTop = true;
+	}
+	// 下
+	sarchChipY = (pos.y + scale.y + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
+	sarchChipX = pos.x / MAP_CHIP_SIZE;
+	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+		isHitBottom = true;
+	}
+	// 左
+	sarchChipY = pos.y / MAP_CHIP_SIZE;
+	if (sarchChipY < 0) sarchChipY = 0;
+	sarchChipX = (pos.x - scale.x - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
+	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+		isHitRight = true;
+	}
+	// 右
+	sarchChipY = pos.y / MAP_CHIP_SIZE;
+	if (sarchChipY < 0) sarchChipY = 0;
+	sarchChipX = (pos.x + scale.x + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
+	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+		isHitLeft = true;
+	}
 
 
 	// マップチップと当たっていたら
@@ -474,11 +475,11 @@ void Boss::CheckHit(const vector<vector<int>> &mapData, bool &isHitMapChip, cons
 		}
 
 		// Swingのフレームが全く経過していなかったら処理を飛ばす。
-		if (SwingMgr::Instance()->easingTimer <= 0.05f) {
+		if (SwingMgr::Instance()->easingTimer <= 0.1f) {
 
 		}
 		// 一定以下だったらダメージを与えない。
-		if (SwingMgr::Instance()->easingTimer <= 0.15f) {
+		if (SwingMgr::Instance()->easingTimer <= 0.2f) {
 
 			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 			Vec2<float>vec = { 0,0 };
