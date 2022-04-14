@@ -12,6 +12,7 @@
 #include"IntoTheAbyss/WinCounter.h"
 #include"IntoTheAbyss/ResultTransfer.h"
 #include"IntoTheAbyss/DebugKeyManager.h"
+#include"IntoTheAbyss/DebugImGuiManager.h"
 
 GameScene::GameScene()
 {
@@ -30,6 +31,13 @@ GameScene::GameScene()
 	addValue = 10.0f;
 
 	sceneChange = std::make_shared<SceneCange>();
+
+
+	//imguiHandle = DebugImGuiManager::Instance()->Add("Round");
+	//imguiRoundHandle = DebugImGuiManager::Instance()->DrawFlag();
+
+	//DebugImGuiManager::Instance()->DrawImGui();
+
 }
 
 void GameScene::OnInitialize()
@@ -137,6 +145,8 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("MaxTimer%d", game.player.CHANGE_GRAVITY_TIMER);
 	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
 	ImGui::End();*/
+
+	DebugImGuiManager::Instance()->DrawImGui();
 
 	SuperiorityGauge::Instance()->DebugValue(&addValue);
 
