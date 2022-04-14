@@ -137,7 +137,6 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
 	ImGui::End();*/
 
-
 	SuperiorityGauge::Instance()->DebugValue(&addValue);
 
 	//game.playerHomeBase->Debug();
