@@ -52,21 +52,8 @@ const bool& SuperiorityGauge::IsStacking()
 
 void SuperiorityGauge::Init()
 {
-	playerGaugeData.reset();
-	enemyGaugeData.reset();
-	playerGaugeData = std::make_unique<GaugeData>();
-	enemyGaugeData = std::make_unique<GaugeData>();
-
-	Vec2<float>winHalf(1280.0f / 2.0f, 65.0f);
-	gaguePos = winHalf;
-	gagueVarPos = winHalf;
-	gagueVarPos.y = 101.0f;
-
-	playerGaugeData->gaugeValue = GAUGE_MAX_VALUE / 2.0f;
-	enemyGaugeData->gaugeValue = GAUGE_MAX_VALUE / 2.0f;
-
-	playerGaugeData->gaugeDivValue = 0.5f;
-	enemyGaugeData->gaugeDivValue = 0.5f;
+	playerGaugeData->Init(GAUGE_MAX_VALUE);
+	enemyGaugeData->Init(GAUGE_MAX_VALUE);
 }
 
 void SuperiorityGauge::Update()
@@ -114,9 +101,12 @@ void SuperiorityGauge::Update()
 void SuperiorityGauge::Draw()
 {
 	static const Vec2<float>OFFSET = { 0.0f,23.0f };
+
+	Vec2<float>gaguePos(1280.0f / 2.0f, 65.0f);
 	DrawFunc::DrawRotaGraph2D(gaguePos + OFFSET, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(gaugeGraphHandle));
 
-	DrawFunc_FillTex::DrawRotaGraph2D(gagueVarPos + OFFSET, { 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(gaugeVarGraphPlayer),
+	Vec2<float> gaugeVarPos = { gaguePos.x,101.0f };
+	DrawFunc_FillTex::DrawRotaGraph2D(gaugeVarPos + OFFSET, { 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(gaugeVarGraphPlayer),
 		TexHandleMgr::GetTexBuffer(gaugeVarGraphEnemy), 1.0f, { 0.5f,0.5f }, { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f));
 }
 

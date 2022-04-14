@@ -34,9 +34,10 @@ void KuroEngine::Render()
 	scenes[nowScene]->Draw();
 
 	//シーン遷移描画
-	if (nowSceneTransition != nullptr)
+	auto sceneTransition = nowSceneTransition.lock();
+	if (sceneTransition)
 	{
-		nowSceneTransition->Draw();
+		sceneTransition->Draw();
 	}
 
 	//グラフィックスマネージャのコマンドリスト全実行
@@ -130,15 +131,16 @@ void KuroEngine::Update()
 	//シーン切り替えフラグ
 	bool sceneChangeFlg = false;
 
-	if (nowSceneTransition != nullptr) //シーン遷移中
+	auto sceneTransition = nowSceneTransition.lock();
+	if (sceneTransition) //シーン遷移中
 	{
 		//シーン遷移クラスの更新関数は、シーン切り替えのタイミングで true を還す
-		sceneChangeFlg = nowSceneTransition->Update() && (nextScene != -1);
+		sceneChangeFlg = sceneTransition->Update() && (nextScene != -1);
 
 		//シーン遷移終了
-		if (nowSceneTransition->Finish())
+		if (sceneTransition->Finish())
 		{
-			nowSceneTransition = nullptr;
+			nowSceneTransition.reset();
 		}
 	}
 

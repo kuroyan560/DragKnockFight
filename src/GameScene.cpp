@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include"KuroEngine.h"
 #include"Sprite.h"
+#include"IntoTheAbyss/ResultTransfer.h"
 #include"GaussianBlur.h"
 #include"IntoTheAbyss/StageMgr.h"
 #include"IntoTheAbyss/SelectStage.h"
@@ -9,7 +10,7 @@
 #include"IntoTheAbyss/GameTimer.h"
 #include"IntoTheAbyss/ScoreManager.h"
 #include"IntoTheAbyss/WinCounter.h"
-#include"IntoTheAbyss/ResultSceneBackGround.h"
+#include"IntoTheAbyss/ResultTransfer.h"
 
 GameScene::GameScene()
 {
@@ -24,18 +25,17 @@ GameScene::GameScene()
 	emissiveMap = D3D12App::Instance()->GenerateRenderTarget(DXGI_FORMAT_R32G32B32A32_FLOAT, Color(0.0f, 0.0f, 0.0f, 1.0f),
 		WinApp::Instance()->GetWinSize(), L"EmissiveMap");
 
-	sceneChange = new SceneCange();
 
 	addValue = 10.0f;
 
-	isSS = false;
-
-	ResultSceneBackGround::Instance()->Init();
+	sceneChange = std::make_shared<SceneCange>();
 }
 
 void GameScene::OnInitialize()
 {
-	ResultSceneBackGround::Instance()->Init();
+	ResultTransfer::Instance()->Init();
+	isSS = false;
+	game.Init();
 }
 
 void GameScene::OnUpdate()
@@ -43,26 +43,13 @@ void GameScene::OnUpdate()
 	DebugParameter::Instance()->Update();
 	game.Update();
 
-
-	if (UsersInput::Instance()->OnTrigger(DIK_Q))
-	{
-		SuperiorityGauge::Instance()->AddPlayerGauge(addValue);
-	}
-	if (UsersInput::Instance()->OnTrigger(DIK_W))
-	{
-		SuperiorityGauge::Instance()->AddEnemyGauge(addValue);
-	}
-	if (UsersInput::Instance()->Input(DIK_S))
-	{
-		isSS = true;
-	}
-	else {
-		isSS = false;
-	}
-
 	// リザルト画面へ飛ばす
-	if (UsersInput::Instance()->OnTrigger(DIK_R)) {
-		KuroEngine::Instance().ChangeScene(3, sceneChange);
+	if (game.TurnResultScene()) {
+		if (isSS)
+		{
+			KuroEngine::Instance().ChangeScene(3, sceneChange);
+		}
+		isSS = true;
 	}
 
 	bool changeInput = UsersInput::Instance()->OnTrigger(DIK_B) || UsersInput::Instance()->OnTrigger(START);
@@ -85,7 +72,7 @@ void GameScene::OnDraw()
 
 	// スクショを保存。
 	if (isSS) {
-		KuroEngine::Instance().Graphics().CopyTexture(ResultSceneBackGround::Instance()->backGround, D3D12App::Instance()->GetBackBuffRenderTarget());
+		KuroEngine::Instance().Graphics().CopyTexture(ResultTransfer::Instance()->backGround, D3D12App::Instance()->GetBackBuffRenderTarget());
 	}
 
 }

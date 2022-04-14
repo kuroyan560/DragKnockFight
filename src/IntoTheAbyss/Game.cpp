@@ -36,6 +36,8 @@
 
 #include"CrashMgr.h"
 
+#include"ResultTransfer.h"
+
 
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
@@ -508,7 +510,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	lineCenterPos = responePos;
 	player.Init(responePos - Vec2<float>(150.0f, 0.0f));
 	//ボスを生成
-	boss.Generate(responePos + Vec2<float>(150.0f, 0.0f));
+	boss.Init(responePos + Vec2<float>(150.0f, 0.0f));
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
@@ -563,10 +565,6 @@ Game::Game()
 	ligMgr.RegisterHemiSphereLight(&hemiLig);
 	ligMgr.RegisterPointLight(&player.lHand->ptLight);	//照準光源
 	ligMgr.RegisterPointLight(&player.rHand->ptLight);//照準光源
-
-
-
-	Init();
 
 	playerHomeBase = std::make_unique<HomeBase>();
 	enemyHomeBase = std::make_unique<HomeBase>();
@@ -629,6 +627,8 @@ void Game::Init()
 
 	//ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
 	//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
+
+	turnResultScene = false;
 }
 
 void Game::Update()
@@ -1035,7 +1035,9 @@ void Game::Update()
 			if (WinCounter::Instance()->GetGameFinish())
 			{
 				//とりあえずリセットしとく
-				WinCounter::Instance()->Reset();
+				//WinCounter::Instance()->Reset();
+				ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
+				turnResultScene = true;
 			}
 			//次のラウンドへ
 			else
@@ -1639,10 +1641,12 @@ void Game::Update()
 	if (SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
 		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
 		StunEffect::Instance()->Activate(player.centerPos, player.centerPos, Vec2<float>(0, 0), false);
+		ResultTransfer::Instance()->leftBreakCount++;
 	}
 	if (SuperiorityGauge::Instance()->GetPlayerGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetPlayerGaugeData()->prevOverGaugeFlag) {
 		// プレイヤーの優勢ゲージが振り切ったということは、敵の優勢ゲージが0だということ。
 		StunEffect::Instance()->Activate(boss.pos, boss.pos, Vec2<float>(1200, 0), true);
+		ResultTransfer::Instance()->rightBreakCount++;
 	}
 
 	CrashMgr::Instance()->Update();

@@ -59,22 +59,10 @@ Boss::Boss()
 	bulletHitBox = std::make_unique<SphereCollision>();
 	bulletHitBox->center = &pos;
 	bulletHitBox->radius = 40.0f;
-
-	Init();
 }
 
-void Boss::Init()
+void Boss::Init(const Vec2<float>& generatePos)
 {
-	pos = {};
-	scale = {};
-	vel = {};
-	moveVel = {};
-	stagingDevice.Init();
-}
-
-void Boss::Generate(const Vec2<float>& generatePos)
-{
-
 	/*===== ê∂ê¨èàóù =====*/
 
 	pos = generatePos;
@@ -91,6 +79,7 @@ void Boss::Generate(const Vec2<float>& generatePos)
 	allowToMoveFlag = false;
 	moveTimer = 0;
 	initPaticleFlag = false;
+	stagingDevice.Init();
 }
 
 #include"Camera.h"
@@ -215,9 +204,6 @@ void Boss::Update()
 			}
 			bossPattern[bossPatternNow]->Update(&patternData);
 			oldBossPattern = bossPatternNow;
-			if (UsersInput::Instance()->Input(DIK_0)) {
-				vel.x = OFFSET_VEL * 5.0f;
-			}
 
 			//É{ÉXÇÃíe
 			for (int i = 0; i < patternData.bulltData.size(); ++i)

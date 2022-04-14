@@ -81,10 +81,7 @@ public:
 	Boss();
 
 	// ‰Šú‰»ˆ—
-	void Init();
-
-	// ¶¬ˆ—
-	void Generate(const Vec2<float> &generatePos);
+	void Init(const Vec2<float>& generatePos);
 
 	// XVˆ—
 	void Update();

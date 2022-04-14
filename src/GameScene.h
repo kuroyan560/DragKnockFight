@@ -20,7 +20,7 @@ class GameScene : public BaseScene
 	float addValue;
 	bool isSS;		// スクショを撮るかのフラグ
 
-	SceneCange *sceneChange;
+	std::shared_ptr<SceneCange>sceneChange;
 public:
 	GameScene();
 	void OnInitialize()override;
