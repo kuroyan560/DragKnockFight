@@ -429,6 +429,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 			}
 		}
+
+
+
+
 	}
 }
 
