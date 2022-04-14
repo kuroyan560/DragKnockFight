@@ -28,6 +28,7 @@ class RenderTarget;
 #include"MiniMap.h"
 
 #include"RoundChangeEffect.h"
+#include"CharacterManager.h"
 
 struct MassChipData
 {
@@ -163,6 +164,9 @@ class Game
 
 	RoundChangeEffect roundChangeEffect;
 	bool playerOrEnemeyWinFlag;
+
+	bool turnResultScene = false;
+
 public:
 
 	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;
@@ -181,5 +185,6 @@ public:
 	LightManager& GetLigManager() { return ligMgr; }
 
 	Vec2<float>GetStageSize();
+	const bool& TurnResultScene() { return turnResultScene; }
 };
 

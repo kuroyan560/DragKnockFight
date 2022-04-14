@@ -17,9 +17,14 @@ private:
 		bool prevOverGaugeFlag;	//1F‘O‚ÌU‚èØ‚Á‚½”»’è
 		bool overGaugeFlag;		//U‚èØ‚Á‚½”»’è
 
-		GaugeData() :gaugeValue(0.0f), gaugeDivValue(0.0f), overGaugeFlag(false), prevOverGaugeFlag(false)
+		GaugeData() {}
+		void Init(const float& GaugeMaxValue)
 		{
-		};
+			gaugeValue = GaugeMaxValue / 2.0f;
+			gaugeDivValue = 0.5f;
+			overGaugeFlag = false;
+			prevOverGaugeFlag = false;
+		}
 	};
 
 public:
@@ -67,8 +72,6 @@ private:
 	int stackTimer;			//‰½•bhR‚µ‚Ä‚¢‚é‚©
 
 	//•`‰æ—p
-	Vec2<float>gaguePos;
-	Vec2<float>gagueVarPos;
 	int gaugeGraphHandle;
 	int gaugeVarGraphPlayer;
 	int gaugeVarGraphEnemy;

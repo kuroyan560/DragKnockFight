@@ -4,7 +4,7 @@
 
 StageSelectScene::StageSelectScene()
 {
-	changeScene = new SceneCange();
+	changeScene = std::make_shared<SceneCange>();
 	stageNum = 0;
 }
 

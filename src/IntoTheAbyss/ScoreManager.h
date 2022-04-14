@@ -19,6 +19,7 @@ public:
 	void Draw();
 
 	void Debug();
+	const float& GetScore() { return honraiScore; }
 private:
 	float score;
 	float honraiScore;
@@ -62,7 +63,5 @@ private:
 		std::reverse(Number.begin(), Number.end());
 		return Number;
 	}
-
-
 };
 

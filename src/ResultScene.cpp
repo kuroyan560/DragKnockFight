@@ -4,7 +4,7 @@
 #include "WinApp.h"
 #include "KuroMath.h"
 #include "UsersInput.h"
-#include "IntoTheAbyss/ResultSceneBackGround.h"
+#include "IntoTheAbyss/ResultTransfer.h"
 
 ResultScene::ResultScene()
 {
@@ -17,7 +17,7 @@ ResultScene::ResultScene()
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, blueNumberHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_yellow.png", 12, { 12, 1 }, goldNumberHandle.data());
 
-	changeScene = new SceneCange();
+	changeScene = std::make_shared<SceneCange>();
 
 	lunaWinGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/luna.png");
 	lacyWinGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
@@ -34,13 +34,13 @@ void ResultScene::OnInitialize()
 	breakEnemyEasingAmount = 0;
 	breakPlayerEasingAmount = 0;
 	scoreEffectTimer = 0;
-	targetScore = 123456789;
+	targetScore = ResultTransfer::Instance()->resultScore;
 	prevScore = { 1,2,3,4,5,6,7,8,9 };
 	scoreSize = { 1 };
 	scoreEffectEasingAmount = 0;
 
-	breakEnemyAmount = 0;
-	breakPlayerAmount = 0;
+	breakEnemyAmount = ResultTransfer::Instance()->rightBreakCount;
+	breakPlayerAmount = ResultTransfer::Instance()->leftBreakCount;
 
 	winnerGraph = lunaWinGraph;
 }
@@ -132,12 +132,6 @@ void ResultScene::OnUpdate()
 
 	}
 
-	if (UsersInput::Instance()->Input(DIK_R)) {
-
-		OnInitialize();
-
-	}
-
 	// ƒŠƒUƒ‹ƒg‰æ–Ê‚Ö”ò‚Î‚·
 	if (UsersInput::Instance()->OnTrigger(DIK_0)) {
 		KuroEngine::Instance().ChangeScene(0, changeScene);
@@ -150,7 +144,7 @@ void ResultScene::OnDraw()
 
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 
-	ResultSceneBackGround::Instance()->Draw();
+	ResultTransfer::Instance()->Draw();
 
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 	//DrawFunc::DrawBox2D(Vec2<float>(0, 0), windowSize, Color(0, 0, 0, 255), DXGI_FORMAT_R8G8B8A8_UNORM);
