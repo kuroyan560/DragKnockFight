@@ -71,7 +71,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -107,7 +107,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				if (height < 0 || mapChipDrawData.size() <= height) continue;
 				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
@@ -166,7 +166,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -184,7 +184,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -1145,8 +1145,8 @@ void Game::Update()
 
 
 	// プレイヤーとボスの引っ張り合いの処理
-
 	Scramble();
+
 
 
 	//	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
