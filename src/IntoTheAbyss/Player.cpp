@@ -1277,7 +1277,7 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 
 			// onGroundがtrueだったら移動量を加算しない。
 			if (!onGround || sinf(rHandAngle) < 0.6f) {
-				vel.x += cosf(rHandAngle) * FIRST_RECOIL_AMOUNT;
+				vel.x += cosf(rHandAngle) * RECOIL_AMOUNT;
 			}
 
 			// プレイヤーのひとつ上のブロックを検索する為の処理。
@@ -1290,17 +1290,17 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 
 			// 入力を受け付けないフラグが立っていなかったら
 			if (!isWallRight && !isWallLeft) {
-				vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
+				vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
 			}
 			// プレイヤーの一個上のマップチップがブロックだったら最初に一発を大きくするフラグを大きくする。
 			else if (mapData[mapY - 1][mapX] > 0 && mapData[mapY - 1][mapX] < 10 && cosf(rHandAngle) < 0.5f && cosf(rHandAngle) > -0.5f) {
-				vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
+				vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
 			}
 			else if (isWallRight && cosf(rHandAngle) < 0.0f) {
-				vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
+				vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
 			}
 			else if (isWallLeft && cosf(rHandAngle) > 0.1f) {
-				vel.y += sinf(rHandAngle) * FIRST_RECOIL_AMOUNT;
+				vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
 			}
 
 			isFirstShot = true;
@@ -1385,22 +1385,22 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 
 			// onGroundがtrueだったら移動量を加算しない。
 			if (!onGround || sinf(lHandAngle) < 0.6f) {
-				vel.x += cosf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+				vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
 			}
 
 			// 入力を受け付けないフラグが立っていなかったら
 			if (!isWallLeft && !isWallRight) {
-				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+				vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
 			}
 			// プレイヤーの一個上のマップチップがブロックだったら最初に一発を大きくするフラグを大きくする。
 			else if (mapData[mapY - 1][mapX] > 0 && mapData[mapY - 1][mapX] < 10 && cosf(lHandAngle) < 0.5f && cosf(lHandAngle) > -0.5f) {
-				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+				vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
 			}
 			else if (isWallRight && cosf(lHandAngle) < 0.3f) {
-				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+				vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
 			}
 			else if (isWallLeft && cosf(lHandAngle) > 0.1f) {
-				vel.y += sinf(lHandAngle) * FIRST_RECOIL_AMOUNT;
+				vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
 			}
 
 			// 最初の一発を撃ったフラグを立てる。
