@@ -999,7 +999,7 @@ void Game::Update()
 	}
 
 	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag && false)
+	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//プレイヤー勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, true);

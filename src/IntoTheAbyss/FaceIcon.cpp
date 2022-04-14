@@ -1,5 +1,6 @@
 #include "FaceIcon.h"
 #include"TexHandleMgr.h"
+#include"SuperiorityGauge.h"
 
 FaceIcon::FaceIcon()
 {
@@ -56,6 +57,7 @@ void FaceIcon::Update()
 		if (status[i] == BREAK && BREAK_SPAN <= timer[i])
 		{
 			Change((WHICH_FACE)i, DEFAULT);
+			SuperiorityGauge::Instance()->Init();
 		}
 	}
 }
