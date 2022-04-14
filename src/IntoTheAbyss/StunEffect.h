@@ -8,7 +8,7 @@ private:
 
 	/*===== メンバ変数 =====*/
 
-	Vec2<float>* focusPos;		// フォーカスする対象の座標
+	const Vec2<float>* focusPos;		// フォーカスする対象の座標
 	int focusTime;				// フォーカスする時間
 
 	// 以下BREAK画像用のメンバ変数
@@ -62,7 +62,7 @@ public:
 	void Init();
 
 	// 生成処理
-	void Activate(Vec2<float>& focusPos, const Vec2<float>& stunPos, const Vec2<float>& iconPos, const bool& isBoss);
+	void Activate(const Vec2<float>& focusPos, const Vec2<float>& iconPos, const bool& isBoss);
 
 	// 更新処理
 	void Update();

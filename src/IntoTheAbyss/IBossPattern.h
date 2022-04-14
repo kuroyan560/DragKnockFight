@@ -25,11 +25,10 @@ struct BossBulletData
 /// <summary>
 /// ボスの行動パターンに必要な情報を渡す
 /// </summary>
+class CharacterInterFace;
 struct BossPatternData
 {
 	Vec2<float>*bossPos;
-	int *stuckWindowTimer;
-	
 	std::array<BossBulletData, 100>bulltData;
 };
 
@@ -41,6 +40,6 @@ class IBossPattern
 public:
 	virtual ~IBossPattern() {};
 	virtual void Init() = 0;
-	virtual void Update(BossPatternData *POS) = 0;
+	virtual void Update(BossPatternData* Boss) = 0;
 };
 

@@ -2,7 +2,6 @@
 #include "ScrollMgr.h"
 #include "ShakeMgr.h"
 #include "SightCollisionStorage.h"
-#include "ViewPort.h"
 #include "MapChipCollider.h"
 #include "StageMgr.h"
 #include "SelectStage.h"
@@ -27,9 +26,6 @@ PlayerHand::PlayerHand(const int& AimGraphHandle) : aimGraphHandle(AimGraphHandl
 
 	// 入力された角度を初期化
 	inputAngle = 0;
-
-	// 最初の一発は反動が強いフラグを立てる
-	isFirstShot = true;
 
 	// ビーコンのクールタイムを初期化
 	pikeCooltime = 0;
@@ -89,10 +85,6 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 	Vec2<float>offset = { cos(inputAngle) * offsetRadius,sin(inputAngle) * offsetRadius };
 	drawPos = handPos + offset;
 
-	// 各短槍の更新処理を行う。
-	if (teleportPike.isActive) teleportPike.Update();
-	if (timeStopPike.isActive) timeStopPike.Update();
-
 	// ビーコンのクールタイムの更新を行う。
 	if (pikeCooltime > 0) --pikeCooltime;
 
@@ -102,17 +94,13 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 
 #include"DrawFunc.h"
 #include"DrawFunc_Shadow.h"
-void PlayerHand::Draw(LightManager& LigManager, const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool& DRAW_CURSOR)
+void PlayerHand::Draw(const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool& DRAW_CURSOR)
 {
 	/*-- 描画処理 --*/
 	afterImg.Draw();
 
 	Vec2<float>ext = { ScrollMgr::Instance()->zoom * ExtRate ,ScrollMgr::Instance()->zoom * ExtRate };
 	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos), ext, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle));
-
-	// ビーコンを描画
-	if (teleportPike.isActive) teleportPike.Draw();
-	if (timeStopPike.isActive) timeStopPike.Draw();
 
 	//照準を描画
 	if (DRAW_CURSOR)

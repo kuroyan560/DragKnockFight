@@ -50,6 +50,4 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 	//	vel.x = OFFSET_VEL * 5.0f;
 		bool debug = false;
 	}
-
-	if (0 < *DATA->stuckWindowTimer) *DATA->stuckWindowTimer -= 1;
 }

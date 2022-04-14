@@ -8,7 +8,7 @@ struct SphereCollision
 	// ’†SÀ•W
 	Vec2<float> *center;
 	// ”¼Œa
-	float radius = 1.0f;
+	float radius;
 };
 
 class BulletCollision :public Singleton<BulletCollision>

@@ -17,16 +17,12 @@ void BulletMgr::Setting()
 
 }
 
-void BulletMgr::Generate(const Vec2<float>& generatePos, const float& forwardAngle, const bool& isFirstShot, const bool& isShotRight)
+void BulletMgr::Generate(const Vec2<float>& generatePos, const float& forwardAngle, const bool& isShotRight)
 {
 
 	/*-- 生成処理 --*/
 
-	int generateBullet = 0;
-
-	// 最初の一発目だったら
-	if (isFirstShot) generateBullet = GENERATE_COUNT * 2.0f;
-	if (!isFirstShot) generateBullet = GENERATE_COUNT;
+	int generateBullet = GENERATE_COUNT;
 
 	// 生成する数分ループ
 	for (int generateCount = 0; generateCount < generateBullet; ++generateCount) {
@@ -52,7 +48,7 @@ void BulletMgr::Generate(const Vec2<float>& generatePos, const float& forwardAng
 			Vec2<float> generateForwardVec = { cosf(generateAngle), sinf(generateAngle) };
 
 			// 生成する。
-			bullets[index]->Generate(generatePos, generateForwardVec, isFirstShot, isShotRight == true ? Bullet::R_HAND : Bullet::L_HAND);
+			bullets[index]->Generate(generatePos, generateForwardVec, isShotRight == true ? Bullet::R_HAND : Bullet::L_HAND);
 
 			break;
 
@@ -96,7 +92,7 @@ void BulletMgr::Draw()
 
 }
 
-void BulletMgr::CheckHit(const vector<vector<int>>& mapData, vector<Bubble>& bubble)
+void BulletMgr::CheckHit(const vector<vector<int>>& mapData)
 {
 
 	/*===== マップチップとの当たり判定 =====*/
@@ -143,41 +139,4 @@ void BulletMgr::CheckHit(const vector<vector<int>>& mapData, vector<Bubble>& bub
 		}
 
 	}
-
-
-	/*===== 弾とシャボン玉の当たり判定 =====*/
-
-	const int BUBBLE_COUNT = bubble.size();
-
-	for (int index = 0; index < BULLET_COUNT; ++index) {
-
-		// 弾が生成されていなかったら処理を飛ばす。
-		if (!bullets[index]->isActive) continue;
-
-		for (int bubbleIndex = 0; bubbleIndex < BUBBLE_COUNT; ++bubbleIndex) {
-
-			// 割れていたら処理を飛ばす。
-			if (bubble[bubbleIndex].isBreak) continue;
-
-			// 円の当たり判定を行う。
-			bool checkHit = bullets[index]->pos.Distance(bubble[bubbleIndex].pos) < bullets[index]->MAX_RADIUS + bubble[bubbleIndex].RADIUS;
-
-			// 当たっていなかったら処理を飛ばす。
-			if (!checkHit) continue;
-
-			// 弾のぱーてぃくるを生成する。
-			//BulletParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec);
-			ParticleMgr::Instance()->Generate(bullets[index]->pos, bullets[index]->forwardVec, BULLET);
-
-			// バブルを動かす。
-			bubble[bubbleIndex].addEasingTimer = 30.0f;
-			bubble[bubbleIndex].isHitBullet = true;
-
-			// 弾を削除する。
-			bullets[index]->Init();
-
-		}
-
-	}
-
 }

@@ -1,5 +1,4 @@
 #include "ThornBlock.h"
-#include"EventCollider.h"
 #include"../Engine/DrawFunc.h"
 #include"ScrollMgr.h"
 #include"Collider.h"
@@ -27,22 +26,8 @@ bool ThornBlock::HitBox(Vec2<float> &PLAYER_POS, const Vec2<float> &SIZE, Vec2<f
 	Vec2<float> hitBoxSize = (size + adjValue) / 2.0f;
 	Vec2<float> hitBoxCentralPos = (leftUpPos + hitBoxSize);
 
-	bool isDossunVel = EventCpllider::Instance()->CheckHitVel(PLAYER_POS, PLAYER_PREV_POS, PLAYER_VEL, SIZE, hitBoxCentralPos, hitBoxSize) != INTERSECTED_NONE;
-	bool topHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, hitBoxSize, INTERSECTED_TOP) != INTERSECTED_NONE;
-	bool buttomFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, hitBoxSize, INTERSECTED_BOTTOM) != INTERSECTED_NONE;
-	bool leftHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, hitBoxSize, INTERSECTED_LEFT) != INTERSECTED_NONE;
-	bool rightHitFlag = EventCpllider::Instance()->CheckHitSize(PLAYER_POS, SIZE, hitBoxCentralPos, hitBoxSize, INTERSECTED_RIGHT) != INTERSECTED_NONE;
-
-	if (isDossunVel || topHitFlag || buttomFlag || leftHitFlag || rightHitFlag)
-	{
-		color = Color(255, 0, 0, 255);
-		return true;
-	}
-	else
-	{
-		color = Color(255, 255, 255, 255);
-		return false;
-	}
+	color = Color(255, 255, 255, 255);
+	return false;
 }
 
 void ThornBlock::Draw()

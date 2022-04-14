@@ -57,7 +57,7 @@ Vec2<float> MapChipCollider::CalIntersectPoint(Vec2<float> posA1, Vec2<float> po
 	return Vec2<float>(posA1.x + (posA2.x - posA1.x) * t, posA1.y + (posA2.y - posA1.y) * t);
 }
 
-INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& vel, const Vec2<float>& size, bool& onGround, const vector<vector<int>>& mapChipData, const bool& isPlayer)
+INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& vel, const Vec2<float>& size, const vector<vector<int>>& mapChipData, const bool& isPlayer)
 {
 	/*===== マップチップとプレイヤーの当たり判定 =====*/
 
@@ -97,7 +97,6 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 
 			// プレイヤーとの距離が一定以上離れていたら処理を行わない。
 			if (Vec2<float>(centerX - pos.x, centerY - pos.y).Length() >= MAP_CHIP_SIZE * 2.0f) {
-				onGround = false;
 				continue;
 			}
 
