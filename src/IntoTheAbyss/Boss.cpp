@@ -384,35 +384,35 @@ void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, cons
 	const int MAP_HEIGHT = mapData.size();
 
 	// 上
-	sarchChipY = (pos.y - scale.y - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
-	sarchChipX = pos.x / MAP_CHIP_SIZE;
-	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-		isHitTop = true;
-	}
-	// 下
-	sarchChipY = (pos.y + scale.y + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
-	sarchChipX = pos.x / MAP_CHIP_SIZE;
-	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-		isHitBottom = true;
-	}
-	// 左
-	sarchChipY = pos.y / MAP_CHIP_SIZE;
-	if (sarchChipY < 0) sarchChipY = 0;
-	sarchChipX = (pos.x - scale.x - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
-	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-		isHitRight = true;
-	}
-	// 右
-	sarchChipY = pos.y / MAP_CHIP_SIZE;
-	if (sarchChipY < 0) sarchChipY = 0;
-	sarchChipX = (pos.x + scale.x + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
-	if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
-	if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
-		isHitLeft = true;
-	}
+	//sarchChipY = (pos.y - scale.y - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	//if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
+	//sarchChipX = pos.x / MAP_CHIP_SIZE;
+	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+	//	isHitTop = true;
+	//}
+	//// 下
+	//sarchChipY = (pos.y + scale.y + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	//if (sarchChipY < 0 || MAP_HEIGHT <= sarchChipY) sarchChipY = 0;
+	//sarchChipX = pos.x / MAP_CHIP_SIZE;
+	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+	//	isHitBottom = true;
+	//}
+	//// 左
+	//sarchChipY = pos.y / MAP_CHIP_SIZE;
+	//if (sarchChipY < 0) sarchChipY = 0;
+	//sarchChipX = (pos.x - scale.x - sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	//if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
+	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+	//	isHitRight = true;
+	//}
+	//// 右
+	//sarchChipY = pos.y / MAP_CHIP_SIZE;
+	//if (sarchChipY < 0) sarchChipY = 0;
+	//sarchChipX = (pos.x + scale.x + sarchOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
+	//if (sarchChipX < 0 || mapData[sarchChipY].size() <= sarchChipX) sarchChipX = 0;
+	//if (0 < mapData[sarchChipY][sarchChipX] && mapData[sarchChipY][sarchChipX] < 10) {
+	//	isHitLeft = true;
+	//}
 
 
 	// マップチップと当たっていたら

@@ -1183,7 +1183,7 @@ void Game::Update()
 	ShakeMgr::Instance()->Update();
 
 	// 振り回し管理クラスの更新処理
-	SwingMgr::Instance()->Update(player.centerPos, boss.pos, lineLengthBoss + lineLengthPlayer + addLineLengthBoss + addLineLengthPlayer);
+	SwingMgr::Instance()->Update(player.centerPos, boss.pos, (player.centerPos - boss.pos).Length());
 
 #pragma region 各ギミックの更新処理
 
