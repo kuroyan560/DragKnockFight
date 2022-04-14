@@ -2,6 +2,7 @@
 #include"../KuroEngine.h"
 #include"../Common/Singleton.h"
 #include<vector>
+#include"DebugImGuiManager.h"
 
 struct PlayerDebugParameterData
 {
@@ -72,5 +73,8 @@ public:
 
 	std::shared_ptr<RoundParameterData> roundData;
 	std::shared_ptr<GaugeDebugParameterData> gaugeData;
+
+	int gaugeParamImguiHandle;
+	int roundParamImguiHandle;
 };
 
