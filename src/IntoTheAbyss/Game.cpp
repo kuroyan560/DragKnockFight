@@ -1720,7 +1720,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		playerBossDir.Normalize();
 		Vec2<float> playerDefLength = player.centerPos + playerBossDir * addLineLengthPlayer;
 
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(playerDefLength + playerBossDir * lineLengthPlayer),
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(lineCenterPos),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 		Vec2<float> bossPlayerDir = player.centerPos - boss.pos;
 		bossPlayerDir.Normalize();
@@ -1738,7 +1738,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(bossDefLength + bossPlayerDir * lineLengthBoss),
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(lineCenterPos),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom * lineExtendScale);
 
 		// 線分の中心に円を描画
@@ -1818,8 +1818,8 @@ void Game::Scramble()
 	float LINE = (lineLengthBoss + lineLengthPlayer) + (addLineLengthBoss + addLineLengthPlayer);
 
 	// 気にしないでください！
-	bool isBoss = false;
-	bool isPlayer = false;
+	bool isBoss = true;
+	bool isPlayer = true;
 
 	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
 	if (playerVelGauge.Length() < bossVelGauge.Length()) {
@@ -1899,12 +1899,12 @@ void Game::Scramble()
 	}
 	else {
 
-		return;
+		//return;
 
 	}
 
 	// 引っかかり判定じゃなかったらだんだん短くする。
-	if (isBoss || (!isCatchMapChipBoss && 0 < addLineLengthBoss)) {
+	if (isBoss && (!isCatchMapChipBoss && 0 < addLineLengthBoss)) {
 
 		addLineLengthBoss -= 5.0f;
 
@@ -1918,7 +1918,7 @@ void Game::Scramble()
 		if (addLineLengthBoss < 0) addLineLengthBoss = 0;
 
 	}
-	if (isPlayer || (!isCatchMapChipPlayer && 0 < addLineLengthPlayer)) {
+	if (isPlayer && (!isCatchMapChipPlayer && 0 < addLineLengthPlayer)) {
 
 		addLineLengthPlayer -= 5.0f;
 
@@ -1933,16 +1933,26 @@ void Game::Scramble()
 
 	}
 
-	// 紐の中心点を計算
-	{
-		Vec2<float> bossDir = boss.pos - player.centerPos;
-		bossDir.Normalize();
-		float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
-		lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
-	}
-
 	isCatchMapChipBoss = false;
 	isCatchMapChipPlayer = false;
+
+	// 紐の中心点を計算
+	{
+		float distance = (boss.pos - player.centerPos).Length();
+		Vec2<float> bossDir = boss.pos - player.centerPos;
+		bossDir.Normalize();
+
+		// ボスとプレイヤー間の距離が規定値以下だったら
+		if (distance < LINE_LENGTH + LINE_LENGTH) {
+			// 既定値以下だったら団子化減少を防ぐために、二点間の真ん中の座標にする。
+			lineCenterPos = player.centerPos + bossDir * Vec2<float>(distance / 2.0f, distance / 2.0f);
+		}
+		else {
+			// 規定値以上だったら普通に場所を求める。
+			float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
+			lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
+		}
+	}
 
 }
 
