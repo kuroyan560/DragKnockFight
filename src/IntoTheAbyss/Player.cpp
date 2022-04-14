@@ -1342,7 +1342,12 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 		// ラウンド終了演出中だったら弾を出さない。
 		if (!isFinish) {
 			AudioApp::Instance()->PlayWave(shotSE);
-			BulletMgr::Instance()->Generate(lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, false);
+
+			// 指定の数霊を生成する。
+			for (int index = 0; index < BULLET_SHOT_COUNT; ++index) {
+				float shotAngle = -(BULLET_SHOT_COUNT / 2.0f * BULLET_SHOT_ANGLE - BULLET_SHOT_ANGLE) + BULLET_SHOT_ANGLE * index;
+				BulletMgr::Instance()->Generate(lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle + shotAngle, false, false);
+			}
 		}
 
 		// 連射タイマーをセット
@@ -1450,7 +1455,12 @@ void Player::Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos
 		// ラウンド終了演出中だったら弾を出さない。
 		if (!isFinish) {
 			AudioApp::Instance()->PlayWave(shotSE);
-			BulletMgr::Instance()->Generate(rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, isFirstShot, true);
+
+			// 指定の数霊を生成する。
+			for (int index = 0; index < BULLET_SHOT_COUNT; ++index) {
+				float shotAngle = -(BULLET_SHOT_COUNT / 2.0f * BULLET_SHOT_ANGLE - BULLET_SHOT_ANGLE) + BULLET_SHOT_ANGLE * index;
+				BulletMgr::Instance()->Generate(rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle + shotAngle, false, true);
+			}
 		}
 
 		// 連射タイマーをセット
