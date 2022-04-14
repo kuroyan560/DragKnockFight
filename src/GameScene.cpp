@@ -157,8 +157,6 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("PlayerWin:%d,EnemyWin:%d", WinCounter::Instance()->GetLeftWin(), WinCounter::Instance()->GetRightWin());
 	ImGui::End();
 
-	DebugParameter::Instance()->DrawImGui();
-
 
 	//GameTimer::Instance()->Debug();
 	//ScoreManager::Instance()->Debug();
