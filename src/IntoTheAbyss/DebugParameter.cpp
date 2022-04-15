@@ -8,7 +8,9 @@ DebugParameter::DebugParameter()
 	playerData.push_back(PlayerDebugParameterData(1.0f, 10.0f, 7.0f, 10.0f, 0.0f, 1));
 
 	//デフォルト
-	nowData = std::make_shared<PlayerDebugParameterData>(0.0f, 0.0f, 7.0f, 0.0f, 0.0f, 0);
+	nowData = std::make_shared<PlayerDebugParameterData>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+
+	gaugeData = std::make_shared<GaugeDebugParameterData>();
 	loadPresetFlag = true;
 
 	roundData = std::make_shared<RoundParameterData>();
@@ -24,6 +26,7 @@ DebugParameter::DebugParameter()
 
 	gaugeParamImguiHandle = DebugImGuiManager::Instance()->Add("RoundParameter");
 	roundParamImguiHandle = DebugImGuiManager::Instance()->Add("GaugeParameter");
+	bossParamImguiHandle = DebugImGuiManager::Instance()->Add("BossParameter");
 }
 
 void DebugParameter::Update()
@@ -83,14 +86,20 @@ void DebugParameter::DrawImGui()
 		ImGui::End();
 	}
 
-	if (DebugImGuiManager::Instance()->DrawFlag(gaugeParamImguiHandle))
+	if (DebugImGuiManager::Instance()->DrawFlag(bossParamImguiHandle))
 	{
-		ImGui::Begin("GaugeParameter");
-		ImGui::InputFloat("playerBulletAddGuaugeValue", &gaugeData->playerBulletAddGuaugeValue);
-		ImGui::InputFloat("enemyBulletAddGuaugeValue", &gaugeData->enemyBulletAddGuaugeValue);
-		ImGui::InputFloat("swingDamageValue", &gaugeData->swingDamageValue);
-		ImGui::InputFloat("playerClashDamageValue", &gaugeData->playerClashDamageValue);
-		ImGui::InputFloat("enemyClashDamageValue", &gaugeData->enemyClashDamageValue);
+		ImGui::Begin("BossParameter");
+		std::string statusString = GetStatus(bossDebugData.bossNowStatus);
+		std::string drawStatusStirng = "BOSS_NOW_STATUS:" + statusString;
+		ImGui::Text(drawStatusStirng.c_str());
+		ImGui::Text("moveVelX:%f", bossDebugData.moveVel.x);
+		ImGui::Text("moveVelY:%f", bossDebugData.moveVel.y);
+		ImGui::InputFloat("PULL_POWER_MIN", &bossDebugData.PULL_POWER_MIN);
+		ImGui::InputFloat("PULL_POWER_MAX", &bossDebugData.PULL_POWER_MAX);
+		ImGui::InputFloat("PULL_ADD_X_POWER", &bossDebugData.PULL_ADD_X_POWER);
+		ImGui::InputFloat("moveX", &bossDebugData.moveX);
+		ImGui::InputInt("PULL_SPAN_MIN", &bossDebugData.PULL_SPAN_MIN);
+		ImGui::InputInt("PULL_SPAN_MAX", &bossDebugData.PULL_SPAN_MAX);
 		ImGui::End();
 	}
 }

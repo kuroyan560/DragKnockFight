@@ -1,6 +1,7 @@
 #include "BossPatternNormalMove.h"
 #include "Camera.h"
 #include"../KuroEngine.h"
+#include"../IntoTheAbyss/DebugParameter.h"
 
 BossPatternNormalMove::BossPatternNormalMove()
 {
@@ -8,6 +9,7 @@ BossPatternNormalMove::BossPatternNormalMove()
 
 void BossPatternNormalMove::Init()
 {
+	PULL_TIMER = 0;
 }
 
 void BossPatternNormalMove::Update(BossPatternData *DATA)
@@ -18,13 +20,13 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 		return;
 	}
 
-	static const int PULL_SPAN_MIN = 30;
-	static const int PULL_SPAN_MAX = 70;
-	static int PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
-	static int PULL_TIMER = 0;
-	static Vec2<float>ACCEL = { 0.0f,0.0f };	//‰Á‘¬“x
-	static const float PULL_POWER_MIN = 15.0f;
-	static const float PULL_POWER_MAX = 25.0f;
+	int PULL_SPAN_MIN = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MIN;
+	int PULL_SPAN_MAX = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MAX;
+	int PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
+	
+	Vec2<float>ACCEL = { 0.0f,0.0f };	//‰Á‘¬“x
+	float PULL_POWER_MIN = DebugParameter::Instance()->bossDebugData.PULL_POWER_MIN;
+	float PULL_POWER_MAX = DebugParameter::Instance()->bossDebugData.PULL_POWER_MAX;
 
 	if (PULL_TIMER < PULL_SPAN)
 	{
@@ -36,11 +38,11 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 
 			auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
 			auto power = KuroFunc::GetRand(PULL_POWER_MIN, PULL_POWER_MAX);
-			ACCEL.x = cos(rad) * power * 1.6f;
+			ACCEL.x = cos(rad) * power * DebugParameter::Instance()->bossDebugData.PULL_ADD_X_POWER;
 			ACCEL.y = sin(rad) * power;
 		}
 	}
-	DATA->moveVel->x = KuroMath::Lerp(DATA->moveVel->x, 10.0f, 0.1f);
+	DATA->moveVel->x = KuroMath::Lerp(DATA->moveVel->x, DebugParameter::Instance()->bossDebugData.moveX, 0.1f);
 	DATA->moveVel->y = KuroMath::Lerp(DATA->moveVel->y, 0.0f, 0.1f);
 	*DATA->moveVel += ACCEL;
 

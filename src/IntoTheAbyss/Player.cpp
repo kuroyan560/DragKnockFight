@@ -319,7 +319,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	/*===== 入力処理 =====*/
 
 	// スタン演出中だったら入力を受け付けない。
-	if (StunEffect::Instance()->isActive || SwingMgr::Instance()->isSwingBoss) return;
+	if (StunEffect::Instance()->isActive) return;
 
 	const float INPUT_DEAD_LINE = 0.3f;
 

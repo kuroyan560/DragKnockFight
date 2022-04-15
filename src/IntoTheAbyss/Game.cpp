@@ -39,6 +39,11 @@
 #include "CharacterInterFace.h"
 
 #include<map>
+
+#include"DebugParameter.h"
+
+#include"DebugKeyManager.h"
+
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
@@ -502,12 +507,12 @@ void Game::Update()
 		//プレイヤーと敵の座標初期化
 		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initGameFlag)
 		{
-			roundChangeEffect.initFlag = true;
+			roundChangeEffect.initGameFlag = true;
 			AudioApp::Instance()->PlayWave(bgm, true);
 		}
 
 		//登場演出
-		if (roundChangeEffect.initFlag)
+		if (roundChangeEffect.initGameFlag)
 		{
 			bool leftAppear = leftCharacter->Appear();
 			bool rightApperar = rightCharacter->Appear();
@@ -664,7 +669,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
 	// プレイヤーとボス間に線を描画
-	if (roundChangeEffect.initFlag)
+	if(roundChangeEffect.initGameFlag)
 	{
 		Vec2<float> playerBossDir = rightCharacter->pos - leftCharacter->pos;
 		playerBossDir.Normalize();
@@ -704,7 +709,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	roundChangeEffect.Draw();
 
-	if (roundChangeEffect.initFlag)
+	if (roundChangeEffect.initGameFlag)
 	{
 		leftCharacter->Draw();
 		rightCharacter->Draw();

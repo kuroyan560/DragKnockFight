@@ -41,11 +41,15 @@ public:
 	BossPatternData patternData;
 	std::array<std::unique_ptr<IBossPattern>, BOSS_PATTERN_MAX>bossPattern;
 	int patternTimer;
+	bool atackModeFlag;
 	//ボスのパターン制御-----------------------
 
 	bool initPaticleFlag;
 	int moveTimer;
 	Vec2<float>initScale;
+
+	//ボスのパラメーター変更
+	int bossImGuiHandle;
 public:
 	/*===== 定数 =====*/
 
