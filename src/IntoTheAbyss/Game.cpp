@@ -532,6 +532,7 @@ void Game::Update()
 
 	// 弾を更新
 	BulletMgr::Instance()->Update();
+	BossBulletManager::Instance()->Update();
 
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();

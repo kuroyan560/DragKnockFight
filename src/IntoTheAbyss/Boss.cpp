@@ -131,7 +131,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 
 	}
 
-	BossBulletManager::Instance()->Update();
 }
 
 #include"DrawFunc_FillTex.h"
