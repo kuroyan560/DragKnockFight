@@ -13,5 +13,6 @@ public:
 
 private:
 	bool swingFlag;
+	bool initSwingFlag;
 };
 

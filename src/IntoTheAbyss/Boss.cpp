@@ -18,6 +18,7 @@
 #include"CrashMgr.h"
 
 #include"ParticleMgr.h"
+#include"DebugKeyManager.h"
 
 static const Vec2<float> SCALE = { 80.0f,80.0f };
 Boss::Boss() :CharacterInterFace(SCALE)
@@ -118,8 +119,27 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 			}
 		}
 	}
-	// 移動量の総量を求める。
 
+
+
+	//振り回しの開始ベクトルを取得。
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_O, "SwingBoss", TO_STRING(DIK_O)))
+	{
+		Vec2<float> dir = GetPartnerPos() - pos;
+		dir.Normalize();
+
+		// 振り回しのトリガー判定
+		if (0.3f < fabs(dir.y))
+		{
+			SwingPartner();
+			// クールタイムを設定。
+		}
+	}
+
+
+
+
+	// 移動量の総量を求める。
 	auto swingAffect = GetSwingInertia();
 	if (GetSwingRigor()) {
 
