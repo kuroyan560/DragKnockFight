@@ -60,6 +60,8 @@ void GameTimer::Init(const Vec2<float> &POS, int TIME, const Vec2<float> &COUNT_
 
 	counDownFinishFlag = false;
 
+	//“oê‰‰o‚Ì‚½‚ßÅ‰‚Í“®‚©‚È‚¢
+	interruput = true;
 }
 
 void GameTimer::Finalize()
@@ -68,6 +70,8 @@ void GameTimer::Finalize()
 
 void GameTimer::Update()
 {
+	if (interruput)return;
+
 	startFlag = countDownFlag;
 	if (startFlag && !timeUpFlag)
 	{

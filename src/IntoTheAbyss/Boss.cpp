@@ -19,7 +19,8 @@
 
 #include"ParticleMgr.h"
 
-Boss::Boss():CharacterInterFace(SCALE)
+static const Vec2<float> SCALE = { 80.0f,80.0f };
+Boss::Boss() :CharacterInterFace(SCALE)
 {
 
 	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy.png");
@@ -80,7 +81,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	else if (isSwingNow) {
 
 	}
-	else {
+	else if(GetCanMove()) {
 
 		//É{ÉXÇÃAI-----------------------
 		++patternTimer;
@@ -131,7 +132,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 
 	}
 
-	BossBulletManager::Instance()->Update();
 }
 
 #include"DrawFunc_FillTex.h"

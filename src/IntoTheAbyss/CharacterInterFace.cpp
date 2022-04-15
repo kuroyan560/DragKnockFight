@@ -147,11 +147,10 @@ void CharacterInterFace::SwingPartner()
 	nowSwing = true;
 }
 
-void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const Vec2<float>& Size)
+void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 {
 	pos = GeneratePos;
 	vel = { 0,0 };
-	size = Size;
 
 	stuckWindowTimer = 0;
 
@@ -167,6 +166,9 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const Vec2<float>&
 	swingInertia = 0;
 	swingInertiaVec = {};
 	afterSwingDelay = 0;
+
+	//“oê‰‰o‚Ì‚½‚ßÅ‰‚Í“®‚¯‚È‚¢
+	canMove = false;
 
 	OnInit();
 }
@@ -201,7 +203,10 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 
 	//“–‚½‚è”»’è
-	CheckHit(MapData, LineCenterPos);
+	if (canMove)
+	{
+		CheckHit(MapData, LineCenterPos);
+	}
 
 	//ˆø‚Á‚©‚©‚Á‚Ä‚¢‚é
 	if (stackMapChip)

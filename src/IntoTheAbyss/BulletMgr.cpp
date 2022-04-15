@@ -60,6 +60,11 @@ void BulletMgr::Generate(const Vec2<float>& generatePos, const float& forwardAng
 
 }
 
+void BulletMgr::Init()
+{
+	for (auto& b : bullets)b->Init();
+}
+
 void BulletMgr::Update()
 {
 

@@ -8,6 +8,7 @@
 /// </summary>
 class GameTimer:public Singleton<GameTimer>
 {
+	bool interruput;
 public:
 	GameTimer();
 
@@ -48,6 +49,11 @@ public:
 	/// </summary>
 	/// <returns>true...カウントダウン終了,false...終了していない</returns>
 	bool StartGame();
+
+	/// <summary>
+	/// 時間計測の一時中断フラグセット
+	/// </summary>
+	void SetInterruput(const bool& Flg) { interruput = Flg; }
 
 
 	bool FinishAllEffect();
