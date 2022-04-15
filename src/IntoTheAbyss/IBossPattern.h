@@ -30,6 +30,12 @@ struct BossPatternData
 {
 	Vec2<float>*moveVel;
 	std::array<BossBulletData, 100>bulltData;
+	bool swingFlag;
+
+	BossPatternData() :swingFlag(false)
+	{
+
+	}
 };
 
 /// <summary>

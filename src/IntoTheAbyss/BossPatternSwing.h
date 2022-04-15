@@ -12,7 +12,6 @@ public:
 	void Update(BossPatternData *DATA)override;
 
 private:
-	bool swingFlag;
 	bool initSwingFlag;
 };
 

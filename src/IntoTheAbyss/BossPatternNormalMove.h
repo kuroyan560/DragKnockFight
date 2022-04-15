@@ -11,5 +11,6 @@ public:
 	void Update(BossPatternData *DATA)override;
 
 private:
+	int PULL_TIMER;
 };
 

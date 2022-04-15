@@ -47,6 +47,9 @@ public:
 	bool initPaticleFlag;
 	int moveTimer;
 	Vec2<float>initScale;
+
+	//ボスのパラメーター変更
+	int bossImGuiHandle;
 public:
 	/*===== 定数 =====*/
 
