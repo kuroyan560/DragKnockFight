@@ -34,12 +34,18 @@ void CharacterInterFace::SwingUpdate()
 		// 現在のベクトルを求める。
 		easeNowVec.y = swingStartVec.y + (easeAmount * (swingEndVec.y - swingStartVec.y));
 		if (easeNowVec.y < 0) {
-			easeNowVec.x = 1.0f + easeNowVec.y;
+			easeNowVec.x = (1.0f + easeNowVec.y) * (signbit(swingStartVec.x) ? -1 : 1);
 		}
 		else {
-			easeNowVec.x = 1.0f - easeNowVec.y;
+			easeNowVec.x = (1.0f - easeNowVec.y) * (signbit(swingStartVec.x) ? -1 : 1);
 		}
+
+		// easeNowVecのX成分が初期値より低くなると、ガクッとなってしまうので修正。
+		if (0 < easeNowVec.x && easeNowVec.x < swingStartVec.x) easeNowVec.x = swingStartVec.x;
+		if (easeNowVec.x < 0 && swingStartVec.x < easeNowVec.x) easeNowVec.x = swingStartVec.x;
+
 		easeNowVec.Normalize();
+
 	}
 
 	const float lineLength = LINE_LENGTH * 2 + addLineLength + partner.lock()->addLineLength;
@@ -92,31 +98,6 @@ void CharacterInterFace::CrashUpdate()
 
 		partner.lock()->nowSwing = false;
 	}
-
-	// マップチップにあたっている状態で画面外に出たら
-	if (stuckWindowTimer <= 0)
-	{
-		Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
-		windowSize *= Vec2<int>(2, 2);
-
-		// ウィンドウ左右
-		bool winLeft = pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x <= 0;
-		bool winRight = windowSize.x <= pos.x + size.x - ScrollMgr::Instance()->scrollAmount.x;
-		if (winRight || winLeft) {
-
-			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			Crash({ winRight ? 1.0f : -1.0f , 0.0f });
-		}
-
-		// ウィンドウ上下
-		bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
-		bool winBottom = windowSize.y <= pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y;
-		if (winBottom || winTop) {
-
-			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-			Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
-		}
-	}
 }
 
 void CharacterInterFace::SwingPartner()
@@ -149,10 +130,10 @@ void CharacterInterFace::SwingPartner()
 
 void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine)
 {
-	if(intersectedLine == INTERSECTED_LINE::INTERSECTED_TOP) isHitTop = true;
-	if(intersectedLine == INTERSECTED_LINE::INTERSECTED_BOTTOM) isHitBottom = true;
-	if(intersectedLine == INTERSECTED_LINE::INTERSECTED_LEFT) isHitLeft = true;
-	if(intersectedLine == INTERSECTED_LINE::INTERSECTED_RIGHT) isHitRight = true;
+	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_TOP) isHitTop = true;
+	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_BOTTOM) isHitBottom = true;
+	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_LEFT) isHitLeft = true;
+	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_RIGHT) isHitRight = true;
 }
 
 void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
@@ -488,10 +469,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 			Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
 			windowSize *= Vec2<int>(2, 2);
-
-			// ボスとプレイヤーの距離
-			float distanceX = fabs(LineCenterPos.x - pos.x);
-			float disntaceY = fabs(LineCenterPos.y - pos.y);
 
 			// ウィンドウ左右
 			bool winLeft = pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x <= 0;
