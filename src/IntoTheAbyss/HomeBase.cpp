@@ -50,7 +50,7 @@ void HomeBase::Draw()
 {
 	Vec2<float>drawLeftUpPos = ScrollMgr::Instance()->Affect(leftUpPos);
 	Vec2<float>drawRightDownPos = ScrollMgr::Instance()->Affect(rightDownPos);
-	
+
 	static const int AREA_ALPHA = 100;
 	static Color PLAYER_COLOR = Color(47, 255, 139, AREA_ALPHA);
 	static Color ENEMY_COLOR = Color(239, 1, 144, AREA_ALPHA);
@@ -78,11 +78,11 @@ void HomeBase::Draw()
 			borderFromPos.x = rightDownPos.x;
 			borderFromPos.x -= BORDER_GRAPH_WIDTH / 2.0f;
 		}
-		
+
 		borderFromPos.y = borderHeight[i];
 		Vec2<float>borderToPos = borderFromPos;
 		borderToPos.y += BORDER_GRAPH_HEIGHT;
-		DrawFunc_Mask::DrawLine2DGraph(ScrollMgr::Instance()->Affect(borderFromPos), 
+		DrawFunc_Mask::DrawLine2DGraph(ScrollMgr::Instance()->Affect(borderFromPos),
 			ScrollMgr::Instance()->Affect(borderToPos), TexHandleMgr::GetTexBuffer(leftPlayer ? PLAYER_BORDER : ENEMY_BORDER), BORDER_GRAPH_WIDTH, drawLeftUpPos, drawRightDownPos);
 		//DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(borderFromPos), ScrollMgr::Instance()->Affect(borderToPos), TexHandleMgr::GetTexBuffer(leftPlayer ? PLAYER_BORDER : ENEMY_BORDER), BORDER_GRAPH_WIDTH);
 	}
