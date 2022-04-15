@@ -659,6 +659,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
 	// プレイヤーとボス間に線を描画
+	if(roundChangeEffect.initFlag)
 	{
 		Vec2<float> playerBossDir = rightCharacter->pos - leftCharacter->pos;
 		playerBossDir.Normalize();
