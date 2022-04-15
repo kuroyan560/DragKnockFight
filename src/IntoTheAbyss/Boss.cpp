@@ -18,7 +18,8 @@
 
 #include"ParticleMgr.h"
 
-Boss::Boss():CharacterInterFace(SCALE)
+static const Vec2<float> SCALE = { 80.0f,80.0f };
+Boss::Boss() :CharacterInterFace(SCALE)
 {
 
 	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy.png");

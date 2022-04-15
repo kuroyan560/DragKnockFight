@@ -27,6 +27,8 @@ Vec2<float> Player::GetGeneratePos()
 	return WinApp::Instance()->GetExpandWinCenter() * Vec2<float>(1.0f, 0.25f);
 }
 
+static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
+static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 Player::Player() :CharacterInterFace(PLAYER_HIT_SIZE)
 {
 	/*====== コンストラクタ =====*/

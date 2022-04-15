@@ -275,10 +275,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	lineCenterPos = responePos;
 	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
-	const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-	leftCharacter->Init(responePos - Vec2<float>(150.0f, 0.0f), PLAYER_HIT_SIZE);
-	const Vec2<float> BOSS_SCALE = { 80.0f,80.0f };
-	rightCharacter->Init(responePos + Vec2<float>(150.0f, 0.0f), BOSS_SCALE);
+	leftCharacter->Init(responePos - Vec2<float>(150.0f, 0.0f));
+	rightCharacter->Init(responePos + Vec2<float>(150.0f, 0.0f));
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 

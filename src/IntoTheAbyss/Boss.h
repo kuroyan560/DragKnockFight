@@ -48,7 +48,7 @@ public:
 public:
 	/*===== ’è” =====*/
 
-	const Vec2<float> SCALE = { 80.0f,80.0f };
+	//const Vec2<float> SCALE = { 80.0f,80.0f };
 	const float OFFSET_VEL = 2.0f;
 	const float OFFSET_INERTIA = 30.0f;		// U‚è‰ñ‚µ‚ÌŠµ«
 	const int AFTER_SWING_DELAY = 15;
