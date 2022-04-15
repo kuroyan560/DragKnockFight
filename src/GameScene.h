@@ -1,10 +1,9 @@
 #pragma once
 #include"KuroEngine.h"
 #include"LightManager.h"
-
 #include"IntoTheAbyss/Game.h"
 #include"IntoTheAbyss/SceneCange.h"
-#include<memory>
+
 
 class Sprite;
 class GaussianBlur;
@@ -19,7 +18,6 @@ class GameScene : public BaseScene
 	Game game;
 	float addValue;
 	bool isSS;		// スクショを撮るかのフラグ
-
 	std::shared_ptr<SceneCange>sceneChange;
 public:
 	GameScene();

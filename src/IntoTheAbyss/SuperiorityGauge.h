@@ -79,4 +79,6 @@ private:
 	void LimitGauge();
 	//デバック用
 	float oldMaxGauge;
+
+	int imguiHandle;
 };

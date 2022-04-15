@@ -35,8 +35,10 @@ private:
 
 	// イージングに使用するタイマー
 	const float ADD_EASING_TIMER = 0.01f;
-	const float EASING_MOVE = 30.0f;
 	const int PERSSSTART_TIMER = 50;
+	const float EASING_MOVE_STAR = 10.0f;
+	const float EASING_MOVE_CHAR = 20.0f;
+	const float EASING_MOVE_TITLE = 30.0f;
 
 
 public:

@@ -28,7 +28,7 @@ struct BossBulletData
 class CharacterInterFace;
 struct BossPatternData
 {
-	Vec2<float>*bossPos;
+	Vec2<float>*moveVel;
 	std::array<BossBulletData, 100>bulltData;
 };
 

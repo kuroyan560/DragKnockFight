@@ -13,6 +13,7 @@
 #include"TexHandleMgr.h"
 #include"BossPatternNormalMove.h"
 #include"BossPatternAttack.h"
+#include"BossPatternSwing.h"
 #include"BossBulletManager.h"
 #include"CrashMgr.h"
 
@@ -27,10 +28,11 @@ Boss::Boss() :CharacterInterFace(SCALE)
 
 	bossPattern[0] = std::make_unique<BossPatternNormalMove>();
 	bossPattern[1] = std::make_unique<BossPatternAttack>();
+	bossPattern[2] = std::make_unique<BossPatternSwing>();
 
 
 	//パターンに渡すデータの初期化
-	patternData.bossPos = &moveVel;
+	patternData.moveVel = &moveVel;
 
 	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 	patternTimer = 0;

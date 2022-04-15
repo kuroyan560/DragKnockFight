@@ -94,6 +94,10 @@ public:
 	int swingCoolTime;
 	const int SWING_COOLTIME = 60;
 
+	// ’e‚ÉŠÖ‚·‚é’è”
+	const int BULLET_SHOT_COUNT = 5;
+	const float BULLET_SHOT_ANGLE = 0.1f;
+
 	// ƒvƒŒƒCƒ„[‚Ì•ûŒü
 	enum PLAYER_DIR {
 

@@ -39,7 +39,12 @@
 #include "CharacterInterFace.h"
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+
+#include"DebugParameter.h"
+
+#include"DebugKeyManager.h"
+
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -65,7 +70,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -101,7 +106,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				if (height < 0 || mapChipDrawData.size() <= height) continue;
 				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
@@ -160,7 +165,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -178,7 +183,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -492,14 +497,14 @@ void Game::Update()
 		ScrollMgr::Instance()->Warp(responePos);
 
 		//プレイヤーと敵の座標初期化
-		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initFlag)
+		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initGameFlag)
 		{
-			roundChangeEffect.initFlag = true;
+			roundChangeEffect.initGameFlag = true;
 			AudioApp::Instance()->PlayWave(bgm, true);
 		}
 
 		//登場演出
-		if (roundChangeEffect.initFlag)
+		if (roundChangeEffect.initGameFlag)
 		{
 			bool leftAppear = leftCharacter->Appear();
 			bool rightApperar = rightCharacter->Appear();
@@ -583,7 +588,7 @@ void Game::Update()
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
 		if (hitFlag && initFlag)
 		{
-			SuperiorityGauge::Instance()->AddEnemyGauge(1.0f);
+			SuperiorityGauge::Instance()->AddEnemyGauge(DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
 			BossBulletManager::Instance()->GetBullet(index)->Init();
 		}
 	}
@@ -598,7 +603,7 @@ void Game::Update()
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
 		if (hitFlag && initFlag)
 		{
-			SuperiorityGauge::Instance()->AddPlayerGauge(1.0f);
+			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
 			BulletMgr::Instance()->GetBullet(index)->Init();
 		}
 	}
@@ -652,7 +657,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
 	// プレイヤーとボス間に線を描画
-	if(roundChangeEffect.initFlag)
+	if(roundChangeEffect.initGameFlag)
 	{
 		Vec2<float> playerBossDir = rightCharacter->pos - leftCharacter->pos;
 		playerBossDir.Normalize();
@@ -692,7 +697,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	roundChangeEffect.Draw();
 
-	if (roundChangeEffect.initFlag)
+	if (roundChangeEffect.initGameFlag)
 	{
 		leftCharacter->Draw();
 		rightCharacter->Draw();
@@ -750,8 +755,8 @@ void Game::Scramble()
 	float LINE = CharacterInterFace::LINE_LENGTH * 2 + (leftCharacter->addLineLength + rightCharacter->addLineLength);
 
 	// 気にしないでください！
-	bool isBoss = false;
-	bool isPlayer = false;
+	bool isBoss = true;
+	bool isPlayer = true;
 
 	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
 	if (playerVelGauge.Length() < bossVelGauge.Length()) {
@@ -831,7 +836,7 @@ void Game::Scramble()
 	}
 	else {
 
-		return;
+		//return;
 
 	}
 
@@ -865,6 +870,9 @@ void Game::Scramble()
 
 	}
 
+	isCatchMapChipBoss = false;
+	isCatchMapChipPlayer = false;
+
 	// 紐の中心点を計算
 	{
 		float distance = (rightCharacter->pos - leftCharacter->pos).Length();
@@ -882,9 +890,6 @@ void Game::Scramble()
 			lineCenterPos = leftCharacter->pos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
 		}
 	}
-
-	isCatchMapChipBoss = false;
-	isCatchMapChipPlayer = false;
 
 }
 
