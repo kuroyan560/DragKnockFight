@@ -13,11 +13,16 @@
 #include"TexHandleMgr.h"
 #include"BossPatternNormalMove.h"
 #include"BossPatternAttack.h"
+#include"BossPatternSwing.h"
 #include"BossBulletManager.h"
 #include"CrashMgr.h"
 #include"CharacterInterFace.h"
 
 #include"ParticleMgr.h"
+#include"DebugKeyManager.h"
+
+#include"DebugParameter.h"
+
 
 static const Vec2<float> SCALE = { 80.0f,80.0f };
 Boss::Boss() :CharacterInterFace(SCALE)
@@ -28,13 +33,13 @@ Boss::Boss() :CharacterInterFace(SCALE)
 
 	bossPattern[0] = std::make_unique<BossPatternNormalMove>();
 	bossPattern[1] = std::make_unique<BossPatternAttack>();
+	bossPattern[2] = std::make_unique<BossPatternSwing>();
 
 
 	//パターンに渡すデータの初期化
-	patternData.bossPos = &moveVel;
+	patternData.moveVel = &moveVel;
 
-	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
-	patternTimer = 0;
+
 }
 
 void Boss::OnInit()
@@ -43,13 +48,16 @@ void Boss::OnInit()
 
 	initScale = SCALE * 5.0f;
 	size = initScale;
-	moveVel = { OFFSET_VEL,0 };
+	moveVel = { 0,0 };
 	swingInertia = 0;
 	swingInertiaVec = {};
 	afterSwingDelay = 0;
 	prevIntersectedLine = INTERSECTED_NONE;
 	moveTimer = 0;
 	initPaticleFlag = false;
+
+	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
+	patternTimer = 0;
 }
 
 #include"Camera.h"
@@ -62,6 +70,13 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	//	moveVel = { 0,0 };
 	//	return;
 	//}
+
+	if (bossPatternNow != BOSS_PATTERN_NORMALMOVE)
+	{
+		moveVel = { 10.0f,0.0f };
+	}
+
+
 
 	for (int i = 0; i < patternData.bulltData.size(); ++i)
 	{
@@ -85,17 +100,23 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 
 		//ボスのAI-----------------------
 		++patternTimer;
+		//次の状態選択
 		if (120 <= patternTimer)
 		{
-			if (atackModeFlag)
+			Vec2<float> dir = GetPartnerPos() - pos;
+			dir.Normalize();
+
+			while (1)
 			{
-				bossPatternNow = BOSS_PATTERN_ATTACK;
+				int random = KuroFunc::GetRand(BOSS_PATTERN_MAX - 1);
+				//振り回しの条件がそろっていない時は振り回しをさせない
+				if (fabs(dir.y) <= 0.3f && random == BOSS_PATTERN_SWING)
+				{
+					continue;
+				}
+				bossPatternNow = static_cast<E_BossPattern>(random);
+				break;
 			}
-			else
-			{
-				bossPatternNow = BOSS_PATTERN_NORMALMOVE;
-			}
-			atackModeFlag = !atackModeFlag;
 			patternTimer = 0;
 		}
 		//ボスのAI-----------------------
@@ -117,21 +138,37 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 			}
 		}
 	}
+	DebugParameter::Instance()->bossDebugData.bossNowStatus = static_cast<E_BossPattern>(bossPatternNow);
+
+
+	//振り回しの開始ベクトルを取得。
+	//if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_O, "SwingBoss", TO_STRING(DIK_O)))
+	if (patternData.swingFlag)
+	{
+		Vec2<float> dir = GetPartnerPos() - pos;
+		dir.Normalize();
+
+		// 振り回しのトリガー判定
+		if (0.3f < fabs(dir.y))
+		{
+			SwingPartner();
+		}
+	}
+
+
+	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
+
 	// 移動量の総量を求める。
-
 	auto swingAffect = GetSwingInertia();
-	if (GetSwingRigor()) {
-
+	if (GetSwingRigor())
+	{
 		// 振り回し直後の硬直が残っている場合は、慣性のみを移動量とする。
 		vel = swingAffect;
-
 	}
-	else {
-
+	else
+	{
 		vel = moveVel + swingAffect;
-
 	}
-
 }
 
 #include"DrawFunc_FillTex.h"

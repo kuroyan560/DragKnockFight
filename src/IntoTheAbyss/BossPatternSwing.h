@@ -1,16 +1,17 @@
 #pragma once
 #include"../IntoTheAbyss/IBossPattern.h"
+#include"../Common/Vec.h"
 
-class BossPatternNormalMove :public IBossPattern
+class BossPatternSwing :public IBossPattern
 {
 public:
-	BossPatternNormalMove();
-	~BossPatternNormalMove() {};
+	BossPatternSwing();
+	~BossPatternSwing() {};
 
 	void Init()override;
 	void Update(BossPatternData *DATA)override;
 
 private:
-	int PULL_TIMER;
+	bool initSwingFlag;
 };
 

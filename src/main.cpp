@@ -11,6 +11,7 @@
 #include"IntoTheAbyss/TitleScene.h"
 #include"ResultScene.h"
 #include"StageSelectScene.h"
+#include"IntoTheAbyss/DebugKeyManager.h"
 
 
 #ifdef _DEBUG
@@ -53,6 +54,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//ƒ‹[ƒv
 	while (1)
 	{
+		DebugKeyManager::Instance()->CountReset();
+
 		KuroEngine::Instance().Update();
 		KuroEngine::Instance().Draw();
 

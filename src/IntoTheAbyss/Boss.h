@@ -33,11 +33,13 @@ public:
 	{
 		BOSS_PATTERN_NONE = -1,
 		BOSS_PATTERN_NORMALMOVE,
-		BOSS_PATTERN_ATTACK
+		BOSS_PATTERN_ATTACK,
+		BOSS_PATTERN_SWING,
+		BOSS_PATTERN_MAX
 	};
 	E_BossPattern bossPatternNow, oldBossPattern;
 	BossPatternData patternData;
-	std::array<std::unique_ptr<IBossPattern>, 2>bossPattern;
+	std::array<std::unique_ptr<IBossPattern>, BOSS_PATTERN_MAX>bossPattern;
 	int patternTimer;
 	bool atackModeFlag;
 	//ボスのパターン制御-----------------------
@@ -45,6 +47,9 @@ public:
 	bool initPaticleFlag;
 	int moveTimer;
 	Vec2<float>initScale;
+
+	//ボスのパラメーター変更
+	int bossImGuiHandle;
 public:
 	/*===== 定数 =====*/
 
@@ -53,6 +58,8 @@ public:
 	const float OFFSET_INERTIA = 30.0f;		// 振り回しの慣性
 	const int AFTER_SWING_DELAY = 15;
 	const int STRUCK_WINDOW_TIMER = 120.0f;
+
+	const float SWING_DISTANCE_DEADLINE = 200.0f;	//プレイヤーを振り回す距離のデットライン
 
 	std::array<Bullet, 200> bullts;
 
