@@ -17,12 +17,6 @@ class CharacterInterFace
 	const int STRUCK_WINDOW_TIMER = 120.0f;// ウィンドウに挟まったタイマー
 	int stuckWindowTimer;		// ウィンドウに挟まったタイマー
 
-	//振り回し処理
-	bool nowSwing;
-	Vec2<float>swingStartVec;
-	Vec2<float>swingEndVec;
-	float swingEaseRate;
-
 	//陣地との判定
 	Square areaHitBox;
 
@@ -33,6 +27,14 @@ class CharacterInterFace
 	Vec2<float> swingInertiaVec;// 振り回しの慣性の移動方向
 	float swingInertia;			// 振り回しの慣性
 	int afterSwingDelay;		// 振り回しのあとにボスを少し動けない状態にするためのタイマー
+
+protected:
+
+	//振り回し処理
+	bool nowSwing;
+	Vec2<float>swingStartVec;
+	Vec2<float>swingEndVec;
+	float swingEaseRate;
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
@@ -67,7 +69,7 @@ protected:
 	//当たり判定
 	void CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
 	//ゲッタ類
-	const Vec2<float>& GetPartnerPos() 
+	const Vec2<float>& GetPartnerPos()
 	{
 		return partner.lock()->pos;
 	}
@@ -98,5 +100,7 @@ public:
 	const int& GetStackWinTimer() { return stuckWindowTimer; }
 	const bool& GetNowSwing() { return nowSwing; }
 	const bool& GetNowStuckWin() { return 0 < stuckWindowTimer; }
+
+	inline void FinishSwing() { nowSwing = false; }
 };
 

@@ -3,6 +3,7 @@
 #include"WinApp.h"
 #include"SuperiorityGauge.h"
 #include"ScrollMgr.h"
+#include"DebugParameter.h"
 
 void CharacterInterFace::SwingUpdate()
 {
@@ -432,6 +433,89 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 
 
+		// 一定以下だったらダメージを与えない。
+		if (partner.lock()->swingEaseRate <= 0.2f) {
+
+			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
+			Vec2<float>vec = { 0,0 };
+			if (partner.lock()->GetNowSwing()) {
+
+				if (isHitLeft)vec.x = -1.0f;
+				else if (isHitRight)vec.x = 1.0f;
+				if (isHitTop)vec.y = -1.0f;
+				else if (isHitBottom)vec.y = 1.0f;
+
+				/*Crash(vec);
+
+				SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);*/
+				partner.lock()->FinishSwing();
+
+			}
+
+		}
+		else {
+
+			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
+			Vec2<float>vec = { 0,0 };
+			if (partner.lock()->GetNowSwing()) {
+
+				if (isHitLeft)vec.x = -1.0f;
+				else if (isHitRight)vec.x = 1.0f;
+				if (isHitTop)vec.y = -1.0f;
+				else if (isHitBottom)vec.y = 1.0f;
+
+				Crash(vec);
+				//CrashMgr::Instance()->Crash(pos, crashDevice, ext);
+				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
+				SuperiorityGauge::Instance()->AddPlayerGauge(10);
+				partner.lock()->FinishSwing();
+			}
+		}
+
+		// 壁はさみの判定
+		if (stuckWindowTimer <= 0) {
+
+			Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
+			windowSize *= Vec2<int>(2, 2);
+
+			// ボスとプレイヤーの距離
+			float distanceX = fabs(LineCenterPos.x - pos.x);
+			float disntaceY = fabs(LineCenterPos.y - pos.y);
+
+			// ウィンドウ左右
+			bool winLeft = pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x <= 0;
+			bool winRight = windowSize.x <= pos.x + size.x - ScrollMgr::Instance()->scrollAmount.x;
+			if (winRight || winLeft) {
+
+				stuckWindowTimer = STRUCK_WINDOW_TIMER;
+
+
+				//CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
+				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
+				SuperiorityGauge::Instance()->AddPlayerGauge(20);
+				Crash({ winRight ? 1.0f : -1.0f , 0.0f });
+			}
+			// ウィンドウ上下
+			bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
+			bool winBottom = windowSize.y <= pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y;
+			if (winBottom || winTop) {
+
+				stuckWindowTimer = STRUCK_WINDOW_TIMER;
+
+				//CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
+				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
+				SuperiorityGauge::Instance()->AddPlayerGauge(20);
+				Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
+			}
+		}
+
+	}
+
+	//prevIntersectedLine = intersectedBuff;
+
+	if (0 < stuckWindowTimer) {
+
+		--stuckWindowTimer;
 
 	}
 }

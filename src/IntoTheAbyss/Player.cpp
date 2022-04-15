@@ -83,6 +83,8 @@ void Player::OnInit()
 	stretch_RB = { 0.0f,0.0f };
 	stretchTimer = STRETCH_RETURN_TIME;
 
+	swingEaseRate = 0;
+
 	drawCursorFlag = true;
 
 	swingCoolTime = 0;
@@ -278,7 +280,7 @@ void Player::OnHitMapChip(const HIT_DIR& Dir)
 		// 移動量が一定以下になったら0にする。
 		if (fabs(vel.x) <= 1.0f) vel.x = 0;
 	}
-	else if(Dir == LEFT)
+	else if (Dir == LEFT)
 	{
 		stretch_LU.x = 0.0f;
 
@@ -579,7 +581,7 @@ void Player::PushBackWall()
 
 }
 
-void Player::CalculateStretch(const Vec2<float> &Move)
+void Player::CalculateStretch(const Vec2<float>& Move)
 {
 	Vec2<float> stretchRate = { abs(Move.x / MAX_RECOIL_AMOUNT),abs(Move.y / MAX_RECOIL_AMOUNT) };
 
@@ -674,7 +676,7 @@ Vec2<float> Player::GetPlayerGraphSize()
 	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 }
 
-void Player::CheckHitMapChipVel(const Vec2<float> &checkPos, const vector<vector<int>> &MapData)
+void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& MapData)
 {
 	// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
 	//Vec2<float> upperPlayerPos = pos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);

@@ -15,6 +15,7 @@
 #include"BossPatternAttack.h"
 #include"BossBulletManager.h"
 #include"CrashMgr.h"
+#include"CharacterInterFace.h"
 
 #include"ParticleMgr.h"
 
