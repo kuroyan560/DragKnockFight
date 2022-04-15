@@ -36,6 +36,8 @@
 #include "Player.h"
 #include "Boss.h"
 
+#include "CharacterInterFace.h"
+
 #include<map>
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
@@ -272,8 +274,11 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	responePos -= 100;
 
 	lineCenterPos = responePos;
-	leftCharacter->Init(responePos - Vec2<float>(150.0f, 0.0f));
-	rightCharacter->Init(responePos + Vec2<float>(150.0f, 0.0f));
+	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
+	const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+	leftCharacter->Init(responePos - Vec2<float>(150.0f, 0.0f), PLAYER_HIT_SIZE);
+	const Vec2<float> BOSS_SCALE = { 80.0f,80.0f };
+	rightCharacter->Init(responePos + Vec2<float>(150.0f, 0.0f), BOSS_SCALE);
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
@@ -335,7 +340,7 @@ void Game::Init()
 	WinCounter::Instance()->Reset();
 
 	turnResultScene = false;
-	
+
 	leftCharacter = std::make_shared<Player>();
 	rightCharacter = std::make_shared<Boss>();
 
@@ -661,7 +666,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		playerBossDir.Normalize();
 		Vec2<float> playerDefLength = leftCharacter->pos + playerBossDir * leftCharacter->addLineLength;
 
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftCharacter->pos), ScrollMgr::Instance()->Affect(playerDefLength + playerBossDir * leftCharacter->addLineLength),
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftCharacter->pos), ScrollMgr::Instance()->Affect(lineCenterPos),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 
 
@@ -681,7 +686,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(rightCharacter->pos), ScrollMgr::Instance()->Affect(bossDefLength + bossPlayerDir * rightCharacter->addLineLength),
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(rightCharacter->pos), ScrollMgr::Instance()->Affect(lineCenterPos),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom * lineExtendScale);
 
 		// 線分の中心に円を描画
@@ -869,10 +874,20 @@ void Game::Scramble()
 
 	// 紐の中心点を計算
 	{
+		float distance = (rightCharacter->pos - leftCharacter->pos).Length();
 		Vec2<float> bossDir = rightCharacter->pos - leftCharacter->pos;
 		bossDir.Normalize();
-		float playerLineLength = CharacterInterFace::LINE_LENGTH + leftCharacter->addLineLength;
-		lineCenterPos = leftCharacter->pos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
+
+		// ボスとプレイヤー間の距離が規定値以下だったら
+		if (distance < CharacterInterFace::LINE_LENGTH + CharacterInterFace::LINE_LENGTH) {
+			// 既定値以下だったら団子化減少を防ぐために、二点間の真ん中の座標にする。
+			lineCenterPos = leftCharacter->pos + bossDir * Vec2<float>(distance / 2.0f, distance / 2.0f);
+		}
+		else {
+			// 規定値以上だったら普通に場所を求める。
+			float playerLineLength = leftCharacter->LINE_LENGTH + leftCharacter->addLineLength;
+			lineCenterPos = leftCharacter->pos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
+		}
 	}
 
 	isCatchMapChipBoss = false;
