@@ -39,7 +39,7 @@
 #include "CharacterInterFace.h"
 
 #include<map>
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -65,7 +65,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -101,7 +101,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				if (height < 0 || mapChipDrawData.size() <= height) continue;
 				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
@@ -160,7 +160,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -178,7 +178,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -439,6 +439,14 @@ void Game::Update()
 		roundFinishFlag = true;
 		playerOrEnemeyWinFlag = false;
 		gameStartFlag = false;
+
+		areaHitColor = Color(255, 0, 0, 255);
+		playerHitColor = Color(255, 0, 0, 255);
+	}
+	else if (!roundFinishFlag)
+	{
+		areaHitColor = Color(255, 255, 255, 255);
+		playerHitColor = Color(255, 255, 255, 255);
 	}
 
 	//ラウンド終了演出開始
@@ -722,6 +730,24 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	WinCounter::Instance()->Draw();
 
 	StunEffect::Instance()->Draw();
+
+	{
+		Vec2<float>leftUpPos = *rightCharacter->GetAreaHitBox().center - rightCharacter->GetAreaHitBox().size / 2.0f;
+		Vec2<float>rightDownPos = *rightCharacter->GetAreaHitBox().center + rightCharacter->GetAreaHitBox().size / 2.0f;
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), Color(255,255,255,255), DXGI_FORMAT_R8G8B8A8_UNORM);
+	}
+
+	{
+		Vec2<float>leftUpPos = *leftCharacter->GetAreaHitBox().center - leftCharacter->GetAreaHitBox().size / 2.0f;
+		Vec2<float>rightDownPos = *leftCharacter->GetAreaHitBox().center + leftCharacter->GetAreaHitBox().size / 2.0f;
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), playerHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
+	}
+
+	{
+		Vec2<float>leftUpPos = *enemyHomeBase->hitBox.center - enemyHomeBase->hitBox.size / 2.0f;
+		Vec2<float>rightDownPos = *enemyHomeBase->hitBox.center + enemyHomeBase->hitBox.size / 2.0f;
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
+	}
 }
 
 void Game::Scramble()
