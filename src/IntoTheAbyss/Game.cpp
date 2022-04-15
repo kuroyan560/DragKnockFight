@@ -503,11 +503,17 @@ void Game::Update()
 			roundChangeEffect.initFlag = true;
 		}
 
-		if (leftCharacter->Appear() && rightCharacter->Appear() && roundChangeEffect.initFlag)
+		//“oê‰‰o
+		if (roundChangeEffect.initFlag)
 		{
-			readyToStartRoundFlag = false;
-			gameStartFlag = true;
-			roundTimer = 0;
+			bool leftAppear = leftCharacter->Appear();
+			bool rightApperar = rightCharacter->Appear();
+			if (leftAppear && rightApperar)	//‚Ç‚¿‚ç‚ÌƒLƒƒƒ‰‚à“oê‰‰oŠ®—¹
+			{
+				readyToStartRoundFlag = false;
+				gameStartFlag = true;
+				roundTimer = 0;
+			}
 		}
 		//gameStartFlag = true;
 		//SelectStage::Instance()->resetStageFlag = true;
@@ -689,8 +695,11 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	roundChangeEffect.Draw();
 
-	leftCharacter->Draw();
-	rightCharacter->Draw();
+	if (roundChangeEffect.initFlag)
+	{
+		leftCharacter->Draw();
+		rightCharacter->Draw();
+	}
 
 	BossBulletManager::Instance()->Draw();
 
