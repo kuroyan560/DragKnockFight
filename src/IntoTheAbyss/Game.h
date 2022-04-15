@@ -109,6 +109,9 @@ class Game
 
 	bool turnResultScene = false;
 
+
+	Color areaHitColor;
+	Color playerHitColor;
 public:
 
 	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;
