@@ -12,7 +12,7 @@ class ConstantBuffer;
 class TextureBuffer;
 class LightManager;
 
-static const enum PARTICLE_TYPE { DASH, BULLET, HIT_MAP, FIRST_DASH, FIRST_DASH_DOUJI, DOSSUN, CRASH };
+static const enum PARTICLE_TYPE { DASH, BULLET, CRASH };
 
 class ParticleMgr : public Singleton<ParticleMgr>
 {
@@ -75,7 +75,7 @@ class ParticleMgr : public Singleton<ParticleMgr>
 public:
 	void Init();
 	void Update();
-	void Draw(LightManager& LigManager);
+	void Draw();
 
 	// ê∂ê¨èàóù
 	void Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const PARTICLE_TYPE& Type);

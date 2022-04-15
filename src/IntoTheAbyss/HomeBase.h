@@ -13,12 +13,13 @@ public:
 	void Draw();
 	void Debug();
 
+
+	Square hitBox;
 private:
 	Vec2<float>leftUpPos, rightDownPos, centerPos;
 	static int AREA_NUM;
 	std::string name;
 
-	Square hitBox;
 
 	bool leftPlayer;
 	

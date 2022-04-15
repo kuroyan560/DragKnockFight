@@ -1,5 +1,4 @@
 #include "ScrollMgr.h"
-#include "ViewPort.h"
 #include"../Engine/WinApp.h"
 
 void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, const Vec2<float> &ADJ)

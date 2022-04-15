@@ -9,8 +9,6 @@ class TextureBuffer;
 class StructuredBuffer;
 #include<vector>
 
-class LightManager;
-
 struct ChipData
 {
 	Vec2<float>pos;
@@ -35,6 +33,5 @@ class DrawMap
 public:
 	DrawMap();
 	void AddChip(const Vec2<float>& Pos, const float& Radian);
-	void Draw(LightManager& LigManager, const std::shared_ptr<TextureBuffer>& Tex,
-		const std::shared_ptr<TextureBuffer>& NormalMap = nullptr, const std::shared_ptr<TextureBuffer>& EmissiveMap = nullptr);
+	void Draw(const std::shared_ptr<TextureBuffer>& Tex,const std::shared_ptr<TextureBuffer>& NormalMap = nullptr, const std::shared_ptr<TextureBuffer>& EmissiveMap = nullptr);
 };

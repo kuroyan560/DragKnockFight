@@ -83,6 +83,10 @@ void CSmain(uint3 DTid : SV_DispatchThreadID)
             //v.alpha = Easing_Circ_In(t, v.lifeSpan / 2.0f, 1.0f, 0.0f);
         }
     }
+    else if(v.type == 3)
+    {
+        
+    }
     
     v.life++;
     if (v.lifeSpan <= v.life)
@@ -209,25 +213,15 @@ void GSmain(
 }
 
 #include"Engine/LightInfo.hlsli"
-cbuffer cbuff2 : register(b2)
-{
-    LightInfo ligNum; //アクティブ中のライトの数の情報
-}
-
-StructuredBuffer<DirectionLight> dirLight : register(t0);
-StructuredBuffer<PointLight> pointLight : register(t1);
-StructuredBuffer<SpotLight> spotLight : register(t2);
-StructuredBuffer<HemiSphereLight> hemiSphereLight : register(t3);
-
-Texture2D<float4> tex0 : register(t4);
-Texture2D<float4> tex1 : register(t5);
-Texture2D<float4> tex2 : register(t6);
-Texture2D<float4> tex3 : register(t7);
-Texture2D<float4> tex4 : register(t8);
-Texture2D<float4> tex5 : register(t9);
-Texture2D<float4> tex6 : register(t10);
-Texture2D<float4> tex7 : register(t11);
-Texture2D<float4> tex8 : register(t12);
+Texture2D<float4> tex0 : register(t0);
+Texture2D<float4> tex1 : register(t1);
+Texture2D<float4> tex2 : register(t2);
+Texture2D<float4> tex3 : register(t3);
+Texture2D<float4> tex4 : register(t4);
+Texture2D<float4> tex5 : register(t5);
+Texture2D<float4> tex6 : register(t6);
+Texture2D<float4> tex7 : register(t7);
+Texture2D<float4> tex8 : register(t8);
 SamplerState smp : register(s0);
 
 struct PSOutput

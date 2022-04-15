@@ -6,10 +6,6 @@
 //#include"BulletParticleMgr.h"
 #include "StunEffect.h"
 #include "SlowMgr.h"
-#include "SwingMgr.h"
-#include"AuraBlock.h"
-#include"ViewPort.h"
-#include"MovingBlockMgr.h"
 #include"Bullet.h"
 #include"Collider.h"
 #include"SightCollisionStorage.h"
@@ -37,14 +33,12 @@
 #include"CrashMgr.h"
 
 #include"ResultTransfer.h"
+#include "Player.h"
+#include "Boss.h"
 
+#include "CharacterInterFace.h"
 
 #include<map>
-
-#include"DebugParameter.h"
-
-#include"DebugKeyManager.h"
-
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
@@ -161,7 +155,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 		{
 			drawMap[i].AddChip(itr->second[chipIdx].pos, itr->second[chipIdx].radian);
 		}
-		drawMap[i].Draw(ligMgr, TexHandleMgr::GetTexBuffer(itr->first), nullptr, nullptr);
+		drawMap[i].Draw(TexHandleMgr::GetTexBuffer(itr->first), nullptr, nullptr);
 		i++;
 	}
 }
@@ -188,7 +182,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
-	AudioApp::Instance()->PlayWave(bgm, true);
+	AudioApp::Instance()->StopWave(bgm);
 
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
@@ -197,87 +191,12 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 
 	FaceIcon::Instance()->Init();
 
-	//ドアが繋がっているか確認
-	if (!SelectStage::Instance()->resetStageFlag && false)
-	{
-		RoomMapChipArray tmpMap = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
-		std::vector<std::unique_ptr<DoorBlock>> tmpDoor;
-		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
-		for (int doorIndex = chipMemorySize.min; doorIndex < chipMemorySize.max; ++doorIndex)
-		{
-			std::vector<std::unique_ptr<MassChipData>> data = AddData(tmpMap, doorIndex);
-			for (int i = 0; i < data.size(); ++i)
-			{
-				tmpDoor.push_back(std::make_unique<DoorBlock>());
-				int doorBlocksArrayNum = tmpDoor.size() - 1;
-				tmpDoor[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex, data[i]->sideOrUpDownFlag);
-			}
-		}
-
-		bool responeErrorFlag = true;
-		for (int tmpDoorIndex = 0; tmpDoorIndex < tmpDoor.size(); ++tmpDoorIndex)
-		{
-			if (tmpDoor[tmpDoorIndex]->chipNumber == doorNumber)
-			{
-				responeErrorFlag = false;
-			}
-		}
-
-		if (responeErrorFlag)
-		{
-			string result = "次につながるドアが見つかりません。\nRalationファイルを確認するか、担当の大石に連絡をください。";
-			MessageBox(NULL, KuroFunc::GetWideStrFromStr(result).c_str(), TEXT("ドアが見つかりません"), MB_OK);
-			stageNum = oldStageNum;
-			roomNum = oldRoomNum;
-			SelectStage::Instance()->SelectStageNum(oldStageNum);
-			SelectStage::Instance()->SelectRoomNum(oldRoomNum);
-			sceneLightFlag = false;
-		}
-	}
-
-
 	mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 
 	// シェイク量を設定。
 	ShakeMgr::Instance()->Init();
 	ParticleMgr::Instance()->Init();
-
-	//オーラブロック追加
-	{
-		const int auraChipNum = MAPCHIP_BLOCK_AURABLOCK;//オーラブロックのチップ番号
-		auraBlock.clear();
-		std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, auraChipNum);
-		for (int i = 0; i < data.size(); ++i)
-		{
-			auraBlock.push_back(std::make_unique<AuraBlock>());
-			int auraBlocksArrayNum = auraBlock.size() - 1;
-			if (data[i]->sideOrUpDownFlag)
-			{
-				auraBlock[auraBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, AURA_DIR_LEFTORRIGHT);
-			}
-			else
-			{
-				auraBlock[auraBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, AURA_DIR_UPORDOWN);
-			}
-		}
-	}
-
-	//ドアの追加
-	{
-		doorBlocks.clear();
-		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
-		for (int doorIndex = chipMemorySize.min; doorIndex < chipMemorySize.max; ++doorIndex)
-		{
-			std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, doorIndex);
-			for (int i = 0; i < data.size(); ++i)
-			{
-				doorBlocks.push_back(std::make_unique<DoorBlock>());
-				int doorBlocksArrayNum = doorBlocks.size() - 1;
-				doorBlocks[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, doorIndex, data[i]->sideOrUpDownFlag);
-			}
-		}
-	}
 
 	//棘ブロック
 	{
@@ -292,168 +211,14 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		}
 	}
 
-#pragma region イベントチップ生成
-	//イベントブロック生成
-	{
-		eventBlocks.clear();
-		SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_EVENT);
-		for (int eventChipIndex = chipMemorySize.min; eventChipIndex < chipMemorySize.max; ++eventChipIndex)
-		{
-			std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, eventChipIndex);
-			for (int i = 0; i < data.size(); ++i)
-			{
-				eventBlocks.push_back(std::make_unique<EventBlock>());
-				int doorBlocksArrayNum = eventBlocks.size() - 1;
-				eventBlocks[doorBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos, eventChipIndex);
-			}
-		}
-	}
-#pragma endregion
-
-#pragma region ドッスン生成
-	// ドッスンブロックを生成。
-	vector<shared_ptr<ThownpeData>> dossunData;
-
-	// ドッスンブロックデータを取得
-	dossunData = GimmickLoader::Instance()->GetThowpeData(stageNum, roomNum);
-
-	const int dossunCount = dossunData.size();
-
-	// 照準の判定に使用するデータを保存。
-	SightCollisionStorage::Instance()->data.clear();
-
-	// ドッスンブロックを初期化。
-	dossunBlock.clear();
-
-	// ドッスンを生成。
-	for (int index = 0; index < dossunCount; ++index) {
-		//始点と終点が一緒なら
-		if (dossunData[index]->startPos != dossunData[index]->endPos)
-		{
-			DossunBlock dossunBuff;
-			dossunBuff.Generate(dossunData[index]->startPos, dossunData[index]->endPos, dossunData[index]->size, dossunData[index]->type);
-			// データを追加。
-			dossunBlock.push_back(dossunBuff);
-			if (&dossunBlock[dossunBlock.size() - 1].sightData == nullptr) assert(0); //ドッスンブロックのデータが何故かNullptrです！
-			SightCollisionStorage::Instance()->data.push_back(&dossunBlock[dossunBlock.size() - 1].sightData);
-		}
-	}
-#pragma endregion
-
-#pragma region シャボン玉
-	// シャボン玉ブロックの情報を取得。
-	vector<shared_ptr<BubbleData>> bubbleData;
-	bubbleData = GimmickLoader::Instance()->GetBubbleData(stageNum, roomNum);
-
-	const int bubbleCount = bubbleData.size();
-
-	// シャボン玉ブロックを初期化。
-	bubbleBlock.clear();
-
-	// シャボン玉ブロックを生成。
-	for (int index = 0; index < bubbleCount; ++index) {
-
-		Bubble bubbleBuff;
-		bubbleBuff.Generate(bubbleData[index]->pos);
-
-		// データを追加。
-		bubbleBlock.push_back(bubbleBuff);
-	}
-#pragma endregion
-
 	initDeadFlag = false;
 	//giveDoorNumber = 0;
 	debugStageData[0] = stageNum;
 	debugStageData[1] = roomNum;
 
+	//ScrollMgr::Instance()->honraiScrollAmount = { -1060.0f,-490.0f };
+	alphaValue = 0;
 
-
-	//ドア遷移はプレイヤーを初期化しない
-	if (!sceneLightFlag)
-	{
-#pragma region プレイヤー初期化
-		bool deadFlag = false;
-		if (player.isDead)
-		{
-			deadFlag = true;
-		}
-
-
-		bool responeFlag = false;
-
-		for (int y = 0; y < mapData.size(); ++y)
-		{
-			for (int x = 0; x < mapData[y].size(); ++x)
-			{
-				if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
-				{
-					restartPos = Vec2<float>(x * 50.0f, y * 50.0f);
-					player.Init(restartPos);
-					responeFlag = true;
-
-					// 紐の中心点を計算
-					Vec2<float> bossDir = boss.pos - player.centerPos;
-					bossDir.Normalize();
-					float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
-					lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
-					prevLineCenterPos = lineCenterPos;
-
-					break;
-				}
-			}
-		}
-
-		//デバック開始用の場所からリスポーンしたらこの処理を通さない
-		if (!responeFlag)
-		{
-			//マップ開始時の場所にスポーンさせる
-			for (int y = 0; y < mapData.size(); ++y)
-			{
-				for (int x = 0; x < mapData[y].size(); ++x)
-				{
-					if (mapData[y][x] == MAPCHIP_BLOCK_START)
-					{
-						restartPos = Vec2<float>(x * 50.0f, y * 50.0f);
-						player.Init(restartPos);
-						break;
-					}
-				}
-			}
-		}
-
-		//ScrollMgr::Instance()->honraiScrollAmount = { -1060.0f,-490.0f };
-#pragma endregion
-		alphaValue = 0;
-	}
-	else
-	{
-		//シーン遷移後の初期化
-		for (int i = 0; i < doorBlocks.size(); ++i)
-		{
-			if (doorBlocks[i]->chipNumber == doorNumber)
-			{
-				responePos = doorBlocks[i]->responePos;
-				restartPos = doorBlocks[i]->restartPos;
-				player.Init(responePos);
-
-				// 紐の中心点を計算
-				Vec2<float> bossDir = boss.pos - player.centerPos;
-				bossDir.Normalize();
-				float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
-				lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
-				prevLineCenterPos = lineCenterPos;
-
-				//ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-				//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
-				door = doorBlocks[i]->doorDir;
-				break;
-			}
-		}
-	}
-
-	ViewPort::Instance()->Init(player.centerPos, { 800.0f,500.0f });
-
-	sceneBlackFlag = false;
 	//sceneLightFlag = false;
 	SelectStage::Instance()->resetStageFlag = false;
 	restartTimer = 0.0f;
@@ -497,10 +262,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		}
 
 
-		lineLengthPlayer = LINE_LENGTH;
-		lineLengthBoss = LINE_LENGTH;
-		addLineLengthPlayer = 0;
-		addLineLengthBoss = 0;
 		lineCenterPos = {};
 		prevLineCenterPos = {};
 
@@ -513,63 +274,32 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	responePos -= 100;
 
 	lineCenterPos = responePos;
-	player.Init(responePos - Vec2<float>(150.0f, 0.0f));
-	//ボスを生成
-	boss.Init(responePos + Vec2<float>(150.0f, 0.0f));
+	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
+	leftCharacter->Init(responePos - Vec2<float>(150.0f, 0.0f));
+	rightCharacter->Init(responePos + Vec2<float>(150.0f, 0.0f));
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	Camera::Instance()->Init();
 
-	//ScrollMgr::Instance()->Init(&mapData);
-	//// スクロール量を設定。
-	//const float WIN_WIDTH_HALF = WinApp::Instance()->GetWinCenter().x;
-	//const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
-	//ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
-	//ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
-
-	//ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-	//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
-	//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-
-
 	GameTimer::Instance()->Init({}, 120, {}, {});
 	GameTimer::Instance()->Start();
-
 
 	ScoreManager::Instance()->Init();
 	firstLoadFlag = false;
 	lineExtendScale = lineExtendMaxScale;
 
+	BulletMgr::Instance()->Init();
+	BossBulletManager::Instance()->Init();
 }
 
 Game::Game()
 {
-	//mapBlockGraph = D3D12App::Instance()->GenerateTextureBuffer("resource/IntoTheAbyss/Block.png");
-
 	// 弾管理クラスを初期化。
 	BulletMgr::Instance()->Setting();
 
-	movingBlockGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/MovingBlock.png");
-	//sceneChangeHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/SceneChange.png");
-	//movingBlockGraph = D3D12App::Instance()->GenerateTextureBuffer("resource/IntoTheAbyss/MovingBlock.png");
-
-	// 弾パーティクルをセッティング。
-	//BulletParticleMgr::Instance()->Setting();
-
 	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 	AudioApp::Instance()->ChangeVolume(bgm, 0.07f);
-
-	//ライト情報
-	ptLig.SetInfluenceRange(PT_LIG_RANGE);
-	ptLig.SetColor(Color(PT_LIG_BRIGHT, PT_LIG_BRIGHT, PT_LIG_BRIGHT, 1.0f));
-	spotLig.SetInfluenceRange(SPOT_LIG_RANGE);
-
-	ligMgr.RegisterPointLight(&ptLig);
-	ligMgr.RegisterSpotLight(&spotLig);
-	ligMgr.RegisterHemiSphereLight(&hemiLig);
-	ligMgr.RegisterPointLight(&player.lHand->ptLight);	//照準光源
-	ligMgr.RegisterPointLight(&player.rHand->ptLight);//照準光源
 
 	playerHomeBase = std::make_unique<HomeBase>();
 	enemyHomeBase = std::make_unique<HomeBase>();
@@ -608,32 +338,15 @@ void Game::Init()
 {
 	WinCounter::Instance()->Reset();
 
-	// スクロールマネージャーを初期化。
-	//ScrollMgr::Instance()->Init(&mapData);
-	//// スクロール量を設定。
-	//const float WIN_WIDTH_HALF = WinApp::Instance()->GetWinCenter().x;
-	//const float WIN_HEIGHT_HALF = WinApp::Instance()->GetWinCenter().y;
-	//ScrollMgr::Instance()->scrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
-	//ScrollMgr::Instance()->honraiScrollAmount = { -WIN_WIDTH_HALF, -WIN_HEIGHT_HALF };
-
-	//bossEnemy.Generate(ENEMY_BOSS, mapData);
-	for (int index = 0; index < SMALL_ENEMY; ++index) {
-
-		smallEnemy[index].Init();
-
-	}
-	for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
-
-		noMovementEnemy[index].Init();
-
-	}
-	enemyGenerateTimer = 0;
-	nomoveMentTimer = 0;
-
-	//ScrollMgr::Instance()->DetectMapChipForScroll(lineCenterPos);
-	//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-
 	turnResultScene = false;
+
+	leftCharacter = std::make_shared<Player>();
+	rightCharacter = std::make_shared<Boss>();
+
+	rightCharacter->RegisterSetPartner(leftCharacter);
+	leftCharacter->RegisterSetPartner(rightCharacter);
+
+	InitGame(0, 0);
 }
 
 void Game::Update()
@@ -695,304 +408,21 @@ void Game::Update()
 		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
 		SelectStage::Instance()->resetStageFlag = true;
 		//mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
-
-		//Vec2<float> door;
-		////デバック用のマップチップ番号からスタートする
-		//for (int y = 0; y < mapData.size(); ++y)
-		//{
-		//	for (int x = 0; x < mapData[y].size(); ++x)
-		//	{
-		//		if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
-		//		{
-		//			door = { (float)x,(float)y };
-		//		}
-		//	}
-		//}
-		//player.Init(door * Vec2<float>(50.0f, 50.0f));
-		//ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
 
-	//ゴールに触れたら次のステージに向かう処理
+	const bool resetInput = UsersInput::Instance()->OnTrigger(DIK_SPACE) || UsersInput::Instance()->OnTrigger(BACK);
+	if (resetInput)
 	{
-		Vec2<float> playerChip((player.centerPos.x + 25.0f) / 50.0f, (player.centerPos.y + 25.0f) / 50.0f);
-		//ゴールに触れたら次のステージに向かう
-		if (StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), playerChip) == MAPCHIP_BLOCK_GOAL)
-		{
-			SelectStage::Instance()->SelectStageNum(0);
-			SelectStage::Instance()->SelectRoomNum(0);
-
-			mapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-			Vec2<float> door;
-			//ゴール探索
-			for (int y = 0; y < mapData.size(); ++y)
-			{
-				for (int x = 0; x < mapData[y].size(); ++x)
-				{
-					if (mapData[y][x] == MAPCHIP_BLOCK_START)
-					{
-						door = { (float)x,(float)y };
-					}
-				}
-			}
-			Vec2<float> tmp = { door.x * 50.0f,door.y * 50.0f };
-			player.centerPos = tmp;
-		}
+		SelectStage::Instance()->resetStageFlag = true;
+		//player.isDead = true;
+		//sceneBlackFlag = true;
+		//sceneChangeDeadFlag = player.isDead;
 	}
 
-
-#pragma region ドア移動
-	if (!sceneBlackFlag && !sceneLightFlag)
-	{
-		for (int doorIndex = 0; doorIndex < doorBlocks.size(); ++doorIndex)
-		{
-			//当たり判定
-			bool hitFlag = doorBlocks[doorIndex]->Collision(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
-
-			//ドアと当たったら数字を渡す
-			if (hitFlag)
-			{
-				giveDoorNumber = doorBlocks[doorIndex]->chipNumber;
-				doorArrayNumber = doorIndex;
-			}
-
-			//プレイヤーの体を完全に隠すためのオフセット
-			Vec2<float>offset;
-			if (player.vel.x <= 0.0f)
-			{
-				offset.x = MAP_CHIP_HALF_SIZE;
-			}
-			else
-			{
-				offset.x = -MAP_CHIP_HALF_SIZE;
-			}
-
-			//現在地取得
-			int nowChip = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), Vec2<float>((player.centerPos + Vec2<float>(0.0f, -MAP_CHIP_HALF_SIZE) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
-			int nowChip2 = StageMgr::Instance()->GetMapChipBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), Vec2<float>((player.centerPos + Vec2<float>(0.0f, MAP_CHIP_HALF_SIZE) + offset) / Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE)));
-
-			//ドア移動判定
-			bool outSideFlag = nowChip == -1 && nowChip2 == -1;//プレイヤーが画面外に出た判定
-			if (outSideFlag)
-			{
-				sceneBlackFlag = true;
-				doorNumber = giveDoorNumber;
-				player.drawCursorFlag = false;
-			}
-		}
-	}
-#pragma endregion
-
-
-
-#pragma region シーン遷移
-	//シーン遷移-----------------------
-	//暗転中
-	if (sceneBlackFlag)
-	{
-		alphaValue += 10;
-
-		//プレイヤーの動きを止める
-		player.vel = { 0.0f,0.0f };
-		player.gravity = 0.0f;
-
-
-		//暗転フラグを下げ、明転準備に入る
-		if (255 <= alphaValue)
-		{
-			alphaValue = 355;
-			++timer;
-			bool responeErrorFlag = false;
-			if (10 <= timer)
-			{
-				if (!sceneChangeDeadFlag)
-				{
-					SizeData chipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_DOOR);
-					//マップ情報更新
-					int localRoomNum = StageMgr::Instance()->GetRelationData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), doorNumber - chipMemorySize.min);
-
-					RoomMapChipArray tmpMapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), localRoomNum);
-
-					SelectStage::Instance()->SelectRoomNum(localRoomNum);
-					sceneChangingFlag = true;
-					initJumpFlag = false;
-				}
-
-				if (!responeErrorFlag)
-				{
-					//暗転開始
-					sceneBlackFlag = false;
-					sceneLightFlag = true;
-				}
-				else
-				{
-					sceneBlackFlag = false;
-					SelectStage::Instance()->resetStageFlag = true;
-				}
-			}
-		}
-	}
-
-	//明転中
-	if (sceneLightFlag)
-	{
-		player.drawCursorFlag = false;
-		alphaValue -= 10;
-		bool goFlag = false;
-
-		//プレイヤーを動かす
-		if (alphaValue <= 250)
-		{
-			if (!sceneChangeDeadFlag)
-			{
-				//sceneChangingFlag = false;
-				switch (door)
-				{
-				case DOOR_UP_GORIGHT:
-					//ジャンプする
-					if (!initJumpFlag)
-					{
-						gravity = 1.0f;
-						initJumpFlag = true;
-					}
-					player.centerPos.y += -15.0f * gravity;
-					gravity -= 0.1f;
-
-					if (!player.onGround)
-					{
-						player.centerPos.x += 5.0f;
-					}
-					else
-					{
-						goFlag = true;
-					}
-					break;
-
-
-				case DOOR_UP_GOLEFT:
-					//ジャンプする
-					if (!initJumpFlag)
-					{
-						gravity = 1.0f;
-						initJumpFlag = true;
-					}
-					player.centerPos.y += -15.0f * gravity;
-					gravity -= 0.1f;
-
-					if (!player.onGround)
-					{
-						player.centerPos.x -= 5.0f;
-					}
-					else
-					{
-						goFlag = true;
-					}
-					break;
-
-				case DOOR_DOWN:
-					goFlag = true;
-					break;
-
-				case DOOR_LEFT:
-					if (restartPos.x <= player.centerPos.x)
-					{
-						player.centerPos.x -= 5.0f;
-					}
-					else
-					{
-						goFlag = true;
-					}
-					break;
-
-				case DOOR_RIGHT:
-					if (player.centerPos.x <= restartPos.x)
-					{
-						player.centerPos.x += 5.0f;
-					}
-					else
-					{
-						goFlag = true;
-					}
-					break;
-
-				case DOOR_Z:
-					break;
-				default:
-					break;
-				}
-
-				//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
-				//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-				//ScrollMgr::Instance()->Restart();
-
-			}
-			else
-			{
-				if (!initDeadFlag)
-				{
-					player.Init(restartPos);
-
-					// 紐の中心点を計算
-					Vec2<float> bossDir = boss.pos - player.centerPos;
-					bossDir.Normalize();
-					float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
-					lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
-					prevLineCenterPos = lineCenterPos;
-
-					//ScrollMgr::Instance()->WarpScroll(lineCenterPos);
-					//ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos);
-					//ScrollMgr::Instance()->AlimentScrollAmount();
-					//ScrollMgr::Instance()->Restart();
-					initDeadFlag = true;
-				}
-				goFlag = true;
-			}
-		}
-		else
-		{
-			player.vel = { 0.0f,0.0f };
-			player.gravity = 0.0f;
-		}
-		//ゲーム開始
-		if (alphaValue <= 0 && goFlag)
-		{
-			sceneLightFlag = false;
-			player.drawCursorFlag = true;
-			sceneChangeDeadFlag = false;
-			initDeadFlag = false;
-		}
-	}
-
-	//暗転と明転中はプレイヤーの入力を禁止する
-	if (sceneChangingFlag)
-	{
-		player.StopDoorLeftRight();
-	}
-
-	if (!sceneBlackFlag && !sceneLightFlag)
-	{
-		alphaValue = 0;
-		timer = 0;
-		sceneChangingFlag = false;
-		player.drawCursorFlag = true;
-	}
-	//シーン遷移-----------------------
-#pragma endregion
-
-
-
-	//ステージ毎の切り替え判定
-	//部屋の初期化
-	//if ((SelectStage::Instance()->GetRoomNum() != oldRoomNum || SelectStage::Instance()->GetStageNum() != oldStageNum) || SelectStage::Instance()->resetStageFlag)
-	if (false)
-	{
-		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-		oldRoomNum = SelectStage::Instance()->GetRoomNum();
-		oldStageNum = SelectStage::Instance()->GetStageNum();
-	}
 
 	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision(boss.areaHitBox) && !roundFinishFlag && !readyToStartRoundFlag)
+	if (playerHomeBase->Collision(rightCharacter->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//プレイヤー勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, true);
@@ -1002,30 +432,43 @@ void Game::Update()
 	}
 
 	//敵陣地とプレイヤーの判定
-	if (enemyHomeBase->Collision(player.areaHitBox) && !roundFinishFlag && !readyToStartRoundFlag)
+	if (enemyHomeBase->Collision(leftCharacter->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//敵勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, false);
 		roundFinishFlag = true;
 		playerOrEnemeyWinFlag = false;
 		gameStartFlag = false;
-	}
 
+		areaHitColor = Color(255, 0, 0, 255);
+		playerHitColor = Color(255, 0, 0, 255);
+	}
+	else if (!roundFinishFlag)
+	{
+		areaHitColor = Color(255, 255, 255, 255);
+		playerHitColor = Color(255, 255, 255, 255);
+	}
 
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
 	{
-		BossBulletManager::Instance()->Init();
+		//動けなくする
+		leftCharacter->SetCanMove(false);
+		rightCharacter->SetCanMove(false);
+
+		//時間計測ストップ
+		GameTimer::Instance()->SetInterruput(true);
+
 
 
 		//勝利数カウント演出
 		if (!WinCounter::Instance()->GetNowAnimation())
 		{
+
 			//どちらかが３勝とったらゲーム終了
 			if (WinCounter::Instance()->GetGameFinish())
 			{
 				//とりあえずリセットしとく
-				//WinCounter::Instance()->Reset();
 				ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
 				turnResultScene = true;
 			}
@@ -1038,7 +481,7 @@ void Game::Update()
 				{
 					readyToStartRoundFlag = true;
 					roundFinishFlag = false;
-					SuperiorityGauge::Instance()->Init();
+					InitGame(0, 0);
 				}
 			}
 		}
@@ -1059,15 +502,25 @@ void Game::Update()
 		//プレイヤーと敵の座標初期化
 		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initGameFlag)
 		{
-			InitGame(0, 0);
-			roundChangeEffect.initGameFlag = true;
+			roundChangeEffect.initFlag = true;
+			AudioApp::Instance()->PlayWave(bgm, true);
 		}
 
-		if (player.allowToMoveFlag && boss.AllowToMove() && roundChangeEffect.initGameFlag)
+		//登場演出
+		if (roundChangeEffect.initFlag)
 		{
-			readyToStartRoundFlag = false;
-			gameStartFlag = true;
-			roundTimer = 0;
+			bool leftAppear = leftCharacter->Appear();
+			bool rightApperar = rightCharacter->Appear();
+			if (leftAppear && rightApperar)	//どちらのキャラも登場演出完了
+			{
+				//ゲームスタート
+				readyToStartRoundFlag = false;
+				gameStartFlag = true;
+				roundTimer = 0;
+				leftCharacter->SetCanMove(true);
+				rightCharacter->SetCanMove(true);
+				GameTimer::Instance()->SetInterruput(false);
+			}
 		}
 		//gameStartFlag = true;
 		//SelectStage::Instance()->resetStageFlag = true;
@@ -1077,56 +530,24 @@ void Game::Update()
 		miniMap.Init(size);
 	}
 
+	miniMap.CalucurateCurrentPos(lineCenterPos);
 
+	// プレイヤーの更新処理
+	leftCharacter->Update(mapData, lineCenterPos);
 
+	// ボスの更新処理
+	rightCharacter->Update(mapData, lineCenterPos);
 
+	// 弾を更新
+	BulletMgr::Instance()->Update();
+	BossBulletManager::Instance()->Update();
 
+	// プレイヤーとボスの引っ張り合いの処理
+	Scramble();
 
-
-	//イベントブロックとの判定
-	for (int i = 0; i < eventBlocks.size(); ++i)
-	{
-		eventBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
-	}
-
-
-#pragma region 死亡判定
-	//遷移中ではない&&プレイヤーが死亡していな時に棘ブロックとの判定を取る
-	if (!player.isDead && !sceneBlackFlag && !sceneLightFlag)
-	{
-		//棘ブロックとの判定
-		for (int i = 0; i < thornBlocks.size(); ++i)
-		{
-			bool hitFlag = thornBlocks[i]->HitBox(player.centerPos, player.PLAYER_HIT_SIZE, player.vel, player.prevFrameCenterPos);
-			if (hitFlag)
-			{
-				player.isDead = true;
-				sceneBlackFlag = true;
-				sceneChangeDeadFlag = player.isDead;
-				break;
-			}
-		}
-	}
-#pragma endregion
-
-
-	if (!readyToStartRoundFlag)
-	{
-		miniMap.CalucurateCurrentPos(lineCenterPos);
-	}
-
-
-	if (roundChangeEffect.initGameFlag)
-	{
-		// プレイヤーの更新処理
-		player.Update(mapData, boss.pos, roundFinishFlag);
-
-
-		boss.readyToStartRoundEffectFlag = readyToStartRoundFlag;
-		// ボスの更新処理
-		boss.Update();
-	}
-
+	// プレイヤーとボスの当たり判定処理
+	leftCharacter->CheckHit(mapData, lineCenterPos);
+	rightCharacter->CheckHit(mapData, lineCenterPos);
 
 	miniMap.Update();
 
@@ -1135,16 +556,8 @@ void Game::Update()
 	GameTimer::Instance()->Update();
 	ScoreManager::Instance()->Update();
 
-
-	// プレイヤーとボスの引っ張り合いの処理
-	Scramble();
-
-
-
 	//	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
 	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
-
-
 
 	// スクロール量の更新処理
 	//ScrollManager::Instance()->Update();
@@ -1154,40 +567,14 @@ void Game::Update()
 	ShakeMgr::Instance()->Update();
 
 	// 振り回し管理クラスの更新処理
-	SwingMgr::Instance()->Update(player.centerPos, boss.pos, (player.centerPos - boss.pos).Length());
+	//SwingMgr::Instance()->Update(player.centerPos, boss.pos, lineLengthBoss + lineLengthPlayer + addLineLengthBoss + addLineLengthPlayer);
 
 #pragma region 各ギミックの更新処理
-
-	// 動的ブロックの更新処理
-	MovingBlockMgr::Instance()->Update(player.centerPos);
 
 	SuperiorityGauge::Instance()->Update();
 
 	// スタン演出クラスの更新処理
 	StunEffect::Instance()->Update();
-
-	// 弾パーティクルの更新処理
-	//BulletParticleMgr::Instance()->Update();
-
-	// ドッスンブロックの更新処理
-	const int DOSSUN_COUNT = dossunBlock.size();
-	for (int index = 0; index < DOSSUN_COUNT; ++index) {
-		dossunBlock[index].Update();
-	}
-
-	ViewPort::Instance()->Update(player.centerPos);
-	for (int i = 0; i < auraBlock.size(); ++i)
-	{
-		auraBlock[i]->Update();
-	}
-
-	// シャボン玉ブロックの更新処理
-	{
-		const int BUBBLE_COUNT = bubbleBlock.size();
-		for (int index = 0; index < BUBBLE_COUNT; ++index) {
-			bubbleBlock[index].Update();
-		}
-	}
 
 #pragma endregion
 
@@ -1195,58 +582,14 @@ void Game::Update()
 	/*===== 当たり判定 =====*/
 
 #pragma region 当たり判定
-
-	// ドッスンブロックの当たり判定
-	for (int index = 0; index < DOSSUN_COUNT; ++index) {
-		dossunBlock[index].CheckHit(mapData);
-	}
-
-	if (roundChangeEffect.initGameFlag && !readyToStartRoundFlag)
-	{
-		// プレイヤーの当たり判定
-		player.CheckHit(mapData, bubbleBlock, dossunBlock, boss.pos, isCatchMapChipPlayer, lineCenterPos);
-	}
-
-	// 動的ブロックの当たり判定
-	MovingBlockMgr::Instance()->CheckHit(mapData);
-
 	// 弾とマップチップの当たり判定
-	BulletMgr::Instance()->CheckHit(mapData, bubbleBlock);
-
-	// ボスの当たり判定
-	if (!readyToStartRoundFlag) {
-		boss.CheckHit(mapData, isCatchMapChipBoss, player.centerPos, lineCenterPos);
-	}
-
-	// ビューポートをプレイヤー基準で移動させる。
-	ViewPort::Instance()->SetPlayerPosX(player.centerPos.x);
-	ViewPort::Instance()->SetPlayerPosY(player.centerPos.y);
-
-	// オーラブロックのデータとビューポートの判定を行う。
-	ViewPort::Instance()->SavePrevFlamePos();
-
-	// 敵と弾の当たり判定
-	bossEnemy.CheckHitBullet();
-	for (int index = 0; index < SMALL_ENEMY; ++index) {
-
-		if (!smallEnemy[index].isActive) continue;
-
-		smallEnemy[index].CheckHitBullet();
-
-	}
-	for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
-
-		if (!noMovementEnemy[index].isActive) continue;
-
-		noMovementEnemy[index].CheckHitBullet();
-
-	}
+	BulletMgr::Instance()->CheckHit(mapData);
 
 	//ボス弾とプレイヤーの判定
 	for (int index = 0; index < BossBulletManager::Instance()->bullets.size(); ++index)
 	{
 		std::shared_ptr<SphereCollision> bullet = BossBulletManager::Instance()->GetBullet(index)->bulletHitBox;
-		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, *player.bulletHitBox);
+		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, leftCharacter->GetBulletHitSphere());
 		bool initFlag = BossBulletManager::Instance()->GetBullet(index)->isActive;
 
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
@@ -1261,7 +604,7 @@ void Game::Update()
 	for (int index = 0; index < BulletMgr::Instance()->bullets.size(); ++index)
 	{
 		std::shared_ptr<SphereCollision> bullet = BulletMgr::Instance()->GetBullet(index)->bulletHitBox;
-		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, *boss.bulletHitBox);
+		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, rightCharacter->GetBulletHitSphere());
 		bool initFlag = BulletMgr::Instance()->GetBullet(index)->isActive;
 
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
@@ -1275,346 +618,23 @@ void Game::Update()
 
 #pragma endregion
 
-#pragma region 必要のない当たり判定
-
-	// 弾とビューポートの当たり判定
-	for (int i = 0; i < BulletMgr::Instance()->bullets.size(); ++i)
-	{
-		int hitArea = ViewPortCollider::Instance()->CheckHitRectanglePoint
-		(
-			ViewPort::Instance()->centralPos,
-			ViewPort::Instance()->windowSize.y / 2.0f + ViewPort::Instance()->addLineValue[ViewPort::Instance()->UP],
-			ViewPort::Instance()->windowSize.x / 2.0f + ViewPort::Instance()->addLineValue[ViewPort::Instance()->RIGHT],
-			ViewPort::Instance()->windowSize.y / 2.0f + ViewPort::Instance()->addLineValue[ViewPort::Instance()->DOWN],
-			ViewPort::Instance()->windowSize.x / 2.0f + ViewPort::Instance()->addLineValue[ViewPort::Instance()->LEFT],
-			BulletMgr::Instance()->GetBullet(i)->pos,
-			BulletMgr::Instance()->GetBullet(i)->MAX_RADIUS
-		);
-
-		//bool hitFlag =
-		//	BulletMgr::Instance()->GetBullet(i)->GetIsActive() &&
-		//	hitArea != ViewPortCollider::Instance()->HIT_AREA_NONE;
-		auto hitFlag = false;
-
-		if (hitFlag)
-		{
-			//ViewPort::Instance()->MoveLine(hitArea, 0.01f);
-
-			// 弾パーティクルを生成する。
-			//BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
-			//BulletParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec);
-			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec, BULLET);
-			ParticleMgr::Instance()->Generate(BulletMgr::Instance()->GetBullet(i)->pos, BulletMgr::Instance()->GetBullet(i)->forwardVec, BULLET);
-
-			BulletMgr::Instance()->GetBullet(i)->Init();
-		}
-	}
-
-	// オーラとビューポートの当たり判定
-	{
-		// オーラブロックのデータとビューポートの判定を行う。
-		vector<ViewPortAuraReturnData> buff;
-		// 上方向
-		buff = ViewPortCollider::Instance()->CheckHitRectangleAura(ViewPort::Instance()->pointData[ViewPort::LEFT_UP], ViewPort::Instance()->pointData[ViewPort::RIGHT_UP], CHECK_HIT_TOP, auraBlock);
-
-		// 押し戻す
-		if (buff.size() > 0 && !ViewPort::Instance()->noHitFlags[ViewPort::Instance()->UP])
-		{
-
-			ViewPortAuraReturnData biggestBuff = {};
-			// 値が一番大きい押し戻し量を求める。
-			for (int index = 0; index < buff.size(); ++index) {
-
-				if (fabs(buff[index].pushBackAmount) < fabs(biggestBuff.pushBackAmount)) continue;
-
-				biggestBuff = buff[index];
-
-			}
-
-			// ホールドされていない状態だったら-方向に押し戻されるのはおかしいので、押し戻し量を打ち消す。
-			if (!biggestBuff.isHold && biggestBuff.pushBackAmount < 0)
-			{
-				biggestBuff.pushBackAmount = 0;
-			}
-			// ホールドされていなる状態だったら+方向に押し戻されるのはおかしいので、押し戻し量を打ち消す。
-			else if (biggestBuff.isHold && biggestBuff.pushBackAmount > 0) {
-
-				biggestBuff.pushBackAmount = 0;
-
-			}
-
-			// 上側に当たった判定を保存する。
-			ViewPort::Instance()->isHitTop = true;
-
-			// ホールド状態だったら
-			if (biggestBuff.isHold) {
-
-
-				ViewPort::Instance()->PushBackAuraHoldUp(biggestBuff.pushBackAmount);
-
-			}
-			else {
-
-				// 中心座標を押し戻す。
-				ViewPort::Instance()->centralPos.y += biggestBuff.pushBackAmount;
-
-				// ビューポートの四点を押し戻す。
-				ViewPort::Instance()->PushBackAura(Vec2<float>(0, biggestBuff.pushBackAmount));
-
-			}
-
-			if (biggestBuff.isHold) {
-				ViewPort::Instance()->holdFlags[ViewPort::Instance()->UP] = true;
-				//ViewPort::Instance()->PushBackLine(ViewPort::Instance()->LEFT, biggestBuff.pushBackAmount);
-			}
-
-			++countStopNum;
-
-		}
-		else
-		{
-			ViewPort::Instance()->holdFlags[ViewPort::Instance()->UP] = false;
-		}
-
-
-		// 右方向
-		buff = ViewPortCollider::Instance()->CheckHitRectangleAura(ViewPort::Instance()->pointData[ViewPort::RIGHT_UP], ViewPort::Instance()->pointData[ViewPort::RIGHT_DOWN], CHECK_HIT_RIGHT, auraBlock);
-
-		// 押し戻す
-		if (buff.size() > 0 && !ViewPort::Instance()->noHitFlags[ViewPort::Instance()->RIGHT])
-		{
-
-			ViewPortAuraReturnData biggestBuff = {};
-			// 値が一番大きい押し戻し量を求める。
-			for (int index = 0; index < buff.size(); ++index) {
-
-				if (fabs(buff[index].pushBackAmount) < fabs(biggestBuff.pushBackAmount)) continue;
-
-				biggestBuff = buff[index];
-
-			}
-
-			// ホールドされていない状態だったら-方向に押し戻されるのはおかしいので、押し戻し量を打ち消す。
-			if (!biggestBuff.isHold && biggestBuff.pushBackAmount > 0)
-			{
-				biggestBuff.pushBackAmount = 0;
-			}
-			// ホールドされていなる状態だったら+方向に押し戻されるのはおかしいので、押し戻し量を打ち消す。
-			else if (biggestBuff.isHold && biggestBuff.pushBackAmount < 0) {
-
-				biggestBuff.pushBackAmount = 0;
-
-			}
-
-			// 右側に当たった判定を保存する。
-			ViewPort::Instance()->isHitRight = true;
-
-			// ホールド状態だったら
-			if (biggestBuff.isHold) {
-
-
-				ViewPort::Instance()->PushBackAuraHoldRight(biggestBuff.pushBackAmount);
-
-			}
-			else {
-
-				// 中心座標を押し戻す。
-				ViewPort::Instance()->centralPos.x += biggestBuff.pushBackAmount;
-
-				// ビューポートの四点を押し戻す。
-				ViewPort::Instance()->PushBackAura(Vec2<float>(biggestBuff.pushBackAmount, 0));
-
-			}
-
-			if (biggestBuff.isHold) {
-				ViewPort::Instance()->holdFlags[ViewPort::Instance()->RIGHT] = true;
-				//ViewPort::Instance()->PushBackLine(ViewPort::Instance()->LEFT, biggestBuff.pushBackAmount);
-			}
-
-		}
-		else
-		{
-			ViewPort::Instance()->holdFlags[ViewPort::Instance()->RIGHT] = false;
-			if (countStopNum % 2 != 0)
-			{
-				countHitNum = 0;
-				countStopNum = 0;
-			}
-			++countHitNum;
-
-			if (2 <= countHitNum)
-			{
-				countStopNum = 0;
-			}
-
-		}
-
-		// 下方向
-		buff = ViewPortCollider::Instance()->CheckHitRectangleAura(ViewPort::Instance()->pointData[ViewPort::LEFT_DOWN], ViewPort::Instance()->pointData[ViewPort::RIGHT_DOWN], CHECK_HIT_BOTTOM, auraBlock);
-
-		// 押し戻す
-		if (buff.size() > 0 && !ViewPort::Instance()->noHitFlags[ViewPort::Instance()->DOWN])
-		{
-
-			ViewPortAuraReturnData biggestBuff = {};
-			// 値が一番大きい押し戻し量を求める。
-			for (int index = 0; index < buff.size(); ++index) {
-
-				if (fabs(buff[index].pushBackAmount) < fabs(biggestBuff.pushBackAmount)) continue;
-
-				biggestBuff = buff[index];
-
-			}
-
-			// ホールドされていない状態だったら-方向に押し戻されるのはおかしいので、押し戻し量を打ち消す。
-			if (!biggestBuff.isHold && biggestBuff.pushBackAmount > 0)
-			{
-				biggestBuff.pushBackAmount = 0;
-			}
-			// ホールドされていなる状態だったら+方向に押し戻されるのはおかしいので、押し戻し量を打ち消す。
-			else if (biggestBuff.isHold && biggestBuff.pushBackAmount < 0) {
-
-				biggestBuff.pushBackAmount = 0;
-
-			}
-
-			// 上側に当たった判定を保存する。
-			ViewPort::Instance()->isHitBottom = true;
-
-			// ホールド状態だったら
-			if (biggestBuff.isHold) {
-
-
-				ViewPort::Instance()->PushBackAuraHoldDown(biggestBuff.pushBackAmount);
-
-			}
-			else {
-
-				// 中心座標を押し戻す。
-				ViewPort::Instance()->centralPos.y += biggestBuff.pushBackAmount;
-
-				// ビューポートの四点を押し戻す。
-				ViewPort::Instance()->PushBackAura(Vec2<float>(0, biggestBuff.pushBackAmount));
-
-			}
-
-			if (biggestBuff.isHold) {
-				ViewPort::Instance()->holdFlags[ViewPort::Instance()->DOWN] = true;
-				//ViewPort::Instance()->PushBackLine(ViewPort::Instance()->LEFT, biggestBuff.pushBackAmount);
-			}
-
-			// スクロールを止める。
-			++countStopNum;
-		}
-		else
-		{
-			ViewPort::Instance()->holdFlags[ViewPort::Instance()->DOWN] = false;
-		}
-
-
-		// 左方向
-		buff = ViewPortCollider::Instance()->CheckHitRectangleAura(ViewPort::Instance()->pointData[ViewPort::LEFT_UP], ViewPort::Instance()->pointData[ViewPort::LEFT_DOWN], CHECK_HIT_LEFT, auraBlock);
-
-
-
-		// 押し戻す
-		if (buff.size() > 0 && !ViewPort::Instance()->noHitFlags[ViewPort::Instance()->LEFT])
-		{
-
-			ViewPortAuraReturnData biggestBuff = {};
-			// 値が一番大きい押し戻し量を求める。
-			for (int index = 0; index < buff.size(); ++index) {
-
-				if (fabs(buff[index].pushBackAmount) < fabs(biggestBuff.pushBackAmount)) continue;
-
-				biggestBuff = buff[index];
-
-			}
-
-			// ホールドされていない状態だったら-方向に押し戻されるのはおかしいので、押し戻し量を打ち消す。
-			if (!biggestBuff.isHold && biggestBuff.pushBackAmount < 0)
-			{
-				biggestBuff.pushBackAmount = 0;
-			}
-			// ホールドされていなる状態だったら+方向に押し戻されるのはおかしいので、押し戻し量を打ち消す。
-			else if (biggestBuff.isHold && biggestBuff.pushBackAmount > 0) {
-
-				biggestBuff.pushBackAmount = 0;
-
-			}
-
-			//biggestBuff.pushBackAmount /= 2.0f;
-
-			// 左側に当たった判定を保存する。
-			ViewPort::Instance()->isHitLeft = true;
-
-			// ホールド状態だったら
-			if (biggestBuff.isHold) {
-
-
-				ViewPort::Instance()->PushBackAuraHoldLeft(biggestBuff.pushBackAmount);
-
-			}
-			else {
-
-				// 中心座標を押し戻す。
-				ViewPort::Instance()->centralPos.x += biggestBuff.pushBackAmount;
-
-				// ビューポートの四点を押し戻す。
-				ViewPort::Instance()->PushBackAura(Vec2<float>(biggestBuff.pushBackAmount, 0));
-
-			}
-
-			if (biggestBuff.isHold) {
-				ViewPort::Instance()->holdFlags[ViewPort::Instance()->LEFT] = true;
-				//ViewPort::Instance()->PushBackLine(ViewPort::Instance()->LEFT, biggestBuff.pushBackAmount);
-			}
-
-			// スクロールを止める。
-			++countStopNum;
-		}
-		else
-		{
-			ViewPort::Instance()->holdFlags[ViewPort::Instance()->LEFT] = false;
-		}
-
-
-	}
-
-#pragma endregion
-
-	ViewPort::Instance()->playerPos = player.centerPos;
-	//ライト更新
-	auto pos = ScrollMgr::Instance()->Affect(player.centerPos);
-	ptLig.SetPos({ pos.x,pos.y,PT_LIG_Z });
-
-	spotLig.SetTarget({ pos.x,pos.y + SPOT_LIG_TARGET_OFFSET_Y,0.0f });
-	spotLig.SetPos({ pos.x,pos.y + SPOT_LIG_TARGET_OFFSET_Y,SPOT_LIG_Z });
-
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
-
-	/*if (UsersInput::Instance()->OnTrigger(DIK_M))
-	{
-		FaceIcon::Instance()->Change(LEFT_FACE, DAMAGE);
-	}*/
 
 	BackGround::Instance()->Update();
 	Camera::Instance()->Update();
 	FaceIcon::Instance()->Update();
 	WinCounter::Instance()->Update();
 
-
-
 	// 優勢ゲージが振り切ったトリガー判定のときにスタン演出を有効化する。
 	if (SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
 		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
-		StunEffect::Instance()->Activate(player.centerPos, player.centerPos, Vec2<float>(0, 0), false);
+		StunEffect::Instance()->Activate(leftCharacter->pos, Vec2<float>(0, 0), false);
 		ResultTransfer::Instance()->leftBreakCount++;
 	}
 	if (SuperiorityGauge::Instance()->GetPlayerGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetPlayerGaugeData()->prevOverGaugeFlag) {
 		// プレイヤーの優勢ゲージが振り切ったということは、敵の優勢ゲージが0だということ。
-		StunEffect::Instance()->Activate(boss.pos, boss.pos, Vec2<float>(1200, 0), true);
+		StunEffect::Instance()->Activate(rightCharacter->pos, Vec2<float>(1200, 0), true);
 		ResultTransfer::Instance()->rightBreakCount++;
 	}
 
@@ -1633,53 +653,9 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 	DrawMapChip(mapData, mapChipDrawData, stageNum, roomNum);
 
-	MovingBlockMgr::Instance()->Draw(movingBlockGraph);
-
-	// 弾パーティクルの描画処理
-	//BulletParticleMgr::Instance()->Draw();
-
-	// ドッスンブロックの描画処理
-	const int DOSSUN_COUNT = dossunBlock.size();
-	for (int index = 0; index < DOSSUN_COUNT; ++index) {
-		dossunBlock[index].Draw();
-	}
-
-	// シャボン玉ブロックの描画処理
-	{
-		const int BUBBLE_COUNT = bubbleBlock.size();
-		for (int index = 0; index < BUBBLE_COUNT; ++index) {
-			if (bubbleBlock[index].isBreak) continue;
-			bubbleBlock[index].Draw();
-		}
-	}
-
-	//ViewPort::Instance()->Draw();
-
-	//オーラブロックの描画
-	for (int i = 0; i < auraBlock.size(); ++i)
-	{
-		auraBlock[i]->Draw();
-	}
-
 	for (int i = 0; i < thornBlocks.size(); ++i)
 	{
 		thornBlocks[i]->Draw();
-	}
-
-	bossEnemy.Draw();
-	for (int index = 0; index < SMALL_ENEMY; ++index) {
-
-		if (!smallEnemy[index].isActive) continue;
-
-		smallEnemy[index].Draw();
-
-	}
-	for (int index = 0; index < NOMOVEMENT_ENEMY; ++index) {
-
-		if (!noMovementEnemy[index].isActive) continue;
-
-		noMovementEnemy[index].Draw();
-
 	}
 
 	playerHomeBase->Draw();
@@ -1688,16 +664,19 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
 	// プレイヤーとボス間に線を描画
+	if (roundChangeEffect.initFlag)
 	{
-		Vec2<float> playerBossDir = boss.pos - player.centerPos;
+		Vec2<float> playerBossDir = rightCharacter->pos - leftCharacter->pos;
 		playerBossDir.Normalize();
-		Vec2<float> playerDefLength = player.centerPos + playerBossDir * addLineLengthPlayer;
+		Vec2<float> playerDefLength = leftCharacter->pos + playerBossDir * leftCharacter->addLineLength;
 
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(lineCenterPos),
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftCharacter->pos), ScrollMgr::Instance()->Affect(lineCenterPos),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-		Vec2<float> bossPlayerDir = player.centerPos - boss.pos;
+
+
+		Vec2<float> bossPlayerDir = leftCharacter->pos - rightCharacter->pos;
 		bossPlayerDir.Normalize();
-		Vec2<float> bossDefLength = boss.pos + bossPlayerDir * addLineLengthBoss;
+		Vec2<float> bossDefLength = rightCharacter->pos + bossPlayerDir * rightCharacter->addLineLength;
 
 		float time = 30.0f;
 		if (1.0f < lineExtendScale)
@@ -1711,7 +690,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(boss.pos), ScrollMgr::Instance()->Affect(lineCenterPos),
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(rightCharacter->pos), ScrollMgr::Instance()->Affect(lineCenterPos),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom * lineExtendScale);
 
 		// 線分の中心に円を描画
@@ -1725,11 +704,15 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	roundChangeEffect.Draw();
 
-	player.Draw(ligMgr);
-	// ボスを描画
-	boss.Draw();
+	if (roundChangeEffect.initFlag)
+	{
+		leftCharacter->Draw();
+		rightCharacter->Draw();
+	}
 
-	ParticleMgr::Instance()->Draw(ligMgr);
+	BossBulletManager::Instance()->Draw();
+
+	ParticleMgr::Instance()->Draw();
 	CrashMgr::Instance()->Draw();
 
 	GameTimer::Instance()->Draw();
@@ -1748,47 +731,53 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	StunEffect::Instance()->Draw();
 
-	if (sceneBlackFlag || sceneLightFlag)
 	{
-		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), D3D12App::Instance()->GetBackBuffFormat(), true, AlphaBlendMode_Trans);
+		Vec2<float>leftUpPos = *rightCharacter->GetAreaHitBox().center - rightCharacter->GetAreaHitBox().size / 2.0f;
+		Vec2<float>rightDownPos = *rightCharacter->GetAreaHitBox().center + rightCharacter->GetAreaHitBox().size / 2.0f;
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), Color(255,255,255,255), DXGI_FORMAT_R8G8B8A8_UNORM);
+	}
 
-		KuroEngine::Instance().Graphics().SetRenderTargets({ EmissiveMap.lock() });
+	{
+		Vec2<float>leftUpPos = *leftCharacter->GetAreaHitBox().center - leftCharacter->GetAreaHitBox().size / 2.0f;
+		Vec2<float>rightDownPos = *leftCharacter->GetAreaHitBox().center + leftCharacter->GetAreaHitBox().size / 2.0f;
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), playerHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
+	}
 
-		DrawFunc::DrawBox2D(Vec2<float>(0.0f, 0.0f), Vec2<float>(1280.0f, 720.0f), Color(0, 0, 0, alphaValue), EmissiveMap.lock()->GetDesc().Format, true, AlphaBlendMode_Trans);
-
-		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),EmissiveMap.lock() });
+	{
+		Vec2<float>leftUpPos = *enemyHomeBase->hitBox.center - enemyHomeBase->hitBox.size / 2.0f;
+		Vec2<float>rightDownPos = *enemyHomeBase->hitBox.center + enemyHomeBase->hitBox.size / 2.0f;
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 }
 
 void Game::Scramble()
 {
 	/*===== 引っ張り合いの処理 =====*/
-
 	// 前フレームの線の中心座標を保存
 	prevLineCenterPos = lineCenterPos;
 
+	if (!leftCharacter->GetCanMove() || !rightCharacter->GetCanMove())return;
+
 	Vec2<float> playerVelGauge;
 	Vec2<float> bossVelGauge;
-	if (player.allowToMoveFlag && boss.AllowToMove())
-	{
-		// 移動量を取得。 優勢ゲージはここで更新。
-		double playerVel = player.vel.Length() * SlowMgr::Instance()->slowAmount;
-		playerVelGauge = (player.vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
-		double bossVel = boss.vel.Length() * SlowMgr::Instance()->slowAmount;
-		bossVelGauge = (boss.vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
-		double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
-		// [振り回し状態のとき] [スタン演出中] [BREAK中] は移動させない。
-		if (!(SwingMgr::Instance()->isSwingBoss || SwingMgr::Instance()->isSwingPlayer || StunEffect::Instance()->isActive || roundFinishFlag)) {
-			player.centerPos += playerVelGauge;
-			boss.pos += bossVelGauge;
-		}
+	// 移動量を取得。 優勢ゲージはここで更新。
+	double playerVel = leftCharacter->vel.Length() * SlowMgr::Instance()->slowAmount;
+	playerVelGauge = (leftCharacter->vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	double bossVel = rightCharacter->vel.Length() * SlowMgr::Instance()->slowAmount;
+	bossVelGauge = (rightCharacter->vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
+
+	// [振り回し状態のとき] [スタン演出中] は移動させない。
+	if (!(rightCharacter->GetNowSwing() || leftCharacter->GetNowSwing() || StunEffect::Instance()->isActive)) {
+		leftCharacter->pos += playerVelGauge;
+		rightCharacter->pos += bossVelGauge;
 	}
 
 
 	// 線分の長さ
 	float line = 0;
-	float LINE = (lineLengthBoss + lineLengthPlayer) + (addLineLengthBoss + addLineLengthPlayer);
+	float LINE = CharacterInterFace::LINE_LENGTH * 2 + (leftCharacter->addLineLength + rightCharacter->addLineLength);
 
 	// 気にしないでください！
 	bool isBoss = true;
@@ -1800,7 +789,7 @@ void Game::Scramble()
 		// ボスの移動量のほうが大きかったら
 
 		// 距離を求める。
-		line = Vec2<float>(player.centerPos).Distance(boss.pos);
+		line = Vec2<float>(leftCharacter->pos).Distance(rightCharacter->pos);
 
 		// プレイヤーをボスの方に移動させる。
 		if (LINE < line) {
@@ -1809,16 +798,16 @@ void Game::Scramble()
 			float moveLength = line - LINE;
 
 			// 押し戻し方向
-			Vec2<float> moveDir = Vec2<float>(boss.pos - player.centerPos);
+			Vec2<float> moveDir = Vec2<float>(rightCharacter->pos - leftCharacter->pos);
 			moveDir.Normalize();
 
 			// 押し戻す。
-			player.centerPos += moveDir * Vec2<float>(moveLength, moveLength);
+			leftCharacter->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
 			// 引っかかり判定だったら
-			if (isCatchMapChipPlayer) {
+			if (leftCharacter->GetStackFlag()) {
 
-				addLineLengthPlayer += moveLength;
+				leftCharacter->addLineLength += moveLength;
 
 			}
 
@@ -1832,7 +821,7 @@ void Game::Scramble()
 		// プレイヤーの移動量のほうが大きかったら
 
 		// 距離を求める。
-		line = Vec2<float>(player.centerPos).Distance(boss.pos);
+		line = Vec2<float>(leftCharacter->pos).Distance(rightCharacter->pos);
 
 		// ボスをプレイヤーの方に移動させる。
 		if (LINE < line) {
@@ -1841,27 +830,27 @@ void Game::Scramble()
 			float moveLength = line - LINE;
 
 			// 押し戻し方向
-			Vec2<float> moveDir = Vec2<float>(player.centerPos - boss.pos);
+			Vec2<float> moveDir = Vec2<float>(leftCharacter->pos - rightCharacter->pos);
 			moveDir.Normalize();
 
 			// 押し戻す。
-			boss.pos += moveDir * Vec2<float>(moveLength, moveLength);
+			rightCharacter->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
-			if (boss.pos.x < boss.prevPos.x) {
-				boss.vel.x -= boss.prevPos.x - boss.pos.x;
-			}
+			//if (rightCharacter->GetPos().x < rightCharacter->GetPrevPos().x) {
+			//	rightCharacter->AddVel({ -(rightCharacter->GetPrevPos().x - rightCharacter->GetPos().x),0.0f });
+			//}
 
 			// ボスの移動量が0を下回らないようにする。
-			if (boss.vel.x < 0) {
+			//if (rightCharacter->GetVel().x < 0) {
 
-				boss.vel.x = 0;
+			//	boss.vel.x = 0;
 
-			}
+			//}
 
 			// 引っかかり判定だったら
-			if (isCatchMapChipBoss) {
+			if (rightCharacter->GetStackFlag()) {
 
-				addLineLengthBoss += moveLength;
+				rightCharacter->addLineLength += moveLength;
 
 			}
 
@@ -1877,32 +866,32 @@ void Game::Scramble()
 	}
 
 	// 引っかかり判定じゃなかったらだんだん短くする。
-	if (isBoss && (!isCatchMapChipBoss && 0 < addLineLengthBoss)) {
+	if (isBoss || (!isCatchMapChipBoss && 0 < rightCharacter->addLineLength)) {
 
-		addLineLengthBoss -= 5.0f;
+		rightCharacter->addLineLength -= 5.0f;
 
 		// ウィンドウに挟まったら
-		if (0 < boss.stuckWindowTimer) {
+		if (0 < rightCharacter->GetStackWinTimer()) {
 
-			addLineLengthBoss -= 20.0f;
+			rightCharacter->addLineLength -= 20.0f;
 
 		}
 
-		if (addLineLengthBoss < 0) addLineLengthBoss = 0;
+		if (rightCharacter->addLineLength < 0) rightCharacter->addLineLength = 0;
 
 	}
-	if (isPlayer && (!isCatchMapChipPlayer && 0 < addLineLengthPlayer)) {
+	if (isPlayer || (!isCatchMapChipPlayer && 0 < leftCharacter->addLineLength)) {
 
-		addLineLengthPlayer -= 5.0f;
+		leftCharacter->addLineLength -= 5.0f;
 
 		// ウィンドウに挟まったら
-		if (0 < player.stuckWindowTimer) {
+		if (leftCharacter->GetNowStuckWin()) {
 
-			addLineLengthPlayer -= 20.0f;
+			leftCharacter->addLineLength -= 20.0f;
 
 		}
 
-		if (addLineLengthPlayer < 0) addLineLengthPlayer = 0;
+		if (leftCharacter->addLineLength < 0) leftCharacter->addLineLength = 0;
 
 	}
 
@@ -1911,19 +900,19 @@ void Game::Scramble()
 
 	// 紐の中心点を計算
 	{
-		float distance = (boss.pos - player.centerPos).Length();
-		Vec2<float> bossDir = boss.pos - player.centerPos;
+		float distance = (rightCharacter->pos - leftCharacter->pos).Length();
+		Vec2<float> bossDir = rightCharacter->pos - leftCharacter->pos;
 		bossDir.Normalize();
 
 		// ボスとプレイヤー間の距離が規定値以下だったら
-		if (distance < LINE_LENGTH + LINE_LENGTH) {
+		if (distance < CharacterInterFace::LINE_LENGTH + CharacterInterFace::LINE_LENGTH) {
 			// 既定値以下だったら団子化減少を防ぐために、二点間の真ん中の座標にする。
-			lineCenterPos = player.centerPos + bossDir * Vec2<float>(distance / 2.0f, distance / 2.0f);
+			lineCenterPos = leftCharacter->pos + bossDir * Vec2<float>(distance / 2.0f, distance / 2.0f);
 		}
 		else {
 			// 規定値以上だったら普通に場所を求める。
-			float playerLineLength = lineLengthPlayer + addLineLengthPlayer;
-			lineCenterPos = player.centerPos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
+			float playerLineLength = leftCharacter->LINE_LENGTH + leftCharacter->addLineLength;
+			lineCenterPos = leftCharacter->pos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
 		}
 	}
 
