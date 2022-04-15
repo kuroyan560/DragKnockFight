@@ -6,6 +6,7 @@
 #include"AreaCollider.h"
 #include"../IntoTheAbyss/BulletCollision.h"
 #include<array>
+#include "Intersected.h"
 
 class CharacterInterFace
 {
@@ -30,6 +31,14 @@ class CharacterInterFace
 
 	//演出などの動きの関係で動きを止める
 	bool canMove;
+
+protected:
+
+	bool nowSwing;
+	Vec2<float> swingStartVec;
+	Vec2<float> swingEndVec;
+	float swingEaseRate;
+
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
@@ -59,8 +68,6 @@ protected:
 	//[共通関数]
 	//振り回し
 	void SwingPartner();
-	//当たり判定
-	void CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
 	//ゲッタ類
 	const Vec2<float>& GetPartnerPos()
 	{
@@ -70,6 +77,8 @@ protected:
 	Vec2<float>GetSwingInertia() { return swingInertiaVec * swingInertia; }
 	//振り回し直後の硬直中か
 	bool GetSwingRigor() { return 0 < afterSwingDelay; }
+	// 当たり判定情報保存。
+	void SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine);
 
 public:
 	//登場演出が完了したか
@@ -86,6 +95,8 @@ public:
 	void Init(const Vec2<float>& GeneratePos);	//ラウンド開始時に呼び出される
 	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
 	void Draw();
+	//当たり判定
+	void CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
 
 	const Square& GetAreaHitBox() { return areaHitBox; }
 	const SphereCollision& GetBulletHitSphere() { return bulletHitSphere; }

@@ -537,6 +537,10 @@ void Game::Update()
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
 
+	// プレイヤーとボスの当たり判定処理
+	leftCharacter->CheckHit(mapData, lineCenterPos);
+	rightCharacter->CheckHit(mapData, lineCenterPos);
+
 	miniMap.Update();
 
 	roundChangeEffect.Update();
@@ -652,7 +656,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
 	// プレイヤーとボス間に線を描画
-	if(roundChangeEffect.initFlag)
+	if (roundChangeEffect.initFlag)
 	{
 		Vec2<float> playerBossDir = rightCharacter->pos - leftCharacter->pos;
 		playerBossDir.Normalize();
@@ -831,7 +835,7 @@ void Game::Scramble()
 	}
 	else {
 
-		return;
+		//return;
 
 	}
 

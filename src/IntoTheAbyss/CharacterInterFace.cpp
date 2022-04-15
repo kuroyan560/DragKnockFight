@@ -147,6 +147,14 @@ void CharacterInterFace::SwingPartner()
 	nowSwing = true;
 }
 
+void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine)
+{
+	if(intersectedLine == INTERSECTED_LINE::INTERSECTED_TOP) isHitTop = true;
+	if(intersectedLine == INTERSECTED_LINE::INTERSECTED_BOTTOM) isHitBottom = true;
+	if(intersectedLine == INTERSECTED_LINE::INTERSECTED_LEFT) isHitLeft = true;
+	if(intersectedLine == INTERSECTED_LINE::INTERSECTED_RIGHT) isHitRight = true;
+}
+
 void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 {
 	pos = GeneratePos;
@@ -201,13 +209,6 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		}
 	}
 
-
-	//当たり判定
-	if (canMove)
-	{
-		CheckHit(MapData, LineCenterPos);
-	}
-
 	//引っかかっている
 	if (stackMapChip)
 	{
@@ -237,10 +238,15 @@ void CharacterInterFace::Draw()
 #include"MapChipCollider.h"
 void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
+
 	/*===== 当たり判定 =====*/
 
+	//当たり判定
+	if (!canMove)return;
+
+
 	//各キャラの特有の当たり判定
-	OnCheckHit(MapData, LineCenterPos);
+	//OnCheckHit(MapData, LineCenterPos);
 
 	// ボスがマップチップと当たっているかのフラグ
 	INTERSECTED_LINE intersectedBuff = {};
@@ -304,49 +310,49 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 	Vec2<float> posBuff = pos + Vec2<float>(size.x - offset, 0);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, size, MapData, INTERSECTED_TOP);
 	pos.y = posBuff.y;
-	if (!isHitTop && intersectedLine == INTERSECTED_TOP) isHitTop = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 	posBuff = pos - Vec2<float>(size.x - offset, 0);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, size, MapData, INTERSECTED_TOP);
 	pos.y = posBuff.y;
-	if (!isHitTop && intersectedLine == INTERSECTED_TOP) isHitTop = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, MapData, INTERSECTED_TOP);
-	if (!isHitTop && intersectedLine == INTERSECTED_TOP) isHitTop = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 
 	// 下方向
 	posBuff = pos + Vec2<float>(size.x - offset, 0);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, size, MapData, INTERSECTED_BOTTOM);
 	pos.y = posBuff.y;
-	if (!isHitBottom && intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 	posBuff = pos - Vec2<float>(size.x - offset, 0);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, size, MapData, INTERSECTED_BOTTOM);
 	pos.y = posBuff.y;
-	if (!isHitBottom && intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, MapData, INTERSECTED_BOTTOM);
-	if (!isHitBottom && intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 
 	// 右方向
 	posBuff = pos + Vec2<float>(0, size.y - offset);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, size, MapData, INTERSECTED_RIGHT);
 	pos.x = posBuff.x;
-	if (!isHitRight && intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 	posBuff = pos - Vec2<float>(0, size.y - offset);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, size, MapData, INTERSECTED_RIGHT);
 	pos.x = posBuff.x;
-	if (!isHitRight && intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, MapData, INTERSECTED_RIGHT);
-	if (!isHitRight && intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 
 	// 下方向
 	posBuff = pos + Vec2<float>(0, size.y - offset);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, size, MapData, INTERSECTED_LEFT);
 	pos.x = posBuff.x;
-	if (!isHitLeft && intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 	posBuff = pos - Vec2<float>(0, size.y - offset);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, size, MapData, INTERSECTED_LEFT);
 	pos.x = posBuff.x;
-	if (!isHitLeft && intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, MapData, INTERSECTED_LEFT);
-	if (!isHitLeft && intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
+	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 
 	// マップチップと当たっていたら
 	if (isHitTop || isHitRight || isHitLeft || isHitBottom) {
@@ -439,7 +445,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 
 		// 一定以下だったらダメージを与えない。
-		if (partner.lock()->swingEaseRate <= 0.2f) {
+		if (partner.lock()->swingEaseRate <= 0.1f) {
 
 			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 			Vec2<float>vec = { 0,0 };
