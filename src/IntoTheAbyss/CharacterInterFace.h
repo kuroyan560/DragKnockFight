@@ -15,8 +15,8 @@ class CharacterInterFace
 	void CrashUpdate();
 
 	//画面挟みクラッシュ判定
-	const int STRUCK_WINDOW_TIMER = 120.0f;// ウィンドウに挟まったタイマー
-	int stuckWindowTimer;		// ウィンドウに挟まったタイマー
+	const int STACK_WINDOW_TIMER = 120.0f;// ウィンドウに挟まったタイマー
+	int stackWindowTimer;		// ウィンドウに挟まったタイマー
 
 	//陣地との判定
 	Square areaHitBox;
@@ -101,10 +101,11 @@ public:
 	const Square& GetAreaHitBox() { return areaHitBox; }
 	const SphereCollision& GetBulletHitSphere() { return bulletHitSphere; }
 
-	const int& GetStackWinTimer() { return stuckWindowTimer; }
+	const int& GetStackWinTimer() { return stackWindowTimer; }
 	const bool& GetNowSwing() { return nowSwing; }
-	const bool& GetNowStuckWin() { return 0 < stuckWindowTimer; }
+	const bool& GetNowStuckWin() { return 0 < stackWindowTimer; }
 	const bool& GetCanMove() { return canMove; }
+	const bool& GetStackFlag() { return stackMapChip; }
 
 	void SetCanMove(const bool& Flg) { canMove = Flg; }
 

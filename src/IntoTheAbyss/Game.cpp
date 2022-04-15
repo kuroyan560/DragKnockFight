@@ -779,7 +779,7 @@ void Game::Scramble()
 			leftCharacter->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
 			// ˆø‚Á‚©‚©‚è”»’è‚¾‚Á‚½‚ç
-			if (isCatchMapChipPlayer) {
+			if (leftCharacter->GetStackFlag()) {
 
 				leftCharacter->addLineLength += moveLength;
 
@@ -822,7 +822,7 @@ void Game::Scramble()
 			//}
 
 			// ˆø‚Á‚©‚©‚è”»’è‚¾‚Á‚½‚ç
-			if (isCatchMapChipBoss) {
+			if (rightCharacter->GetStackFlag()) {
 
 				rightCharacter->addLineLength += moveLength;
 

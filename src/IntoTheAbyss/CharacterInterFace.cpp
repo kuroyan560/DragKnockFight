@@ -141,7 +141,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	pos = GeneratePos;
 	vel = { 0,0 };
 
-	stuckWindowTimer = 0;
+	stackWindowTimer = 0;
 
 	nowSwing = false;
 
@@ -184,9 +184,9 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	{
 		OnUpdate(MapData);
 		//ウィンドウの引っかかっている判定のタイマー更新
-		if (0 < stuckWindowTimer) {
+		if (0 < stackWindowTimer) {
 
-			--stuckWindowTimer;
+			--stackWindowTimer;
 		}
 	}
 
@@ -195,9 +195,6 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	{
 		CrashUpdate();
 	}
-
-	//マップチップと引っかかっているフラグを下ろす
-	stackMapChip = false;
 
 	//マップチップとの当たり判定があったときの処理呼び出し
 	for (int i = 0; i < HIT_DIR_NUM; ++i)
@@ -335,6 +332,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, size, MapData, INTERSECTED_LEFT);
 	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine);
 
+
+	//マップチップと引っかかっているフラグを下ろす
+	stackMapChip = false;
+
 	// マップチップと当たっていたら
 	if (isHitTop || isHitRight || isHitLeft || isHitBottom) {
 
@@ -465,7 +466,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 		}
 
 		// 壁はさみの判定
-		if (stuckWindowTimer <= 0) {
+		if (stackWindowTimer <= 0) {
 
 			Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
 			windowSize *= Vec2<int>(2, 2);
@@ -475,7 +476,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			bool winRight = windowSize.x <= pos.x + size.x - ScrollMgr::Instance()->scrollAmount.x;
 			if (winRight || winLeft) {
 
-				stuckWindowTimer = STRUCK_WINDOW_TIMER;
+				stackWindowTimer = STACK_WINDOW_TIMER;
 
 
 				//CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
@@ -488,7 +489,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			bool winBottom = windowSize.y <= pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y;
 			if (winBottom || winTop) {
 
-				stuckWindowTimer = STRUCK_WINDOW_TIMER;
+				stackWindowTimer = STACK_WINDOW_TIMER;
 
 				//CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
@@ -501,9 +502,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 	//prevIntersectedLine = intersectedBuff;
 
-	if (0 < stuckWindowTimer) {
+	if (0 < stackWindowTimer) {
 
-		--stuckWindowTimer;
+		--stackWindowTimer;
+		stackMapChip = false;
 
 	}
 }
