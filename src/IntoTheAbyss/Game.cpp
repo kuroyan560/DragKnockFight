@@ -738,8 +738,8 @@ void Game::Scramble()
 	// 移動量を取得。 優勢ゲージはここで更新。
 	double playerVel = leftCharacter->vel.Length() * SlowMgr::Instance()->slowAmount;
 	playerVelGauge = (leftCharacter->vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
-	double bossVel = rightCharacter->vel.Length() * SlowMgr::Instance()->slowAmount * 0.0f;
-	bossVelGauge = (rightCharacter->vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount * 0.0f;
+	double bossVel = rightCharacter->vel.Length() * SlowMgr::Instance()->slowAmount;
+	bossVelGauge = (rightCharacter->vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
 	// [振り回し状態のとき] [スタン演出中] は移動させない。
