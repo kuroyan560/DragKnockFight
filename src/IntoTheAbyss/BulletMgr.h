@@ -41,6 +41,9 @@ public:
 	// ¶¬ˆ—
 	void Generate(const Vec2<float>& generatePos, const float& forwardAngle, const bool& isShotRight = false);
 
+	//‰Šú‰»ˆ—
+	void Init();
+
 	// XVˆ—
 	void Update();
 

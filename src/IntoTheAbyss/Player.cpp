@@ -111,7 +111,7 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 	/*===== 入力処理 =====*/
 	// 入力に関する更新処理を行う。
-	Input(MapData);
+	if(GetCanMove())Input(MapData);
 
 	/*===== 更新処理 =====*/
 	//移動に関する処理

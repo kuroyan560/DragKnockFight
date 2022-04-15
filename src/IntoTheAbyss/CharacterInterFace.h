@@ -34,6 +34,9 @@ class CharacterInterFace
 	float swingInertia;			// 振り回しの慣性
 	int afterSwingDelay;		// 振り回しのあとにボスを少し動けない状態にするためのタイマー
 
+	//演出などの動きの関係で動きを止める
+	bool canMove;
+
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
 	std::array<int, HIT_DIR_NUM>mapChipHit;
@@ -51,8 +54,6 @@ protected:
 	std::weak_ptr<CharacterInterFace>partner;
 	StagingInterFace stagingDevice;
 	Vec2<float>size;	//サイズ
-
-
 
 	//[キャラごとに違う関数]
 	virtual void OnInit() = 0;
@@ -98,5 +99,8 @@ public:
 	const int& GetStackWinTimer() { return stuckWindowTimer; }
 	const bool& GetNowSwing() { return nowSwing; }
 	const bool& GetNowStuckWin() { return 0 < stuckWindowTimer; }
+	const bool& GetCanMove() { return canMove; }
+
+	void SetCanMove(const bool& Flg) { canMove = Flg; }
 };
 

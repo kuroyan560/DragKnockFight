@@ -166,6 +166,9 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	swingInertiaVec = {};
 	afterSwingDelay = 0;
 
+	//“oê‰‰o‚Ì‚½‚ßÅ‰‚Í“®‚¯‚È‚¢
+	canMove = false;
+
 	OnInit();
 }
 
@@ -199,7 +202,10 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 
 	//“–‚½‚è”»’è
-	CheckHit(MapData, LineCenterPos);
+	if (canMove)
+	{
+		CheckHit(MapData, LineCenterPos);
+	}
 
 	//ˆø‚Á‚©‚©‚Á‚Ä‚¢‚é
 	if (stackMapChip)

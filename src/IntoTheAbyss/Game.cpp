@@ -182,7 +182,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
-	AudioApp::Instance()->PlayWave(bgm, true);
+	AudioApp::Instance()->StopWave(bgm);
 
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
@@ -285,11 +285,12 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	GameTimer::Instance()->Init({}, 120, {}, {});
 	GameTimer::Instance()->Start();
 
-
 	ScoreManager::Instance()->Init();
 	firstLoadFlag = false;
 	lineExtendScale = lineExtendMaxScale;
 
+	BulletMgr::Instance()->Init();
+	BossBulletManager::Instance()->Init();
 }
 
 Game::Game()
@@ -407,21 +408,6 @@ void Game::Update()
 		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
 		SelectStage::Instance()->resetStageFlag = true;
 		//mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
-
-		//Vec2<float> door;
-		////デバック用のマップチップ番号からスタートする
-		//for (int y = 0; y < mapData.size(); ++y)
-		//{
-		//	for (int x = 0; x < mapData[y].size(); ++x)
-		//	{
-		//		if (mapData[y][x] == MAPCHIP_BLOCK_DEBUG_START)
-		//		{
-		//			door = { (float)x,(float)y };
-		//		}
-		//	}
-		//}
-		//player.Init(door * Vec2<float>(50.0f, 50.0f));
-		//ScrollMgr::Instance()->WarpScroll(player.centerPos);
 	}
 #pragma endregion
 
@@ -458,17 +444,23 @@ void Game::Update()
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
 	{
-		BossBulletManager::Instance()->Init();
+		//動けなくする
+		leftCharacter->SetCanMove(false);
+		rightCharacter->SetCanMove(false);
+
+		//時間計測ストップ
+		GameTimer::Instance()->SetInterruput(true);
+
 
 
 		//勝利数カウント演出
 		if (!WinCounter::Instance()->GetNowAnimation())
 		{
+
 			//どちらかが３勝とったらゲーム終了
 			if (WinCounter::Instance()->GetGameFinish())
 			{
 				//とりあえずリセットしとく
-				//WinCounter::Instance()->Reset();
 				ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
 				turnResultScene = true;
 			}
@@ -481,7 +473,7 @@ void Game::Update()
 				{
 					readyToStartRoundFlag = true;
 					roundFinishFlag = false;
-					SuperiorityGauge::Instance()->Init();
+					InitGame(0, 0);
 				}
 			}
 		}
@@ -502,8 +494,8 @@ void Game::Update()
 		//プレイヤーと敵の座標初期化
 		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initFlag)
 		{
-			InitGame(0, 0);
 			roundChangeEffect.initFlag = true;
+			AudioApp::Instance()->PlayWave(bgm, true);
 		}
 
 		//登場演出
@@ -513,9 +505,13 @@ void Game::Update()
 			bool rightApperar = rightCharacter->Appear();
 			if (leftAppear && rightApperar)	//どちらのキャラも登場演出完了
 			{
+				//ゲームスタート
 				readyToStartRoundFlag = false;
 				gameStartFlag = true;
 				roundTimer = 0;
+				leftCharacter->SetCanMove(true);
+				rightCharacter->SetCanMove(true);
+				GameTimer::Instance()->SetInterruput(false);
 			}
 		}
 		//gameStartFlag = true;
@@ -526,23 +522,19 @@ void Game::Update()
 		miniMap.Init(size);
 	}
 
-	if (!readyToStartRoundFlag)
-	{
-		miniMap.CalucurateCurrentPos(lineCenterPos);
+	miniMap.CalucurateCurrentPos(lineCenterPos);
 
-		// プレイヤーの更新処理
-		leftCharacter->Update(mapData, lineCenterPos);
+	// プレイヤーの更新処理
+	leftCharacter->Update(mapData, lineCenterPos);
 
-		// ボスの更新処理
-		rightCharacter->Update(mapData, lineCenterPos);
+	// ボスの更新処理
+	rightCharacter->Update(mapData, lineCenterPos);
 
-		// 弾を更新
-		BulletMgr::Instance()->Update();
+	// 弾を更新
+	BulletMgr::Instance()->Update();
 
-		// プレイヤーとボスの引っ張り合いの処理
-		Scramble();
-	}
-
+	// プレイヤーとボスの引っ張り合いの処理
+	Scramble();
 
 	miniMap.Update();
 
@@ -730,9 +722,10 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 void Game::Scramble()
 {
 	/*===== 引っ張り合いの処理 =====*/
-
 	// 前フレームの線の中心座標を保存
 	prevLineCenterPos = lineCenterPos;
+
+	if (!leftCharacter->GetCanMove() || !rightCharacter->GetCanMove())return;
 
 	Vec2<float> playerVelGauge;
 	Vec2<float> bossVelGauge;

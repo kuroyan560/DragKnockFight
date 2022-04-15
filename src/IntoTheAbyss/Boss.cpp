@@ -80,7 +80,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	else if (isSwingNow) {
 
 	}
-	else {
+	else if(GetCanMove()) {
 
 		//É{ÉXÇÃAI-----------------------
 		++patternTimer;
