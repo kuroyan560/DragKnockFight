@@ -111,7 +111,7 @@ public:
 	/*-- メンバ関数 --*/
 
 	// コンストラクタ
-	Player(const int& ControllerIdx);
+	Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx);
 	~Player();
 
 private:

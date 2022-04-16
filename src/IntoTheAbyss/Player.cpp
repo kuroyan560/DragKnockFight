@@ -29,13 +29,18 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player(const int& ControllerIdx) :CharacterInterFace(PLAYER_HIT_SIZE), controllerIdx(ControllerIdx)
+Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx) :CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx)
 {
 	/*====== コンストラクタ =====*/
-
-	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/arm_L.png");
-	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/arm_R.png");
-	static const int AIM_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/aim.png");
+	if (PLAYER_CHARACTER_NUM <= CharacterName)assert(0);
+	static const std::string NAME_DIR[PLAYER_CHARACTER_NUM] =
+	{
+		"luna",
+		"lacy"
+	};
+	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/arm_L.png");
+	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/arm_R.png");
+	static const int AIM_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/aim.png");
 	lHand = make_unique<PlayerHand>(ARM_GRAPH_L, AIM_GRAPH);
 	rHand = make_unique<PlayerHand>(ARM_GRAPH_R, AIM_GRAPH);
 
@@ -45,7 +50,7 @@ Player::Player(const int& ControllerIdx) :CharacterInterFace(PLAYER_HIT_SIZE), c
 	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav");
 	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
 
-	bulletGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/bullet.png");
+	bulletGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/bullet.png");
 }
 
 Player::~Player()

@@ -3,7 +3,6 @@
 #include"Singleton.h"
 #include<array>
 
-static const enum PLAYABLE_CHARACTER_NAME { PLAYABLE_LUNA, PLAYABLE_LACY, PLAYABLE_BOSS_0, PLAYABLE_CHARACTER_NUM };
 class CharacterManager : public Singleton<CharacterManager>
 {
 	friend class Singleton<CharacterManager>;

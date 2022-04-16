@@ -7,9 +7,9 @@ std::shared_ptr<CharacterInterFace> CharacterManager::CreateCharacter(const  PLA
 	switch (CharacterName)
 	{
 	case PLAYABLE_LUNA:
-		return std::make_shared<Player>(ControllerIdx);
+		return std::make_shared<Player>(CharacterName, ControllerIdx);
 	case PLAYABLE_LACY:
-		return std::make_shared<Player>(ControllerIdx);
+		return std::make_shared<Player>(CharacterName, ControllerIdx);
 	case PLAYABLE_BOSS_0:
 		return std::make_shared<Boss>();
 	}
