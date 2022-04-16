@@ -23,16 +23,33 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 		return;
 	}
 
+	bool allDidntHitFlg = true;
 	//近距離レイと壁との判定
 	for (int i = 0; i < DATA->nearLimmitLine.size(); ++i)
 	{
 		DATA->nearLimmitLine[i].hitFlag = CheckMapChipWallAndRay(DATA->nearLimmitLine[i].startPos, DATA->nearLimmitLine[i].endPos);
+		
+		if (DATA->nearLimmitLine[i].hitFlag)
+		{
+			allDidntHitFlg = false;
+		}
 	}
+
+
 	//遠距離レイと壁との判定
 	for (int i = 0; i < DATA->farLimmitLine.size(); ++i)
 	{
-		DATA->farLimmitLine[i].hitFlag = CheckMapChipWallAndRay(DATA->farLimmitLine[i].startPos, DATA->farLimmitLine[i].endPos);
+		//近距離の判定が全部なくなるまで有効にし続ける
+		if (CheckMapChipWallAndRay(DATA->farLimmitLine[i].startPos, DATA->farLimmitLine[i].endPos))
+		{
+			DATA->farLimmitLine[i].hitFlag = true;
+		}
+		if (allDidntHitFlg)
+		{
+			DATA->farLimmitLine[i].hitFlag = false;
+		}
 	}
+
 
 
 
@@ -57,7 +74,7 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 
 			//どの方向に進んでいいのか
 			//auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
-			float rad = GetDir(DATA->nearLimmitLine);
+			float rad = GetDir(DATA->nearLimmitLine, DATA->farLimmitLine);
 			auto power = KuroFunc::GetRand(PULL_POWER_MIN, PULL_POWER_MAX);
 			ACCEL.x = cos(rad) * power * DebugParameter::Instance()->bossDebugData.PULL_ADD_X_POWER;
 			ACCEL.y = sin(rad) * power;
@@ -226,11 +243,19 @@ bool BossPatternNormalMove::CheckMapChipWallAndRay(const Vec2<float> &START_POS,
 	return 0 < shortestPoints.size();
 }
 
-float BossPatternNormalMove::GetDir(const std::array<BossLimitMoveData, 8> &DATA)
+float BossPatternNormalMove::GetDir(const std::array<BossLimitMoveData, 8> &DATA, const std::array<BossLimitMoveData, 4> &FAR_LINE_DATA)
 {
 	//どの角度に向かって進んでいいか配列に纏めた物
 	std::vector<float>allowToUseThisAngleArray;
 	std::vector<float>moveToPlayerAreaAngleArray;
+
+	//遠距離レイを近距離の処理を合わせる為に別の配列に組み込む
+	std::array<BossLimitMoveData, 8>tmpFarLineData;
+	tmpFarLineData[0] = FAR_LINE_DATA[0];
+	tmpFarLineData[2] = FAR_LINE_DATA[1];
+	tmpFarLineData[4] = FAR_LINE_DATA[2];
+	tmpFarLineData[6] = FAR_LINE_DATA[3];
+
 
 	//どの方向に向かって進んでいいか
 	for (int i = 0; i < DATA.size(); ++i)
@@ -245,7 +270,7 @@ float BossPatternNormalMove::GetDir(const std::array<BossLimitMoveData, 8> &DATA
 			moveToPlayerAreaAngleArray.push_back(rad);
 		}
 		//プレイヤー陣地の方向以外に進む
-		else if (!DATA[i].hitFlag)
+		else if (!DATA[i].hitFlag && !tmpFarLineData[i].hitFlag)
 		{
 			//向いている方向から上下それぞれ45度の範囲内で乱数を取る
 			int maxAngle = (i + 1) * 45;

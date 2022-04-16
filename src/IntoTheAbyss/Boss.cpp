@@ -87,7 +87,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 		float angle = i * (360.0f / patternData.farLimmitLine.size());
 		float dir = Angle::ConvertToRadian(angle);
-		float distance = 350.0f;
+		float distance = 250.0f;
 		patternData.farLimmitLine[i].endPos = pos + Vec2<float>(cosf(dir), sinf(dir)) * distance;
 	}
 

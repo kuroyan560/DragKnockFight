@@ -27,6 +27,10 @@ struct BossLimitMoveData
 	Vec2<float>startPos;
 	Vec2<float>endPos;
 	bool hitFlag;
+
+	BossLimitMoveData() :startPos(), endPos(), hitFlag(false)
+	{
+	}
 };
 
 /// <summary>
