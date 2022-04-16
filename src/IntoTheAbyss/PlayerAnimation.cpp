@@ -1,12 +1,19 @@
 #include "PlayerAnimation.h"
 #include"TexHandleMgr.h"
 
-PlayerAnimation::PlayerAnimation()
+PlayerAnimation::PlayerAnimation(const PLAYABLE_CHARACTER_NAME& CharacterName)
 {
+	if (PLAYER_CHARACTER_NUM <= CharacterName)assert(0);
+	static const std::string NAME_DIR[PLAYER_CHARACTER_NUM] =
+	{
+		"luna",
+		"lacy"
+	};
+
 	static const int DEFAULT_FRONT_NUM = 1;
 	animations[DEFAULT_FRONT].graph.resize(1);
 	//TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/Player/on_ground_wait.png", ON_GROUND_WAIT_NUM, { ON_GROUND_WAIT_NUM,1 }, animations[ON_GROUND_WAIT].graph.data());
-	animations[DEFAULT_FRONT].graph[0] = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/player.png");
+	animations[DEFAULT_FRONT].graph[0] = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/player.png");
 	animations[DEFAULT_FRONT].interval = 10;
 	animations[DEFAULT_FRONT].loop = true;
 	animations[DEFAULT_FRONT].size = { 123,123 };
@@ -14,7 +21,7 @@ PlayerAnimation::PlayerAnimation()
 
 	static const int DEFAULT_BACK_NUM = 1;
 	animations[DEFAULT_BACK].graph.resize(1);
-	animations[DEFAULT_BACK].graph[0] = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/player_back.png");
+	animations[DEFAULT_BACK].graph[0] = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/player_back.png");
 	animations[DEFAULT_BACK].interval = 10;
 	animations[DEFAULT_BACK].loop = true;
 	animations[DEFAULT_BACK].size = { 117,96 };
