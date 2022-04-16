@@ -17,7 +17,7 @@ public:
 	INTERSECTED_LINE CheckHitSize(Vec2<float>& posA, const Vec2<float>& sizeA, const Vec2<float>& posB, const Vec2<float>& sizeB, const INTERSECTED_LINE& dir);
 
 
-private:
+public:
 
 	// ü•ª‚Æü•ª‚Ì“–‚½‚è”»’è
 	bool IsIntersected(const Vec2<float>& posA1, const Vec2<float>& posA2, const Vec2<float>& posB1, const Vec2<float>& posB2);
