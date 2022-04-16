@@ -23,10 +23,19 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 		return;
 	}
 
+	//ボスと壁との判定
+	for (int i = 0; i < DATA->limmitLine.size(); ++i)
+	{
+		DATA->limmitLine[i].hitFlag = CheckMapChipWallAndRay(DATA->limmitLine[i].startPos, DATA->limmitLine[i].endPos);
+	}
+
+
+
+
 	int PULL_SPAN_MIN = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MIN;
 	int PULL_SPAN_MAX = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MAX;
 	int PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
-	
+
 	Vec2<float>ACCEL = { 0.0f,0.0f };	//加速度
 	float PULL_POWER_MIN = DebugParameter::Instance()->bossDebugData.PULL_POWER_MIN;
 	float PULL_POWER_MAX = DebugParameter::Instance()->bossDebugData.PULL_POWER_MAX;
@@ -52,19 +61,19 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 	ACCEL = KuroMath::Lerp(ACCEL, { 0.0f,0.0f }, 0.8f);
 
 	if (UsersInput::Instance()->Input(DIK_0)) {
-	//	vel.x = OFFSET_VEL * 5.0f;
+		//	vel.x = OFFSET_VEL * 5.0f;
 		bool debug = false;
 	}
 }
 
-void BossPatternNormalMove::CheckMapChipWallAndRay()
+bool BossPatternNormalMove::CheckMapChipWallAndRay(const Vec2<float> &START_POS, const Vec2<float> &END_POS)
 {
 	//どうやって使うか
-	Vec2<float>handSegmentStart, handSegmentEnd;//線分
-	Vec2<float>handSegmentDir;					//線分の方向
-	Vec2<float>handPos;							//起点となる座標...?この場合ボスになるのか?
-	Vec2<float>sightPos;						//??
-	RoomMapChipArray mapData;					//マップ
+	Vec2<float>handSegmentStart(START_POS), handSegmentEnd(END_POS);//線分
+	Vec2<float>handSegmentDir(END_POS - START_POS);					//線分の方向
+	Vec2<float>handPos(START_POS);									//線分の始点
+	Vec2<float>sightPos;						//求められた交点の中の最短距離
+	RoomMapChipArray mapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());					//マップ
 	//どうやって使うか
 
 
@@ -174,9 +183,7 @@ void BossPatternNormalMove::CheckMapChipWallAndRay()
 			// 最短の距離を保存する。
 			pair<Vec2<float>, float> buff = { shortestPos, shoterstLength };
 			shortestPoints.push_back(buff);
-
 		}
-
 	}
 
 
@@ -192,8 +199,7 @@ void BossPatternNormalMove::CheckMapChipWallAndRay()
 	if (SHORTEST_COUNT <= 0) {
 
 		sightPos = { -100,-100 };
-		return;
-
+		return false;
 	}
 
 	for (int index = 0; index < SHORTEST_COUNT; ++index) {
@@ -205,4 +211,8 @@ void BossPatternNormalMove::CheckMapChipWallAndRay()
 		shortestLength = shortestPoints[index].second;
 		sightPos = shortestPoints[index].first;
 	}
+
+
+	//最短距離が一つでも算出されたら当たり判定を出す
+	return 0 < shortestPoints.size();
 }

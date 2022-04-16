@@ -61,7 +61,7 @@ void Boss::OnInit()
 }
 
 #include"Camera.h"
-void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
+void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 {
 	/*===== 更新処理 =====*/
 
@@ -70,6 +70,18 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	//	moveVel = { 0,0 };
 	//	return;
 	//}
+
+	for (int i = 0; i < patternData.limmitLine.size(); ++i)
+	{
+		patternData.limmitLine[i].startPos = pos;
+
+		float angle = i * (360.0f / patternData.limmitLine.size());
+		float dir = angle * Angle::PI() / 180.0f;
+		float distance = 150.0f;
+		patternData.limmitLine[i].endPos = pos + Vec2<float>(cosf(dir), sinf(dir)) * distance;
+
+	}
+
 
 	if (bossPatternNow != BOSS_PATTERN_NORMALMOVE)
 	{
@@ -96,7 +108,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	else if (isSwingNow) {
 
 	}
-	else if(GetCanMove()) {
+	else if (GetCanMove()) {
 
 		//ボスのAI-----------------------
 		++patternTimer;
@@ -120,6 +132,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 			patternTimer = 0;
 		}
 		//ボスのAI-----------------------
+		bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 
 		//ボスの挙動
 		if (bossPatternNow != oldBossPattern)
@@ -183,9 +196,24 @@ void Boss::OnDraw()
 	auto drawPos = pos + stagingDevice.GetShake();
 	auto drawScale = size * stagingDevice.GetExtRate();
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
-	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
+	//DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
+//		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
 
+
+	//レイとの判定確認
+	for (int i = 0; i < patternData.limmitLine.size(); ++i)
+	{
+		Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.limmitLine[i].startPos);
+		Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.limmitLine[i].endPos);
+		if (patternData.limmitLine[i].hitFlag)
+		{
+			DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 0, 0, 255));
+		}
+		else
+		{
+			DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 255, 255, 255));
+		}
+	}
 }
 
 //void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)

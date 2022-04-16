@@ -22,6 +22,13 @@ struct BossBulletData
 	}
 };
 
+struct BossLimitMoveData
+{
+	Vec2<float>startPos;
+	Vec2<float>endPos;
+	bool hitFlag;
+};
+
 /// <summary>
 /// ボスの行動パターンに必要な情報を渡す
 /// </summary>
@@ -31,6 +38,7 @@ struct BossPatternData
 	Vec2<float>*moveVel;
 	std::array<BossBulletData, 100>bulltData;
 	bool swingFlag;
+	std::array<BossLimitMoveData, 8> limmitLine;//ボスと壁との距離を調べる為の情報
 
 	BossPatternData() :swingFlag(false)
 	{

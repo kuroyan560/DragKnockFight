@@ -17,6 +17,6 @@ private:
 	int PULL_TIMER;
 	const int MAP_CHIP_SIZE = 50;
 	const int MAP_CHIP_HALF_SIZE = MAP_CHIP_SIZE / 2;
-	void CheckMapChipWallAndRay();
+	bool CheckMapChipWallAndRay(const Vec2<float> &START_POS, const Vec2<float>&END_POS);
 };
 
