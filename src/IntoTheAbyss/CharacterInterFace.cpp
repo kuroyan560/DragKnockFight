@@ -48,7 +48,7 @@ void CharacterInterFace::SwingUpdate()
 
 	}
 
-	const float lineLength = LINE_LENGTH * 2 + addLineLength + partner.lock()->addLineLength;
+	const float lineLength = (pos - partner.lock()->pos).Length();
 	partner.lock()->pos = this->pos + easeNowVec * lineLength;
 
 	// イージングタイマーが限界を超えたらフラグを折る。
