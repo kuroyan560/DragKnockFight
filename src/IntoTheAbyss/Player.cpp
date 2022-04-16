@@ -29,7 +29,7 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player(const WHICH_TEAM& Team, const int& ControllerIdx) :CharacterInterFace(Team,PLAYER_HIT_SIZE), controllerIdx(ControllerIdx)
+Player::Player(const int& ControllerIdx) :CharacterInterFace(PLAYER_HIT_SIZE), controllerIdx(ControllerIdx)
 {
 	/*====== コンストラクタ =====*/
 

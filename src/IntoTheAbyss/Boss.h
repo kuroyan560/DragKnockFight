@@ -67,7 +67,7 @@ public:
 	/*===== メンバ関数 =====*/
 
 	// コンストラクタ
-	Boss(const WHICH_TEAM& Team);
+	Boss();
 
 private:
 	// 初期化処理

@@ -25,11 +25,8 @@
 
 
 static const Vec2<float> SCALE = { 80.0f,80.0f };
-Boss::Boss(const WHICH_TEAM& Team) :CharacterInterFace(Team,SCALE)
+Boss::Boss() :CharacterInterFace(SCALE)
 {
-	//ボスは常に右チーム
-	if (Team == LEFT_TEAM)assert(0);
-
 	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
 	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
 

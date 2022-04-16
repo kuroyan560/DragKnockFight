@@ -8,7 +8,7 @@
 #include<array>
 #include "Intersected.h"
 
-static const enum WHICH_TEAM { LEFT_TEAM, RIGHT_TEAM };
+static const enum WHICH_TEAM { LEFT_TEAM, RIGHT_TEAM, TEAM_NUM };
 
 class CharacterInterFace
 {
@@ -52,7 +52,7 @@ protected:
 	bool stackMapChip;
 
 	//試合開始時に呼び出される
-	CharacterInterFace(const WHICH_TEAM& Team, const Vec2<float>& HonraiSize) :team(Team), size(HonraiSize)
+	CharacterInterFace(const Vec2<float>& HonraiSize) : size(HonraiSize)
 	{
 		areaHitBox.center = &pos;
 		areaHitBox.size = size;
@@ -101,7 +101,11 @@ public:
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
 
-	void RegisterSetPartner(const std::shared_ptr<CharacterInterFace>Partner) { partner = Partner; }
+	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team)
+	{ 
+		partner = Partner;
+		team = Team;
+	}
 	void Init(const Vec2<float>& GeneratePos);	//ラウンド開始時に呼び出される
 	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
 	void Draw();

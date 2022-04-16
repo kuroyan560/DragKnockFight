@@ -111,7 +111,7 @@ public:
 	/*-- メンバ関数 --*/
 
 	// コンストラクタ
-	Player(const WHICH_TEAM& Team, const int& ControllerIdx);
+	Player(const int& ControllerIdx);
 	~Player();
 
 private:
