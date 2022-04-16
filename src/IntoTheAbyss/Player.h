@@ -56,6 +56,8 @@ public:
 
 	Vec2<float>scale;
 
+	const int controllerIdx;
+
 public:
 
 	/*-- 定数 --*/
@@ -116,7 +118,7 @@ public:
 	/*-- メンバ関数 --*/
 
 	// コンストラクタ
-	Player();
+	Player(const int& ControllerIdx);
 	~Player();
 
 private:

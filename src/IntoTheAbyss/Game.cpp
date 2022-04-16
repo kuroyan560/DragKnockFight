@@ -279,7 +279,6 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	responePos -= 100;
 
 	lineCenterPos = responePos;
-	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 	leftCharacter->Init(responePos - Vec2<float>(150.0f, 0.0f));
 	rightCharacter->Init(responePos + Vec2<float>(150.0f, 0.0f));
 
@@ -345,7 +344,7 @@ void Game::Init()
 
 	turnResultScene = false;
 
-	leftCharacter = std::make_shared<Player>();
+	leftCharacter = std::make_shared<Player>(0);
 	rightCharacter = std::make_shared<Boss>();
 
 	rightCharacter->RegisterSetPartner(leftCharacter);
@@ -363,10 +362,10 @@ void Game::Update()
 	const bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//ƒ}ƒbƒv‚ÌØ‚è‘Ö‚¦
 	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectStageFlag2 && nowSelectNum == 0)
-	const bool up = UsersInput::Instance()->OnTrigger(DIK_UP) || UsersInput::Instance()->OnTrigger(DPAD_UP);
-	const bool down = UsersInput::Instance()->OnTrigger(DIK_DOWN) || UsersInput::Instance()->OnTrigger(DPAD_DOWN);
-	const bool left = UsersInput::Instance()->OnTrigger(DIK_LEFT) || UsersInput::Instance()->OnTrigger(DPAD_LEFT);
-	const bool right = UsersInput::Instance()->OnTrigger(DIK_RIGHT) || UsersInput::Instance()->OnTrigger(DPAD_RIGHT);
+	const bool up = UsersInput::Instance()->KeyOnTrigger(DIK_UP) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_UP);
+	const bool down = UsersInput::Instance()->KeyOnTrigger(DIK_DOWN) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_DOWN);
+	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_LEFT);
+	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_RIGHT);
 
 	if (up && enableToSelectStageFlag2 && nowSelectNum == 0)
 	{
@@ -406,7 +405,7 @@ void Game::Update()
 		debugStageData[1] = 0;
 	}
 
-	const bool done = UsersInput::Instance()->OnTrigger(DIK_RETURN) || UsersInput::Instance()->OnTrigger(A);
+	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0,A);
 	if (done)
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
@@ -416,7 +415,7 @@ void Game::Update()
 	}
 #pragma endregion
 
-	const bool resetInput = UsersInput::Instance()->OnTrigger(DIK_SPACE) || UsersInput::Instance()->OnTrigger(BACK);
+	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0,BACK);
 	if (resetInput)
 	{
 		SelectStage::Instance()->resetStageFlag = true;

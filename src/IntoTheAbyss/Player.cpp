@@ -29,7 +29,7 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player() :CharacterInterFace(PLAYER_HIT_SIZE)
+Player::Player(const int& ControllerIdx) :CharacterInterFace(PLAYER_HIT_SIZE), controllerIdx(ControllerIdx)
 {
 	/*====== コンストラクタ =====*/
 
@@ -325,7 +325,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	Vec2<float> inputVec;
 
-	inputVec = UsersInput::Instance()->GetLeftStickVecFuna();
+	inputVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
 	inputVec /= {32768.0f, 32768.0f};
 	// 入力のデッドラインを設ける。
 	if (inputVec.Length() >= 0.9f) {
@@ -338,7 +338,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	}
 
-	inputVec = UsersInput::Instance()->GetRightStickVecFuna();
+	inputVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
 	inputVec /= {32768.0f, 32768.0f};
 
 	// 入力のデッドラインを設ける。
@@ -353,7 +353,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	}
 
 	// LBが押されたら反動をつける。
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
 
 		// 反動をつける。
 		float rHandAngle = lHand->GetAngle();
@@ -396,7 +396,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	}
 
 	// RBが押されたら反動をつける。
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
 
 		// 反動をつける。
 		float lHandAngle = rHand->GetAngle();
@@ -454,7 +454,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
 
 	// RTが押されたら
-	if (swingCoolTime <= 0 && UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RT)) {
+	if (swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT)) {
 
 		// 振り回しの処理
 

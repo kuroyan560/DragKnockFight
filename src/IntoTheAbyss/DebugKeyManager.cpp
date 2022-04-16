@@ -22,7 +22,7 @@ bool DebugKeyManager::DebugKeyTrigger(int KEY, const std::string &KEY_NAME, cons
 {
 #ifdef  _DEBUG
 	CheckKey(KEY, KEY_NAME, KEY_NUM);
-	return UsersInput::Instance()->OnTrigger(KEY);
+	return UsersInput::Instance()->KeyOnTrigger(KEY);
 #endif //  DEBUG
 	return false;
 }
@@ -31,7 +31,7 @@ bool DebugKeyManager::DebugKeyState(int KEY, const std::string &KEY_NAME, const 
 {
 #ifdef  _DEBUG
 	CheckKey(KEY, KEY_NAME, KEY_NUM);
-	return UsersInput::Instance()->Input(KEY);
+	return UsersInput::Instance()->KeyInput(KEY);
 #endif //  DEBUG
 	return false;
 }

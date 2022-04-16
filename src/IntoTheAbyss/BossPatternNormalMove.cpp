@@ -48,7 +48,7 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 
 	ACCEL = KuroMath::Lerp(ACCEL, { 0.0f,0.0f }, 0.8f);
 
-	if (UsersInput::Instance()->Input(DIK_0)) {
+	if (UsersInput::Instance()->KeyInput(DIK_0)) {
 	//	vel.x = OFFSET_VEL * 5.0f;
 		bool debug = false;
 	}
