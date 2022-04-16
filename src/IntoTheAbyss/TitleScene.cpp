@@ -35,7 +35,7 @@ void TitleScene::OnInitialize()
 void TitleScene::OnUpdate()
 {
 	//ステージセレクトに移動する
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::A))
+	if (UsersInput::Instance()->ControllerOnTrigger(0,XBOX_BUTTON::A))
 	{
 		KuroEngine::Instance().ChangeScene(1, changeScene);
 	}

@@ -112,7 +112,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			// 全ての線分との当たり判定を行う。
 
 			// 上辺
-			if (IsIntersected(rightTop, leftTop, prevFramePosBuff - playerVel, prevFramePosBuff + playerVel)) {
+			if (IsIntersected(rightTop, leftTop, prevFramePosBuff, prevFramePosBuff + playerVel)) {
 
 				// 当たっていたら交点を計算して保存
 				pair<Vec2<float>, INTERSECTED_LINE> buff;
@@ -135,7 +135,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 
 			// 右辺
 			bool isHitRight = false;
-			if (isPlayer) isHitRight = IsIntersected(rightTop, rightBottom, prevFramePosBuff - playerVel, prevFramePosBuff + playerVel);
+			if (isPlayer) isHitRight = IsIntersected(rightTop, rightBottom, prevFramePosBuff, prevFramePosBuff + playerVel);
 			if (!isPlayer) isHitRight = IsIntersected(rightTop, rightBottom, pos - playerVel, pos + playerVel);
 			if (isHitRight) {
 
@@ -159,7 +159,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			}
 
 			// 下辺
-			if (IsIntersected(leftBottom, rightBottom, prevFramePosBuff - playerVel, prevFramePosBuff + playerVel)) {
+			if (IsIntersected(leftBottom, rightBottom, prevFramePosBuff , prevFramePosBuff + playerVel)) {
 
 				// 当たっていたら交点を計算して保存
 				pair<Vec2<float>, INTERSECTED_LINE> buff;
@@ -186,7 +186,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 
 			// 左辺
 			bool isIntersectedLeft = false;
-			if (isPlayer) isIntersectedLeft = IsIntersected(leftBottom, leftTop, prevFramePosBuff - playerVel, prevFramePosBuff + playerVel);
+			if (isPlayer) isIntersectedLeft = IsIntersected(leftBottom, leftTop, prevFramePosBuff, prevFramePosBuff + playerVel);
 			if (!isPlayer) isIntersectedLeft = IsIntersected(leftBottom, leftTop, pos - playerVel, pos + playerVel);
 			if (isIntersectedLeft) {
 

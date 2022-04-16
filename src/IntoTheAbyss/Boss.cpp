@@ -27,9 +27,8 @@
 static const Vec2<float> SCALE = { 80.0f,80.0f };
 Boss::Boss() :CharacterInterFace(SCALE)
 {
-
-	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy.png");
-	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/enemy_back.png");
+	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
+	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
 
 	bossPattern[0] = std::make_unique<BossPatternNormalMove>();
 	bossPattern[1] = std::make_unique<BossPatternAttack>();

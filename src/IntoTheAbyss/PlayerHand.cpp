@@ -10,7 +10,7 @@
 #include"TexHandleMgr.h"
 #include "WinApp.h"
 
-PlayerHand::PlayerHand(const int& AimGraphHandle) : aimGraphHandle(AimGraphHandle)
+PlayerHand::PlayerHand(const int& HandGraph, const int& AimGraphHandle) : handGraphHandle(HandGraph), aimGraphHandle(AimGraphHandle)
 {
 
 	/*-- コンストラクタ --*/
@@ -27,14 +27,9 @@ PlayerHand::PlayerHand(const int& AimGraphHandle) : aimGraphHandle(AimGraphHandl
 	// 入力された角度を初期化
 	inputAngle = 0;
 
-	// ビーコンのクールタイムを初期化
-	pikeCooltime = 0;
-
 	// 手の画像をロード
 	//playerHandGraph = LoadGraph("Resource/PlayerHand.png");
 	//playerHandGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/PlayerHand.png");
-
-	isNoInputTimer = false;
 
 	ptLight.SetInfluenceRange(64.0f);
 }
@@ -55,11 +50,6 @@ void PlayerHand::Init(const float& armDistance)
 
 	// 入力された角度を初期化
 	inputAngle = 0;
-
-	// ビーコンのクールタイムを初期化
-	pikeCooltime = 0;
-
-	isNoInputTimer = false;
 
 	offsetRadiusTimer = OFFSET_RADIUS_TIME;
 
@@ -85,22 +75,19 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 	Vec2<float>offset = { cos(inputAngle) * offsetRadius,sin(inputAngle) * offsetRadius };
 	drawPos = handPos + offset;
 
-	// ビーコンのクールタイムの更新を行う。
-	if (pikeCooltime > 0) --pikeCooltime;
-
 	//isFirstShot = false;
 
 }
 
 #include"DrawFunc.h"
 #include"DrawFunc_Shadow.h"
-void PlayerHand::Draw(const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool& DRAW_CURSOR)
+void PlayerHand::Draw(const float& ExtRate, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool& DRAW_CURSOR)
 {
 	/*-- 描画処理 --*/
 	afterImg.Draw();
 
 	Vec2<float>ext = { ScrollMgr::Instance()->zoom * ExtRate ,ScrollMgr::Instance()->zoom * ExtRate };
-	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos), ext, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(GraphHandle));
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos), ext, inputAngle - InitAngle, TexHandleMgr::GetTexBuffer(handGraphHandle));
 
 	//照準を描画
 	if (DRAW_CURSOR)

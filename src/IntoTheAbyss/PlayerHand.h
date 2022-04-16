@@ -25,12 +25,10 @@ public:
 	Vec2<float> muzzlePos;			// 銃口の座標
 	float armDistance;		// プレイヤーの中心からの距離 右手と左手で変えるため
 	float inputAngle;		// 入力された角度
-	bool isNoInputTimer;	// Input Sitenai Tokiha Honrai Amount Wo Herasu
-
-	int pikeCooltime;		// 短槍全般ののクールタイム
 
 	AfterImg afterImg;
 
+	const int handGraphHandle;
 	const int aimGraphHandle;
 	//照準を光らせる
 	Light::Point ptLight;
@@ -51,7 +49,7 @@ public:
 public:
 
 	// コンストラクタ
-	PlayerHand(const int& AimGraphHandle);
+	PlayerHand(const int& HandGraph, const int& AimGraphHandle);
 
 	// 初期化処理
 	void Init(const float& armDistance);
@@ -60,7 +58,7 @@ public:
 	void Update(const Vec2<float>& playerCenterPos);
 
 	// 描画処理
-	void Draw(const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool &DRAW_CURSOR);
+	void Draw(const float& ExtRate, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool &DRAW_CURSOR);
 
 	// 弾を打った時の処理
 	void Shot(const Vec2<float>& forwardVec, const bool& isFirstShot);
@@ -77,9 +75,6 @@ public:
 
 	// Angle wo Tikadukeru
 	inline void PutCloseAngle(const float& defAngle) { inputAngle += (defAngle - inputAngle) / 10.0f; }
-
-	// isNoInputTimer no Setter
-	inline void SetIsNoInputTimer(const bool& set) { isNoInputTimer = set; }
 
 	// 角度のセッタ
 	inline void SetAngle(const float& angle) { inputAngle = angle; }

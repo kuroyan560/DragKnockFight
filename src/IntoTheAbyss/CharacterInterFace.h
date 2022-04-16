@@ -8,8 +8,11 @@
 #include<array>
 #include "Intersected.h"
 
+static const enum WHICH_TEAM { LEFT_TEAM, RIGHT_TEAM, TEAM_NUM };
+
 class CharacterInterFace
 {
+private:
 	void SwingUpdate();
 	void Crash(const Vec2<float>& MyVec);
 	void CrashUpdate();
@@ -32,6 +35,9 @@ class CharacterInterFace
 	//演出などの動きの関係で動きを止める
 	bool canMove;
 
+	//左か右か
+	WHICH_TEAM team;
+
 protected:
 
 	bool nowSwing;
@@ -46,7 +52,7 @@ protected:
 	bool stackMapChip;
 
 	//試合開始時に呼び出される
-	CharacterInterFace(const Vec2<float>& HonraiSize) :size(HonraiSize)
+	CharacterInterFace(const Vec2<float>& HonraiSize) : size(HonraiSize)
 	{
 		areaHitBox.center = &pos;
 		areaHitBox.size = size;
@@ -61,6 +67,7 @@ protected:
 	//[キャラごとに違う関数]
 	virtual void OnInit() = 0;
 	virtual void OnUpdate(const std::vector<std::vector<int>>& MapData) = 0;
+	virtual void OnUpdateNoRelatedSwing() = 0;	//スウィング中でも通る処理
 	virtual void OnDraw() = 0;
 	virtual void OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos) = 0;
 	virtual void OnHitMapChip(const HIT_DIR& Dir) = 0;
@@ -77,6 +84,9 @@ protected:
 	Vec2<float>GetSwingInertia() { return swingInertiaVec * swingInertia; }
 	//振り回し直後の硬直中か
 	bool GetSwingRigor() { return 0 < afterSwingDelay; }
+	//左チームか右チームか
+	const WHICH_TEAM& GetWhichTeam() { return team; }
+
 	// 当たり判定情報保存。
 	void SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine);
 
@@ -91,7 +101,11 @@ public:
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
 
-	void RegisterSetPartner(const std::shared_ptr<CharacterInterFace>Partner) { partner = Partner; }
+	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team)
+	{ 
+		partner = Partner;
+		team = Team;
+	}
 	void Init(const Vec2<float>& GeneratePos);	//ラウンド開始時に呼び出される
 	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
 	void Draw();

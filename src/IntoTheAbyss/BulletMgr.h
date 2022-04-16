@@ -39,7 +39,7 @@ public:
 	void Setting();
 
 	// ¶¬ˆ—
-	void Generate(const Vec2<float>& generatePos, const float& forwardAngle, const bool& isShotRight = false);
+	void Generate(const int& graphHandle, const Vec2<float>& generatePos, const float& forwardAngle, const bool& isShotRight = false);
 
 	//‰Šú‰»ˆ—
 	void Init();

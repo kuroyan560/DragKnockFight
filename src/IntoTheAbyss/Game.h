@@ -43,10 +43,6 @@ class Game
 	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum);
 	const int& GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS);
 
-	//キャラクター情報
-	std::shared_ptr<CharacterInterFace>leftCharacter;
-	std::shared_ptr<CharacterInterFace>rightCharacter;
-
 	// ボスorプレイヤーが引っかかっているかのフラグ
 	bool isCatchMapChipBoss;
 	bool isCatchMapChipPlayer;

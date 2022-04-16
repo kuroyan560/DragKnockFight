@@ -17,7 +17,7 @@ void BulletMgr::Setting()
 
 }
 
-void BulletMgr::Generate(const Vec2<float>& generatePos, const float& forwardAngle, const bool& isShotRight)
+void BulletMgr::Generate(const int& graphHandle, const Vec2<float>& generatePos, const float& forwardAngle, const bool& isShotRight)
 {
 
 	/*-- ê∂ê¨èàóù --*/
@@ -48,7 +48,7 @@ void BulletMgr::Generate(const Vec2<float>& generatePos, const float& forwardAng
 			Vec2<float> generateForwardVec = { cosf(generateAngle), sinf(generateAngle) };
 
 			// ê∂ê¨Ç∑ÇÈÅB
-			bullets[index]->Generate(generatePos, generateForwardVec, isShotRight == true ? Bullet::R_HAND : Bullet::L_HAND);
+			bullets[index]->Generate(graphHandle, generatePos, generateForwardVec, isShotRight == true ? Bullet::R_HAND : Bullet::L_HAND);
 
 			break;
 
