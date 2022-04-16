@@ -221,11 +221,22 @@ float BossPatternNormalMove::GetDir(const std::array<BossLimitMoveData, 8> &DATA
 {
 	//どの角度に向かって進んでいいか配列に纏めた物
 	std::vector<float>allowToUseThisAngleArray;
+	std::vector<float>moveToPlayerAreaAngleArray;
 
 	//どの方向に向かって進んでいいか
 	for (int i = 0; i < DATA.size(); ++i)
 	{
-		if (!DATA[i].hitFlag)
+		//プレイヤー陣地の方向に進む
+		if (!DATA[i].hitFlag && 3 <= i && i <= 5)
+		{
+			//向いている方向から上下それぞれ45度の範囲内で乱数を取る
+			int maxAngle = (i + 1) * 45;
+			int minAngle = maxAngle - 90;
+			float rad = Angle::ConvertToRadian(KuroFunc::GetRand(minAngle, maxAngle));
+			moveToPlayerAreaAngleArray.push_back(rad);
+		}
+		//プレイヤー陣地の方向以外に進む
+		else if (!DATA[i].hitFlag)
 		{
 			//向いている方向から上下それぞれ45度の範囲内で乱数を取る
 			int maxAngle = (i + 1) * 45;
@@ -235,9 +246,16 @@ float BossPatternNormalMove::GetDir(const std::array<BossLimitMoveData, 8> &DATA
 		}
 	}
 
-	//
-
-
-	int getDirNum = KuroFunc::GetRand(0, allowToUseThisAngleArray.size() - 1);
-	return 	allowToUseThisAngleArray[getDirNum];
+	int getDirNum = -1;
+	//プレイヤー陣地に向かわない処理
+	if (allowToUseThisAngleArray.size() != 0)
+	{
+		getDirNum = KuroFunc::GetRand(0, allowToUseThisAngleArray.size() - 1);
+		return 	allowToUseThisAngleArray[getDirNum];
+	}
+	else
+	{
+		getDirNum = KuroFunc::GetRand(0, moveToPlayerAreaAngleArray.size() - 1);
+		return 	moveToPlayerAreaAngleArray[getDirNum];
+	}
 }
