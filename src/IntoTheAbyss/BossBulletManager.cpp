@@ -31,7 +31,7 @@ void BossBulletManager::Generate(const Vec2<float> &generatePos, const float &fo
 		Vec2<float> generateForwardVec = { cosf(forwardAngle), sinf(forwardAngle) };
 
 		// ¶¬‚·‚éB
-		bullets[index]->Generate(generatePos, generateForwardVec, false, true ? Bullet::R_HAND : Bullet::L_HAND, speed, graph);
+		bullets[index]->Generate(generatePos, generateForwardVec, Bullet::R_HAND, speed, graph);
 
 		break;
 	}

@@ -33,11 +33,6 @@ DrawMap::DrawMap()
 		{
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"平行投影行列定数バッファ"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"拡大率"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"アクティブ中のライト数バッファ"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"ディレクションライト情報 (構造化バッファ)"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"ポイントライト情報 (構造化バッファ)"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"スポットライト情報 (構造化バッファ)"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"天球ライト情報 (構造化バッファ)"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャリソース"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"ノーマルマップシェーダーリソース"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"エミッシブマップシェーダーリソース")
@@ -78,7 +73,7 @@ void DrawMap::AddChip(const Vec2<float>& Pos, const float& Radian)
 }
 
 #include"ScrollMgr.h"
-void DrawMap::Draw(LightManager& LigManager, const std::shared_ptr<TextureBuffer>& Tex, const std::shared_ptr<TextureBuffer>& NormalMap, const std::shared_ptr<TextureBuffer>& EmissiveMap)
+void DrawMap::Draw(const std::shared_ptr<TextureBuffer>& Tex, const std::shared_ptr<TextureBuffer>& NormalMap, const std::shared_ptr<TextureBuffer>& EmissiveMap)
 {
 	KuroEngine::Instance().Graphics().SetPipeline(PIPELINE);
 
@@ -95,13 +90,8 @@ void DrawMap::Draw(LightManager& LigManager, const std::shared_ptr<TextureBuffer
 		{
 			KuroEngine::Instance().GetParallelMatProjBuff(),
 			EXT_RATE_BUFF,
-			LigManager.GetLigNumInfo(),	//アクティブ中のライト数
-			LigManager.GetLigInfo(Light::DIRECTION),	//ディレクションライト
-			LigManager.GetLigInfo(Light::POINT),	//ポイントライト
-			LigManager.GetLigInfo(Light::SPOT),	//スポットライト
-			LigManager.GetLigInfo(Light::HEMISPHERE),	//天球ライト
 			Tex,normalMap,emissiveMap
-		}, { CBV,CBV,CBV,SRV,SRV,SRV,SRV,SRV,SRV,SRV }, 0.0f, true);
+		}, { CBV,CBV,SRV,SRV,SRV }, 0.0f, true);
 
 	chipNum = 0;
 }

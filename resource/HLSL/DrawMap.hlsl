@@ -10,19 +10,9 @@ cbuffer cbuff1 : register(b1)
     float extRate;
 };
 
-cbuffer cbuff2 : register(b2)
-{
-    LightInfo ligNum; //アクティブ中のライトの数の情報
-}
-
-StructuredBuffer<DirectionLight> dirLight : register(t0);
-StructuredBuffer<PointLight> pointLight : register(t1);
-StructuredBuffer<SpotLight> spotLight : register(t2);
-StructuredBuffer<HemiSphereLight> hemiSphereLight : register(t3);
-
-Texture2D<float4> tex : register(t4); //テクスチャ
-Texture2D<float4> normalMap : register(t5); //ノーマルマップ
-Texture2D<float4> emissiveMap : register(t6); //エミッシブマップ
+Texture2D<float4> tex : register(t0); //テクスチャ
+Texture2D<float4> normalMap : register(t1); //ノーマルマップ
+Texture2D<float4> emissiveMap : register(t2); //エミッシブマップ
 
 SamplerState smp : register(s0);
 

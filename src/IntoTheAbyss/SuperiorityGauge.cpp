@@ -4,6 +4,7 @@
 #include"../Engine/DrawFunc_FillTex.h"
 #include"../Engine/DrawFunc.h"
 #include"TexHandleMgr.h"
+#include"DebugImGuiManager.h"
 
 float SuperiorityGauge::GAUGE_MAX_VALUE = 100.0f;
 int SuperiorityGauge::STACK_MAX_TIMER = 120;
@@ -15,9 +16,11 @@ SuperiorityGauge::SuperiorityGauge()
 	gaugeGraphHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_flame.png");
 	gaugeVarGraphPlayer = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_player.png");
 	gaugeVarGraphEnemy = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_enemy.png");
+
+	imguiHandle = DebugImGuiManager::Instance()->Add("Gauge");
 }
 
-void SuperiorityGauge::AddPlayerGauge(const float& VALUE)
+void SuperiorityGauge::AddPlayerGauge(const float &VALUE)
 {
 	float value = fabs(VALUE);
 	playerGaugeData->gaugeValue += value;
@@ -26,7 +29,7 @@ void SuperiorityGauge::AddPlayerGauge(const float& VALUE)
 	LimitGauge();
 }
 
-void SuperiorityGauge::AddEnemyGauge(const float& VALUE)
+void SuperiorityGauge::AddEnemyGauge(const float &VALUE)
 {
 	float value = fabs(VALUE);
 	playerGaugeData->gaugeValue += -value;
@@ -35,17 +38,17 @@ void SuperiorityGauge::AddEnemyGauge(const float& VALUE)
 	LimitGauge();
 }
 
-const std::unique_ptr<SuperiorityGauge::GaugeData>& SuperiorityGauge::GetPlayerGaugeData()
+const std::unique_ptr<SuperiorityGauge::GaugeData> &SuperiorityGauge::GetPlayerGaugeData()
 {
 	return playerGaugeData;
 }
 
-const std::unique_ptr<SuperiorityGauge::GaugeData>& SuperiorityGauge::GetEnemyGaugeData()
+const std::unique_ptr<SuperiorityGauge::GaugeData> &SuperiorityGauge::GetEnemyGaugeData()
 {
 	return enemyGaugeData;
 }
 
-const bool& SuperiorityGauge::IsStacking()
+const bool &SuperiorityGauge::IsStacking()
 {
 	return isStackingFlag;
 }
@@ -110,19 +113,22 @@ void SuperiorityGauge::Draw()
 		TexHandleMgr::GetTexBuffer(gaugeVarGraphEnemy), 1.0f, { 0.5f,0.5f }, { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f));
 }
 
-void SuperiorityGauge::DebugValue(float* ADD_VALUE)
+void SuperiorityGauge::DebugValue(float *ADD_VALUE)
 {
-	ImGui::Begin("Gauge");
-	ImGui::Text("Q...AddPlayerGaugeValue,W...AddEnemyGagueValue");
-	ImGui::Text("PlayerGauge:%f EnemyGauge:%f", playerGaugeData->gaugeValue, enemyGaugeData->gaugeValue);
-	ImGui::Text("PlayerDivGauge:%f EnemyDivGauge:%f", playerGaugeData->gaugeDivValue, enemyGaugeData->gaugeDivValue);
-	ImGui::Text("PlayerOver:%d EnemyOver:%d", playerGaugeData->overGaugeFlag, enemyGaugeData->overGaugeFlag);
-	ImGui::Text("StackTimer:%d", stackTimer);
-	ImGui::Text("StackFlag:%d", isStackingFlag);
-	ImGui::InputFloat("GAUGE_MAX_VALUE", &GAUGE_MAX_VALUE);
-	ImGui::InputFloat("ADD_VALUE", ADD_VALUE);
-	ImGui::InputInt("STACK_MAX_TIMER", &STACK_MAX_TIMER);
-	ImGui::End();
+	if (DebugImGuiManager::Instance()->DrawFlag(imguiHandle))
+	{
+		ImGui::Begin("Gauge");
+		ImGui::Text("Q...AddPlayerGaugeValue,W...AddEnemyGagueValue");
+		ImGui::Text("PlayerGauge:%f EnemyGauge:%f", playerGaugeData->gaugeValue, enemyGaugeData->gaugeValue);
+		ImGui::Text("PlayerDivGauge:%f EnemyDivGauge:%f", playerGaugeData->gaugeDivValue, enemyGaugeData->gaugeDivValue);
+		ImGui::Text("PlayerOver:%d EnemyOver:%d", playerGaugeData->overGaugeFlag, enemyGaugeData->overGaugeFlag);
+		ImGui::Text("StackTimer:%d", stackTimer);
+		ImGui::Text("StackFlag:%d", isStackingFlag);
+		ImGui::InputFloat("GAUGE_MAX_VALUE", &GAUGE_MAX_VALUE);
+		ImGui::InputFloat("ADD_VALUE", ADD_VALUE);
+		ImGui::InputInt("STACK_MAX_TIMER", &STACK_MAX_TIMER);
+		ImGui::End();
+	}
 }
 
 void SuperiorityGauge::LimitGauge()

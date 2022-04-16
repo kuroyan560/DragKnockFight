@@ -1,7 +1,5 @@
 #pragma once
 #include "Vec.h"
-#include "DossunBlock.h"
-#include "Bubble.h"
 #include <memory>
 #include <vector>
 #include"AreaCollider.h"
@@ -14,48 +12,23 @@ class PlayerHand;
 #include"PlayerAnimation.h"
 #include"AfterImg.h"
 class LightManager;
-#include"Muffler.h"
 #include"StagingInterFace.h"
 
-#include"../IntoTheAbyss/BulletCollision.h"
+#include"CharacterInterFace.h"
 
 // プレイヤークラス
-class Player {
-
+class Player :public CharacterInterFace
+{
 public:
-
 	/*-- メンバ変数 --*/
-
-	Vec2<float> centerPos;					// プレイヤーの中心座標
-	Vec2<float> prevFrameCenterPos;		// 前フレームのプレイヤーの中心座標
-	Vec2<float> vel;						// 移動量
-	Vec2<float> gimmickVel;			// ギミックから与えられる移動量(ドッスンブロックに張り付いた時等。)
-	float gravity;					// 重力
-	bool onGround;					// プレイヤーが接地しているかのフラグ
-	bool firstShot;					// 最初の一発が撃たれたかどうか trueで撃たれた判定
-	bool isWallRight;				// 右の壁にくっついているか
-	bool isWallLeft;				// 左の壁にくっついているか
-	bool inBubble;					// シャボン玉に入っているかどうか
-	bool isDead;					// 死んだかどうかフラグ
-	bool isDouji;					// 同時に撃ったかのフラグ
 	int rapidFireTimerLeft;			// 連射タイマー左手
 	int rapidFireTimerRight;		// 連射タイマー右手
-	int gravityInvalidTimer;		// 重力無効化タイマー
 	int handReturnTimer;			// 入力が終わってから腕がデフォルトの位置に戻るまでのタイマー
 	int asSoonAsInputTimer;			// 移動入力が行われてから数フレーム間有効化する処理を作るためにタイマー 主にシャボン玉
-	int firstRecoilParticleTimer;	// 最初のショットのときのパーティクルを出すタイマー
-
-	// 壁ズリフラグ
-	bool isSlippingWall[4];			// 壁ズリパーティクルを出すフラグ
-
-	// ウィンドウに挟まったタイマー
-	int stuckWindowTimer;		// ウィンドウに挟まったタイマー
-	const int STRUCK_WINDOW_TIMER = 120.0f;// ウィンドウに挟まったタイマー
 
 	// プレイヤーの腕
 	unique_ptr<PlayerHand> lHand;	// 左手
 	unique_ptr<PlayerHand> rHand;	// 右手
-	bool isPrevFrameShotBeacon;
 
 	//int playerGraph;
 
@@ -79,27 +52,8 @@ public:
 	//残像
 	AfterImg afImg;
 
-	//テレポートしたとき光る
-	const int TELE_FLASH_TIME = 120;
-	const int DOUJI_FLASH_TIME = 60;
-	int flashTotalTime;
-	int flashTimer;
-
-	//同時ショット判定をとる許容フレーム
-	const int DOUJI_ALLOWANCE_FRAME = 22;
-	int isLeftFirstShotTimer;
-	int isRightFirstShotTimer;
-
-	bool isZeroGravity;
-	int changeGravityTimer;
-	const int CHANGE_GRAVITY_TIMER = 300;
-
-	//Muffler muffler;
-
 	int shotSE;
 
-	//クラッシュ演出補助
-	StagingInterFace stagingDevice;
 	Vec2<float>scale;
 
 public:
@@ -114,8 +68,8 @@ public:
 	//const float FIRST_RECOIL_AMOUNT = 15.0;		// 弾を撃った際の反動
 	//const float RECOIL_AMOUNT = FIRST_RECOIL_AMOUNT;			// 弾を撃った際の反動
 	float MAX_RECOIL_AMOUNT = 30.0f;		// 弾を撃った際の反動の最大値
-	const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
-	const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+	//const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
+	//const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 	static Vec2<float>GetGeneratePos();
 	int RAPID_FIRE_TIMER = 4;			// 連射タイマー
 	const int GRAVITY_INVALID_TIMER = 20;		// 重力無効化タイマー
@@ -154,12 +108,6 @@ public:
 
 	};
 
-	//陣地との判定
-	Square areaHitBox;
-
-	std::shared_ptr<SphereCollision> bulletHitBox;
-
-	bool allowToMoveFlag;
 	float sizeVel;
 	bool initPaticleFlag;
 	int moveTimer;
@@ -171,27 +119,22 @@ public:
 	Player();
 	~Player();
 
+private:
 	// 初期化処理
-	void Init(const Vec2<float>& INIT_POS);
+	void OnInit()override;
 
 	// 更新処理
-	void Update(const vector<vector<int>> mapData, const Vec2<float>& bossPos, const bool& isFinish);
+	void OnUpdate(const vector<vector<int>>& MapData)override;
 
 	// 描画処理
-	void Draw(LightManager& LigManager);
+	void OnDraw()override;
 
 	// マップチップとの当たり判定
-	void CheckHit(const vector<vector<int>> mapData, vector<Bubble>& bubble, vector<DossunBlock>& dossun, const Vec2<float>& bossPos, bool& isHitMapChip, const Vec2<float>& lineCenterPos);
+	void OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)override;
 
-	// 方向ごとのマップチップとの当たり判定関数
-	void HitMapChipTop();
-	void HitMapChipLeft();
-	void HitMapChipRight();
-	void HitMapChipBottom();
+	//マップチップとヒットしたとき
+	void OnHitMapChip(const HIT_DIR& Dir)override;
 
-	//プレイヤーの入力を禁止する
-	void StopDoorLeftRight();
-	void StopDoorUpDown();
 	bool drawCursorFlag;
 
 	Vec2<float>size;
@@ -200,13 +143,10 @@ private:
 	/*-- クラス内で使用する関数 --*/
 
 	// 入力処理
-	void Input(const vector<vector<int>> mapData, const Vec2<float>& bossPos, const bool& isFinish);
+	void Input(const vector<vector<int>>& MapData);
 
 	// 移動処理
 	void Move();
-
-	// 重力に関する更新処理
-	void UpdateGravity();
 
 	// 壁との押し戻しに関する更新処理
 	void PushBackWall();
@@ -215,9 +155,6 @@ private:
 	bool stopMoveFlag;
 
 
-	bool doorMoveLeftRightFlag;
-	bool doorMoveUpDownFlag;
-	bool doorMoveDownFlag;
 	//ストレッチの値を計算
 	void CalculateStretch(const Vec2<float>& Move);
 	//ストレッチ値更新
@@ -226,7 +163,8 @@ private:
 	Vec2<float> GetPlayerGraphSize();
 
 	// 移動量での当たり判定
-	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip);
-	void CheckHitSize(const Vec2<float>& checkPos, const vector<vector<int>>& mapData, const Vec2<float>& bossPos, bool& isHitMapChip);
+	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
 
+public:
+	bool Appear()override;
 };

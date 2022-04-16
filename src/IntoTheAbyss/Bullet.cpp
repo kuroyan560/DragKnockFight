@@ -1,7 +1,6 @@
 #include "Bullet.h"
 #include "ScrollMgr.h"
 #include "ShakeMgr.h"
-#include "ViewPortCollider.h"
 #include "SlowMgr.h"
 
 #include"KuroFunc.h"
@@ -36,7 +35,7 @@ void Bullet::Init()
 	isActive = false;
 }
 
-void Bullet::Generate(const Vec2<float> &generatePos, const Vec2<float> forwardVec, const bool isFirstShot, const SHOT_HAND &id, const float &speed, const int &GRPHA_HANDLE)
+void Bullet::Generate(const Vec2<float> &generatePos, const Vec2<float> forwardVec, const SHOT_HAND &id, const float &speed, const int &GRPHA_HANDLE)
 {
 
 	/*-- ê∂ê¨èàóù --*/
@@ -60,13 +59,7 @@ void Bullet::Generate(const Vec2<float> &generatePos, const Vec2<float> forwardV
 
 	alpha = 255;
 
-	if (isFirstShot) {
-		//speed = GetRand(MAX_SPEED * 0.25f) + MAX_SPEED * 0.75f;
-		this->speed = KuroFunc::GetRand(MAX_SPEED * 0.25f) + MAX_SPEED * 0.75f;
-	}
-	else {
-		this->speed = speed;
-	}
+	this->speed = speed;
 
 	deadTimer = DEAD_TIMER;
 

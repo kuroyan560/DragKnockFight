@@ -34,7 +34,7 @@ void StunEffect::Init()
 }
 
 #include"AudioApp.h"
-void StunEffect::Activate(Vec2<float>& focusPos, const Vec2<float>& stunPos, const Vec2<float>& iconPos, const bool& isBoss)
+void StunEffect::Activate(const Vec2<float>& focusPos, const Vec2<float>& iconPos, const bool& isBoss)
 {
 
 	/*===== 生成処理 =====*/
@@ -49,7 +49,7 @@ void StunEffect::Activate(Vec2<float>& focusPos, const Vec2<float>& stunPos, con
 
 
 	// 引数のstunPosはワールド座標系なので、ローカル座標系に変換する。
-	breakUIPos = stunPos - ScrollMgr::Instance()->scrollAmount;
+	breakUIPos = focusPos - ScrollMgr::Instance()->scrollAmount;
 	breakUIPosDef = breakUIPos;
 
 	this->isBoss = isBoss;

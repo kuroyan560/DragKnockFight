@@ -1,6 +1,5 @@
 #pragma once
 #include "Singleton.h"
-#include "Bubble.h"
 #include "Vec.h"
 #include <memory>
 #include <vector>
@@ -40,7 +39,10 @@ public:
 	void Setting();
 
 	// ¶¬ˆ—
-	void Generate(const Vec2<float>& generatePos, const float& forwardAngle, const bool& isFirstShot = false, const bool& isShotRight = false);
+	void Generate(const Vec2<float>& generatePos, const float& forwardAngle, const bool& isShotRight = false);
+
+	//‰Šú‰»ˆ—
+	void Init();
 
 	// XVˆ—
 	void Update();
@@ -49,7 +51,7 @@ public:
 	void Draw();
 
 	// ’e‚Ì“–‚½‚è”»’è
-	void CheckHit(const vector<vector<int>>& mapData, vector<Bubble>& bubble);
+	void CheckHit(const vector<vector<int>>& mapData);
 
 	const shared_ptr<Bullet>& GetBullet(const int& index) { return bullets[index]; };
 

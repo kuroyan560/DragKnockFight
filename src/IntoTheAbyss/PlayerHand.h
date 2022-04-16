@@ -1,6 +1,5 @@
 #pragma once
 #include "Vec.h"
-#include "Beacon.h"
 #include <vector>
 using namespace std;
 #include"WinApp.h"
@@ -26,11 +25,8 @@ public:
 	Vec2<float> muzzlePos;			// 銃口の座標
 	float armDistance;		// プレイヤーの中心からの距離 右手と左手で変えるため
 	float inputAngle;		// 入力された角度
-	bool isFirstShot;		// 最初の一発は強い反動フラグ
 	bool isNoInputTimer;	// Input Sitenai Tokiha Honrai Amount Wo Herasu
 
-	Beacon teleportPike;	// 瞬間移動の短槍
-	Beacon timeStopPike;	// 時間停止の短槍
 	int pikeCooltime;		// 短槍全般ののクールタイム
 
 	AfterImg afterImg;
@@ -64,7 +60,7 @@ public:
 	void Update(const Vec2<float>& playerCenterPos);
 
 	// 描画処理
-	void Draw(LightManager& LigManager, const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool &DRAW_CURSOR);
+	void Draw(const float& ExtRate, const int& GraphHandle, const float& InitAngle, const Vec2<float>& RotaCenterUV, const bool &DRAW_CURSOR);
 
 	// 弾を打った時の処理
 	void Shot(const Vec2<float>& forwardVec, const bool& isFirstShot);
@@ -85,20 +81,12 @@ public:
 	// isNoInputTimer no Setter
 	inline void SetIsNoInputTimer(const bool& set) { isNoInputTimer = set; }
 
-	// 壁にあたった時に最初に当たったフラグを初期化する処理.
-	inline void Hit() { isFirstShot = false; }
-
-	// 最初に撃った時の処理。
-	inline void FirstShot() { isFirstShot = true; }
-
 	// 角度のセッタ
 	inline void SetAngle(const float& angle) { inputAngle = angle; }
 	// 角度のゲッタ
 	inline const float& GetAngle() { return inputAngle; }
 	// 座標のゲッタ
 	inline const Vec2<float>& GetPos() { return handPos; }
-	// 最初に当たったフラグのゲッタ
-	inline const bool& GetIsFirstShot() { return isFirstShot; }
 
 	//残像を出す
 	void EmitAfterImg(const Vec2<float>& TeleAmount, const int& GraphHandle, const Vec2<float>& GraphSize, const Vec2<bool>& Miror);

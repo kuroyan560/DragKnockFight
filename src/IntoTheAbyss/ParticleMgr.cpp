@@ -111,11 +111,6 @@ ParticleMgr::ParticleMgr()
 		{
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"平行投影行列定数バッファ"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"ズームとスクロールとスロー"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"アクティブ中のライト数バッファ"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"ディレクションライト情報 (構造化バッファ)"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"ポイントライト情報 (構造化バッファ)"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"スポットライト情報 (構造化バッファ)"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"天球ライト情報 (構造化バッファ)"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 0"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 1"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 2"),
@@ -180,7 +175,7 @@ void ParticleMgr::Update()
 #include"ShakeMgr.h"
 #include"LightManager.h"
 #include"SlowMgr.h"
-void ParticleMgr::Draw(LightManager& LigManager)
+void ParticleMgr::Draw()
 {
 	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
@@ -195,16 +190,11 @@ void ParticleMgr::Draw(LightManager& LigManager)
 		zoomAndScroll->Mapping(&ZOOM_AND_SCROLL);
 	}
 
-	static std::vector<DESC_HANDLE_TYPE>descTypes = { CBV,CBV,CBV,SRV,SRV,SRV,SRV };
+	static std::vector<DESC_HANDLE_TYPE>descTypes = { CBV,CBV };
 	std::vector<std::shared_ptr<DescriptorData>>descDatas =
 	{
 		KuroEngine::Instance().GetParallelMatProjBuff(),
 		zoomAndScroll,
-		LigManager.GetLigNumInfo(),
-		LigManager.GetLigInfo(Light::DIRECTION),	//ディレクションライト
-		LigManager.GetLigInfo(Light::POINT),	//ポイントライト
-		LigManager.GetLigInfo(Light::SPOT),	//スポットライト
-		LigManager.GetLigInfo(Light::HEMISPHERE),	//天球ライト
 	};
 	for (int i = 0; i < PARTICLE_TEX::TEX_NUM; ++i)
 	{

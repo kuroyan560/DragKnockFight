@@ -100,7 +100,7 @@ void RoundChangeEffect::Start(const int &ROUND_NUMBER, const bool &LEFT_OR_RIGHT
 
 		initShakeFlag = false;
 		readyToInitFlag = false;
-		initFlag = false;
+		initGameFlag = false;
 		maxShakeAmount = 25.0f;
 		rate = 0.0f;
 		oneFlameLateFlag = false;

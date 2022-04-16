@@ -34,6 +34,8 @@ void SwingMgr::Update(const Vec2<float>& playerPos, const Vec2<float>& bossPos, 
 
 	/*===== 更新処理 =====*/
 
+	if (easingStartVec.x == 0) easingStartVec.x = 0.001f;
+
 	// イージング量を求める。
 	float easingChange = ADD_EASINGTIMER_MAX - ADD_EASINGTIMER_MINIMUM;
 	addEasingTimer = ADD_EASINGTIMER_MINIMUM + (fabs(fabs(easingEndVec.y) - fabs(easingStartVec.y)) * easingChange);
@@ -71,8 +73,14 @@ void SwingMgr::Update(const Vec2<float>& playerPos, const Vec2<float>& bossPos, 
 		easeAmount = KuroMath::Ease(Out, Cubic, easingTimer, 0.0f, 1.0f);
 
 		// 現在のベクトルを求める。
-		easingNowVec.x = easingStartVec.x;
+		easingNowVec.Normalize();
 		easingNowVec.y = easingStartVec.y + (easeAmount * easeChangeAmountY);
+		if (easingNowVec.y < 0) {
+			easingNowVec.x = 1.0f + easingNowVec.y;
+		}
+		else {
+			easingNowVec.x = 1.0f - easingNowVec.y;
+		}
 		easingNowVec.Normalize();
 
 	}
