@@ -56,10 +56,6 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 
 
 
-
-
-
-
 	Vec2<float>ACCEL = { 0.0f,0.0f };	//‰Á‘¬“x
 
 	if (pullTimer < pullSpan)
@@ -89,10 +85,6 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 
 	ACCEL = KuroMath::Lerp(ACCEL, { 0.0f,0.0f }, 0.8f);
 
-	if (UsersInput::Instance()->Input(DIK_0)) {
-		//	vel.x = OFFSET_VEL * 5.0f;
-		bool debug = false;
-	}
 }
 
 bool BossPatternNormalMove::CheckMapChipWallAndRay(const Vec2<float> &START_POS, const Vec2<float> &END_POS)

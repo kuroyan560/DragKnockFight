@@ -631,6 +631,18 @@ void Game::Update()
 	FaceIcon::Instance()->Update();
 	WinCounter::Instance()->Update();
 
+
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_Q, "AddPlayerSuperiorityGauge", TO_STRING(DIK_Q)))
+	{
+		SuperiorityGauge::Instance()->AddPlayerGauge(10.0f);
+	}
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_W, "AddEnemySuperiorityGauge", TO_STRING(DIK_W)))
+	{
+		SuperiorityGauge::Instance()->AddEnemyGauge(10.0f);
+	}
+
+
+
 	// 優勢ゲージが振り切ったトリガー判定のときにスタン演出を有効化する。
 	if (SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
 		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
