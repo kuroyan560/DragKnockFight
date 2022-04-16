@@ -30,8 +30,6 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 	}
 
 
-
-
 	int PULL_SPAN_MIN = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MIN;
 	int PULL_SPAN_MAX = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MAX;
 	int PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
@@ -48,7 +46,9 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 			PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
 			PULL_TIMER = 0;
 
-			auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
+			//どの方向に進んでいいのか
+			//auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
+			float rad = GetDir(DATA->limmitLine);
 			auto power = KuroFunc::GetRand(PULL_POWER_MIN, PULL_POWER_MAX);
 			ACCEL.x = cos(rad) * power * DebugParameter::Instance()->bossDebugData.PULL_ADD_X_POWER;
 			ACCEL.y = sin(rad) * power;
@@ -215,4 +215,29 @@ bool BossPatternNormalMove::CheckMapChipWallAndRay(const Vec2<float> &START_POS,
 
 	//最短距離が一つでも算出されたら当たり判定を出す
 	return 0 < shortestPoints.size();
+}
+
+float BossPatternNormalMove::GetDir(const std::array<BossLimitMoveData, 8> &DATA)
+{
+	//どの角度に向かって進んでいいか配列に纏めた物
+	std::vector<float>allowToUseThisAngleArray;
+
+	//どの方向に向かって進んでいいか
+	for (int i = 0; i < DATA.size(); ++i)
+	{
+		if (!DATA[i].hitFlag)
+		{
+			//向いている方向から上下それぞれ45度の範囲内で乱数を取る
+			int maxAngle = (i + 1) * 45;
+			int minAngle = maxAngle - 90;
+			float rad = Angle::ConvertToRadian(KuroFunc::GetRand(minAngle, maxAngle));
+			allowToUseThisAngleArray.push_back(rad);
+		}
+	}
+
+	//
+
+
+	int getDirNum = KuroFunc::GetRand(0, allowToUseThisAngleArray.size() - 1);
+	return 	allowToUseThisAngleArray[getDirNum];
 }
