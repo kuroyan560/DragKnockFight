@@ -23,11 +23,20 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 		return;
 	}
 
-	//ボスと壁との判定
-	for (int i = 0; i < DATA->limmitLine.size(); ++i)
+	//近距離レイと壁との判定
+	for (int i = 0; i < DATA->nearLimmitLine.size(); ++i)
 	{
-		DATA->limmitLine[i].hitFlag = CheckMapChipWallAndRay(DATA->limmitLine[i].startPos, DATA->limmitLine[i].endPos);
+		DATA->nearLimmitLine[i].hitFlag = CheckMapChipWallAndRay(DATA->nearLimmitLine[i].startPos, DATA->nearLimmitLine[i].endPos);
 	}
+	//遠距離レイと壁との判定
+	for (int i = 0; i < DATA->farLimmitLine.size(); ++i)
+	{
+		DATA->farLimmitLine[i].hitFlag = CheckMapChipWallAndRay(DATA->farLimmitLine[i].startPos, DATA->farLimmitLine[i].endPos);
+	}
+
+
+
+
 
 
 	int PULL_SPAN_MIN = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MIN;
@@ -48,7 +57,7 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 
 			//どの方向に進んでいいのか
 			//auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
-			float rad = GetDir(DATA->limmitLine);
+			float rad = GetDir(DATA->nearLimmitLine);
 			auto power = KuroFunc::GetRand(PULL_POWER_MIN, PULL_POWER_MAX);
 			ACCEL.x = cos(rad) * power * DebugParameter::Instance()->bossDebugData.PULL_ADD_X_POWER;
 			ACCEL.y = sin(rad) * power;

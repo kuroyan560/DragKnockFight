@@ -71,17 +71,25 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	//	return;
 	//}
 
-	for (int i = 0; i < patternData.limmitLine.size(); ++i)
+	for (int i = 0; i < patternData.nearLimmitLine.size(); ++i)
 	{
-		patternData.limmitLine[i].startPos = pos;
+		patternData.nearLimmitLine[i].startPos = pos;
 
-		float angle = i * (360.0f / patternData.limmitLine.size());
-		float dir = angle * Angle::PI() / 180.0f;
+		float angle = i * (360.0f / patternData.nearLimmitLine.size());
+		float dir = Angle::ConvertToRadian(angle);
 		float distance = 150.0f;
-		patternData.limmitLine[i].endPos = pos + Vec2<float>(cosf(dir), sinf(dir)) * distance;
-
+		patternData.nearLimmitLine[i].endPos = pos + Vec2<float>(cosf(dir), sinf(dir)) * distance;
 	}
 
+	for (int i = 0; i < patternData.farLimmitLine.size(); ++i)
+	{
+		patternData.farLimmitLine[i].startPos = pos;
+
+		float angle = i * (360.0f / patternData.farLimmitLine.size());
+		float dir = Angle::ConvertToRadian(angle);
+		float distance = 350.0f;
+		patternData.farLimmitLine[i].endPos = pos + Vec2<float>(cosf(dir), sinf(dir)) * distance;
+	}
 
 	if (bossPatternNow != BOSS_PATTERN_NORMALMOVE)
 	{
@@ -201,11 +209,11 @@ void Boss::OnDraw()
 
 
 	//ƒŒƒC‚Æ‚Ì”»’èŠm”F
-	for (int i = 0; i < patternData.limmitLine.size(); ++i)
+	for (int i = 0; i < patternData.nearLimmitLine.size(); ++i)
 	{
-		Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.limmitLine[i].startPos);
-		Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.limmitLine[i].endPos);
-		if (patternData.limmitLine[i].hitFlag)
+		Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.nearLimmitLine[i].startPos);
+		Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.nearLimmitLine[i].endPos);
+		if (patternData.nearLimmitLine[i].hitFlag)
 		{
 			DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 0, 0, 255));
 		}
@@ -214,6 +222,22 @@ void Boss::OnDraw()
 			DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 255, 255, 255));
 		}
 	}
+
+
+	for (int i = 0; i < patternData.farLimmitLine.size(); ++i)
+	{
+		Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.farLimmitLine[i].startPos);
+		Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.farLimmitLine[i].endPos);
+		if (patternData.farLimmitLine[i].hitFlag)
+		{
+			DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(0, 255, 0, 255));
+		}
+		else
+		{
+			DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(0, 0, 255, 255));
+		}
+	}
+
 }
 
 //void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)

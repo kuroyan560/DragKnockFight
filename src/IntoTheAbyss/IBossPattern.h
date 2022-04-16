@@ -38,7 +38,8 @@ struct BossPatternData
 	Vec2<float>*moveVel;
 	std::array<BossBulletData, 100>bulltData;
 	bool swingFlag;
-	std::array<BossLimitMoveData, 8> limmitLine;//ボスと壁との距離を調べる為の情報
+	std::array<BossLimitMoveData, 8> nearLimmitLine;//ボスと壁との距離を調べる為の情報(近距離)
+	std::array<BossLimitMoveData, 4> farLimmitLine; //ボスと壁との距離を調べる為の情報(遠距離)
 
 	BossPatternData() :swingFlag(false)
 	{
