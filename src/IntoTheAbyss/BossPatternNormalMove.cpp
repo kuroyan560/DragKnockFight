@@ -13,6 +13,10 @@ BossPatternNormalMove::BossPatternNormalMove()
 void BossPatternNormalMove::Init()
 {
 	pullTimer = 0;
+
+	int PULL_SPAN_MIN = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MIN;
+	int PULL_SPAN_MAX = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MAX;
+	pullSpan = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
 }
 
 void BossPatternNormalMove::Update(BossPatternData *DATA)
@@ -56,25 +60,24 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 
 
 
-	int PULL_SPAN_MIN = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MIN;
-	int PULL_SPAN_MAX = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MAX;
-	int PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
-
 	Vec2<float>ACCEL = { 0.0f,0.0f };	//‰Á‘¬“x
-	float PULL_POWER_MIN = DebugParameter::Instance()->bossDebugData.PULL_POWER_MIN;
-	float PULL_POWER_MAX = DebugParameter::Instance()->bossDebugData.PULL_POWER_MAX;
 
-	if (pullTimer < PULL_SPAN)
+	if (pullTimer < pullSpan)
 	{
 		++pullTimer;
-		if (PULL_SPAN <= pullTimer)
+		if (pullSpan <= pullTimer)
 		{
-			PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
+			int PULL_SPAN_MIN = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MIN;
+			int PULL_SPAN_MAX = DebugParameter::Instance()->bossDebugData.PULL_SPAN_MAX;
+			pullSpan = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
 			pullTimer = 0;
 
 			//‚Ç‚Ì•ûŒü‚Éi‚ñ‚Å‚¢‚¢‚Ì‚©
 			//auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
 			float rad = GetDir(DATA->nearLimmitLine, DATA->farLimmitLine);
+
+			float PULL_POWER_MIN = DebugParameter::Instance()->bossDebugData.PULL_POWER_MIN;
+			float PULL_POWER_MAX = DebugParameter::Instance()->bossDebugData.PULL_POWER_MAX;
 			auto power = KuroFunc::GetRand(PULL_POWER_MIN, PULL_POWER_MAX);
 			ACCEL.x = cos(rad) * power * DebugParameter::Instance()->bossDebugData.PULL_ADD_X_POWER;
 			ACCEL.y = sin(rad) * power;

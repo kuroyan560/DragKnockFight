@@ -15,6 +15,7 @@ public:
 
 private:
 	int pullTimer;
+	int pullSpan;
 	const int MAP_CHIP_SIZE = 50;
 	const int MAP_CHIP_HALF_SIZE = MAP_CHIP_SIZE / 2;
 	bool CheckMapChipWallAndRay(const Vec2<float> &START_POS, const Vec2<float>&END_POS);
