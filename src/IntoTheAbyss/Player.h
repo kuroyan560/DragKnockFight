@@ -23,8 +23,6 @@ public:
 	/*-- メンバ変数 --*/
 	int rapidFireTimerLeft;			// 連射タイマー左手
 	int rapidFireTimerRight;		// 連射タイマー右手
-	int handReturnTimer;			// 入力が終わってから腕がデフォルトの位置に戻るまでのタイマー
-	int asSoonAsInputTimer;			// 移動入力が行われてから数フレーム間有効化する処理を作るためにタイマー 主にシャボン玉
 
 	// プレイヤーの腕
 	unique_ptr<PlayerHand> lHand;	// 左手
@@ -57,6 +55,7 @@ public:
 	Vec2<float>scale;
 
 	const int controllerIdx;
+	int bulletGraph;
 
 public:
 
@@ -81,16 +80,10 @@ public:
 	const float STOP_DEADLINE_X = 3.0f;		// X軸の移動量がコレ以下だったら移動量を0にする。
 	const float VEL_MUL_AMOUNT = 0.95f;	//摩擦係数
 
-	// 手が初期位置に戻るまでのタイマー
-	const int DEF_HAND_RETURN_TIMER = 180;
-
 	// 左手の初期位置
 	const float DEF_LEFT_HAND_ANGLE = 2.35619f;
 	// 右手の初期位置
 	const float DEF_RIGHT_HAND_ANGLE = 0.785398f;
-
-	// 入力されてから数フレームを取得するためのタイマーのでフォルチ値
-	const int AS_SOON_AS_INPUT_TIMER = 2;
 
 	// 振り回しのクールタイム
 	int swingCoolTime;
@@ -118,7 +111,7 @@ public:
 	/*-- メンバ関数 --*/
 
 	// コンストラクタ
-	Player(const int& ControllerIdx);
+	Player(const WHICH_TEAM& Team, const int& ControllerIdx);
 	~Player();
 
 private:
@@ -127,6 +120,9 @@ private:
 
 	// 更新処理
 	void OnUpdate(const vector<vector<int>>& MapData)override;
+
+	//スウィング中も呼び出される更新処理
+	void OnUpdateNoRelatedSwing()override;
 
 	// 描画処理
 	void OnDraw()override;

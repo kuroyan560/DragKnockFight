@@ -189,6 +189,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 			--stackWindowTimer;
 		}
 	}
+	OnUpdateNoRelatedSwing();
 
 	//ˆø‚Á‚©‚©‚Á‚Ä‚¢‚é
 	if (stackMapChip)

@@ -344,8 +344,9 @@ void Game::Init()
 
 	turnResultScene = false;
 
-	leftCharacter = std::make_shared<Player>(0);
-	rightCharacter = std::make_shared<Boss>();
+	leftCharacter = std::make_shared<Player>(LEFT_TEAM, 0);
+	//rightCharacter = std::make_shared<Player>(RIGHT_TEAM, 0);
+	rightCharacter = std::make_shared<Boss>(RIGHT_TEAM);
 
 	rightCharacter->RegisterSetPartner(leftCharacter);
 	leftCharacter->RegisterSetPartner(rightCharacter);

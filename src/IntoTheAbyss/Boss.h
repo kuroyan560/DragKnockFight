@@ -67,7 +67,7 @@ public:
 	/*===== メンバ関数 =====*/
 
 	// コンストラクタ
-	Boss();
+	Boss(const WHICH_TEAM& Team);
 
 private:
 	// 初期化処理
@@ -75,6 +75,9 @@ private:
 
 	// 更新処理
 	void OnUpdate(const std::vector<std::vector<int>>& MapData)override;
+
+	//スウィング中も呼び出される更新処理
+	void OnUpdateNoRelatedSwing()override {}
 
 	// 描画処理
 	void OnDraw()override;
