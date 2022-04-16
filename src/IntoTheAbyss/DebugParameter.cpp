@@ -100,6 +100,10 @@ void DebugParameter::DrawImGui()
 		ImGui::InputFloat("moveX", &bossDebugData.moveX);
 		ImGui::InputInt("PULL_SPAN_MIN", &bossDebugData.PULL_SPAN_MIN);
 		ImGui::InputInt("PULL_SPAN_MAX", &bossDebugData.PULL_SPAN_MAX);
+		ImGui::Text("DrawDebug");
+		ImGui::Checkbox("NearRay", &bossDebugData.drawNearRayFlag);
+		ImGui::Checkbox("FarRay", &bossDebugData.drawFarRayFlag);
+		ImGui::Checkbox("Boss", &bossDebugData.drawBossFlag);
 		ImGui::End();
 	}
 }

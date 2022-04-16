@@ -204,40 +204,47 @@ void Boss::OnDraw()
 	auto drawPos = pos + stagingDevice.GetShake();
 	auto drawScale = size * stagingDevice.GetExtRate();
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
-//DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-//		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
 
+	if (DebugParameter::Instance()->bossDebugData.drawBossFlag)
+	{
+		DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
+			TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
+	}
 
 	//ƒŒƒC‚Æ‚Ì”»’èŠm”F
-	for (int i = 0; i < patternData.nearLimmitLine.size(); ++i)
+	if (DebugParameter::Instance()->bossDebugData.drawNearRayFlag)
 	{
-		Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.nearLimmitLine[i].startPos);
-		Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.nearLimmitLine[i].endPos);
-		if (patternData.nearLimmitLine[i].hitFlag)
+		for (int i = 0; i < patternData.nearLimmitLine.size(); ++i)
 		{
-			DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 0, 0, 255));
-		}
-		else
-		{
-			DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 255, 255, 255));
+			Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.nearLimmitLine[i].startPos);
+			Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.nearLimmitLine[i].endPos);
+			if (patternData.nearLimmitLine[i].hitFlag)
+			{
+				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 0, 0, 255));
+			}
+			else
+			{
+				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 255, 255, 255));
+			}
 		}
 	}
 
-
-	for (int i = 0; i < patternData.farLimmitLine.size(); ++i)
+	if (DebugParameter::Instance()->bossDebugData.drawFarRayFlag)
 	{
-		Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.farLimmitLine[i].startPos);
-		Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.farLimmitLine[i].endPos);
-		if (patternData.farLimmitLine[i].hitFlag)
+		for (int i = 0; i < patternData.farLimmitLine.size(); ++i)
 		{
-			DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(0, 255, 0, 255));
-		}
-		else
-		{
-			DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(0, 0, 255, 255));
+			Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.farLimmitLine[i].startPos);
+			Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.farLimmitLine[i].endPos);
+			if (patternData.farLimmitLine[i].hitFlag)
+			{
+				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(0, 255, 0, 255));
+			}
+			else
+			{
+				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(0, 0, 255, 255));
+			}
 		}
 	}
-
 }
 
 //void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
