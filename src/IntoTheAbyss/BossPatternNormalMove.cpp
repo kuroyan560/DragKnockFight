@@ -12,7 +12,7 @@ BossPatternNormalMove::BossPatternNormalMove()
 
 void BossPatternNormalMove::Init()
 {
-	PULL_TIMER = 0;
+	pullTimer = 0;
 }
 
 void BossPatternNormalMove::Update(BossPatternData *DATA)
@@ -38,13 +38,13 @@ void BossPatternNormalMove::Update(BossPatternData *DATA)
 	float PULL_POWER_MIN = DebugParameter::Instance()->bossDebugData.PULL_POWER_MIN;
 	float PULL_POWER_MAX = DebugParameter::Instance()->bossDebugData.PULL_POWER_MAX;
 
-	if (PULL_TIMER < PULL_SPAN)
+	if (pullTimer < PULL_SPAN)
 	{
-		PULL_TIMER++;
-		if (PULL_SPAN <= PULL_TIMER)
+		++pullTimer;
+		if (PULL_SPAN <= pullTimer)
 		{
 			PULL_SPAN = KuroFunc::GetRand(PULL_SPAN_MIN, PULL_SPAN_MAX);
-			PULL_TIMER = 0;
+			pullTimer = 0;
 
 			//‚Ç‚Ì•ûŒü‚Éi‚ñ‚Å‚¢‚¢‚Ì‚©
 			//auto rad = Angle::ConvertToRadian(KuroFunc::GetRand(-70, 70));
