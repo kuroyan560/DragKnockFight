@@ -22,7 +22,6 @@ Bullet::Bullet()
 	bulletHitBox->center = &pos;
 	bulletHitBox->radius = 10.0f;
 
-	graph = TexHandleMgr::LoadGraph("resource/ChainCombat/bullet.png");
 
 }
 
@@ -35,7 +34,7 @@ void Bullet::Init()
 	isActive = false;
 }
 
-void Bullet::Generate(const Vec2<float> &generatePos, const Vec2<float> forwardVec, const SHOT_HAND &id, const float &speed, const int &GRPHA_HANDLE)
+void Bullet::Generate(const int& GRPHA_HANDLE, const Vec2<float> &generatePos, const Vec2<float> forwardVec, const SHOT_HAND &id, const float &speed)
 {
 
 	/*-- ê∂ê¨èàóù --*/

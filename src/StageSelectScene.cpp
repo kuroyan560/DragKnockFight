@@ -15,24 +15,24 @@ void StageSelectScene::OnInitialize()
 void StageSelectScene::OnUpdate()
 {
 	//ゲームシーンに移動する
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::A))
+	if (UsersInput::Instance()->ControllerOnTrigger(0,XBOX_BUTTON::A))
 	{
 		KuroEngine::Instance().ChangeScene(2, changeScene);
 		SelectStage::Instance()->resetStageFlag = true;
 	}
 	//タイトルシーンに移動する
-	if (UsersInput::Instance()->OnTrigger(XBOX_BUTTON::B))
+	if (UsersInput::Instance()->ControllerOnTrigger(0,XBOX_BUTTON::B))
 	{
 		KuroEngine::Instance().ChangeScene(0, changeScene);
 	}
 
 	//ステージ番号を増やす
-	if (UsersInput::Instance()->OnTrigger(XBOX_STICK::L_UP))
+	if (UsersInput::Instance()->ControllerOnTrigger(0,XBOX_STICK::L_UP))
 	{
 		++stageNum;
 	}
 	//ステージ番号を減らす
-	if (UsersInput::Instance()->OnTrigger(XBOX_STICK::L_DOWN))
+	if (UsersInput::Instance()->ControllerOnTrigger(0,XBOX_STICK::L_DOWN))
 	{
 		--stageNum;
 	}

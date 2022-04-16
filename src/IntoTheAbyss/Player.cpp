@@ -29,12 +29,15 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player() :CharacterInterFace(PLAYER_HIT_SIZE)
+Player::Player(const WHICH_TEAM& Team, const int& ControllerIdx) :CharacterInterFace(Team,PLAYER_HIT_SIZE), controllerIdx(ControllerIdx)
 {
 	/*====== コンストラクタ =====*/
 
-	lHand = make_unique<PlayerHand>(TexHandleMgr::LoadGraph("resource/IntoTheAbyss/aim_time.png"));
-	rHand = make_unique<PlayerHand>(TexHandleMgr::LoadGraph("resource/IntoTheAbyss/aim_tele.png"));
+	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/arm_L.png");
+	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/arm_R.png");
+	static const int AIM_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/aim.png");
+	lHand = make_unique<PlayerHand>(ARM_GRAPH_L, AIM_GRAPH);
+	rHand = make_unique<PlayerHand>(ARM_GRAPH_R, AIM_GRAPH);
 
 	// 画像をロード
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
@@ -42,7 +45,7 @@ Player::Player() :CharacterInterFace(PLAYER_HIT_SIZE)
 	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav");
 	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
 
-
+	bulletGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/bullet.png");
 }
 
 Player::~Player()
@@ -70,15 +73,9 @@ void Player::OnInit()
 	rapidFireTimerLeft = 0;
 	rapidFireTimerRight = 0;
 
-	// 初期位置に戻るまでのタイマーを初期化
-	handReturnTimer = DEF_HAND_RETURN_TIMER;
-
 	// 手を初期位置に戻す。
 	rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
 	lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
-
-	// 入力してから少しだけ数えるタイマーを初期化
-	asSoonAsInputTimer = 0;
 
 	//ストレッチ初期化
 	stretch_LU = { 0.0f,0.0f };
@@ -123,10 +120,6 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;
 	if (rapidFireTimerRight > 0) --rapidFireTimerRight;
 
-	// 腕を更新
-	lHand->Update(pos + anim.GetHandCenterOffset());
-	rHand->Update(pos + anim.GetHandCenterOffset());
-
 	// プレイヤーのすぐ一個上のマップチップ座標を検索する。
 	int mapX = pos.x / MAP_CHIP_SIZE;
 	int mapY = (pos.y - PLAYER_HIT_SIZE.y - 1.0f) / MAP_CHIP_SIZE;
@@ -141,34 +134,6 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	// 一個上のマップチップがブロックで、X軸方向の移動量が一定以上だったらパーティクルを生成する。
 	//if (MapData[mapY][mapX] > 0 && MapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)ParticleMgr::Instance()->Generate(Vec2<float>(pos.x, pos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1), HIT_MAP);
 
-	// 一定時間入力がなかったら腕を初期位置に戻すタイマーを更新。
-	if (handReturnTimer > 0) {
-		--handReturnTimer;
-	}
-	// 何かしらの移動量が存在したらNoInputを初期化する。
-	if (vel.x != 0 || vel.y != 0) handReturnTimer = DEF_HAND_RETURN_TIMER;
-	// 0以下になったら
-	if (handReturnTimer <= 0) {
-
-		// 手を初期位置に戻す。
-		rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
-		lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
-
-		// Syokiiti Ni Modosu Timer Ga <=0 no Tokiha Honrai no Amount Wo Herasu
-		rHand->SetIsNoInputTimer(true);
-		lHand->SetIsNoInputTimer(true);
-
-	}
-	else {
-
-		rHand->SetIsNoInputTimer(false);
-		lHand->SetIsNoInputTimer(false);
-
-	}
-
-	// 入力されてから数フレームを取得するタイマーを更新。
-	if (asSoonAsInputTimer > 0) --asSoonAsInputTimer;
-
 	//ストレッチ更新
 	UpdateStretch();
 
@@ -179,6 +144,13 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	if (0 < swingCoolTime) --swingCoolTime;
 
 	//muffler.Update(pos);
+}
+
+void Player::OnUpdateNoRelatedSwing()
+{
+	// 腕を更新
+	lHand->Update(pos + anim.GetHandCenterOffset());
+	rHand->Update(pos + anim.GetHandCenterOffset());
 }
 
 void Player::OnDraw()
@@ -200,10 +172,9 @@ void Player::OnDraw()
 
 	//muffler.Draw(LigManager);
 
-	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_L.png");
-	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/arm_R.png");
-	rHand->Draw(EXT_RATE, ARM_GRAPH_R, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
-	lHand->Draw(EXT_RATE, ARM_GRAPH_L, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
+
+	rHand->Draw(EXT_RATE, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
+	lHand->Draw(EXT_RATE, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 
 	//ストレッチ加算
 	//leftUp += stretch_LU;
@@ -214,7 +185,7 @@ void Player::OnDraw()
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
-		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha());
+		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { GetWhichTeam() == RIGHT_TEAM,false });
 
 
 	// 弾を描画
@@ -325,20 +296,16 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	Vec2<float> inputVec;
 
-	inputVec = UsersInput::Instance()->GetLeftStickVecFuna();
+	inputVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
 	inputVec /= {32768.0f, 32768.0f};
 	// 入力のデッドラインを設ける。
 	if (inputVec.Length() >= 0.9f) {
 
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
-
-		// 一定時間入力がなかったら初期位置に戻す
-		handReturnTimer = DEF_HAND_RETURN_TIMER;
-
 	}
 
-	inputVec = UsersInput::Instance()->GetRightStickVecFuna();
+	inputVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
 	inputVec /= {32768.0f, 32768.0f};
 
 	// 入力のデッドラインを設ける。
@@ -353,7 +320,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	}
 
 	// LBが押されたら反動をつける。
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
 
 		// 反動をつける。
 		float rHandAngle = lHand->GetAngle();
@@ -380,23 +347,17 @@ void Player::Input(const vector<vector<int>>& MapData)
 		float angle = lHand->GetAngle();
 
 		AudioApp::Instance()->PlayWave(shotSE);
-		BulletMgr::Instance()->Generate(lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, false);
+		BulletMgr::Instance()->Generate(bulletGraph, lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, false);
 
 		// 連射タイマーをセット
 		rapidFireTimerLeft = RAPID_FIRE_TIMER;
-
-		// 一定時間入力がなかったら初期位置に戻す
-		handReturnTimer = DEF_HAND_RETURN_TIMER;
-
-		// 入力タイマーをセット。
-		asSoonAsInputTimer = AS_SOON_AS_INPUT_TIMER;
 
 		//ストレッチ
 		CalculateStretch(vel);
 	}
 
 	// RBが押されたら反動をつける。
-	if (UsersInput::Instance()->Input(XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
 
 		// 反動をつける。
 		float lHandAngle = rHand->GetAngle();
@@ -432,16 +393,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 		float angle = rHand->GetAngle();
 
 		AudioApp::Instance()->PlayWave(shotSE);
-		BulletMgr::Instance()->Generate(rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, true);
+		BulletMgr::Instance()->Generate(bulletGraph, rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, true);
 
 		// 連射タイマーをセット
 		rapidFireTimerRight = RAPID_FIRE_TIMER;
-
-		// 一定時間入力がなかったら初期位置に戻す
-		handReturnTimer = DEF_HAND_RETURN_TIMER;
-
-		// 入力タイマーをセット。
-		asSoonAsInputTimer = AS_SOON_AS_INPUT_TIMER;
 
 		//ストレッチ
 		CalculateStretch(vel);
@@ -454,7 +409,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
 
 	// RTが押されたら
-	if (swingCoolTime <= 0 && UsersInput::Instance()->OnTrigger(XBOX_BUTTON::RT)) {
+	if (swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT)) {
 
 		// 振り回しの処理
 
