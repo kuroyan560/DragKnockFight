@@ -2,6 +2,7 @@
 #include"../Common/Singleton.h"
 #include<memory>
 #include"../Common/Vec.h"
+#include"CharacterInterFace.h"
 
 /// <summary>
 /// 優勢ゲージ
@@ -31,28 +32,24 @@ public:
 	SuperiorityGauge();
 
 	/// <summary>
-	/// プレイヤーにゲージ量を追加し、追加した分エネミーのゲージ量を減らします
+	/// ゲージ変動
 	/// </summary>
-	/// <param name="VALUE">追加する値</param>
-	void AddPlayerGauge(const float &VALUE);
-
-	/// <summary>
-	/// エネミーにゲージ量を追加し、追加した分プレイヤーのゲージ量を減らします
-	/// </summary>
-	/// <param name="VALUE"></param>
-	void AddEnemyGauge(const float &VALUE);
+	/// <param name="Team">左右どちらのチームか</param>
+	/// <param name="Value">変動する量
+	/// </param>
+	void AddGauge(const WHICH_TEAM& Team, const float& Value);
 
 	/// <summary>
 	/// プレイヤーに関するゲージのデータを入手します
 	/// </summary>
 	/// <returns>プレイヤーのゲージデータ</returns>
-	const std::unique_ptr<GaugeData> &GetPlayerGaugeData();
+	const GaugeData& GetLeftGaugeData();
 
 	/// <summary>
 	/// エネミーに関するゲージのデータを入手します
 	/// </summary>
 	/// <returns>エネミーのゲージデータ</returns>
-	const std::unique_ptr<GaugeData> &GetEnemyGaugeData();
+	const GaugeData& GetRightGaugeData();
 
 	const bool &IsStacking();
 
@@ -65,8 +62,7 @@ private:
 	static float GAUGE_MAX_VALUE;			//ゲージの最大量
 	static int STACK_MAX_TIMER;			//何秒間拮抗したら拮抗状態だと判断するか
 
-	std::unique_ptr<GaugeData> playerGaugeData;	//プレイヤーのゲージデータ
-	std::unique_ptr<GaugeData> enemyGaugeData;	//敵のゲージデータ
+	GaugeData gaugeData[TEAM_NUM];
 
 	bool isStackingFlag;	//拮抗しているかどうか
 	int stackTimer;			//何秒拮抗しているか

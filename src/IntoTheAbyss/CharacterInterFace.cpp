@@ -75,7 +75,7 @@ void CharacterInterFace::Crash(const Vec2<float>& MyVec)
 	else if (MyVec.y < 0.0f)smokeVec.y = 1.0f;
 
 	CrashMgr::Instance()->Crash(pos, stagingDevice, ext, smokeVec);
-	SuperiorityGauge::Instance()->AddPlayerGauge(10.0f);
+	SuperiorityGauge::Instance()->AddGauge(team, 10.0f);
 }
 
 void CharacterInterFace::CrashUpdate()
@@ -159,6 +159,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	//登場演出のため最初は動けない
 	canMove = false;
 
+	bulletMgr.Init();
+
 	OnInit();
 }
 
@@ -191,6 +193,9 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	}
 	OnUpdateNoRelatedSwing();
 
+	//弾の更新
+	bulletMgr.Update();
+
 	//引っかかっている
 	if (stackMapChip)
 	{
@@ -211,6 +216,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 void CharacterInterFace::Draw()
 {
 	OnDraw();
+	bulletMgr.Draw();
 }
 
 #include"Intersected.h"
@@ -461,7 +467,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				Crash(vec);
 				//CrashMgr::Instance()->Crash(pos, crashDevice, ext);
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
-				SuperiorityGauge::Instance()->AddPlayerGauge(10);
+				SuperiorityGauge::Instance()->AddGauge(team, 10);
 				partner.lock()->FinishSwing();
 			}
 		}
@@ -482,7 +488,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				//CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
-				SuperiorityGauge::Instance()->AddPlayerGauge(20);
+				SuperiorityGauge::Instance()->AddGauge(team, 20);
 				Crash({ winRight ? 1.0f : -1.0f , 0.0f });
 			}
 			// ウィンドウ上下
@@ -494,7 +500,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				//CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
-				SuperiorityGauge::Instance()->AddPlayerGauge(20);
+				SuperiorityGauge::Instance()->AddGauge(team, 20);
 				Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
 			}
 		}

@@ -7,6 +7,7 @@
 #include"../IntoTheAbyss/BulletCollision.h"
 #include<array>
 #include "Intersected.h"
+#include"BulletMgrBase.h"
 
 static const enum PLAYABLE_CHARACTER_NAME { PLAYABLE_LUNA, PLAYABLE_LACY, PLAYABLE_BOSS_0, PLAYABLE_CHARACTER_NUM, PLAYER_CHARACTER_NUM = PLAYABLE_LACY + 1 };
 static const enum WHICH_TEAM { LEFT_TEAM, RIGHT_TEAM, TEAM_NUM };
@@ -39,8 +40,9 @@ private:
 	//ç∂Ç©âEÇ©
 	WHICH_TEAM team;
 
-protected:
 
+protected:
+	BulletMgrBase bulletMgr;
 	bool nowSwing;
 	Vec2<float> swingStartVec;
 	Vec2<float> swingEndVec;
@@ -121,6 +123,7 @@ public:
 	const bool& GetNowStuckWin() { return 0 < stackWindowTimer; }
 	const bool& GetCanMove() { return canMove; }
 	const bool& GetStackFlag() { return stackMapChip; }
+	BulletMgrBase& GetBulletMgr() { return bulletMgr; }
 
 	void SetCanMove(const bool& Flg) { canMove = Flg; }
 

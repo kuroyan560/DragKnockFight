@@ -19,12 +19,6 @@ public:
 	const float MAX_SPEED = 30.0f;
 	const int DEAD_TIMER = 120;
 
-	enum SHOT_HAND {
-		R_HAND,
-		L_HAND,
-	};
-
-
 public:
 
 	/*-- メンバ変数 --*/
@@ -37,7 +31,6 @@ public:
 	int deadTimer;		// 死ぬまでの時間
 	bool isActive;		// 生存しているかのフラグ
 	bool isFirstFrame;
-	SHOT_HAND handID;	// 撃たれた手
 
 	std::shared_ptr<SphereCollision> bulletHitBox;
 
@@ -53,7 +46,7 @@ public:
 	void Init();
 
 	// 生成処理
-	void Generate(const int& GRPHA_HANDLE, const Vec2<float>& generatePos, const Vec2<float> forwardVec, const SHOT_HAND& id, const float& speed = 30.0f);
+	void Generate(const int& graphHandle, const Vec2<float>& generatePos, const Vec2<float> forwardVec, const float& speed);
 
 	// 更新処理
 	void Update();

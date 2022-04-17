@@ -1,6 +1,5 @@
 #include "Player.h"
 #include "PlayerHand.h"
-#include "BulletMgr.h"
 #include "ScrollMgr.h"
 #include "ShakeMgr.h"
 #include "MapChipCollider.h"
@@ -38,9 +37,9 @@ Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& Controll
 		"luna",
 		"lacy"
 	};
-	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/arm_L.png");
-	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/arm_R.png");
-	static const int AIM_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/aim.png");
+	const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/arm_L.png");
+	const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/arm_R.png");
+	const int AIM_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/aim.png");
 	lHand = make_unique<PlayerHand>(ARM_GRAPH_L, AIM_GRAPH);
 	rHand = make_unique<PlayerHand>(ARM_GRAPH_R, AIM_GRAPH);
 
@@ -191,11 +190,6 @@ void Player::OnDraw()
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
 		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { GetWhichTeam() == RIGHT_TEAM,false });
-
-
-	// 弾を描画
-	BulletMgr::Instance()->Draw();
-
 }
 
 void Player::OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
@@ -352,7 +346,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		float angle = lHand->GetAngle();
 
 		AudioApp::Instance()->PlayWave(shotSE);
-		BulletMgr::Instance()->Generate(bulletGraph, lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, false);
+		Shot(lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle);
 
 		// 連射タイマーをセット
 		rapidFireTimerLeft = RAPID_FIRE_TIMER;
@@ -398,7 +392,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		float angle = rHand->GetAngle();
 
 		AudioApp::Instance()->PlayWave(shotSE);
-		BulletMgr::Instance()->Generate(bulletGraph, rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, true);
+		Shot(rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle);
 
 		// 連射タイマーをセット
 		rapidFireTimerRight = RAPID_FIRE_TIMER;
@@ -466,6 +460,13 @@ void Player::Move()
 		// 符号をかける。
 		vel.y *= sign ? -1 : 1;
 	}
+}
+
+void Player::Shot(const Vec2<float>& GeneratePos, const float& ForwardAngle)
+{
+	//弾速
+	static const float BULLET_SPEED = 30.0f;
+	bulletMgr.Generate(bulletGraph, GeneratePos, ForwardAngle, BULLET_SPEED);
 }
 
 void Player::PushBackWall()

@@ -1,7 +1,6 @@
 #include "Game.h"
 #include"MapChipCollider.h"
 #include"ShakeMgr.h"
-#include "BulletMgr.h"
 #include"ScrollMgr.h"
 //#include"BulletParticleMgr.h"
 #include "StunEffect.h"
@@ -25,8 +24,6 @@
 #include"ScoreManager.h"
 #include"FaceIcon.h"
 #include"WinCounter.h"
-
-#include"BossBulletManager.h"
 
 #include"BulletCollision.h"
 
@@ -293,16 +290,10 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	ScoreManager::Instance()->Init();
 	firstLoadFlag = false;
 	lineExtendScale = lineExtendMaxScale;
-
-	BulletMgr::Instance()->Init();
-	BossBulletManager::Instance()->Init();
 }
 
 Game::Game()
 {
-	// 弾管理クラスを初期化。
-	BulletMgr::Instance()->Setting();
-
 	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 	AudioApp::Instance()->ChangeVolume(bgm, 0.07f);
 
@@ -539,10 +530,6 @@ void Game::Update()
 	// ボスの更新処理
 	CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
 
-	// 弾を更新
-	BulletMgr::Instance()->Update();
-	BossBulletManager::Instance()->Update();
-
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
 
@@ -583,39 +570,42 @@ void Game::Update()
 	/*===== 当たり判定 =====*/
 
 #pragma region 当たり判定
-	// 弾とマップチップの当たり判定
-	BulletMgr::Instance()->CheckHit(mapData);
 
-	//ボス弾とプレイヤーの判定
-	for (int index = 0; index < BossBulletManager::Instance()->bullets.size(); ++index)
+	//左弾と右プレイヤーの判定
+	auto& leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
+	for (int index = 0; index < leftBulMgr.bullets.size(); ++index)
 	{
-		std::shared_ptr<SphereCollision> bullet = BossBulletManager::Instance()->GetBullet(index)->bulletHitBox;
-		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, CharacterManager::Instance()->Left()->GetBulletHitSphere());
-		bool initFlag = BossBulletManager::Instance()->GetBullet(index)->isActive;
+		auto& bul = leftBulMgr.bullets[index];
+		if (!bul.isActive)continue;
+
+		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
+		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bulCol, CharacterManager::Instance()->Right()->GetBulletHitSphere());
 
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
-		if (hitFlag && initFlag)
+		if (hitFlag)
 		{
-			SuperiorityGauge::Instance()->AddEnemyGauge(DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
-			BossBulletManager::Instance()->GetBullet(index)->Init();
+			SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
+			bul.Init();
 		}
 	}
 
-	//プレイヤー弾とボスの判定
-	for (int index = 0; index < BulletMgr::Instance()->bullets.size(); ++index)
+	//右弾と左プレイヤーの判定
+	auto rightBulMgr = CharacterManager::Instance()->Right()->GetBulletMgr();
+	for (int index = 0; index < rightBulMgr.bullets.size(); ++index)
 	{
-		std::shared_ptr<SphereCollision> bullet = BulletMgr::Instance()->GetBullet(index)->bulletHitBox;
-		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, CharacterManager::Instance()->Right()->GetBulletHitSphere());
-		bool initFlag = BulletMgr::Instance()->GetBullet(index)->isActive;
+		auto& bul = rightBulMgr.bullets[index];
+		if (!bul.isActive)continue;
+
+		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
+		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bulCol, CharacterManager::Instance()->Left()->GetBulletHitSphere());
 
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
-		if (hitFlag && initFlag)
+		if (hitFlag)
 		{
-			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
-			BulletMgr::Instance()->GetBullet(index)->Init();
+			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
+			bul.Init();
 		}
 	}
-
 
 #pragma endregion
 
@@ -628,24 +618,24 @@ void Game::Update()
 	WinCounter::Instance()->Update();
 
 
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_Q, "AddPlayerSuperiorityGauge", TO_STRING(DIK_Q)))
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_Q, "AddLeftSuperiorityGauge", TO_STRING(DIK_Q)))
 	{
-		SuperiorityGauge::Instance()->AddPlayerGauge(10.0f);
+		SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM,10.0f);
 	}
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_W, "AddEnemySuperiorityGauge", TO_STRING(DIK_W)))
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_W, "AddRightSuperiorityGauge", TO_STRING(DIK_W)))
 	{
-		SuperiorityGauge::Instance()->AddEnemyGauge(10.0f);
+		SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, 10.0f);
 	}
 
 
 
 	// 優勢ゲージが振り切ったトリガー判定のときにスタン演出を有効化する。
-	if (SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
+	if (SuperiorityGauge::Instance()->GetRightGaugeData().overGaugeFlag && !SuperiorityGauge::Instance()->GetRightGaugeData().prevOverGaugeFlag) {
 		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
 		StunEffect::Instance()->Activate(CharacterManager::Instance()->Left()->pos, Vec2<float>(0, 0), false);
 		ResultTransfer::Instance()->leftBreakCount++;
 	}
-	if (SuperiorityGauge::Instance()->GetPlayerGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetPlayerGaugeData()->prevOverGaugeFlag) {
+	if (SuperiorityGauge::Instance()->GetLeftGaugeData().overGaugeFlag && !SuperiorityGauge::Instance()->GetLeftGaugeData().prevOverGaugeFlag) {
 		// プレイヤーの優勢ゲージが振り切ったということは、敵の優勢ゲージが0だということ。
 		StunEffect::Instance()->Activate(CharacterManager::Instance()->Right()->pos, Vec2<float>(1200, 0), true);
 		ResultTransfer::Instance()->rightBreakCount++;
@@ -723,8 +713,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		CharacterManager::Instance()->Right()->Draw();
 	}
 
-	BossBulletManager::Instance()->Draw();
-
 	ParticleMgr::Instance()->Draw();
 	CrashMgr::Instance()->Draw();
 
@@ -776,9 +764,9 @@ void Game::Scramble()
 
 	// 移動量を取得。 優勢ゲージはここで更新。
 	double playerVel = CharacterManager::Instance()->Left()->vel.Length() * SlowMgr::Instance()->slowAmount;
-	playerVelGauge = (CharacterManager::Instance()->Left()->vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	playerVelGauge = (CharacterManager::Instance()->Left()->vel * SuperiorityGauge::Instance()->GetLeftGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 	double bossVel = CharacterManager::Instance()->Right()->vel.Length() * SlowMgr::Instance()->slowAmount;
-	bossVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	bossVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetRightGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
 
 	// [振り回し状態のとき] [スタン演出中] は移動させない。

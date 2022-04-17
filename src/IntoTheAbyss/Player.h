@@ -146,6 +146,9 @@ private:
 	// ˆÚ“®ˆ—
 	void Move();
 
+	//’e‚Ì”­Ë
+	void Shot(const Vec2<float>& GeneratePos, const float& ForwardAngle);
+
 	// •Ç‚Æ‚Ì‰Ÿ‚µ–ß‚µ‚ÉŠÖ‚·‚éXVˆ—
 	void PushBackWall();
 

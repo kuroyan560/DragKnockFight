@@ -11,8 +11,6 @@ int SuperiorityGauge::STACK_MAX_TIMER = 120;
 
 SuperiorityGauge::SuperiorityGauge()
 {
-	playerGaugeData = std::make_unique<GaugeData>();
-	enemyGaugeData = std::make_unique<GaugeData>();
 	gaugeGraphHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_flame.png");
 	gaugeVarGraphPlayer = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_player.png");
 	gaugeVarGraphEnemy = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_enemy.png");
@@ -20,32 +18,21 @@ SuperiorityGauge::SuperiorityGauge()
 	imguiHandle = DebugImGuiManager::Instance()->Add("Gauge");
 }
 
-void SuperiorityGauge::AddPlayerGauge(const float &VALUE)
+void SuperiorityGauge::AddGauge(const WHICH_TEAM& Team, const float& Value)
 {
-	float value = fabs(VALUE);
-	playerGaugeData->gaugeValue += value;
-	enemyGaugeData->gaugeValue += -value;
-
+	gaugeData[Team].gaugeValue += Value;
+	gaugeData[TEAM_NUM - Team - 1].gaugeValue -= Value;
 	LimitGauge();
 }
 
-void SuperiorityGauge::AddEnemyGauge(const float &VALUE)
+const SuperiorityGauge::GaugeData& SuperiorityGauge::GetLeftGaugeData()
 {
-	float value = fabs(VALUE);
-	playerGaugeData->gaugeValue += -value;
-	enemyGaugeData->gaugeValue += value;
-
-	LimitGauge();
+	return gaugeData[LEFT_TEAM];
 }
 
-const std::unique_ptr<SuperiorityGauge::GaugeData> &SuperiorityGauge::GetPlayerGaugeData()
+const SuperiorityGauge::GaugeData& SuperiorityGauge::GetRightGaugeData()
 {
-	return playerGaugeData;
-}
-
-const std::unique_ptr<SuperiorityGauge::GaugeData> &SuperiorityGauge::GetEnemyGaugeData()
-{
-	return enemyGaugeData;
+	return gaugeData[RIGHT_TEAM];
 }
 
 const bool &SuperiorityGauge::IsStacking()
@@ -55,8 +42,8 @@ const bool &SuperiorityGauge::IsStacking()
 
 void SuperiorityGauge::Init()
 {
-	playerGaugeData->Init(GAUGE_MAX_VALUE);
-	enemyGaugeData->Init(GAUGE_MAX_VALUE);
+	gaugeData[LEFT_TEAM].Init(GAUGE_MAX_VALUE);
+	gaugeData[RIGHT_TEAM].Init(GAUGE_MAX_VALUE);
 }
 
 void SuperiorityGauge::Update()
@@ -64,24 +51,24 @@ void SuperiorityGauge::Update()
 	//デバック用
 	if (GAUGE_MAX_VALUE != oldMaxGauge)
 	{
-		playerGaugeData->gaugeValue = GAUGE_MAX_VALUE / 2.0f;
-		enemyGaugeData->gaugeValue = GAUGE_MAX_VALUE / 2.0f;
+		gaugeData[LEFT_TEAM].gaugeValue = GAUGE_MAX_VALUE / 2.0f;
+		gaugeData[RIGHT_TEAM].gaugeValue = GAUGE_MAX_VALUE / 2.0f;
 	}
 	oldMaxGauge = GAUGE_MAX_VALUE;
 
 	//前フレームの振り切りフラグを保存。
-	playerGaugeData->prevOverGaugeFlag = playerGaugeData->overGaugeFlag;
-	enemyGaugeData->prevOverGaugeFlag = enemyGaugeData->overGaugeFlag;
+	gaugeData[LEFT_TEAM].prevOverGaugeFlag = gaugeData[LEFT_TEAM].overGaugeFlag;
+	gaugeData[RIGHT_TEAM].prevOverGaugeFlag = gaugeData[RIGHT_TEAM].overGaugeFlag;
 
 	LimitGauge();
 
 	//割合計算
-	playerGaugeData->gaugeDivValue = playerGaugeData->gaugeValue / GAUGE_MAX_VALUE;
-	enemyGaugeData->gaugeDivValue = enemyGaugeData->gaugeValue / GAUGE_MAX_VALUE;
+	gaugeData[LEFT_TEAM].gaugeDivValue = gaugeData[LEFT_TEAM].gaugeValue / GAUGE_MAX_VALUE;
+	gaugeData[RIGHT_TEAM].gaugeDivValue = gaugeData[RIGHT_TEAM].gaugeValue / GAUGE_MAX_VALUE;
 
 
 	//拮抗しているかどうか
-	if (playerGaugeData->gaugeDivValue == enemyGaugeData->gaugeDivValue)
+	if (gaugeData[LEFT_TEAM].gaugeDivValue == gaugeData[RIGHT_TEAM].gaugeDivValue)
 	{
 		++stackTimer;
 	}
@@ -110,7 +97,7 @@ void SuperiorityGauge::Draw()
 
 	Vec2<float> gaugeVarPos = { gaguePos.x,101.0f };
 	DrawFunc_FillTex::DrawRotaGraph2D(gaugeVarPos + OFFSET, { 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(gaugeVarGraphPlayer),
-		TexHandleMgr::GetTexBuffer(gaugeVarGraphEnemy), 1.0f, { 0.5f,0.5f }, { false,false }, Vec2<float>(playerGaugeData->gaugeDivValue, 0.0f));
+		TexHandleMgr::GetTexBuffer(gaugeVarGraphEnemy), 1.0f, { 0.5f,0.5f }, { false,false }, Vec2<float>(gaugeData[LEFT_TEAM].gaugeDivValue, 0.0f));
 }
 
 void SuperiorityGauge::DebugValue(float *ADD_VALUE)
@@ -119,9 +106,9 @@ void SuperiorityGauge::DebugValue(float *ADD_VALUE)
 	{
 		ImGui::Begin("Gauge");
 		ImGui::Text("Q...AddPlayerGaugeValue,W...AddEnemyGagueValue");
-		ImGui::Text("PlayerGauge:%f EnemyGauge:%f", playerGaugeData->gaugeValue, enemyGaugeData->gaugeValue);
-		ImGui::Text("PlayerDivGauge:%f EnemyDivGauge:%f", playerGaugeData->gaugeDivValue, enemyGaugeData->gaugeDivValue);
-		ImGui::Text("PlayerOver:%d EnemyOver:%d", playerGaugeData->overGaugeFlag, enemyGaugeData->overGaugeFlag);
+		ImGui::Text("PlayerGauge:%f EnemyGauge:%f", gaugeData[LEFT_TEAM].gaugeValue, gaugeData[RIGHT_TEAM].gaugeValue);
+		ImGui::Text("PlayerDivGauge:%f EnemyDivGauge:%f", gaugeData[LEFT_TEAM].gaugeDivValue, gaugeData[RIGHT_TEAM].gaugeDivValue);
+		ImGui::Text("PlayerOver:%d EnemyOver:%d", gaugeData[LEFT_TEAM].overGaugeFlag, gaugeData[RIGHT_TEAM].overGaugeFlag);
 		ImGui::Text("StackTimer:%d", stackTimer);
 		ImGui::Text("StackFlag:%d", isStackingFlag);
 		ImGui::InputFloat("GAUGE_MAX_VALUE", &GAUGE_MAX_VALUE);
@@ -133,29 +120,29 @@ void SuperiorityGauge::DebugValue(float *ADD_VALUE)
 
 void SuperiorityGauge::LimitGauge()
 {
-	playerGaugeData->overGaugeFlag = false;
-	enemyGaugeData->overGaugeFlag = false;
+	gaugeData[LEFT_TEAM].overGaugeFlag = false;
+	gaugeData[RIGHT_TEAM].overGaugeFlag = false;
 
 	//プレイヤーの最小制限
-	if (playerGaugeData->gaugeValue <= 0.0f)
+	if (gaugeData[LEFT_TEAM].gaugeValue <= 0.0f)
 	{
-		playerGaugeData->gaugeValue = 0.0f;
+		gaugeData[LEFT_TEAM].gaugeValue = 0.0f;
 	}
 	//敵の最小制限
-	if (enemyGaugeData->gaugeValue <= 0.0f)
+	if (gaugeData[RIGHT_TEAM].gaugeValue <= 0.0f)
 	{
-		enemyGaugeData->gaugeValue = 0.0f;
+		gaugeData[RIGHT_TEAM].gaugeValue = 0.0f;
 	}
 	//プレイヤーが振り切った判定
-	if (GAUGE_MAX_VALUE <= playerGaugeData->gaugeValue)
+	if (GAUGE_MAX_VALUE <= gaugeData[LEFT_TEAM].gaugeValue)
 	{
-		playerGaugeData->gaugeValue = GAUGE_MAX_VALUE;
-		playerGaugeData->overGaugeFlag = true;
+		gaugeData[LEFT_TEAM].gaugeValue = GAUGE_MAX_VALUE;
+		gaugeData[LEFT_TEAM].overGaugeFlag = true;
 	}
 	//敵が振り切った判定
-	if (GAUGE_MAX_VALUE <= enemyGaugeData->gaugeValue)
+	if (GAUGE_MAX_VALUE <= gaugeData[RIGHT_TEAM].gaugeValue)
 	{
-		enemyGaugeData->gaugeValue = GAUGE_MAX_VALUE;
-		enemyGaugeData->overGaugeFlag = true;
+		gaugeData[RIGHT_TEAM].gaugeValue = GAUGE_MAX_VALUE;
+		gaugeData[RIGHT_TEAM].overGaugeFlag = true;
 	}
 }

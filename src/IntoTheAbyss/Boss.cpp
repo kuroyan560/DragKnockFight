@@ -14,7 +14,6 @@
 #include"BossPatternNormalMove.h"
 #include"BossPatternAttack.h"
 #include"BossPatternSwing.h"
-#include"BossBulletManager.h"
 #include"CrashMgr.h"
 #include"CharacterInterFace.h"
 
@@ -37,8 +36,6 @@ Boss::Boss() :CharacterInterFace(SCALE)
 
 	//パターンに渡すデータの初期化
 	patternData.moveVel = &moveVel;
-
-
 }
 
 void Boss::OnInit()
@@ -154,7 +151,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		{
 			if (patternData.bulltData[i].initFlag)
 			{
-				BossBulletManager::Instance()->Generate(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
+				Shot(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
 			}
 		}
 	}
@@ -528,6 +525,12 @@ void Boss::OnDraw()
 //	}
 //
 //}
+
+void Boss::Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed)
+{
+	static const int BULLET_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
+	bulletMgr.Generate(BULLET_GRAPH, generatePos, forwardAngle, speed);
+}
 
 bool Boss::Appear()
 {
