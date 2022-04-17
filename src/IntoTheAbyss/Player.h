@@ -66,6 +66,7 @@ public:
 	float MAX_GRAVITY = 15.0f;			// プレイヤーにかける重力の最大量
 	float RECOIL_AMOUNT = 30.0f;			// 弾を撃った際の反動
 	float FIRST_RECOIL_AMOUNT = 35.0;		// 弾を撃った際の反動
+	float MOVE_SPEED = 15.0f;			// 移動速度
 	//const float FIRST_RECOIL_AMOUNT = 15.0;		// 弾を撃った際の反動
 	//const float RECOIL_AMOUNT = FIRST_RECOIL_AMOUNT;			// 弾を撃った際の反動
 	float MAX_RECOIL_AMOUNT = 30.0f;		// 弾を撃った際の反動の最大値
