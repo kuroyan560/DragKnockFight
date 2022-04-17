@@ -447,6 +447,8 @@ void Game::Update()
 		//動けなくする
 		CharacterManager::Instance()->Left()->SetCanMove(false);
 		CharacterManager::Instance()->Right()->SetCanMove(false);
+		CharacterManager::Instance()->Left()->SetHitCheck(false);
+		CharacterManager::Instance()->Right()->SetHitCheck(false);
 
 		//時間計測ストップ
 		GameTimer::Instance()->SetInterruput(true);
@@ -511,6 +513,8 @@ void Game::Update()
 				roundTimer = 0;
 				CharacterManager::Instance()->Left()->SetCanMove(true);
 				CharacterManager::Instance()->Right()->SetCanMove(true);
+				CharacterManager::Instance()->Left()->SetHitCheck(true);
+				CharacterManager::Instance()->Right()->SetHitCheck(true);
 				GameTimer::Instance()->SetInterruput(false);
 			}
 		}
@@ -586,6 +590,7 @@ void Game::Update()
 		{
 			SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
 			bul.Init();
+			CharacterManager::Instance()->Right()->Damage();
 		}
 	}
 
@@ -604,6 +609,7 @@ void Game::Update()
 		{
 			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
 			bul.Init();
+			CharacterManager::Instance()->Left()->Damage();
 		}
 	}
 
@@ -632,13 +638,15 @@ void Game::Update()
 	// 優勢ゲージが振り切ったトリガー判定のときにスタン演出を有効化する。
 	if (SuperiorityGauge::Instance()->GetRightGaugeData().overGaugeFlag && !SuperiorityGauge::Instance()->GetRightGaugeData().prevOverGaugeFlag) {
 		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
-		StunEffect::Instance()->Activate(CharacterManager::Instance()->Left()->pos, Vec2<float>(0, 0), false);
+		StunEffect::Instance()->Activate(CharacterManager::Instance()->Left()->pos, Vec2<float>(0, 0), LEFT_TEAM);
 		ResultTransfer::Instance()->leftBreakCount++;
+		CharacterManager::Instance()->Left()->Break();
 	}
 	if (SuperiorityGauge::Instance()->GetLeftGaugeData().overGaugeFlag && !SuperiorityGauge::Instance()->GetLeftGaugeData().prevOverGaugeFlag) {
 		// プレイヤーの優勢ゲージが振り切ったということは、敵の優勢ゲージが0だということ。
-		StunEffect::Instance()->Activate(CharacterManager::Instance()->Right()->pos, Vec2<float>(1200, 0), true);
+		StunEffect::Instance()->Activate(CharacterManager::Instance()->Right()->pos, Vec2<float>(1200, 0), RIGHT_TEAM);
 		ResultTransfer::Instance()->rightBreakCount++;
+		CharacterManager::Instance()->Right()->Break();
 	}
 
 	CrashMgr::Instance()->Update();
@@ -757,7 +765,8 @@ void Game::Scramble()
 	// 前フレームの線の中心座標を保存
 	prevLineCenterPos = lineCenterPos;
 
-	if (!CharacterManager::Instance()->Left()->GetCanMove() || !CharacterManager::Instance()->Right()->GetCanMove())return;
+	//どちらも動けないとき何もしない
+	if (!(CharacterManager::Instance()->Left()->GetCanMove() || CharacterManager::Instance()->Right()->GetCanMove()))return;
 
 	Vec2<float> playerVelGauge;
 	Vec2<float> bossVelGauge;

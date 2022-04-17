@@ -4,7 +4,8 @@
 #include"SuperiorityGauge.h"
 #include"ScrollMgr.h"
 #include"DebugParameter.h"
-
+#include"StunEffect.h"
+#include"FaceIcon.h"
 void CharacterInterFace::SwingUpdate()
 {
 	static const float ADD_EASINGTIMER_MINIMUM = 0.025f;	// イージングタイマーに加算する量 最小値
@@ -158,14 +159,39 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	//登場演出のため最初は動けない
 	canMove = false;
+	//登場演出のため最初は当たり判定とらない
+	hitCheck = false;
 
 	bulletMgr.Init();
+
+	stanTimer = 0;
 
 	OnInit();
 }
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
+	//スタン状態更新
+	if (stanTimer)
+	{
+		stanTimer--;
+		//スタン終了
+		if (stanTimer <= 0)
+		{
+			canMove = true;
+			FaceIcon::Instance()->Change(team, FACE_STATUS::DEFAULT);
+		}
+	}
+	//ダメージ状態更新（顔制御）
+	if (damageTimer)
+	{
+		damageTimer--;
+		if (damageTimer <= 0)
+		{
+			FaceIcon::Instance()->Change(team, FACE_STATUS::DEFAULT);
+		}
+	}
+
 	prevPos = pos;
 
 	// 慣性を更新。
@@ -219,6 +245,21 @@ void CharacterInterFace::Draw()
 	bulletMgr.Draw();
 }
 
+void CharacterInterFace::Break()
+{
+	static const int STAN_TOTAL_TIME = 120;
+	stanTimer = STAN_TOTAL_TIME + StunEffect::GetTotalTime();
+}
+
+void CharacterInterFace::Damage()
+{
+	static const int DAMAGE_TOTAL_TIME = 90;
+	if (stanTimer)return;	//スタン中ならダメージによる顔変更なし
+
+	damageTimer = DAMAGE_TOTAL_TIME;
+	FaceIcon::Instance()->Change(team, FACE_STATUS::DAMAGE);
+}
+
 #include"Intersected.h"
 #include"MapChipCollider.h"
 void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
@@ -227,7 +268,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 	/*===== 当たり判定 =====*/
 
 	//当たり判定
-	if (!canMove)return;
+	if (!hitCheck)return;
 
 
 	//各キャラの特有の当たり判定

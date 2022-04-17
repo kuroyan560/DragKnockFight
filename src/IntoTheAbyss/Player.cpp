@@ -192,26 +192,6 @@ void Player::OnDraw()
 		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { GetWhichTeam() == RIGHT_TEAM,false });
 }
 
-void Player::OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
-{
-
-	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
-	{
-		// ウィンドウに挟まっていなかったら
-		if (!GetNowStuckWin()) {
-			// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
-			CheckHitMapChipVel(pos, MapData);
-		}
-
-	}
-
-
-	/*===== 腕の当たり判定 =====*/
-
-	lHand->CheckHit(MapData);
-	rHand->CheckHit(MapData);
-}
-
 void Player::OnHitMapChip(const HIT_DIR& Dir)
 {
 	if (Dir == TOP)

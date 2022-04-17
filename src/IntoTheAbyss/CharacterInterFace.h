@@ -36,10 +36,16 @@ private:
 
 	//演出などの動きの関係で動きを止める
 	bool canMove;
+	//演出などの関係で当たり判定をとらなくなる
+	bool hitCheck;
 
 	//左か右か
 	WHICH_TEAM team;
 
+	//スタン用タイマー
+	int stanTimer;
+	//ダメージ用タイマー
+	int damageTimer;
 
 protected:
 	BulletMgrBase bulletMgr;
@@ -72,7 +78,6 @@ protected:
 	virtual void OnUpdate(const std::vector<std::vector<int>>& MapData) = 0;
 	virtual void OnUpdateNoRelatedSwing() = 0;	//スウィング中でも通る処理
 	virtual void OnDraw() = 0;
-	virtual void OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos) = 0;
 	virtual void OnHitMapChip(const HIT_DIR& Dir) = 0;
 
 	//[共通関数]
@@ -115,17 +120,24 @@ public:
 	//当たり判定
 	void CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
 
+	//スタン
+	void Break();
+	//ダメージ
+	void Damage();
+
 	const Square& GetAreaHitBox() { return areaHitBox; }
 	const SphereCollision& GetBulletHitSphere() { return bulletHitSphere; }
 
 	const int& GetStackWinTimer() { return stackWindowTimer; }
 	const bool& GetNowSwing() { return nowSwing; }
 	const bool& GetNowStuckWin() { return 0 < stackWindowTimer; }
-	const bool& GetCanMove() { return canMove; }
+	const bool& GetCanMove() { return canMove && !stanTimer; }
 	const bool& GetStackFlag() { return stackMapChip; }
+	const bool& GetNowBreak() { return stanTimer; }
 	BulletMgrBase& GetBulletMgr() { return bulletMgr; }
 
 	void SetCanMove(const bool& Flg) { canMove = Flg; }
+	void SetHitCheck(const bool& Flg) { hitCheck = Flg; }
 
 	inline void FinishSwing() { nowSwing = false; }
 };

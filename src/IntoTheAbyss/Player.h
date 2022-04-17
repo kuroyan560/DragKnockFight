@@ -127,9 +127,6 @@ private:
 	// 描画処理
 	void OnDraw()override;
 
-	// マップチップとの当たり判定
-	void OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)override;
-
 	//マップチップとヒットしたとき
 	void OnHitMapChip(const HIT_DIR& Dir)override;
 

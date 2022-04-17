@@ -78,7 +78,6 @@ private:
 	// •`‰æˆ—
 	void OnDraw()override;
 
-	void OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)override {};
 	virtual void OnHitMapChip(const HIT_DIR& Dir)override {};
 
 	void Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed);
