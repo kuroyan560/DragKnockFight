@@ -166,6 +166,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	stanTimer = 0;
 
+	stagingDevice.Init();
+
 	OnInit();
 }
 
@@ -180,6 +182,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		{
 			canMove = true;
 			FaceIcon::Instance()->Change(team, FACE_STATUS::DEFAULT);
+			SuperiorityGauge::Instance()->Init();
 		}
 	}
 	//ダメージ状態更新（顔制御）
@@ -237,6 +240,9 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 			mapChipHit[i] = false;
 		}
 	}
+
+	//演出補助更新
+	stagingDevice.Update();
 }
 
 void CharacterInterFace::Draw()
@@ -254,6 +260,9 @@ void CharacterInterFace::Break()
 void CharacterInterFace::Damage()
 {
 	static const int DAMAGE_TOTAL_TIME = 90;
+	stagingDevice.Flash(DAMAGE_TOTAL_TIME, 0.7f);
+	stagingDevice.Shake(DAMAGE_TOTAL_TIME / 2, 2, 3.0f);
+
 	if (stanTimer)return;	//スタン中ならダメージによる顔変更なし
 
 	damageTimer = DAMAGE_TOTAL_TIME;
