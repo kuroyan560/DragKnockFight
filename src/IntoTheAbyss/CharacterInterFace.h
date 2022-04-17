@@ -104,6 +104,8 @@ public:
 
 public:
 	static const int LINE_LENGTH = 150;
+	static const int ADD_LINE_LENGTH_VEL = 100;	// ˆÚ“®—Ê‚É‰‚¶‚ÄL‚Ñ‚éaddLineLength‚ÌÅ‘å—Ê
+	float MOVE_SPEED_PLAYER = 15.0f;			// ˆÚ“®‘¬“x
 	float addLineLength;	//•R
 	Vec2<float> pos;			// À•W
 	Vec2<float>vel;

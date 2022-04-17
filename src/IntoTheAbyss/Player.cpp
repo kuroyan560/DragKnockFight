@@ -282,11 +282,11 @@ void Player::Input(const vector<vector<int>>& MapData)
 	if (inputRate >= 0.5f) {
 
 		// 移動を受け付ける。
-		vel.x = inputVec.x * (MOVE_SPEED * inputRate);
-		vel.y = inputVec.y * (MOVE_SPEED * inputRate);
+		vel.x = inputVec.x * (MOVE_SPEED_PLAYER * inputRate);
+		vel.y = inputVec.y * (MOVE_SPEED_PLAYER * inputRate);
 
 		// 右手の角度を更新
-		lHand->SetAngle(KuroFunc::GetAngle(-inputVec));
+		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
 	}
 
 	inputVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
