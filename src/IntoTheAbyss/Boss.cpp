@@ -529,7 +529,7 @@ void Boss::OnDraw()
 void Boss::Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed)
 {
 	static const int BULLET_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
-	//bulletMgr.Generate(BULLET_GRAPH, generatePos, forwardAngle, speed);
+	bulletMgr.Generate(BULLET_GRAPH, generatePos, forwardAngle, speed);
 }
 
 bool Boss::Appear()
