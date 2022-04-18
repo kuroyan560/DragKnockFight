@@ -22,7 +22,6 @@ void SuperiorityGauge::AddGauge(const WHICH_TEAM& Team, const float& Value)
 {
 	gaugeData[Team].gaugeValue += Value;
 	gaugeData[TEAM_NUM - Team - 1].gaugeValue -= Value;
-	LimitGauge();
 }
 
 const SuperiorityGauge::GaugeData& SuperiorityGauge::GetLeftGaugeData()
