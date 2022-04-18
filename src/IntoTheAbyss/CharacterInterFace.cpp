@@ -103,8 +103,17 @@ void CharacterInterFace::CrashUpdate()
 
 void CharacterInterFace::SwingPartner()
 {
+	static int SE = -1;
+	if (SE == -1)
+	{
+		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/swing.wav");
+		AudioApp::Instance()->ChangeVolume(SE, 0.13f);
+	}
+
 	//振り回し処理が既に走っている場合は、重ねて振り回せない
 	if (partner.lock()->nowSwing || nowSwing)return;
+
+	AudioApp::Instance()->PlayWave(SE);
 
 	//相手とのベクトル取得
 	Vec2<float>dir = GetPartnerPos() - pos;

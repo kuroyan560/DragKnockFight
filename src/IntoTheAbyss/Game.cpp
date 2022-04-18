@@ -441,6 +441,10 @@ void Game::Update()
 		playerHitColor = Color(255, 255, 255, 255);
 	}
 
+	//デバッグ用
+	ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
+	turnResultScene = true;
+
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
 	{
@@ -453,8 +457,6 @@ void Game::Update()
 		//時間計測ストップ
 		GameTimer::Instance()->SetInterruput(true);
 
-
-
 		//勝利数カウント演出
 		if (!WinCounter::Instance()->GetNowAnimation())
 		{
@@ -462,7 +464,6 @@ void Game::Update()
 			//どちらかが３勝とったらゲーム終了
 			if (WinCounter::Instance()->GetGameFinish())
 			{
-				//とりあえずリセットしとく
 				ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
 				turnResultScene = true;
 			}

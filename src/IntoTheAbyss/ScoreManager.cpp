@@ -33,6 +33,9 @@ void ScoreManager::Sub(const int &SUB_POINT)
 
 void ScoreManager::Update()
 {
+	//スコア制度なし
+	return;
+
 	float lerp = honraiScore - score;
 	score += lerp * 0.1f;
 
@@ -73,6 +76,9 @@ void ScoreManager::Update()
 
 void ScoreManager::Draw()
 {
+	//スコア制度なし
+	return;
+
 	float size = 0.55f;
 	for (int i = 0; i < numberHandle.size(); i++)
 	{

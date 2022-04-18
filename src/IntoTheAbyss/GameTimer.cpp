@@ -3,6 +3,7 @@
 #include"../Engine/DrawFunc.h"
 #include"../Engine/ImguiApp.h"
 #include"../Common/KuroMath.h"
+#include"WinApp.h"
 
 GameTimer::GameTimer()
 {
@@ -15,6 +16,8 @@ GameTimer::GameTimer()
 	texSize = { 48,44 };
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, number.data());
 
+	//スコア無効、タイマーを中心に描画
+	timerPos.x = WinApp::Instance()->GetExpandWinCenter().x - texSize.x * 2.0f;
 }
 
 void GameTimer::Init(const Vec2<float> &POS, int TIME, const Vec2<float> &COUNT_DOWN_START_POS, const Vec2<float> &COUNT_DOWN_END_POS)
