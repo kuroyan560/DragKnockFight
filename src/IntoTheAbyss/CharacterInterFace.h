@@ -50,9 +50,12 @@ private:
 protected:
 	BulletMgrBase bulletMgr;
 	bool nowSwing;
-	Vec2<float> swingStartVec;
-	Vec2<float> swingEndVec;
-	float swingEaseRate;
+	Vec2<float> nowSwingVec;		// 現在の角度
+	Vec2<float> swingTargetVec;		// 目標地点
+	float addSwingAngle;			// 振り回しで回転させる量 だんだん増える。
+	bool isSwingClockWise;			// この振り回しが時計回りかどうか true...時計回り...右回転  false...反時計回り...左回転
+	const float ADD_SWING_ANGLE = 0.002f;
+	const float MAX_SWING_ANGLE = 0.07f;
 
 
 protected:
@@ -82,7 +85,7 @@ protected:
 
 	//[共通関数]
 	//振り回し
-	void SwingPartner();
+	void SwingPartner(const Vec2<float>& SwingTargetVec);
 	//ゲッタ類
 	const Vec2<float>& GetPartnerPos()
 	{
@@ -104,13 +107,18 @@ public:
 
 public:
 	static const int LINE_LENGTH = 150;
+	static const int ADD_LINE_LENGTH_VEL = 100;	// 移動量に応じて伸びるaddLineLengthの最大量
+	float MOVE_SPEED_PLAYER = 15.0f;			// 移動速度
 	float addLineLength;	//紐
 	Vec2<float> pos;			// 座標
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
+	bool isHold;				// つかんでいるかフラグ
+	int gripPowerTimer;			// 握力タイマー
+	const int MAX_GRIP_POWER_TIMER = 180;
 
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team)
-	{ 
+	{
 		partner = Partner;
 		team = Team;
 	}

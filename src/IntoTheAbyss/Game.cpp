@@ -43,7 +43,7 @@
 
 #include"CharacterManager.h"
 
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -69,7 +69,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -105,7 +105,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				if (height < 0 || mapChipDrawData.size() <= height) continue;
 				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
@@ -164,7 +164,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
+const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -182,7 +182,7 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
+void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -350,10 +350,10 @@ void Game::Update()
 	const bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//マップの切り替え
 	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectStageFlag2 && nowSelectNum == 0)
-	const bool up = UsersInput::Instance()->KeyOnTrigger(DIK_UP) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_UP);
-	const bool down = UsersInput::Instance()->KeyOnTrigger(DIK_DOWN) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_DOWN);
-	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_LEFT);
-	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_RIGHT);
+	const bool up = UsersInput::Instance()->KeyOnTrigger(DIK_UP) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_UP);
+	const bool down = UsersInput::Instance()->KeyOnTrigger(DIK_DOWN) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_DOWN);
+	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_LEFT);
+	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_RIGHT);
 
 	if (up && enableToSelectStageFlag2 && nowSelectNum == 0)
 	{
@@ -393,7 +393,7 @@ void Game::Update()
 		debugStageData[1] = 0;
 	}
 
-	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0,A);
+	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0, A);
 	if (done)
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
@@ -403,7 +403,7 @@ void Game::Update()
 	}
 #pragma endregion
 
-	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0,BACK);
+	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0, BACK);
 	if (resetInput)
 	{
 		SelectStage::Instance()->resetStageFlag = true;
@@ -627,7 +627,7 @@ void Game::Update()
 
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_Q, "AddLeftSuperiorityGauge", TO_STRING(DIK_Q)))
 	{
-		SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM,10.0f);
+		SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, 10.0f);
 	}
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_W, "AddRightSuperiorityGauge", TO_STRING(DIK_W)))
 	{
@@ -676,7 +676,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
 	// プレイヤーとボス間に線を描画
-	if(roundChangeEffect.initGameFlag)
+	if (roundChangeEffect.initGameFlag)
 	{
 		Vec2<float> playerBossDir = CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos;
 		playerBossDir.Normalize();
@@ -744,7 +744,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	{
 		Vec2<float>leftUpPos = *CharacterManager::Instance()->Right()->GetAreaHitBox().center - CharacterManager::Instance()->Right()->GetAreaHitBox().size / 2.0f;
 		Vec2<float>rightDownPos = *CharacterManager::Instance()->Right()->GetAreaHitBox().center + CharacterManager::Instance()->Right()->GetAreaHitBox().size / 2.0f;
-		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), Color(255,255,255,255), DXGI_FORMAT_R8G8B8A8_UNORM);
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), Color(255, 255, 255, 255), DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	{
@@ -769,20 +769,20 @@ void Game::Scramble()
 	//どちらも動けないとき何もしない
 	if (!(CharacterManager::Instance()->Left()->GetCanMove() || CharacterManager::Instance()->Right()->GetCanMove()))return;
 
-	Vec2<float> playerVelGauge;
-	Vec2<float> bossVelGauge;
+	Vec2<float> leftVelGauge;
+	Vec2<float> rightVelGauge;
 
 	// 移動量を取得。 優勢ゲージはここで更新。
-	double playerVel = CharacterManager::Instance()->Left()->vel.Length() * SlowMgr::Instance()->slowAmount;
-	playerVelGauge = (CharacterManager::Instance()->Left()->vel * SuperiorityGauge::Instance()->GetLeftGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
-	double bossVel = CharacterManager::Instance()->Right()->vel.Length() * SlowMgr::Instance()->slowAmount;
-	bossVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetRightGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
-	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
+	double leftVel = CharacterManager::Instance()->Left()->vel.Length() * SlowMgr::Instance()->slowAmount;
+	leftVelGauge = (CharacterManager::Instance()->Left()->vel * SuperiorityGauge::Instance()->GetLeftGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	double rightVel = CharacterManager::Instance()->Right()->vel.Length() * SlowMgr::Instance()->slowAmount;
+	rightVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetRightGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	double subVel = fabs(fabs(leftVel) - fabs(rightVel));
 
-	// [振り回し状態のとき] [スタン演出中] は移動させない。
+	// [振り回し状態のとき] [スタン演出中] は移動させない。 踏ん張り中の場合は、どちらにせよ移動量が限りなく0に近いので移動させても問題がない。
 	if (!(CharacterManager::Instance()->Right()->GetNowSwing() || CharacterManager::Instance()->Left()->GetNowSwing() || StunEffect::Instance()->isActive)) {
-		CharacterManager::Instance()->Left()->pos += playerVelGauge;
-		CharacterManager::Instance()->Right()->pos += bossVelGauge;
+		CharacterManager::Instance()->Left()->pos += leftVelGauge;
+		CharacterManager::Instance()->Right()->pos += rightVelGauge;
 	}
 
 
@@ -790,14 +790,80 @@ void Game::Scramble()
 	float line = 0;
 	float LINE = CharacterInterFace::LINE_LENGTH * 2 + (CharacterManager::Instance()->Left()->addLineLength + CharacterManager::Instance()->Right()->addLineLength);
 
-	// 気にしないでください！
-	bool isBoss = true;
-	bool isPlayer = true;
+	// どちらかが踏ん張っているか。
+	bool isHoldNow = CharacterManager::Instance()->Left()->isHold || CharacterManager::Instance()->Right()->isHold;
+
+
+	// どちらかが踏ん張っていたら。
+	if (isHoldNow) {
+
+		// 右側のキャラが踏ん張っていたら。
+		if (CharacterManager::Instance()->Left()->isHold) {
+
+			// 距離を求める。
+			line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
+
+			// ボスをプレイヤーの方に移動させる。
+			if (LINE < line) {
+
+				// 押し戻し量
+				float moveLength = line - LINE;
+
+				// 押し戻し方向
+				Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos);
+				moveDir.Normalize();
+
+				// 押し戻す。
+				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+
+				// 引っかかり判定だったら
+				if (CharacterManager::Instance()->Right()->GetStackFlag()) {
+
+					CharacterManager::Instance()->Right()->addLineLength += moveLength;
+
+				}
+
+			}
+
+		}
+		// 左側のキャラが踏ん張っていたら。
+		else {
+
+			// 距離を求める。
+			line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
+
+			// プレイヤーをボスの方に移動させる。
+			if (LINE < line) {
+
+				// 押し戻し量
+				float moveLength = line - LINE;
+
+				// 押し戻し方向
+				Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos);
+				moveDir.Normalize();
+
+				// 押し戻す。
+				CharacterManager::Instance()->Left()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+
+				// 引っかかり判定だったら
+				if (CharacterManager::Instance()->Left()->GetStackFlag()) {
+
+					CharacterManager::Instance()->Left()->addLineLength += moveLength;
+
+				}
+
+			}
+
+		}
+
+
+	}
 
 	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
-	if (playerVelGauge.Length() < bossVelGauge.Length()) {
+	else if (leftVelGauge.Length() < rightVelGauge.Length()) {
 
-		// ボスの移動量のほうが大きかったら
+		// 右側のほうが移動量が大きかったら。
+		// 右側のキャラを中心とした位置に左側のキャラを持ってくる。
 
 		// 距離を求める。
 		line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
@@ -822,14 +888,13 @@ void Game::Scramble()
 
 			}
 
-			isBoss = true;
-
 		}
 
 	}
-	else if (bossVelGauge.Length() < playerVelGauge.Length()) {
+	else if (rightVelGauge.Length() < leftVelGauge.Length()) {
 
-		// プレイヤーの移動量のほうが大きかったら
+		// 左側のほうが移動量が大きかったら。
+		// 左側のキャラを中心とした位置に右側のキャラを持ってくる。
 
 		// 距離を求める。
 		line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
@@ -865,8 +930,6 @@ void Game::Scramble()
 
 			}
 
-			isPlayer = true;
-
 		}
 
 	}
@@ -877,7 +940,7 @@ void Game::Scramble()
 	}
 
 	// 引っかかり判定じゃなかったらだんだん短くする。
-	if (isBoss || (!isCatchMapChipBoss && 0 < CharacterManager::Instance()->Right()->addLineLength)) {
+	if (!isCatchMapChipBoss && 0 < CharacterManager::Instance()->Right()->addLineLength) {
 
 		CharacterManager::Instance()->Right()->addLineLength -= 5.0f;
 
@@ -891,7 +954,7 @@ void Game::Scramble()
 		if (CharacterManager::Instance()->Right()->addLineLength < 0) CharacterManager::Instance()->Right()->addLineLength = 0;
 
 	}
-	if (isPlayer || (!isCatchMapChipPlayer && 0 < CharacterManager::Instance()->Left()->addLineLength)) {
+	if (!isCatchMapChipPlayer && 0 < CharacterManager::Instance()->Left()->addLineLength) {
 
 		CharacterManager::Instance()->Left()->addLineLength -= 5.0f;
 
@@ -908,6 +971,19 @@ void Game::Scramble()
 
 	isCatchMapChipBoss = false;
 	isCatchMapChipPlayer = false;
+
+
+	// 移動量に応じて本来あるべき長さにする。
+	float horaiAddLineLength = (CharacterManager::Instance()->Left()->vel.Length() / CharacterManager::Instance()->Left()->MOVE_SPEED_PLAYER);
+	horaiAddLineLength *= CharacterManager::Instance()->Left()->ADD_LINE_LENGTH_VEL;
+	if (CharacterManager::Instance()->Left()->addLineLength < horaiAddLineLength) {
+		CharacterManager::Instance()->Left()->addLineLength = horaiAddLineLength;
+	}
+	horaiAddLineLength = (CharacterManager::Instance()->Right()->vel.Length() / CharacterManager::Instance()->Right()->MOVE_SPEED_PLAYER);
+	horaiAddLineLength *= CharacterManager::Instance()->Right()->ADD_LINE_LENGTH_VEL;
+	if (CharacterManager::Instance()->Right()->addLineLength < horaiAddLineLength) {
+		CharacterManager::Instance()->Right()->addLineLength = horaiAddLineLength;
+	}
 
 	// 紐の中心点を計算
 	{

@@ -57,7 +57,7 @@ void Boss::OnInit()
 }
 
 #include"Camera.h"
-void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
+void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 {
 	/*===== 更新処理 =====*/
 
@@ -168,7 +168,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		// 振り回しのトリガー判定
 		if (0.3f < fabs(dir.y))
 		{
-			SwingPartner();
+			SwingPartner({ 0,1 });
 		}
 	}
 
