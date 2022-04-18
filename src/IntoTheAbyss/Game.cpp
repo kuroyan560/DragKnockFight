@@ -441,10 +441,6 @@ void Game::Update()
 		playerHitColor = Color(255, 255, 255, 255);
 	}
 
-	//デバッグ用
-	ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
-	turnResultScene = true;
-
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
 	{

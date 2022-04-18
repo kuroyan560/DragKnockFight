@@ -183,6 +183,8 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec)
 	//振り回し処理が既に走っている場合は、重ねて振り回せない
 	if (partner.lock()->nowSwing || nowSwing)return;
 
+	AudioApp::Instance()->PlayWave(SE);
+
 	// 目標地点のベクトルを保存。
 	swingTargetVec = SwingTargetVec;
 
