@@ -110,9 +110,10 @@ public:
 	Vec2<float> pos;			// 座標
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
+	bool isHold;				// つかんでいるかフラグ
 
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team)
-	{ 
+	{
 		partner = Partner;
 		team = Team;
 	}

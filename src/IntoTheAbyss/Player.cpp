@@ -287,6 +287,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
+
 	}
 
 	inputVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
@@ -300,6 +301,20 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		// 一定時間入力がなかったら初期位置に戻す
 		//handReturnTimer = DEF_HAND_RETURN_TIMER;
+
+	}
+
+	// 移動速度が限りなく0に近い時にLTを押されたら
+	if (vel.Length() < 1.0f && UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT)) {
+
+		// 紐つかみ状態(踏ん張り状態)にする。
+		isHold = true;
+
+	}
+	else {
+
+		// 紐つかみ状態(踏ん張り状態)を解除する。
+		isHold = false;
 
 	}
 

@@ -169,10 +169,14 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	stagingDevice.Init();
 
 	OnInit();
+
+	isHold = false;
+
 }
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
+
 	//スタン状態更新
 	if (stanTimer)
 	{
