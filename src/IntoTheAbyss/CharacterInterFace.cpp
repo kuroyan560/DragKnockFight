@@ -334,7 +334,7 @@ void CharacterInterFace::Draw()
 	OnDraw();
 	bulletMgr.Draw();
 
-	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(pos + swingTargetVec * 100.0f), Color());
+	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(pos + swingTargetVec * 100.0f), Color());
 }
 
 void CharacterInterFace::Break()
