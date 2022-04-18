@@ -374,6 +374,16 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 	//当たり判定
 	if (!hitCheck)return;
 
+	// 壁はさみからの当たり判定無効化する。
+	if (0 < stackWindowTimer) {
+
+		--stackWindowTimer;
+		stackMapChip = false;
+
+		return;
+
+	}
+
 
 	//各キャラの特有の当たり判定
 	//OnCheckHit(MapData, LineCenterPos);
@@ -654,11 +664,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 	//prevIntersectedLine = intersectedBuff;
 
-	if (0 < stackWindowTimer) {
 
-		--stackWindowTimer;
-		stackMapChip = false;
-
-	}
 }
 
