@@ -169,6 +169,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 		if (0.3f < fabs(dir.y))
 		{
 			SwingPartner({ 0,1 });
+			patternData.swingFlag = false;
 		}
 	}
 
