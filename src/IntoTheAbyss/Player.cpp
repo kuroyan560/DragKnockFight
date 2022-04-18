@@ -304,17 +304,25 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	}
 
-	// 移動速度が限りなく0に近い時にLTを押されたら
-	if (vel.Length() < 1.0f && UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT)) {
+	// [移動速度が限りなく0に近い時] [LTを押されたら] [握力が残っていたら]
+	if (vel.Length() < 1.0f && UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && 0 < gripPowerTimer) {
 
 		// 紐つかみ状態(踏ん張り状態)にする。
 		isHold = true;
+
+		// 握力タイマーを0に近づける。
+		--gripPowerTimer;
 
 	}
 	else {
 
 		// 紐つかみ状態(踏ん張り状態)を解除する。
 		isHold = false;
+
+		// 握力タイマーを規定値に近づける。
+		if (gripPowerTimer < MAX_GRIP_POWER_TIMER) {
+			++gripPowerTimer;
+		}
 
 	}
 
