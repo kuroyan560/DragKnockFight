@@ -8,57 +8,127 @@
 #include"FaceIcon.h"
 void CharacterInterFace::SwingUpdate()
 {
-	static const float ADD_EASINGTIMER_MINIMUM = 0.025f;	// イージングタイマーに加算する量 最小値
-	static const float ADD_EASINGTIMER_MAX = 0.05f;	// イージングタイマーに加算する量 最大値
 
-	// イージング量を求める。
-	float easingChange = ADD_EASINGTIMER_MAX - ADD_EASINGTIMER_MINIMUM;
-	float addEasingTimer = ADD_EASINGTIMER_MINIMUM + (fabs(fabs(swingEndVec.y) - fabs(swingStartVec.y)) * easingChange);
+	/*===== 振り回し中に呼ばれる処理 =====*/
 
-	// [補正]X軸のベクトルが0だったら強制的に0.01fにする。
-	if (fabs(swingStartVec.x) <= 0.001f) swingStartVec.x = 0.001f;
 
-	Vec2<float>easeNowVec = { 0,0 };
+	/*
 
-	// イージングタイマーを更新する。
-	if (swingEaseRate < 1.0f) {
+	メモ
+	①トリガー判定の時に入力されていたベクトルをswingTargetVecとして保存する。
+	②その際に、外積による左右判定でどっち回転かを保存する。
+	③更新処理で現在のベクトルの角度を求めて、その角度にaddSwingAngleを加算する。
+	④加算したらベクトルを求めて、それを現在のベクトルとして使用する。
+	⑤最後に目標のベクトルと現在のベクトルで外積による左右判定を行って、最初に保存したフラグと逆側だったら振り回し終了。
 
-		// イージングタイマーを更新する。
-		swingEaseRate += addEasingTimer;
+	*/
 
-		// 限界値を超えないようにする。
-		if (1.0f <= swingEaseRate) swingEaseRate = 1.0f;
 
-		// イージングタイマーから求められるイージング量を求める。
-		auto easeAmount = KuroMath::Ease(Out, Cubic, swingEaseRate, 0.0f, 1.0f);
+	// 角度に加算する量を更新。
+	addSwingAngle += ADD_SWING_ANGLE;
 
-		// 現在のベクトルを求める。
-		easeNowVec.y = swingStartVec.y + (easeAmount * (swingEndVec.y - swingStartVec.y));
-		if (easeNowVec.y < 0) {
-			easeNowVec.x = (1.0f + easeNowVec.y) * (signbit(swingStartVec.x) ? -1 : 1);
-		}
-		else {
-			easeNowVec.x = (1.0f - easeNowVec.y) * (signbit(swingStartVec.x) ? -1 : 1);
-		}
+	// 限界を超えていたら修正。
+	if (MAX_SWING_ANGLE < addSwingAngle) {
 
-		// easeNowVecのX成分が初期値より低くなると、ガクッとなってしまうので修正。
-		if (0 < easeNowVec.x && easeNowVec.x < swingStartVec.x) easeNowVec.x = swingStartVec.x;
-		if (easeNowVec.x < 0 && swingStartVec.x < easeNowVec.x) easeNowVec.x = swingStartVec.x;
-
-		easeNowVec.Normalize();
+		addSwingAngle = MAX_SWING_ANGLE;
 
 	}
 
-	const float lineLength = (pos - partner.lock()->pos).Length();
-	partner.lock()->pos = this->pos + easeNowVec * lineLength;
+	// 現在の角度を求める。
+	float nowAngle = atan2f(GetPartnerPos().y - pos.y, GetPartnerPos().x - pos.x);
 
-	// イージングタイマーが限界を超えたらフラグを折る。
-	if (1.0f <= swingEaseRate) {
+	// 現在の角度に角度の加算量を足す。
+	if (isSwingClockWise) {
+
+		// 時計回りだったら
+		nowAngle += addSwingAngle;
+
+	}
+	else {
+
+		// 反時計回りだったら
+		nowAngle -= addSwingAngle;
+
+	}
+
+	// この角度を現在のベクトルとして使用する。
+	nowSwingVec = { cosf(nowAngle), sinf(nowAngle) };
+
+	// 相方をここで振り回してしまう！
+	float partnerDistance = (pos - partner.lock()->pos).Length();
+
+	partner.lock()->pos = pos + nowSwingVec * partnerDistance;
+
+	// 現在のベクトルと最終目標のベクトルで外積の左右判定を行い、通り越していたら振り回しを終える。 負の値が左(反時計回り)、正の値が右(時計回り)。
+	float crossResult = nowSwingVec.Cross(swingTargetVec);
+
+	// [最初が時計回り] 且つ [現在が反時計回り] だったら
+	if (isSwingClockWise && crossResult < 0) {
+
+		// 振り回し終わり！
 		nowSwing = false;
-		swingInertiaVec = (pos - prevPos).GetNormal();
-		swingInertia = (prevPos - pos).Length();
-		afterSwingDelay = AFTER_SWING_DELAY;
+
 	}
+	// [最初が反時計回り] 且つ [現在が時計回り] だったら
+	if (!isSwingClockWise && 0 < crossResult) {
+
+		// 振り回し終わり！
+		nowSwing = false;
+
+	}
+
+
+	//static const float ADD_EASINGTIMER_MINIMUM = 0.025f;	// イージングタイマーに加算する量 最小値
+	//static const float ADD_EASINGTIMER_MAX = 0.05f;	// イージングタイマーに加算する量 最大値
+
+	//// イージング量を求める。
+	//float easingChange = ADD_EASINGTIMER_MAX - ADD_EASINGTIMER_MINIMUM;
+	//float addEasingTimer = ADD_EASINGTIMER_MINIMUM + (fabs(fabs(swingEndVec.y) - fabs(swingStartVec.y)) * easingChange);
+
+	//// [補正]X軸のベクトルが0だったら強制的に0.01fにする。
+	//if (fabs(swingStartVec.x) <= 0.001f) swingStartVec.x = 0.001f;
+
+	//Vec2<float>easeNowVec = { 0,0 };
+
+	//// イージングタイマーを更新する。
+	//if (swingEaseRate < 1.0f) {
+
+	//	// イージングタイマーを更新する。
+	//	swingEaseRate += addEasingTimer;
+
+	//	// 限界値を超えないようにする。
+	//	if (1.0f <= swingEaseRate) swingEaseRate = 1.0f;
+
+	//	// イージングタイマーから求められるイージング量を求める。
+	//	auto easeAmount = KuroMath::Ease(Out, Cubic, swingEaseRate, 0.0f, 1.0f);
+
+	//	// 現在のベクトルを求める。
+	//	easeNowVec.y = swingStartVec.y + (easeAmount * (swingEndVec.y - swingStartVec.y));
+	//	if (easeNowVec.y < 0) {
+	//		easeNowVec.x = (1.0f + easeNowVec.y) * (signbit(swingStartVec.x) ? -1 : 1);
+	//	}
+	//	else {
+	//		easeNowVec.x = (1.0f - easeNowVec.y) * (signbit(swingStartVec.x) ? -1 : 1);
+	//	}
+
+	//	// easeNowVecのX成分が初期値より低くなると、ガクッとなってしまうので修正。
+	//	if (0 < easeNowVec.x && easeNowVec.x < swingStartVec.x) easeNowVec.x = swingStartVec.x;
+	//	if (easeNowVec.x < 0 && swingStartVec.x < easeNowVec.x) easeNowVec.x = swingStartVec.x;
+
+	//	easeNowVec.Normalize();
+
+	//}
+
+	//const float lineLength = (pos - partner.lock()->pos).Length();
+	//partner.lock()->pos = this->pos + easeNowVec * lineLength;
+
+	//// イージングタイマーが限界を超えたらフラグを折る。
+	//if (1.0f <= swingEaseRate) {
+	//	nowSwing = false;
+	//	swingInertiaVec = (pos - prevPos).GetNormal();
+	//	swingInertia = (prevPos - pos).Length();
+	//	afterSwingDelay = AFTER_SWING_DELAY;
+	//}
 }
 
 void CharacterInterFace::Crash(const Vec2<float>& MyVec)
@@ -86,7 +156,7 @@ void CharacterInterFace::CrashUpdate()
 	{
 		//一定量振り回した後
 		static const float CRASH_SWING_RATE = 0.15f;
-		if (CRASH_SWING_RATE < partner.lock()->swingEaseRate)
+		if (ADD_SWING_ANGLE * 2.0f < partner.lock()->addSwingAngle)
 		{
 			Vec2<float>vec = { 0,0 };
 			if (mapChipHit[LEFT])vec.x = -1.0f;
@@ -101,29 +171,36 @@ void CharacterInterFace::CrashUpdate()
 	}
 }
 
-void CharacterInterFace::SwingPartner()
+void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec)
 {
 	//振り回し処理が既に走っている場合は、重ねて振り回せない
 	if (partner.lock()->nowSwing || nowSwing)return;
 
-	//相手とのベクトル取得
-	Vec2<float>dir = GetPartnerPos() - pos;
-	dir.Normalize();
+	// 目標地点のベクトルを保存。
+	swingTargetVec = SwingTargetVec;
 
-	//振り回しのデッドライン
-	static const float SWING_DEAD_LINE = 0.3f;
-	if (fabs(dir.y) <= SWING_DEAD_LINE)return;
+	// 現在のフレームの相方とのベクトルを求める。
+	nowSwingVec = GetPartnerPos() - pos;
+	nowSwingVec.Normalize();
 
-	//振り回しの開始ベクトル
-	swingStartVec = dir;
-	// [補正]X軸のベクトルが0だったら強制的に0.01fにする。
-	if (fabs(swingStartVec.x) <= 0.001f) swingStartVec.x = 0.001f;
+	// 外積の左右判定によりどちら側に振り回すかを判断する。 負の値が左、正の値が右。
+	float crossResult = nowSwingVec.Cross(swingTargetVec);
+	if (crossResult < 0) {
 
-	//振り回しの終了ベクトル
-	swingEndVec = swingStartVec * Vec2<float>(1.0f, -1.0f);
+		// マイナスなので左(反時計回り)。
+		isSwingClockWise = false;
 
-	//振り回しイージング率リセット
-	swingEaseRate = 0.0f;
+
+	}
+	else if (0 <= crossResult) {
+
+		// プラスなので右(時計回り)。
+		isSwingClockWise = true;
+
+	}
+
+	// 角度への加算量を初期化。
+	addSwingAngle = 0;
 
 	//振り回しフラグの有効化
 	nowSwing = true;
@@ -251,10 +328,13 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	stagingDevice.Update();
 }
 
+#include "DrawFunc.h"
 void CharacterInterFace::Draw()
 {
 	OnDraw();
 	bulletMgr.Draw();
+
+	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(pos + swingTargetVec * 100.0f), Color());
 }
 
 void CharacterInterFace::Break()
@@ -490,7 +570,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 
 		// 一定以下だったらダメージを与えない。
-		if (partner.lock()->swingEaseRate <= 0.1f) {
+		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 2.0f) {
 
 			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 			Vec2<float>vec = { 0,0 };

@@ -57,7 +57,7 @@ void Boss::OnInit()
 }
 
 #include"Camera.h"
-void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
+void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 {
 	/*===== 更新処理 =====*/
 
@@ -168,7 +168,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		// 振り回しのトリガー判定
 		if (0.3f < fabs(dir.y))
 		{
-			SwingPartner();
+			SwingPartner({ 0,1 });
 		}
 	}
 
@@ -529,7 +529,7 @@ void Boss::OnDraw()
 void Boss::Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed)
 {
 	static const int BULLET_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
-	bulletMgr.Generate(BULLET_GRAPH, generatePos, forwardAngle, speed);
+	//bulletMgr.Generate(BULLET_GRAPH, generatePos, forwardAngle, speed);
 }
 
 bool Boss::Appear()

@@ -50,9 +50,12 @@ private:
 protected:
 	BulletMgrBase bulletMgr;
 	bool nowSwing;
-	Vec2<float> swingStartVec;
-	Vec2<float> swingEndVec;
-	float swingEaseRate;
+	Vec2<float> nowSwingVec;		// 現在の角度
+	Vec2<float> swingTargetVec;		// 目標地点
+	float addSwingAngle;			// 振り回しで回転させる量 だんだん増える。
+	bool isSwingClockWise;			// この振り回しが時計回りかどうか true...時計回り...右回転  false...反時計回り...左回転
+	const float ADD_SWING_ANGLE = 0.002f;
+	const float MAX_SWING_ANGLE = 0.07f;
 
 
 protected:
@@ -82,7 +85,7 @@ protected:
 
 	//[共通関数]
 	//振り回し
-	void SwingPartner();
+	void SwingPartner(const Vec2<float>& SwingTargetVec);
 	//ゲッタ類
 	const Vec2<float>& GetPartnerPos()
 	{

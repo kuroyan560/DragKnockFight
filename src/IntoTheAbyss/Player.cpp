@@ -86,8 +86,6 @@ void Player::OnInit()
 	stretch_RB = { 0.0f,0.0f };
 	stretchTimer = STRETCH_RETURN_TIME;
 
-	swingEaseRate = 0;
-
 	drawCursorFlag = true;
 
 	swingCoolTime = 0;
@@ -326,6 +324,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	}
 
+#pragma region itiou nokosite okimasu
+
 	// LBが押されたら反動をつける。
 	//if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
 
@@ -415,25 +415,26 @@ void Player::Input(const vector<vector<int>>& MapData)
 	//if (vel.y >= MAX_RECOIL_AMOUNT) vel.y = MAX_RECOIL_AMOUNT;
 	//if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
 
+
+#pragma endregion
+
 	// RTが押されたら
-	if (swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT)) {
+	if (isHold && swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT)) {
 
 		// 振り回しの処理
 
-		// 振り回しにデッドラインを設ける。
-		Vec2<float> dir = GetPartnerPos() - pos;
-		dir.Normalize();
+		SwingPartner({ cosf(rHand->GetAngle()), sinf(rHand->GetAngle()) });
 
-		// 振り回しのトリガー判定
-		if (0.3f < fabs(dir.y)) {
-
-			SwingPartner();
-
-			// クールタイムを設定。
-			swingCoolTime = SWING_COOLTIME;
-		}
+		// クールタイムを設定。
+		swingCoolTime = SWING_COOLTIME;
 
 	}
+	else {
+
+		nowSwing = false;
+
+	}
+
 }
 
 void Player::Move()
