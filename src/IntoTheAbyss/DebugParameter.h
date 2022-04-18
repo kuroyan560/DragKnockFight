@@ -74,7 +74,7 @@ struct BossDebugParameterData
 	bool drawBossFlag;
 	BossDebugParameterData() :
 		PULL_POWER_MIN(15.0f), PULL_POWER_MAX(25.0f), PULL_SPAN_MIN(30), PULL_SPAN_MAX(70), moveX(10.0f), PULL_ADD_X_POWER(1.6f),
-		drawNearRayFlag(true), drawFarRayFlag(true), drawBossFlag(false)
+		drawNearRayFlag(false), drawFarRayFlag(false), drawBossFlag(true)
 	{
 	}
 };

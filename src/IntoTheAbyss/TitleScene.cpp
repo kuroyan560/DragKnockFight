@@ -4,8 +4,6 @@
 #include "TexHandleMgr.h"
 #include "SceneCange.h"
 #include "KuroMath.h"
-#include"DebugParameter.h"
-#include"../Engine/DrawFunc_Mask.h"
 
 TitleScene::TitleScene()
 {

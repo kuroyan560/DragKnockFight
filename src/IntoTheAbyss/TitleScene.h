@@ -1,7 +1,6 @@
 #pragma once
 #include"KuroEngine.h"
 #include"SceneCange.h"
-#include<array>
 
 class TitleScene : public BaseScene
 {
