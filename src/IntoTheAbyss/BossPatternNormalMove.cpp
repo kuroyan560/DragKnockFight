@@ -282,9 +282,14 @@ float BossPatternNormalMove::GetDir(const std::array<BossLimitMoveData, 8> &DATA
 		getDirNum = KuroFunc::GetRand(0, allowToUseThisAngleArray.size() - 1);
 		return 	allowToUseThisAngleArray[getDirNum];
 	}
-	else
+	else if (moveToPlayerAreaAngleArray.size() != 0)
 	{
 		getDirNum = KuroFunc::GetRand(0, moveToPlayerAreaAngleArray.size() - 1);
 		return 	moveToPlayerAreaAngleArray[getDirNum];
+	}
+	else
+	{
+		//‰½‚©‚µ‚ç“Áê‚ÈğŒ‚Å‚Ç‚±‚É‚às‚¯‚È‚¢ê‡A“Gw’n‚ÉŒü‚©‚¤ˆ—
+		return  Angle::ConvertToRadian(KuroFunc::GetRand(70, -70));
 	}
 }

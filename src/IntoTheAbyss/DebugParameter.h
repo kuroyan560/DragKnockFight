@@ -79,6 +79,13 @@ struct BossDebugParameterData
 	}
 };
 
+struct MaskData
+{
+	Vec2<float>maskPos;
+	Vec2<float>maskSize;
+	Vec2<float>pos;
+};
+
 class DebugParameter :public Singleton<DebugParameter>
 {
 public:
@@ -98,6 +105,8 @@ public:
 	int gaugeParamImguiHandle;
 	int roundParamImguiHandle;
 	int bossParamImguiHandle;
+
+	MaskData maskData;
 
 	BossDebugParameterData bossDebugData;
 

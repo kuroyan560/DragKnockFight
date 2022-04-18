@@ -106,4 +106,15 @@ void DebugParameter::DrawImGui()
 		ImGui::Checkbox("Boss", &bossDebugData.drawBossFlag);
 		ImGui::End();
 	}
+
+
+	ImGui::Begin("RoundMaskParameter");
+	ImGui::InputFloat("PosX", &maskData.pos.x);
+	ImGui::InputFloat("PosY", &maskData.pos.y);
+	ImGui::InputFloat("MaskPosX", &maskData.maskPos.x);
+	ImGui::InputFloat("MaskPosY", &maskData.maskPos.y);
+	ImGui::InputFloat("MaskSizeX", &maskData.maskSize.x);
+	ImGui::InputFloat("MaskSizeY", &maskData.maskSize.y);
+	ImGui::End();
+
 }

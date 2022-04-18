@@ -4,6 +4,8 @@
 #include "TexHandleMgr.h"
 #include "SceneCange.h"
 #include "KuroMath.h"
+#include"DebugParameter.h"
+#include"../Engine/DrawFunc_Mask.h"
 
 TitleScene::TitleScene()
 {
@@ -25,7 +27,6 @@ TitleScene::TitleScene()
 
 	isPressStartDraw = true;
 	pressStartTimer = 0;
-
 }
 
 void TitleScene::OnInitialize()
@@ -93,7 +94,6 @@ void TitleScene::OnDraw()
 	if (isPressStartDraw) {
 		DrawFunc::DrawGraph(PRESS_START_POS, TexHandleMgr::GetTexBuffer(pressStartHandle), AlphaBlendMode_Trans);
 	}
-
 }
 
 void TitleScene::OnImguiDebug()

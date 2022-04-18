@@ -1,6 +1,7 @@
 #pragma once
 #include"KuroEngine.h"
 #include"SceneCange.h"
+#include<array>
 
 class TitleScene : public BaseScene
 {
@@ -39,7 +40,6 @@ private:
 	const float EASING_MOVE_STAR = 10.0f;
 	const float EASING_MOVE_CHAR = 20.0f;
 	const float EASING_MOVE_TITLE = 30.0f;
-
 
 public:
 	TitleScene();
