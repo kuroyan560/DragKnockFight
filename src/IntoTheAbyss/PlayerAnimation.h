@@ -7,6 +7,7 @@ static const enum PLAYER_ANIM
 {
 	DEFAULT_FRONT,
 	DEFAULT_BACK,
+	HOLD,
 	PLAYER_ANIM_NUM
 };
 
@@ -24,7 +25,7 @@ class PlayerAnimation
 	Anim animations[PLAYER_ANIM_NUM];
 
 	int idx;	//画像インデックス
-	int timer;	//時間計測
+	float timer;	//時間計測
 
 public:
 	PlayerAnimation(const PLAYABLE_CHARACTER_NAME& CharacterName);
@@ -59,5 +60,7 @@ public:
 	{
 		return animations[status].handCenterOffset;
 	}
+
+	const PLAYER_ANIM& GetNowAnim() { return status; }
 };
 
