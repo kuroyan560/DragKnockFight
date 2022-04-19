@@ -36,6 +36,13 @@ PlayerAnimation::PlayerAnimation(const PLAYABLE_CHARACTER_NAME& CharacterName)
 	animations[HOLD].size = { 230,220 };
 	animations[HOLD].handCenterOffset = { 0.0f,0.0f };
 
+	static const int SWINGED_NUM = 1;
+	animations[SWINGED].graph.resize(SWINGED_NUM);
+	animations[SWINGED].graph[0] = TexHandleMgr::LoadGraph(DIR + NAME_DIR[CharacterName] + "/swinged.png");
+	animations[SWINGED].interval = 10;
+	animations[SWINGED].loop = true;
+	animations[SWINGED].size = { 102,123 };
+	animations[SWINGED].handCenterOffset = { 0.0f,0.0f };
 }
 
 #include"SlowMgr.h"

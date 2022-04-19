@@ -131,7 +131,9 @@ private:
 	//マップチップとヒットしたとき
 	void OnHitMapChip(const HIT_DIR& Dir)override;
 
-	void OnBreak() { isHold = false; }
+	void OnBreak()override { isHold = false; }
+	void OnSwinged()override;
+	void OnSwingedFinish()override;
 
 	bool drawCursorFlag;
 

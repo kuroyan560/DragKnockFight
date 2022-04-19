@@ -171,7 +171,7 @@ void Player::OnUpdateNoRelatedSwing()
 void Player::OnDraw()
 {
 	//if (vel.y < 0)playerDir = BACK;
-	if (!isHold)
+	if (!isHold && anim.GetNowAnim() != SWINGED)
 	{
 		if (vel.y < 0)anim.ChangeAnim(DEFAULT_BACK);
 		//if (0 < vel.y)playerDir = FRONT;
@@ -204,7 +204,7 @@ void Player::OnDraw()
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	bool mirorX = 0 < vel.x || (isHold && (partner.lock()->pos - pos).x < 0);
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
-		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
+		stagingDevice.GetSpinRadian() , bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
 }
 
 void Player::OnDrawUI()
@@ -301,6 +301,16 @@ void Player::OnHitMapChip(const HIT_DIR& Dir)
 		//壁貼り付きアニメーション
 		//anim.ChangeAnim(ON_WALL_WAIT);
 	}
+}
+
+void Player::OnSwinged()
+{
+	anim.ChangeAnim(SWINGED);
+}
+
+void Player::OnSwingedFinish()
+{
+	anim.ChangeAnim(DEFAULT_FRONT);
 }
 
 void Player::Input(const vector<vector<int>>& MapData)

@@ -12,6 +12,9 @@ void StagingInterFace::Init()
 
 	flashTimer = -1;
 	flashAlpha = 0.0f;
+
+	spin = false;
+	spinRadian = 0.0f;
 }
 
 void StagingInterFace::Update()
@@ -44,6 +47,9 @@ void StagingInterFace::Update()
 		flashAlpha = KuroMath::Ease(Out, Circ, timer, flashTotalTime, flashRate, 0.0f);
 		flashTimer--;
 	}
+
+	//‰ñ“]
+	if (spin)spinRadian += Angle::ConvertToRadian(5.0f) * spinRadianSign;
 }
 
 void StagingInterFace::Shake(const int& Time, const int& Span, const int& Power)
@@ -70,3 +76,4 @@ void StagingInterFace::Flash(const int& Time, const float& FlashRate)
 	flashTotalTime = Time;
 	flashRate = FlashRate;
 }
+

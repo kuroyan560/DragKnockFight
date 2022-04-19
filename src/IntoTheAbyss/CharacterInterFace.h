@@ -86,6 +86,8 @@ protected:
 	virtual void OnDrawUI() = 0;
 	virtual void OnHitMapChip(const HIT_DIR& Dir) = 0;
 	virtual void OnBreak() = 0;
+	virtual void OnSwinged() = 0;
+	virtual void OnSwingedFinish() = 0;
 
 	//[ã§í ä÷êî]
 	//êUÇËâÒÇµ
