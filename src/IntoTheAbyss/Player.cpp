@@ -190,6 +190,18 @@ void Player::OnDraw()
 		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { GetWhichTeam() == RIGHT_TEAM,false });
 }
 
+void Player::OnDrawUI()
+{
+	//U‚è‰ñ‚µæ•`‰æ
+	static const int RETICLE_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png") };
+	if (isHold)
+	{
+		float dist = partner.lock()->pos.Distance(pos);
+		Vec2<float>target = pos + UsersInput::Instance()->GetRightStickVec(controllerIdx) * dist;
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), { ScrollMgr::Instance()->zoom * 0.8f,ScrollMgr::Instance()->zoom * 0.8f }, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[GetWhichTeam()]));
+	}
+}
+
 void Player::OnHitMapChip(const HIT_DIR& Dir)
 {
 	if (Dir == TOP)
