@@ -731,8 +731,12 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	{
 		CharacterManager::Instance()->Left()->Draw();
 		CharacterManager::Instance()->Right()->Draw();
-		CharacterManager::Instance()->Left()->DrawUI();
-		CharacterManager::Instance()->Right()->DrawUI();
+
+		if (!roundFinishFlag)
+		{
+			CharacterManager::Instance()->Left()->DrawUI();
+			CharacterManager::Instance()->Right()->DrawUI();
+		}
 	}
 
 	ParticleMgr::Instance()->Draw();

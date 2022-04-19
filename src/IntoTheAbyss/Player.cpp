@@ -219,25 +219,35 @@ void Player::OnDraw()
 
 void Player::OnDrawUI()
 {
+	static const int LINE_ALPHA = 120;
+	static std::shared_ptr<TextureBuffer> COLOR_TEX[TEAM_NUM] =
+	{
+		 D3D12App::Instance()->GenerateTextureBuffer(Color(47,255,139,LINE_ALPHA)),
+		 D3D12App::Instance()->GenerateTextureBuffer(Color(239,1,144,LINE_ALPHA))
+	};
 	static const int RETICLE_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png") };
 	static const int ARROW_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png") };
 	static const Angle ARROW_ANGLE_OFFSET = Angle(1);
-	if (isHold)
+	static const float ARROW_DIST_OFFSET = 32.0f;
+	if (isHold && !GetNowSwing())
 	{
 		const Vec2<float>drawScale = { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom };
 		const auto team = GetWhichTeam();
-		const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx);
+		const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0,0 });
 
 		//êUÇËâÒÇµêÊï`âÊ
 		float dist = partner.lock()->pos.Distance(pos);
 		Vec2<float>target = pos + rightStickVec * dist;
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(target), COLOR_TEX[GetWhichTeam()], 2, AlphaBlendMode_Trans);
 		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), drawScale * 0.8f, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[team]));
 
 		//êUÇËâÒÇµï˚å¸ï`âÊ
-		bool clockWise = 0 < rightStickVec.Cross(partner.lock()->pos);
+		bool clockWise = 0 < rightStickVec.Cross(partner.lock()->pos - pos);
 		Angle arrowPosAngle = KuroFunc::GetAngle(pos, partner.lock()->pos);
 		Angle rotateAngle = arrowPosAngle + Angle(90 * (clockWise ? -1 : 1));
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), { 0.0f,0.5f });
+		Vec2<float>vec = partner.lock()->pos - pos;
+		vec.Normalize();
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos + vec * ARROW_DIST_OFFSET), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), { 0.0f,0.5f });
 	}
 }
 
