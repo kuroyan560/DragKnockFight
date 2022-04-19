@@ -310,6 +310,12 @@ void Player::Input(const vector<vector<int>>& MapData)
 	// スタン演出中だったら入力を受け付けない。
 	if (StunEffect::Instance()->isActive) return;
 
+	// 入力を受け付けないタイマーが0より大きかったら処理を飛ばす。
+	if (0 < inputInvalidTimer) return;
+
+	// 壁に挟まって判定が無効化されている間は処理を受け付けない。
+	if (0 < GetStackWinTimer()) return;
+
 	const float INPUT_DEAD_LINE = 0.3f;
 
 	Vec2<float> inputVec;

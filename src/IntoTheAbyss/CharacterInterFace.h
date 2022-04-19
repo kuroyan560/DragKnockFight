@@ -59,6 +59,9 @@ protected:
 	const float ADD_SWING_ANGLE = 0.002f;
 	const float MAX_SWING_ANGLE = 0.07f;
 
+	int inputInvalidTimer;	// 当たり判定無効化タイマー
+	const int INPUT_INVALID_TIMER = 30;
+
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
@@ -156,6 +159,6 @@ public:
 
 	inline void FinishSwing() { nowSwing = false; }
 
-	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName;	}
+	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName; }
 };
 
