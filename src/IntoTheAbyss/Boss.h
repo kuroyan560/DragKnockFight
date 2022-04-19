@@ -77,6 +77,7 @@ private:
 
 	// •`‰æˆ—
 	void OnDraw()override;
+	void OnDrawUI()override {};
 
 	virtual void OnHitMapChip(const HIT_DIR& Dir)override {};
 
