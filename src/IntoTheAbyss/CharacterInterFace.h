@@ -158,7 +158,7 @@ public:
 	void SetCanMove(const bool& Flg) { canMove = Flg; }
 	void SetHitCheck(const bool& Flg) { hitCheck = Flg; }
 
-	inline void FinishSwing() { nowSwing = false; }
+	void FinishSwing();
 
 	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName; }
 };

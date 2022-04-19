@@ -66,17 +66,13 @@ void CharacterInterFace::SwingUpdate()
 	if (isSwingClockWise && crossResult < 0) {
 
 		// 振り回し終わり！
-		nowSwing = false;
-		partner.lock()->stagingDevice.StopSpin();
-		partner.lock()->OnSwingedFinish();
+		FinishSwing();
 	}
 	// [最初が反時計回り] 且つ [現在が時計回り] だったら
 	if (!isSwingClockWise && 0 < crossResult) {
 
 		// 振り回し終わり！
-		nowSwing = false;
-		partner.lock()->stagingDevice.StopSpin();
-		partner.lock()->OnSwingedFinish();
+		FinishSwing();
 	}
 
 
@@ -172,7 +168,7 @@ void CharacterInterFace::CrashUpdate()
 			Crash(vec);
 		}
 
-		partner.lock()->nowSwing = false;
+		partner.lock()->FinishSwing();
 	}
 }
 
@@ -707,3 +703,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 }
 
+void CharacterInterFace::FinishSwing()
+{
+	nowSwing = false;
+	partner.lock()->stagingDevice.StopSpin();
+	partner.lock()->OnSwingedFinish();
+}
