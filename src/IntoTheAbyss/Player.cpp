@@ -140,6 +140,16 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	if (0 < swingCoolTime) --swingCoolTime;
 
 	//muffler.Update(pos);
+
+	// 入力を無効化するタイマーを更新。
+	if (0 < inputInvalidTimerByCrash)
+	{
+		--inputInvalidTimerByCrash;
+		if (inputInvalidTimerByCrash <= 0 && !GetNowBreak())
+		{
+			anim.ChangeAnim(DEFAULT_FRONT);
+		}
+	}
 }
 
 void Player::OnUpdateNoRelatedSwing()
@@ -171,7 +181,7 @@ void Player::OnUpdateNoRelatedSwing()
 void Player::OnDraw()
 {
 	//if (vel.y < 0)playerDir = BACK;
-	if (!isHold)
+	if (!isHold && anim.GetNowAnim() != SWINGED)
 	{
 		if (vel.y < 0)anim.ChangeAnim(DEFAULT_BACK);
 		//if (0 < vel.y)playerDir = FRONT;
@@ -204,30 +214,40 @@ void Player::OnDraw()
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	bool mirorX = 0 < vel.x || (isHold && (partner.lock()->pos - pos).x < 0);
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
-		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
+		stagingDevice.GetSpinRadian() , bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
 }
 
 void Player::OnDrawUI()
 {
+	static const int LINE_ALPHA = 120;
+	static std::shared_ptr<TextureBuffer> COLOR_TEX[TEAM_NUM] =
+	{
+		 D3D12App::Instance()->GenerateTextureBuffer(Color(47,255,139,LINE_ALPHA)),
+		 D3D12App::Instance()->GenerateTextureBuffer(Color(239,1,144,LINE_ALPHA))
+	};
 	static const int RETICLE_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png") };
 	static const int ARROW_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png") };
 	static const Angle ARROW_ANGLE_OFFSET = Angle(1);
-	if (isHold)
+	static const float ARROW_DIST_OFFSET = 32.0f;
+	if (isHold && !GetNowSwing())
 	{
 		const Vec2<float>drawScale = { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom };
 		const auto team = GetWhichTeam();
-		const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx);
+		const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0,0 });
 
 		//振り回し先描画
 		float dist = partner.lock()->pos.Distance(pos);
 		Vec2<float>target = pos + rightStickVec * dist;
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(target), COLOR_TEX[GetWhichTeam()], 2, AlphaBlendMode_Trans);
 		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), drawScale * 0.8f, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[team]));
 
 		//振り回し方向描画
-		bool clockWise = 0 < rightStickVec.Cross(partner.lock()->pos);
+		bool clockWise = 0 < rightStickVec.Cross(partner.lock()->pos - pos);
 		Angle arrowPosAngle = KuroFunc::GetAngle(pos, partner.lock()->pos);
 		Angle rotateAngle = arrowPosAngle + Angle(90 * (clockWise ? -1 : 1));
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), { 0.0f,0.5f });
+		Vec2<float>vec = partner.lock()->pos - pos;
+		vec.Normalize();
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos + vec * ARROW_DIST_OFFSET), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), { 0.0f,0.5f });
 	}
 }
 
@@ -311,7 +331,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	if (StunEffect::Instance()->isActive) return;
 
 	// 入力を受け付けないタイマーが0より大きかったら処理を飛ばす。
-	if (0 < inputInvalidTimer) return;
+	if (0 < inputInvalidTimerByCrash) return;
 
 	// 壁に挟まって判定が無効化されている間は処理を受け付けない。
 	if (0 < GetStackWinTimer()) return;

@@ -320,14 +320,11 @@ Game::Game()
 	SuperiorityGauge::Instance()->Init();
 
 	readyToStartRoundFlag = true;
-
 	//”wŒi‚É¯
 	BackGround::Instance()->Init(GetStageSize());
 
 	GameTimer::Instance()->Init({}, 120, {}, {});
 	ScoreManager::Instance()->Init();
-
-
 }
 
 void Game::Init()
@@ -339,6 +336,9 @@ void Game::Init()
 	CharacterManager::Instance()->CharactersGenerate();
 
 	InitGame(0, 0);
+	ScrollMgr::Instance()->Reset();
+	roundChangeEffect.Init();
+	readyToStartRoundFlag = true;
 }
 
 void Game::Update()
@@ -770,8 +770,12 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	{
 		CharacterManager::Instance()->Left()->Draw();
 		CharacterManager::Instance()->Right()->Draw();
-		CharacterManager::Instance()->Left()->DrawUI();
-		CharacterManager::Instance()->Right()->DrawUI();
+
+		if (!roundFinishFlag)
+		{
+			CharacterManager::Instance()->Left()->DrawUI();
+			CharacterManager::Instance()->Right()->DrawUI();
+		}
 	}
 
 	ParticleMgr::Instance()->Draw();

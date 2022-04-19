@@ -66,15 +66,13 @@ void CharacterInterFace::SwingUpdate()
 	if (isSwingClockWise && crossResult < 0) {
 
 		// 振り回し終わり！
-		nowSwing = false;
-
+		FinishSwing();
 	}
 	// [最初が反時計回り] 且つ [現在が時計回り] だったら
 	if (!isSwingClockWise && 0 < crossResult) {
 
 		// 振り回し終わり！
-		nowSwing = false;
-
+		FinishSwing();
 	}
 
 
@@ -147,6 +145,9 @@ void CharacterInterFace::Crash(const Vec2<float>& MyVec)
 
 	CrashMgr::Instance()->Crash(pos, stagingDevice, ext, smokeVec);
 	//SuperiorityGauge::Instance()->AddGauge(team, -10.0f);
+	stagingDevice.StopSpin();
+
+	OnCrash();
 }
 
 void CharacterInterFace::CrashUpdate()
@@ -167,7 +168,7 @@ void CharacterInterFace::CrashUpdate()
 			Crash(vec);
 		}
 
-		partner.lock()->nowSwing = false;
+		partner.lock()->FinishSwing();
 	}
 }
 
@@ -182,6 +183,8 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec)
 
 	//振り回し処理が既に走っている場合は、重ねて振り回せない
 	if (partner.lock()->nowSwing || nowSwing)return;
+
+	partner.lock()->OnSwinged();
 
 	AudioApp::Instance()->PlayWave(SE);
 
@@ -213,6 +216,8 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec)
 
 	//振り回しフラグの有効化
 	nowSwing = true;
+
+	partner.lock()->stagingDevice.StartSpin(isSwingClockWise);
 }
 
 void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine)
@@ -277,6 +282,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 			canMove = true;
 			FaceIcon::Instance()->Change(team, FACE_STATUS::DEFAULT);
 			SuperiorityGauge::Instance()->Init();
+			OnBreakFinish();
 		}
 	}
 	//ダメージ状態更新（顔制御）
@@ -343,10 +349,6 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	//演出補助更新
 	stagingDevice.Update();
-
-	// 入力を無効化するタイマーを更新。
-	if (0 < inputInvalidTimer) --inputInvalidTimer;
-
 }
 
 #include "DrawFunc.h"
@@ -666,10 +668,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
 				SuperiorityGauge::Instance()->AddGauge(team, -10);
 				partner.lock()->FinishSwing();
-
-				// 入力受付無効化タイマーをセッティングする。
-				inputInvalidTimer = INPUT_INVALID_TIMER;
-
 			}
 		}
 
@@ -691,9 +689,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
 				SuperiorityGauge::Instance()->AddGauge(team, -20);
 				Crash({ winRight ? 1.0f : -1.0f , 0.0f });
-
-				// 入力受付無効化タイマーをセッティングする。
-				inputInvalidTimer = INPUT_INVALID_TIMER;
 			}
 			// ウィンドウ上下
 			bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
@@ -706,9 +701,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
 				SuperiorityGauge::Instance()->AddGauge(team, -20);
 				Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
-
-				// 入力受付無効化タイマーをセッティングする。
-				inputInvalidTimer = INPUT_INVALID_TIMER;
 			}
 		}
 
@@ -719,3 +711,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 }
 
+void CharacterInterFace::FinishSwing()
+{
+	nowSwing = false;
+	partner.lock()->stagingDevice.StopSpin();
+	partner.lock()->OnSwingedFinish();
+}

@@ -57,6 +57,9 @@ public:
 	const int controllerIdx;
 	int bulletGraph;
 
+	int inputInvalidTimerByCrash;	// 当たり判定無効化タイマー
+	const int INPUT_INVALID_TIMER = 30;
+
 public:
 
 	/*-- 定数 --*/
@@ -131,7 +134,21 @@ private:
 	//マップチップとヒットしたとき
 	void OnHitMapChip(const HIT_DIR& Dir)override;
 
-	void OnBreak() { isHold = false; }
+	void OnBreak()override { isHold = false; }
+	void OnBreakFinish()override { anim.ChangeAnim(DEFAULT_FRONT); }
+	void OnSwinged()override
+	{
+		anim.ChangeAnim(SWINGED);
+	}
+	void OnSwingedFinish()override
+	{
+		anim.ChangeAnim(DEFAULT_FRONT);
+	}
+	void OnCrash()override
+	{	
+		// 入力受付無効化タイマーをセッティングする。
+		inputInvalidTimerByCrash = INPUT_INVALID_TIMER;
+	}
 
 	bool drawCursorFlag;
 

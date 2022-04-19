@@ -59,9 +59,6 @@ protected:
 	const float ADD_SWING_ANGLE = 0.002f;
 	const float MAX_SWING_ANGLE = 0.07f;
 
-	int inputInvalidTimer;	// 当たり判定無効化タイマー
-	const int INPUT_INVALID_TIMER = 30;
-
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
@@ -89,6 +86,10 @@ protected:
 	virtual void OnDrawUI() = 0;
 	virtual void OnHitMapChip(const HIT_DIR& Dir) = 0;
 	virtual void OnBreak() = 0;
+	virtual void OnBreakFinish() = 0;
+	virtual void OnSwinged() = 0;
+	virtual void OnSwingedFinish() = 0;
+	virtual void OnCrash() = 0;
 
 	//[共通関数]
 	//振り回し
@@ -157,7 +158,7 @@ public:
 	void SetCanMove(const bool& Flg) { canMove = Flg; }
 	void SetHitCheck(const bool& Flg) { hitCheck = Flg; }
 
-	inline void FinishSwing() { nowSwing = false; }
+	void FinishSwing();
 
 	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName; }
 };

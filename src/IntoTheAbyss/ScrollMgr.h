@@ -17,6 +17,7 @@ public:
 	Vec2<float>Affect(const Vec2<float> &Pos);//スクロールとズームを適用させる
 
 	void Warp(const Vec2<float> POS);
+	void Reset();
 
 	Vec2<float> honraiScrollAmount;	//本来スクロール量
 	Vec2<float> scrollAmount;		//スクロール量
@@ -29,6 +30,7 @@ private:
 	Vec2<float> mapSize;
 	bool warpFlag;
 
+	Vec2<float>resetAmount;
 public:
 	Vec2<float> CaluStartScrollLine(const Vec2<float> &SIZE)
 	{
