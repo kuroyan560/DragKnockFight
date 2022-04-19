@@ -24,8 +24,7 @@ DebugParameter::DebugParameter()
 	roundData->numberData.maskMaxTimer = 60.0f;
 	roundData->nextNumberData.maskMaxTimer = 60.0f;
 
-	gaugeParamImguiHandle = DebugImGuiManager::Instance()->Add("RoundParameter");
-	roundParamImguiHandle = DebugImGuiManager::Instance()->Add("GaugeParameter");
+	roundParamImguiHandle = DebugImGuiManager::Instance()->Add("RoundParameter");
 	bossParamImguiHandle = DebugImGuiManager::Instance()->Add("BossParameter");
 }
 

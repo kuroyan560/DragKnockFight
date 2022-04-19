@@ -15,7 +15,7 @@ SuperiorityGauge::SuperiorityGauge()
 	gaugeVarGraphPlayer = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_player.png");
 	gaugeVarGraphEnemy = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/gauge_enemy.png");
 
-	imguiHandle = DebugImGuiManager::Instance()->Add("Gauge");
+	//imguiHandle = DebugImGuiManager::Instance()->Add("Gauge");
 }
 
 void SuperiorityGauge::AddGauge(const WHICH_TEAM& Team, const float& Value)
@@ -91,7 +91,7 @@ void SuperiorityGauge::Draw()
 
 void SuperiorityGauge::DebugValue(float *ADD_VALUE)
 {
-	if (DebugImGuiManager::Instance()->DrawFlag(imguiHandle))
+	if (false && DebugImGuiManager::Instance()->DrawFlag(imguiHandle))
 	{
 		ImGui::Begin("Gauge");
 		ImGui::Text("Q...AddPlayerGaugeValue,W...AddEnemyGagueValue");
