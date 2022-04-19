@@ -192,13 +192,25 @@ void Player::OnDraw()
 
 void Player::OnDrawUI()
 {
-	//êUÇËâÒÇµêÊï`âÊ
 	static const int RETICLE_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png") };
+	static const int ARROW_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png") };
+	static const Angle ARROW_ANGLE_OFFSET = Angle(1);
 	if (isHold)
 	{
+		const Vec2<float>drawScale = { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom };
+		const auto team = GetWhichTeam();
+		const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx);
+
+		//êUÇËâÒÇµêÊï`âÊ
 		float dist = partner.lock()->pos.Distance(pos);
-		Vec2<float>target = pos + UsersInput::Instance()->GetRightStickVec(controllerIdx) * dist;
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), { ScrollMgr::Instance()->zoom * 0.8f,ScrollMgr::Instance()->zoom * 0.8f }, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[GetWhichTeam()]));
+		Vec2<float>target = pos + rightStickVec * dist;
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), drawScale * 0.8f, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[team]));
+
+		//êUÇËâÒÇµï˚å¸ï`âÊ
+		bool clockWise = 0 < rightStickVec.Cross(partner.lock()->pos);
+		Angle arrowPosAngle = KuroFunc::GetAngle(pos, partner.lock()->pos);
+		Angle rotateAngle = arrowPosAngle + Angle(90 * (clockWise ? -1 : 1));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), { 0.0f,0.5f });
 	}
 }
 
