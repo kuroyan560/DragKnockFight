@@ -545,13 +545,6 @@ void Game::Update()
 	GameTimer::Instance()->Update();
 	ScoreManager::Instance()->Update();
 
-	//	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
-	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
-
-	// スクロール量の更新処理
-	//ScrollManager::Instance()->Update();
-	ScrollMgr::Instance()->Update();
-
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();
 
@@ -611,6 +604,17 @@ void Game::Update()
 	}
 
 #pragma endregion
+
+
+	// 中心点を計算。
+	CalCenterPos();
+
+	//	ScrollManager::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
+	ScrollMgr::Instance()->CalucurateScroll(prevLineCenterPos - lineCenterPos, lineCenterPos);
+
+	// スクロール量の更新処理
+	//ScrollManager::Instance()->Update();
+	ScrollMgr::Instance()->Update();
 
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
@@ -712,6 +716,20 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		}
 
+
+		/*auto& left = CharacterManager::Instance()->Left();
+		auto& right = CharacterManager::Instance()->Right();
+
+		Vec2<float> dir = (left->pos - right->pos).GetNormal();
+		Vec2<float> buff = right->pos + dir * right->addLineLength;
+		DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(right->pos), ScrollMgr::Instance()->Affect(buff), Color(255, 0, 0, 255));
+
+		DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(buff), ScrollMgr::Instance()->Affect(buff + dir * (CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f)), Color(255, 255, 255, 255));
+		buff = buff + dir * (CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f);
+
+		DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(buff), ScrollMgr::Instance()->Affect(buff + dir * left->addLineLength), Color(0, 0, 255, 255));
+
+
 		Vec2<float> bossPlayerDir = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
 		bossPlayerDir.Normalize();
 		Vec2<float> bossDefLength = CharacterManager::Instance()->Right()->pos + bossPlayerDir * CharacterManager::Instance()->Right()->addLineLength;
@@ -724,7 +742,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		else
 		{
 			lineExtendScale = 1.0f;
-		}
+		}*/
 
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
@@ -998,6 +1016,14 @@ void Game::Scramble()
 	isCatchMapChipBoss = false;
 	isCatchMapChipPlayer = false;
 
+}
+
+void Game::CalCenterPos()
+{
+
+	/*===== 中心点を求める処理 =====*/
+
+	// 本当はScrambleの一番うしろに入れていた処理なんですが、押し戻しをした後に呼ぶ必要が出てきたので関数で分けました。
 
 	// 移動量に応じて本来あるべき長さにする。
 	Vec2<float> prevSubPos = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos;
@@ -1026,8 +1052,24 @@ void Game::Scramble()
 		}
 		else {
 			// 規定値以上だったら普通に場所を求める。
-			float playerLineLength = CharacterManager::Instance()->Left()->LINE_LENGTH + CharacterManager::Instance()->Left()->addLineLength;
-			lineCenterPos = CharacterManager::Instance()->Left()->pos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
+
+			auto& right = CharacterManager::Instance()->Right();
+			auto& left = CharacterManager::Instance()->Left();
+
+			Vec2<float> rightPos = right->pos;
+			rightPos += (left->pos - right->pos).GetNormal() * right->addLineLength;
+
+			Vec2<float> leftPos = left->pos;
+			leftPos += (right->pos - left->pos).GetNormal() * left->addLineLength;
+
+			float length = (leftPos - rightPos).Length();
+			length /= 2.0f;
+			Vec2<float> dir = (leftPos - rightPos).GetNormal();
+
+			lineCenterPos = rightPos + dir * length;
+
+			//float playerLineLength = CharacterManager::Instance()->Left()->LINE_LENGTH + CharacterManager::Instance()->Left()->addLineLength;
+			//lineCenterPos = CharacterManager::Instance()->Left()->pos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
 		}
 	}
 

@@ -506,7 +506,15 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 		// ‘Šè‚Æ‚ÌŠp“x
 		const auto partnerPos = partner.lock()->pos;
 		float partnerAngle = atan2(partnerPos.y - pos.y, partnerPos.x - pos.x);
-		partnerAngle = fabs(partnerAngle);
+
+		// Šp“x‚ª-‚¾‚Á‚½‚ç180“xˆÈã
+		if (partnerAngle < 0) {
+
+			float angleBuff = 3.14f - fabs(partnerAngle);
+
+			partnerAngle = 3.14f + angleBuff;
+
+		}
 
 		if (isHitTop) {
 

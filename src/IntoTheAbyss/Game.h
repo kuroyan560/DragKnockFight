@@ -88,7 +88,7 @@ class Game
 	bool gameStartFlag;			//ゲーム開始中のフラグ
 
 	float lineExtendScale;
-	const float lineExtendMaxScale=10.0f;
+	const float lineExtendMaxScale = 10.0f;
 
 
 	int roundTimer;
@@ -120,6 +120,7 @@ public:
 	void Update();
 	void Draw(std::weak_ptr<RenderTarget>EmissiveMap);
 	void Scramble();
+	void CalCenterPos();
 
 	Vec2<float>GetStageSize();
 	const bool& TurnResultScene() { return turnResultScene; }
