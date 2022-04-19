@@ -49,7 +49,12 @@ void StagingInterFace::Update()
 	}
 
 	//‰ñ“]
-	if (spin)spinRadian += Angle::ConvertToRadian(5.0f) * spinRadianSign;
+	if (spin)
+	{
+		static const float MAX_ADD_RADIAN = Angle::ConvertToRadian(30.0f);
+		addSpinRadian = KuroMath::Lerp(addSpinRadian, MAX_ADD_RADIAN, 0.05f);
+		spinRadian += addSpinRadian * spinRadianSign;
+	}
 }
 
 void StagingInterFace::Shake(const int& Time, const int& Span, const int& Power)

@@ -23,6 +23,7 @@ class StagingInterFace
 	bool spin;
 	int spinRadianSign;
 	float spinRadian;
+	float addSpinRadian;
 	
 public:
 	void Init();
@@ -40,6 +41,7 @@ public:
 		spin = true; 
 		if (Add)spinRadianSign = 1;
 		else spinRadianSign = -1;
+		addSpinRadian = 0.0f;
 	}
 	void StopSpin() { spin = false; spinRadian = 0.0f; }
 };

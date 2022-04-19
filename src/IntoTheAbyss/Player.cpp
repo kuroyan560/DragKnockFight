@@ -140,6 +140,16 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	if (0 < swingCoolTime) --swingCoolTime;
 
 	//muffler.Update(pos);
+
+	// 入力を無効化するタイマーを更新。
+	if (0 < inputInvalidTimerByCrash)
+	{
+		--inputInvalidTimerByCrash;
+		if (inputInvalidTimerByCrash <= 0 && !GetNowBreak())
+		{
+			anim.ChangeAnim(DEFAULT_FRONT);
+		}
+	}
 }
 
 void Player::OnUpdateNoRelatedSwing()
@@ -303,22 +313,18 @@ void Player::OnHitMapChip(const HIT_DIR& Dir)
 	}
 }
 
-void Player::OnSwinged()
-{
-	anim.ChangeAnim(SWINGED);
-}
-
-void Player::OnSwingedFinish()
-{
-	anim.ChangeAnim(DEFAULT_FRONT);
-}
-
 void Player::Input(const vector<vector<int>>& MapData)
 {
 	/*===== 入力処理 =====*/
 
 	// スタン演出中だったら入力を受け付けない。
 	if (StunEffect::Instance()->isActive) return;
+
+	// 入力を受け付けないタイマーが0より大きかったら処理を飛ばす。
+	if (0 < inputInvalidTimerByCrash) return;
+
+	// 壁に挟まって判定が無効化されている間は処理を受け付けない。
+	if (0 < GetStackWinTimer()) return;
 
 	const float INPUT_DEAD_LINE = 0.3f;
 

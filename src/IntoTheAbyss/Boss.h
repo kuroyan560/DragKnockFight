@@ -82,8 +82,10 @@ private:
 	void OnHitMapChip(const HIT_DIR& Dir)override {}
 
 	void OnBreak()override {}
+	void OnBreakFinish()override {}
 	void OnSwinged()override {}
 	void OnSwingedFinish()override {}
+	void OnCrash()override {}
 
 	void Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed);
 public:

@@ -67,16 +67,16 @@ void CharacterInterFace::SwingUpdate()
 
 		// 振り回し終わり！
 		nowSwing = false;
-		partner.lock()->OnSwingedFinish();
 		partner.lock()->stagingDevice.StopSpin();
+		partner.lock()->OnSwingedFinish();
 	}
 	// [最初が反時計回り] 且つ [現在が時計回り] だったら
 	if (!isSwingClockWise && 0 < crossResult) {
 
 		// 振り回し終わり！
 		nowSwing = false;
-		partner.lock()->OnSwingedFinish();
 		partner.lock()->stagingDevice.StopSpin();
+		partner.lock()->OnSwingedFinish();
 	}
 
 
@@ -150,6 +150,8 @@ void CharacterInterFace::Crash(const Vec2<float>& MyVec)
 	CrashMgr::Instance()->Crash(pos, stagingDevice, ext, smokeVec);
 	//SuperiorityGauge::Instance()->AddGauge(team, -10.0f);
 	stagingDevice.StopSpin();
+
+	OnCrash();
 }
 
 void CharacterInterFace::CrashUpdate()
@@ -284,6 +286,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 			canMove = true;
 			FaceIcon::Instance()->Change(team, FACE_STATUS::DEFAULT);
 			SuperiorityGauge::Instance()->Init();
+			OnBreakFinish();
 		}
 	}
 	//ダメージ状態更新（顔制御）

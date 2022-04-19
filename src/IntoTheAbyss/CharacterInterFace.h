@@ -86,8 +86,10 @@ protected:
 	virtual void OnDrawUI() = 0;
 	virtual void OnHitMapChip(const HIT_DIR& Dir) = 0;
 	virtual void OnBreak() = 0;
+	virtual void OnBreakFinish() = 0;
 	virtual void OnSwinged() = 0;
 	virtual void OnSwingedFinish() = 0;
+	virtual void OnCrash() = 0;
 
 	//[ã§í ä÷êî]
 	//êUÇËâÒÇµ
@@ -158,6 +160,6 @@ public:
 
 	inline void FinishSwing() { nowSwing = false; }
 
-	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName;	}
+	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName; }
 };
 
