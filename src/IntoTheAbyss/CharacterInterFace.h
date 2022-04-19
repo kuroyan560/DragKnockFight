@@ -83,6 +83,7 @@ protected:
 	virtual void OnDraw() = 0;
 	virtual void OnDrawUI() = 0;
 	virtual void OnHitMapChip(const HIT_DIR& Dir) = 0;
+	virtual void OnBreak() = 0;
 
 	//[共通関数]
 	//振り回し
@@ -116,7 +117,7 @@ public:
 	Vec2<float> prevPos;		// 前フレームの座標
 	bool isHold;				// つかんでいるかフラグ
 	bool isGripPowerEmpty;		// 握力タイマーを使い切ってから回復するまでを判断するためのフラグ
-	int gripPowerTimer;			// 握力タイマー
+	float gripPowerTimer;			// 握力タイマー
 	const int MAX_GRIP_POWER_TIMER = 180;
 
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team)

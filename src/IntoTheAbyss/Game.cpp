@@ -633,13 +633,13 @@ void Game::Update()
 
 
 	// 優勢ゲージが振り切ったトリガー判定のときにスタン演出を有効化する。
-	if (SuperiorityGauge::Instance()->GetRightGaugeData().overGaugeFlag && !SuperiorityGauge::Instance()->GetRightGaugeData().prevOverGaugeFlag) {
+	if (SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).overGaugeFlag && !SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).prevOverGaugeFlag) {
 		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
 		StunEffect::Instance()->Activate(CharacterManager::Instance()->Left()->pos, Vec2<float>(0, 0), LEFT_TEAM);
 		ResultTransfer::Instance()->leftBreakCount++;
 		CharacterManager::Instance()->Left()->Break();
 	}
-	if (SuperiorityGauge::Instance()->GetLeftGaugeData().overGaugeFlag && !SuperiorityGauge::Instance()->GetLeftGaugeData().prevOverGaugeFlag) {
+	if (SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).overGaugeFlag && !SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).prevOverGaugeFlag) {
 		// プレイヤーの優勢ゲージが振り切ったということは、敵の優勢ゲージが0だということ。
 		StunEffect::Instance()->Activate(CharacterManager::Instance()->Right()->pos, Vec2<float>(1200, 0), RIGHT_TEAM);
 		ResultTransfer::Instance()->rightBreakCount++;
@@ -790,9 +790,9 @@ void Game::Scramble()
 
 	// 移動量を取得。 優勢ゲージはここで更新。
 	double leftVel = CharacterManager::Instance()->Left()->vel.Length() * SlowMgr::Instance()->slowAmount;
-	leftVelGauge = (CharacterManager::Instance()->Left()->vel * SuperiorityGauge::Instance()->GetLeftGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	leftVelGauge = (CharacterManager::Instance()->Left()->vel * SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 	double rightVel = CharacterManager::Instance()->Right()->vel.Length() * SlowMgr::Instance()->slowAmount;
-	rightVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetRightGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	rightVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 	double subVel = fabs(fabs(leftVel) - fabs(rightVel));
 
 	// [振り回し状態のとき] [スタン演出中] は移動させない。 踏ん張り中の場合は、どちらにせよ移動量が限りなく0に近いので移動させても問題がない。

@@ -131,6 +131,8 @@ private:
 	//マップチップとヒットしたとき
 	void OnHitMapChip(const HIT_DIR& Dir)override;
 
+	void OnBreak() { isHold = false; }
+
 	bool drawCursorFlag;
 
 	Vec2<float>size;
@@ -152,7 +154,6 @@ private:
 
 	bool stopInputFlag;//入力を禁止するフラグ
 	bool stopMoveFlag;
-
 
 	//ストレッチの値を計算
 	void CalculateStretch(const Vec2<float>& Move);

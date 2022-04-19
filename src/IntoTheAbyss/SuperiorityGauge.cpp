@@ -24,19 +24,9 @@ void SuperiorityGauge::AddGauge(const WHICH_TEAM& Team, const float& Value)
 	gaugeData[TEAM_NUM - Team - 1].gaugeValue -= Value;
 }
 
-const SuperiorityGauge::GaugeData& SuperiorityGauge::GetLeftGaugeData()
+const SuperiorityGauge::GaugeData& SuperiorityGauge::GetGaugeData(const WHICH_TEAM& Team)
 {
-	return gaugeData[LEFT_TEAM];
-}
-
-const SuperiorityGauge::GaugeData& SuperiorityGauge::GetRightGaugeData()
-{
-	return gaugeData[RIGHT_TEAM];
-}
-
-const bool &SuperiorityGauge::IsStacking()
-{
-	return isStackingFlag;
+	return gaugeData[Team];
 }
 
 void SuperiorityGauge::Init()
