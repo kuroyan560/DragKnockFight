@@ -696,9 +696,21 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 				TexHandleMgr::GetTexBuffer(ENEMY_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 		}
 
+		float charaDistance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
 		//中央チェイン
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftChainBorderPos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
-			TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+		if (charaDistance < CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f) {
+
+			// 既定値より短かったら。
+			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos),
+				TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+
+		}
+		else {
+
+			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftChainBorderPos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
+				TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+
+		}
 
 		Vec2<float> bossPlayerDir = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
 		bossPlayerDir.Normalize();
@@ -988,14 +1000,16 @@ void Game::Scramble()
 
 
 	// 移動量に応じて本来あるべき長さにする。
-	float horaiAddLineLength = (CharacterManager::Instance()->Left()->vel.Length() / CharacterManager::Instance()->Left()->MOVE_SPEED_PLAYER);
+	Vec2<float> prevSubPos = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos;
+	float horaiAddLineLength = (prevSubPos.Length() / CharacterManager::Instance()->Left()->MOVE_SPEED_PLAYER);
 	horaiAddLineLength *= CharacterManager::Instance()->Left()->ADD_LINE_LENGTH_VEL;
-	if (CharacterManager::Instance()->Left()->addLineLength < horaiAddLineLength) {
+	if (CharacterManager::Instance()->Left()->addLineLength < horaiAddLineLength && 1.0f < CharacterManager::Instance()->Left()->vel.Length()) {
 		CharacterManager::Instance()->Left()->addLineLength = horaiAddLineLength;
 	}
-	horaiAddLineLength = (CharacterManager::Instance()->Right()->vel.Length() / CharacterManager::Instance()->Right()->MOVE_SPEED_PLAYER);
+	prevSubPos = CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Right()->prevPos;
+	horaiAddLineLength = (prevSubPos.Length() / CharacterManager::Instance()->Right()->MOVE_SPEED_PLAYER);
 	horaiAddLineLength *= CharacterManager::Instance()->Right()->ADD_LINE_LENGTH_VEL;
-	if (CharacterManager::Instance()->Right()->addLineLength < horaiAddLineLength) {
+	if (CharacterManager::Instance()->Right()->addLineLength < horaiAddLineLength && 1.0f < CharacterManager::Instance()->Right()->vel.Length()) {
 		CharacterManager::Instance()->Right()->addLineLength = horaiAddLineLength;
 	}
 
