@@ -311,13 +311,16 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		{
 			OnUpdate(MapData);
 		}
-		//ウィンドウの引っかかっている判定のタイマー更新
-		if (0 < stackWindowTimer) {
 
-			--stackWindowTimer;
-		}
 	}
+
 	OnUpdateNoRelatedSwing();
+
+	//ウィンドウの引っかかっている判定のタイマー更新
+	if (0 < stackWindowTimer) {
+
+		--stackWindowTimer;
+	}
 
 	//弾の更新
 	bulletMgr.Update();
