@@ -142,7 +142,7 @@ private:
 	}
 	void OnSwingedFinish()override
 	{
-		anim.ChangeAnim(DEFAULT_FRONT);
+		if(!GetNowBreak() && !inputInvalidTimerByCrash)anim.ChangeAnim(DEFAULT_FRONT);
 	}
 	void OnCrash()override
 	{	
