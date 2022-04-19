@@ -302,14 +302,17 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	}
 
-	// [移動速度が限りなく0に近い時] [LTを押されたら] [握力が残っていたら]
-	if (vel.Length() < 1.0f && UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && 0 < gripPowerTimer) {
+	// [LTを押されたら] [握力が残っていたら]
+	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && 0 < gripPowerTimer) {
 
 		// 紐つかみ状態(踏ん張り状態)にする。
 		isHold = true;
 
 		// 握力タイマーを0に近づける。
 		--gripPowerTimer;
+
+		// 移動量を0にする。
+		vel = {};
 
 	}
 	else {
@@ -337,7 +340,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	//	// onGroundがtrueだったら移動量を加算しない。
 	//	//if (!onGround || sinf(rHandAngle) < 0.5f) {
-	//	vel.x += cosf(rHandAngle) * RECOIL_AMOUNT;
+	//	].x += cosf(rHandAngle) * RECOIL_AMOUNT;
 	//	//}
 
 	//	vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
