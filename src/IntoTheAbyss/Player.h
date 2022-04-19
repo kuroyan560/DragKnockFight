@@ -126,6 +126,7 @@ private:
 
 	// 描画処理
 	void OnDraw()override;
+	void OnDrawUI()override;
 
 	//マップチップとヒットしたとき
 	void OnHitMapChip(const HIT_DIR& Dir)override;

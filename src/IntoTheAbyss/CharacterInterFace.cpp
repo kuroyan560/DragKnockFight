@@ -338,25 +338,33 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 }
 
 #include "DrawFunc.h"
+#include"TexHandleMgr.h"
 void CharacterInterFace::Draw()
 {
 	OnDraw();
 	bulletMgr.Draw();
+}
 
+void CharacterInterFace::DrawUI()
+{
+	//à¨óÕÉQÅ[ÉWï`âÊ
 	static Color GAUGE_COLOR[TEAM_NUM] = { Color(47,255,139,255),Color(239,1,144,255) };
 	static Color GAUGE_SHADOW_COLOR[TEAM_NUM] = { Color(41,166,150,255),Color(162,27,108,255) };
-
 	static const int STAMINA_GAUGE_WIDTH = 110;
 	static const int STAMINA_GAUGE_HEIGHT = 5;
 	static const int STAMINA_GAUGE_OFFSET_Y = -64;
-	const float drawWidth = STAMINA_GAUGE_WIDTH * ((float)gripPowerTimer / MAX_GRIP_POWER_TIMER);
-	const Vec2<float>leftUp = pos + Vec2<float>(-STAMINA_GAUGE_WIDTH / 2.0f, STAMINA_GAUGE_OFFSET_Y - STAMINA_GAUGE_HEIGHT);
-	const Vec2<float>rightBottom = pos + Vec2<float>(-STAMINA_GAUGE_WIDTH / 2.0f + drawWidth, STAMINA_GAUGE_OFFSET_Y + STAMINA_GAUGE_HEIGHT);
+	static const Vec2<float> STAMINA_SHADOW_OFFSET_SIZE = { 4.0f,4.0f };
+	{
+		const float drawWidth = STAMINA_GAUGE_WIDTH * ((float)gripPowerTimer / MAX_GRIP_POWER_TIMER);
+		const Vec2<float>leftUp = pos + Vec2<float>(-STAMINA_GAUGE_WIDTH / 2.0f, STAMINA_GAUGE_OFFSET_Y - STAMINA_GAUGE_HEIGHT);
+		const Vec2<float>rightBottom = pos + Vec2<float>(-STAMINA_GAUGE_WIDTH / 2.0f + drawWidth, STAMINA_GAUGE_OFFSET_Y + STAMINA_GAUGE_HEIGHT);
 
-	static const Vec2<float> SHADOW_OFFSET_SIZE = { 4.0f,4.0f };
-	if(isHold && 0.0f < drawWidth)DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUp - SHADOW_OFFSET_SIZE), ScrollMgr::Instance()->Affect(rightBottom + SHADOW_OFFSET_SIZE), GAUGE_SHADOW_COLOR[team], D3D12App::Instance()->GetBackBuffFormat(), true);
-	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUp), ScrollMgr::Instance()->Affect(rightBottom), GAUGE_COLOR[team], D3D12App::Instance()->GetBackBuffFormat(), true);
-	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(pos + swingTargetVec * 100.0f), Color());
+
+		if (isHold && 0.0f < drawWidth)DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUp - STAMINA_SHADOW_OFFSET_SIZE), ScrollMgr::Instance()->Affect(rightBottom + STAMINA_SHADOW_OFFSET_SIZE), GAUGE_SHADOW_COLOR[team], D3D12App::Instance()->GetBackBuffFormat(), true);
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUp), ScrollMgr::Instance()->Affect(rightBottom), GAUGE_COLOR[team], D3D12App::Instance()->GetBackBuffFormat(), true);
+	}
+
+	OnDrawUI();
 }
 
 void CharacterInterFace::Break()
