@@ -202,15 +202,7 @@ void Player::OnDraw()
 	//“·‘Ì
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	bool mirorX = 0 < vel.x;
-	if (GetWhichTeam() == LEFT_TEAM)
-	{
-		mirorX = 0 < vel.x || (isHold && (partner.lock()->pos - pos).x < 0);
-	}
-	else
-	{
-		mirorX = vel.x < 0 || (isHold && 0 < (partner.lock()->pos - pos).x);
-	}
+	bool mirorX = 0 < vel.x || (isHold && (partner.lock()->pos - pos).x < 0);
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
 		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
 }
