@@ -167,7 +167,7 @@ void Player::OnUpdateNoRelatedSwing()
 
 			gripPowerTimer = MAX_GRIP_POWER_TIMER;
 			isGripPowerEmpty = false;
-
+			anim.ChangeAnim(DEFAULT_FRONT);
 		}
 	}
 
@@ -181,7 +181,7 @@ void Player::OnUpdateNoRelatedSwing()
 void Player::OnDraw()
 {
 	//if (vel.y < 0)playerDir = BACK;
-	if (!isHold && anim.GetNowAnim() != SWINGED)
+	if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty)
 	{
 		if (vel.y < 0)anim.ChangeAnim(DEFAULT_BACK);
 		//if (0 < vel.y)playerDir = FRONT;
@@ -229,7 +229,7 @@ void Player::OnDrawUI()
 	static const int ARROW_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png") };
 	static const Angle ARROW_ANGLE_OFFSET = Angle(1);
 	static const float ARROW_DIST_OFFSET = 32.0f;
-	if (isHold && !GetNowSwing())
+	if (isHold && !GetNowSwing() && !StunEffect::Instance()->isActive)
 	{
 		const Vec2<float>drawScale = { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom };
 		const auto team = GetWhichTeam();
@@ -387,7 +387,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		if (gripPowerTimer <= 0) {
 
 			isGripPowerEmpty = true;
-
+			anim.ChangeAnim(TIRED);
 		}
 
 	}

@@ -9,6 +9,7 @@ static const enum PLAYER_ANIM
 	DEFAULT_BACK,
 	HOLD,
 	SWINGED,
+	TIRED,
 	PLAYER_ANIM_NUM
 };
 

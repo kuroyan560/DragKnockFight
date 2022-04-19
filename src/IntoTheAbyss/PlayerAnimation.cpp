@@ -43,6 +43,14 @@ PlayerAnimation::PlayerAnimation(const PLAYABLE_CHARACTER_NAME& CharacterName)
 	animations[SWINGED].loop = true;
 	animations[SWINGED].size = { 102,123 };
 	animations[SWINGED].handCenterOffset = { 0.0f,0.0f };
+
+	static const int TIRED_NUM = 3;
+	animations[TIRED].graph.resize(TIRED_NUM);
+	TexHandleMgr::LoadDivGraph(DIR + NAME_DIR[CharacterName] + "/tired.png", TIRED_NUM, { TIRED_NUM,1 }, animations[TIRED].graph.data());
+	animations[TIRED].interval = 6;
+	animations[TIRED].loop = true;
+	animations[TIRED].size = { 117,93 };
+	animations[TIRED].handCenterOffset = { 0.0f,0.0f };
 }
 
 #include"SlowMgr.h"
