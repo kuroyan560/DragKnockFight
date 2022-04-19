@@ -94,7 +94,7 @@ void CharacterManager::CharactersGenerate()
 	//どちらのキャラクターも生成完了してからでないと、情報登録出来ない
 	for (int i = 0; i < TEAM_NUM; ++i)
 	{
-		characters[i]->RegisterCharacterInfo(characters[TEAM_NUM - i - 1], (WHICH_TEAM)i);
+		characters[i]->RegisterCharacterInfo(characters[TEAM_NUM - i - 1], (WHICH_TEAM)i, characterName[i]);
 	}
 }
 

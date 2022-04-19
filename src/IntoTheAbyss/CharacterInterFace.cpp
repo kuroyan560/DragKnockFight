@@ -311,13 +311,16 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		{
 			OnUpdate(MapData);
 		}
-		//ウィンドウの引っかかっている判定のタイマー更新
-		if (0 < stackWindowTimer) {
 
-			--stackWindowTimer;
-		}
 	}
+
 	OnUpdateNoRelatedSwing();
+
+	//ウィンドウの引っかかっている判定のタイマー更新
+	if (0 < stackWindowTimer) {
+
+		--stackWindowTimer;
+	}
 
 	//弾の更新
 	bulletMgr.Update();
@@ -340,6 +343,10 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	//演出補助更新
 	stagingDevice.Update();
+
+	// 入力を無効化するタイマーを更新。
+	if (0 < inputInvalidTimer) --inputInvalidTimer;
+
 }
 
 #include "DrawFunc.h"
@@ -651,6 +658,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
 				SuperiorityGauge::Instance()->AddGauge(team, -10);
 				partner.lock()->FinishSwing();
+
+				// 入力受付無効化タイマーをセッティングする。
+				inputInvalidTimer = INPUT_INVALID_TIMER;
+
 			}
 		}
 
@@ -672,6 +683,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
 				SuperiorityGauge::Instance()->AddGauge(team, -20);
 				Crash({ winRight ? 1.0f : -1.0f , 0.0f });
+
+				// 入力受付無効化タイマーをセッティングする。
+				inputInvalidTimer = INPUT_INVALID_TIMER;
 			}
 			// ウィンドウ上下
 			bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
@@ -684,6 +698,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
 				SuperiorityGauge::Instance()->AddGauge(team, -20);
 				Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
+
+				// 入力受付無効化タイマーをセッティングする。
+				inputInvalidTimer = INPUT_INVALID_TIMER;
 			}
 		}
 

@@ -435,11 +435,6 @@ void Game::Update()
 		areaHitColor = Color(255, 0, 0, 255);
 		playerHitColor = Color(255, 0, 0, 255);
 	}
-	else if (!roundFinishFlag)
-	{
-		areaHitColor = Color(255, 255, 255, 255);
-		playerHitColor = Color(255, 255, 255, 255);
-	}
 
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
@@ -461,6 +456,8 @@ void Game::Update()
 			if (WinCounter::Instance()->GetGameFinish())
 			{
 				ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
+				if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
+				else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
 				turnResultScene = true;
 			}
 			//次のラウンドへ

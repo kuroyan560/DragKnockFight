@@ -1,6 +1,7 @@
 #pragma once
 #include "Singleton.h"
 #include "KuroEngine.h"
+#include"CharacterInterFace.h"
 
 class RenderTarget;
 class GaussianBlur;
@@ -24,6 +25,8 @@ public:
 	//Break‚Ì‰ñ”
 	int leftBreakCount;
 	int rightBreakCount;
+
+	PLAYABLE_CHARACTER_NAME winner;
 
 	void Init();
 	void Draw();

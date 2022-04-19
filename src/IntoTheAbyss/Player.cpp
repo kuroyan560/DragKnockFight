@@ -136,12 +136,6 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	// 一個上のマップチップがブロックで、X軸方向の移動量が一定以上だったらパーティクルを生成する。
 	//if (MapData[mapY][mapX] > 0 && MapData[mapY][mapX] < 10 && fabs(vel.x) >= 10.0f)ParticleMgr::Instance()->Generate(Vec2<float>(pos.x, pos.y - GetPlayerGraphSize().y), Vec2<float>(0, -1), HIT_MAP);
 
-	//ストレッチ更新
-	UpdateStretch();
-
-	//アニメーション更新
-	anim.Update();
-
 	// 振り回しのクールタイムを更新
 	if (0 < swingCoolTime) --swingCoolTime;
 
@@ -166,14 +160,23 @@ void Player::OnUpdateNoRelatedSwing()
 
 		}
 	}
+
+	//ストレッチ更新
+	UpdateStretch();
+
+	//アニメーション更新
+	anim.Update();
 }
 
 void Player::OnDraw()
 {
 	//if (vel.y < 0)playerDir = BACK;
-	if (vel.y < 0)anim.ChangeAnim(DEFAULT_BACK);
-	//if (0 < vel.y)playerDir = FRONT;
-	if (0 < vel.y)anim.ChangeAnim(DEFAULT_FRONT);
+	if (!isHold)
+	{
+		if (vel.y < 0)anim.ChangeAnim(DEFAULT_BACK);
+		//if (0 < vel.y)playerDir = FRONT;
+		if (0 < vel.y)anim.ChangeAnim(DEFAULT_FRONT);
+	}
 
 	/*===== 描画処理 =====*/
 
@@ -199,8 +202,9 @@ void Player::OnDraw()
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
+	bool mirorX = 0 < vel.x || (isHold && (partner.lock()->pos - pos).x < 0);
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
-		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { GetWhichTeam() == RIGHT_TEAM,false });
+		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
 }
 
 void Player::OnDrawUI()
@@ -306,6 +310,12 @@ void Player::Input(const vector<vector<int>>& MapData)
 	// スタン演出中だったら入力を受け付けない。
 	if (StunEffect::Instance()->isActive) return;
 
+	// 入力を受け付けないタイマーが0より大きかったら処理を飛ばす。
+	if (0 < inputInvalidTimer) return;
+
+	// 壁に挟まって判定が無効化されている間は処理を受け付けない。
+	if (0 < GetStackWinTimer()) return;
+
 	const float INPUT_DEAD_LINE = 0.3f;
 
 	Vec2<float> inputVec;
@@ -342,6 +352,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 	// [LTを押されたら] [握力が残っていたら] [握力を使い切ってから回復している状態じゃなかったら]
 	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && 0 < gripPowerTimer && !isGripPowerEmpty) {
 
+		anim.ChangeAnim(HOLD);
+
 		// 紐つかみ状態(踏ん張り状態)にする。
 		isHold = true;
 
@@ -360,6 +372,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	}
 	else {
+		if (anim.GetNowAnim() == HOLD)anim.ChangeAnim(DEFAULT_FRONT);
 
 		// 紐つかみ状態(踏ん張り状態)を解除する。
 		isHold = false;
