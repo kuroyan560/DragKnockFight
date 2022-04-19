@@ -8,6 +8,7 @@ static const enum PLAYER_ANIM
 	DEFAULT_FRONT,
 	DEFAULT_BACK,
 	HOLD,
+	SWINGED,
 	PLAYER_ANIM_NUM
 };
 
