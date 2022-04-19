@@ -286,10 +286,10 @@ void RoundChangeEffect::Draw()
 		DrawFunc::DrawRotaGraph2D(roundData->pos, roundData->size, 0.0f, TexHandleMgr::GetTexBuffer(roundData->handle));
 		//DrawFunc::DrawRotaGraph2D(numberData->pos, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle));
 
-		DrawFunc_Mask::DrawRotaGraph2D(numberData->pos, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle), numberData->maskPos, Vec2<float>(120.0f, 120.0f));
+		DrawFunc_Mask::DrawRotaGraph2D(numberData->maskPos, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle), numberData->pos, Vec2<float>(120.0f, 120.0f));
 		if (!firstRoundFlag)
 		{
-			DrawFunc_Mask::DrawRotaGraph2D(nextNumberData->pos, nextNumberData->size, 0.0f, TexHandleMgr::GetTexBuffer(nextNumberData->handle), nextNumberData->maskPos, Vec2<float>(120.0f, 120.0f));
+			DrawFunc_Mask::DrawRotaGraph2D(nextNumberData->maskPos, nextNumberData->size, 0.0f, TexHandleMgr::GetTexBuffer(nextNumberData->handle), nextNumberData->pos, Vec2<float>(120.0f, 120.0f));
 		}
 		playerReticle->transform.SetPos(playerReticleData->pos);
 		playerReticle->transform.SetScale(playerReticleData->size);
@@ -312,6 +312,4 @@ void RoundChangeEffect::Draw()
 			DrawFunc::DrawRotaGraph2D(readyData->pos, readyData->size, 0.0f, TexHandleMgr::GetTexBuffer(readyData->handle));
 		}
 	}
-
-
 }

@@ -1,5 +1,6 @@
 #include "Vec.h"
 #include "Singleton.h"
+#include"CharacterInterFace.h"
 
 // スタンした際の演出クラス
 class StunEffect : public Singleton<StunEffect> {
@@ -21,7 +22,7 @@ private:
 	int enemyBreakHandle;		// 敵の[BREAK]の画像ハンドル
 	int playerBreakHandle;		// プレイヤーの[BRWAK]の画像ハンドル
 	int useHandle;				// 実際に描画する画像ハンドル
-	bool isBoss;
+	WHICH_TEAM breakTeam;
 
 	enum BREAK_UI_STATUS {
 		STATUS_GENERATE,		// 生成して中央に向かうシーン
@@ -41,9 +42,9 @@ private:
 
 	/*===== 定数 =====*/
 
-	const int BREAK_UI_GENERATE_TIMER = 50;
-	const int BREAK_UI_STOP_TIMER = 60;
-	const int BREAK_UI_ICON_TIMER = 30;
+	static const int BREAK_UI_GENERATE_TIMER = 50;
+	static const int BREAK_UI_STOP_TIMER = 60;
+	static const int BREAK_UI_ICON_TIMER = 30;
 	const int FOCUS_TIME = 120;
 	const float FOCUS_ZOOM = 1.7f;
 	const float DEF_RADIAN = 3600.0f;
@@ -52,6 +53,11 @@ private:
 
 
 public:
+	//演出にかかる時間
+	static const int GetTotalTime()
+	{
+		return BREAK_UI_GENERATE_TIMER + BREAK_UI_STOP_TIMER + BREAK_UI_ICON_TIMER;
+	}
 
 	/*===== メンバ関数 =====*/
 
@@ -62,7 +68,7 @@ public:
 	void Init();
 
 	// 生成処理
-	void Activate(const Vec2<float>& focusPos, const Vec2<float>& iconPos, const bool& isBoss);
+	void Activate(const Vec2<float>& focusPos, const Vec2<float>& iconPos, const WHICH_TEAM& Team);
 
 	// 更新処理
 	void Update();

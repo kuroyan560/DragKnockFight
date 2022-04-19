@@ -4,6 +4,8 @@
 
 class StageSelectScene : public BaseScene
 {
+	//キャラクター選択中フラグ
+	bool charactersSelect;
 public:
 	StageSelectScene();
 	void OnInitialize()override;

@@ -34,7 +34,7 @@ void StunEffect::Init()
 }
 
 #include"AudioApp.h"
-void StunEffect::Activate(const Vec2<float>& focusPos, const Vec2<float>& iconPos, const bool& isBoss)
+void StunEffect::Activate(const Vec2<float>& focusPos, const Vec2<float>& iconPos, const WHICH_TEAM& Team)
 {
 
 	/*===== 生成処理 =====*/
@@ -52,8 +52,8 @@ void StunEffect::Activate(const Vec2<float>& focusPos, const Vec2<float>& iconPo
 	breakUIPos = focusPos - ScrollMgr::Instance()->scrollAmount;
 	breakUIPosDef = breakUIPos;
 
-	this->isBoss = isBoss;
-	if (isBoss) {
+	breakTeam = Team;
+	if (breakTeam == RIGHT_TEAM) {
 		useHandle = enemyBreakHandle;
 	}
 	else {
@@ -174,24 +174,13 @@ void StunEffect::Update()
 
 			Camera::Instance()->Init();
 			isActive = false;
-
-			if(isBoss){
-				FaceIcon::Instance()->Change(WHICH_FACE::RIGHT_FACE, FACE_STATUS::BREAK);
-			}
-			else{
-				FaceIcon::Instance()->Change(WHICH_FACE::LEFT_FACE, FACE_STATUS::BREAK);
-			}
-
+			FaceIcon::Instance()->Change(breakTeam, FACE_STATUS::BREAK);
 		}
 
 		break;
 	default:
 		break;
 	}
-
-
-
-
 	//// タイマーが0になったら。
 	//if (focusTime <= 0) {
 

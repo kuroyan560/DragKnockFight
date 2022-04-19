@@ -1,6 +1,7 @@
 #pragma once
 #include<vector>
 #include"Vec.h"
+#include"CharacterInterFace.h"
 
 static const enum PLAYER_ANIM
 {
@@ -26,7 +27,7 @@ class PlayerAnimation
 	int timer;	//ŽžŠÔŒv‘ª
 
 public:
-	PlayerAnimation();
+	PlayerAnimation(const PLAYABLE_CHARACTER_NAME& CharacterName);
 	void Init(const PLAYER_ANIM& AnimStatus = DEFAULT_FRONT)
 	{
 		status = AnimStatus;

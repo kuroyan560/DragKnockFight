@@ -34,13 +34,13 @@ void Bullet::Init()
 	isActive = false;
 }
 
-void Bullet::Generate(const int& GRPHA_HANDLE, const Vec2<float> &generatePos, const Vec2<float> forwardVec, const SHOT_HAND &id, const float &speed)
+void Bullet::Generate(const int& graphHandle, const Vec2<float>& generatePos, const Vec2<float> forwardVec, const float& speed)
 {
 
 	/*-- 生成処理 --*/
-	if (GRPHA_HANDLE != -1)
+	if (graphHandle != -1)
 	{
-		graph = GRPHA_HANDLE;
+		graph = graphHandle;
 	}
 
 	// 座標をセット
@@ -64,10 +64,6 @@ void Bullet::Generate(const int& GRPHA_HANDLE, const Vec2<float> &generatePos, c
 
 	// 最初の1Frameが経過したか
 	isFirstFrame = false;
-
-	// IDを保存
-	handID = id;
-
 }
 
 void Bullet::Update()

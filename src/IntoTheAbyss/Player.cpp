@@ -1,6 +1,5 @@
 #include "Player.h"
 #include "PlayerHand.h"
-#include "BulletMgr.h"
 #include "ScrollMgr.h"
 #include "ShakeMgr.h"
 #include "MapChipCollider.h"
@@ -29,13 +28,18 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player(const WHICH_TEAM& Team, const int& ControllerIdx) :CharacterInterFace(Team,PLAYER_HIT_SIZE), controllerIdx(ControllerIdx)
+Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx) :CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx)
 {
 	/*====== コンストラクタ =====*/
-
-	static const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/arm_L.png");
-	static const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/arm_R.png");
-	static const int AIM_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/aim.png");
+	if (PLAYER_CHARACTER_NUM <= CharacterName)assert(0);
+	static const std::string NAME_DIR[PLAYER_CHARACTER_NUM] =
+	{
+		"luna",
+		"lacy"
+	};
+	const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/arm_L.png");
+	const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/arm_R.png");
+	const int AIM_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/aim.png");
 	lHand = make_unique<PlayerHand>(ARM_GRAPH_L, AIM_GRAPH);
 	rHand = make_unique<PlayerHand>(ARM_GRAPH_R, AIM_GRAPH);
 
@@ -45,7 +49,7 @@ Player::Player(const WHICH_TEAM& Team, const int& ControllerIdx) :CharacterInter
 	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav");
 	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
 
-	bulletGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/bullet.png");
+	bulletGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/bullet.png");
 }
 
 Player::~Player()
@@ -82,8 +86,6 @@ void Player::OnInit()
 	stretch_RB = { 0.0f,0.0f };
 	stretchTimer = STRETCH_RETURN_TIME;
 
-	swingEaseRate = 0;
-
 	drawCursorFlag = true;
 
 	swingCoolTime = 0;
@@ -110,7 +112,7 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 	/*===== 入力処理 =====*/
 	// 入力に関する更新処理を行う。
-	if(GetCanMove())Input(MapData);
+	if (GetCanMove())Input(MapData);
 
 	/*===== 更新処理 =====*/
 	//移動に関する処理
@@ -186,31 +188,6 @@ void Player::OnDraw()
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
 		0.0f, bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { GetWhichTeam() == RIGHT_TEAM,false });
-
-
-	// 弾を描画
-	BulletMgr::Instance()->Draw();
-
-}
-
-void Player::OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
-{
-
-	/*===== マップチップとプレイヤーとの当たり判定全般 =====*/
-	{
-		// ウィンドウに挟まっていなかったら
-		if (!GetNowStuckWin()) {
-			// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
-			CheckHitMapChipVel(pos, MapData);
-		}
-
-	}
-
-
-	/*===== 腕の当たり判定 =====*/
-
-	lHand->CheckHit(MapData);
-	rHand->CheckHit(MapData);
 }
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)
@@ -299,17 +276,23 @@ void Player::Input(const vector<vector<int>>& MapData)
 	inputVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
 	inputVec /= {32768.0f, 32768.0f};
 	// 入力のデッドラインを設ける。
-	if (inputVec.Length() >= 0.9f) {
+	float inputRate = inputVec.Length();
+	if (inputRate >= 0.5f) {
+
+		// 移動を受け付ける。
+		vel.x = inputVec.x * (MOVE_SPEED_PLAYER * inputRate);
+		vel.y = inputVec.y * (MOVE_SPEED_PLAYER * inputRate);
 
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
+
 	}
 
 	inputVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
 	inputVec /= {32768.0f, 32768.0f};
 
 	// 入力のデッドラインを設ける。
-	if (inputVec.Length() >= 0.9f) {
+	if (inputVec.Length() >= 0.5f) {
 
 		// 左手の角度を更新
 		rHand->SetAngle(KuroFunc::GetAngle(inputVec));
@@ -319,114 +302,139 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	}
 
-	// LBが押されたら反動をつける。
-	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+	// [移動速度が限りなく0に近い時] [LTを押されたら] [握力が残っていたら]
+	if (vel.Length() < 1.0f && UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && 0 < gripPowerTimer) {
 
-		// 反動をつける。
-		float rHandAngle = lHand->GetAngle();
+		// 紐つかみ状態(踏ん張り状態)にする。
+		isHold = true;
 
-		// Getした値は手の向いている方向なので、-180度する。
-		rHandAngle -= Angle::PI();
+		// 握力タイマーを0に近づける。
+		--gripPowerTimer;
 
-		// onGroundがtrueだったら移動量を加算しない。
-		//if (!onGround || sinf(rHandAngle) < 0.5f) {
-		vel.x += cosf(rHandAngle) * RECOIL_AMOUNT;
-		//}
-
-		vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
-
-		// プレイヤーの腕を動かす。
-		lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
-
-
-		// 弾を生成する。
-		const float ARM_DISTANCE = 20.0f;
-		const float OFFSET_Y = -14.0f;
-		const float OFFSET_X = 12.0f;
-
-		float angle = lHand->GetAngle();
-
-		AudioApp::Instance()->PlayWave(shotSE);
-		BulletMgr::Instance()->Generate(bulletGraph, lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, false);
-
-		// 連射タイマーをセット
-		rapidFireTimerLeft = RAPID_FIRE_TIMER;
-
-		//ストレッチ
-		CalculateStretch(vel);
 	}
+	else {
 
-	// RBが押されたら反動をつける。
-	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+		// 紐つかみ状態(踏ん張り状態)を解除する。
+		isHold = false;
 
-		// 反動をつける。
-		float lHandAngle = rHand->GetAngle();
-
-		// Getした値は手の向いている方向なので、-180度する。
-		lHandAngle -= Angle::PI();
-
-		// プレイヤーのひとつ上のブロックを検索する為の処理。
-		int mapX = pos.x / MAP_CHIP_SIZE;
-		int mapY = pos.y / MAP_CHIP_SIZE;
-		if (mapX <= 0) mapX = 1;
-		if (mapX >= MapData[0].size()) mapX = MapData[0].size() - 1;
-		if (mapY <= 0) mapY = 1;
-		if (mapY >= MapData.size()) mapY = MapData.size() - 1;
-
-		// onGroundがtrueだったら移動量を加算しない。
-			//if (!onGround || sinf(lHandAngle) < 0) {
-		vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
-
-
-
-		vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
-
-		// プレイヤーの腕を動かす。
-		rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
-
-
-		// 弾を生成する。
-		const float ARM_DISTANCE = 20.0f;
-		const float OFFSET_Y = -14.0f;
-		const float OFFSET_X = -12.0f;
-
-		float angle = rHand->GetAngle();
-
-		AudioApp::Instance()->PlayWave(shotSE);
-		BulletMgr::Instance()->Generate(bulletGraph, rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle, true);
-
-		// 連射タイマーをセット
-		rapidFireTimerRight = RAPID_FIRE_TIMER;
-
-		//ストレッチ
-		CalculateStretch(vel);
-	}
-
-	// 移動速度が限界値を超えないようにする。
-	if (vel.x >= MAX_RECOIL_AMOUNT) vel.x = MAX_RECOIL_AMOUNT;
-	if (vel.x <= -MAX_RECOIL_AMOUNT) vel.x = -MAX_RECOIL_AMOUNT;
-	if (vel.y >= MAX_RECOIL_AMOUNT) vel.y = MAX_RECOIL_AMOUNT;
-	if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
-
-	// RTが押されたら
-	if (swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT)) {
-
-		// 振り回しの処理
-
-		// 振り回しにデッドラインを設ける。
-		Vec2<float> dir = GetPartnerPos() - pos;
-		dir.Normalize();
-
-		// 振り回しのトリガー判定
-		if (0.3f < fabs(dir.y)) {
-
-			SwingPartner();
-
-			// クールタイムを設定。
-			swingCoolTime = SWING_COOLTIME;
+		// 握力タイマーを規定値に近づける。
+		if (gripPowerTimer < MAX_GRIP_POWER_TIMER) {
+			++gripPowerTimer;
 		}
 
 	}
+
+#pragma region itiou nokosite okimasu
+
+	// LBが押されたら反動をつける。
+	//if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
+
+	//	// 反動をつける。
+	//	float rHandAngle = lHand->GetAngle();
+
+	//	// Getした値は手の向いている方向なので、-180度する。
+	//	rHandAngle -= Angle::PI();
+
+	//	// onGroundがtrueだったら移動量を加算しない。
+	//	//if (!onGround || sinf(rHandAngle) < 0.5f) {
+	//	vel.x += cosf(rHandAngle) * RECOIL_AMOUNT;
+	//	//}
+
+	//	vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
+
+	//	// プレイヤーの腕を動かす。
+	//	lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
+
+
+	//	// 弾を生成する。
+	//	const float ARM_DISTANCE = 20.0f;
+	//	const float OFFSET_Y = -14.0f;
+	//	const float OFFSET_X = 12.0f;
+
+	//	float angle = lHand->GetAngle();
+
+	//	AudioApp::Instance()->PlayWave(shotSE);
+	//	Shot(lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle);
+
+	//	// 連射タイマーをセット
+	//	rapidFireTimerLeft = RAPID_FIRE_TIMER;
+
+	//	//ストレッチ
+	//	CalculateStretch(vel);
+	//}
+
+	//// RBが押されたら反動をつける。
+	//if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
+
+	//	// 反動をつける。
+	//	float lHandAngle = rHand->GetAngle();
+
+	//	// Getした値は手の向いている方向なので、-180度する。
+	//	lHandAngle -= Angle::PI();
+
+	//	// プレイヤーのひとつ上のブロックを検索する為の処理。
+	//	int mapX = pos.x / MAP_CHIP_SIZE;
+	//	int mapY = pos.y / MAP_CHIP_SIZE;
+	//	if (mapX <= 0) mapX = 1;
+	//	if (mapX >= MapData[0].size()) mapX = MapData[0].size() - 1;
+	//	if (mapY <= 0) mapY = 1;
+	//	if (mapY >= MapData.size()) mapY = MapData.size() - 1;
+
+	//	// onGroundがtrueだったら移動量を加算しない。
+	//		//if (!onGround || sinf(lHandAngle) < 0) {
+	//	vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
+
+
+
+	//	vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
+
+	//	// プレイヤーの腕を動かす。
+	//	rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
+
+
+	//	// 弾を生成する。
+	//	const float ARM_DISTANCE = 20.0f;
+	//	const float OFFSET_Y = -14.0f;
+	//	const float OFFSET_X = -12.0f;
+
+	//	float angle = rHand->GetAngle();
+
+	//	AudioApp::Instance()->PlayWave(shotSE);
+	//	Shot(rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle);
+
+	//	// 連射タイマーをセット
+	//	rapidFireTimerRight = RAPID_FIRE_TIMER;
+
+	//	//ストレッチ
+	//	CalculateStretch(vel);
+	//}
+
+	// 移動速度が限界値を超えないようにする。
+	//if (vel.x >= MAX_RECOIL_AMOUNT) vel.x = MAX_RECOIL_AMOUNT;
+	//if (vel.x <= -MAX_RECOIL_AMOUNT) vel.x = -MAX_RECOIL_AMOUNT;
+	//if (vel.y >= MAX_RECOIL_AMOUNT) vel.y = MAX_RECOIL_AMOUNT;
+	//if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
+
+
+#pragma endregion
+
+	// RTが押されたら
+	if (isHold && swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT)) {
+
+		// 振り回しの処理
+
+		SwingPartner({ cosf(rHand->GetAngle()), sinf(rHand->GetAngle()) });
+
+		// クールタイムを設定。
+		swingCoolTime = SWING_COOLTIME;
+
+	}
+	else {
+
+		nowSwing = false;
+
+	}
+
 }
 
 void Player::Move()
@@ -461,6 +469,13 @@ void Player::Move()
 		// 符号をかける。
 		vel.y *= sign ? -1 : 1;
 	}
+}
+
+void Player::Shot(const Vec2<float>& GeneratePos, const float& ForwardAngle)
+{
+	//弾速
+	static const float BULLET_SPEED = 30.0f;
+	bulletMgr.Generate(bulletGraph, GeneratePos, ForwardAngle, BULLET_SPEED);
 }
 
 void Player::PushBackWall()

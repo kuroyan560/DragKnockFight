@@ -1,7 +1,6 @@
 #include "Game.h"
 #include"MapChipCollider.h"
 #include"ShakeMgr.h"
-#include "BulletMgr.h"
 #include"ScrollMgr.h"
 //#include"BulletParticleMgr.h"
 #include "StunEffect.h"
@@ -26,8 +25,6 @@
 #include"FaceIcon.h"
 #include"WinCounter.h"
 
-#include"BossBulletManager.h"
-
 #include"BulletCollision.h"
 
 #include"CrashMgr.h"
@@ -44,7 +41,9 @@
 
 #include"DebugKeyManager.h"
 
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+#include"CharacterManager.h"
+
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -70,7 +69,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -106,7 +105,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				if (height < 0 || mapChipDrawData.size() <= height) continue;
 				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
@@ -165,7 +164,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
+const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -183,7 +182,7 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
+void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -279,8 +278,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	responePos -= 100;
 
 	lineCenterPos = responePos;
-	leftCharacter->Init(responePos - Vec2<float>(150.0f, 0.0f));
-	rightCharacter->Init(responePos + Vec2<float>(150.0f, 0.0f));
+	CharacterManager::Instance()->CharactersInit(responePos);
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
@@ -292,16 +290,10 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	ScoreManager::Instance()->Init();
 	firstLoadFlag = false;
 	lineExtendScale = lineExtendMaxScale;
-
-	BulletMgr::Instance()->Init();
-	BossBulletManager::Instance()->Init();
 }
 
 Game::Game()
 {
-	// 弾管理クラスを初期化。
-	BulletMgr::Instance()->Setting();
-
 	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 	AudioApp::Instance()->ChangeVolume(bgm, 0.07f);
 
@@ -344,12 +336,7 @@ void Game::Init()
 
 	turnResultScene = false;
 
-	leftCharacter = std::make_shared<Player>(LEFT_TEAM, 0);
-	//rightCharacter = std::make_shared<Player>(RIGHT_TEAM, 0);
-	rightCharacter = std::make_shared<Boss>(RIGHT_TEAM);
-
-	rightCharacter->RegisterSetPartner(leftCharacter);
-	leftCharacter->RegisterSetPartner(rightCharacter);
+	CharacterManager::Instance()->CharactersGenerate();
 
 	InitGame(0, 0);
 }
@@ -363,10 +350,10 @@ void Game::Update()
 	const bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//マップの切り替え
 	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectStageFlag2 && nowSelectNum == 0)
-	const bool up = UsersInput::Instance()->KeyOnTrigger(DIK_UP) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_UP);
-	const bool down = UsersInput::Instance()->KeyOnTrigger(DIK_DOWN) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_DOWN);
-	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_LEFT);
-	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0,DPAD_RIGHT);
+	const bool up = UsersInput::Instance()->KeyOnTrigger(DIK_UP) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_UP);
+	const bool down = UsersInput::Instance()->KeyOnTrigger(DIK_DOWN) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_DOWN);
+	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_LEFT);
+	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_RIGHT);
 
 	if (up && enableToSelectStageFlag2 && nowSelectNum == 0)
 	{
@@ -406,7 +393,7 @@ void Game::Update()
 		debugStageData[1] = 0;
 	}
 
-	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0,A);
+	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0, A);
 	if (done)
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
@@ -416,7 +403,7 @@ void Game::Update()
 	}
 #pragma endregion
 
-	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0,BACK);
+	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0, BACK);
 	if (resetInput)
 	{
 		SelectStage::Instance()->resetStageFlag = true;
@@ -427,7 +414,7 @@ void Game::Update()
 
 
 	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision(rightCharacter->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
+	if (playerHomeBase->Collision(CharacterManager::Instance()->Right()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//プレイヤー勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, true);
@@ -437,7 +424,7 @@ void Game::Update()
 	}
 
 	//敵陣地とプレイヤーの判定
-	if (enemyHomeBase->Collision(leftCharacter->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
+	if (enemyHomeBase->Collision(CharacterManager::Instance()->Left()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//敵勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, false);
@@ -458,13 +445,13 @@ void Game::Update()
 	if (roundFinishFlag)
 	{
 		//動けなくする
-		leftCharacter->SetCanMove(false);
-		rightCharacter->SetCanMove(false);
+		CharacterManager::Instance()->Left()->SetCanMove(false);
+		CharacterManager::Instance()->Right()->SetCanMove(false);
+		CharacterManager::Instance()->Left()->SetHitCheck(false);
+		CharacterManager::Instance()->Right()->SetHitCheck(false);
 
 		//時間計測ストップ
 		GameTimer::Instance()->SetInterruput(true);
-
-
 
 		//勝利数カウント演出
 		if (!WinCounter::Instance()->GetNowAnimation())
@@ -473,7 +460,6 @@ void Game::Update()
 			//どちらかが３勝とったらゲーム終了
 			if (WinCounter::Instance()->GetGameFinish())
 			{
-				//とりあえずリセットしとく
 				ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
 				turnResultScene = true;
 			}
@@ -514,16 +500,18 @@ void Game::Update()
 		//登場演出
 		if (roundChangeEffect.initGameFlag)
 		{
-			bool leftAppear = leftCharacter->Appear();
-			bool rightApperar = rightCharacter->Appear();
+			bool leftAppear = CharacterManager::Instance()->Left()->Appear();
+			bool rightApperar = CharacterManager::Instance()->Right()->Appear();
 			if (leftAppear && rightApperar)	//どちらのキャラも登場演出完了
 			{
 				//ゲームスタート
 				readyToStartRoundFlag = false;
 				gameStartFlag = true;
 				roundTimer = 0;
-				leftCharacter->SetCanMove(true);
-				rightCharacter->SetCanMove(true);
+				CharacterManager::Instance()->Left()->SetCanMove(true);
+				CharacterManager::Instance()->Right()->SetCanMove(true);
+				CharacterManager::Instance()->Left()->SetHitCheck(true);
+				CharacterManager::Instance()->Right()->SetHitCheck(true);
 				GameTimer::Instance()->SetInterruput(false);
 			}
 		}
@@ -538,21 +526,17 @@ void Game::Update()
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	// プレイヤーの更新処理
-	leftCharacter->Update(mapData, lineCenterPos);
+	CharacterManager::Instance()->Left()->Update(mapData, lineCenterPos);
 
 	// ボスの更新処理
-	rightCharacter->Update(mapData, lineCenterPos);
-
-	// 弾を更新
-	BulletMgr::Instance()->Update();
-	BossBulletManager::Instance()->Update();
+	CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
 
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
 
 	// プレイヤーとボスの当たり判定処理
-	leftCharacter->CheckHit(mapData, lineCenterPos);
-	rightCharacter->CheckHit(mapData, lineCenterPos);
+	CharacterManager::Instance()->Left()->CheckHit(mapData, lineCenterPos);
+	CharacterManager::Instance()->Right()->CheckHit(mapData, lineCenterPos);
 
 	miniMap.Update();
 
@@ -587,39 +571,44 @@ void Game::Update()
 	/*===== 当たり判定 =====*/
 
 #pragma region 当たり判定
-	// 弾とマップチップの当たり判定
-	BulletMgr::Instance()->CheckHit(mapData);
 
-	//ボス弾とプレイヤーの判定
-	for (int index = 0; index < BossBulletManager::Instance()->bullets.size(); ++index)
+	//左弾と右プレイヤーの判定
+	auto& leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
+	for (int index = 0; index < leftBulMgr.bullets.size(); ++index)
 	{
-		std::shared_ptr<SphereCollision> bullet = BossBulletManager::Instance()->GetBullet(index)->bulletHitBox;
-		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, leftCharacter->GetBulletHitSphere());
-		bool initFlag = BossBulletManager::Instance()->GetBullet(index)->isActive;
+		auto& bul = leftBulMgr.bullets[index];
+		if (!bul.isActive)continue;
+
+		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
+		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bulCol, CharacterManager::Instance()->Right()->GetBulletHitSphere());
 
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
-		if (hitFlag && initFlag)
+		if (hitFlag)
 		{
-			SuperiorityGauge::Instance()->AddEnemyGauge(DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
-			BossBulletManager::Instance()->GetBullet(index)->Init();
+			SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
+			bul.Init();
+			CharacterManager::Instance()->Right()->Damage();
 		}
 	}
 
-	//プレイヤー弾とボスの判定
-	for (int index = 0; index < BulletMgr::Instance()->bullets.size(); ++index)
+	//右弾と左プレイヤーの判定
+	auto rightBulMgr = CharacterManager::Instance()->Right()->GetBulletMgr();
+	for (int index = 0; index < rightBulMgr.bullets.size(); ++index)
 	{
-		std::shared_ptr<SphereCollision> bullet = BulletMgr::Instance()->GetBullet(index)->bulletHitBox;
-		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bullet, rightCharacter->GetBulletHitSphere());
-		bool initFlag = BulletMgr::Instance()->GetBullet(index)->isActive;
+		auto& bul = rightBulMgr.bullets[index];
+		if (!bul.isActive)continue;
+
+		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
+		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bulCol, CharacterManager::Instance()->Left()->GetBulletHitSphere());
 
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
-		if (hitFlag && initFlag)
+		if (hitFlag)
 		{
-			SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
-			BulletMgr::Instance()->GetBullet(index)->Init();
+			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
+			bul.Init();
+			CharacterManager::Instance()->Left()->Damage();
 		}
 	}
-
 
 #pragma endregion
 
@@ -631,16 +620,30 @@ void Game::Update()
 	FaceIcon::Instance()->Update();
 	WinCounter::Instance()->Update();
 
-	// 優勢ゲージが振り切ったトリガー判定のときにスタン演出を有効化する。
-	if (SuperiorityGauge::Instance()->GetEnemyGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetEnemyGaugeData()->prevOverGaugeFlag) {
-		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
-		StunEffect::Instance()->Activate(leftCharacter->pos, Vec2<float>(0, 0), false);
-		ResultTransfer::Instance()->leftBreakCount++;
+
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_Q, "AddLeftSuperiorityGauge", TO_STRING(DIK_Q)))
+	{
+		SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, 10.0f);
 	}
-	if (SuperiorityGauge::Instance()->GetPlayerGaugeData()->overGaugeFlag && !SuperiorityGauge::Instance()->GetPlayerGaugeData()->prevOverGaugeFlag) {
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_W, "AddRightSuperiorityGauge", TO_STRING(DIK_W)))
+	{
+		SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, 10.0f);
+	}
+
+
+
+	// 優勢ゲージが振り切ったトリガー判定のときにスタン演出を有効化する。
+	if (SuperiorityGauge::Instance()->GetRightGaugeData().overGaugeFlag && !SuperiorityGauge::Instance()->GetRightGaugeData().prevOverGaugeFlag) {
+		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
+		StunEffect::Instance()->Activate(CharacterManager::Instance()->Left()->pos, Vec2<float>(0, 0), LEFT_TEAM);
+		ResultTransfer::Instance()->leftBreakCount++;
+		CharacterManager::Instance()->Left()->Break();
+	}
+	if (SuperiorityGauge::Instance()->GetLeftGaugeData().overGaugeFlag && !SuperiorityGauge::Instance()->GetLeftGaugeData().prevOverGaugeFlag) {
 		// プレイヤーの優勢ゲージが振り切ったということは、敵の優勢ゲージが0だということ。
-		StunEffect::Instance()->Activate(rightCharacter->pos, Vec2<float>(1200, 0), true);
+		StunEffect::Instance()->Activate(CharacterManager::Instance()->Right()->pos, Vec2<float>(1200, 0), RIGHT_TEAM);
 		ResultTransfer::Instance()->rightBreakCount++;
+		CharacterManager::Instance()->Right()->Break();
 	}
 
 	CrashMgr::Instance()->Update();
@@ -669,19 +672,19 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	static int CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static const int CHAIN_THICKNESS = 4;
 	// プレイヤーとボス間に線を描画
-	if(roundChangeEffect.initGameFlag)
+	if (roundChangeEffect.initGameFlag)
 	{
-		Vec2<float> playerBossDir = rightCharacter->pos - leftCharacter->pos;
+		Vec2<float> playerBossDir = CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos;
 		playerBossDir.Normalize();
-		Vec2<float> playerDefLength = leftCharacter->pos + playerBossDir * leftCharacter->addLineLength;
+		Vec2<float> playerDefLength = CharacterManager::Instance()->Left()->pos + playerBossDir * CharacterManager::Instance()->Left()->addLineLength;
 
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftCharacter->pos), ScrollMgr::Instance()->Affect(lineCenterPos),
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(lineCenterPos),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 
 
-		Vec2<float> bossPlayerDir = leftCharacter->pos - rightCharacter->pos;
+		Vec2<float> bossPlayerDir = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
 		bossPlayerDir.Normalize();
-		Vec2<float> bossDefLength = rightCharacter->pos + bossPlayerDir * rightCharacter->addLineLength;
+		Vec2<float> bossDefLength = CharacterManager::Instance()->Right()->pos + bossPlayerDir * CharacterManager::Instance()->Right()->addLineLength;
 
 		float time = 30.0f;
 		if (1.0f < lineExtendScale)
@@ -695,7 +698,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(rightCharacter->pos), ScrollMgr::Instance()->Affect(lineCenterPos),
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), ScrollMgr::Instance()->Affect(lineCenterPos),
 			TexHandleMgr::GetTexBuffer(CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom * lineExtendScale);
 
 		// 線分の中心に円を描画
@@ -711,11 +714,9 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	if (roundChangeEffect.initGameFlag)
 	{
-		leftCharacter->Draw();
-		rightCharacter->Draw();
+		CharacterManager::Instance()->Left()->Draw();
+		CharacterManager::Instance()->Right()->Draw();
 	}
-
-	BossBulletManager::Instance()->Draw();
 
 	ParticleMgr::Instance()->Draw();
 	CrashMgr::Instance()->Draw();
@@ -737,21 +738,21 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	StunEffect::Instance()->Draw();
 
 	{
-		Vec2<float>leftUpPos = *rightCharacter->GetAreaHitBox().center - rightCharacter->GetAreaHitBox().size / 2.0f;
-		Vec2<float>rightDownPos = *rightCharacter->GetAreaHitBox().center + rightCharacter->GetAreaHitBox().size / 2.0f;
-		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), Color(255,255,255,255), DXGI_FORMAT_R8G8B8A8_UNORM);
+		Vec2<float>leftUpPos = *CharacterManager::Instance()->Right()->GetAreaHitBox().center - CharacterManager::Instance()->Right()->GetAreaHitBox().size / 2.0f;
+		Vec2<float>rightDownPos = *CharacterManager::Instance()->Right()->GetAreaHitBox().center + CharacterManager::Instance()->Right()->GetAreaHitBox().size / 2.0f;
+		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), Color(255, 255, 255, 255), DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	{
-		Vec2<float>leftUpPos = *leftCharacter->GetAreaHitBox().center - leftCharacter->GetAreaHitBox().size / 2.0f;
-		Vec2<float>rightDownPos = *leftCharacter->GetAreaHitBox().center + leftCharacter->GetAreaHitBox().size / 2.0f;
-		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), playerHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
+		Vec2<float>leftUpPos = *CharacterManager::Instance()->Left()->GetAreaHitBox().center - CharacterManager::Instance()->Left()->GetAreaHitBox().size / 2.0f;
+		Vec2<float>rightDownPos = *CharacterManager::Instance()->Left()->GetAreaHitBox().center + CharacterManager::Instance()->Left()->GetAreaHitBox().size / 2.0f;
+		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), playerHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	{
 		Vec2<float>leftUpPos = *enemyHomeBase->hitBox.center - enemyHomeBase->hitBox.size / 2.0f;
 		Vec2<float>rightDownPos = *enemyHomeBase->hitBox.center + enemyHomeBase->hitBox.size / 2.0f;
-		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
+		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 }
 
@@ -761,40 +762,107 @@ void Game::Scramble()
 	// 前フレームの線の中心座標を保存
 	prevLineCenterPos = lineCenterPos;
 
-	if (!leftCharacter->GetCanMove() || !rightCharacter->GetCanMove())return;
+	//どちらも動けないとき何もしない
+	if (!(CharacterManager::Instance()->Left()->GetCanMove() || CharacterManager::Instance()->Right()->GetCanMove()))return;
 
-	Vec2<float> playerVelGauge;
-	Vec2<float> bossVelGauge;
+	Vec2<float> leftVelGauge;
+	Vec2<float> rightVelGauge;
 
 	// 移動量を取得。 優勢ゲージはここで更新。
-	double playerVel = leftCharacter->vel.Length() * SlowMgr::Instance()->slowAmount;
-	playerVelGauge = (leftCharacter->vel * SuperiorityGauge::Instance()->GetPlayerGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
-	double bossVel = rightCharacter->vel.Length() * SlowMgr::Instance()->slowAmount;
-	bossVelGauge = (rightCharacter->vel * SuperiorityGauge::Instance()->GetEnemyGaugeData()->gaugeDivValue) * SlowMgr::Instance()->slowAmount;
-	double subVel = fabs(fabs(playerVel) - fabs(bossVel));
+	double leftVel = CharacterManager::Instance()->Left()->vel.Length() * SlowMgr::Instance()->slowAmount;
+	leftVelGauge = (CharacterManager::Instance()->Left()->vel * SuperiorityGauge::Instance()->GetLeftGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	double rightVel = CharacterManager::Instance()->Right()->vel.Length() * SlowMgr::Instance()->slowAmount;
+	rightVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetRightGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	double subVel = fabs(fabs(leftVel) - fabs(rightVel));
 
-	// [振り回し状態のとき] [スタン演出中] は移動させない。
-	if (!(rightCharacter->GetNowSwing() || leftCharacter->GetNowSwing() || StunEffect::Instance()->isActive)) {
-		leftCharacter->pos += playerVelGauge;
-		rightCharacter->pos += bossVelGauge;
+	// [振り回し状態のとき] [スタン演出中] は移動させない。 踏ん張り中の場合は、どちらにせよ移動量が限りなく0に近いので移動させても問題がない。
+	if (!(CharacterManager::Instance()->Right()->GetNowSwing() || CharacterManager::Instance()->Left()->GetNowSwing() || StunEffect::Instance()->isActive)) {
+		CharacterManager::Instance()->Left()->pos += leftVelGauge;
+		CharacterManager::Instance()->Right()->pos += rightVelGauge;
 	}
 
 
 	// 線分の長さ
 	float line = 0;
-	float LINE = CharacterInterFace::LINE_LENGTH * 2 + (leftCharacter->addLineLength + rightCharacter->addLineLength);
+	float LINE = CharacterInterFace::LINE_LENGTH * 2 + (CharacterManager::Instance()->Left()->addLineLength + CharacterManager::Instance()->Right()->addLineLength);
 
-	// 気にしないでください！
-	bool isBoss = true;
-	bool isPlayer = true;
+	// どちらかが踏ん張っているか。
+	bool isHoldNow = CharacterManager::Instance()->Left()->isHold || CharacterManager::Instance()->Right()->isHold;
+
+
+	// どちらかが踏ん張っていたら。
+	if (isHoldNow) {
+
+		// 右側のキャラが踏ん張っていたら。
+		if (CharacterManager::Instance()->Left()->isHold) {
+
+			// 距離を求める。
+			line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
+
+			// ボスをプレイヤーの方に移動させる。
+			if (LINE < line) {
+
+				// 押し戻し量
+				float moveLength = line - LINE;
+
+				// 押し戻し方向
+				Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos);
+				moveDir.Normalize();
+
+				// 押し戻す。
+				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+
+				// 引っかかり判定だったら
+				if (CharacterManager::Instance()->Right()->GetStackFlag()) {
+
+					CharacterManager::Instance()->Right()->addLineLength += moveLength;
+
+				}
+
+			}
+
+		}
+		// 左側のキャラが踏ん張っていたら。
+		else {
+
+			// 距離を求める。
+			line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
+
+			// プレイヤーをボスの方に移動させる。
+			if (LINE < line) {
+
+				// 押し戻し量
+				float moveLength = line - LINE;
+
+				// 押し戻し方向
+				Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos);
+				moveDir.Normalize();
+
+				// 押し戻す。
+				CharacterManager::Instance()->Left()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+
+				// 引っかかり判定だったら
+				if (CharacterManager::Instance()->Left()->GetStackFlag()) {
+
+					CharacterManager::Instance()->Left()->addLineLength += moveLength;
+
+				}
+
+			}
+
+		}
+
+
+	}
 
 	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
-	if (playerVelGauge.Length() < bossVelGauge.Length()) {
+	else if (leftVelGauge.Length() < rightVelGauge.Length()) {
 
-		// ボスの移動量のほうが大きかったら
+		// 右側のほうが移動量が大きかったら。
+		// 右側のキャラを中心とした位置に左側のキャラを持ってくる。
 
 		// 距離を求める。
-		line = Vec2<float>(leftCharacter->pos).Distance(rightCharacter->pos);
+		line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
 
 		// プレイヤーをボスの方に移動させる。
 		if (LINE < line) {
@@ -803,30 +871,29 @@ void Game::Scramble()
 			float moveLength = line - LINE;
 
 			// 押し戻し方向
-			Vec2<float> moveDir = Vec2<float>(rightCharacter->pos - leftCharacter->pos);
+			Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos);
 			moveDir.Normalize();
 
 			// 押し戻す。
-			leftCharacter->pos += moveDir * Vec2<float>(moveLength, moveLength);
+			CharacterManager::Instance()->Left()->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
 			// 引っかかり判定だったら
-			if (leftCharacter->GetStackFlag()) {
+			if (CharacterManager::Instance()->Left()->GetStackFlag()) {
 
-				leftCharacter->addLineLength += moveLength;
+				CharacterManager::Instance()->Left()->addLineLength += moveLength;
 
 			}
-
-			isBoss = true;
 
 		}
 
 	}
-	else if (bossVelGauge.Length() < playerVelGauge.Length()) {
+	else if (rightVelGauge.Length() < leftVelGauge.Length()) {
 
-		// プレイヤーの移動量のほうが大きかったら
+		// 左側のほうが移動量が大きかったら。
+		// 左側のキャラを中心とした位置に右側のキャラを持ってくる。
 
 		// 距離を求める。
-		line = Vec2<float>(leftCharacter->pos).Distance(rightCharacter->pos);
+		line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
 
 		// ボスをプレイヤーの方に移動させる。
 		if (LINE < line) {
@@ -835,31 +902,29 @@ void Game::Scramble()
 			float moveLength = line - LINE;
 
 			// 押し戻し方向
-			Vec2<float> moveDir = Vec2<float>(leftCharacter->pos - rightCharacter->pos);
+			Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos);
 			moveDir.Normalize();
 
 			// 押し戻す。
-			rightCharacter->pos += moveDir * Vec2<float>(moveLength, moveLength);
+			CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
-			//if (rightCharacter->GetPos().x < rightCharacter->GetPrevPos().x) {
-			//	rightCharacter->AddVel({ -(rightCharacter->GetPrevPos().x - rightCharacter->GetPos().x),0.0f });
+			//if (CharacterManager::Instance()->Right()->GetPos().x < CharacterManager::Instance()->Right()->GetPrevPos().x) {
+			//	CharacterManager::Instance()->Right()->AddVel({ -(CharacterManager::Instance()->Right()->GetPrevPos().x - CharacterManager::Instance()->Right()->GetPos().x),0.0f });
 			//}
 
 			// ボスの移動量が0を下回らないようにする。
-			//if (rightCharacter->GetVel().x < 0) {
+			//if (CharacterManager::Instance()->Right()->GetVel().x < 0) {
 
 			//	boss.vel.x = 0;
 
 			//}
 
 			// 引っかかり判定だったら
-			if (rightCharacter->GetStackFlag()) {
+			if (CharacterManager::Instance()->Right()->GetStackFlag()) {
 
-				rightCharacter->addLineLength += moveLength;
+				CharacterManager::Instance()->Right()->addLineLength += moveLength;
 
 			}
-
-			isPlayer = true;
 
 		}
 
@@ -871,53 +936,66 @@ void Game::Scramble()
 	}
 
 	// 引っかかり判定じゃなかったらだんだん短くする。
-	if (isBoss || (!isCatchMapChipBoss && 0 < rightCharacter->addLineLength)) {
+	if (!isCatchMapChipBoss && 0 < CharacterManager::Instance()->Right()->addLineLength) {
 
-		rightCharacter->addLineLength -= 5.0f;
+		CharacterManager::Instance()->Right()->addLineLength -= 5.0f;
 
 		// ウィンドウに挟まったら
-		if (0 < rightCharacter->GetStackWinTimer()) {
+		if (0 < CharacterManager::Instance()->Right()->GetStackWinTimer()) {
 
-			rightCharacter->addLineLength -= 20.0f;
+			CharacterManager::Instance()->Right()->addLineLength -= 20.0f;
 
 		}
 
-		if (rightCharacter->addLineLength < 0) rightCharacter->addLineLength = 0;
+		if (CharacterManager::Instance()->Right()->addLineLength < 0) CharacterManager::Instance()->Right()->addLineLength = 0;
 
 	}
-	if (isPlayer || (!isCatchMapChipPlayer && 0 < leftCharacter->addLineLength)) {
+	if (!isCatchMapChipPlayer && 0 < CharacterManager::Instance()->Left()->addLineLength) {
 
-		leftCharacter->addLineLength -= 5.0f;
+		CharacterManager::Instance()->Left()->addLineLength -= 5.0f;
 
 		// ウィンドウに挟まったら
-		if (leftCharacter->GetNowStuckWin()) {
+		if (CharacterManager::Instance()->Left()->GetNowStuckWin()) {
 
-			leftCharacter->addLineLength -= 20.0f;
+			CharacterManager::Instance()->Left()->addLineLength -= 20.0f;
 
 		}
 
-		if (leftCharacter->addLineLength < 0) leftCharacter->addLineLength = 0;
+		if (CharacterManager::Instance()->Left()->addLineLength < 0) CharacterManager::Instance()->Left()->addLineLength = 0;
 
 	}
 
 	isCatchMapChipBoss = false;
 	isCatchMapChipPlayer = false;
 
+
+	// 移動量に応じて本来あるべき長さにする。
+	float horaiAddLineLength = (CharacterManager::Instance()->Left()->vel.Length() / CharacterManager::Instance()->Left()->MOVE_SPEED_PLAYER);
+	horaiAddLineLength *= CharacterManager::Instance()->Left()->ADD_LINE_LENGTH_VEL;
+	if (CharacterManager::Instance()->Left()->addLineLength < horaiAddLineLength) {
+		CharacterManager::Instance()->Left()->addLineLength = horaiAddLineLength;
+	}
+	horaiAddLineLength = (CharacterManager::Instance()->Right()->vel.Length() / CharacterManager::Instance()->Right()->MOVE_SPEED_PLAYER);
+	horaiAddLineLength *= CharacterManager::Instance()->Right()->ADD_LINE_LENGTH_VEL;
+	if (CharacterManager::Instance()->Right()->addLineLength < horaiAddLineLength) {
+		CharacterManager::Instance()->Right()->addLineLength = horaiAddLineLength;
+	}
+
 	// 紐の中心点を計算
 	{
-		float distance = (rightCharacter->pos - leftCharacter->pos).Length();
-		Vec2<float> bossDir = rightCharacter->pos - leftCharacter->pos;
+		float distance = (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).Length();
+		Vec2<float> bossDir = CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos;
 		bossDir.Normalize();
 
 		// ボスとプレイヤー間の距離が規定値以下だったら
 		if (distance < CharacterInterFace::LINE_LENGTH + CharacterInterFace::LINE_LENGTH) {
 			// 既定値以下だったら団子化減少を防ぐために、二点間の真ん中の座標にする。
-			lineCenterPos = leftCharacter->pos + bossDir * Vec2<float>(distance / 2.0f, distance / 2.0f);
+			lineCenterPos = CharacterManager::Instance()->Left()->pos + bossDir * Vec2<float>(distance / 2.0f, distance / 2.0f);
 		}
 		else {
 			// 規定値以上だったら普通に場所を求める。
-			float playerLineLength = leftCharacter->LINE_LENGTH + leftCharacter->addLineLength;
-			lineCenterPos = leftCharacter->pos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
+			float playerLineLength = CharacterManager::Instance()->Left()->LINE_LENGTH + CharacterManager::Instance()->Left()->addLineLength;
+			lineCenterPos = CharacterManager::Instance()->Left()->pos + bossDir * Vec2<float>(playerLineLength, playerLineLength);
 		}
 	}
 

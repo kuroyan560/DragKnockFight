@@ -5,8 +5,6 @@
 #include"IBossPattern.h"
 #include<array>
 #include<memory>
-#include"Bullet.h"
-#include"BulletCollision.h"
 
 #include"StagingInterFace.h"
 using namespace std;
@@ -61,13 +59,11 @@ public:
 
 	const float SWING_DISTANCE_DEADLINE = 200.0f;	//プレイヤーを振り回す距離のデットライン
 
-	std::array<Bullet, 200> bullts;
-
 public:
 	/*===== メンバ関数 =====*/
 
 	// コンストラクタ
-	Boss(const WHICH_TEAM& Team);
+	Boss();
 
 private:
 	// 初期化処理
@@ -82,9 +78,9 @@ private:
 	// 描画処理
 	void OnDraw()override;
 
-	void OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)override {};
 	virtual void OnHitMapChip(const HIT_DIR& Dir)override {};
 
+	void Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed);
 public:
 	bool Appear()override;
 };

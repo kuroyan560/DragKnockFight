@@ -7,8 +7,10 @@
 #include"../IntoTheAbyss/BulletCollision.h"
 #include<array>
 #include "Intersected.h"
+#include"BulletMgrBase.h"
 
-static const enum WHICH_TEAM { LEFT_TEAM, RIGHT_TEAM };
+static const enum PLAYABLE_CHARACTER_NAME { PLAYABLE_LUNA, PLAYABLE_LACY, PLAYABLE_BOSS_0, PLAYABLE_CHARACTER_NUM, PLAYER_CHARACTER_NUM = PLAYABLE_LACY + 1 };
+static const enum WHICH_TEAM { LEFT_TEAM, RIGHT_TEAM, TEAM_NUM };
 
 class CharacterInterFace
 {
@@ -34,16 +36,26 @@ private:
 
 	//演出などの動きの関係で動きを止める
 	bool canMove;
+	//演出などの関係で当たり判定をとらなくなる
+	bool hitCheck;
 
 	//左か右か
 	WHICH_TEAM team;
 
-protected:
+	//スタン用タイマー
+	int stanTimer;
+	//ダメージ用タイマー
+	int damageTimer;
 
+protected:
+	BulletMgrBase bulletMgr;
 	bool nowSwing;
-	Vec2<float> swingStartVec;
-	Vec2<float> swingEndVec;
-	float swingEaseRate;
+	Vec2<float> nowSwingVec;		// 現在の角度
+	Vec2<float> swingTargetVec;		// 目標地点
+	float addSwingAngle;			// 振り回しで回転させる量 だんだん増える。
+	bool isSwingClockWise;			// この振り回しが時計回りかどうか true...時計回り...右回転  false...反時計回り...左回転
+	const float ADD_SWING_ANGLE = 0.002f;
+	const float MAX_SWING_ANGLE = 0.07f;
 
 
 protected:
@@ -52,7 +64,7 @@ protected:
 	bool stackMapChip;
 
 	//試合開始時に呼び出される
-	CharacterInterFace(const WHICH_TEAM& Team, const Vec2<float>& HonraiSize) :team(Team), size(HonraiSize)
+	CharacterInterFace(const Vec2<float>& HonraiSize) : size(HonraiSize)
 	{
 		areaHitBox.center = &pos;
 		areaHitBox.size = size;
@@ -69,12 +81,11 @@ protected:
 	virtual void OnUpdate(const std::vector<std::vector<int>>& MapData) = 0;
 	virtual void OnUpdateNoRelatedSwing() = 0;	//スウィング中でも通る処理
 	virtual void OnDraw() = 0;
-	virtual void OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos) = 0;
 	virtual void OnHitMapChip(const HIT_DIR& Dir) = 0;
 
 	//[共通関数]
 	//振り回し
-	void SwingPartner();
+	void SwingPartner(const Vec2<float>& SwingTargetVec);
 	//ゲッタ類
 	const Vec2<float>& GetPartnerPos()
 	{
@@ -96,17 +107,31 @@ public:
 
 public:
 	static const int LINE_LENGTH = 150;
+	static const int ADD_LINE_LENGTH_VEL = 100;	// 移動量に応じて伸びるaddLineLengthの最大量
+	float MOVE_SPEED_PLAYER = 15.0f;			// 移動速度
 	float addLineLength;	//紐
 	Vec2<float> pos;			// 座標
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
+	bool isHold;				// つかんでいるかフラグ
+	int gripPowerTimer;			// 握力タイマー
+	const int MAX_GRIP_POWER_TIMER = 180;
 
-	void RegisterSetPartner(const std::shared_ptr<CharacterInterFace>Partner) { partner = Partner; }
+	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team)
+	{
+		partner = Partner;
+		team = Team;
+	}
 	void Init(const Vec2<float>& GeneratePos);	//ラウンド開始時に呼び出される
 	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
 	void Draw();
 	//当たり判定
 	void CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
+
+	//スタン
+	void Break();
+	//ダメージ
+	void Damage();
 
 	const Square& GetAreaHitBox() { return areaHitBox; }
 	const SphereCollision& GetBulletHitSphere() { return bulletHitSphere; }
@@ -114,10 +139,13 @@ public:
 	const int& GetStackWinTimer() { return stackWindowTimer; }
 	const bool& GetNowSwing() { return nowSwing; }
 	const bool& GetNowStuckWin() { return 0 < stackWindowTimer; }
-	const bool& GetCanMove() { return canMove; }
+	const bool& GetCanMove() { return canMove && !stanTimer; }
 	const bool& GetStackFlag() { return stackMapChip; }
+	const bool& GetNowBreak() { return stanTimer; }
+	BulletMgrBase& GetBulletMgr() { return bulletMgr; }
 
 	void SetCanMove(const bool& Flg) { canMove = Flg; }
+	void SetHitCheck(const bool& Flg) { hitCheck = Flg; }
 
 	inline void FinishSwing() { nowSwing = false; }
 };

@@ -14,7 +14,6 @@
 #include"BossPatternNormalMove.h"
 #include"BossPatternAttack.h"
 #include"BossPatternSwing.h"
-#include"BossBulletManager.h"
 #include"CrashMgr.h"
 #include"CharacterInterFace.h"
 
@@ -25,11 +24,8 @@
 
 
 static const Vec2<float> SCALE = { 80.0f,80.0f };
-Boss::Boss(const WHICH_TEAM& Team) :CharacterInterFace(Team,SCALE)
+Boss::Boss() :CharacterInterFace(SCALE)
 {
-	//ボスは常に右チーム
-	if (Team == LEFT_TEAM)assert(0);
-
 	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
 	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
 
@@ -40,8 +36,6 @@ Boss::Boss(const WHICH_TEAM& Team) :CharacterInterFace(Team,SCALE)
 
 	//パターンに渡すデータの初期化
 	patternData.moveVel = &moveVel;
-
-
 }
 
 void Boss::OnInit()
@@ -73,6 +67,26 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	//	return;
 	//}
 
+	for (int i = 0; i < patternData.nearLimmitLine.size(); ++i)
+	{
+		patternData.nearLimmitLine[i].startPos = pos;
+
+		float angle = i * (360.0f / patternData.nearLimmitLine.size());
+		float dir = Angle::ConvertToRadian(angle);
+		float distance = 150.0f;
+		patternData.nearLimmitLine[i].endPos = pos + Vec2<float>(cosf(dir), sinf(dir)) * distance;
+	}
+
+	for (int i = 0; i < patternData.farLimmitLine.size(); ++i)
+	{
+		patternData.farLimmitLine[i].startPos = pos;
+
+		float angle = i * (360.0f / patternData.farLimmitLine.size());
+		float dir = Angle::ConvertToRadian(angle);
+		float distance = 350.0f;
+		patternData.farLimmitLine[i].endPos = pos + Vec2<float>(cosf(dir), sinf(dir)) * distance;
+	}
+
 	if (bossPatternNow != BOSS_PATTERN_NORMALMOVE)
 	{
 		moveVel = { 10.0f,0.0f };
@@ -98,7 +112,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	else if (isSwingNow) {
 
 	}
-	else if(GetCanMove()) {
+	else if (GetCanMove()) {
 
 		//ボスのAI-----------------------
 		++patternTimer;
@@ -122,6 +136,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 			patternTimer = 0;
 		}
 		//ボスのAI-----------------------
+		//bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 
 		//ボスの挙動
 		if (bossPatternNow != oldBossPattern)
@@ -136,7 +151,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 		{
 			if (patternData.bulltData[i].initFlag)
 			{
-				BossBulletManager::Instance()->Generate(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
+				Shot(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
 			}
 		}
 	}
@@ -153,7 +168,8 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 		// 振り回しのトリガー判定
 		if (0.3f < fabs(dir.y))
 		{
-			SwingPartner();
+			SwingPartner({ 0,1 });
+			patternData.swingFlag = false;
 		}
 	}
 
@@ -185,9 +201,47 @@ void Boss::OnDraw()
 	auto drawPos = pos + stagingDevice.GetShake();
 	auto drawScale = size * stagingDevice.GetExtRate();
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
-	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
 
+	if (DebugParameter::Instance()->bossDebugData.drawBossFlag)
+	{
+		DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
+			TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
+	}
+
+	//レイとの判定確認
+	if (DebugParameter::Instance()->bossDebugData.drawNearRayFlag)
+	{
+		for (int i = 0; i < patternData.nearLimmitLine.size(); ++i)
+		{
+			Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.nearLimmitLine[i].startPos);
+			Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.nearLimmitLine[i].endPos);
+			if (patternData.nearLimmitLine[i].hitFlag)
+			{
+				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 0, 0, 255));
+			}
+			else
+			{
+				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 255, 255, 255));
+			}
+		}
+	}
+
+	if (DebugParameter::Instance()->bossDebugData.drawFarRayFlag)
+	{
+		for (int i = 0; i < patternData.farLimmitLine.size(); ++i)
+		{
+			Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.farLimmitLine[i].startPos);
+			Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.farLimmitLine[i].endPos);
+			if (patternData.farLimmitLine[i].hitFlag)
+			{
+				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(0, 255, 0, 255));
+			}
+			else
+			{
+				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(0, 0, 255, 255));
+			}
+		}
+	}
 }
 
 //void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
@@ -472,6 +526,12 @@ void Boss::OnDraw()
 //	}
 //
 //}
+
+void Boss::Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed)
+{
+	static const int BULLET_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
+	bulletMgr.Generate(BULLET_GRAPH, generatePos, forwardAngle, speed);
+}
 
 bool Boss::Appear()
 {

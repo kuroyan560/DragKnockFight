@@ -111,7 +111,7 @@ public:
 	/*-- メンバ関数 --*/
 
 	// コンストラクタ
-	Player(const WHICH_TEAM& Team, const int& ControllerIdx);
+	Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx);
 	~Player();
 
 private:
@@ -126,9 +126,6 @@ private:
 
 	// 描画処理
 	void OnDraw()override;
-
-	// マップチップとの当たり判定
-	void OnCheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)override;
 
 	//マップチップとヒットしたとき
 	void OnHitMapChip(const HIT_DIR& Dir)override;
@@ -145,6 +142,9 @@ private:
 
 	// 移動処理
 	void Move();
+
+	//弾の発射
+	void Shot(const Vec2<float>& GeneratePos, const float& ForwardAngle);
 
 	// 壁との押し戻しに関する更新処理
 	void PushBackWall();

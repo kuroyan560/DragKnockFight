@@ -40,7 +40,6 @@ private:
 	const float EASING_MOVE_CHAR = 20.0f;
 	const float EASING_MOVE_TITLE = 30.0f;
 
-
 public:
 	TitleScene();
 	void OnInitialize()override;
