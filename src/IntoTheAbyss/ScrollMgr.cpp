@@ -16,6 +16,8 @@ void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, con
 	Vec2<float>endPos = CaluEndScrollLine(windowHalfSize + adjLine);
 	honraiScrollAmount = (POS + adjLine) - startPos;
 	scrollAmount = honraiScrollAmount;
+
+	resetAmount = scrollAmount;
 	warpFlag = false;
 }
 
@@ -81,4 +83,10 @@ void ScrollMgr::Warp(const Vec2<float> POS)
 	honraiScrollAmount = { 0.0f,0.0f };
 	Vec2<float>startPos = CaluStartScrollLine(windowHalfSize - adjLine);
 	honraiScrollAmount = (POS + adjLine) - startPos;
+}
+
+void ScrollMgr::Reset()
+{
+	honraiScrollAmount = resetAmount;
+	scrollAmount = resetAmount;
 }
