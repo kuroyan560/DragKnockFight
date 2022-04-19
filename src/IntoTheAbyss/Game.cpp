@@ -680,44 +680,44 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	// プレイヤーとボス間に線を描画
 	if (roundChangeEffect.initGameFlag)
 	{
-		////左プレイヤー～中央のチェイン
-		//auto& left = CharacterManager::Instance()->Left();
-		//Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
-		//Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
-		//if (0.0f < left->addLineLength)
-		//{
-		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(left->pos), ScrollMgr::Instance()->Affect(leftChainBorderPos),
-		//		TexHandleMgr::GetTexBuffer(PLAYER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-		//}
-
-		////右プレイヤー～中央のチェイン
-		//auto& right = CharacterManager::Instance()->Right();
-		//Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
-		//Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
-		//if (0.0f < right->addLineLength)
-		//{
-		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(right->pos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
-		//		TexHandleMgr::GetTexBuffer(ENEMY_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-		//}
-
-		//float charaDistance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
-		////中央チェイン
-		//if (charaDistance < CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f) {
-
-		//	// 既定値より短かったら。
-		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos),
-		//		TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-
-		//}
-		//else {
-
-		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftChainBorderPos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
-		//		TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-
-		//}
-
-
+		//左プレイヤー～中央のチェイン
 		auto& left = CharacterManager::Instance()->Left();
+		Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
+		Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
+		if (0.0f < left->addLineLength)
+		{
+			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(left->pos), ScrollMgr::Instance()->Affect(leftChainBorderPos),
+				TexHandleMgr::GetTexBuffer(PLAYER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+		}
+
+		//右プレイヤー～中央のチェイン
+		auto& right = CharacterManager::Instance()->Right();
+		Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
+		Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
+		if (0.0f < right->addLineLength)
+		{
+			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(right->pos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
+				TexHandleMgr::GetTexBuffer(ENEMY_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+		}
+
+		float charaDistance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
+		//中央チェイン
+		if (charaDistance < CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f) {
+
+			// 既定値より短かったら。
+			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos),
+				TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+
+		}
+		else {
+
+			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftChainBorderPos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
+				TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+
+		}
+
+
+		/*auto& left = CharacterManager::Instance()->Left();
 		auto& right = CharacterManager::Instance()->Right();
 
 		Vec2<float> dir = (left->pos - right->pos).GetNormal();
@@ -751,7 +751,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		else
 		{
 			lineExtendScale = 1.0f;
-		}
+		}*/
 
 		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
 		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
@@ -820,7 +820,6 @@ void Game::Scramble()
 	prevLineCenterPos = lineCenterPos;
 
 	//どちらも動けないとき何もしない
-	CharacterManager::Instance()->Right()->vel = {};
 	if (!(CharacterManager::Instance()->Left()->GetCanMove() || CharacterManager::Instance()->Right()->GetCanMove()))return;
 
 	Vec2<float> leftVelGauge;
@@ -829,8 +828,8 @@ void Game::Scramble()
 	// 移動量を取得。 優勢ゲージはここで更新。
 	double leftVel = CharacterManager::Instance()->Left()->vel.Length() * SlowMgr::Instance()->slowAmount;
 	leftVelGauge = (CharacterManager::Instance()->Left()->vel * SuperiorityGauge::Instance()->GetLeftGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
-	double rightVel = CharacterManager::Instance()->Right()->vel.Length() * SlowMgr::Instance()->slowAmount * 0.0f;
-	rightVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetRightGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount * 0.0f;
+	double rightVel = CharacterManager::Instance()->Right()->vel.Length() * SlowMgr::Instance()->slowAmount;
+	rightVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetRightGaugeData().gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 	double subVel = fabs(fabs(leftVel) - fabs(rightVel));
 
 	// [振り回し状態のとき] [スタン演出中] は移動させない。 踏ん張り中の場合は、どちらにせよ移動量が限りなく0に近いので移動させても問題がない。
@@ -1031,23 +1030,35 @@ void Game::Scramble()
 			// 右側が引っかかっていたら。
 			if (CharacterManager::Instance()->Right()->GetStackFlag()) {
 				// 右側が引っかかっているときは代わりに左側を動かす。
-				CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * 5.0f;
+				CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * 5.0f;
 			}
 			else {
 				CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * 5.0f;
 			}
 		}
 
-		// ウィンドウに挟まったら
-		if (0 < CharacterManager::Instance()->Right()->GetStackWinTimer()) {
+	}
+	// ウィンドウに挟まったら
+	if (0 < CharacterManager::Instance()->Right()->GetStackWinTimer()) {
 
+		if (CharacterManager::Instance()->Right()->addLineLength < 20.0f) {
+
+			CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * CharacterManager::Instance()->Right()->addLineLength;
+			CharacterManager::Instance()->Right()->addLineLength = 0;
+
+		}
+		else {
+
+			CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * 20.0f;
 			CharacterManager::Instance()->Right()->addLineLength -= 20.0f;
 
 		}
 
-		if (CharacterManager::Instance()->Right()->addLineLength < 0) CharacterManager::Instance()->Right()->addLineLength = 0;
-
 	}
+
+	if (CharacterManager::Instance()->Right()->addLineLength < 0) CharacterManager::Instance()->Right()->addLineLength = 0;
+
+
 	movedVel = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos);
 	// 左側の紐の処理
 	if (!isCatchMapChipPlayer && 0 < CharacterManager::Instance()->Left()->addLineLength && movedVel.Length() <= 0.0f) {
@@ -1061,24 +1072,34 @@ void Game::Scramble()
 
 			// 左側が引っかかっていたら。
 			if (CharacterManager::Instance()->Left()->GetStackFlag()) {
-				// 右側が引っかかっているときは代わりに左側を動かす。
-				CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * 5.0f;
+				// 左側が引っかかっているときは代わりに右側を動かす。
+				CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * 5.0f;
 			}
 			else {
-				CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * 5.0f;
+				CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * 5.0f;
 			}
 		}
 
-		// ウィンドウに挟まったら
-		if (CharacterManager::Instance()->Left()->GetNowStuckWin()) {
+	}
+	// ウィンドウに挟まったら
+	if (0 < CharacterManager::Instance()->Left()->GetStackWinTimer()) {
 
+		if (CharacterManager::Instance()->Left()->addLineLength < 20.0f) {
+
+			CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * CharacterManager::Instance()->Left()->addLineLength;
+			CharacterManager::Instance()->Left()->addLineLength = 0;
+
+		}
+		else {
+
+			CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * 20.0f;
 			CharacterManager::Instance()->Left()->addLineLength -= 20.0f;
 
 		}
 
-		if (CharacterManager::Instance()->Left()->addLineLength < 0) CharacterManager::Instance()->Left()->addLineLength = 0;
-
 	}
+
+	if (CharacterManager::Instance()->Right()->addLineLength < 0) CharacterManager::Instance()->Right()->addLineLength = 0;
 
 	isCatchMapChipBoss = false;
 	isCatchMapChipPlayer = false;
@@ -1092,6 +1113,9 @@ void Game::CalCenterPos()
 
 	// 本当はScrambleの一番うしろに入れていた処理なんですが、押し戻しをした後に呼ぶ必要が出てきたので関数で分けました。
 
+	auto& left = CharacterManager::Instance()->Left();
+	auto& right = CharacterManager::Instance()->Right();
+
 	// 移動量に応じて本来あるべき長さにする。
 	Vec2<float> prevSubPos = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos;
 	float horaiAddLineLength = (prevSubPos.Length() / CharacterManager::Instance()->Left()->MOVE_SPEED_PLAYER);
@@ -1104,6 +1128,44 @@ void Game::CalCenterPos()
 	horaiAddLineLength *= CharacterManager::Instance()->Right()->ADD_LINE_LENGTH_VEL;
 	if (CharacterManager::Instance()->Right()->addLineLength < horaiAddLineLength && 1.0f < CharacterManager::Instance()->Right()->vel.Length() && 1.0f < prevSubPos.Length()) {
 		CharacterManager::Instance()->Right()->addLineLength = horaiAddLineLength;
+	}
+
+	// 現在の距離が加算されている紐の長さより短かったら、addLineValueを短くする。
+	float nowLength = (left->pos - right->pos).Length();
+	if (nowLength < CharacterInterFace::LINE_LENGTH * 2.0f + left->addLineLength + right->addLineLength) {
+
+		// オーバーしている量を求める。
+		float overLength = (CharacterInterFace::LINE_LENGTH * 2.0f + left->addLineLength + right->addLineLength) - nowLength;
+		// オーバーしている量の半分を求める。
+		float halfOverLength = overLength / 2.0f;
+
+		// まずは左側から短くする。
+
+		left->addLineLength -= halfOverLength;
+
+		// 0以下になったら、その量を保存しておく。
+		float leftOverLength = 0;
+		if (left->addLineLength < 0) {
+
+			leftOverLength = fabs(left->addLineLength);
+
+			// 紐の長さが0未満にならないようにする。
+			left->addLineLength = 0;
+
+		}
+
+		// 次に右側を短くする。
+
+		right->addLineLength -= halfOverLength + leftOverLength;
+
+		// 紐の長さが0未満にならないようにする。
+		if (right->addLineLength < 0) {
+
+			right->addLineLength = 0;
+
+		}
+
+
 	}
 
 	// 紐の中心点を計算
