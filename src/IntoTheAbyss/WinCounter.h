@@ -1,6 +1,7 @@
 #pragma once
 #include"Singleton.h"
 #include"Vec.h"
+#include"CharacterInterFace.h"
 class WinCounter : public Singleton<WinCounter>
 {
 	friend class Singleton<WinCounter>;
@@ -54,6 +55,12 @@ public:
 	const int& GetRightWin() { return countRightWin; }
 	const bool& GetNowAnimation() { return animation; }
 	const bool& GetGameFinish() { return gameFinish; }
+
+	WHICH_TEAM Winner()
+	{
+		if (countLeftWin < countRightWin)return RIGHT_TEAM;
+		return LEFT_TEAM;
+	}
 
 	void RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsLeft);
 };

@@ -42,6 +42,8 @@ private:
 	//左か右か
 	WHICH_TEAM team;
 
+	PLAYABLE_CHARACTER_NAME characterName;
+
 	//スタン用タイマー
 	int stanTimer;
 	//ダメージ用タイマー
@@ -120,10 +122,11 @@ public:
 	float gripPowerTimer;			// 握力タイマー
 	const int MAX_GRIP_POWER_TIMER = 180;
 
-	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team)
+	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team, const PLAYABLE_CHARACTER_NAME& Name)
 	{
 		partner = Partner;
 		team = Team;
+		characterName = Name;
 	}
 	void Init(const Vec2<float>& GeneratePos);	//ラウンド開始時に呼び出される
 	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
@@ -152,5 +155,7 @@ public:
 	void SetHitCheck(const bool& Flg) { hitCheck = Flg; }
 
 	inline void FinishSwing() { nowSwing = false; }
+
+	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName;	}
 };
 

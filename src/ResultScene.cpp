@@ -19,8 +19,9 @@ ResultScene::ResultScene()
 
 	changeScene = std::make_shared<SceneCange>();
 
-	lunaWinGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/luna.png");
-	lacyWinGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
+	winnerGraph[PLAYABLE_LUNA] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/luna.png");
+	winnerGraph[PLAYABLE_LACY] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
+	winnerGraph[PLAYABLE_BOSS_0] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
 }
 
 void ResultScene::OnInitialize()
@@ -41,8 +42,7 @@ void ResultScene::OnInitialize()
 
 	breakEnemyAmount = ResultTransfer::Instance()->rightBreakCount;
 	breakPlayerAmount = ResultTransfer::Instance()->leftBreakCount;
-
-	winnerGraph = lunaWinGraph;
+	winnerName = ResultTransfer::Instance()->winner;
 }
 
 void ResultScene::OnUpdate()
@@ -151,7 +151,7 @@ void ResultScene::OnDraw()
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 	//DrawFunc::DrawBox2D(Vec2<float>(0, 0), windowSize, Color(0, 0, 0, 255), DXGI_FORMAT_R8G8B8A8_UNORM);
 	DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(winnerFrameHandle), AlphaBlendMode_Trans);
-	DrawFunc::DrawGraph({ 25.0f,30.0f }, TexHandleMgr::GetTexBuffer(winnerGraph), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph({ 25.0f,30.0f }, TexHandleMgr::GetTexBuffer(winnerGraph[winnerName]), AlphaBlendMode_Trans);
 
 	// [RESULT] Ç∆ [BREAK]ÇÃï`âÊèàóù
 	{
