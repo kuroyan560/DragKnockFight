@@ -320,14 +320,11 @@ Game::Game()
 	SuperiorityGauge::Instance()->Init();
 
 	readyToStartRoundFlag = true;
-
 	//”wŒi‚É¯
 	BackGround::Instance()->Init(GetStageSize());
 
 	GameTimer::Instance()->Init({}, 120, {}, {});
 	ScoreManager::Instance()->Init();
-
-
 }
 
 void Game::Init()
@@ -339,6 +336,9 @@ void Game::Init()
 	CharacterManager::Instance()->CharactersGenerate();
 
 	InitGame(0, 0);
+	ScrollMgr::Instance()->Reset();
+	roundChangeEffect.Init();
+	readyToStartRoundFlag = true;
 }
 
 void Game::Update()
