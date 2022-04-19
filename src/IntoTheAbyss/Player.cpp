@@ -153,6 +153,19 @@ void Player::OnUpdateNoRelatedSwing()
 	// 腕を更新
 	lHand->Update(pos + anim.GetHandCenterOffset());
 	rHand->Update(pos + anim.GetHandCenterOffset());
+
+	// 握力タイマーを規定値に近づける。
+	if (!isHold && gripPowerTimer < MAX_GRIP_POWER_TIMER) {
+		gripPowerTimer += SlowMgr::Instance()->slowAmount;
+
+		// 最大値になったら握力を使い切ってから回復している状態フラグを折る。
+		if (MAX_GRIP_POWER_TIMER <= gripPowerTimer) {
+
+			gripPowerTimer = MAX_GRIP_POWER_TIMER;
+			isGripPowerEmpty = false;
+
+		}
+	}
 }
 
 void Player::OnDraw()
@@ -350,20 +363,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		// 紐つかみ状態(踏ん張り状態)を解除する。
 		isHold = false;
-
-		// 握力タイマーを規定値に近づける。
-		if (gripPowerTimer < MAX_GRIP_POWER_TIMER) {
-			++gripPowerTimer;
-
-			// 最大値になったら握力を使い切ってから回復している状態フラグを折る。
-			if (MAX_GRIP_POWER_TIMER <= gripPowerTimer) {
-
-				isGripPowerEmpty = false;
-
-			}
-
-		}
-
 	}
 
 #pragma region itiou nokosite okimasu

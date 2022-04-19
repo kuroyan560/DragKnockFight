@@ -307,7 +307,10 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	//相手が振り回していないとき
 	else if (!partner.lock()->nowSwing)
 	{
-		OnUpdate(MapData);
+		if (SuperiorityGauge::Instance()->GetGaugeData(team).gaugeValue)
+		{
+			OnUpdate(MapData);
+		}
 		//ウィンドウの引っかかっている判定のタイマー更新
 		if (0 < stackWindowTimer) {
 
@@ -373,6 +376,7 @@ void CharacterInterFace::Break()
 {
 	static const int STAN_TOTAL_TIME = 120;
 	stanTimer = STAN_TOTAL_TIME + StunEffect::GetTotalTime();
+	OnBreak();
 }
 
 void CharacterInterFace::Damage()

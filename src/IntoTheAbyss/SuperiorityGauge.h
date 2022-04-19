@@ -43,13 +43,7 @@ public:
 	/// プレイヤーに関するゲージのデータを入手します
 	/// </summary>
 	/// <returns>プレイヤーのゲージデータ</returns>
-	const GaugeData& GetLeftGaugeData();
-
-	/// <summary>
-	/// エネミーに関するゲージのデータを入手します
-	/// </summary>
-	/// <returns>エネミーのゲージデータ</returns>
-	const GaugeData& GetRightGaugeData();
+	const GaugeData& GetGaugeData(const WHICH_TEAM& Team);
 
 	const bool &IsStacking();
 
