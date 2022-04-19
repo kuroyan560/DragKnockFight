@@ -115,6 +115,7 @@ public:
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
 	bool isHold;				// つかんでいるかフラグ
+	bool isGripPowerEmpty;		// 握力タイマーを使い切ってから回復するまでを判断するためのフラグ
 	int gripPowerTimer;			// 握力タイマー
 	const int MAX_GRIP_POWER_TIMER = 180;
 

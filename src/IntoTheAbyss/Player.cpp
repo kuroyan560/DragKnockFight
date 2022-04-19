@@ -314,8 +314,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	}
 
-	// [LTを押されたら] [握力が残っていたら]
-	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && 0 < gripPowerTimer) {
+	// [LTを押されたら] [握力が残っていたら] [握力を使い切ってから回復している状態じゃなかったら]
+	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && 0 < gripPowerTimer && !isGripPowerEmpty) {
 
 		// 紐つかみ状態(踏ん張り状態)にする。
 		isHold = true;
@@ -326,6 +326,13 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// 移動量を0にする。
 		vel = {};
 
+		// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
+		if (gripPowerTimer <= 0) {
+
+			isGripPowerEmpty = true;
+
+		}
+
 	}
 	else {
 
@@ -335,6 +342,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// 握力タイマーを規定値に近づける。
 		if (gripPowerTimer < MAX_GRIP_POWER_TIMER) {
 			++gripPowerTimer;
+
+			// 最大値になったら握力を使い切ってから回復している状態フラグを折る。
+			if (MAX_GRIP_POWER_TIMER <= gripPowerTimer) {
+
+				isGripPowerEmpty = false;
+
+			}
+
 		}
 
 	}

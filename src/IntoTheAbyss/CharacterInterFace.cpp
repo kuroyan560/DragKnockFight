@@ -260,6 +260,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	gripPowerTimer = MAX_GRIP_POWER_TIMER;
 
+	isGripPowerEmpty = false;
+
 }
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
