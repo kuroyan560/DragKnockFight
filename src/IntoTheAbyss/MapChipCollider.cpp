@@ -159,7 +159,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			}
 
 			// 下辺
-			if (IsIntersected(leftBottom, rightBottom, prevFramePosBuff , prevFramePosBuff + playerVel)) {
+			if (IsIntersected(leftBottom, rightBottom, prevFramePosBuff, prevFramePosBuff + playerVel)) {
 
 				// 当たっていたら交点を計算して保存
 				pair<Vec2<float>, INTERSECTED_LINE> buff;
@@ -234,7 +234,10 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 
 			// 押し戻してから当たった辺を返す。
 
-			// 最小の交点の種類によって処理を分ける・
+
+			float offset = 0.0f;
+
+			// 最小の交点の種類によって処理を分ける。
 			if (miniIntersectedPoint.second == INTERSECTED_TOP) {
 
 				// 押し戻す。
@@ -243,7 +246,6 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			}
 			else if (miniIntersectedPoint.second == INTERSECTED_RIGHT) {
 
-				float offset = 1.0f;
 
 				// ひとつ上のマップチップが空白だったら押し戻さないで上に飛ばすという処理を挟む。
 				int mapX = (miniIntersectedPoint.first.x - MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
@@ -289,13 +291,11 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			else if (miniIntersectedPoint.second == INTERSECTED_BOTTOM) {
 
 				// 押し戻す。
-				float offset = 1.0f;
 				pos.y = miniIntersectedPoint.first.y + size.y + offset;
 
 			}
 			else if (miniIntersectedPoint.second == INTERSECTED_LEFT) {
 
-				float offset = 1.0f;
 
 				// ひとつ上のマップチップが空白だったら押し戻さないで上に飛ばすという処理を挟む。
 				int mapX = (miniIntersectedPoint.first.x + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE;
@@ -559,7 +559,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			}
 
 			// ピッタリ押し戻したら不都合なことが起こるので、多少オフセット値を設ける。
-			float pushBackOffset = 1.0f;
+			float pushBackOffset = 0.0f;
 
 			// 最小の交点の種類によって処理を分ける。
 			if (miniIntersectedPoint.second == INTERSECTED_TOP) {
