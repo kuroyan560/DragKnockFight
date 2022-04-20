@@ -6,6 +6,8 @@
 #include"DebugParameter.h"
 #include"StunEffect.h"
 #include"FaceIcon.h"
+#include "ResultTransfer.h"
+
 void CharacterInterFace::SwingUpdate()
 {
 
@@ -602,6 +604,15 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
 				SuperiorityGauge::Instance()->AddGauge(team, -10);
 				partner.lock()->FinishSwing();
+
+				// チームに応じてクラッシュ数を加算する変数を変える。
+				if (team == WHICH_TEAM::LEFT_TEAM) {
+					++ResultTransfer::Instance()->leftCrashCount;
+				}
+				else {
+					++ResultTransfer::Instance()->rightCrashCount;
+				}
+
 			}
 		}
 
@@ -623,6 +634,14 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
 				SuperiorityGauge::Instance()->AddGauge(team, -20);
 				Crash({ winRight ? 1.0f : -1.0f , 0.0f });
+
+				// チームに応じてクラッシュ数を加算する変数を変える。
+				if (team == WHICH_TEAM::LEFT_TEAM) {
+					++ResultTransfer::Instance()->leftCrashCount;
+				}
+				else {
+					++ResultTransfer::Instance()->rightCrashCount;
+				}
 			}
 			// ウィンドウ上下
 			bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
@@ -635,6 +654,14 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
 				SuperiorityGauge::Instance()->AddGauge(team, -20);
 				Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
+
+				// チームに応じてクラッシュ数を加算する変数を変える。
+				if (team == WHICH_TEAM::LEFT_TEAM) {
+					++ResultTransfer::Instance()->leftCrashCount;
+				}
+				else {
+					++ResultTransfer::Instance()->rightCrashCount;
+				}
 			}
 		}
 

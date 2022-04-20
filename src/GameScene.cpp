@@ -53,7 +53,7 @@ void GameScene::OnUpdate()
 	game.Update();
 
 	// ƒŠƒUƒ‹ƒg‰æ–Ê‚Ö”ò‚Î‚·
-	if (game.TurnResultScene() || DebugKeyManager::Instance()->DebugKeyTrigger(DIK_R, "Change ResultScene", "DIK_R")) {
+	if (game.TurnResultScene()) {
 		if (isSS)
 		{
 			KuroEngine::Instance().ChangeScene(3, sceneChange);

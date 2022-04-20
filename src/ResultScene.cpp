@@ -48,8 +48,8 @@ void ResultScene::OnInitialize()
 
 	breakEnemyAmount = ResultTransfer::Instance()->rightBreakCount;
 	breakPlayerAmount = ResultTransfer::Instance()->leftBreakCount;
-	crashEnemyAmount = 0;
-	crashPlayerAmount = 0;
+	crashEnemyAmount = ResultTransfer::Instance()->rightCrashCount;
+	crashPlayerAmount = ResultTransfer::Instance()->leftCrashCount;
 	winnerName = ResultTransfer::Instance()->winner;
 }
 
@@ -72,7 +72,7 @@ void ResultScene::OnUpdate()
 			++resultUITimer;
 			// タイマーが規定値に達したら。
 			if (RESULT_UI_TIMER <= resultUITimer) {
-				delayTimer = DELAY_TIMER / 2.0f;
+				delayTimer = DELAY_TIMER;
 				isSkip = true;
 			}
 		}
@@ -184,7 +184,7 @@ void ResultScene::OnDraw()
 		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX, RESULT_POS.y), TexHandleMgr::GetTexBuffer(resultHandle), AlphaBlendMode_Trans);
 		DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, breakEnemyHandle, breakEnemyAmount);
 		DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, crashEnemyHandle, crashEnemyAmount);
-		DrawBREAK(BREAK_PLAYER_POS, breakPlayerEasingAmount, breakPlayerHandle, breakEnemyAmount);
+		DrawBREAK(BREAK_PLAYER_POS, breakPlayerEasingAmount, breakPlayerHandle, breakPlayerAmount);
 		DrawBREAK(CRASH_PLAYER_POS, crashPlayerEasingAmount, crashPlayerHandle, crashPlayerAmount);
 	}
 
