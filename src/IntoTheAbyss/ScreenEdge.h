@@ -1,5 +1,6 @@
 #pragma once
 #include"../Common/Vec.h"
+#include<array>
 
 class ScreenEdge
 {
@@ -18,6 +19,11 @@ private:
 	float maxDistance;
 	Vec2<float>basePos;
 	Vec2<float>pos;
+	Vec2<float>lerpPos;
+
+	std::array<Vec2<float>, 2> scrollChancePos;
+	Vec2<float> vel;
+	Vec2<float> speed;
 
 	Vec2<float>shakeValue;
 	float shakeRate;
@@ -27,9 +33,19 @@ private:
 	Vec2<float> distance;
 
 	enum VEC_TYPE{ X_VEC, Y_VEC };
+	enum WIN_TYPE{ WIN_LEFT, WIN_RIGHT };
 	VEC_TYPE vecType;
+	WIN_TYPE winType;
 
 	float rate;
+
+
+	bool winFlag;
+	bool getAwayFlag;
+	bool initWinFlag;
+	bool initGetAwayFlag;
+	int initTimer;
+	Vec2<float> winPos;
 
 	//‰æ‘œƒnƒ“ƒhƒ‹-----------------------
 	int playerChancehandle;

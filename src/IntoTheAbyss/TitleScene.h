@@ -52,6 +52,7 @@ public:
 	std::shared_ptr<SceneCange> changeScene;
 
 	float rate;
+	bool initFlag;
 	ScreenEdgeEffect effect;
 };
 

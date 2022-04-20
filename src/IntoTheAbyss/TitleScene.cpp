@@ -64,7 +64,14 @@ void TitleScene::OnUpdate()
 
 	}
 
-	effect.CheckPos(rate);
+	if (initFlag)
+	{
+		effect.Init();
+	}
+	else
+	{
+		effect.CheckPos(rate);
+	}
 	effect.Update();
 }
 
@@ -108,7 +115,10 @@ void TitleScene::OnImguiDebug()
 
 
 	ImGui::Begin("screenEdge");
-	ImGui::InputFloat("Rate", &rate);
+	ImGui::Checkbox("leftWinFlag", &effect.leftWinFlag);
+	ImGui::Checkbox("rightWinFlag", &effect.rightWinFlag);
+	ImGui::Checkbox("initFlag", &initFlag);
+	ImGui::SliderFloat("rate", &rate, 0.0f, 1.0f);
 	ImGui::End();
 }
 

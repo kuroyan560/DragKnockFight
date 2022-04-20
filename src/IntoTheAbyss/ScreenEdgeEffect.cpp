@@ -30,6 +30,21 @@ void ScreenEdgeEffect::Update()
 		screenEdge[i].CaluPos(nowDistance);
 		screenEdge[i].Update();
 	}
+
+	if (leftWinFlag)
+	{
+		screenEdge[UP].StartWinEffect();
+		screenEdge[DOWN].StartFinishEffect();
+		screenEdge[LEFT].StartWinEffect();
+		screenEdge[RIGHT].StartFinishEffect();
+	}
+	if (rightWinFlag)
+	{
+		screenEdge[UP].StartWinEffect();
+		screenEdge[DOWN].StartFinishEffect();
+		screenEdge[LEFT].StartFinishEffect();
+		screenEdge[RIGHT].StartWinEffect();
+	}
 }
 
 void ScreenEdgeEffect::Draw()

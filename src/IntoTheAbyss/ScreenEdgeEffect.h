@@ -13,9 +13,12 @@ public:
 
 	void CheckPos(const float &LINE_CENTER_POS);
 
+	bool leftWinFlag;
+	bool rightWinFlag;
 private:
 	Vec2<float>pos;
 	float nowDistance;
+
 
 	enum 
 	{
