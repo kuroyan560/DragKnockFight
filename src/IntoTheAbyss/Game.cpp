@@ -339,7 +339,7 @@ void Game::Init()
 	ScrollMgr::Instance()->Reset();
 	roundChangeEffect.Init();
 	readyToStartRoundFlag = true;
-	screenEdgeEffect.Init();
+	//screenEdgeEffect.Init();
 }
 
 void Game::Update()
@@ -528,7 +528,7 @@ void Game::Update()
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
-	screenEdgeEffect.CheckPos(miniMap.nowValue);
+	//screenEdgeEffect.CheckPos(miniMap.nowValue);
 
 
 
