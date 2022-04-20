@@ -20,6 +20,7 @@ class RenderTarget;
 #include"MiniMap.h"
 
 #include"RoundChangeEffect.h"
+#include"ScreenEdgeEffect.h"
 
 class CharacterInterFace;
 
@@ -108,6 +109,8 @@ class Game
 
 	Color areaHitColor;
 	Color playerHitColor;
+
+	ScreenEdgeEffect screenEdgeEffect;
 public:
 
 	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;

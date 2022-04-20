@@ -339,6 +339,7 @@ void Game::Init()
 	ScrollMgr::Instance()->Reset();
 	roundChangeEffect.Init();
 	readyToStartRoundFlag = true;
+	screenEdgeEffect.Init();
 }
 
 void Game::Update()
@@ -421,6 +422,8 @@ void Game::Update()
 		roundFinishFlag = true;
 		playerOrEnemeyWinFlag = true;
 		gameStartFlag = false;
+
+		screenEdgeEffect.LeftPlayerWin();
 	}
 
 	//敵陣地とプレイヤーの判定
@@ -434,6 +437,8 @@ void Game::Update()
 
 		areaHitColor = Color(255, 0, 0, 255);
 		playerHitColor = Color(255, 0, 0, 255);
+
+		screenEdgeEffect.RightPlayerWin();
 	}
 
 	//ラウンド終了演出開始
@@ -505,6 +510,7 @@ void Game::Update()
 				readyToStartRoundFlag = false;
 				gameStartFlag = true;
 				roundTimer = 0;
+				screenEdgeEffect.Init();
 				CharacterManager::Instance()->Left()->SetCanMove(true);
 				CharacterManager::Instance()->Right()->SetCanMove(true);
 				CharacterManager::Instance()->Left()->SetHitCheck(true);
@@ -522,6 +528,10 @@ void Game::Update()
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
+	screenEdgeEffect.CheckPos(miniMap.nowValue);
+
+
+
 	// プレイヤーの更新処理
 	CharacterManager::Instance()->Left()->Update(mapData, lineCenterPos);
 
@@ -536,6 +546,7 @@ void Game::Update()
 	CharacterManager::Instance()->Right()->CheckHit(mapData, lineCenterPos);
 
 	miniMap.Update();
+	screenEdgeEffect.Update();
 
 	roundChangeEffect.Update();
 
@@ -814,6 +825,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		Vec2<float>rightDownPos = *enemyHomeBase->hitBox.center + enemyHomeBase->hitBox.size / 2.0f;
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
+
+	screenEdgeEffect.Draw();
 }
 
 void Game::Scramble()

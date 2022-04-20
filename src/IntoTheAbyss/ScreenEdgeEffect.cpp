@@ -21,6 +21,9 @@ void ScreenEdgeEffect::Init()
 	screenEdge[DOWN].Init(distance, Vec2<float>(winHalfSize.x, winSize.y + adjDistance), 0.0f);
 	screenEdge[LEFT].Init(distance, Vec2<float>(0.0f - adjDistance, winHalfSize.y), 90.0f);
 	screenEdge[RIGHT].Init(distance, Vec2<float>(winSize.x + adjDistance, winHalfSize.y), 90.0f);
+
+	leftWinFlag = false;
+	rightWinFlag = false;
 }
 
 void ScreenEdgeEffect::Update()
@@ -31,14 +34,14 @@ void ScreenEdgeEffect::Update()
 		screenEdge[i].Update();
 	}
 
-	if (leftWinFlag)
+	if (rightWinFlag)
 	{
 		screenEdge[UP].StartWinEffect();
 		screenEdge[DOWN].StartFinishEffect();
 		screenEdge[LEFT].StartWinEffect();
 		screenEdge[RIGHT].StartFinishEffect();
 	}
-	if (rightWinFlag)
+	if (leftWinFlag)
 	{
 		screenEdge[UP].StartWinEffect();
 		screenEdge[DOWN].StartFinishEffect();
@@ -58,4 +61,14 @@ void ScreenEdgeEffect::Draw()
 void ScreenEdgeEffect::CheckPos(const float &LINE_CENTER_POS)
 {
 	nowDistance = LINE_CENTER_POS;
+}
+
+void ScreenEdgeEffect::LeftPlayerWin()
+{
+	leftWinFlag = true;
+}
+
+void ScreenEdgeEffect::RightPlayerWin()
+{
+	rightWinFlag = true;
 }

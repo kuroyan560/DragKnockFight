@@ -15,6 +15,9 @@ public:
 
 	bool leftWinFlag;
 	bool rightWinFlag;
+
+	void LeftPlayerWin();
+	void RightPlayerWin();
 private:
 	Vec2<float>pos;
 	float nowDistance;
