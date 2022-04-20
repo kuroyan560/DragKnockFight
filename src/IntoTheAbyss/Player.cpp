@@ -118,6 +118,17 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	//移動に関する処理
 	Move();
 
+	if (isGripPowerEmpty)
+	{
+		outOfStaminaEffect.Start(pos);
+	}
+	else
+	{
+		outOfStaminaEffect.Init();
+	}
+	outOfStaminaEffect.Update();
+
+
 	// 連射タイマーを更新
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;
 	if (rapidFireTimerRight > 0) --rapidFireTimerRight;
@@ -187,6 +198,8 @@ void Player::OnDraw()
 		//if (0 < vel.y)playerDir = FRONT;
 		if (0 < vel.y)anim.ChangeAnim(DEFAULT_FRONT);
 	}
+
+	outOfStaminaEffect.Draw();
 
 	/*===== 描画処理 =====*/
 
