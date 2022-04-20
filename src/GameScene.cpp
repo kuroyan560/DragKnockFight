@@ -53,7 +53,7 @@ void GameScene::OnUpdate()
 	game.Update();
 
 	// ƒŠƒUƒ‹ƒg‰æ–Ê‚Ö”ò‚Î‚·
-	if (game.TurnResultScene()) {
+	if (game.TurnResultScene() || DebugKeyManager::Instance()->DebugKeyTrigger(DIK_R, "Change ResultScene", "DIK_R")) {
 		if (isSS)
 		{
 			KuroEngine::Instance().ChangeScene(3, sceneChange);
@@ -61,7 +61,7 @@ void GameScene::OnUpdate()
 		isSS = true;
 	}
 
-	bool changeInput = UsersInput::Instance()->KeyOnTrigger(DIK_B) || UsersInput::Instance()->ControllerOnTrigger(0,START);
+	bool changeInput = UsersInput::Instance()->KeyOnTrigger(DIK_B) || UsersInput::Instance()->ControllerOnTrigger(0, START);
 	if (changeInput)
 	{
 		KuroEngine::Instance().ChangeScene(1, sceneChange);
