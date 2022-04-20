@@ -28,12 +28,28 @@ PlayerAnimation::PlayerAnimation(const PLAYABLE_CHARACTER_NAME& CharacterName)
 	animations[DEFAULT_BACK].size = { 117,96 };
 	animations[DEFAULT_BACK].handCenterOffset = { 0.0f,0.0f };
 
-	static const int HOLD_NUM = 3;
+	static const int PULL_FRONT_NUM = 3;
+	animations[PULL_FRONT].graph.resize(PULL_FRONT_NUM);
+	TexHandleMgr::LoadDivGraph(DIR + NAME_DIR[CharacterName] + "/pull_front.png", PULL_FRONT_NUM, { PULL_FRONT_NUM,1 }, animations[PULL_FRONT].graph.data());
+	animations[PULL_FRONT].interval = 6;
+	animations[PULL_FRONT].loop = true;
+	animations[PULL_FRONT].size = { 138,132 };
+	animations[PULL_FRONT].handCenterOffset = { 0.0f,0.0f };
+
+	static const int PULL_BACK_NUM = 3;
+	animations[PULL_BACK].graph.resize(PULL_FRONT_NUM);
+	TexHandleMgr::LoadDivGraph(DIR + NAME_DIR[CharacterName] + "/pull_back.png", PULL_BACK_NUM, { PULL_BACK_NUM,1 }, animations[PULL_BACK].graph.data());
+	animations[PULL_BACK].interval = 6;
+	animations[PULL_BACK].loop = true;
+	animations[PULL_BACK].size = { 138,132 };
+	animations[PULL_BACK].handCenterOffset = { 0.0f,0.0f };
+
+	static const int HOLD_NUM = 5;
 	animations[HOLD].graph.resize(HOLD_NUM);
 	TexHandleMgr::LoadDivGraph(DIR + NAME_DIR[CharacterName] + "/hold.png", HOLD_NUM, { HOLD_NUM,1 }, animations[HOLD].graph.data());
-	animations[HOLD].interval = 6;
-	animations[HOLD].loop = true;
-	animations[HOLD].size = { 230,220 };
+	animations[HOLD].interval = 3;
+	animations[HOLD].loop = false;
+	animations[HOLD].size = { 126,126 };
 	animations[HOLD].handCenterOffset = { 0.0f,0.0f };
 
 	static const int SWINGED_NUM = 1;
