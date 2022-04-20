@@ -13,8 +13,8 @@ ResultScene::ResultScene()
 	resultHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/result.png");
 	breakEnemyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/break_enemy.png");
 	breakPlayerHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/break_player.png");
-	crashEnemyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/crash.png");;
-	crashPlayerHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/crash.png");;
+	crashEnemyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/crash_red.png");;
+	crashPlayerHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/crash_green.png");;
 	scoreHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/score.png");
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, blueNumberHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_yellow.png", 12, { 12, 1 }, goldNumberHandle.data());
