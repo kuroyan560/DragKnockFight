@@ -120,11 +120,7 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 	if (isGripPowerEmpty)
 	{
-		outOfStaminaEffect.Start(pos);
-	}
-	else
-	{
-		outOfStaminaEffect.Init();
+		outOfStaminaEffect.Start(pos, MAX_GRIP_POWER_TIMER);
 	}
 	outOfStaminaEffect.Update();
 
@@ -226,7 +222,7 @@ void Player::OnDraw()
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	bool mirorX = 0 < vel.x || (isHold && (partner.lock()->pos - pos).x < 0);
-	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size * outOfStaminaEffect.GetSize(),
 		stagingDevice.GetSpinRadian() , bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
 }
 
