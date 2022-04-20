@@ -97,14 +97,14 @@ public:
 	const float BULLET_SHOT_ANGLE = 0.1f;
 
 	// ÉvÉåÉCÉÑÅ[ÇÃï˚å¸
-	enum PLAYER_DIR {
-
+	enum PLAYER_DIR_X {
 		PLAYER_LEFT,
-		PLAYER_RIGHT,
-		PLAYER_TOP,
-		PLAYER_BOTTOM,
-
-	};
+		PLAYER_RIGHT
+	}playerDirX;
+	enum PLAYER_DIR_Y {
+		PLAYER_FRONT,
+		PLAYER_BACK
+	}playerDirY;
 
 	float sizeVel;
 	bool initPaticleFlag;
@@ -142,7 +142,10 @@ private:
 	}
 	void OnSwingedFinish()override
 	{
-		if(!GetNowBreak() && !inputInvalidTimerByCrash)anim.ChangeAnim(DEFAULT_FRONT);
+		if (!GetNowBreak() && !inputInvalidTimerByCrash)
+		{
+			anim.ChangeAnim(DEFAULT_FRONT);
+		}
 	}
 	void OnCrash()override
 	{	

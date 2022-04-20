@@ -95,6 +95,11 @@ void Player::OnInit()
 	sizeVel = 120.0f;
 	initPaticleFlag = false;
 	moveTimer = 0;
+
+	playerDirX = GetWhichTeam() == LEFT_TEAM ? PLAYER_LEFT : PLAYER_RIGHT;
+	playerDirY = PLAYER_FRONT;
+
+	inputInvalidTimerByCrash = 0;
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -181,11 +186,20 @@ void Player::OnUpdateNoRelatedSwing()
 void Player::OnDraw()
 {
 	//if (vel.y < 0)playerDir = BACK;
+	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
+
 	if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty)
 	{
-		if (vel.y < 0)anim.ChangeAnim(DEFAULT_BACK);
-		//if (0 < vel.y)playerDir = FRONT;
-		if (0 < vel.y)anim.ChangeAnim(DEFAULT_FRONT);
+		if (moveInput.x)
+		{
+			if (playerDirY == PLAYER_BACK)anim.ChangeAnim(PULL_BACK);
+			else anim.ChangeAnim(PULL_FRONT);
+		}
+		else
+		{
+			if (playerDirY == PLAYER_BACK)anim.ChangeAnim(DEFAULT_BACK);
+			else anim.ChangeAnim(DEFAULT_FRONT);
+		}
 	}
 
 	/*===== 描画処理 =====*/
@@ -201,8 +215,8 @@ void Player::OnDraw()
 	//muffler.Draw(LigManager);
 
 
-	rHand->Draw(EXT_RATE, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
-	lHand->Draw(EXT_RATE, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
+	//rHand->Draw(EXT_RATE, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
+	//lHand->Draw(EXT_RATE, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 
 	//ストレッチ加算
 	//leftUp += stretch_LU;
@@ -212,7 +226,7 @@ void Player::OnDraw()
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	bool mirorX = 0 < vel.x || (isHold && (partner.lock()->pos - pos).x < 0);
+	bool mirorX = playerDirX == PLAYER_RIGHT || (isHold && (partner.lock()->pos - pos).x < 0);
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
 		stagingDevice.GetSpinRadian() , bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
 }
@@ -353,6 +367,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
 
+		if (vel.x < 0)playerDirX = PLAYER_LEFT;
+		else if (0 < vel.x)playerDirX = PLAYER_RIGHT;
+		if (vel.y < 0)playerDirY = PLAYER_BACK;
+		else if (0 < vel.y)playerDirY = PLAYER_FRONT;
 	}
 
 	inputVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);

@@ -88,7 +88,7 @@ void WinCounter::Draw()
 
 	if (!animation)return;
 	static const float KNOCK_OUT_SCALE = 0.8f;
-	DrawFunc::DrawRotaGraph2D(knockOutPos, { kncokOutScale * KNOCK_OUT_SCALE,kncokOutScale * KNOCK_OUT_SCALE }, knockOutRadian, TexHandleMgr::GetTexBuffer(knockOutGraph));
+	//DrawFunc::DrawRotaGraph2D(knockOutPos, { kncokOutScale * KNOCK_OUT_SCALE,kncokOutScale * KNOCK_OUT_SCALE }, knockOutRadian, TexHandleMgr::GetTexBuffer(knockOutGraph));
 }
 
 #include"AudioApp.h"
