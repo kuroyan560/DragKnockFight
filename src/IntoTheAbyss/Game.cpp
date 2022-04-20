@@ -417,7 +417,7 @@ void Game::Update()
 	if (playerHomeBase->Collision(CharacterManager::Instance()->Right()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//ƒvƒŒƒCƒ„[Ÿ—˜
-		WinCounter::Instance()->RoundFinish(lineCenterPos, true);
+		WinCounter::Instance()->RoundFinish(lineCenterPos, true, CharacterManager::Instance()->Left()->pos);
 		roundFinishFlag = true;
 		playerOrEnemeyWinFlag = true;
 		gameStartFlag = false;
@@ -427,7 +427,7 @@ void Game::Update()
 	if (enemyHomeBase->Collision(CharacterManager::Instance()->Left()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//“GŸ—˜
-		WinCounter::Instance()->RoundFinish(lineCenterPos, false);
+		WinCounter::Instance()->RoundFinish(lineCenterPos, false, CharacterManager::Instance()->Right()->pos);
 		roundFinishFlag = true;
 		playerOrEnemeyWinFlag = false;
 		gameStartFlag = false;
