@@ -11,19 +11,6 @@ void CharacterInterFace::SwingUpdate()
 
 	/*===== 振り回し中に呼ばれる処理 =====*/
 
-
-	/*
-
-	メモ
-	①トリガー判定の時に入力されていたベクトルをswingTargetVecとして保存する。
-	②その際に、外積による左右判定でどっち回転かを保存する。
-	③更新処理で現在のベクトルの角度を求めて、その角度にaddSwingAngleを加算する。
-	④加算したらベクトルを求めて、それを現在のベクトルとして使用する。
-	⑤最後に目標のベクトルと現在のベクトルで外積による左右判定を行って、最初に保存したフラグと逆側だったら振り回し終了。
-
-	*/
-
-
 	// 角度に加算する量を更新。
 	addSwingAngle += ADD_SWING_ANGLE;
 
@@ -75,58 +62,6 @@ void CharacterInterFace::SwingUpdate()
 		FinishSwing();
 	}
 
-
-	//static const float ADD_EASINGTIMER_MINIMUM = 0.025f;	// イージングタイマーに加算する量 最小値
-	//static const float ADD_EASINGTIMER_MAX = 0.05f;	// イージングタイマーに加算する量 最大値
-
-	//// イージング量を求める。
-	//float easingChange = ADD_EASINGTIMER_MAX - ADD_EASINGTIMER_MINIMUM;
-	//float addEasingTimer = ADD_EASINGTIMER_MINIMUM + (fabs(fabs(swingEndVec.y) - fabs(swingStartVec.y)) * easingChange);
-
-	//// [補正]X軸のベクトルが0だったら強制的に0.01fにする。
-	//if (fabs(swingStartVec.x) <= 0.001f) swingStartVec.x = 0.001f;
-
-	//Vec2<float>easeNowVec = { 0,0 };
-
-	//// イージングタイマーを更新する。
-	//if (swingEaseRate < 1.0f) {
-
-	//	// イージングタイマーを更新する。
-	//	swingEaseRate += addEasingTimer;
-
-	//	// 限界値を超えないようにする。
-	//	if (1.0f <= swingEaseRate) swingEaseRate = 1.0f;
-
-	//	// イージングタイマーから求められるイージング量を求める。
-	//	auto easeAmount = KuroMath::Ease(Out, Cubic, swingEaseRate, 0.0f, 1.0f);
-
-	//	// 現在のベクトルを求める。
-	//	easeNowVec.y = swingStartVec.y + (easeAmount * (swingEndVec.y - swingStartVec.y));
-	//	if (easeNowVec.y < 0) {
-	//		easeNowVec.x = (1.0f + easeNowVec.y) * (signbit(swingStartVec.x) ? -1 : 1);
-	//	}
-	//	else {
-	//		easeNowVec.x = (1.0f - easeNowVec.y) * (signbit(swingStartVec.x) ? -1 : 1);
-	//	}
-
-	//	// easeNowVecのX成分が初期値より低くなると、ガクッとなってしまうので修正。
-	//	if (0 < easeNowVec.x && easeNowVec.x < swingStartVec.x) easeNowVec.x = swingStartVec.x;
-	//	if (easeNowVec.x < 0 && swingStartVec.x < easeNowVec.x) easeNowVec.x = swingStartVec.x;
-
-	//	easeNowVec.Normalize();
-
-	//}
-
-	//const float lineLength = (pos - partner.lock()->pos).Length();
-	//partner.lock()->pos = this->pos + easeNowVec * lineLength;
-
-	//// イージングタイマーが限界を超えたらフラグを折る。
-	//if (1.0f <= swingEaseRate) {
-	//	nowSwing = false;
-	//	swingInertiaVec = (pos - prevPos).GetNormal();
-	//	swingInertia = (prevPos - pos).Length();
-	//	afterSwingDelay = AFTER_SWING_DELAY;
-	//}
 }
 
 void CharacterInterFace::Crash(const Vec2<float>& MyVec)
@@ -267,6 +202,9 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	isGripPowerEmpty = false;
 
+	advancedEntrySwingTimer = 0;
+	isAdvancedEntrySwing = false;
+
 }
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
@@ -310,14 +248,10 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	{
 		SwingUpdate();
 	}
-	//相手が振り回していないとき
-	else if (!partner.lock()->nowSwing)
-	{
-		if (SuperiorityGauge::Instance()->GetGaugeData(team).gaugeValue)
-		{
-			OnUpdate(MapData);
-		}
 
+	if (SuperiorityGauge::Instance()->GetGaugeData(team).gaugeValue)
+	{
+		OnUpdate(MapData);
 	}
 
 	OnUpdateNoRelatedSwing();

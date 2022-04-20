@@ -115,6 +115,18 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	if (GetCanMove())Input(MapData);
 
 	/*===== 更新処理 =====*/
+
+	// 先行入力タイマーを更新。
+	if (isAdvancedEntrySwing) {
+
+		--advancedEntrySwingTimer;
+		if (advancedEntrySwingTimer < 0) isAdvancedEntrySwing = false;
+
+	}
+
+	// 相方が振り回しをしていたら更新処理を行わない。
+	if (!(!partner.lock()->GetNowSwing() && !nowSwing)) return;
+
 	//移動に関する処理
 	Move();
 
@@ -214,7 +226,7 @@ void Player::OnDraw()
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	bool mirorX = 0 < vel.x || (isHold && (partner.lock()->pos - pos).x < 0);
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
-		stagingDevice.GetSpinRadian() , bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
+		stagingDevice.GetSpinRadian(), bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
 }
 
 void Player::OnDrawUI()
@@ -336,6 +348,15 @@ void Player::Input(const vector<vector<int>>& MapData)
 	// 壁に挟まって判定が無効化されている間は処理を受け付けない。
 	if (0 < GetStackWinTimer()) return;
 
+	// 振り回しているときは入力を受け付けない。
+	if (nowSwing) return;
+
+	// 振り回されているフラグ
+	bool isSwingPartner = partner.lock()->GetNowSwing();
+
+	// 振り回されている状態の時に踏ん張りの状態になっているかフラグ(実際には踏ん張っていない)。
+	bool isSwingPartnerHold = false;
+
 	const float INPUT_DEAD_LINE = 0.3f;
 
 	Vec2<float> inputVec;
@@ -370,24 +391,35 @@ void Player::Input(const vector<vector<int>>& MapData)
 	}
 
 	// [LTを押されたら] [握力が残っていたら] [握力を使い切ってから回復している状態じゃなかったら]
-	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && 0 < gripPowerTimer && !isGripPowerEmpty) {
+	bool isInputLT = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT);
+	if (isInputLT && 0 < gripPowerTimer && !isGripPowerEmpty) {
 
-		anim.ChangeAnim(HOLD);
+		// 振り回されていたら
+		if (isSwingPartner) {
 
-		// 紐つかみ状態(踏ん張り状態)にする。
-		isHold = true;
+			isSwingPartnerHold = true;
 
-		// 握力タイマーを0に近づける。
-		--gripPowerTimer;
+		}
+		else {
 
-		// 移動量を0にする。
-		vel = {};
+			anim.ChangeAnim(HOLD);
 
-		// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
-		if (gripPowerTimer <= 0) {
+			// 紐つかみ状態(踏ん張り状態)にする。
+			isHold = true;
 
-			isGripPowerEmpty = true;
-			anim.ChangeAnim(TIRED);
+			// 握力タイマーを0に近づける。
+			--gripPowerTimer;
+
+			// 移動量を0にする。
+			vel = {};
+
+			// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
+			if (gripPowerTimer <= 0) {
+
+				isGripPowerEmpty = true;
+				anim.ChangeAnim(TIRED);
+			}
+
 		}
 
 	}
@@ -493,7 +525,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 #pragma endregion
 
 	// RTが押されたら
-	if (isHold && swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT)) {
+	bool canSwing = swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT);
+	if (!isSwingPartner && ((isHold && canSwing) || isAdvancedEntrySwing)) {
 
 		// 振り回しの処理
 
@@ -501,6 +534,13 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		// クールタイムを設定。
 		swingCoolTime = SWING_COOLTIME;
+
+	}
+	else if (isSwingPartner && isSwingPartnerHold && canSwing) {
+
+		// 先行入力を保存。
+		isAdvancedEntrySwing = true;
+		advancedEntrySwingTimer = ADVANCED_ENTRY_SWING_TIMER;
 
 	}
 	else {
