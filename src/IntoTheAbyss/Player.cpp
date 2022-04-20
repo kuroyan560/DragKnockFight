@@ -195,8 +195,6 @@ void Player::OnDraw()
 		if (0 < vel.y)anim.ChangeAnim(DEFAULT_FRONT);
 	}
 
-	outOfStaminaEffect.Draw();
-
 	/*===== •`‰æˆ— =====*/
 
 	// ƒvƒŒƒCƒ„[‚Ì•`‰æˆ—

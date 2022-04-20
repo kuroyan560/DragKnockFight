@@ -62,8 +62,6 @@ public:
 	int inputInvalidTimerByCrash;	// 当たり判定無効化タイマー
 	const int INPUT_INVALID_TIMER = 30;
 
-	RunOutOfStaminaEffect outOfStaminaEffect;
-
 public:
 
 	/*-- 定数 --*/

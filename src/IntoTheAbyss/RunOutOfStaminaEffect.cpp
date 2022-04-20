@@ -88,13 +88,9 @@ void RunOutOfStaminaEffect::Start(const Vec2<float> &POS, int MAX_TIMER)
 {
 	if (!startFlag)
 	{
-		for (int i = 0; i < 3; ++i)
-		{
-			float max = 180 / 3;
-			//ã‚Ì•ûŒü‚É”ò‚Î‚·
-			float rad = Angle::ConvertToRadian(180 - (max * i));
-			ParticleMgr::Instance()->Generate(POS, Vec2<float>(cosf(rad), sinf(rad)), BULLET);
-		}
+		//ã‚Ì•ûŒü‚É”ò‚Î‚·
+		float rad = Angle::ConvertToRadian(90);
+		ParticleMgr::Instance()->Generate(POS, Vec2<float>(cosf(rad), sinf(rad)), BULLET);
 		lerpPlayerSize = { 1.0f,1.0f };
 		playerSize = { 1.0f,1.0f };
 

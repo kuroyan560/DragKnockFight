@@ -779,6 +779,11 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	}
 
 	ParticleMgr::Instance()->Draw();
+
+	CharacterManager::Instance()->Left()->outOfStaminaEffect.Draw();
+	CharacterManager::Instance()->Right()->outOfStaminaEffect.Draw();
+
+
 	CrashMgr::Instance()->Draw();
 
 	GameTimer::Instance()->Draw();
