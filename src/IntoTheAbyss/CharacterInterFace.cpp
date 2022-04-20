@@ -568,8 +568,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 
 
+
 		// 一定以下だったらダメージを与えない。
-		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 2.0f) {
+		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 1.0f) {
+
+		}
+		else if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 3.0f) {
 
 			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 			Vec2<float>vec = { 0,0 };
