@@ -25,8 +25,6 @@ TitleScene::TitleScene()
 
 	isPressStartDraw = true;
 	pressStartTimer = 0;
-	rate = 0.0f;
-	effect.Init();
 }
 
 void TitleScene::OnInitialize()
@@ -63,16 +61,6 @@ void TitleScene::OnUpdate()
 		isPressStartDraw = isPressStartDraw ? false : true;
 
 	}
-
-	if (initFlag)
-	{
-		effect.Init();
-	}
-	else
-	{
-		effect.CheckPos(rate);
-	}
-	effect.Update();
 }
 
 void TitleScene::OnDraw()
@@ -103,22 +91,12 @@ void TitleScene::OnDraw()
 	if (isPressStartDraw) {
 		DrawFunc::DrawGraph(PRESS_START_POS, TexHandleMgr::GetTexBuffer(pressStartHandle), AlphaBlendMode_Trans);
 	}
-
-	effect.Draw();
 }
 
 void TitleScene::OnImguiDebug()
 {
 	ImGui::Begin("TitleScene");
 	ImGui::Text("Abutton:StageSelect");
-	ImGui::End();
-
-
-	ImGui::Begin("screenEdge");
-	ImGui::Checkbox("leftWinFlag", &effect.leftWinFlag);
-	ImGui::Checkbox("rightWinFlag", &effect.rightWinFlag);
-	ImGui::Checkbox("initFlag", &initFlag);
-	ImGui::SliderFloat("rate", &rate, 0.0f, 1.0f);
 	ImGui::End();
 }
 
