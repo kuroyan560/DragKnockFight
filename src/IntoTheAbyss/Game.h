@@ -113,7 +113,7 @@ class Game
 	ScreenEdgeEffect screenEdgeEffect;
 public:
 
-	std::unique_ptr<HomeBase> playerHomeBase, enemyHomeBase;
+	HomeBase playerHomeBase, enemyHomeBase;
 
 	array<int, 2> debugStageData = { 0,0 };//デバック用のステージと部屋番号
 	int nowSelectNum = 0;

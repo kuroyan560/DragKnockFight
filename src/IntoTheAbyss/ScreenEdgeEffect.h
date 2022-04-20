@@ -22,7 +22,6 @@ private:
 	Vec2<float>pos;
 	float nowDistance;
 
-
 	enum 
 	{
 		UP,
