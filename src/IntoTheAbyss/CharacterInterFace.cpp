@@ -86,6 +86,12 @@ void CharacterInterFace::Crash(const Vec2<float>& MyVec)
 	stagingDevice.StopSpin();
 
 	OnCrash();
+
+	if (stanTimer)return;	//スタン中ならダメージによる顔変更なし
+	static const int DAMAGE_TOTAL_TIME = 90;
+
+	damageTimer = DAMAGE_TOTAL_TIME;
+	FaceIcon::Instance()->Change(team, FACE_STATUS::DAMAGE);
 }
 
 void CharacterInterFace::CrashUpdate()
@@ -207,6 +213,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	advancedEntrySwingTimer = 0;
 	isAdvancedEntrySwing = false;
+
+	damageTimer = 0;
 
 }
 

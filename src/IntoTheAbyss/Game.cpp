@@ -526,10 +526,13 @@ void Game::Update()
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	// プレイヤーの更新処理
-	CharacterManager::Instance()->Left()->Update(mapData, lineCenterPos);
+	if (!roundFinishFlag)
+	{
+		CharacterManager::Instance()->Left()->Update(mapData, lineCenterPos);
 
-	// ボスの更新処理
-	CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
+		// ボスの更新処理
+		CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
+	}
 
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
