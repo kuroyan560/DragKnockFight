@@ -642,8 +642,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			windowSize *= Vec2<int>(2, 2);
 
 			// ウィンドウ左右
-			bool winLeft = pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x <= 0;
-			bool winRight = windowSize.x <= pos.x + size.x - ScrollMgr::Instance()->scrollAmount.x;
+			float windowOffset = 100.0f;
+			bool winLeft = pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x <= -windowOffset;
+			bool winRight = windowSize.x + windowOffset <= pos.x + size.x - ScrollMgr::Instance()->scrollAmount.x;
 			if (winRight || winLeft) {
 
 				stackWindowTimer = STACK_WINDOW_TIMER;
@@ -666,8 +667,8 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				CrashEffectMgr::Instance()->Generate(pos);
 			}
 			// ウィンドウ上下
-			bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
-			bool winBottom = windowSize.y <= pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y;
+			bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= -windowOffset;
+			bool winBottom = windowSize.y + windowOffset <= pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y;
 			if (winBottom || winTop) {
 
 				stackWindowTimer = STACK_WINDOW_TIMER;
