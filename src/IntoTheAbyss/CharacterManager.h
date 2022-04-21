@@ -2,14 +2,15 @@
 #include"CharacterInterFace.h"
 #include"Singleton.h"
 #include<array>
+class Tutorial;
 
 class CharacterManager : public Singleton<CharacterManager>
 {
 	friend class Singleton<CharacterManager>;
-	CharacterManager() {}
+	CharacterManager();
 
 	//キャラクター生成
-	std::shared_ptr<CharacterInterFace>CreateCharacter(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx);
+	std::shared_ptr<CharacterInterFace>CreateCharacter(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& Team);
 
 	//キャラクター選択用
 	WHICH_TEAM nowSelectTeam;
@@ -17,6 +18,9 @@ class CharacterManager : public Singleton<CharacterManager>
 
 	//キャラクター情報
 	std::array<std::shared_ptr<CharacterInterFace>, TEAM_NUM>characters;
+
+	//プレイヤー用チュートリアル
+	std::array<std::shared_ptr<Tutorial>, TEAM_NUM>tutorials;
 
 public:
 	//選択

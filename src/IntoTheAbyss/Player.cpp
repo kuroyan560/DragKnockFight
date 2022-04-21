@@ -20,6 +20,7 @@
 #include"AudioApp.h"
 #include "SlowMgr.h"
 #include"CrashMgr.h"
+#include"Tutorial.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -28,7 +29,8 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx) :CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx)
+Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx, const std::shared_ptr<Tutorial>& Tutorial)
+	:CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx), tutorial(Tutorial)
 {
 	/*====== コンストラクタ =====*/
 	if (PLAYER_CHARACTER_NUM <= CharacterName)assert(0);
@@ -255,11 +257,13 @@ void Player::OnDrawUI()
 	static const int ARROW_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png") };
 	static const Angle ARROW_ANGLE_OFFSET = Angle(1);
 	static const float ARROW_DIST_OFFSET = 32.0f;
+
+	const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0.5f,0.5f });
+
 	if (isHold && !GetNowSwing() && !StunEffect::Instance()->isActive)
 	{
 		const Vec2<float>drawScale = { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom };
 		const auto team = GetWhichTeam();
-		const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0,0 });
 
 		//振り回し先描画
 		float dist = partner.lock()->pos.Distance(pos);
@@ -275,6 +279,12 @@ void Player::OnDrawUI()
 		vec.Normalize();
 		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos + vec * ARROW_DIST_OFFSET), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), { 0.0f,0.5f });
 	}
+
+	const auto leftStickVec = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
+	const auto leftTrigger = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT);
+	const auto rightTrigger = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RT);
+
+	tutorial.lock()->Draw(leftStickVec, rightStickVec, leftTrigger, rightTrigger);
 }
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)
@@ -425,6 +435,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 			// 紐つかみ状態(踏ん張り状態)にする。
 			isHold = true;
 
+
 			// 握力タイマーを0に近づける。
 			--gripPowerTimer;
 
@@ -446,6 +457,12 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		// 紐つかみ状態(踏ん張り状態)を解除する。
 		isHold = false;
+	}
+
+	//チュートリアルの表示 / 非表示
+	if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::BACK))
+	{
+		tutorial.lock()->TurnActive();
 	}
 
 #pragma region itiou nokosite okimasu

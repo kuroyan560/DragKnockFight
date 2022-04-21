@@ -15,6 +15,7 @@ class LightManager;
 #include"StagingInterFace.h"
 
 #include"CharacterInterFace.h"
+class Tutorial;
 
 // プレイヤークラス
 class Player :public CharacterInterFace
@@ -109,12 +110,16 @@ public:
 	float sizeVel;
 	bool initPaticleFlag;
 	int moveTimer;
+
+	//チュートリアルアイコン
+	std::weak_ptr<Tutorial>tutorial;
+
 public:
 
 	/*-- メンバ関数 --*/
 
 	// コンストラクタ
-	Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx);
+	Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx,const std::shared_ptr<Tutorial>&Tutorial);
 	~Player();
 
 private:
