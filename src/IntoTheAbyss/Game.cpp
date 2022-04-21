@@ -799,12 +799,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		AfterImageMgr::Instance()->Draw();
 		CharacterManager::Instance()->Left()->Draw();
 		CharacterManager::Instance()->Right()->Draw();
-
-		if (!roundFinishFlag)
-		{
-			CharacterManager::Instance()->Left()->DrawUI();
-			CharacterManager::Instance()->Right()->DrawUI();
-		}
 	}
 
 	// クラッシュ時の演出の描画処理。
@@ -818,6 +812,14 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	CrashMgr::Instance()->Draw();
 
+	screenEdgeEffect.Draw();
+
+	if (roundChangeEffect.initGameFlag && !roundFinishFlag)
+	{
+		CharacterManager::Instance()->Left()->DrawUI();
+		CharacterManager::Instance()->Right()->DrawUI();
+	}
+
 	GameTimer::Instance()->Draw();
 	ScoreManager::Instance()->Draw();
 
@@ -830,7 +832,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	FaceIcon::Instance()->Draw();
 
-	screenEdgeEffect.Draw();
 	WinCounter::Instance()->Draw();
 
 	StunEffect::Instance()->Draw();
