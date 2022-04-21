@@ -45,7 +45,7 @@ void StoryMgr::Update()
 
 	if (UsersInput::Instance()->ControllerOnTrigger(0, A))
 	{
-		story[storyHandle]->Finish();
+		story[storyHandle]->GotoNextString();
 	}
 
 	story[storyHandle]->Update();

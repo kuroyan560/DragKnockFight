@@ -27,24 +27,19 @@ void PictureStory::InitScene()
 
 void PictureStory::Update()
 {
+	static const int CHANGE_PIC_TIME = 60;
 	if (startFlag)
 	{
 		if (!finishFlag)
 		{
 			//‰æ‘œ‚ÌØ‚è‘Ö‚¦-----------------------
 			++changePictureTimer;
-			if (120 <= changePictureTimer)
+			if (CHANGE_PIC_TIME <= changePictureTimer)
 			{
 				++pictureArrayHandle;
 				changePictureTimer = 0;
 			}
 
-			++changeStringTimer;
-			if (120 <= changeStringTimer && !nextFlag)
-			{
-				nextFlag = true;
-				changeStringTimer = 0;
-			}
 			//‰æ‘œ‚ÌØ‚è‘Ö‚¦-----------------------
 		}
 
@@ -58,6 +53,12 @@ void PictureStory::Update()
 			{
 				++stringArrayHandle;
 				nextFlag = false;
+
+				if (stringHandle.size() <= stringArrayHandle)
+				{
+					stringArrayHandle--;	//ÅŒã‚Ì‰æ‘œ‚Ì‚Ü‚Ü
+					finishFlag = true;
+				}
 			}
 		}
 		else
@@ -91,10 +92,6 @@ void PictureStory::Update()
 		if (pictureHandle.size() <= pictureArrayHandle)
 		{
 			pictureArrayHandle = 0;
-		}
-		if (stringHandle.size() <= stringArrayHandle)
-		{
-			stringArrayHandle = 0;
 		}
 		//‰æ‘œ‚Ìƒ‹[ƒv-----------------------
 
@@ -131,7 +128,6 @@ void PictureStory::Start()
 		pictureArrayHandle = 0;
 
 		//•¶š•`‰æ‚Ì‰Šú‰»
-		changeStringTimer = 0;
 		stringArrayHandle = 0;
 		stringAppearRate = 0.0f;
 		stringNextRate = 0.0f;
@@ -146,9 +142,10 @@ void PictureStory::Start()
 	}
 }
 
-void PictureStory::Finish()
+void PictureStory::GotoNextString()
 {
-	finishFlag = true;
+	if (nextFlag)return;
+	nextFlag = true;
 }
 
 bool PictureStory::GoToNextScene()

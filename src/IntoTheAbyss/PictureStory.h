@@ -14,7 +14,7 @@ public:
 	void Draw();
 
 	void Start();
-	void Finish();
+	void GotoNextString();
 
 	bool GoToNextScene();
 private:
@@ -29,7 +29,6 @@ private:
 	Vec2<float>basePos;
 	std::vector<Vec2<float>>stringPos;
 	std::vector<int>stringHandle;
-	int changeStringTimer;
 	int stringArrayHandle;
 	float stringAppearRate;
 	float stringNextRate;
