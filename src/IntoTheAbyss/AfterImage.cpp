@@ -10,7 +10,7 @@ void AfterImageMgr::Init()
 	for (int index = 0; index < AFTERIMAGE_COUNT; ++index) {
 
 		afterImages[index].pos = {};
-		afterImages[index].alpha = 0.5f;
+		afterImages[index].alpha = 0.8f;
 		afterImages[index].handle = 0;
 		afterImages[index].extRate = {};
 		afterImages[index].radian = 0;
@@ -23,7 +23,7 @@ void AfterImageMgr::Init()
 
 }
 
-void AfterImageMgr::Generate(const Vec2<float>& Pos, const Vec2<float>& ExtRate, const float& Radian, const int& Handle, const Color& SrcColor)
+void AfterImageMgr::Generate(const Vec2<float>& Pos, const Vec2<float>& ExtRate, const float& Radian, const int& Handle, const Color& SrcColor, const bool& IsExtendGraph, const Vec2<float>& Size)
 {
 
 	/*===== 生成処理 =====*/
@@ -46,6 +46,8 @@ void AfterImageMgr::Generate(const Vec2<float>& Pos, const Vec2<float>& ExtRate,
 		afterImages[index].radian = Radian;
 		afterImages[index].srcColor = SrcColor;
 		afterImages[index].isActive = true;
+		afterImages[index].size = Size;
+		afterImages[index].isExtendGraph = IsExtendGraph;
 
 		break;
 
@@ -68,7 +70,7 @@ void AfterImageMgr::Update()
 		if (!afterImages[index].isActive) continue;
 
 		// アルファ値を下げる。
-		static const float SUB_ALPHA = 0.05f;
+		static const float SUB_ALPHA = 0.04f;
 		afterImages[index].alpha -= SUB_ALPHA;
 
 		// アルファ値が0未満になったら無効化する。
@@ -96,8 +98,18 @@ void AfterImageMgr::Draw()
 		// 描画。
 		Color texColor = afterImages[index].srcColor;
 		texColor.Alpha() = afterImages[index].alpha;
-		DrawFunc_Color::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos), afterImages[index].extRate, afterImages[index].radian, TexHandleMgr::GetTexBuffer(afterImages[index].handle), texColor);
 
+		// ExtendGraphフラグが立っていたら。
+		if (afterImages[index].isExtendGraph) {
+
+			DrawFunc_Color::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos - afterImages[index].size), ScrollMgr::Instance()->Affect(afterImages[index].pos + afterImages[index].size), TexHandleMgr::GetTexBuffer(afterImages[index].handle), texColor);
+
+		}
+		else {
+
+			DrawFunc_Color::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos), afterImages[index].extRate, afterImages[index].radian, TexHandleMgr::GetTexBuffer(afterImages[index].handle), texColor);
+
+		}
 	}
 
 }
