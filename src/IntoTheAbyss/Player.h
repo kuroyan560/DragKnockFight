@@ -31,7 +31,7 @@ public:
 	unique_ptr<PlayerHand> rHand;	// ‰Eè
 
 	// ‚±‚ÌƒLƒƒƒ‰‚ÌF
-	int charaColor;
+	Color charaColor;
 
 	//int playerGraph;
 

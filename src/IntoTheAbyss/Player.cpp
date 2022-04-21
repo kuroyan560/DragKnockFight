@@ -104,11 +104,11 @@ void Player::OnInit()
 
 	// 右のキャラだったら赤
 	if (GetWhichTeam() == RIGHT_TEAM) {
-		charaColor = TexHandleMgr::LoadGraph("resource/ChainCombat/zeroAlpha.png");
+		charaColor = { 239, 1, 144,255 };
 	}
 	// ひだりのキャラだったら緑
 	else if (GetWhichTeam() == LEFT_TEAM) {
-		charaColor = TexHandleMgr::LoadGraph("resource/ChainCombat/zeroAlpha.png");
+		charaColor = { 47, 255, 139,255 };
 	}
 
 	inputInvalidTimerByCrash = 0;
@@ -146,7 +146,7 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 		// 残像を保存。
 		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size;
-		AfterImageMgr::Instance()->Generate(pos, extRate, stagingDevice.GetSpinRadian(), charaColor, anim.GetGraphHandle());
+		AfterImageMgr::Instance()->Generate(pos, extRate, stagingDevice.GetSpinRadian(), anim.GetGraphHandle(), charaColor);
 
 	}
 

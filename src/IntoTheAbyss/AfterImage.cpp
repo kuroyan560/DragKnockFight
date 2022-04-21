@@ -1,5 +1,5 @@
 #include "AfterImage.h"
-#include "DrawFunc_FillTex.h"
+#include "DrawFunc_Color.h"
 #include "TexHandleMgr.h"
 
 void AfterImageMgr::Init()
@@ -9,11 +9,13 @@ void AfterImageMgr::Init()
 
 	for (int index = 0; index < AFTERIMAGE_COUNT; ++index) {
 
-		afterImages[index].alpha = 0;
-		afterImages[index].destHandle = 0;
-		afterImages[index].srcHandle = 0;
-		afterImages[index].isActive = false;
 		afterImages[index].pos = {};
+		afterImages[index].alpha = 0.5f;
+		afterImages[index].handle = 0;
+		afterImages[index].extRate = {};
+		afterImages[index].radian = 0;
+		afterImages[index].srcColor = Color();
+		afterImages[index].isActive = false;
 
 	}
 
@@ -21,7 +23,7 @@ void AfterImageMgr::Init()
 
 }
 
-void AfterImageMgr::Generate(const Vec2<float>& Pos, const Vec2<float>& ExtRate, const float& Radian, const int& SrcHandle, const int& DestHandle)
+void AfterImageMgr::Generate(const Vec2<float>& Pos, const Vec2<float>& ExtRate, const float& Radian, const int& Handle, const Color& SrcColor)
 {
 
 	/*===== ê∂ê¨èàóù =====*/
@@ -39,10 +41,10 @@ void AfterImageMgr::Generate(const Vec2<float>& Pos, const Vec2<float>& ExtRate,
 		// ê∂ê¨Ç∑ÇÈÅB
 		afterImages[index].pos = Pos;
 		afterImages[index].alpha = 0.5f;
-		afterImages[index].srcHandle = SrcHandle;
-		afterImages[index].destHandle = DestHandle;
+		afterImages[index].handle = Handle;
 		afterImages[index].extRate = ExtRate;
 		afterImages[index].radian = Radian;
+		afterImages[index].srcColor = SrcColor;
 		afterImages[index].isActive = true;
 
 		break;
@@ -92,7 +94,9 @@ void AfterImageMgr::Draw()
 		if (!afterImages[index].isActive) continue;
 
 		// ï`âÊÅB
-		DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos), afterImages[index].extRate, afterImages[index].radian, TexHandleMgr::GetTexBuffer(afterImages[index].destHandle), TexHandleMgr::GetTexBuffer(afterImages[index].srcHandle), afterImages[index].alpha);
+		Color texColor = afterImages[index].srcColor;
+		texColor.Alpha() = afterImages[index].alpha;
+		DrawFunc_Color::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos), afterImages[index].extRate, afterImages[index].radian, TexHandleMgr::GetTexBuffer(afterImages[index].handle), texColor);
 
 	}
 

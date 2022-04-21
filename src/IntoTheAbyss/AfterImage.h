@@ -1,5 +1,6 @@
 #include "Vec.h"
 #include "Singleton.h"
+#include "Color.h"
 #include <array>
 
 // 残像演出
@@ -13,14 +14,14 @@ private:
 
 		Vec2<float> pos;	// 描画座標
 		Vec2<float> extRate;// 大きさ
-		int srcHandle;		// 使用画像ハンドル
-		int destHandle;		// 被せるよう画像ハンドル
+		Color srcColor;		// 被せる色
+		int handle;			// 使用画像ハンドル
 		float alpha;		// アルファ値
 		float radian;		// 角度
 		bool isActive;		// アクティブフラグ
 
 		// コンストラクタ
-		AfterImage() :pos({}), srcHandle(0), destHandle(0), alpha(0), extRate({}), radian(0), isActive(false) {};
+		AfterImage() :pos({}), handle(0), alpha(0), extRate({}), radian(0), isActive(false) {};
 
 	};
 
@@ -41,7 +42,7 @@ public:
 	void Init();
 
 	// 生成処理
-	void Generate(const Vec2<float>& Pos, const Vec2<float>& ExtRate, const float& Radian, const int& SrcHandle, const int& DestHandle);
+	void Generate(const Vec2<float>& Pos, const Vec2<float>& ExtRate, const float& Radian, const int& Handle, const Color& SrcColor);
 
 	// 更新処理
 	void Update();
