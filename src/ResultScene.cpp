@@ -13,6 +13,8 @@ ResultScene::ResultScene()
 	resultHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/result.png");
 	breakEnemyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/break_enemy.png");
 	breakPlayerHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/break_player.png");
+	crashEnemyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/crash_red.png");;
+	crashPlayerHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/crash_green.png");;
 	scoreHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/score.png");
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, blueNumberHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_yellow.png", 12, { 12, 1 }, goldNumberHandle.data());
@@ -29,11 +31,15 @@ void ResultScene::OnInitialize()
 	resultUITimer = 0;
 	breakEnemyUITimer = 0;
 	breakPlayerUITimer = 0;
+	crashEnemyUITimer = 0;
+	crashPlayerUITimer = 0;
 	scoreUITimer = 0;
 	delayTimer = 0;
 	resultEasingAmount = 0;
 	breakEnemyEasingAmount = 0;
 	breakPlayerEasingAmount = 0;
+	crashEnemyEasingAmount = 0;
+	crashPlayerEasingAmount = 0;
 	scoreEffectTimer = 0;
 	targetScore = ResultTransfer::Instance()->resultScore;
 	prevScore = { 1,2,3,4,5,6,7,8,9 };
@@ -42,6 +48,8 @@ void ResultScene::OnInitialize()
 
 	breakEnemyAmount = ResultTransfer::Instance()->rightBreakCount;
 	breakPlayerAmount = ResultTransfer::Instance()->leftBreakCount;
+	crashEnemyAmount = ResultTransfer::Instance()->rightCrashCount;
+	crashPlayerAmount = ResultTransfer::Instance()->leftCrashCount;
 	winnerName = ResultTransfer::Instance()->winner;
 }
 
@@ -53,6 +61,9 @@ void ResultScene::OnUpdate()
 	// 遅延タイマーが既定値以下だったらインクリメントする。
 	if (delayTimer < DELAY_TIMER) ++delayTimer;
 
+	// 処理を飛ばすフラグ。
+	bool isSkip = false;
+
 	// 遅延が発生していなかったら。
 	if (DELAY_TIMER <= delayTimer) {
 
@@ -61,56 +72,68 @@ void ResultScene::OnUpdate()
 			++resultUITimer;
 			// タイマーが規定値に達したら。
 			if (RESULT_UI_TIMER <= resultUITimer) {
-				delayTimer = 0;
-			}
-			else {
 				delayTimer = DELAY_TIMER;
+				isSkip = true;
 			}
 		}
 		// [BREAK]敵の画像 タイマーが規定値以下だったら。
-		if (breakEnemyUITimer < BREAK_ENEMY_UI_TIMER && RESULT_UI_TIMER <= resultUITimer) {
+		if (!isSkip && breakEnemyUITimer < BREAK_ENEMY_UI_TIMER && RESULT_UI_TIMER <= resultUITimer) {
 			++breakEnemyUITimer;
 			// タイマーが規定値に達したら。
 			if (BREAK_ENEMY_UI_TIMER <= breakEnemyUITimer) {
-				delayTimer = 0;
-			}
-			else {
 				delayTimer = DELAY_TIMER;
+				isSkip = true;
+			}
+		}
+		// [CRASH]敵の画像 タイマーが規定値以下だったら。
+		if (!isSkip && crashEnemyUITimer < CRASH_ENEMY_UI_TIMER && BREAK_ENEMY_UI_TIMER <= breakEnemyUITimer) {
+			++crashEnemyUITimer;
+			// タイマーが規定値に達したら。
+			if (CRASH_ENEMY_UI_TIMER <= crashEnemyUITimer) {
+				delayTimer = DELAY_TIMER;
+				isSkip = true;
 			}
 		}
 		// [BREAK]プレイヤーの画像 タイマーが規定値以下だったら。
-		if (breakPlayerUITimer < BREAK_PLAYER_UI_TIMER && BREAK_ENEMY_UI_TIMER <= breakEnemyUITimer) {
+		if (!isSkip && breakPlayerUITimer < BREAK_PLAYER_UI_TIMER && CRASH_ENEMY_UI_TIMER <= crashEnemyUITimer) {
 			++breakPlayerUITimer;
 			// タイマーが規定値に達したら。
 			if (BREAK_PLAYER_UI_TIMER <= breakPlayerUITimer) {
-				delayTimer = -DELAY_TIMER;
-			}
-			else {
 				delayTimer = DELAY_TIMER;
+				isSkip = true;
 			}
 		}
-		// [SCORE]画像 タイマーが規定値以下だったら。
-		if (scoreUITimer < SCORE_UI_TIMER && BREAK_PLAYER_UI_TIMER <= breakPlayerUITimer) {
-			++scoreUITimer;
+		// [CRASH]プレイヤーの画像 タイマーが規定値以下だったら。
+		if (!isSkip && crashPlayerUITimer < CRASH_PLAYER_UI_TIMER && BREAK_PLAYER_UI_TIMER <= breakPlayerUITimer) {
+			++crashPlayerUITimer;
 			// タイマーが規定値に達したら。
-			if (SCORE_UI_TIMER <= scoreUITimer) {
-				delayTimer = -180;
-			}
-			else {
+			if (CRASH_PLAYER_UI_TIMER <= crashPlayerUITimer) {
 				delayTimer = DELAY_TIMER;
+				isSkip = true;
 			}
 		}
-		// スコアのタイマーが規定値以下だったら。
-		if (scoreEffectTimer < SCORE_EFFECT_TIMER && SCORE_UI_TIMER <= scoreUITimer) {
-			++scoreEffectTimer;
-			// タイマーが規定値に達したら。
-			if (SCORE_EFFECT_TIMER <= scoreEffectTimer) {
-				delayTimer = 0;
-			}
-			else {
-				delayTimer = DELAY_TIMER;
-			}
-		}
+		//// [SCORE]画像 タイマーが規定値以下だったら。
+		//if (scoreUITimer < SCORE_UI_TIMER && CRASH_ENEMY_UI_TIMER <= crashPlayerUITimer) {
+		//	++scoreUITimer;
+		//	// タイマーが規定値に達したら。
+		//	if (SCORE_UI_TIMER <= scoreUITimer) {
+		//		delayTimer = -180;
+		//	}
+		//	else {
+		//		delayTimer = DELAY_TIMER;
+		//	}
+		//}
+		//// スコアのタイマーが規定値以下だったら。
+		//if (scoreEffectTimer < SCORE_EFFECT_TIMER && SCORE_UI_TIMER <= scoreUITimer) {
+		//	++scoreEffectTimer;
+		//	// タイマーが規定値に達したら。
+		//	if (SCORE_EFFECT_TIMER <= scoreEffectTimer) {
+		//		delayTimer = 0;
+		//	}
+		//	else {
+		//		delayTimer = DELAY_TIMER;
+		//	}
+		//}
 
 	}
 
@@ -118,6 +141,8 @@ void ResultScene::OnUpdate()
 	resultEasingAmount = KuroMath::Ease(Out, Cubic, (float)resultUITimer / RESULT_UI_TIMER, 0.0f, 1.0f);
 	breakEnemyEasingAmount = KuroMath::Ease(Out, Cubic, (float)breakEnemyUITimer / BREAK_ENEMY_UI_TIMER, 0.0f, 1.0f);
 	breakPlayerEasingAmount = KuroMath::Ease(Out, Cubic, (float)breakPlayerUITimer / BREAK_PLAYER_UI_TIMER, 0.0f, 1.0f);
+	crashEnemyEasingAmount = KuroMath::Ease(Out, Cubic, (float)crashEnemyUITimer / CRASH_ENEMY_UI_TIMER, 0.0f, 1.0f);
+	crashPlayerEasingAmount = KuroMath::Ease(Out, Cubic, (float)crashPlayerUITimer / CRASH_PLAYER_UI_TIMER, 0.0f, 1.0f);
 	scoreEasingAmount = KuroMath::Ease(Out, Cubic, (float)scoreUITimer / SCORE_UI_TIMER, 0.0f, 1.0f);
 	scoreEffectEasingAmount = KuroMath::Ease(Out, Cubic, (float)scoreEffectTimer / SCORE_EFFECT_TIMER, 0.0f, 1.0f);
 
@@ -157,8 +182,10 @@ void ResultScene::OnDraw()
 	{
 		float easingPosX = resultEasingAmount * (RESULT_POS.x - windowSize.x);
 		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX, RESULT_POS.y), TexHandleMgr::GetTexBuffer(resultHandle), AlphaBlendMode_Trans);
-		DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, true, breakEnemyAmount);
-		DrawBREAK(BREAK_PLAYER_POS, breakPlayerEasingAmount, false, breakPlayerAmount);
+		DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, breakEnemyHandle, breakEnemyAmount);
+		DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, crashEnemyHandle, crashEnemyAmount);
+		DrawBREAK(BREAK_PLAYER_POS, breakPlayerEasingAmount, breakPlayerHandle, breakPlayerAmount);
+		DrawBREAK(CRASH_PLAYER_POS, crashPlayerEasingAmount, crashPlayerHandle, crashPlayerAmount);
 	}
 
 	// [SCORE] の描画処理
@@ -174,19 +201,15 @@ void ResultScene::OnFinalize()
 {
 }
 
-void ResultScene::DrawBREAK(const Vec2<float>& targetPosm, const float& easingTimer, const bool& isBoss, const int& breakCount)
+void ResultScene::DrawBREAK(const Vec2<float>& targetPosm, const float& easingTimer, const int& graphHandle, const int& breakCount)
 {
 
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 
-	// 使用する画像ハンドルを求める。
-	int handle = breakEnemyHandle;
-	if (!isBoss) handle = breakPlayerHandle;
-
 	// イージングをかけた位置を求めて[BREAK]を描画をする。
 	float easingPosX = easingTimer * (targetPosm.x - windowSize.x);
 	Vec2<float> drawPos = Vec2<float>(windowSize.x + easingPosX, targetPosm.y);
-	DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(handle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(graphHandle), AlphaBlendMode_Trans);
 
 	// BREAKの画像サイズ分右に動かした位置に*を描画する。
 	drawPos = drawPos + Vec2<float>(292.0f, 0.0f);

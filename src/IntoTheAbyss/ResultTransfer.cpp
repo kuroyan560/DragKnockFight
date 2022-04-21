@@ -13,6 +13,8 @@ void ResultTransfer::Init()
 {
 	leftBreakCount = 0;
 	rightBreakCount = 0;
+	leftCrashCount = 0;
+	rightCrashCount = 0;
 	winner = PLAYABLE_LUNA;
 }
 

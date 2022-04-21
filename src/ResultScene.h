@@ -18,6 +18,8 @@ class ResultScene : public BaseScene
 	int resultHandle;			// リザルトの画像ハンドル
 	int breakEnemyHandle;		// BREAKの画像ハンドル 敵
 	int breakPlayerHandle;		// BREAKの画像ハンドル プレイヤー
+	int crashEnemyHandle;		// CRASHの画像ハンドル 敵
+	int crashPlayerHandle;		// CRASHの画像ハンドル プレイヤー
 	int scoreHandle;			// SCOREの画像ハンドル
 	int crossHandle;			// *の画像ハンドル
 	std::array<int, 12> blueNumberHandle;// 青の数字の画像ハンドル
@@ -33,17 +35,23 @@ class ResultScene : public BaseScene
 	int resultUITimer;			// リザルトの画像のイージングに使用するタイマー
 	int breakEnemyUITimer;		// BREAKの画像ハンドル敵に使用するタイマー
 	int breakPlayerUITimer;		// BREAKの画像ハンドルプレイヤーに使用するタイマー
+	int crashEnemyUITimer;		// CRASHの画像ハンドル敵に使用するタイマー
+	int crashPlayerUITimer;		// CRASHの画像ハンドルプレイヤーに使用するタイマー
 	int scoreUITimer;			// SCOREの画像ハンドルに使用するタイマー
 	int delayTimer;				// 各イージングの間の遅延タイマー
 
 	// 各クラッシュの数字
-	int breakEnemyAmount;		// 敵のクラッシュの数
-	int breakPlayerAmount;		// プレイヤーのクラッシュの数
+	int breakEnemyAmount;		// 敵のブレークの数
+	int breakPlayerAmount;		// プレイヤーのブレークの数
+	int crashEnemyAmount;		// 敵のクラッシュの数
+	int crashPlayerAmount;		// プレイヤーのクラッシュの数
 
 	// 各イージング量
 	float resultEasingAmount;		// リザルトの画像のイージング量
 	float breakEnemyEasingAmount;	// BREAKの画像のイージング量
 	float breakPlayerEasingAmount;	// BREAKの画像のイージング量
+	float crashEnemyEasingAmount;	// CRASHの画像のイージング量
+	float crashPlayerEasingAmount;	// CRASHの画像のイージング量
 	float scoreEasingAmount;		// SCOREの画像のイージング量
 	float scoreEffectEasingAmount;	// スコアのガラガラ表示するために使用するタイマー
 
@@ -58,13 +66,17 @@ public:
 	// イージング結果の座標
 	const Vec2<float> RESULT_POS = { (float)WINDOW_CENTER.x - 90.0f, 30.0f };
 	const Vec2<float> BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x + 10.0f, 150.0f };
-	const Vec2<float> BREAK_PLAYER_POS = { (float)WINDOW_CENTER.x + 110.0f, 250.0f };
+	const Vec2<float> CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x + 110.0f, 250.0f };
+	const Vec2<float> BREAK_PLAYER_POS = { (float)WINDOW_CENTER.x + 110.0f, 420.0f };
+	const Vec2<float> CRASH_PLAYER_POS = { (float)WINDOW_CENTER.x + 10.0f, 520.0f };
 	const Vec2<float> SCORE_POS = { (float)WINDOW_CENTER.x - 90.0f, (float)WINDOW_CENTER.y + 30.0f };
 
 	// 各タイマーのデフォルト値
 	const int RESULT_UI_TIMER = 20;
 	const int BREAK_ENEMY_UI_TIMER = 20;
 	const int BREAK_PLAYER_UI_TIMER = 20;
+	const int CRASH_ENEMY_UI_TIMER = 20;
+	const int CRASH_PLAYER_UI_TIMER = 20;
 	const int SCORE_UI_TIMER = 40;
 	const int DELAY_TIMER = 30;
 	const int SCORE_EFFECT_TIMER = 180;
@@ -92,7 +104,7 @@ private:
 	}
 
 	// [BREAK]を描画
-	void DrawBREAK(const Vec2<float>& targetPosm, const float& easingTimer, const bool& isBoss, const int& breakCount);
+	void DrawBREAK(const Vec2<float>& targetPosm, const float& easingTimer, const int& graphHandle, const int& breakCount);
 
 	// [SCORE][スコア]を描画
 	void DrawSCORE(const float& easingTimer, const double& scoreEffectEasingTimer);
