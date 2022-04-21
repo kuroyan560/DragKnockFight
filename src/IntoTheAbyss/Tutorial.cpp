@@ -26,15 +26,42 @@ Tutorial::Tutorial(const WHICH_TEAM& Team) :team(Team)
 }
 
 #include"DrawFunc.h"
+#include"DrawFunc_Color.h"
+
 void Tutorial::DrawIcon(const Vec2<float>& Pos, const int& Handle)
 {
 	DrawFunc::DrawRotaGraph2D(Pos, { 0.8 * SCALE, 0.8f * SCALE }, 0.0f, TexHandleMgr::GetTexBuffer(Handle));
 	//DrawFunc::DrawGraph(Pos, TexHandleMgr::GetTexBuffer(Handle), AlphaBlendMode_Trans);
 }
 
-void Tutorial::Draw(const Vec2<float>& LStickVec, const Vec2<float>& RStickVec, const bool& LTrigger, const bool& RTrigger)
+void Tutorial::DrawIconNonActive(const Vec2<float>& Pos, const int& Handle)
+{
+	static const Vec2<float>OFFSET = { -20,0.0f };
+	static const Color COLOR[TEAM_NUM] =
+	{
+		Color(47,255,139,100),
+		Color(239,1,144,100)
+	};
+	//DrawFunc::DrawRotaGraph2D(Pos + OFFSET * Vec2<float>(team == LEFT ? -1 : 1, 1.0f), { 0.8 * SCALE, 0.8f * SCALE }, 0.0f, TexHandleMgr::GetTexBuffer(Handle));
+	DrawFunc_Color::DrawRotaGraph2D(Pos + OFFSET, { 0.8 * SCALE, 0.8f * SCALE }, 0.0f, TexHandleMgr::GetTexBuffer(Handle), COLOR[team]);
+}
+
+void Tutorial::DrawIcon(const bool& IsActive, const Vec2<float>& Pos, const int& Handle)
+{
+	if (IsActive)DrawIcon(Pos, Handle);
+	else DrawIconNonActive(Pos, Handle);
+}
+
+void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const bool& LTrigger, bool RTrigger)
 {
 	if (!active)return;
+
+	if (!rightStickInput)
+	{
+		RStickVec = { 0,0 };
+		RTrigger = false;
+	}
+
 
 	static const int STICK_HEAD_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/icon/stickHead.png");
 	//右プレイヤーか左プレイヤーかでの位置オフセット
@@ -61,14 +88,14 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, const Vec2<float>& RStickVec, 
 
 	//右スティック
 	static const Vec2<float>RstickPos = { 20 + R_OFFSET_X,20.0f + ICON_OFFSET_Y + LtriggerPos.y };
-	DrawIcon(RstickPos + OFFSET[team], iconGraphs.stickBase_R);
+	DrawIcon(rightStickInput, RstickPos + OFFSET[team], iconGraphs.stickBase_R);
 	//右スティックヘッド
 	static const Vec2<float>RstickHeadCenterOffset = Vec2<float>(33.0f, 3.0f) * SCALE;
 	const Vec2<float>RstickHeadPos = RstickPos + RstickHeadCenterOffset + RStickVec.GetNormal() * STICK_HEAD_RADIUS_OFFSET;
-	DrawIcon(RstickHeadPos + OFFSET[team], STICK_HEAD_GRAPH);
+	DrawIcon(rightStickInput, RstickHeadPos + OFFSET[team], STICK_HEAD_GRAPH);
 
 	//右トリガー
 	static const Vec2<float>RtriggerPos = { 22 + R_OFFSET_X,ICON_OFFSET_Y + RstickPos.y };
-	DrawIcon(RtriggerPos + OFFSET[team], RTrigger ? iconGraphs.triggerOn_R : iconGraphs.triggerOff_R);
+	DrawIcon(rightStickInput && (RStickVec.x  || RStickVec.y), RtriggerPos + OFFSET[team], RTrigger ? iconGraphs.triggerOn_R : iconGraphs.triggerOff_R);
 
 }

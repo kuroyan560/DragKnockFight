@@ -164,5 +164,8 @@ public:
 	void FinishSwing();
 
 	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName; }
+
+	//ノックアウトされた側
+	virtual void OnKnockOut() = 0;
 };
 

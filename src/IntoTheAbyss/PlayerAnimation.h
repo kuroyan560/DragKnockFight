@@ -12,6 +12,7 @@ static const enum PLAYER_ANIM
 	HOLD,
 	SWINGED,
 	TIRED,
+	KNOCK_OUT,
 	PLAYER_ANIM_NUM
 };
 
@@ -45,6 +46,7 @@ public:
 	void ChangeAnim(const PLAYER_ANIM& AnimStatus)
 	{
 		if (status == AnimStatus)return;
+		if (status == KNOCK_OUT)return;
 		status = AnimStatus;
 		timer = 0;
 		idx = 0;

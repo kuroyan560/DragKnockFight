@@ -202,7 +202,7 @@ void Player::OnDraw()
 	//if (vel.y < 0)playerDir = BACK;
 	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
 
-	if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty)
+	if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty && 20 <= moveTimer)
 	{
 		if (moveInput.x)
 		{
@@ -435,6 +435,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 			// 紐つかみ状態(踏ん張り状態)にする。
 			isHold = true;
 
+			tutorial.lock()->SetRstickInput(true);
 
 			// 握力タイマーを0に近づける。
 			--gripPowerTimer;
@@ -457,6 +458,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		// 紐つかみ状態(踏ん張り状態)を解除する。
 		isHold = false;
+
+		tutorial.lock()->SetRstickInput(false);
 	}
 
 	//チュートリアルの表示 / 非表示

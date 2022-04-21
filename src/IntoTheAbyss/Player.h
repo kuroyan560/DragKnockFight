@@ -192,4 +192,5 @@ private:
 
 public:
 	bool Appear()override;
+	void OnKnockOut()override { anim.ChangeAnim(KNOCK_OUT); }
 };

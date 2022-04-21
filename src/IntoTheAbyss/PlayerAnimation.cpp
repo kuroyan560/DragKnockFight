@@ -67,6 +67,14 @@ PlayerAnimation::PlayerAnimation(const PLAYABLE_CHARACTER_NAME& CharacterName)
 	animations[TIRED].loop = true;
 	animations[TIRED].size = { 117,93 };
 	animations[TIRED].handCenterOffset = { 0.0f,0.0f };
+
+	static const int KNOCK_OUT_NUM = 1;
+	animations[KNOCK_OUT].graph.resize(KNOCK_OUT_NUM);
+	animations[KNOCK_OUT].graph[0] = TexHandleMgr::LoadGraph(DIR + NAME_DIR[CharacterName] + "/swinged.png");
+	animations[KNOCK_OUT].interval = 10;
+	animations[KNOCK_OUT].loop = true;
+	animations[KNOCK_OUT].size = { 102,123 };
+	animations[KNOCK_OUT].handCenterOffset = { 0.0f,0.0f };
 }
 
 #include"SlowMgr.h"
