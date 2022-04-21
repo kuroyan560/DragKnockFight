@@ -8,6 +8,7 @@
 #include"FaceIcon.h"
 #include "ResultTransfer.h"
 #include "AfterImage.h"
+#include "CrashEffectMgr.h"
 
 void CharacterInterFace::SwingUpdate()
 {
@@ -572,10 +573,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 
 		// 一定以下だったらダメージを与えない。
-		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 1.0f) {
+		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 2.0f) {
 
 		}
-		else if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 3.0f) {
+		else if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 4.0f) {
 
 			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 			Vec2<float>vec = { 0,0 };
@@ -619,7 +620,11 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					++ResultTransfer::Instance()->rightCrashCount;
 				}
 
+				// クラッシュ演出を追加。
+				CrashEffectMgr::Instance()->Generate(pos);
+
 			}
+
 		}
 
 		// 壁はさみの判定
@@ -648,6 +653,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				else {
 					++ResultTransfer::Instance()->rightCrashCount;
 				}
+
+				// クラッシュ演出を追加。
+				CrashEffectMgr::Instance()->Generate(pos);
 			}
 			// ウィンドウ上下
 			bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
@@ -668,6 +676,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				else {
 					++ResultTransfer::Instance()->rightCrashCount;
 				}
+
+				// クラッシュ演出を追加。
+				CrashEffectMgr::Instance()->Generate(pos);
 			}
 		}
 

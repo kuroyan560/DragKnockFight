@@ -10,6 +10,7 @@
 #include"SightCollisionStorage.h"
 #include"SelectStage.h"
 #include"AfterImage.h"
+#include"CrashEffectMgr.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -340,6 +341,7 @@ void Game::Init()
 	ScrollMgr::Instance()->Reset();
 	roundChangeEffect.Init();
 	readyToStartRoundFlag = true;
+	CrashEffectMgr::Instance()->Init();
 }
 
 void Game::Update()
@@ -655,6 +657,9 @@ void Game::Update()
 	// 残像を更新。
 	AfterImageMgr::Instance()->Update();
 
+	// クラッシュ時の演出の更新処理。
+	CrashEffectMgr::Instance()->Update();
+
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -786,6 +791,9 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 			CharacterManager::Instance()->Right()->DrawUI();
 		}
 	}
+
+	// クラッシュ時の演出の描画処理。
+	CrashEffectMgr::Instance()->Draw();
 
 	ParticleMgr::Instance()->Draw();
 	CrashMgr::Instance()->Draw();
