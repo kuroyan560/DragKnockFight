@@ -1,6 +1,8 @@
 #pragma once
 #include"../Common/Vec.h"
 #include<array>
+#include"../Engine/DrawFunc.h"
+#include"../Engine/Sprite.h"
 
 class ScreenEdge
 {
@@ -24,6 +26,7 @@ private:
 	std::array<Vec2<float>, 2> scrollChancePos;
 	Vec2<float> vel;
 	Vec2<float> speed;
+	float uv;
 
 	Vec2<float>shakeValue;
 	float shakeRate;
@@ -39,6 +42,8 @@ private:
 
 	float rate;
 
+	float chanceAlpha;
+	float sinCurve;
 
 	bool winFlag;
 	bool getAwayFlag;
@@ -48,7 +53,13 @@ private:
 	int fadeOutMaxTimer;
 	Vec2<float> winPos;
 
+	Vec2<float>adjPos;
+	Vec2<float>adjTexPos;
+	Vec2<float>adjYPos;
+
 	//‰æ‘œƒnƒ“ƒhƒ‹-----------------------
+	std::array<Sprite, 2> chanceRender;
+
 	int playerChancehandle;
 	int playerFlamehandle;
 

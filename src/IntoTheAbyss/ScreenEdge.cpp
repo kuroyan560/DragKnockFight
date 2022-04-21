@@ -1,5 +1,4 @@
 #include "ScreenEdge.h"
-#include"../Engine/DrawFunc.h"
 #include"TexHandleMgr.h"
 #include"../Common/Angle.h"
 #include"../Common/KuroMath.h"
@@ -25,15 +24,19 @@ void ScreenEdge::Init(const float &DISTANCE, const Vec2<float> INIT_POS, const f
 	if (angle == 90.0f)
 	{
 		vecType = X_VEC;
-		speed = { 0.0f,3.0f };
-		scrollChancePos[1] = { 0.0f,-1280.0f / 2.0f };
+		speed = { 0.1f,0.0f };
+		scrollChancePos[1] = { 0.0f,-1280.0f };
+		adjTexPos.y = 640.0f;
 	}
 	else
 	{
 		vecType = Y_VEC;
-		speed = { 3.0f,0.0f };
-		scrollChancePos[1] = { -1280.0f / 2.0f,0.0f };
+		speed = { 0.1f,0.0f };
+		scrollChancePos[1] = { -1280.0f,0.0f };
+		adjTexPos.x = 640.0f;
+		adjYPos.x = -14.0f;
 	}
+	scrollChancePos[1] = {};
 
 	getAwayFlag = false;
 	winFlag = false;
@@ -56,7 +59,7 @@ void ScreenEdge::Init(const float &DISTANCE, const Vec2<float> INIT_POS, const f
 		else
 		{
 			reversFlag = true;
-			shakeRate = 1.0f;
+			shakeRate = 0.0f;
 		}
 		break;
 
@@ -71,7 +74,7 @@ void ScreenEdge::Init(const float &DISTANCE, const Vec2<float> INIT_POS, const f
 		else
 		{
 			reversFlag = true;
-			shakeRate = 1.0f;
+			shakeRate = 0.0f;
 		}
 		break;
 	default:
@@ -80,6 +83,12 @@ void ScreenEdge::Init(const float &DISTANCE, const Vec2<float> INIT_POS, const f
 
 
 	fadeOutMaxTimer = 120;
+
+	sinCurve = 0.0f;
+	chanceAlpha = 0.0f;
+
+	adjPos.x = 16.0f;
+	adjPos.y = -16.0f;
 }
 
 void ScreenEdge::StartWinEffect(int FADE_OUT_TIMER)
@@ -159,7 +168,7 @@ void ScreenEdge::Update()
 			reversFlag = false;
 		}
 
-		float timer = 10.0f + 30.0f * (1.0 - rate);
+		float timer = 2.0f + 20.0f * (1.0 - rate);
 		if (reversFlag)
 		{
 			MRate(&shakeRate, timer);
@@ -171,10 +180,10 @@ void ScreenEdge::Update()
 		switch (vecType)
 		{
 		case ScreenEdge::X_VEC:
-			shakeValue.x = KuroMath::Lerp(0.0f, 10.0f, shakeRate);
+			shakeValue.x = KuroMath::Liner(0.0f, distance.x , shakeRate);
 			break;
 		case ScreenEdge::Y_VEC:
-			shakeValue.y = KuroMath::Lerp(0.0f, 10.0f, shakeRate);
+			shakeValue.y = KuroMath::Liner(0.0f, distance.y, shakeRate);
 			break;
 		default:
 			break;
@@ -182,7 +191,7 @@ void ScreenEdge::Update()
 		//進行方向に揺らす処理-----------------------
 
 		//座標の初期化
-		lerpPos = basePos + distance + shakeValue;
+		lerpPos = basePos + shakeValue;
 	}
 	//捌ける演出
 	else if (getAwayFlag && !initGetAwayFlag)
@@ -300,19 +309,20 @@ void ScreenEdge::Update()
 	{
 		scrollChancePos[i] += vel;
 
+		float texSize = 1280.0f;
 		switch (vecType)
 		{
 		case ScreenEdge::X_VEC:
-			if (WinApp::Instance()->GetWinSize().x / 2.0f <= scrollChancePos[i].y)
+			if (texSize <= scrollChancePos[i].y)
 			{
-				scrollChancePos[i].y = -1280.0f / 2.0f;
+				scrollChancePos[i].y = -(1280.0f) * WinApp::Instance()->GetWinDifferRate().x;
 			}
 			break;
 
 		case ScreenEdge::Y_VEC:
-			if (WinApp::Instance()->GetWinSize().x / 2.0f <= scrollChancePos[i].x)
+			if (texSize <= scrollChancePos[i].x)
 			{
-				scrollChancePos[i].x = -1280.0f / 2.0f;
+				scrollChancePos[i].x = -1280.0f;
 			}
 			break;
 		default:
@@ -324,14 +334,33 @@ void ScreenEdge::Update()
 
 	Vec2<float> lerp = lerpPos - pos;
 	pos += lerp * 0.2f;
+
+	//チャンスフレームのサインカーブ
+	float pi = 3.14f;
+	float pi2 = pi / 2.0f;
+	sinCurve += 3.0f;
+	chanceAlpha = 55.0f + ((sinf(-pi2 + pi / 120.0f * sinCurve) + 1.0f) / 2) * 200.0f;
+
+	uv += 0.001f;
+	for (int i = 0; i < 2; ++i)
+	{
+		chanceRender[i].transform.SetPos(pos + adjPos + adjYPos);
+		chanceRender[i].mesh.SetSize(Vec2<float>(1280.0f, 32.0f));
+		Vec3<Angle>lAngle = { 0.0f,0.0f,Angle(static_cast<int>(angle)) };
+		chanceRender[i].transform.SetRotate(lAngle);
+		chanceRender[i].SetTexture(TexHandleMgr::GetTexBuffer(nowChanceHandle));
+		chanceRender[i].SetColor(Color(255, 255, 255, static_cast<int>(chanceAlpha)));
+
+		chanceRender[i].mesh.SetUv(0.0f, 1.0f, 0.0f + uv, 1.0f + uv);
+	}
 }
 
 void ScreenEdge::Draw()
 {
-	DrawFunc::DrawRotaGraph2D(pos, Vec2<float>(1.0f, 1.0f), Angle::ConvertToRadian(angle), TexHandleMgr::GetTexBuffer(nowFlameHandle));
+	DrawFunc::DrawRotaGraph2D(pos + adjTexPos, Vec2<float>(1.0f, 1.0f), Angle::ConvertToRadian(angle), TexHandleMgr::GetTexBuffer(nowFlameHandle));
 
 	for (int i = 0; i < scrollChancePos.size(); ++i)
 	{
-		DrawFunc::DrawRotaGraph2D(pos + scrollChancePos[i], Vec2<float>(1.0f, 1.0f), Angle::ConvertToRadian(angle), TexHandleMgr::GetTexBuffer(nowChanceHandle));
+		chanceRender[i].Draw(AlphaBlendMode_Trans);
 	}
 }

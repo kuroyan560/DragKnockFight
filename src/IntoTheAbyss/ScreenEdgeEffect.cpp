@@ -14,13 +14,13 @@ void ScreenEdgeEffect::Init()
 	winHalfSize = winSize;
 	winHalfSize /= 2.0f;
 
-	float distance = 120.0f;
+	float distance = 220.0f;
 	float adjDistance = 40.0f;
 
-	screenEdge[UP].Init(distance, Vec2<float>(winHalfSize.x, -adjDistance), 0.0f);
-	screenEdge[DOWN].Init(distance, Vec2<float>(winHalfSize.x, winSize.y + adjDistance), 0.0f);
-	screenEdge[LEFT].Init(distance, Vec2<float>(0.0f - adjDistance, winHalfSize.y), 90.0f);
-	screenEdge[RIGHT].Init(distance, Vec2<float>(winSize.x + adjDistance, winHalfSize.y), 90.0f);
+	screenEdge[UP].Init(distance, Vec2<float>(0.0f, -adjDistance), 0.0f);
+	screenEdge[DOWN].Init(distance, Vec2<float>(0.0f, winSize.y + adjDistance), 0.0f);
+	screenEdge[LEFT].Init(distance, Vec2<float>(0.0f - adjDistance, 0.0f), 90.0f);
+	screenEdge[RIGHT].Init(distance, Vec2<float>(winSize.x + adjDistance, 0.0f), 90.0f);
 
 	leftWinFlag = false;
 	rightWinFlag = false;
