@@ -138,6 +138,7 @@ public:
 		partner = Partner;
 		team = Team;
 		characterName = Name;
+		outOfStaminaEffect.Init();
 	}
 	void Init(const Vec2<float>& GeneratePos);	//ラウンド開始時に呼び出される
 	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
