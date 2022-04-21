@@ -13,6 +13,7 @@ Tutorial::Tutorial(const WHICH_TEAM& Team) :team(Team)
 		for (int i = 0; i < TEAM_NUM; ++i)
 		{
 			std::string dir = "resource/ChainCombat/tutorial/icon/" + additionalDir[i];
+			ICON_GRAPHS[i].stickHead = TexHandleMgr::LoadGraph(dir + "stickHead.png");
 			ICON_GRAPHS[i].stickBase_L = TexHandleMgr::LoadGraph(dir + "L_stick_base.png");
 			ICON_GRAPHS[i].stickBase_R = TexHandleMgr::LoadGraph(dir + "R_stick_base.png");
 			ICON_GRAPHS[i].triggerOn_L = TexHandleMgr::LoadGraph(dir + "L_trigger_on.png");
@@ -63,7 +64,6 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 	}
 
 
-	static const int STICK_HEAD_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/icon/stickHead.png");
 	//右プレイヤーか左プレイヤーかでの位置オフセット
 	static const Vec2<float> OFFSET[TEAM_NUM] = { {65,500},{1135,500} };
 	//スティックのヘッドの半径オフセット
@@ -78,7 +78,7 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 	//左スティックヘッド
 	static const Vec2<float>LstickHeadCenterOffset = Vec2<float>(-48.0f, 2.0f) * SCALE;
 	const Vec2<float>LstickHeadPos = LstickPos + LstickHeadCenterOffset + LStickVec.GetNormal() * STICK_HEAD_RADIUS_OFFSET;
-	DrawIcon(LstickHeadPos + LstickOffset + OFFSET[team], STICK_HEAD_GRAPH);
+	DrawIcon(LstickHeadPos + LstickOffset + OFFSET[team], iconGraphs.stickHead);
 
 	//左トリガー
 	static const Vec2<float>LtriggerPos = { 22,ICON_OFFSET_Y + LstickPos.y };
@@ -100,5 +100,5 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 	DrawIcon(rightStickInput && (RStickVec.x  || RStickVec.y), RtriggerPos + OFFSET[team], RTrigger ? iconGraphs.triggerOn_R : iconGraphs.triggerOff_R);
 
 	DrawIcon(rightStickInput, RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBase_R);
-	DrawIcon(rightStickInput, RstickHeadPos + OFFSET[team], STICK_HEAD_GRAPH);
+	DrawIcon(rightStickInput, RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
 }
