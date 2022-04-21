@@ -31,8 +31,11 @@ TitleScene::TitleScene()
 	std::vector<int>handle;
 	std::vector<int>handle2;
 
-	handle.push_back({});
-	handle2.push_back({});
+	handle.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/0.png"));
+	handle.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/1.png"));
+	handle.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/2.png"));
+	handle2.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/str/0.png"));
+	handle2.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/str/1.png"));
 
 	picture.Init(handle, handle2);
 }
@@ -79,11 +82,11 @@ void TitleScene::OnUpdate()
 		isPressStartDraw = isPressStartDraw ? false : true;
 	}
 
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_S, "Start", "DIK_S"))
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_A, "Start", "DIK_A"))
 	{
 		picture.Start();
 	}
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_S, "End", "DIK_E"))
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_E, "End", "DIK_E"))
 	{
 		picture.Finish();
 	}

@@ -1,6 +1,7 @@
 #include "PictureStory.h"
 #include"../Engine/DrawFunc.h"
 #include"TexHandleMgr.h"
+#include"../Engine/WinApp.h"
 
 PictureStory::PictureStory()
 {
@@ -13,6 +14,9 @@ void PictureStory::Init(const std::vector<int> &PICTURE_HANDLE, const std::vecto
 
 	picturePos.resize(PICTURE_HANDLE.size());
 	stringPos.resize(PICTURE_HANDLE.size());
+
+	basePos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x / 2);
+	basePos.y = -50.0f;
 }
 
 void PictureStory::Update()
@@ -38,14 +42,6 @@ void PictureStory::Update()
 
 
 
-
-
-
-		//ìoèÍââèo
-		Rate(&stringAppearRate, 30.0f);
-		stringPos[stringArrayHandle] = basePos;
-		stringPos[stringArrayHandle].y += KuroMath::Ease(Out, Elastic, stringAppearRate, 0.0f, 1.0f) * 200.0f;
-
 		//ìríÜââèo
 		if (nextFlag)
 		{
@@ -60,6 +56,13 @@ void PictureStory::Update()
 		{
 			MRate(&stringNextRate, 30.0f);
 		}
+
+		//ìoèÍââèo
+		Rate(&stringAppearRate, 30.0f);
+		stringPos[stringArrayHandle] = basePos;
+		stringPos[stringArrayHandle].y += KuroMath::Ease(Out, Elastic, stringAppearRate, 0.0f, 1.0f) * 200.0f;
+
+		//ìríÜââèoÇÃâ¡éZ
 		stringPos[stringArrayHandle].y += -KuroMath::Ease(Out, Cubic, stringNextRate, 0.0f, 1.0f) * 10.0f;
 
 		//èIóπèàóù
@@ -71,7 +74,7 @@ void PictureStory::Update()
 				goToNextSceneFlag = true;
 			}
 		}
-		stringPos[stringArrayHandle].y += -KuroMath::Ease(In, Cubic, stringFinishRate, 0.0f, 1.0f) * 200.0f;
+		stringPos[stringArrayHandle].y += -KuroMath::Ease(In, Cubic, stringFinishRate, 0.0f, 1.0f) * 300.0f;
 
 
 
@@ -92,8 +95,14 @@ void PictureStory::Update()
 
 void PictureStory::Draw()
 {
-	DrawFunc::DrawRotaGraph2D(picturePos[pictureArrayHandle], Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(pictureHandle[pictureArrayHandle]));
-	DrawFunc::DrawRotaGraph2D(stringPos[stringArrayHandle], Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(stringHandle[stringArrayHandle]));
+	if (startFlag)
+	{
+		Vec2<float>adjPos;
+		adjPos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x / 2);
+		adjPos.y = static_cast<float>(WinApp::Instance()->GetWinSize().y / 2);
+		DrawFunc::DrawRotaGraph2D(picturePos[pictureArrayHandle] + adjPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(pictureHandle[pictureArrayHandle]));
+		DrawFunc::DrawRotaGraph2D(stringPos[stringArrayHandle], Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(stringHandle[stringArrayHandle]));
+	}
 }
 
 void PictureStory::Start()
@@ -120,4 +129,5 @@ void PictureStory::Start()
 
 void PictureStory::Finish()
 {
+	finishFlag = true;
 }
