@@ -25,6 +25,8 @@ TutorialScene::TutorialScene()
 	aButtonHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/star.png");
 	pos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x - 70);
 	pos.y = static_cast<float>(WinApp::Instance()->GetWinSize().y - 70);
+	drawButtonFlag = true;
+	flashTimer = 0;
 }
 
 void TutorialScene::OnInitialize()
@@ -40,6 +42,13 @@ void TutorialScene::OnUpdate()
 	{
 		KuroEngine::Instance().ChangeScene(0, changeScene);
 	}
+
+	++flashTimer;
+	if (30 <= flashTimer)
+	{
+		drawButtonFlag = !drawButtonFlag;
+		flashTimer = 0;
+	}
 }
 
 void TutorialScene::OnDraw()
@@ -49,7 +58,10 @@ void TutorialScene::OnDraw()
 
 	pictureStory.Draw();
 
-	DrawFunc::DrawRotaGraph2D(pos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(aButtonHandle));
+	if (drawButtonFlag)
+	{
+		DrawFunc::DrawRotaGraph2D(pos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(aButtonHandle));
+	}
 }
 
 void TutorialScene::OnImguiDebug()

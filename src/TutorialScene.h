@@ -19,5 +19,7 @@ public:
 
 	Vec2<float>pos;
 	int aButtonHandle;
+	int flashTimer;
+	bool drawButtonFlag;
 };
 

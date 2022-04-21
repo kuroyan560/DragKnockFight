@@ -28,7 +28,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	engineOption.windowName = "DragKnockFight";
 	engineOption.windowSize = { 1280,720 };
 	engineOption.iconPath = nullptr;
-	engineOption.backBuffClearColor = Color(0.0f, 0.0f, 0.0f, 1.0f);
+	engineOption.backBuffClearColor = Color(56, 22, 74, 255);
 	engineOption.useHDR = false;
 	engineOption.frameRate = 43;
 	engineOption.imguiActive = false;
