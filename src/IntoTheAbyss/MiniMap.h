@@ -13,10 +13,12 @@ public:
 
 	float miniX;
 	float massX;
+
+	float nowValue;
 private:
 	Vec2<float>	nowPos;
 	float maxValue;
-	float nowValue;
+
 	float keep;
 
 	int lineHandle;

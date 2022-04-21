@@ -69,7 +69,6 @@ void TitleScene::OnUpdate()
 		isPressStartDraw = isPressStartDraw ? false : true;
 
 	}
-
 }
 
 void TitleScene::OnDraw()
