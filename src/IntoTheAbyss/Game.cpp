@@ -420,7 +420,7 @@ void Game::Update()
 		playerOrEnemeyWinFlag = true;
 		gameStartFlag = false;
 
-		screenEdgeEffect.LeftPlayerWin();
+		screenEdgeEffect.LeftPlayerWin(120);
 	}
 
 	//敵陣地とプレイヤーの判定
@@ -435,7 +435,7 @@ void Game::Update()
 		areaHitColor = Color(255, 0, 0, 255);
 		playerHitColor = Color(255, 0, 0, 255);
 
-		screenEdgeEffect.RightPlayerWin();
+		screenEdgeEffect.RightPlayerWin(120);
 	}
 
 	//ラウンド終了演出開始

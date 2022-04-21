@@ -78,11 +78,14 @@ void ScreenEdge::Init(const float &DISTANCE, const Vec2<float> INIT_POS, const f
 		break;
 	}
 
+
+	fadeOutMaxTimer = 120;
 }
 
-void ScreenEdge::StartWinEffect()
+void ScreenEdge::StartWinEffect(int FADE_OUT_TIMER)
 {
 	winFlag = true;
+	fadeOutMaxTimer = FADE_OUT_TIMER;
 }
 
 void ScreenEdge::StartFinishEffect()
@@ -257,7 +260,7 @@ void ScreenEdge::Update()
 	{
 		++initTimer;
 	}
-	if (120 <= initTimer && initWinFlag)
+	if (fadeOutMaxTimer <= initTimer && initWinFlag)
 	{
 		switch (vecType)
 		{

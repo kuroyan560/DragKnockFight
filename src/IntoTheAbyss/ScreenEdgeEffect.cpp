@@ -24,6 +24,7 @@ void ScreenEdgeEffect::Init()
 
 	leftWinFlag = false;
 	rightWinFlag = false;
+	winFadeOutTimer = 120;
 }
 
 void ScreenEdgeEffect::Update()
@@ -36,17 +37,17 @@ void ScreenEdgeEffect::Update()
 
 	if (rightWinFlag)
 	{
-		screenEdge[UP].StartWinEffect();
+		screenEdge[UP].StartWinEffect(winFadeOutTimer);
 		screenEdge[DOWN].StartFinishEffect();
-		screenEdge[LEFT].StartWinEffect();
+		screenEdge[LEFT].StartWinEffect(winFadeOutTimer);
 		screenEdge[RIGHT].StartFinishEffect();
 	}
 	if (leftWinFlag)
 	{
-		screenEdge[UP].StartWinEffect();
+		screenEdge[UP].StartWinEffect(winFadeOutTimer);
 		screenEdge[DOWN].StartFinishEffect();
 		screenEdge[LEFT].StartFinishEffect();
-		screenEdge[RIGHT].StartWinEffect();
+		screenEdge[RIGHT].StartWinEffect(winFadeOutTimer);
 	}
 }
 
@@ -63,12 +64,14 @@ void ScreenEdgeEffect::CheckPos(const float &LINE_CENTER_POS)
 	nowDistance = LINE_CENTER_POS;
 }
 
-void ScreenEdgeEffect::LeftPlayerWin()
+void ScreenEdgeEffect::LeftPlayerWin(const int &FADE_OUT_TIEMR)
 {
 	leftWinFlag = true;
+	winFadeOutTimer = FADE_OUT_TIEMR;
 }
 
-void ScreenEdgeEffect::RightPlayerWin()
+void ScreenEdgeEffect::RightPlayerWin(const int &FADE_OUT_TIEMR)
 {
 	rightWinFlag = true;
+	winFadeOutTimer = FADE_OUT_TIEMR;
 }

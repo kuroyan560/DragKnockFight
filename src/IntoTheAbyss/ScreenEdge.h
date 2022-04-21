@@ -8,7 +8,7 @@ public:
 	ScreenEdge();
 
 	void Init(const float &DISTANCE, const Vec2<float> INIT_POS, const float ANGLE);
-	void StartWinEffect();
+	void StartWinEffect(int FADE_OUT_TIMER = 120);
 	void StartFinishEffect();
 	void CaluPos(const float &RATE);
 
@@ -45,6 +45,7 @@ private:
 	bool initWinFlag;
 	bool initGetAwayFlag;
 	int initTimer;
+	int fadeOutMaxTimer;
 	Vec2<float> winPos;
 
 	//‰æ‘œƒnƒ“ƒhƒ‹-----------------------

@@ -13,14 +13,16 @@ public:
 
 	void CheckPos(const float &LINE_CENTER_POS);
 
-	bool leftWinFlag;
-	bool rightWinFlag;
-
-	void LeftPlayerWin();
-	void RightPlayerWin();
+	void LeftPlayerWin(const int &FADE_OUT_TIEMR);
+	void RightPlayerWin(const int &FADE_OUT_TIEMR);
 private:
 	Vec2<float>pos;
 	float nowDistance;
+
+	bool leftWinFlag;
+	bool rightWinFlag;
+
+	int winFadeOutTimer;
 
 	enum 
 	{
