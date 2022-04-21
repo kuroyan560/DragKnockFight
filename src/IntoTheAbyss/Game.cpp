@@ -193,7 +193,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	SuperiorityGauge::Instance()->Init();
 
-	FaceIcon::Instance()->Init();
+	FaceIcon::Instance()->Init(CharacterManager::Instance()->Left()->GetCharacterName(), CharacterManager::Instance()->Right()->GetCharacterName());
 
 	mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
@@ -257,8 +257,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		}
 
 		Vec2<float>chipPos(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE);
-		playerHomeBase->Init(playerLeftUpPos - chipPos, playerRightDownPos + chipPos, true);
-		enemyHomeBase->Init(enemyLeftUpPos - chipPos, enemyRightDownPos + chipPos, false);
+		playerHomeBase.Init(playerLeftUpPos - chipPos, playerRightDownPos + chipPos, true);
+		enemyHomeBase.Init(enemyLeftUpPos - chipPos, enemyRightDownPos + chipPos, false);
 
 		{
 			float size = (mapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
@@ -297,11 +297,8 @@ Game::Game()
 	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 	AudioApp::Instance()->ChangeVolume(bgm, 0.07f);
 
-	playerHomeBase = std::make_unique<HomeBase>();
-	enemyHomeBase = std::make_unique<HomeBase>();
-
-	playerHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f }, true);
-	enemyHomeBase->Init({ 0.0f,0.0f }, { 800.0f,1000.0f }, false);
+	playerHomeBase.Init({ 0.0f,0.0f }, { 0.0f,0.0f }, true);
+	enemyHomeBase.Init({ 0.0f,0.0f }, { 800.0f,1000.0f }, false);
 	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
 
 	cameraBasePos = { 0.0f,-40.0f };
@@ -340,6 +337,7 @@ void Game::Init()
 	ScrollMgr::Instance()->Reset();
 	roundChangeEffect.Init();
 	readyToStartRoundFlag = true;
+	screenEdgeEffect.Init();
 }
 
 void Game::Update()
@@ -415,7 +413,7 @@ void Game::Update()
 
 
 	//プレイヤー陣地と敵の判定
-	if (playerHomeBase->Collision(CharacterManager::Instance()->Right()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
+	if (playerHomeBase.Collision(CharacterManager::Instance()->Right()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//プレイヤー勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, true, CharacterManager::Instance()->Right()->pos);
@@ -423,10 +421,12 @@ void Game::Update()
 		roundFinishFlag = true;
 		playerOrEnemeyWinFlag = true;
 		gameStartFlag = false;
+
+		screenEdgeEffect.LeftPlayerWin(120);
 	}
 
 	//敵陣地とプレイヤーの判定
-	if (enemyHomeBase->Collision(CharacterManager::Instance()->Left()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
+	if (enemyHomeBase.Collision(CharacterManager::Instance()->Left()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//敵勝利
 		WinCounter::Instance()->RoundFinish(lineCenterPos, false, CharacterManager::Instance()->Left()->pos);
@@ -437,6 +437,8 @@ void Game::Update()
 
 		areaHitColor = Color(255, 0, 0, 255);
 		playerHitColor = Color(255, 0, 0, 255);
+
+		screenEdgeEffect.RightPlayerWin(120);
 	}
 
 	//ラウンド終了演出開始
@@ -481,6 +483,10 @@ void Game::Update()
 	//ラウンド開始時の演出開始
 	if (readyToStartRoundFlag)
 	{
+		CharacterManager::Instance()->Left()->outOfStaminaEffect.Init();
+		CharacterManager::Instance()->Right()->outOfStaminaEffect.Init();
+
+
 		roundChangeEffect.Start(WinCounter::Instance()->GetNowRound(), playerOrEnemeyWinFlag);
 		Vec2<float>winSize;
 		winSize.x = static_cast<float>(WinApp::Instance()->GetWinSize().x);
@@ -508,6 +514,7 @@ void Game::Update()
 				readyToStartRoundFlag = false;
 				gameStartFlag = true;
 				roundTimer = 0;
+				screenEdgeEffect.Init();
 				CharacterManager::Instance()->Left()->SetCanMove(true);
 				CharacterManager::Instance()->Right()->SetCanMove(true);
 				CharacterManager::Instance()->Left()->SetHitCheck(true);
@@ -525,11 +532,18 @@ void Game::Update()
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
-	// プレイヤーの更新処理
-	CharacterManager::Instance()->Left()->Update(mapData, lineCenterPos);
+	screenEdgeEffect.CheckPos(miniMap.nowValue);
 
-	// ボスの更新処理
-	CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
+
+
+	// プレイヤーの更新処理
+	if (!roundFinishFlag)
+	{
+		CharacterManager::Instance()->Left()->Update(mapData, lineCenterPos);
+
+		// ボスの更新処理
+		CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
+	}
 
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
@@ -539,6 +553,7 @@ void Game::Update()
 	CharacterManager::Instance()->Right()->CheckHit(mapData, lineCenterPos);
 
 	miniMap.Update();
+	screenEdgeEffect.Update();
 
 	roundChangeEffect.Update();
 
@@ -674,8 +689,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		thornBlocks[i]->Draw();
 	}
 
-	playerHomeBase->Draw();
-	enemyHomeBase->Draw();
+	playerHomeBase.Draw();
+	enemyHomeBase.Draw();
 
 	static int CENTER_CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static int PLAYER_CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain_player.png");
@@ -788,6 +803,11 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	}
 
 	ParticleMgr::Instance()->Draw();
+
+	CharacterManager::Instance()->Left()->outOfStaminaEffect.Draw();
+	CharacterManager::Instance()->Right()->outOfStaminaEffect.Draw();
+
+
 	CrashMgr::Instance()->Draw();
 
 	GameTimer::Instance()->Draw();
@@ -802,6 +822,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	FaceIcon::Instance()->Draw();
 
+	screenEdgeEffect.Draw();
 	WinCounter::Instance()->Draw();
 
 	StunEffect::Instance()->Draw();
@@ -819,10 +840,11 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	}
 
 	{
-		Vec2<float>leftUpPos = *enemyHomeBase->hitBox.center - enemyHomeBase->hitBox.size / 2.0f;
-		Vec2<float>rightDownPos = *enemyHomeBase->hitBox.center + enemyHomeBase->hitBox.size / 2.0f;
+		Vec2<float>leftUpPos = *enemyHomeBase.hitBox.center - enemyHomeBase.hitBox.size / 2.0f;
+		Vec2<float>rightDownPos = *enemyHomeBase.hitBox.center + enemyHomeBase.hitBox.size / 2.0f;
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
+
 }
 
 void Game::Scramble()

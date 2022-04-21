@@ -17,6 +17,8 @@ class LightManager;
 #include"CharacterInterFace.h"
 class Tutorial;
 
+#include"RunOutOfStaminaEffect.h"
+
 // プレイヤークラス
 class Player :public CharacterInterFace
 {

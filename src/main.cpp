@@ -5,6 +5,7 @@
 #include"Transform2D.h"
 #include"Color.h"
 #include"DrawFunc.h"
+#include"DrawFunc_Color.h"
 #include"DrawFunc_Shadow.h"
 #include"DrawFunc_FillTex.h"
 #include"DrawFunc_Mask.h"
@@ -65,6 +66,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		Transform2D::DirtyReset();
 
 		DrawFunc::CountReset();
+		DrawFunc_Color::CountReset();
 		DrawFunc_Shadow::CountReset();
 		DrawFunc_FillTex::CountReset();
 		DrawFunc_Mask::CountReset();

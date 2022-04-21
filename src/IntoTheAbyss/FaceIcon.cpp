@@ -11,6 +11,18 @@ FaceIcon::FaceIcon()
 	animasions[PLAYABLE_LUNA][DAMAGE].graph.emplace_back(TexHandleMgr::LoadGraph(lunaDir + "damage.png"));
 	animasions[PLAYABLE_LUNA][BREAK].graph.emplace_back(TexHandleMgr::LoadGraph(lunaDir + "break.png"));
 	animasions[PLAYABLE_LUNA][DEAD].graph.emplace_back(TexHandleMgr::LoadGraph(lunaDir + "dead.png"));
+
+	const std::string lacyDir = dir + "lacy/";
+	animasions[PLAYABLE_LACY][DEFAULT].graph.emplace_back(TexHandleMgr::LoadGraph(lacyDir + "default.png"));
+	animasions[PLAYABLE_LACY][DAMAGE].graph.emplace_back(TexHandleMgr::LoadGraph(lacyDir + "damage.png"));
+	animasions[PLAYABLE_LACY][BREAK].graph.emplace_back(TexHandleMgr::LoadGraph(lacyDir + "break.png"));
+	animasions[PLAYABLE_LACY][DEAD].graph.emplace_back(TexHandleMgr::LoadGraph(lacyDir + "dead.png"));
+
+	const std::string boss_0Dir = dir + "boss_0/";
+	animasions[PLAYABLE_BOSS_0][DEFAULT].graph.emplace_back(TexHandleMgr::LoadGraph(boss_0Dir + "default.png"));
+	animasions[PLAYABLE_BOSS_0][DAMAGE].graph.emplace_back(TexHandleMgr::LoadGraph(boss_0Dir + "damage.png"));
+	animasions[PLAYABLE_BOSS_0][BREAK].graph.emplace_back(TexHandleMgr::LoadGraph(boss_0Dir + "break.png"));
+	animasions[PLAYABLE_BOSS_0][DEAD].graph.emplace_back(TexHandleMgr::LoadGraph(boss_0Dir + "dead.png"));
 }
 
 void FaceIcon::Init(const PLAYABLE_CHARACTER_NAME& Left, const PLAYABLE_CHARACTER_NAME& Right)

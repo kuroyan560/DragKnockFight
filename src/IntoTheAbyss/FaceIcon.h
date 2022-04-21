@@ -34,10 +34,6 @@ class FaceIcon : public Singleton<FaceIcon>
 
 public:
 	void Init(const PLAYABLE_CHARACTER_NAME& Left, const PLAYABLE_CHARACTER_NAME& Right);
-	void Init()
-	{
-		Init(PLAYABLE_LUNA, PLAYABLE_LUNA);
-	}
 	void Update();
 	void Draw();
 

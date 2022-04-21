@@ -1,6 +1,7 @@
 #pragma once
 #include"KuroEngine.h"
 #include"SceneCange.h"
+#include"ScreenEdgeEffect.h"
 
 class TitleScene : public BaseScene
 {
@@ -49,5 +50,6 @@ public:
 	void OnFinalize()override;
 
 	std::shared_ptr<SceneCange> changeScene;
+
 };
 
