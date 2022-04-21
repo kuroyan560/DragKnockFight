@@ -156,6 +156,15 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	//移動に関する処理
 	Move();
 
+	if (isGripPowerEmpty)
+	{
+		outOfStaminaEffect.Start(pos, MAX_GRIP_POWER_TIMER);
+	}
+	outOfStaminaEffect.baseMaxStringPos = pos;
+	outOfStaminaEffect.baseEmptyStringPos = pos;
+	outOfStaminaEffect.Update();
+
+
 	// 連射タイマーを更新
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;
 	if (rapidFireTimerRight > 0) --rapidFireTimerRight;
@@ -259,9 +268,9 @@ void Player::OnDraw()
 	//胴体
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
-	bool mirorX = playerDirX == PLAYER_RIGHT || (isHold && (partner.lock()->pos - pos).x < 0);
-	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
-		stagingDevice.GetSpinRadian(), bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
+	bool mirorX = 0 < vel.x || (isHold && (partner.lock()->pos - pos).x < 0);
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size * outOfStaminaEffect.GetSize(),
+		stagingDevice.GetSpinRadian() , bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
 }
 
 void Player::OnDrawUI()

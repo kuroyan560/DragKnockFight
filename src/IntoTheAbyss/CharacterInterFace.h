@@ -8,6 +8,7 @@
 #include<array>
 #include "Intersected.h"
 #include"BulletMgrBase.h"
+#include"RunOutOfStaminaEffect.h"
 
 static const enum PLAYABLE_CHARACTER_NAME { PLAYABLE_LUNA, PLAYABLE_LACY, PLAYABLE_BOSS_0, PLAYABLE_CHARACTER_NUM, PLAYER_CHARACTER_NUM = PLAYABLE_LACY + 1 };
 static const enum WHICH_TEAM { LEFT_TEAM, RIGHT_TEAM, TEAM_NUM };
@@ -129,6 +130,7 @@ public:
 	bool isGripPowerEmpty;		// 握力タイマーを使い切ってから回復するまでを判断するためのフラグ
 	float gripPowerTimer;			// 握力タイマー
 	const int MAX_GRIP_POWER_TIMER = 180;
+	RunOutOfStaminaEffect outOfStaminaEffect;
 
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team, const PLAYABLE_CHARACTER_NAME& Name)
 	{
