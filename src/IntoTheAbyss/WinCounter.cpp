@@ -34,13 +34,17 @@ void WinCounter::Update()
 	static const int APPEAR_TIME = 60;
 	static const int WAIT_TIME = 30;
 	static const int DISAPPEAR_TIME = 60;
+	static const Vec2<float> APPEAR_POS = { (float)WinApp::Instance()->GetWinCenter().x, (float)WinApp::Instance()->GetWinCenter().y + 100.0f };
 	const float toRad = Angle::ROUND() * 2.0f * knockOutSpinVec;
 
 	if (knockOutTimer <= APPEAR_TIME)
 	{
-		knockOutPos = KuroMath::Ease(Out, Exp, knockOutTimer, APPEAR_TIME, knockOutAppearPos, WinApp::Instance()->GetExpandWinCenter());
+		/*knockOutPos = KuroMath::Ease(Out, Exp, knockOutTimer, APPEAR_TIME, knockOutAppearPos, WinApp::Instance()->GetExpandWinCenter());
 		kncokOutScale = KuroMath::Ease(Out, Elastic, knockOutTimer, APPEAR_TIME, 0.0f, 1.0f);
-		knockOutRadian = KuroMath::Ease(Out, Exp, knockOutTimer, APPEAR_TIME, 0.0f, toRad);
+		knockOutRadian = KuroMath::Ease(Out, Exp, knockOutTimer, APPEAR_TIME, 0.0f, toRad);*/
+
+		knockOutPos = KuroMath::Ease(Out, Exp, knockOutTimer, APPEAR_TIME, { APPEAR_POS.x, -100.0f }, APPEAR_POS);
+		kncokOutScale = 1.0f;
 	}
 	else if (knockOutTimer <= APPEAR_TIME + WAIT_TIME)
 	{
@@ -48,9 +52,13 @@ void WinCounter::Update()
 	else if (knockOutTimer <= APPEAR_TIME + WAIT_TIME + DISAPPEAR_TIME)
 	{
 		int timer = knockOutTimer - APPEAR_TIME - WAIT_TIME;
-		knockOutPos = KuroMath::Ease(In, Exp, timer, DISAPPEAR_TIME, WinApp::Instance()->GetExpandWinCenter(), knockOutDisappearPos);
+
+		knockOutPos = KuroMath::Ease(In, Cubic, timer, DISAPPEAR_TIME, APPEAR_POS, { APPEAR_POS.x, (float)WinApp::Instance()->GetWinSize().y + 100.0f });
+		kncokOutScale = 1.0f;
+
+		/*knockOutPos = KuroMath::Ease(In, Exp, timer, DISAPPEAR_TIME, WinApp::Instance()->GetExpandWinCenter(), knockOutDisappearPos);
 		kncokOutScale = KuroMath::Ease(In, Back, timer, DISAPPEAR_TIME, 1.0f, 0.0f);
-		knockOutRadian = KuroMath::Ease(In, Exp, timer, DISAPPEAR_TIME, toRad, 0.0f);
+		knockOutRadian = KuroMath::Ease(In, Exp, timer, DISAPPEAR_TIME, toRad, 0.0f);*/
 	}
 	else
 	{
@@ -76,7 +84,7 @@ void WinCounter::Draw()
 
 	for (int i = 0; i < drawCountLeft; ++i)
 	{
-		DrawFunc::DrawGraph(GetWinCountPos(true,i), TexHandleMgr::GetTexBuffer(winCountGraph_Left), AlphaBlendMode_Trans);
+		DrawFunc::DrawGraph(GetWinCountPos(true, i), TexHandleMgr::GetTexBuffer(winCountGraph_Left), AlphaBlendMode_Trans);
 	}
 
 	//勝利数カウント(右)
@@ -92,7 +100,7 @@ void WinCounter::Draw()
 }
 
 #include"AudioApp.h"
-void WinCounter::RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsLeft)
+void WinCounter::RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsLeft, const Vec2<float>& WinnerPos)
 {
 	static int SE = -1;
 	if (SE == -1)
@@ -124,4 +132,8 @@ void WinCounter::RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsL
 
 	knockOutTimer = 0;
 	animation = true;
+
+	// ズームを付ける。
+	Camera::Instance()->Focus(WinnerPos + Vec2<float>(0.0f, 50.0f), 1.8f);
+
 }

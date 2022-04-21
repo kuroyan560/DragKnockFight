@@ -62,6 +62,6 @@ public:
 		return LEFT_TEAM;
 	}
 
-	void RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsLeft);
+	void RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsLeft, const Vec2<float>& WinnerPos);
 };
 

@@ -67,6 +67,9 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	//	return;
 	//}
 
+	// パートナーが振り回し状態だったら更新処理を行わない。
+	if (!(!partner.lock()->GetNowSwing() && !nowSwing)) return;
+
 	for (int i = 0; i < patternData.nearLimmitLine.size(); ++i)
 	{
 		patternData.nearLimmitLine[i].startPos = pos;
@@ -138,6 +141,13 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 		//ボスのAI-----------------------
 		bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 
+		/*if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_P, "Boss Swing", "DIK_P")) {
+
+			bossPatternNow = static_cast<E_BossPattern>(BOSS_PATTERN_SWING);
+			patternTimer = 0;
+
+		}*/
+
 		//ボスの挙動
 		if (bossPatternNow != oldBossPattern)
 		{
@@ -187,6 +197,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	{
 		vel = moveVel + swingAffect;
 	}
+
 }
 
 #include"DrawFunc_FillTex.h"

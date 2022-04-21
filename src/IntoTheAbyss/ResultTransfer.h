@@ -26,6 +26,10 @@ public:
 	int leftBreakCount;
 	int rightBreakCount;
 
+	//Crash‚Ì‰ñ”
+	int leftCrashCount;
+	int rightCrashCount;
+
 	PLAYABLE_CHARACTER_NAME winner;
 
 	void Init();

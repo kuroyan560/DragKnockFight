@@ -94,7 +94,7 @@ void PlayerHand::Draw(const float& ExtRate, const float& InitAngle, const Vec2<f
 	{
 		const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(sightPos);
 		//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
-		DrawFunc::DrawRotaGraph2D(drawPos, ext, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
+		//DrawFunc::DrawRotaGraph2D(drawPos, ext, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
 		ptLight.SetPos(Vec3<float>(drawPos, -1.0f));
 	}
 

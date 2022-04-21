@@ -52,6 +52,9 @@ private:
 protected:
 	BulletMgrBase bulletMgr;
 	bool nowSwing;
+	bool isAdvancedEntrySwing;		// 振り回し先行入力
+	int advancedEntrySwingTimer;	// 振り回しの先行入力を受け付けてから、無効化されるまでのタイマー
+	const int ADVANCED_ENTRY_SWING_TIMER = 30;
 	Vec2<float> nowSwingVec;		// 現在の角度
 	Vec2<float> swingTargetVec;		// 目標地点
 	float addSwingAngle;			// 振り回しで回転させる量 だんだん増える。
