@@ -55,6 +55,13 @@ void ResultScene::OnInitialize()
 
 void ResultScene::OnUpdate()
 {
+	static int SE = -1;
+	if (SE == -1)
+	{
+		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/resultScore.wav");
+		AudioApp::Instance()->ChangeVolume(SE, 0.13f);
+	}
+
 
 	Vec2<float> windowSize = WinApp::Instance()->GetWinSize().Float();
 
@@ -69,11 +76,16 @@ void ResultScene::OnUpdate()
 
 		// [RESULT]の画像 [RESULT]のタイマーが既定値以下だったら。
 		if (resultUITimer < RESULT_UI_TIMER) {
+			// タイマーが0だったら
+			if (resultUITimer == 0) {
+				AudioApp::Instance()->PlayWave(SE);
+			}
 			++resultUITimer;
 			// タイマーが規定値に達したら。
 			if (RESULT_UI_TIMER <= resultUITimer) {
 				delayTimer = DELAY_TIMER;
 				isSkip = true;
+				AudioApp::Instance()->PlayWave(SE);
 			}
 		}
 		// [BREAK]敵の画像 タイマーが規定値以下だったら。
@@ -83,6 +95,7 @@ void ResultScene::OnUpdate()
 			if (BREAK_ENEMY_UI_TIMER <= breakEnemyUITimer) {
 				delayTimer = DELAY_TIMER;
 				isSkip = true;
+				AudioApp::Instance()->PlayWave(SE);
 			}
 		}
 		// [CRASH]敵の画像 タイマーが規定値以下だったら。
@@ -92,6 +105,7 @@ void ResultScene::OnUpdate()
 			if (CRASH_ENEMY_UI_TIMER <= crashEnemyUITimer) {
 				delayTimer = DELAY_TIMER;
 				isSkip = true;
+				AudioApp::Instance()->PlayWave(SE);
 			}
 		}
 		// [BREAK]プレイヤーの画像 タイマーが規定値以下だったら。
@@ -101,6 +115,7 @@ void ResultScene::OnUpdate()
 			if (BREAK_PLAYER_UI_TIMER <= breakPlayerUITimer) {
 				delayTimer = DELAY_TIMER;
 				isSkip = true;
+				AudioApp::Instance()->PlayWave(SE);
 			}
 		}
 		// [CRASH]プレイヤーの画像 タイマーが規定値以下だったら。
@@ -158,7 +173,7 @@ void ResultScene::OnUpdate()
 	}
 
 	// リザルト画面へ飛ばす
-	if (UsersInput::Instance()->ControllerOnTrigger(0,XBOX_BUTTON::A)) {
+	if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A)) {
 		static int bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 		AudioApp::Instance()->StopWave(bgm);
 		KuroEngine::Instance().ChangeScene(0, changeScene);

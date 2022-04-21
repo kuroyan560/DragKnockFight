@@ -1,4 +1,5 @@
 #include "RoundChangeEffect.h"
+#include "AudioApp.h"
 #include"../Common/KuroMath.h"
 #include"../Engine/DrawFunc.h"
 #include"../Engine/DrawFunc_FillTex.h"
@@ -26,6 +27,23 @@ RoundChangeEffect::RoundChangeEffect()
 	fightData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/fight.png");
 	playerReticleData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/reticle_player.png");
 	enemyReticleData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/reticle_enemy.png");
+
+	fightSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_fight.wav");
+	readySE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_ready.wav");
+	round1SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round1.wav");
+	round2SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round2.wav");
+	round3SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round3.wav");
+	round4SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round4.wav");
+	round5SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round5.wav");
+
+	AudioApp::Instance()->ChangeVolume(round1SE, 0.13f);
+	AudioApp::Instance()->ChangeVolume(round2SE, 0.13f);
+	AudioApp::Instance()->ChangeVolume(round3SE, 0.13f);
+	AudioApp::Instance()->ChangeVolume(round4SE, 0.13f);
+	AudioApp::Instance()->ChangeVolume(round5SE, 0.13f);
+	AudioApp::Instance()->ChangeVolume(readySE, 0.13f);
+	AudioApp::Instance()->ChangeVolume(fightSE, 0.13f);
+
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, numberHandle.data());
 
 
@@ -37,7 +55,7 @@ void RoundChangeEffect::Init()
 	startFlag = false;
 }
 
-void RoundChangeEffect::Start(const int &ROUND_NUMBER, const bool &LEFT_OR_RIGHT_FLAG)
+void RoundChangeEffect::Start(const int& ROUND_NUMBER, const bool& LEFT_OR_RIGHT_FLAG)
 {
 	if (!startFlag)
 	{
@@ -50,6 +68,8 @@ void RoundChangeEffect::Start(const int &ROUND_NUMBER, const bool &LEFT_OR_RIGHT
 
 		playerReticleData->Init();
 		enemyReticleData->Init();
+
+		nowRoundCount = ROUND_NUMBER;
 
 		playerOrEnemySideFlag = LEFT_OR_RIGHT_FLAG;
 		if (playerOrEnemySideFlag)
@@ -151,6 +171,37 @@ void RoundChangeEffect::Update()
 				code *= -1;
 			}
 
+			// rateが0の時に"ラウンド◯"のSEを再生する。
+			if (roundData->rate == 0) {
+
+				switch (nowRoundCount)
+				{
+				case 1:
+					AudioApp::Instance()->PlayWave(round1SE);
+					break;
+
+				case 2:
+					AudioApp::Instance()->PlayWave(round2SE);
+					break;
+
+				case 3:
+					AudioApp::Instance()->PlayWave(round3SE);
+					break;
+
+				case 4:
+					AudioApp::Instance()->PlayWave(round4SE);
+					break;
+
+				case 5:
+					AudioApp::Instance()->PlayWave(round5SE);
+					break;
+
+				default:
+					break;
+				}
+
+			}
+
 			//陣地に触れた場所の逆から中央に向かって移動する
 			//数字とラウンドの移動
 			Rate(&roundData->rate, roundData->maxTimer);
@@ -186,6 +237,7 @@ void RoundChangeEffect::Update()
 		}
 		else if (1.0f <= roundData->rate && firstRoundFlag)
 		{
+
 			Rate(&roundData->sizeRate, roundData->sizeMaxTimer);
 			Rate(&numberData->sizeRate, numberData->sizeMaxTimer);
 			roundData->size.y = roundData->baseSize.y + -KuroMath::Ease(Out, Cubic, numberData->sizeRate, 0.0f, 1.0f) * roundData->baseSize.y;
@@ -198,6 +250,11 @@ void RoundChangeEffect::Update()
 		//消えたらReadyを中央から上下に拡大する
 		if (1.0f <= nextNumberData->sizeRate || 1.0f <= numberData->sizeRate)
 		{
+			// readyのSEを再生する。
+			if (readyData->size.y == 0) {
+				AudioApp::Instance()->PlayWave(readySE);
+			}
+
 			drawReadyFlag = true;
 			Rate(&readyData->sizeRate, readyData->sizeMaxTimer);
 			readyData->size.y = readyData->baseSize.y + KuroMath::Ease(Out, Cubic, readyData->sizeRate, 0.0f, 1.0f) * 1.0f;
@@ -207,6 +264,11 @@ void RoundChangeEffect::Update()
 		//Fightを1フレ登場させて縮小をかける
 		if (1.0f <= readyData->sizeRate)
 		{
+			// fightのSEを再生する。
+			if (fightData->size.x == 5.0f) {
+				AudioApp::Instance()->PlayWave(fightSE);
+			}
+
 			drawFightFlag = true;
 			Rate(&fightData->sizeRate, fightData->sizeMaxTimer);
 			fightData->size.x = fightData->baseSize.x + -KuroMath::Ease(Out, Cubic, fightData->sizeRate, 0.0f, 1.0f) * 4.0f;
