@@ -14,6 +14,7 @@ static const enum WHICH_TEAM { LEFT_TEAM, RIGHT_TEAM, TEAM_NUM };
 
 class CharacterInterFace
 {
+
 private:
 	void SwingUpdate();
 	void Crash(const Vec2<float>& MyVec);

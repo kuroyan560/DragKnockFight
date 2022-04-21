@@ -7,6 +7,7 @@
 #include"StunEffect.h"
 #include"FaceIcon.h"
 #include "ResultTransfer.h"
+#include "AfterImage.h"
 
 void CharacterInterFace::SwingUpdate()
 {
@@ -291,6 +292,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 #include"TexHandleMgr.h"
 void CharacterInterFace::Draw()
 {
+	// Žc‘œ‚ð•`‰æ
 	OnDraw();
 	bulletMgr.Draw();
 }
