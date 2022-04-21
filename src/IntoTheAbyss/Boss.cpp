@@ -136,7 +136,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 			patternTimer = 0;
 		}
 		//ボスのAI-----------------------
-		//bossPatternNow = BOSS_PATTERN_NORMALMOVE;
+		bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 
 		//ボスの挙動
 		if (bossPatternNow != oldBossPattern)

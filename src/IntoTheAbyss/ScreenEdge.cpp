@@ -156,7 +156,7 @@ void ScreenEdge::Update()
 			reversFlag = false;
 		}
 
-		float timer = 20.0f + 30.0f * (1.0 - rate);
+		float timer = 10.0f + 30.0f * (1.0 - rate);
 		if (reversFlag)
 		{
 			MRate(&shakeRate, timer);

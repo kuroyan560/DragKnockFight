@@ -15,7 +15,7 @@ void ScreenEdgeEffect::Init()
 	winHalfSize /= 2.0f;
 
 	float distance = 120.0f;
-	float adjDistance = 80.0f;
+	float adjDistance = 40.0f;
 
 	screenEdge[UP].Init(distance, Vec2<float>(winHalfSize.x, -adjDistance), 0.0f);
 	screenEdge[DOWN].Init(distance, Vec2<float>(winHalfSize.x, winSize.y + adjDistance), 0.0f);
