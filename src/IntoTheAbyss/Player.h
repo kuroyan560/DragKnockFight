@@ -20,6 +20,7 @@ class Tutorial;
 // プレイヤークラス
 class Player :public CharacterInterFace
 {
+
 public:
 	/*-- メンバ変数 --*/
 	int rapidFireTimerLeft;			// 連射タイマー左手
@@ -28,6 +29,9 @@ public:
 	// プレイヤーの腕
 	unique_ptr<PlayerHand> lHand;	// 左手
 	unique_ptr<PlayerHand> rHand;	// 右手
+
+	// このキャラの色
+	Color charaColor;
 
 	//int playerGraph;
 
@@ -153,7 +157,7 @@ private:
 		}
 	}
 	void OnCrash()override
-	{	
+	{
 		// 入力受付無効化タイマーをセッティングする。
 		inputInvalidTimerByCrash = INPUT_INVALID_TIMER;
 	}

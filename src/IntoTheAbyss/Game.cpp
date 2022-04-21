@@ -9,7 +9,7 @@
 #include"Collider.h"
 #include"SightCollisionStorage.h"
 #include"SelectStage.h"
-
+#include"AfterImage.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -650,6 +650,10 @@ void Game::Update()
 	}
 
 	CrashMgr::Instance()->Update();
+
+	// 残像を更新。
+	AfterImageMgr::Instance()->Update();
+
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -770,6 +774,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	if (roundChangeEffect.initGameFlag)
 	{
+		// 残像を描画
+		AfterImageMgr::Instance()->Draw();
 		CharacterManager::Instance()->Left()->Draw();
 		CharacterManager::Instance()->Right()->Draw();
 
