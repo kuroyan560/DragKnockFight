@@ -801,6 +801,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	FaceIcon::Instance()->Draw();
 
+	screenEdgeEffect.Draw();
 	WinCounter::Instance()->Draw();
 
 	StunEffect::Instance()->Draw();
@@ -823,7 +824,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
-	screenEdgeEffect.Draw();
 }
 
 void Game::Scramble()
