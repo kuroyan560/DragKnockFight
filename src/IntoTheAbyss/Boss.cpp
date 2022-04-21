@@ -189,7 +189,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 		// U‚è‰ñ‚µ‚ÌƒgƒŠƒK[”»’è
 		if (0.3f < fabs(dir.y))
 		{
-			SwingPartner({ 0,1 });
+			SwingPartner({ 0,1 }, false);
 			patternData.swingFlag = false;
 		}
 	}

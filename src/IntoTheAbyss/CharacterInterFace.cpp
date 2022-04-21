@@ -18,6 +18,9 @@ void CharacterInterFace::SwingUpdate()
 	// 角度に加算する量を更新。
 	addSwingAngle += ADD_SWING_ANGLE;
 
+	// 振り回しの経過時間を設定。
+	++swingTimer;
+
 	// 限界を超えていたら修正。
 	if (MAX_SWING_ANGLE < addSwingAngle) {
 
@@ -27,6 +30,15 @@ void CharacterInterFace::SwingUpdate()
 
 	// 現在の角度を求める。
 	float nowAngle = atan2f(GetPartnerPos().y - pos.y, GetPartnerPos().x - pos.x);
+
+	// 角度が-だったら矯正する。
+	if (nowAngle < 0) {
+
+		float angleBuff = 3.14f - fabs(nowAngle);
+
+		nowAngle = 3.14f + angleBuff;
+
+	}
 
 	// 現在の角度に角度の加算量を足す。
 	if (isSwingClockWise) {
@@ -54,17 +66,21 @@ void CharacterInterFace::SwingUpdate()
 	float crossResult = nowSwingVec.Cross(swingTargetVec);
 
 	// [最初が時計回り] 且つ [現在が反時計回り] だったら
-	if (isSwingClockWise && crossResult < 0) {
+	if (isSwingClockWise && crossResult < 0 && 30 < swingTimer) {
 
 		// 振り回し終わり！
 		FinishSwing();
 	}
 	// [最初が反時計回り] 且つ [現在が時計回り] だったら
-	if (!isSwingClockWise && 0 < crossResult) {
+	if (!isSwingClockWise && 0 < crossResult && 30 < swingTimer) {
 
 		// 振り回し終わり！
 		FinishSwing();
 	}
+
+
+	// 紐つかみ状態を削除。 この新仕様の振り回しで行くとしたらこの変数はいらないので削除する。
+	isHold = false;
 
 }
 
@@ -117,7 +133,7 @@ void CharacterInterFace::CrashUpdate()
 	}
 }
 
-void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec)
+void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const bool& IsClockWise)
 {
 	static int SE = -1;
 	if (SE == -1)
@@ -142,14 +158,14 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec)
 
 	// 外積の左右判定によりどちら側に振り回すかを判断する。 負の値が左、正の値が右。
 	float crossResult = nowSwingVec.Cross(swingTargetVec);
-	if (crossResult < 0) {
+	if (!IsClockWise) {
 
 		// マイナスなので左(反時計回り)。
 		isSwingClockWise = false;
 
 
 	}
-	else if (0 <= crossResult) {
+	else if (IsClockWise) {
 
 		// プラスなので右(時計回り)。
 		isSwingClockWise = true;
@@ -161,6 +177,8 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec)
 
 	//振り回しフラグの有効化
 	nowSwing = true;
+
+	swingTimer = 0;
 
 	partner.lock()->stagingDevice.StartSpin(isSwingClockWise);
 }

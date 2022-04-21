@@ -35,6 +35,7 @@ private:
 	Vec2<float> swingInertiaVec;// 振り回しの慣性の移動方向
 	float swingInertia;			// 振り回しの慣性
 	int afterSwingDelay;		// 振り回しのあとにボスを少し動けない状態にするためのタイマー
+	int swingTimer;				// 振り回しの経過時間
 
 	//演出などの動きの関係で動きを止める
 	bool canMove;
@@ -99,7 +100,7 @@ protected:
 
 	//[共通関数]
 	//振り回し
-	void SwingPartner(const Vec2<float>& SwingTargetVec);
+	void SwingPartner(const Vec2<float>& SwingTargetVec, const bool& IsClockWise);
 	//ゲッタ類
 	const Vec2<float>& GetPartnerPos()
 	{
