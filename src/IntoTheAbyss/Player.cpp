@@ -160,6 +160,8 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	{
 		outOfStaminaEffect.Start(pos, MAX_GRIP_POWER_TIMER);
 	}
+	outOfStaminaEffect.baseMaxStringPos = pos;
+	outOfStaminaEffect.baseEmptyStringPos = pos;
 	outOfStaminaEffect.Update();
 
 

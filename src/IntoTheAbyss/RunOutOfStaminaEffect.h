@@ -19,13 +19,13 @@ public:
 		return playerSize;
 	};
 	Vec2<float>playerSize;
+	Vec2<float> baseMaxStringPos;
+	Vec2<float> baseEmptyStringPos;
 private:
 	Vec2<float> lerpEmptyStringPos;
-	Vec2<float> baseEmptyStringPos;
 	Vec2<float> emptyStringPos;
 
 	Vec2<float> lerpMaxStringPos;
-	Vec2<float> baseMaxStringPos;
 	Vec2<float> maxStringPos;
 
 	int emptyHande;
@@ -34,7 +34,7 @@ private:
 	int timer;
 	int finishTimer;
 	bool drawFlag;
-
+	bool drawEmptyFlag;
 	bool drawMaxFlag;
 
 	Vec2<float>lerpPlayerSize;
@@ -44,5 +44,10 @@ private:
 
 	bool extendMaxFlag;
 	bool shrinkMaxFlag;
+
+	float rate;
+
+	float emptyRate;
+	float fullRate;
 };
 
