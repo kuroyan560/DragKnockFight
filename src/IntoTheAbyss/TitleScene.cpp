@@ -4,6 +4,7 @@
 #include "TexHandleMgr.h"
 #include "SceneCange.h"
 #include "KuroMath.h"
+#include"DebugKeyManager.h"
 
 TitleScene::TitleScene()
 {
@@ -25,6 +26,15 @@ TitleScene::TitleScene()
 
 	isPressStartDraw = true;
 	pressStartTimer = 0;
+
+
+	std::vector<int>handle;
+	std::vector<int>handle2;
+
+	handle.push_back({});
+	handle2.push_back({});
+
+	picture.Init(handle, handle2);
 }
 
 void TitleScene::OnInitialize()
@@ -67,8 +77,18 @@ void TitleScene::OnUpdate()
 
 		pressStartTimer = 0;
 		isPressStartDraw = isPressStartDraw ? false : true;
-
 	}
+
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_S, "Start", "DIK_S"))
+	{
+		picture.Start();
+	}
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_S, "End", "DIK_E"))
+	{
+		picture.Finish();
+	}
+
+	picture.Update();
 }
 
 void TitleScene::OnDraw()
@@ -99,6 +119,8 @@ void TitleScene::OnDraw()
 	if (isPressStartDraw) {
 		DrawFunc::DrawGraph(PRESS_START_POS, TexHandleMgr::GetTexBuffer(pressStartHandle), AlphaBlendMode_Trans);
 	}
+
+	picture.Draw();
 }
 
 void TitleScene::OnImguiDebug()

@@ -2,6 +2,7 @@
 #include"KuroEngine.h"
 #include"SceneCange.h"
 #include"ScreenEdgeEffect.h"
+#include"PictureStory.h"
 
 class TitleScene : public BaseScene
 {
@@ -50,6 +51,6 @@ public:
 	void OnFinalize()override;
 
 	std::shared_ptr<SceneCange> changeScene;
-
+	PictureStory picture;
 };
 
