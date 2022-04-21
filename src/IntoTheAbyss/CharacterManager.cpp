@@ -1,15 +1,24 @@
 #include "CharacterManager.h"
 #include"Player.h"
 #include"Boss.h"
+#include"Tutorial.h"
 
-std::shared_ptr<CharacterInterFace> CharacterManager::CreateCharacter(const  PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx)
+CharacterManager::CharacterManager()
+{
+	for (int i = 0; i < TEAM_NUM; ++i)
+	{
+		tutorials[i] = std::make_shared<Tutorial>((WHICH_TEAM)i);
+	}
+}
+
+std::shared_ptr<CharacterInterFace> CharacterManager::CreateCharacter(const  PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& Team)
 {
 	switch (CharacterName)
 	{
 	case PLAYABLE_LUNA:
-		return std::make_shared<Player>(CharacterName, ControllerIdx);
+		return std::make_shared<Player>(CharacterName, Team, tutorials[Team]);
 	case PLAYABLE_LACY:
-		return std::make_shared<Player>(CharacterName, ControllerIdx);
+		return std::make_shared<Player>(CharacterName, Team, tutorials[Team]);
 	case PLAYABLE_BOSS_0:
 		return std::make_shared<Boss>();
 	}
@@ -19,6 +28,10 @@ std::shared_ptr<CharacterInterFace> CharacterManager::CreateCharacter(const  PLA
 void CharacterManager::CharactersSelectInit()
 {
 	nowSelectTeam = LEFT_TEAM;
+
+	//ビッサミ提出用
+	characterName[LEFT_TEAM] = PLAYABLE_LUNA;
+	characterName[RIGHT_TEAM] = PLAYABLE_LACY;
 }
 
 void CharacterManager::CharactersSelectUpdate()
@@ -89,7 +102,7 @@ void CharacterManager::CharactersGenerate()
 	//キャラクター生成
 	for (int i = 0; i < TEAM_NUM; ++i)
 	{
-		characters[i] = CreateCharacter(characterName[i], i);
+		characters[i] = CreateCharacter(characterName[i], (WHICH_TEAM)i);
 	}
 	//どちらのキャラクターも生成完了してからでないと、情報登録出来ない
 	for (int i = 0; i < TEAM_NUM; ++i)

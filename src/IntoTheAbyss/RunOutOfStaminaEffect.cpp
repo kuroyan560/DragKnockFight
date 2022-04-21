@@ -8,7 +8,7 @@
 RunOutOfStaminaEffect::RunOutOfStaminaEffect()
 {
 	emptyHande = TexHandleMgr::LoadGraph("resource/ChainCombat/empty.png");
-	maxHande = TexHandleMgr::LoadGraph("resource/ChainCombat/empty.png");
+	maxHande = TexHandleMgr::LoadGraph("resource/ChainCombat/full.png");
 	lerpPlayerSize = { 1.0f,1.0f };
 	playerSize = { 1.0f,1.0f };
 	startFlag = false;

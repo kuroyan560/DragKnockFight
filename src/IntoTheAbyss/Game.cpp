@@ -9,7 +9,7 @@
 #include"Collider.h"
 #include"SightCollisionStorage.h"
 #include"SelectStage.h"
-
+#include"AfterImage.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -325,6 +325,7 @@ Game::Game()
 
 	GameTimer::Instance()->Init({}, 120, {}, {});
 	ScoreManager::Instance()->Init();
+
 }
 
 void Game::Init()
@@ -417,7 +418,8 @@ void Game::Update()
 	if (playerHomeBase->Collision(CharacterManager::Instance()->Right()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//プレイヤー勝利
-		WinCounter::Instance()->RoundFinish(lineCenterPos, true);
+		WinCounter::Instance()->RoundFinish(lineCenterPos, true, CharacterManager::Instance()->Right()->pos);
+		CharacterManager::Instance()->Right()->OnKnockOut();
 		roundFinishFlag = true;
 		playerOrEnemeyWinFlag = true;
 		gameStartFlag = false;
@@ -427,7 +429,8 @@ void Game::Update()
 	if (enemyHomeBase->Collision(CharacterManager::Instance()->Left()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//敵勝利
-		WinCounter::Instance()->RoundFinish(lineCenterPos, false);
+		WinCounter::Instance()->RoundFinish(lineCenterPos, false, CharacterManager::Instance()->Left()->pos);
+		CharacterManager::Instance()->Left()->OnKnockOut();
 		roundFinishFlag = true;
 		playerOrEnemeyWinFlag = false;
 		gameStartFlag = false;
@@ -648,6 +651,10 @@ void Game::Update()
 	}
 
 	CrashMgr::Instance()->Update();
+
+	// 残像を更新。
+	AfterImageMgr::Instance()->Update();
+
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -768,6 +775,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	if (roundChangeEffect.initGameFlag)
 	{
+		// 残像を描画
+		AfterImageMgr::Instance()->Draw();
 		CharacterManager::Instance()->Left()->Draw();
 		CharacterManager::Instance()->Right()->Draw();
 

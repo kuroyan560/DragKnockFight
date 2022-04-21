@@ -69,11 +69,11 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 	// 本来あるべきプレイヤーの手の座標に近付ける。
 	handPos = KuroMath::Lerp(handPos, honraiHandPos, 1.0f);
 
-	static const float OFFSET_RADIUS_MAX = 18.0f;
+	/*static const float OFFSET_RADIUS_MAX = 18.0f;
 	if (offsetRadiusTimer < OFFSET_RADIUS_TIME)offsetRadiusTimer++;
 	float offsetRadius = KuroMath::Ease(Out, Back, offsetRadiusTimer, OFFSET_RADIUS_TIME, OFFSET_RADIUS_MAX, 0.0f);
 	Vec2<float>offset = { cos(inputAngle) * offsetRadius,sin(inputAngle) * offsetRadius };
-	drawPos = handPos + offset;
+	drawPos = handPos + offset;*/
 
 	//isFirstShot = false;
 
@@ -94,7 +94,7 @@ void PlayerHand::Draw(const float& ExtRate, const float& InitAngle, const Vec2<f
 	{
 		const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(sightPos);
 		//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(179, 255, 239, 255), D3D12App::Instance()->GetBackBuffFormat(), true);
-		DrawFunc::DrawRotaGraph2D(drawPos, ext, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
+		//DrawFunc::DrawRotaGraph2D(drawPos, ext, 0.0f, TexHandleMgr::GetTexBuffer(aimGraphHandle));
 		ptLight.SetPos(Vec3<float>(drawPos, -1.0f));
 	}
 

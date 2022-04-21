@@ -61,7 +61,7 @@ void GameScene::OnUpdate()
 		isSS = true;
 	}
 
-	bool changeInput = UsersInput::Instance()->KeyOnTrigger(DIK_B) || UsersInput::Instance()->ControllerOnTrigger(0,START);
+	bool changeInput = UsersInput::Instance()->KeyOnTrigger(DIK_B) || UsersInput::Instance()->ControllerOnTrigger(0, START);
 	if (changeInput)
 	{
 		KuroEngine::Instance().ChangeScene(1, sceneChange);

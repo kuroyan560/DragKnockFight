@@ -23,12 +23,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	//ÉGÉìÉWÉìê›íË=====================
 	EngineOption engineOption;
-	engineOption.windowName = "KuroEngine3.0";
+	engineOption.windowName = "DragKnockFight";
 	engineOption.windowSize = { 1280,720 };
 	engineOption.iconPath = nullptr;
 	engineOption.backBuffClearColor = Color(0.0f, 0.0f, 0.0f, 1.0f);
 	engineOption.useHDR = false;
 	engineOption.frameRate = 43;
+	engineOption.imguiActive = false;
 
 	//===============================
 

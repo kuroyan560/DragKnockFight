@@ -21,6 +21,7 @@
 #include"DebugKeyManager.h"
 
 #include"DebugParameter.h"
+#include"AfterImage.h"
 
 
 static const Vec2<float> SCALE = { 80.0f,80.0f };
@@ -66,6 +67,18 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	//	moveVel = { 0,0 };
 	//	return;
 	//}
+
+	// パートナーが振り回していたら残像を出す。
+	if (partner.lock()->GetNowSwing()) {
+
+		DIR dir = FRONT;
+		if (vel.y < 0)dir = BACK;
+		AfterImageMgr::Instance()->Generate(pos, {}, 0, graphHandle[dir], Color(239, 1, 144, 255), true, size);
+
+	}
+
+	// パートナーが振り回し状態だったら更新処理を行わない。
+	if (!(!partner.lock()->GetNowSwing() && !nowSwing)) return;
 
 	for (int i = 0; i < patternData.nearLimmitLine.size(); ++i)
 	{
@@ -138,6 +151,14 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 		//ボスのAI-----------------------
 		bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 
+		/*if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_P, "Boss Swing", "DIK_P")) {
+
+			bossPatternNow = static_cast<E_BossPattern>(BOSS_PATTERN_SWING);
+			patternTimer = 0;
+			bossPattern[bossPatternNow]->Init();
+
+		}*/
+
 		//ボスの挙動
 		if (bossPatternNow != oldBossPattern)
 		{
@@ -187,6 +208,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	{
 		vel = moveVel + swingAffect;
 	}
+
 }
 
 #include"DrawFunc_FillTex.h"

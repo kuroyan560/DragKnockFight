@@ -15,12 +15,14 @@ class LightManager;
 #include"StagingInterFace.h"
 
 #include"CharacterInterFace.h"
+class Tutorial;
 
 #include"RunOutOfStaminaEffect.h"
 
 // プレイヤークラス
 class Player :public CharacterInterFace
 {
+
 public:
 	/*-- メンバ変数 --*/
 	int rapidFireTimerLeft;			// 連射タイマー左手
@@ -29,6 +31,9 @@ public:
 	// プレイヤーの腕
 	unique_ptr<PlayerHand> lHand;	// 左手
 	unique_ptr<PlayerHand> rHand;	// 右手
+
+	// このキャラの色
+	Color charaColor;
 
 	//int playerGraph;
 
@@ -99,24 +104,28 @@ public:
 	const float BULLET_SHOT_ANGLE = 0.1f;
 
 	// プレイヤーの方向
-	enum PLAYER_DIR {
-
+	enum PLAYER_DIR_X {
 		PLAYER_LEFT,
-		PLAYER_RIGHT,
-		PLAYER_TOP,
-		PLAYER_BOTTOM,
-
-	};
+		PLAYER_RIGHT
+	}playerDirX;
+	enum PLAYER_DIR_Y {
+		PLAYER_FRONT,
+		PLAYER_BACK
+	}playerDirY;
 
 	float sizeVel;
 	bool initPaticleFlag;
 	int moveTimer;
+
+	//チュートリアルアイコン
+	std::weak_ptr<Tutorial>tutorial;
+
 public:
 
 	/*-- メンバ関数 --*/
 
 	// コンストラクタ
-	Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx);
+	Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx,const std::shared_ptr<Tutorial>&Tutorial);
 	~Player();
 
 private:
@@ -144,10 +153,13 @@ private:
 	}
 	void OnSwingedFinish()override
 	{
-		if(!GetNowBreak() && !inputInvalidTimerByCrash)anim.ChangeAnim(DEFAULT_FRONT);
+		if (!GetNowBreak() && !inputInvalidTimerByCrash)
+		{
+			anim.ChangeAnim(DEFAULT_FRONT);
+		}
 	}
 	void OnCrash()override
-	{	
+	{
 		// 入力受付無効化タイマーをセッティングする。
 		inputInvalidTimerByCrash = INPUT_INVALID_TIMER;
 	}
@@ -186,4 +198,5 @@ private:
 
 public:
 	bool Appear()override;
+	void OnKnockOut()override { anim.ChangeAnim(KNOCK_OUT); }
 };

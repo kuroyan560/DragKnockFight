@@ -20,6 +20,8 @@
 #include"AudioApp.h"
 #include "SlowMgr.h"
 #include"CrashMgr.h"
+#include"Tutorial.h"
+#include "AfterImage.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -28,7 +30,8 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx) :CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx)
+Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx, const std::shared_ptr<Tutorial>& Tutorial)
+	:CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx), tutorial(Tutorial)
 {
 	/*====== コンストラクタ =====*/
 	if (PLAYER_CHARACTER_NUM <= CharacterName)assert(0);
@@ -95,6 +98,20 @@ void Player::OnInit()
 	sizeVel = 120.0f;
 	initPaticleFlag = false;
 	moveTimer = 0;
+
+	playerDirX = GetWhichTeam() == LEFT_TEAM ? PLAYER_LEFT : PLAYER_RIGHT;
+	playerDirY = PLAYER_FRONT;
+
+	// 右のキャラだったら赤
+	if (GetWhichTeam() == RIGHT_TEAM) {
+		charaColor = { 239, 1, 144,255 };
+	}
+	// ひだりのキャラだったら緑
+	else if (GetWhichTeam() == LEFT_TEAM) {
+		charaColor = { 47, 255, 139,255 };
+	}
+
+	inputInvalidTimerByCrash = 0;
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -115,6 +132,27 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	if (GetCanMove())Input(MapData);
 
 	/*===== 更新処理 =====*/
+
+	// 先行入力タイマーを更新。
+	if (isAdvancedEntrySwing) {
+
+		--advancedEntrySwingTimer;
+		if (advancedEntrySwingTimer < 0) isAdvancedEntrySwing = false;
+
+	}
+
+	// 相方が振り回しをしていたら。
+	if (partner.lock()->GetNowSwing()) {
+
+		// 残像を保存。
+		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size;
+		AfterImageMgr::Instance()->Generate(pos, extRate, stagingDevice.GetSpinRadian(), anim.GetGraphHandle(), charaColor);
+
+	}
+
+	// 相方が振り回しをしていたら更新処理を行わない。
+	if (!(!partner.lock()->GetNowSwing() && !nowSwing)) return;
+
 	//移動に関する処理
 	Move();
 
@@ -188,11 +226,20 @@ void Player::OnUpdateNoRelatedSwing()
 void Player::OnDraw()
 {
 	//if (vel.y < 0)playerDir = BACK;
-	if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty)
+	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
+
+	if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty && 20 <= moveTimer)
 	{
-		if (vel.y < 0)anim.ChangeAnim(DEFAULT_BACK);
-		//if (0 < vel.y)playerDir = FRONT;
-		if (0 < vel.y)anim.ChangeAnim(DEFAULT_FRONT);
+		if (moveInput.x)
+		{
+			if (playerDirY == PLAYER_BACK)anim.ChangeAnim(PULL_BACK);
+			else anim.ChangeAnim(PULL_FRONT);
+		}
+		else
+		{
+			if (playerDirY == PLAYER_BACK)anim.ChangeAnim(DEFAULT_BACK);
+			else anim.ChangeAnim(DEFAULT_FRONT);
+		}
 	}
 
 	/*===== 描画処理 =====*/
@@ -208,8 +255,8 @@ void Player::OnDraw()
 	//muffler.Draw(LigManager);
 
 
-	rHand->Draw(EXT_RATE, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
-	lHand->Draw(EXT_RATE, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
+	//rHand->Draw(EXT_RATE, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
+	//lHand->Draw(EXT_RATE, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
 
 	//ストレッチ加算
 	//leftUp += stretch_LU;
@@ -236,11 +283,13 @@ void Player::OnDrawUI()
 	static const int ARROW_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png") };
 	static const Angle ARROW_ANGLE_OFFSET = Angle(1);
 	static const float ARROW_DIST_OFFSET = 32.0f;
+
+	const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0.5f,0.5f });
+
 	if (isHold && !GetNowSwing() && !StunEffect::Instance()->isActive)
 	{
 		const Vec2<float>drawScale = { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom };
 		const auto team = GetWhichTeam();
-		const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0,0 });
 
 		//振り回し先描画
 		float dist = partner.lock()->pos.Distance(pos);
@@ -256,6 +305,12 @@ void Player::OnDrawUI()
 		vec.Normalize();
 		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos + vec * ARROW_DIST_OFFSET), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), { 0.0f,0.5f });
 	}
+
+	const auto leftStickVec = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
+	const auto leftTrigger = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT);
+	const auto rightTrigger = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RT);
+
+	tutorial.lock()->Draw(leftStickVec, rightStickVec, leftTrigger, rightTrigger);
 }
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)
@@ -343,6 +398,15 @@ void Player::Input(const vector<vector<int>>& MapData)
 	// 壁に挟まって判定が無効化されている間は処理を受け付けない。
 	if (0 < GetStackWinTimer()) return;
 
+	// 振り回しているときは入力を受け付けない。
+	if (nowSwing) return;
+
+	// 振り回されているフラグ
+	bool isSwingPartner = partner.lock()->GetNowSwing();
+
+	// 振り回されている状態の時に踏ん張りの状態になっているかフラグ(実際には踏ん張っていない)。
+	bool isSwingPartnerHold = false;
+
 	const float INPUT_DEAD_LINE = 0.3f;
 
 	Vec2<float> inputVec;
@@ -360,6 +424,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
 
+		if (vel.x < 0)playerDirX = PLAYER_LEFT;
+		else if (0 < vel.x)playerDirX = PLAYER_RIGHT;
+		if (vel.y < 0)playerDirY = PLAYER_BACK;
+		else if (0 < vel.y)playerDirY = PLAYER_FRONT;
 	}
 
 	inputVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
@@ -377,24 +445,37 @@ void Player::Input(const vector<vector<int>>& MapData)
 	}
 
 	// [LTを押されたら] [握力が残っていたら] [握力を使い切ってから回復している状態じゃなかったら]
-	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && 0 < gripPowerTimer && !isGripPowerEmpty) {
+	bool isInputLT = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT);
+	if (isInputLT && 0 < gripPowerTimer && !isGripPowerEmpty) {
 
-		anim.ChangeAnim(HOLD);
+		// 振り回されていたら
+		if (isSwingPartner) {
 
-		// 紐つかみ状態(踏ん張り状態)にする。
-		isHold = true;
+			isSwingPartnerHold = true;
 
-		// 握力タイマーを0に近づける。
-		--gripPowerTimer;
+		}
+		else {
 
-		// 移動量を0にする。
-		vel = {};
+			anim.ChangeAnim(HOLD);
 
-		// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
-		if (gripPowerTimer <= 0) {
+			// 紐つかみ状態(踏ん張り状態)にする。
+			isHold = true;
 
-			isGripPowerEmpty = true;
-			anim.ChangeAnim(TIRED);
+			tutorial.lock()->SetRstickInput(true);
+
+			// 握力タイマーを0に近づける。
+			--gripPowerTimer;
+
+			// 移動量を0にする。
+			vel = {};
+
+			// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
+			if (gripPowerTimer <= 0) {
+
+				isGripPowerEmpty = true;
+				anim.ChangeAnim(TIRED);
+			}
+
 		}
 
 	}
@@ -403,6 +484,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		// 紐つかみ状態(踏ん張り状態)を解除する。
 		isHold = false;
+
+		tutorial.lock()->SetRstickInput(false);
+	}
+
+	//チュートリアルの表示 / 非表示
+	if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::BACK))
+	{
+		tutorial.lock()->TurnActive();
 	}
 
 #pragma region itiou nokosite okimasu
@@ -500,7 +589,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 #pragma endregion
 
 	// RTが押されたら
-	if (isHold && swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT)) {
+	bool canSwing = swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT);
+	if (!isSwingPartner && ((isHold && canSwing) || isAdvancedEntrySwing)) {
 
 		// 振り回しの処理
 
@@ -508,6 +598,13 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		// クールタイムを設定。
 		swingCoolTime = SWING_COOLTIME;
+
+	}
+	else if (isSwingPartner && isSwingPartnerHold && canSwing) {
+
+		// 先行入力を保存。
+		isAdvancedEntrySwing = true;
+		advancedEntrySwingTimer = ADVANCED_ENTRY_SWING_TIMER;
 
 	}
 	else {
