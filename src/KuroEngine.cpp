@@ -43,16 +43,19 @@ void KuroEngine::Render()
 	//グラフィックスマネージャのコマンドリスト全実行
 	gManager.CommandsExcute(d3d12App->GetCmdList());
 
-	//Imgui
-	d3d12App->SetBackBufferRenderTarget();
-	imguiApp->BeginImgui();
-	scenes[nowScene]->ImguiDebug();
+	if (imguiActive)
+	{
+		//Imgui
+		d3d12App->SetBackBufferRenderTarget();
+		imguiApp->BeginImgui();
+		scenes[nowScene]->ImguiDebug();
 
-	ImGui::Begin("Fps");
-	ImGui::Text("fps : %.5f", fps->GetNowFps());
-	ImGui::End();
+		ImGui::Begin("Fps");
+		ImGui::Text("fps : %.5f", fps->GetNowFps());
+		ImGui::End();
 
-	imguiApp->EndImgui(d3d12App->GetCmdList());
+		imguiApp->EndImgui(d3d12App->GetCmdList());
+	}
 }
 
 KuroEngine::~KuroEngine()
@@ -102,6 +105,8 @@ void KuroEngine::Initialize(const EngineOption& Option)
 	//FPS固定機能
 	fps = std::make_shared<Fps>(Option.frameRate);
 
+	//imgui表示フラグ設定
+	imguiActive = Option.imguiActive;
 
 	//平行投影行列定数バッファ生成
 	parallelMatProjBuff = d3d12App->GenerateConstantBuffer(sizeof(XMMATRIX), 1, 

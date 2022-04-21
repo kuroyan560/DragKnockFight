@@ -28,6 +28,10 @@ std::shared_ptr<CharacterInterFace> CharacterManager::CreateCharacter(const  PLA
 void CharacterManager::CharactersSelectInit()
 {
 	nowSelectTeam = LEFT_TEAM;
+
+	//ビッサミ提出用
+	characterName[LEFT_TEAM] = PLAYABLE_LUNA;
+	characterName[RIGHT_TEAM] = PLAYABLE_LACY;
 }
 
 void CharacterManager::CharactersSelectUpdate()

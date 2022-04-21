@@ -63,6 +63,9 @@ struct EngineOption
 
 	//フレームレート
 	int frameRate = 60;
+
+	//imgui表示フラグ
+	bool imguiActive = true;
 };
 
 //エンジン本体
@@ -107,6 +110,9 @@ private:
 
 	//FPS固定
 	std::shared_ptr<Fps>fps;
+
+	//imgui表示フラグ
+	bool imguiActive;
 
 	//終了フラグ
 	bool end = false;

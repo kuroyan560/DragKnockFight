@@ -1,3 +1,0 @@
-name Thwomp
-type onLow
-size 32 32

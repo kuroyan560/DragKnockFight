@@ -17,6 +17,12 @@ void StageSelectScene::OnInitialize()
 
 void StageSelectScene::OnUpdate()
 {
+	if (isSkip)
+	{
+		KuroEngine::Instance().ChangeScene(2, changeScene);
+		SelectStage::Instance()->resetStageFlag = true;
+	}
+
 	if (charactersSelect)
 	{
 		//キャラクター選択更新
