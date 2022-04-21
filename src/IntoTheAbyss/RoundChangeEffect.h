@@ -66,6 +66,17 @@ private:
 	Vec2<float>shakeAmount;
 	float maxShakeAmount;
 
+	// ƒTƒEƒ“ƒh
+	int fightSE;
+	int readySE;
+	int round1SE;
+	int round2SE;
+	int round3SE;
+	int round4SE;
+	int round5SE;
+
+	int nowRoundCount;
+
 	std::array<int, 10>numberHandle;
 	bool startFlag;
 	bool oneFlameLateFlag;
