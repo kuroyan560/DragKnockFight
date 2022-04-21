@@ -9,8 +9,10 @@
 
 StageMgr::StageMgr()
 {
-	int allStageNum = 4;
-	int allRoomNum = 10;
+	//int allStageNum = 4;
+	int allStageNum = 1;
+	//int allRoomNum = 10;
+	int allRoomNum = 1;
 	int nowStage = 0;
 
 	allMapChipData.resize(allStageNum);

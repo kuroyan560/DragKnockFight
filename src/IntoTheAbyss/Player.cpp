@@ -20,6 +20,8 @@
 #include"AudioApp.h"
 #include "SlowMgr.h"
 #include"CrashMgr.h"
+#include"Tutorial.h"
+#include "AfterImage.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -28,7 +30,8 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx) :CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx)
+Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx, const std::shared_ptr<Tutorial>& Tutorial)
+	:CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx), tutorial(Tutorial)
 {
 	/*====== コンストラクタ =====*/
 	if (PLAYER_CHARACTER_NUM <= CharacterName)assert(0);
@@ -99,6 +102,15 @@ void Player::OnInit()
 	playerDirX = GetWhichTeam() == LEFT_TEAM ? PLAYER_LEFT : PLAYER_RIGHT;
 	playerDirY = PLAYER_FRONT;
 
+	// 右のキャラだったら赤
+	if (GetWhichTeam() == RIGHT_TEAM) {
+		charaColor = { 239, 1, 144,255 };
+	}
+	// ひだりのキャラだったら緑
+	else if (GetWhichTeam() == LEFT_TEAM) {
+		charaColor = { 47, 255, 139,255 };
+	}
+
 	inputInvalidTimerByCrash = 0;
 }
 
@@ -126,6 +138,15 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 		--advancedEntrySwingTimer;
 		if (advancedEntrySwingTimer < 0) isAdvancedEntrySwing = false;
+
+	}
+
+	// 相方が振り回しをしていたら。
+	if (partner.lock()->GetNowSwing()) {
+
+		// 残像を保存。
+		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size;
+		AfterImageMgr::Instance()->Generate(pos, extRate, stagingDevice.GetSpinRadian(), anim.GetGraphHandle(), charaColor);
 
 	}
 
@@ -200,7 +221,7 @@ void Player::OnDraw()
 	//if (vel.y < 0)playerDir = BACK;
 	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
 
-	if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty)
+	if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty && 20 <= moveTimer)
 	{
 		if (moveInput.x)
 		{
@@ -255,11 +276,13 @@ void Player::OnDrawUI()
 	static const int ARROW_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png") };
 	static const Angle ARROW_ANGLE_OFFSET = Angle(1);
 	static const float ARROW_DIST_OFFSET = 32.0f;
+
+	const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0.5f,0.5f });
+
 	if (isHold && !GetNowSwing() && !StunEffect::Instance()->isActive)
 	{
 		const Vec2<float>drawScale = { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom };
 		const auto team = GetWhichTeam();
-		const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0,0 });
 
 		//振り回し先描画
 		float dist = partner.lock()->pos.Distance(pos);
@@ -275,6 +298,12 @@ void Player::OnDrawUI()
 		vec.Normalize();
 		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos + vec * ARROW_DIST_OFFSET), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), { 0.0f,0.5f });
 	}
+
+	const auto leftStickVec = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
+	const auto leftTrigger = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT);
+	const auto rightTrigger = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RT);
+
+	tutorial.lock()->Draw(leftStickVec, rightStickVec, leftTrigger, rightTrigger);
 }
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)
@@ -425,6 +454,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 			// 紐つかみ状態(踏ん張り状態)にする。
 			isHold = true;
 
+			tutorial.lock()->SetRstickInput(true);
+
 			// 握力タイマーを0に近づける。
 			--gripPowerTimer;
 
@@ -446,6 +477,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		// 紐つかみ状態(踏ん張り状態)を解除する。
 		isHold = false;
+
+		tutorial.lock()->SetRstickInput(false);
+	}
+
+	//チュートリアルの表示 / 非表示
+	if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::BACK))
+	{
+		tutorial.lock()->TurnActive();
 	}
 
 #pragma region itiou nokosite okimasu

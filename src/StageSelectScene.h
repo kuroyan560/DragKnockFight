@@ -4,8 +4,12 @@
 
 class StageSelectScene : public BaseScene
 {
+	//ビッサミ提出用
+	bool isSkip = true;
+
 	//キャラクター選択中フラグ
 	bool charactersSelect;
+
 public:
 	StageSelectScene();
 	void OnInitialize()override;

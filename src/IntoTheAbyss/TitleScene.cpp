@@ -33,10 +33,18 @@ void TitleScene::OnInitialize()
 
 void TitleScene::OnUpdate()
 {
+	static int SE = -1;
+	if (SE == -1)
+	{
+		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/select.wav");
+		AudioApp::Instance()->ChangeVolume(SE, 0.13f);
+	}
+
 	//ステージセレクトに移動する
-	if (UsersInput::Instance()->ControllerOnTrigger(0,XBOX_BUTTON::A))
+	if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
 	{
 		KuroEngine::Instance().ChangeScene(1, changeScene);
+		AudioApp::Instance()->PlayWave(SE);
 	}
 
 	if (isUpper) {
