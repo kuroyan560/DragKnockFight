@@ -193,7 +193,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	SuperiorityGauge::Instance()->Init();
 
-	FaceIcon::Instance()->Init();
+	FaceIcon::Instance()->Init(CharacterManager::Instance()->Left()->GetCharacterName(), CharacterManager::Instance()->Right()->GetCharacterName());
 
 	mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
