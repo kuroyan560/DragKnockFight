@@ -1,5 +1,6 @@
 #include "StoryMgr.h"
 #include"../Engine/UsersInput.h"
+#include"TexHandleMgr.h"
 
 StoryMgr::StoryMgr()
 {

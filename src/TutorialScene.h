@@ -16,5 +16,8 @@ public:
 	std::shared_ptr<SceneCange> changeScene;
 
 	StoryMgr pictureStory;
+
+	Vec2<float>pos;
+	int aButtonHandle;
 };
 

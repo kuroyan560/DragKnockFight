@@ -53,7 +53,7 @@ void PictureStory::Update()
 		//“r’†‰‰o
 		if (nextFlag)
 		{
-			Rate(&stringNextRate, 30.0f);
+			Rate(&stringNextRate, 5.0f);
 			if (1.0f <= stringNextRate)
 			{
 				++stringArrayHandle;
@@ -62,11 +62,11 @@ void PictureStory::Update()
 		}
 		else
 		{
-			MRate(&stringNextRate, 30.0f);
+			MRate(&stringNextRate, 5.0f);
 		}
 
 		//“oê‰‰o
-		Rate(&stringAppearRate, 30.0f);
+		Rate(&stringAppearRate, 60.0f);
 		stringPos[stringArrayHandle] = basePos;
 		stringPos[stringArrayHandle].y += KuroMath::Ease(Out, Elastic, stringAppearRate, 0.0f, 1.0f) * 200.0f;
 

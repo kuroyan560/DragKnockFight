@@ -27,6 +27,5 @@ public:
 private:
 	std::vector<std::shared_ptr<PictureStory>> story;
 	int storyHandle;
-
 };
 

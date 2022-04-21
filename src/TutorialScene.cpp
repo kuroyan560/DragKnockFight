@@ -1,5 +1,6 @@
 #include "TutorialScene.h"
 #include"IntoTheAbyss/TexHandleMgr.h"
+#include"../src/Engine/DrawFunc.h"
 
 TutorialScene::TutorialScene()
 {
@@ -15,9 +16,15 @@ TutorialScene::TutorialScene()
 	handle2.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/str/1.png"));
 
 	std::vector<PictureStoryHandleData> data;
+	//1シーン目の画像追加
 	data.push_back(PictureStoryHandleData(handle, handle2));
-	data.push_back(PictureStoryHandleData(handle, handle2));
+	//2シーン目の画像追加(テスト)
+	//data.push_back(PictureStoryHandleData(handle, handle2));
 	pictureStory.Init(data);
+
+	aButtonHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/star.png");
+	pos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x - 70);
+	pos.y = static_cast<float>(WinApp::Instance()->GetWinSize().y - 70);
 }
 
 void TutorialScene::OnInitialize()
@@ -41,6 +48,8 @@ void TutorialScene::OnDraw()
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 
 	pictureStory.Draw();
+
+	DrawFunc::DrawRotaGraph2D(pos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(aButtonHandle));
 }
 
 void TutorialScene::OnImguiDebug()
