@@ -27,17 +27,6 @@ TitleScene::TitleScene()
 	isPressStartDraw = true;
 	pressStartTimer = 0;
 
-
-	std::vector<int>handle;
-	std::vector<int>handle2;
-
-	handle.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/0.png"));
-	handle.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/1.png"));
-	handle.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/2.png"));
-	handle2.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/str/0.png"));
-	handle2.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/str/1.png"));
-
-	picture.Init(handle, handle2);
 }
 
 void TitleScene::OnInitialize()
@@ -82,16 +71,12 @@ void TitleScene::OnUpdate()
 		isPressStartDraw = isPressStartDraw ? false : true;
 	}
 
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_A, "Start", "DIK_A"))
+
+	if (UsersInput::Instance()->ControllerOnTrigger(0, B))
 	{
-		picture.Start();
-	}
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_E, "End", "DIK_E"))
-	{
-		picture.Finish();
+		KuroEngine::Instance().ChangeScene(4, changeScene);
 	}
 
-	picture.Update();
 }
 
 void TitleScene::OnDraw()
@@ -122,8 +107,6 @@ void TitleScene::OnDraw()
 	if (isPressStartDraw) {
 		DrawFunc::DrawGraph(PRESS_START_POS, TexHandleMgr::GetTexBuffer(pressStartHandle), AlphaBlendMode_Trans);
 	}
-
-	picture.Draw();
 }
 
 void TitleScene::OnImguiDebug()

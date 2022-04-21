@@ -51,6 +51,5 @@ public:
 	void OnFinalize()override;
 
 	std::shared_ptr<SceneCange> changeScene;
-	PictureStory picture;
 };
 

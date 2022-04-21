@@ -9,6 +9,7 @@ public:
 	PictureStory();
 
 	void Init(const std::vector<int> &PICTURE_HANDLE, const std::vector<int> &STRING_HANDLE);
+	void InitScene();
 	void Update();
 	void Draw();
 
@@ -36,7 +37,8 @@ private:
 	bool nextFlag;
 	bool finishFlag;
 	bool goToNextSceneFlag;
-
+	bool startCountDownTogoToNextSceneFlag;
+	int countDownTimer;
 
 	void Rate(float *RATE, const float &MAX_RATE)
 	{

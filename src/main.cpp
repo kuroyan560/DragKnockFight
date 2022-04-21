@@ -10,6 +10,7 @@
 #include"DrawFunc_FillTex.h"
 #include"DrawFunc_Mask.h"
 #include"IntoTheAbyss/TitleScene.h"
+#include"../src/TutorialScene.h"
 #include"ResultScene.h"
 #include"StageSelectScene.h"
 #include"IntoTheAbyss/DebugKeyManager.h"
@@ -45,6 +46,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		new StageSelectScene(),
 		new GameScene(),
 		new ResultScene(),
+		new TutorialScene()
 	};
 	int awakeScene = 0;	//開始時のステージ番号
 

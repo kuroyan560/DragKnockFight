@@ -19,26 +19,34 @@ void PictureStory::Init(const std::vector<int> &PICTURE_HANDLE, const std::vecto
 	basePos.y = -50.0f;
 }
 
+void PictureStory::InitScene()
+{
+	startFlag = false;
+	goToNextSceneFlag = false;
+}
+
 void PictureStory::Update()
 {
 	if (startFlag)
 	{
-		//‰æ‘œ‚ÌØ‚è‘Ö‚¦-----------------------
-		++changePictureTimer;
-		if (120 <= changePictureTimer)
+		if (!finishFlag)
 		{
-			++pictureArrayHandle;
-			changePictureTimer = 0;
-		}
+			//‰æ‘œ‚ÌØ‚è‘Ö‚¦-----------------------
+			++changePictureTimer;
+			if (120 <= changePictureTimer)
+			{
+				++pictureArrayHandle;
+				changePictureTimer = 0;
+			}
 
-		++changeStringTimer;
-		if (120 <= changeStringTimer && !nextFlag)
-		{
-			nextFlag = true;
-			changeStringTimer = 0;
+			++changeStringTimer;
+			if (120 <= changeStringTimer && !nextFlag)
+			{
+				nextFlag = true;
+				changeStringTimer = 0;
+			}
+			//‰æ‘œ‚ÌØ‚è‘Ö‚¦-----------------------
 		}
-		//‰æ‘œ‚ÌØ‚è‘Ö‚¦-----------------------
-
 
 
 
@@ -71,7 +79,7 @@ void PictureStory::Update()
 			Rate(&stringFinishRate, 30.0f);
 			if (1.0f <= stringFinishRate)
 			{
-				goToNextSceneFlag = true;
+				startCountDownTogoToNextSceneFlag = true;
 			}
 		}
 		stringPos[stringArrayHandle].y += -KuroMath::Ease(In, Cubic, stringFinishRate, 0.0f, 1.0f) * 300.0f;
@@ -90,6 +98,15 @@ void PictureStory::Update()
 		}
 		//‰æ‘œ‚Ìƒ‹[ƒv-----------------------
 
+
+		if (startCountDownTogoToNextSceneFlag)
+		{
+			++countDownTimer;
+		}
+		if (60 <= countDownTimer)
+		{
+			goToNextSceneFlag = true;
+		}
 	}
 }
 
@@ -119,7 +136,9 @@ void PictureStory::Start()
 		stringAppearRate = 0.0f;
 		stringNextRate = 0.0f;
 		stringFinishRate = 0.0f;
+		countDownTimer = 0;
 
+		startCountDownTogoToNextSceneFlag = false;
 		goToNextSceneFlag = false;
 		nextFlag = false;
 		finishFlag = false;
@@ -130,4 +149,9 @@ void PictureStory::Start()
 void PictureStory::Finish()
 {
 	finishFlag = true;
+}
+
+bool PictureStory::GoToNextScene()
+{
+	return goToNextSceneFlag;
 }
