@@ -8,6 +8,7 @@ class Tutorial
 
 	struct IconGraphs
 	{
+		int stickHead;
 		int stickBase_L;
 		int stickBase_R;
 		int triggerOn_L;
