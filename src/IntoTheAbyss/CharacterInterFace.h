@@ -77,6 +77,7 @@ protected:
 		areaHitBox.size = size;
 		bulletHitSphere.center = &pos;
 		bulletHitSphere.radius = size.x;
+		outOfStaminaEffect.Init();
 	}
 
 	std::weak_ptr<CharacterInterFace>partner;

@@ -483,6 +483,10 @@ void Game::Update()
 	//ラウンド開始時の演出開始
 	if (readyToStartRoundFlag)
 	{
+		CharacterManager::Instance()->Left()->outOfStaminaEffect.Init();
+		CharacterManager::Instance()->Right()->outOfStaminaEffect.Init();
+
+
 		roundChangeEffect.Start(WinCounter::Instance()->GetNowRound(), playerOrEnemeyWinFlag);
 		Vec2<float>winSize;
 		winSize.x = static_cast<float>(WinApp::Instance()->GetWinSize().x);
