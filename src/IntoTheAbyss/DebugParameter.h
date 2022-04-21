@@ -30,7 +30,7 @@ struct GaugeDebugParameterData
 	float enemyClashDamageValue;
 	float swingDamageValue;
 
-	GaugeDebugParameterData() :playerBulletAddGuaugeValue(10.0f), enemyBulletAddGuaugeValue(10.0f),
+	GaugeDebugParameterData() :playerBulletAddGuaugeValue(4.0f), enemyBulletAddGuaugeValue(4.0f),
 		playerClashDamageValue(10.0f), enemyClashDamageValue(10.0f),
 		swingDamageValue(5.0f)
 	{

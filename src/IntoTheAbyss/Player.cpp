@@ -20,6 +20,7 @@
 #include"AudioApp.h"
 #include "SlowMgr.h"
 #include"CrashMgr.h"
+#include "AfterImage.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -99,6 +100,15 @@ void Player::OnInit()
 	playerDirX = GetWhichTeam() == LEFT_TEAM ? PLAYER_LEFT : PLAYER_RIGHT;
 	playerDirY = PLAYER_FRONT;
 
+	// 右のキャラだったら赤
+	if (GetWhichTeam() == RIGHT_TEAM) {
+		charaColor = TexHandleMgr::LoadGraph("resource/ChainCombat/zeroAlpha.png");
+	}
+	// ひだりのキャラだったら緑
+	else if (GetWhichTeam() == LEFT_TEAM) {
+		charaColor = TexHandleMgr::LoadGraph("resource/ChainCombat/zeroAlpha.png");
+	}
+
 	inputInvalidTimerByCrash = 0;
 }
 
@@ -126,6 +136,15 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 		--advancedEntrySwingTimer;
 		if (advancedEntrySwingTimer < 0) isAdvancedEntrySwing = false;
+
+	}
+
+	// 相方が振り回しをしていたら。
+	if (partner.lock()->GetNowSwing()) {
+
+		// 残像を保存。
+		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size;
+		AfterImageMgr::Instance()->Generate(pos, extRate, stagingDevice.GetSpinRadian(), charaColor, anim.GetGraphHandle());
 
 	}
 

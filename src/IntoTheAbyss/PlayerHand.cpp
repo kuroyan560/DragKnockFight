@@ -69,11 +69,11 @@ void PlayerHand::Update(const Vec2<float>& playerCenterPos)
 	// 本来あるべきプレイヤーの手の座標に近付ける。
 	handPos = KuroMath::Lerp(handPos, honraiHandPos, 1.0f);
 
-	static const float OFFSET_RADIUS_MAX = 18.0f;
+	/*static const float OFFSET_RADIUS_MAX = 18.0f;
 	if (offsetRadiusTimer < OFFSET_RADIUS_TIME)offsetRadiusTimer++;
 	float offsetRadius = KuroMath::Ease(Out, Back, offsetRadiusTimer, OFFSET_RADIUS_TIME, OFFSET_RADIUS_MAX, 0.0f);
 	Vec2<float>offset = { cos(inputAngle) * offsetRadius,sin(inputAngle) * offsetRadius };
-	drawPos = handPos + offset;
+	drawPos = handPos + offset;*/
 
 	//isFirstShot = false;
 

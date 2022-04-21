@@ -141,12 +141,13 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 		//ボスのAI-----------------------
 		//bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 
-		/*if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_P, "Boss Swing", "DIK_P")) {
+		if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_P, "Boss Swing", "DIK_P")) {
 
 			bossPatternNow = static_cast<E_BossPattern>(BOSS_PATTERN_SWING);
 			patternTimer = 0;
+			bossPattern[bossPatternNow]->Init();
 
-		}*/
+		}
 
 		//ボスの挙動
 		if (bossPatternNow != oldBossPattern)
