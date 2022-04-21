@@ -10,6 +10,7 @@
 #include"DrawFunc_FillTex.h"
 #include"DrawFunc_Mask.h"
 #include"IntoTheAbyss/TitleScene.h"
+#include"../src/TutorialScene.h"
 #include"ResultScene.h"
 #include"StageSelectScene.h"
 #include"IntoTheAbyss/DebugKeyManager.h"
@@ -27,7 +28,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	engineOption.windowName = "DragKnockFight";
 	engineOption.windowSize = { 1280,720 };
 	engineOption.iconPath = nullptr;
-	engineOption.backBuffClearColor = Color(0.0f, 0.0f, 0.0f, 1.0f);
+	engineOption.backBuffClearColor = Color(56, 22, 74, 255);
 	engineOption.useHDR = false;
 	engineOption.frameRate = 43;
 	engineOption.imguiActive = false;
@@ -45,6 +46,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		new StageSelectScene(),
 		new GameScene(),
 		new ResultScene(),
+		new TutorialScene()
 	};
 	int awakeScene = 0;	//開始時のステージ番号
 

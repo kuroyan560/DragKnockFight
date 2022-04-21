@@ -4,6 +4,7 @@
 #include "TexHandleMgr.h"
 #include "SceneCange.h"
 #include "KuroMath.h"
+#include"DebugKeyManager.h"
 
 TitleScene::TitleScene()
 {
@@ -25,6 +26,7 @@ TitleScene::TitleScene()
 
 	isPressStartDraw = true;
 	pressStartTimer = 0;
+
 }
 
 void TitleScene::OnInitialize()
@@ -67,8 +69,14 @@ void TitleScene::OnUpdate()
 
 		pressStartTimer = 0;
 		isPressStartDraw = isPressStartDraw ? false : true;
-
 	}
+
+
+	if (UsersInput::Instance()->ControllerOnTrigger(0, B))
+	{
+		KuroEngine::Instance().ChangeScene(4, changeScene);
+	}
+
 }
 
 void TitleScene::OnDraw()
