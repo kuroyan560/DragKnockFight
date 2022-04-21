@@ -30,7 +30,7 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx, const std::shared_ptr<Tutorial>& Tutorial)
+Player::Player(const PLAYABLE_CHARACTER_NAME &CharacterName, const int &ControllerIdx, const std::shared_ptr<Tutorial> &Tutorial)
 	:CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx), tutorial(Tutorial)
 {
 	/*====== コンストラクタ =====*/
@@ -114,7 +114,7 @@ void Player::OnInit()
 	inputInvalidTimerByCrash = 0;
 }
 
-void Player::OnUpdate(const vector<vector<int>>& MapData)
+void Player::OnUpdate(const vector<vector<int>> &MapData)
 {
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
@@ -155,6 +155,15 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 	//移動に関する処理
 	Move();
+
+	if (isGripPowerEmpty)
+	{
+		outOfStaminaEffect.Start(pos, MAX_GRIP_POWER_TIMER);
+	}
+	outOfStaminaEffect.baseEmptyStringPos = pos;
+	outOfStaminaEffect.baseMaxStringPos = pos;
+	outOfStaminaEffect.Update();
+
 
 	// 連射タイマーを更新
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;
@@ -306,7 +315,7 @@ void Player::OnDrawUI()
 	tutorial.lock()->Draw(leftStickVec, rightStickVec, leftTrigger, rightTrigger);
 }
 
-void Player::OnHitMapChip(const HIT_DIR& Dir)
+void Player::OnHitMapChip(const HIT_DIR &Dir)
 {
 	if (Dir == TOP)
 	{
@@ -378,7 +387,7 @@ void Player::OnHitMapChip(const HIT_DIR& Dir)
 	}
 }
 
-void Player::Input(const vector<vector<int>>& MapData)
+void Player::Input(const vector<vector<int>> &MapData)
 {
 	/*===== 入力処理 =====*/
 
@@ -642,7 +651,7 @@ void Player::Move()
 	}
 }
 
-void Player::Shot(const Vec2<float>& GeneratePos, const float& ForwardAngle)
+void Player::Shot(const Vec2<float> &GeneratePos, const float &ForwardAngle)
 {
 	//弾速
 	static const float BULLET_SPEED = 30.0f;
@@ -724,7 +733,7 @@ void Player::PushBackWall()
 
 }
 
-void Player::CalculateStretch(const Vec2<float>& Move)
+void Player::CalculateStretch(const Vec2<float> &Move)
 {
 	Vec2<float> stretchRate = { abs(Move.x / MAX_RECOIL_AMOUNT),abs(Move.y / MAX_RECOIL_AMOUNT) };
 
@@ -819,7 +828,7 @@ Vec2<float> Player::GetPlayerGraphSize()
 	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 }
 
-void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& MapData)
+void Player::CheckHitMapChipVel(const Vec2<float> &checkPos, const vector<vector<int>> &MapData)
 {
 	// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
 	//Vec2<float> upperPlayerPos = pos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);
