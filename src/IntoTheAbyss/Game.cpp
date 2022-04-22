@@ -389,7 +389,7 @@ void Game::Update()
 	}
 
 	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0, A);
-	if (done)
+	if (done && false)
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
 		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
