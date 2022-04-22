@@ -39,12 +39,7 @@ struct SizeData
 enum MapChipData
 {
 	MAPCHIP_TYPE_STATIC_BLOCK,
-	MAPCHIP_TYPE_MOVING_BLOCK,
 	MAPCHIP_TYPE_TOCH,
-	MAPCHIP_TYPE_DOOR,
-	MAPCHIP_TYPE_THOWNP,
-	MAPCHIP_TYPE_BUBBLE,
-	MAPCHIP_TYPE_EVENT,
 	MAPCHIP_TYPE_MAX
 };
 enum MapChipBlockData
@@ -309,24 +304,6 @@ public:
 		}
 	};
 
-	//指定の番号が空白かどうか判断する
-	inline void AlimentSpaceNumber(int *CHIP_NUMBER)
-	{
-		bool isSpaceFlag = false;
-		//ドア番号は空白として扱う
-		bool doorFlag = mapChipMemoryData[MAPCHIP_TYPE_DOOR].min <= *CHIP_NUMBER && *CHIP_NUMBER <= mapChipMemoryData[MAPCHIP_TYPE_DOOR].max;
-
-		//チップ番号が0もしくは10以上なら空白判定を出す
-		if ((*CHIP_NUMBER == 0 || 10 <= *CHIP_NUMBER))
-		{
-			isSpaceFlag = true;
-		}
-
-		if (isSpaceFlag || doorFlag)
-		{
-			*CHIP_NUMBER = 0;
-		}
-	};
 
 private:
 	const int &GetGimmickNumber(const int &NUMBER)

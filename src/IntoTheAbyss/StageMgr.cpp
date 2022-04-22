@@ -19,14 +19,7 @@ StageMgr::StageMgr()
 	relationRoomData.resize(allStageNum);
 	allMapChipDrawData.resize(allStageNum);
 
-	mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK] = { 0,9 };
-	mapChipMemoryData[MAPCHIP_TYPE_MOVING_BLOCK] = { 10,19 };
-	mapChipMemoryData[MAPCHIP_TYPE_DOOR] = { 20,29 };
-	mapChipMemoryData[MAPCHIP_TYPE_TOCH] = { 30,39 };
-	mapChipMemoryData[MAPCHIP_TYPE_THOWNP] = { 50,79 };
-	mapChipMemoryData[MAPCHIP_TYPE_BUBBLE] = { 80,89 };
-	mapChipMemoryData[MAPCHIP_TYPE_EVENT] = { 90,99 };
-
+	mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK] = { 1,16 };
 
 	//LoadDivGraph("Resource/chip_sheet.png", 18, 6, 3, 32, 32, mapChipGraphHandle.data());
 
