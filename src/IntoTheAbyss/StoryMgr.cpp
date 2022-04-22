@@ -52,7 +52,7 @@ void StoryMgr::Update()
 		}
 	}
 
-	if (story[storyHandle]->OneLooped() && UsersInput::Instance()->ControllerOnTrigger(0, A))
+	if (story[storyHandle]->OneLooped() && !story[storyHandle]->NextFlg() && UsersInput::Instance()->ControllerOnTrigger(0, A))
 	{
 		AudioApp::Instance()->PlayWave(SE);
 		story[storyHandle]->GotoNextString();

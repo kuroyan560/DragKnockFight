@@ -27,8 +27,10 @@ void PictureStory::InitScene()
 }
 
 #include"UsersInput.h"
+#include"AudioApp.h"
 void PictureStory::Update()
 {
+	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/select.wav");
 	if (startFlag)
 	{
 		if (!finishFlag)
@@ -36,10 +38,12 @@ void PictureStory::Update()
 			if (0 < pictureArrayHandle && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
 			{
 				pictureArrayHandle--;
+				AudioApp::Instance()->PlayWave(SE);
 			}
 			if (pictureArrayHandle < pictureHandle.size() - 1 && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_RIGHT))
 			{
 				pictureArrayHandle++;
+				AudioApp::Instance()->PlayWave(SE);
 			}
 		}
 
@@ -158,7 +162,6 @@ void PictureStory::Start()
 
 void PictureStory::GotoNextString()
 {
-	if (nextFlag)return;
 	nextFlag = true;
 }
 

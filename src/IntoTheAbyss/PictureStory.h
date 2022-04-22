@@ -15,6 +15,7 @@ public:
 
 	void Start();
 	const bool& OneLooped() { return oneLoop; }
+	const bool& NextFlg() { return nextFlag; }
 	void GotoNextString();
 
 	bool GoToNextScene();

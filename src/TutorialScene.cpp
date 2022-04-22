@@ -82,7 +82,7 @@ void TutorialScene::OnUpdate()
 
 	if (pictureStory.goToTitleSceneFlag)
 	{
-		KuroEngine::Instance().ChangeScene(0, changeScene);
+		KuroEngine::Instance().ChangeScene(1, changeScene);
 	}
 }
 
