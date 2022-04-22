@@ -9,6 +9,8 @@
 #include "Intersected.h"
 #include"BulletMgrBase.h"
 #include"RunOutOfStaminaEffect.h"
+#include"SwingLineSegmentMgr.h"
+#include"TexHandleMgr.h"
 
 static const enum PLAYABLE_CHARACTER_NAME { PLAYABLE_LUNA, PLAYABLE_LACY, PLAYABLE_BOSS_0, PLAYABLE_CHARACTER_NUM, PLAYER_CHARACTER_NUM = PLAYABLE_LACY + 1 };
 static const enum WHICH_TEAM { LEFT_TEAM, RIGHT_TEAM, TEAM_NUM };
@@ -65,6 +67,15 @@ protected:
 	const float ADD_SWING_ANGLE = 0.002f;
 	const float MAX_SWING_ANGLE = 0.07f;
 
+	//振り回し可視化用線分クラス
+	SwingLineSegmentMgr CWSwingSegmentMgr;	// 時計回り
+	SwingLineSegmentMgr CCWSwingSegmentMgr;	// 反時計回り
+	bool isInputSwingRB;					// RBでスイングしたかどうか falseだったらLB
+	int rbHandle;
+	int lbHandle;
+	int lineHandle;
+	int arrowHandle;
+
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
@@ -79,6 +90,10 @@ protected:
 		bulletHitSphere.center = &pos;
 		bulletHitSphere.radius = size.x;
 		outOfStaminaEffect.Init();
+		rbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_RB.png");
+		lbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_LB.png");
+		lineHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_line.png");
+		arrowHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_arrow.png");
 	}
 
 	std::weak_ptr<CharacterInterFace>partner;

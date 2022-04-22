@@ -235,6 +235,10 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	damageTimer = 0;
 
+	CWSwingSegmentMgr.Setting(true,rbHandle,arrowHandle,lineHandle);
+	CCWSwingSegmentMgr.Setting(false,lbHandle,arrowHandle,lineHandle);
+	isInputSwingRB = false;
+
 }
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
@@ -313,6 +317,17 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	//演出補助更新
 	stagingDevice.Update();
+
+	// 振り回し可視化用のクラスを更新。
+	if (nowSwing) {
+		CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), !isInputSwingRB, true);
+		CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), isInputSwingRB, true);
+	}
+	else {
+		CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), false, false);
+		CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), false, false);
+	}
+
 }
 
 #include "DrawFunc.h"
@@ -320,6 +335,8 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 void CharacterInterFace::Draw()
 {
 	// 残像を描画
+	CWSwingSegmentMgr.Draw();
+	CCWSwingSegmentMgr.Draw();
 	OnDraw();
 	bulletMgr.Draw();
 }

@@ -629,6 +629,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// クールタイムを設定。
 		swingCoolTime = SWING_COOLTIME;
 
+		isInputSwingRB = isInputRB;
+
 	}
 	else if (isSwingPartner && canSwing) {
 
