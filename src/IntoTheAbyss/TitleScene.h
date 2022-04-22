@@ -2,6 +2,7 @@
 #include"KuroEngine.h"
 #include"SceneCange.h"
 #include"ScreenEdgeEffect.h"
+#include"PictureStory.h"
 
 class TitleScene : public BaseScene
 {
@@ -41,6 +42,11 @@ private:
 	const float EASING_MOVE_CHAR = 20.0f;
 	const float EASING_MOVE_TITLE = 30.0f;
 
+	//チュートリアル選択
+	bool tutorialQuestion = false;
+	bool tutorialSelect = false;
+	bool tutorialYes = true;
+
 public:
 	TitleScene();
 	void OnInitialize()override;
@@ -50,6 +56,5 @@ public:
 	void OnFinalize()override;
 
 	std::shared_ptr<SceneCange> changeScene;
-
 };
 
