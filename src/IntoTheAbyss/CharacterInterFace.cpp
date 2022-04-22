@@ -235,8 +235,11 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	damageTimer = 0;
 
-	CWSwingSegmentMgr.Setting(true,rbHandle,arrowHandle,lineHandle);
-	CCWSwingSegmentMgr.Setting(false,lbHandle,arrowHandle,lineHandle);
+	static const int RETICLE_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png") };
+	int team = GetWhichTeam();
+
+	CWSwingSegmentMgr.Setting(true,rbHandle,arrowHandle,lineHandle,RETICLE_GRAPH[team]);
+	CCWSwingSegmentMgr.Setting(false,lbHandle,arrowHandle,lineHandle,RETICLE_GRAPH[team]);
 	isInputSwingRB = false;
 
 }

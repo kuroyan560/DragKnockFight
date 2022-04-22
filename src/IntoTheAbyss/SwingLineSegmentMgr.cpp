@@ -46,18 +46,38 @@ void SwingLineSegment::Draw()
 		if (alpha == 50) {
 			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), Color(255, 255, 255, alpha), AlphaBlendMode_Trans);
 		}
+		else if (alpha == 100) {
+			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), Color(0, 0, 0, alpha), AlphaBlendMode_Trans);
+		}
 		else {
 			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 64, AlphaBlendMode_Trans);
 		}
+
 		break;
+
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_UI:
+
 		drawPos = Vec2<float>(start - end) / 2.0f;
 		size = { 64.0f,64.0f };
 		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 64, AlphaBlendMode_Trans);
+
 		break;
+
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW:
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 64, AlphaBlendMode_Trans);
+
+		// 仮でアルファで画像を変える。
+		if (alpha == 50 || alpha == 100) {
+			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), Color(255, 255, 255, alpha), AlphaBlendMode_Trans);
+		}
+		else if (alpha == 100) {
+			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), Color(0, 0, 0, alpha), AlphaBlendMode_Trans);
+		}
+		else {
+			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 64, AlphaBlendMode_Trans);
+		}
+
 		break;
+
 	default:
 		break;
 	}
@@ -76,7 +96,7 @@ void SwingLineSegment::ResetDistance(const Vec2<float>& Pos, const float& Distan
 
 }
 
-void SwingLineSegmentMgr::Setting(const bool& IsClockWise, const int& HandleUI, const int& HandleArrow, const int& HandleLine)
+void SwingLineSegmentMgr::Setting(const bool& IsClockWise, const int& HandleUI, const int& HandleArrow, const int& HandleLine, const int& ReticleHandle)
 {
 
 	/*===== 前準備 =====*/
@@ -85,6 +105,7 @@ void SwingLineSegmentMgr::Setting(const bool& IsClockWise, const int& HandleUI, 
 	UIHandle = HandleUI;
 	arrowHandle = HandleArrow;
 	lineHandle = HandleLine;
+	reticleHandle = ReticleHandle;
 
 }
 
@@ -161,14 +182,17 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 		// 使用する画像を決める。
 		int handle = 0;
 		SwingLineSegment::SEGMENT_ID id;
+		// 最初は操作ボタンが書いてあるUIを描画する。
 		if (index == 0) {
 			handle = UIHandle;
 			id = SwingLineSegment::SEGMENT_ID::SEGMENT_ID_UI;
 		}
+		// 最後の線分は矢印を描画する。
 		else if (index == LINE_COUNT - 1) {
 			handle = arrowHandle;
 			id = SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW;
 		}
+		// それ以外は普通の線分を描画する。
 		else {
 			handle = lineHandle;
 			id = SwingLineSegment::SEGMENT_ID::SEGMENT_ID_LINE;
@@ -188,6 +212,10 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 
 	/*===== 各線分とマップチップの当たり判定を行う =====*/
 
+	// 照準画像を吹っ飛ばす。(毎フレーム衝突点を計算するため)。
+	reticlePos = { -1000,-1000 };
+
+	// 一度マップチップに当たったらそれ以降は描画しないand当たり判定を行わないようにするために使用。
 	int isHitMapChip = false;
 	for (int index = 0; index < LINE_COUNT; ++index) {
 
@@ -200,7 +228,38 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 		}
 
 		// マップチップと当たり判定を行う。
+		Vec2<float> resultPos = CheckHitMapChip(lineSegments[index].GetStart(), lineSegments[index].GetEnd());
 
+		// 値が-1だったら当たっていないということなので、処理を飛ばす。
+		if (resultPos.x == -1) continue;
+
+		// マップチップと当たった判定にする。
+		lineSegments[index].SetEnd(resultPos);
+
+		// スイング中だったら交点のところの線分を矢印にする。
+		if (IsSwing) {
+			lineSegments[index].SetID(SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW);
+			lineSegments[index].SetHandle(arrowHandle);
+		}
+
+		isHitMapChip = true;
+
+		// 照準の位置を保存。
+		reticlePos = resultPos;
+
+	}
+
+	// マップチップと当たっていたら、全ての線分の色をちょっとだけ濃くする。
+	if (isHitMapChip) {
+
+		for (int index = 0; index < LINE_COUNT; ++index) {
+
+			// 線分は濃くしない。	橋本さんから貰う画像を入れる際はこの処理はいらなくなる。
+			if(lineSegments[index].GetID() == SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW) continue;
+
+			lineSegments[index].SetAlpha(100);
+
+		}
 
 	}
 
@@ -213,157 +272,170 @@ void SwingLineSegmentMgr::Draw()
 
 	for (int index = 0; index < LINE_COUNT; ++index) {
 
+		if (!lineSegments[index].GetIsActive())continue;
+
 		lineSegments[index].Draw();
 
 	}
 
+	// 照準を描画。
+	Vec2<float> size = { 32,32 };
+	DrawFunc::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(reticlePos - size), ScrollMgr::Instance()->Affect(reticlePos + size), TexHandleMgr::GetTexBuffer(reticleHandle), AlphaBlendMode_Trans);
+
 }
 
 #include "WinApp.h"
-bool SwingLineSegmentMgr::CheckHitMapChip()
+#include <IntoTheAbyss/StageMgr.h>
+#include "SelectStage.h"
+#include "Collider.h"
+const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos)
 {
-	//// 最短距離を保存するようの配列。
-	//vector<pair<Vec2<float>, float>> shortestPoints;
-
-	//// 照準のレイの方向によって当たり判定を無効化する為のフラグをセットする。
-	//bool isTop = handSegmentDir.y < 0;
-	//bool isLeft = handSegmentDir.x < 0;
-
-	//// 次にマップチップとの最短距離を求める。
-	//const int MAP_Y = mapData.size();
-	//for (int height = 0; height < MAP_Y; ++height) {
-
-	//	const int MAP_X = mapData[height].size();
-	//	for (int width = 0; width < MAP_X; ++width) {
-
-	//		// このマップチップが1~9以外だったら判定を飛ばす。
-	//		if (mapData[height][width] < 1 || mapData[height][width] > 9) continue;
-
-	//		// このインデックスのブロックの座標を取得。
-	//		const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);
-
-	//		Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
-
-	//		// 一定範囲以外だったら処理を飛ばす。
-	//		bool checkInsideTop = BLOCK_POS.y < handPos.y - windowSize.y;
-	//		bool checkInsideBottom = handPos.y + windowSize.y > BLOCK_POS.y;
-	//		bool checkInsideLeft = BLOCK_POS.x < handPos.x + windowSize.x;
-	//		bool checkInsideRight = handPos.x + windowSize.x > BLOCK_POS.x;
-	//		if (checkInsideTop && checkInsideBottom && checkInsideLeft && checkInsideRight) {
-	//			//player.onGround = false;
-	//			continue;
-	//		}
-
-	//		// そのブロックが内包されているブロックだったら処理を飛ばす。
-	//		Vec2<int> mapChipIndex = { width, height };
-	//		if (StageMgr::Instance()->IsItWallIn(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), mapChipIndex)) {
-
-	//			continue;
-
-	//		}
-
-	//		// レイの方向とブロックの位置関係で処理を飛ばす。ウィンドウを4分割するやつ
-	//		float offsetHandPos = MAP_CHIP_SIZE;
-	//		if (isLeft && handPos.x + offsetHandPos < BLOCK_POS.x) continue;
-	//		if (!isLeft && BLOCK_POS.x < handPos.x - offsetHandPos) continue;
-	//		if (isTop && handPos.y + offsetHandPos < BLOCK_POS.y) continue;
-	//		if (!isTop && BLOCK_POS.y < handPos.y - offsetHandPos) continue;
-
-	//		// ビューポート外にあったら処理を行わない。
-	//		//if (ViewPort::Instance()->pointPos[ViewPort::LEFT_UP].x - MAP_CHIP_HALF_SIZE > BLOCK_POS.x) continue;
-	//		//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].x + MAP_CHIP_HALF_SIZE < BLOCK_POS.x) continue;
-	//		//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_UP].y - MAP_CHIP_HALF_SIZE > BLOCK_POS.y) continue;
-	//		//if (ViewPort::Instance()->pointPos[ViewPort::RIGHT_DOWN].y + MAP_CHIP_HALF_SIZE < BLOCK_POS.y) continue;
-
-	//		// 四辺分交点を求める。
-
-	//		// 交点保存用
-	//		vector<Vec2<float>> intersectedPos;
-
-	//		// 上方向
-	//		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE))) {
-
-	//			// 交点を求めて保存する。
-	//			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE)));
-
-	//		}
-	//		// 右方向
-	//		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
-
-	//			// 交点を求めて保存する。
-	//			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE)));
-
-	//		}
-	//		// 下方向
-	//		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
-
-	//			// 交点を求めて保存する。
-	//			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE)));
-
-	//		}
-	//		// 左方向
-	//		if (IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
-
-	//			// 交点を求めて保存する。
-	//			intersectedPos.push_back(CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE)));
-
-	//		}
-
-	//		// 最短距離を求める。
-	//		Vec2<float> shortestPos = {};
-	//		float shoterstLength = 1000000.0f;
-
-	//		// サイズが0だったら処理を飛ばす。
-	//		const int INTERSECTED_COUNT = intersectedPos.size();
-	//		if (INTERSECTED_COUNT <= 0) continue;
-
-	//		// 最短距離を求める。
-	//		for (int index = 0; index < INTERSECTED_COUNT; ++index) {
-
-	//			// 保存されているデータより大きかったら処理を飛ばす。
-	//			float lengthBuff = Vec2<float>(intersectedPos[index] - handPos).Length();
-	//			if (lengthBuff >= shoterstLength) continue;
-
-	//			// データを保存する。
-	//			shoterstLength = lengthBuff;
-	//			shortestPos = intersectedPos[index];
-
-	//		}
-
-	//		// 最短の距離を保存する。
-	//		pair<Vec2<float>, float> buff = { shortestPos, shoterstLength };
-	//		shortestPoints.push_back(buff);
-
-	//	}
-
-	//}
+	//どうやって使うか
+	Vec2<float>handSegmentStart(StartPos), handSegmentEnd(EndPos);//線分
+	Vec2<float>handSegmentDir(EndPos - StartPos);					//線分の方向
+	Vec2<float>handPos(StartPos);									//線分の始点
+	Vec2<float>sightPos;						//求められた交点の中の最短距離
+	RoomMapChipArray mapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());					//マップ
+	//どうやって使うか
 
 
-	///*-- ここまでの過程で様々な最短を求めることができた。 --*/
+	// 最短距離を保存するようの配列。
+	std::vector<std::pair<Vec2<float>, float>> shortestPoints;
 
-	//// 最短の座標を保存する用変数。
-	//float shortestLength = 100000.0f;
+	// 照準のレイの方向によって当たり判定を無効化する為のフラグをセットする。
+	bool isTop = handSegmentDir.y < 0;
+	bool isLeft = handSegmentDir.x < 0;
 
-	//// 全ての最短の中から最も短いものを求める。
-	//const int SHORTEST_COUNT = shortestPoints.size();
+	// 次にマップチップとの最短距離を求める。
+	const int MAP_Y = mapData.size();
+	for (int height = 0; height < MAP_Y; ++height) {
 
-	//// サイズが0だったら照準をどっかに飛ばしてリターン。
-	//if (SHORTEST_COUNT <= 0) {
+		const int MAP_X = mapData[height].size();
+		for (int width = 0; width < MAP_X; ++width) {
 
-	//	sightPos = { -100,-100 };
-	//	return;
+			// このマップチップが1~9以外だったら判定を飛ばす。
+			if (mapData[height][width] < 1 || mapData[height][width] > 9) continue;
 
-	//}
+			// このインデックスのブロックの座標を取得。
+			const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);
 
-	//for (int index = 0; index < SHORTEST_COUNT; ++index) {
+			Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
 
-	//	// 保存されているデータより大きかったら処理を飛ばす。
-	//	if (shortestPoints[index].second >= shortestLength) continue;
+			// 一定範囲以外だったら処理を飛ばす。
+			bool checkInsideTop = BLOCK_POS.y < handPos.y - windowSize.y;
+			bool checkInsideBottom = handPos.y + windowSize.y > BLOCK_POS.y;
+			bool checkInsideLeft = BLOCK_POS.x < handPos.x + windowSize.x;
+			bool checkInsideRight = handPos.x + windowSize.x > BLOCK_POS.x;
+			if (checkInsideTop && checkInsideBottom && checkInsideLeft && checkInsideRight) {
+				//player.onGround = false;
+				continue;
+			}
 
-	//	// データを保存する。
-	//	shortestLength = shortestPoints[index].second;
-	//	sightPos = shortestPoints[index].first;
-	//}
-	return false;
+			// そのブロックが内包されているブロックだったら処理を飛ばす。
+			Vec2<int> mapChipIndex = { width, height };
+			if (StageMgr::Instance()->IsItWallIn(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), mapChipIndex)) {
+
+				continue;
+
+			}
+
+			// レイの方向とブロックの位置関係で処理を飛ばす。ウィンドウを4分割するやつ
+			float offsetHandPos = MAP_CHIP_SIZE;
+			if (isLeft && handPos.x + offsetHandPos < BLOCK_POS.x) continue;
+			if (!isLeft && BLOCK_POS.x < handPos.x - offsetHandPos) continue;
+			if (isTop && handPos.y + offsetHandPos < BLOCK_POS.y) continue;
+			if (!isTop && BLOCK_POS.y < handPos.y - offsetHandPos) continue;
+
+
+			// 四辺分交点を求める。
+
+			// 交点保存用
+			vector<Vec2<float>> intersectedPos;
+
+			// 上方向
+			if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE))) {
+
+				// 交点を求めて保存する。
+				intersectedPos.push_back(Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE)));
+
+			}
+			// 右方向
+			if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+
+				// 交点を求めて保存する。
+				intersectedPos.push_back(Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE)));
+
+			}
+			// 下方向
+			if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+
+				// 交点を求めて保存する。
+				intersectedPos.push_back(Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE)));
+
+			}
+			// 左方向
+			if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+
+				// 交点を求めて保存する。
+				intersectedPos.push_back(Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE)));
+
+			}
+
+			// 最短距離を求める。
+			Vec2<float> shortestPos = {};
+			float shoterstLength = 1000000.0f;
+
+			// サイズが0だったら処理を飛ばす。
+			const int INTERSECTED_COUNT = intersectedPos.size();
+			if (INTERSECTED_COUNT <= 0) continue;
+
+			// 最短距離を求める。
+			for (int index = 0; index < INTERSECTED_COUNT; ++index) {
+
+				// 保存されているデータより大きかったら処理を飛ばす。
+				float lengthBuff = Vec2<float>(intersectedPos[index] - handPos).Length();
+				if (lengthBuff >= shoterstLength) continue;
+
+				// データを保存する。
+				shoterstLength = lengthBuff;
+				shortestPos = intersectedPos[index];
+
+			}
+
+			// 最短の距離を保存する。
+			pair<Vec2<float>, float> buff = { shortestPos, shoterstLength };
+			shortestPoints.push_back(buff);
+		}
+	}
+
+
+	/*-- ここまでの過程で様々な最短を求めることができた。 --*/
+
+	// 最短の座標を保存する用変数。
+	float shortestLength = 100000.0f;
+
+	// 全ての最短の中から最も短いものを求める。
+	const int SHORTEST_COUNT = shortestPoints.size();
+
+	// サイズが0だったら照準をどっかに飛ばしてリターン。
+	if (SHORTEST_COUNT <= 0) {
+
+		sightPos = { -100,-100 };
+		return Vec2<float>(-1, -1);
+	}
+
+	for (int index = 0; index < SHORTEST_COUNT; ++index) {
+
+		// 保存されているデータより大きかったら処理を飛ばす。
+		if (shortestPoints[index].second >= shortestLength) continue;
+
+		// データを保存する。
+		shortestLength = shortestPoints[index].second;
+		sightPos = shortestPoints[index].first;
+	}
+
+
+	//最短距離が一つでも算出されたら当たり判定を出す
+	return sightPos;
 
 }

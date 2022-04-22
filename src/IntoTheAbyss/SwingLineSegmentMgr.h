@@ -52,6 +52,13 @@ public:
 
 	inline void SetAlpha(const int& Alpha) { alpha = Alpha; }
 	inline void Deactivate() { isActive = false; }
+	inline const Vec2<float>& GetStart() { return start; }
+	inline const Vec2<float>& GetEnd() { return end; }
+	inline const bool& GetIsActive() { return isActive; }
+	inline const SEGMENT_ID& GetID() { return id; }
+	inline void SetEnd(const Vec2<float>& End) { end = End; }
+	inline void SetID(const SEGMENT_ID& ID) { id = ID; }
+	inline void SetHandle(const int& Handle) { graphHandle = Handle; }
 
 };
 
@@ -65,10 +72,12 @@ private:
 
 	static const int LINE_COUNT = 9;	// 線分の数
 	std::array<SwingLineSegment, LINE_COUNT> lineSegments;	// 線分
+	Vec2<float> reticlePos;	// 照準座標
 
 	int UIHandle;		// ボタンのUIの画像
 	int arrowHandle;	// 矢印画像
 	int lineHandle;		// 線の画像
+	int reticleHandle;	// 照準画像
 
 	bool isClockWise;	// 時計回りか？
 
@@ -79,7 +88,7 @@ public:
 	/*===== メンバ関数 =====*/
 
 	// セッティング処理
-	void Setting(const bool& IsClockWise, const int& HandleUI, const int& HandleArrow, const int& HandleLine);
+	void Setting(const bool& IsClockWise, const int& HandleUI, const int& HandleArrow, const int& HandleLine, const int& ReticleHandle);
 
 	// 初期化処理
 	void Init();
@@ -100,6 +109,6 @@ public:
 private:
 
 	// 線分とマップチップの交差
-	bool CheckHitMapChip();
+	const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos);
 
 };

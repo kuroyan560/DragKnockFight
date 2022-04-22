@@ -64,8 +64,8 @@ protected:
 	Vec2<float> swingTargetVec;		// 目標地点
 	float addSwingAngle;			// 振り回しで回転させる量 だんだん増える。
 	bool isSwingClockWise;			// この振り回しが時計回りかどうか true...時計回り...右回転  false...反時計回り...左回転
-	const float ADD_SWING_ANGLE = 0.002f;
-	const float MAX_SWING_ANGLE = 0.07f;
+	const float ADD_SWING_ANGLE = 0.008f;
+	const float MAX_SWING_ANGLE = 0.13f;
 
 	//振り回し可視化用線分クラス
 	SwingLineSegmentMgr CWSwingSegmentMgr;	// 時計回り
@@ -75,6 +75,7 @@ protected:
 	int lbHandle;
 	int lineHandle;
 	int arrowHandle;
+	int reticleHandle;
 
 
 protected:

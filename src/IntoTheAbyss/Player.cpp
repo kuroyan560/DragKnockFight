@@ -315,7 +315,7 @@ void Player::OnDrawUI()
 		float dist = partner.lock()->pos.Distance(pos);
 		Vec2<float>target = pos + rightStickVec * dist;
 		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(target), COLOR_TEX[GetWhichTeam()], 2, AlphaBlendMode_Trans);
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), drawScale * 0.8f, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[team]));
+		//DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), drawScale * 0.8f, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[team]));
 
 		//U‚è‰ñ‚µ•ûŒü•`‰æ
 		bool clockWise = 0 < rightStickVec.Cross(partner.lock()->pos - pos);
