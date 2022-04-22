@@ -14,6 +14,7 @@ public:
 	void Draw();
 
 	void Start();
+	const bool& OneLooped() { return oneLoop; }
 	void GotoNextString();
 
 	bool GoToNextScene();
@@ -38,6 +39,9 @@ private:
 	bool goToNextSceneFlag;
 	bool startCountDownTogoToNextSceneFlag;
 	int countDownTimer;
+
+	//ƒsƒNƒ`ƒƒ‚ªˆêŽü‚µ‚½‚©
+	bool oneLoop = false;
 
 	void Rate(float *RATE, const float &MAX_RATE)
 	{

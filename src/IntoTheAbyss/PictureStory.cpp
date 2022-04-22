@@ -13,7 +13,7 @@ void PictureStory::Init(const std::vector<int> &PICTURE_HANDLE, const std::vecto
 	stringHandle = STRING_HANDLE;
 
 	picturePos.resize(PICTURE_HANDLE.size());
-	stringPos.resize(PICTURE_HANDLE.size());
+	stringPos.resize(STRING_HANDLE.size());
 
 	basePos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x / 2);
 	basePos.y = -50.0f;
@@ -23,6 +23,7 @@ void PictureStory::InitScene()
 {
 	startFlag = false;
 	goToNextSceneFlag = false;
+	oneLoop = false;
 }
 
 void PictureStory::Update()
@@ -77,7 +78,7 @@ void PictureStory::Update()
 		//èIóπèàóù
 		if (finishFlag)
 		{
-			Rate(&stringFinishRate, 30.0f);
+			Rate(&stringFinishRate, 15.0f);
 			if (1.0f <= stringFinishRate)
 			{
 				startCountDownTogoToNextSceneFlag = true;
@@ -92,6 +93,7 @@ void PictureStory::Update()
 		if (pictureHandle.size() <= pictureArrayHandle)
 		{
 			pictureArrayHandle = 0;
+			if (!oneLoop)oneLoop = true;
 		}
 		//âÊëúÇÃÉãÅ[Év-----------------------
 

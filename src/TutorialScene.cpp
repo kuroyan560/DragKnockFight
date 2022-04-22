@@ -1,32 +1,74 @@
 #include "TutorialScene.h"
 #include"IntoTheAbyss/TexHandleMgr.h"
-#include"../src/Engine/DrawFunc.h"
+#include"KuroFunc.h"
+#include<sys/stat.h>
+
+int TutorialScene::LoadPngFile(const std::string& Dir, const int& Num)
+{
+	const std::string path = Dir + std::to_string(Num) + ".png";
+
+	//ファイルが存在しない
+	if (!KuroFunc::ExistFile(path))return 0;
+
+	return TexHandleMgr::LoadGraph(path);
+}
+
+bool TutorialScene::ExistDir(const std::string& Dir)
+{
+	static struct stat statBuff;
+	return stat(Dir.c_str(), &statBuff) == 0;
+}
+
 
 TutorialScene::TutorialScene()
 {
 	changeScene = std::make_shared<SceneCange>();
 
-	std::vector<int>handle;
-	std::vector<int>handle2;
+	static const std::string DIR = "resource/ChainCombat/tutorial/";
+	std::vector<PictureStoryHandleData> picStorys;
 
-	handle.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/0.png"));
-	handle.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/1.png"));
-	handle.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/2.png"));
-	handle2.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/str/0.png"));
-	handle2.push_back(TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/0/str/1.png"));
+	while (1)
+	{
+		const int storyIdx = picStorys.size();
+		const std::string dir = DIR + std::to_string(storyIdx) + "/";
 
-	std::vector<PictureStoryHandleData> data;
-	//1シーン目の画像追加
-	data.push_back(PictureStoryHandleData(handle, handle2));
-	//2シーン目の画像追加(テスト)
-	//data.push_back(PictureStoryHandleData(handle, handle2));
-	pictureStory.Init(data);
+		//ディレクトリが存在しない
+		if (!ExistDir(dir))break;
 
-	aButtonHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/star.png");
-	pos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x - 70);
-	pos.y = static_cast<float>(WinApp::Instance()->GetWinSize().y - 70);
-	drawButtonFlag = true;
-	flashTimer = 0;
+		//画像の読み込み
+		std::vector<int>picHandles;
+		while (1)
+		{
+			const int picIdx = picHandles.size();
+
+			//PNGファイル読み込み
+			int png = LoadPngFile(dir, picIdx);
+
+			//PNGファイルが存在しない
+			if (!png)break;
+
+			picHandles.emplace_back(png);
+		}
+
+		//文章画像読み込み
+		std::vector<int>strHandles;
+		while (1)
+		{
+			const int strIdx = strHandles.size();
+
+			//PNGファイル読み込み
+			int png = LoadPngFile(dir + "str/", strIdx);
+
+			//PNGファイルが存在しない
+			if (!png)break;
+
+			strHandles.emplace_back(png);
+		}
+
+		picStorys.emplace_back(PictureStoryHandleData(picHandles, strHandles));
+	}
+
+	pictureStory.Init(picStorys);
 }
 
 void TutorialScene::OnInitialize()
@@ -42,13 +84,6 @@ void TutorialScene::OnUpdate()
 	{
 		KuroEngine::Instance().ChangeScene(0, changeScene);
 	}
-
-	++flashTimer;
-	if (30 <= flashTimer)
-	{
-		drawButtonFlag = !drawButtonFlag;
-		flashTimer = 0;
-	}
 }
 
 void TutorialScene::OnDraw()
@@ -57,11 +92,6 @@ void TutorialScene::OnDraw()
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 
 	pictureStory.Draw();
-
-	if (drawButtonFlag)
-	{
-		DrawFunc::DrawRotaGraph2D(pos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(aButtonHandle));
-	}
 }
 
 void TutorialScene::OnImguiDebug()

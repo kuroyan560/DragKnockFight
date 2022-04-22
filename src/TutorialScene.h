@@ -5,6 +5,8 @@
 
 class TutorialScene :public BaseScene
 {
+	int LoadPngFile(const std::string& Dir, const int& Num);
+	bool ExistDir(const std::string& Dir);
 public:
 	TutorialScene();
 	void OnInitialize()override;
@@ -16,10 +18,5 @@ public:
 	std::shared_ptr<SceneCange> changeScene;
 
 	StoryMgr pictureStory;
-
-	Vec2<float>pos;
-	int aButtonHandle;
-	int flashTimer;
-	bool drawButtonFlag;
 };
 

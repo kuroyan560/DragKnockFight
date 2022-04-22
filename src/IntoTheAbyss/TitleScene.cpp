@@ -74,6 +74,7 @@ void TitleScene::OnUpdate()
 
 	if (UsersInput::Instance()->ControllerOnTrigger(0, B))
 	{
+		AudioApp::Instance()->PlayWave(SE);
 		KuroEngine::Instance().ChangeScene(4, changeScene);
 	}
 
