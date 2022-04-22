@@ -1,5 +1,6 @@
 #include "MapChipCollider.h"
 #include "DrawFunc.h"
+#include "StageMgr.h"
 
 bool MapChipCollider::IsIntersected(const Vec2<float>& posA1, const Vec2<float>& posA2, const Vec2<float>& posB1, const Vec2<float>& posB2)
 {
@@ -76,6 +77,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 	}
 
 	const int HEIGHT = mapChipData.size();
+	SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 	for (int height = 0; height < HEIGHT; ++height) {
 
 		// マップの横
@@ -83,7 +85,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 		for (int width = 0; width < WIDTH; ++width) {
 
 			// マップIDが0だったら処理を飛ばす。
-			if (!(mapChipData[height][width] >= 1 && mapChipData[height][width] <= 9)) continue;
+			if (!(mapChipSizeData.min <= mapChipData[height][width] && mapChipData[height][width] <= mapChipSizeData.max)) continue;
 
 			// このマップの中心座標を求める。
 			const float centerX = width * MAP_CHIP_SIZE;
@@ -400,6 +402,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 
 	const int HEIGHT = mapChipData.size();
+	SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 	for (int height = 0; height < HEIGHT; ++height) {
 
 		// マップの横
@@ -407,7 +410,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 		for (int width = 0; width < WIDTH; ++width) {
 
 			// マップIDが0だったら処理を飛ばす。
-			if (!(mapChipData[height][width] >= 1 && mapChipData[height][width] <= 9)) continue;
+			if (!(mapChipSizeData.min <= mapChipData[height][width] && mapChipData[height][width] <= mapChipSizeData.max)) continue;
 
 			// このマップの中心座標を求める。
 			const float centerX = width * MAP_CHIP_SIZE;
