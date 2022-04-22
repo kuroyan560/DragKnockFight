@@ -213,7 +213,7 @@ private:
 	std::array<int, 12> eventChipHandle;
 
 	array<int, 30> mapChipGraphHandle;
-	enum
+	enum MapChipDrawEnum
 	{
 		MAPCHIP_DRAW_WALL_LEFT_UP,
 		MAPCHIP_DRAW_FLOOR,
