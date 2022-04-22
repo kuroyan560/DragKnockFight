@@ -33,17 +33,15 @@ void PictureStory::Update()
 	{
 		if (!finishFlag)
 		{
-			if (0 < pictureArrayHandle && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::DPAD_LEFT))
+			if (0 < pictureArrayHandle && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
 			{
 				pictureArrayHandle--;
 			}
-			if (pictureArrayHandle < pictureHandle.size() - 1 && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::DPAD_RIGHT))
+			if (pictureArrayHandle < pictureHandle.size() - 1 && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_RIGHT))
 			{
 				pictureArrayHandle++;
 			}
 		}
-
-
 
 		//ìríÜââèo
 		if (nextFlag)
@@ -108,23 +106,31 @@ void PictureStory::Update()
 void PictureStory::Draw()
 {
 	static const float ARROR_X_OFFSET = 90;
+	const auto winCenter = WinApp::Instance()->GetExpandWinCenter();
+	static const int ARROW_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/arrow.png");
+	static const float ARROW_FLOAT_Y = 10.0f;
+	static float ARROW_FLOAT_RADIAN = 0.0f;
+
+	ARROW_FLOAT_RADIAN += Angle::ConvertToRadian(3.0f);
 
 	if (startFlag)
 	{
-		Vec2<float>adjPos;
-		adjPos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x / 2);
-		adjPos.y = static_cast<float>(WinApp::Instance()->GetWinSize().y / 2);
-		DrawFunc::DrawRotaGraph2D(picturePos[pictureArrayHandle] + adjPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(pictureHandle[pictureArrayHandle]));
+		//adjPos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x / 2);
+		//adjPos.y = static_cast<float>(WinApp::Instance()->GetWinSize().y / 2);
+		DrawFunc::DrawRotaGraph2D(picturePos[pictureArrayHandle] + winCenter, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(pictureHandle[pictureArrayHandle]));
 		DrawFunc::DrawRotaGraph2D(stringPos[stringArrayHandle], Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(stringHandle[stringArrayHandle]));
 
 		//ñÓàÛÇÃï`âÊ
-		if (!finishFlag)
+		const float offsetY = ARROW_FLOAT_Y * cos(ARROW_FLOAT_RADIAN);
+		//ç∂ë§
+		if (0 < pictureArrayHandle)
 		{
-			//ç∂ë§
-			if (0 < pictureArrayHandle)
-			{
-
-			}
+			DrawFunc::DrawRotaGraph2D({ ARROR_X_OFFSET,winCenter.y + offsetY }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(ARROW_GRAPH), { 0.5f,0.5f }, AlphaBlendMode_Trans, { true,false });
+		}
+		//âEë§
+		if (pictureArrayHandle < pictureHandle.size() - 1)
+		{
+			DrawFunc::DrawRotaGraph2D({ winCenter.x * 2 - ARROR_X_OFFSET,winCenter.y + offsetY }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(ARROW_GRAPH));
 		}
 	}
 }
