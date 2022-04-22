@@ -181,10 +181,9 @@ StageMgr::StageMgr()
 			{
 				for (int x = 0; x < allMapChipDrawData[stageNum][roomNum][y].size(); ++x)
 				{
-					int handle = allMapChipData[stageNum][roomNum][y][x];
-					if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= handle && handle <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max)
+					if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[stageNum][roomNum][y][x] && allMapChipData[stageNum][roomNum][y][x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max)
 					{
-						MapChipDrawEnum now = static_cast<MapChipDrawEnum>(handle - 1);
+						MapChipDrawEnum now = static_cast<MapChipDrawEnum>(allMapChipData[stageNum][roomNum][y][x] -1);
 						allMapChipDrawData[stageNum][roomNum][y][x].handle = mapChipGraphHandle[now];
 					}
 				}

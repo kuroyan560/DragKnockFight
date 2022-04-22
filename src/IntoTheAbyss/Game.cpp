@@ -88,11 +88,9 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 		for (int width = 0; width < WIDTH; ++width) {
 
 			// ブロック以外だったら処理を飛ばす。
-			bool blockFlag = (mapChipData[height][width] >= 1 && mapChipData[height][width] <= 9);
-			bool thownFlag = mapChipData[height][width] == 41;
+			bool blockFlag = (mapChipData[height][width] >= wallChipMemorySize.min && mapChipData[height][width] <= wallChipMemorySize.max);
 
-
-			if (blockFlag || thownFlag)
+			if (blockFlag)
 			{
 				// スクロール量から描画する位置を求める。
 				const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE });
