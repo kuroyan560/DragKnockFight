@@ -24,7 +24,6 @@ private:
 	std::vector<Vec2<float>>picturePos;
 	std::vector<int>pictureHandle;
 	int pictureArrayHandle;
-	int changePictureTimer;
 	
 
 	Vec2<float>basePos;

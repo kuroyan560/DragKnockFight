@@ -26,22 +26,21 @@ void PictureStory::InitScene()
 	oneLoop = false;
 }
 
+#include"UsersInput.h"
 void PictureStory::Update()
 {
-	static const int CHANGE_PIC_TIME = 60;
 	if (startFlag)
 	{
 		if (!finishFlag)
 		{
-			//‰æ‘œ‚ÌØ‚è‘Ö‚¦-----------------------
-			++changePictureTimer;
-			if (CHANGE_PIC_TIME <= changePictureTimer)
+			if (0 < pictureArrayHandle && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::DPAD_LEFT))
 			{
-				++pictureArrayHandle;
-				changePictureTimer = 0;
+				pictureArrayHandle--;
 			}
-
-			//‰æ‘œ‚ÌØ‚è‘Ö‚¦-----------------------
+			if (pictureArrayHandle < pictureHandle.size() - 1 && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::DPAD_RIGHT))
+			{
+				pictureArrayHandle++;
+			}
 		}
 
 
@@ -89,14 +88,11 @@ void PictureStory::Update()
 
 
 
-		//‰æ‘œ‚Ìƒ‹[ƒv-----------------------
-		if (pictureHandle.size() <= pictureArrayHandle)
+		//ÅŒã‚Ì‰æ‘œ‚Ü‚ÅŒ©‚½
+		if (pictureHandle.size() - 1 <= pictureArrayHandle)
 		{
-			pictureArrayHandle = 0;
 			if (!oneLoop)oneLoop = true;
 		}
-		//‰æ‘œ‚Ìƒ‹[ƒv-----------------------
-
 
 		if (startCountDownTogoToNextSceneFlag)
 		{
@@ -111,6 +107,8 @@ void PictureStory::Update()
 
 void PictureStory::Draw()
 {
+	static const float ARROR_X_OFFSET = 90;
+
 	if (startFlag)
 	{
 		Vec2<float>adjPos;
@@ -118,6 +116,16 @@ void PictureStory::Draw()
 		adjPos.y = static_cast<float>(WinApp::Instance()->GetWinSize().y / 2);
 		DrawFunc::DrawRotaGraph2D(picturePos[pictureArrayHandle] + adjPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(pictureHandle[pictureArrayHandle]));
 		DrawFunc::DrawRotaGraph2D(stringPos[stringArrayHandle], Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(stringHandle[stringArrayHandle]));
+
+		//–îˆó‚Ì•`‰æ
+		if (!finishFlag)
+		{
+			//¶‘¤
+			if (0 < pictureArrayHandle)
+			{
+
+			}
+		}
 	}
 }
 
@@ -125,8 +133,6 @@ void PictureStory::Start()
 {
 	if (!startFlag)
 	{
-		//”wŒi‰æ‘œ‚Ì‰Šú‰»
-		changePictureTimer = 0;
 		pictureArrayHandle = 0;
 
 		//•¶š•`‰æ‚Ì‰Šú‰»
