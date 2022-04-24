@@ -166,3 +166,15 @@ void DrawFunc_Color::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float
 
 	DRAW_ROTA_GRAPH_COUNT++;
 }
+
+void DrawFunc_Color::DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const std::shared_ptr<TextureBuffer>& Tex, const Color& Paint, const int& Thickness, const Vec2<bool>& Mirror)
+{
+	float distance = FromPos.Distance(ToPos);
+	Vec2<float> vec = (ToPos - FromPos).GetNormal();
+
+	auto graphSize = Tex->GetGraphSize().Float();
+	Vec2<float>expRate = { distance / graphSize.x,Thickness / graphSize.y };
+	Vec2<float>centerPos = FromPos + vec * distance / 2;
+
+	DrawRotaGraph2D(centerPos, expRate, KuroFunc::GetAngle(vec), Tex, Paint, { 0.5f,0.5f }, Mirror);
+}
