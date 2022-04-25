@@ -16,7 +16,7 @@ public:
 	/// ŠÔ‚Ì•`‰æÀ•W‚ğ‰Šú‰»‚µ‚Ü‚·
 	/// </summary>
 	/// <param name="POS">ŠÔ‚Ì•`‰æÀ•W</param>
-	void Init(const Vec2<float> &POS, int TIME, const Vec2<float> &COUNT_DOWN_START_POS, const Vec2<float> &COUNT_DOWN_END_POS);
+	void Init(int TIME);
 	void Finalize();
 	void Update();
 	void Draw();
@@ -75,7 +75,6 @@ private:
 	std::vector<int> timeHandle;
 	std::vector<int> miriHandle;
 
-	Vec2<float>  initCountDownPos, countDownPos;
 	float countDownEndPos;
 	Vec2<int> texSize;
 	int countDownNum;

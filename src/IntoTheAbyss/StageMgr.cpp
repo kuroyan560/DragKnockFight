@@ -192,13 +192,8 @@ StageMgr::StageMgr()
 	}
 	//•”‰®‚²‚Æ‚Ì•`‰æî•ñ‚ðŠi”[‚·‚é-----------------------
 
-
-	GimmickLoader::Instance()->ErrorCheck();
-
-
-
-	bool debug = false;
-	debug = true;
+	//Žg‚í‚È‚¢
+	//GimmickLoader::Instance()->ErrorCheck();
 }
 
 const RoomMapChipArray &StageMgr::GetMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
