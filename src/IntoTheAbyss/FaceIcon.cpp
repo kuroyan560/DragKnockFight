@@ -17,6 +17,10 @@ FaceIcon::FaceIcon()
 	animasions[PLAYABLE_LACY][DAMAGE].graph.emplace_back(TexHandleMgr::LoadGraph(lacyDir + "damage.png"));
 	animasions[PLAYABLE_LACY][BREAK].graph.emplace_back(TexHandleMgr::LoadGraph(lacyDir + "break.png"));
 	animasions[PLAYABLE_LACY][DEAD].graph.emplace_back(TexHandleMgr::LoadGraph(lacyDir + "dead.png"));
+	for (auto& anim : animasions[PLAYABLE_LACY])
+	{
+		anim.mirrorX = true;
+	}
 
 	const std::string boss_0Dir = dir + "boss_0/";
 	animasions[PLAYABLE_BOSS_0][DEFAULT].graph.emplace_back(TexHandleMgr::LoadGraph(boss_0Dir + "default.png"));
@@ -81,13 +85,17 @@ void FaceIcon::Draw()
 	static const int FACE_ICON_OFFSET = 9;
 
 	//¶
+	bool mirrorX = false;
+	if (animasions[character[LEFT_TEAM]]->mirrorX)mirrorX = !mirrorX;
 	DrawFunc_FillTex::DrawGraph(POS, TexHandleMgr::GetTexBuffer(backGraph), BACK_COLOR[status[LEFT_TEAM]], 1.0f);
-	DrawFunc::DrawGraph({ POS.x + OFFSET_X - FACE_ICON_OFFSET,POS.y }, TexHandleMgr::GetTexBuffer(animasions[character[LEFT_TEAM]][status[LEFT_TEAM]].graph[graphIdx[LEFT_TEAM]]), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph({ POS.x + OFFSET_X - FACE_ICON_OFFSET,POS.y }, TexHandleMgr::GetTexBuffer(animasions[character[LEFT_TEAM]][status[LEFT_TEAM]].graph[graphIdx[LEFT_TEAM]]), AlphaBlendMode_Trans, { mirrorX, false });
 
 	//‰E
 	static const float RIGHT_X = WinApp::Instance()->GetExpandWinSize().x - POS.x - BACK_WIDTH;
 	DrawFunc_FillTex::DrawGraph({ RIGHT_X ,POS.y }, TexHandleMgr::GetTexBuffer(backGraph), BACK_COLOR[status[RIGHT_TEAM]], 1.0f, { true,false });
-	DrawFunc::DrawGraph({ RIGHT_X + OFFSET_X + FACE_ICON_OFFSET,POS.y }, TexHandleMgr::GetTexBuffer(animasions[character[RIGHT_TEAM]][status[RIGHT_TEAM]].graph[graphIdx[RIGHT_TEAM]]), AlphaBlendMode_Trans, { true,false });
+	mirrorX = true;
+	if (animasions[character[RIGHT_TEAM]]->mirrorX)mirrorX = !mirrorX;
+	DrawFunc::DrawGraph({ RIGHT_X + OFFSET_X + FACE_ICON_OFFSET,POS.y }, TexHandleMgr::GetTexBuffer(animasions[character[RIGHT_TEAM]][status[RIGHT_TEAM]].graph[graphIdx[RIGHT_TEAM]]), AlphaBlendMode_Trans, { mirrorX,false });
 }
 
 void FaceIcon::Change(const WHICH_TEAM& WhichTeam, const FACE_STATUS& Status)
