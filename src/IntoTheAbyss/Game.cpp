@@ -267,11 +267,10 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	Camera::Instance()->Init();
-
 	GameTimer::Instance()->Init(120);
 	GameTimer::Instance()->Start();
-
 	ScoreManager::Instance()->Init();
+
 	firstLoadFlag = false;
 	lineExtendScale = lineExtendMaxScale;
 }
