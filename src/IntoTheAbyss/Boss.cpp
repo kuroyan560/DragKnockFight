@@ -149,7 +149,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 			patternTimer = 0;
 		}
 		//ƒ{ƒX‚ÌAI-----------------------
-		bossPatternNow = BOSS_PATTERN_NORMALMOVE;
+		//bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 
 		/*if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_P, "Boss Swing", "DIK_P")) {
 

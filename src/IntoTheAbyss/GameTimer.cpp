@@ -20,16 +20,13 @@ GameTimer::GameTimer()
 	timerPos.x = WinApp::Instance()->GetExpandWinCenter().x - texSize.x * 2.0f;
 }
 
-void GameTimer::Init(const Vec2<float> &POS, int TIME, const Vec2<float> &COUNT_DOWN_START_POS, const Vec2<float> &COUNT_DOWN_END_POS)
+void GameTimer::Init(int TIME)
 {
 	startFlag = false;
 	timeUpFlag = false;
 	timer = TIME;
 	flame = 0;
 
-	initCountDownPos = COUNT_DOWN_START_POS;
-	initCountDownPos.y -= (texSize.y + 10);
-	countDownEndPos = COUNT_DOWN_END_POS.x - COUNT_DOWN_START_POS.x;
 
 	countDownNum = 3;
 
@@ -125,6 +122,8 @@ void GameTimer::Update()
 
 void GameTimer::Draw()
 {
+	return;
+
 	Vec2<float>centralPos;
 	int offset = 0;
 	float size = 0.8f;
