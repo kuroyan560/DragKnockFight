@@ -30,9 +30,12 @@ void SwingLineSegment::Update(const Vec2<float>& Start, const Vec2<float>& End, 
 
 }
 
-void SwingLineSegment::Draw()
+void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 {
-
+	static const int TEAM_COLOR_X[TEAM_NUM] = { 47,239 };
+	static const int TEAM_COLOR_Y[TEAM_NUM] = { 255,1 };
+	static const int TEAM_COLOR_Z[TEAM_NUM] = { 139,144 };
+	
 	/*===== 描画処理 =====*/
 
 	Vec2<float> drawPos = {};
@@ -43,7 +46,8 @@ void SwingLineSegment::Draw()
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_LINE:
 
 		// 仮でアルファで画像を変える。
-		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), Color(255, 255, 255, alpha), 32);
+		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle),
+			Color(TEAM_COLOR_X[Team], TEAM_COLOR_Y[Team], TEAM_COLOR_Z[Team], alpha), 32);
 
 		break;
 
@@ -51,14 +55,16 @@ void SwingLineSegment::Draw()
 
 		drawPos = Vec2<float>(start - end) / 2.0f;
 		size = { 64.0f,64.0f };
-		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), Color(255, 255, 255, alpha), 32);
+		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 
+			Color(TEAM_COLOR_X[Team], TEAM_COLOR_Y[Team], TEAM_COLOR_Z[Team], alpha), 32);
 
 		break;
 
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW:
 
 		// 仮でアルファで画像を変える。
-		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), Color(255, 255, 255, alpha), 32);
+		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 
+			Color(TEAM_COLOR_X[Team], TEAM_COLOR_Y[Team], TEAM_COLOR_Z[Team], alpha), 32);
 
 		break;
 
@@ -249,7 +255,7 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 
 }
 
-void SwingLineSegmentMgr::Draw()
+void SwingLineSegmentMgr::Draw(const WHICH_TEAM& Team)
 {
 
 	/*===== 描画処理 =====*/
@@ -258,7 +264,7 @@ void SwingLineSegmentMgr::Draw()
 
 		if (!lineSegments[index].GetIsActive())continue;
 
-		lineSegments[index].Draw();
+		lineSegments[index].Draw(Team);
 
 	}
 

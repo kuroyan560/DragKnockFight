@@ -360,8 +360,8 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 void CharacterInterFace::Draw()
 {
 	// Žc‘œ‚ð•`‰æ
-	CWSwingSegmentMgr.Draw();
-	CCWSwingSegmentMgr.Draw();
+	CWSwingSegmentMgr.Draw(team);
+	CCWSwingSegmentMgr.Draw(team);
 	OnDraw();
 	bulletMgr.Draw();
 }

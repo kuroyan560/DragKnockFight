@@ -1,6 +1,7 @@
 #include "Vec.h"
 #include <array>
 #include <vector>
+#include"CharacterInfo.h"
 
 // 振り回し領域可視化のための線分単体
 class SwingLineSegment {
@@ -45,7 +46,7 @@ public:
 	void Update(const Vec2<float>& Start, const Vec2<float>& End, const Vec2<float>& StartDir, const Vec2<float>& EndDir, const int& Alpha, const SEGMENT_ID& ID, const int& Handle);
 
 	// 描画処理
-	void Draw();
+	void Draw(const WHICH_TEAM& Team);
 
 	// 距離修正 スイング中は線分の更新を止めるが、スイング中に紐の長さが変わってしまう場合があるのでそれに対応させるために追加。
 	void ResetDistance(const Vec2<float>& Pos, const float& Distance);
@@ -104,7 +105,7 @@ public:
 	void Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const bool& IsSwing, const bool& NoMove, const std::vector<std::vector<int>>& mapData);
 
 	// 描画処理
-	void Draw();
+	void Draw(const WHICH_TEAM& Team);
 
 private:
 
