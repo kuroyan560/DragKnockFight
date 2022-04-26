@@ -858,8 +858,14 @@ void Game::Scramble()
 
 	// [スタン演出中] は移動させない。 踏ん張り中の場合は、どちらにせよ移動量が限りなく0に近いので移動させても問題がない。
 	if (!(StunEffect::Instance()->isActive)) {
-		CharacterManager::Instance()->Left()->pos += leftVelGauge;
-		CharacterManager::Instance()->Right()->pos += rightVelGauge;
+		// 振り回され中じゃなかったら移動させる。
+		if (!CharacterManager::Instance()->Right()->GetNowSwing()) {
+			CharacterManager::Instance()->Left()->pos += leftVelGauge;
+		}
+		// 振り回され中じゃなかったら移動させる。
+		if (!CharacterManager::Instance()->Left()->GetNowSwing()) {
+			CharacterManager::Instance()->Right()->pos += rightVelGauge;
+		}
 	}
 
 
