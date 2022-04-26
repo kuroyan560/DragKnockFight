@@ -1,6 +1,6 @@
 #include "SwingLineSegmentMgr.h"
 #include "DrawFunc.h"
-#include "DrawFunc_Color.h"
+#include "../Engine/DrawFunc_Color.h"
 #include "ScrollMgr.h"
 #include "TexHandleMgr.h"
 #include "MapChipCollider.h"
@@ -43,15 +43,7 @@ void SwingLineSegment::Draw()
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_LINE:
 
 		// 仮でアルファで画像を変える。
-		if (alpha == 50) {
-			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), Color(255, 255, 255, alpha), AlphaBlendMode_Trans);
-		}
-		else if (alpha == 100) {
-			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), Color(0, 0, 0, alpha), AlphaBlendMode_Trans);
-		}
-		else {
-			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 64, AlphaBlendMode_Trans);
-		}
+		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), Color(255, 255, 255, alpha), 32);
 
 		break;
 
@@ -59,22 +51,14 @@ void SwingLineSegment::Draw()
 
 		drawPos = Vec2<float>(start - end) / 2.0f;
 		size = { 64.0f,64.0f };
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 64, AlphaBlendMode_Trans);
+		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), Color(255, 255, 255, alpha), 32);
 
 		break;
 
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW:
 
 		// 仮でアルファで画像を変える。
-		if (alpha == 50 || alpha == 100) {
-			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), Color(255, 255, 255, alpha), AlphaBlendMode_Trans);
-		}
-		else if (alpha == 100) {
-			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), Color(0, 0, 0, alpha), AlphaBlendMode_Trans);
-		}
-		else {
-			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 64, AlphaBlendMode_Trans);
-		}
+		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), Color(255, 255, 255, alpha), 32);
 
 		break;
 
@@ -144,14 +128,14 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 		// 動かさないフラグが立っていたらfor分を抜ける。
 		if (IsSwing) {
 
-			lineSegments[index].SetAlpha(200);
+			lineSegments[index].SetAlpha(250);
 			lineSegments[index].ResetDistance(Pos, Distance);
 			continue;
 
 		}
 		else if (NoMove) {
 
-			lineSegments[index].SetAlpha(50);
+			lineSegments[index].SetAlpha(0);
 			lineSegments[index].ResetDistance(Pos, Distance);
 			continue;
 
@@ -203,7 +187,7 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 		Vec2<float> endPos = Pos + Vec2<float>(cosf(endAngle), sinf(endAngle)) * Distance;
 
 		// 線分を生成。
-		lineSegments[index].Update(startPos, endPos, Vec2<float>(cosf(startAngle), sinf(startAngle)), Vec2<float>(cosf(endAngle), sinf(endAngle)), 50, id, handle);
+		lineSegments[index].Update(startPos, endPos, Vec2<float>(cosf(startAngle), sinf(startAngle)), Vec2<float>(cosf(endAngle), sinf(endAngle)), 0, id, handle);
 
 		// 角度を保存。
 		nowAngle = endAngle;
@@ -255,9 +239,9 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 		for (int index = 0; index < LINE_COUNT; ++index) {
 
 			// 線分は濃くしない。	橋本さんから貰う画像を入れる際はこの処理はいらなくなる。
-			if(lineSegments[index].GetID() == SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW) continue;
+			if (lineSegments[index].GetID() == SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW) continue;
 
-			lineSegments[index].SetAlpha(100);
+			lineSegments[index].SetAlpha(200);
 
 		}
 
@@ -346,6 +330,10 @@ const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& Start
 			if (isTop && handPos.y + offsetHandPos < BLOCK_POS.y) continue;
 			if (!isTop && BLOCK_POS.y < handPos.y - offsetHandPos) continue;
 
+			// 線分の始点とのマップチップの距離が、視点と終点の距離より大きかったら処理を行わない。
+			float startEndDistance = (StartPos - EndPos).Length();
+			float blockDistance = (StartPos - BLOCK_POS).Length();
+			if (startEndDistance < blockDistance) continue;
 
 			// 四辺分交点を求める。
 

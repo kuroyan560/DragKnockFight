@@ -856,8 +856,8 @@ void Game::Scramble()
 	rightVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeDivValue) * SlowMgr::Instance()->slowAmount;
 	double subVel = fabs(fabs(leftVel) - fabs(rightVel));
 
-	// [振り回し状態のとき] [スタン演出中] は移動させない。 踏ん張り中の場合は、どちらにせよ移動量が限りなく0に近いので移動させても問題がない。
-	if (!(CharacterManager::Instance()->Right()->GetNowSwing() || CharacterManager::Instance()->Left()->GetNowSwing() || StunEffect::Instance()->isActive)) {
+	// [スタン演出中] は移動させない。 踏ん張り中の場合は、どちらにせよ移動量が限りなく0に近いので移動させても問題がない。
+	if (!(StunEffect::Instance()->isActive)) {
 		CharacterManager::Instance()->Left()->pos += leftVelGauge;
 		CharacterManager::Instance()->Right()->pos += rightVelGauge;
 	}

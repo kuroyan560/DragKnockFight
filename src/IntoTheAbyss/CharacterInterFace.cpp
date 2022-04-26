@@ -66,13 +66,19 @@ void CharacterInterFace::SwingUpdate()
 	float crossResult = nowSwingVec.Cross(swingTargetVec);
 
 	// [最初が時計回り] 且つ [現在が反時計回り] だったら
-	if (isSwingClockWise && crossResult < 0 && 30 < swingTimer) {
+	if (isSwingClockWise && crossResult < 0 && 15 < swingTimer) {
+
+		// パートナーに慣性を与える。
+		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 1.0f;
 
 		// 振り回し終わり！
 		FinishSwing();
 	}
 	// [最初が反時計回り] 且つ [現在が時計回り] だったら
-	if (!isSwingClockWise && 0 < crossResult && 30 < swingTimer) {
+	if (!isSwingClockWise && 0 < crossResult && 15 < swingTimer) {
+
+		// パートナーに慣性を与える。
+		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 1.0f;
 
 		// 振り回し終わり！
 		FinishSwing();
@@ -156,6 +162,8 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 	nowSwingVec = GetPartnerPos() - pos;
 	nowSwingVec.Normalize();
 
+	float pi45 = Angle::ConvertToRadian(42);
+
 	// 外積の左右判定によりどちら側に振り回すかを判断する。 負の値が左、正の値が右。
 	float crossResult = nowSwingVec.Cross(swingTargetVec);
 	if (!IsClockWise) {
@@ -163,6 +171,12 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 		// マイナスなので左(反時計回り)。
 		isSwingClockWise = false;
 
+		// 時計回りの方に目標地点ベクトルを修正。
+		float targetAngle = atan2f(SwingTargetVec.y, SwingTargetVec.x);
+
+		targetAngle += pi45;
+
+		swingTargetVec = {cosf(targetAngle),sinf(targetAngle)};
 
 	}
 	else if (IsClockWise) {
@@ -170,7 +184,15 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 		// プラスなので右(時計回り)。
 		isSwingClockWise = true;
 
+		// 時計回りの方に目標地点ベクトルを修正。
+		float targetAngle = atan2f(SwingTargetVec.y, SwingTargetVec.x);
+
+		targetAngle -= pi45;
+
+		swingTargetVec = {cosf(targetAngle),sinf(targetAngle)};
+
 	}
+	crossResult = nowSwingVec.Cross(swingTargetVec);
 
 	// 角度への加算量を初期化。
 	addSwingAngle = 0;
@@ -238,8 +260,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	static const int RETICLE_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png") };
 	int team = GetWhichTeam();
 
-	CWSwingSegmentMgr.Setting(true,rbHandle,arrowHandle,lineHandle,RETICLE_GRAPH[team]);
-	CCWSwingSegmentMgr.Setting(false,lbHandle,arrowHandle,lineHandle,RETICLE_GRAPH[team]);
+	CWSwingSegmentMgr.Setting(true, rbHandle, arrowHandle, lineHandle, RETICLE_GRAPH[team]);
+	CCWSwingSegmentMgr.Setting(false, lbHandle, arrowHandle, lineHandle, RETICLE_GRAPH[team]);
 	isInputSwingRB = false;
 
 }
@@ -269,9 +291,6 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 			FaceIcon::Instance()->Change(team, FACE_STATUS::DEFAULT);
 		}
 	}
-
-	prevPos = pos;
-
 	// 慣性を更新。
 	if (0 < swingInertia) {
 		swingInertia -= swingInertia / 5.0f;
@@ -285,6 +304,9 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	{
 		SwingUpdate();
 	}
+
+	prevPos = pos;
+
 
 	if (SuperiorityGauge::Instance()->GetGaugeData(team).gaugeValue)
 	{
@@ -741,4 +763,5 @@ void CharacterInterFace::FinishSwing()
 	nowSwing = false;
 	partner.lock()->stagingDevice.StopSpin();
 	partner.lock()->OnSwingedFinish();
+
 }

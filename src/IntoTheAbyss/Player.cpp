@@ -438,8 +438,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 	if (inputRate >= 0.5f) {
 
 		// 移動を受け付ける。
-		vel.x = inputVec.x * (MOVE_SPEED_PLAYER * inputRate);
-		vel.y = inputVec.y * (MOVE_SPEED_PLAYER * inputRate);
+		if (vel.Length() < MOVE_SPEED_PLAYER) {
+			vel.x = inputVec.x * (MOVE_SPEED_PLAYER * inputRate);
+			vel.y = inputVec.y * (MOVE_SPEED_PLAYER * inputRate);
+		}
 
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
@@ -466,7 +468,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	// [LTを押されたら] [握力が残っていたら] [握力を使い切ってから回復している状態じゃなかったら]
 	bool isInputLB = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
-	if (isInputLB && 0 < gripPowerTimer && !isGripPowerEmpty) {
+	bool isInputRB = UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RB);
+	if ((isInputLB || isInputRB) && 0 < gripPowerTimer && !isGripPowerEmpty) {
 
 		// 振り回されていたら
 		if (isSwingPartner) {
@@ -616,7 +619,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 	swingVec = (subPos).GetNormal();
 
 	// RTが押されたら
-	bool isInputRB = UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RB);
 	bool canSwing = swingCoolTime <= 0 && (isInputRB || isInputLB);
 	if (!isSwingPartner && canSwing || isAdvancedEntrySwing) {
 
@@ -645,6 +647,20 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	}
 
+
+
+	bool isInputA = UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::A);	// 入力のデッドラインを設ける。
+	inputVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
+	inputVec /= {32768.0f, 32768.0f};
+	inputRate = inputVec.Length();
+	if (isInputA && 0.5f <= inputRate) {
+
+		// inputVec = ひだりスティックの入力方向
+		const float DASH_SPEED = 20.0f;
+		vel += inputVec * DASH_SPEED;
+
+	}
+
 }
 
 void Player::Move()
@@ -656,29 +672,29 @@ void Player::Move()
 	vel = KuroMath::Lerp(vel, { 0.0f,0.0f }, 0.05f);
 
 	// 移動量が限界を超えないようにする。
-	if (fabs(vel.x) > MAX_RECOIL_AMOUNT) {
+	//if (fabs(vel.x) > MAX_RECOIL_AMOUNT) {
 
-		// 符号を保存する。
-		bool sign = std::signbit(vel.x);
+	//	// 符号を保存する。
+	//	bool sign = std::signbit(vel.x);
 
-		// 上限を与える。
-		vel.x = MAX_RECOIL_AMOUNT;
+	//	// 上限を与える。
+	//	vel.x = MAX_RECOIL_AMOUNT;
 
-		// 符号をかける。
-		vel.x *= sign ? -1 : 1;
+	//	// 符号をかける。
+	//	vel.x *= sign ? -1 : 1;
 
-	}
-	if (fabs(vel.y) > MAX_RECOIL_AMOUNT) {
+	//}
+	//if (fabs(vel.y) > MAX_RECOIL_AMOUNT) {
 
-		// 符号を保存する。
-		bool sign = std::signbit(vel.y);
+	//	// 符号を保存する。
+	//	bool sign = std::signbit(vel.y);
 
-		// 上限を与える。
-		vel.y = MAX_RECOIL_AMOUNT;
+	//	// 上限を与える。
+	//	vel.y = MAX_RECOIL_AMOUNT;
 
-		// 符号をかける。
-		vel.y *= sign ? -1 : 1;
-	}
+	//	// 符号をかける。
+	//	vel.y *= sign ? -1 : 1;
+	//}
 }
 
 void Player::Shot(const Vec2<float>& GeneratePos, const float& ForwardAngle)
