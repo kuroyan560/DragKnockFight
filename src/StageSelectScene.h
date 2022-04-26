@@ -5,7 +5,7 @@
 class StageSelectScene : public BaseScene
 {
 	//ビッサミ提出用
-	bool isSkip = true;
+	bool isSkip = false;
 
 	//キャラクター選択中フラグ
 	bool charactersSelect;
