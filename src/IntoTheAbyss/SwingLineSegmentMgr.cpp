@@ -35,7 +35,7 @@ void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 	static const int TEAM_COLOR_X[TEAM_NUM] = { 47,239 };
 	static const int TEAM_COLOR_Y[TEAM_NUM] = { 255,1 };
 	static const int TEAM_COLOR_Z[TEAM_NUM] = { 139,144 };
-	
+
 	/*===== 描画処理 =====*/
 
 	Vec2<float> drawPos = {};
@@ -55,7 +55,7 @@ void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 
 		drawPos = Vec2<float>(start - end) / 2.0f;
 		size = { 64.0f,64.0f };
-		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 
+		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle),
 			Color(TEAM_COLOR_X[Team], TEAM_COLOR_Y[Team], TEAM_COLOR_Z[Team], alpha), 32);
 
 		break;
@@ -63,7 +63,7 @@ void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW:
 
 		// 仮でアルファで画像を変える。
-		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 
+		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle),
 			Color(TEAM_COLOR_X[Team], TEAM_COLOR_Y[Team], TEAM_COLOR_Z[Team], alpha), 32);
 
 		break;
@@ -110,9 +110,11 @@ void SwingLineSegmentMgr::Init()
 
 	}
 
+	reticlePos = { -1000,-1000 };
+
 }
 
-void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const bool& IsSwing, const bool& NoMove, const std::vector<std::vector<int>>& mapData)
+void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const vector<vector<int>>& MapData)
 {
 
 	/*===== 更新処理 =====*/
@@ -131,21 +133,21 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 	// 全ての線分を生成する。
 	for (int index = 0; index < LINE_COUNT; ++index) {
 
-		// 動かさないフラグが立っていたらfor分を抜ける。
-		if (IsSwing) {
+		//// 動かさないフラグが立っていたらfor分を抜ける。
+		//if (IsSwing) {
 
-			lineSegments[index].SetAlpha(250);
-			lineSegments[index].ResetDistance(Pos, Distance);
-			continue;
+		//	lineSegments[index].SetAlpha(250);
+		//	lineSegments[index].ResetDistance(Pos, Distance);
+		//	continue;
 
-		}
-		else if (NoMove) {
+		//}
+		//else if (NoMove) {
 
-			lineSegments[index].SetAlpha(0);
-			lineSegments[index].ResetDistance(Pos, Distance);
-			continue;
+		//	lineSegments[index].SetAlpha(0);
+		//	lineSegments[index].ResetDistance(Pos, Distance);
+		//	continue;
 
-		}
+		//}
 
 		// 開始時角度と終了時角度を求める。
 		float startAngle = nowAngle;
@@ -193,7 +195,7 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 		Vec2<float> endPos = Pos + Vec2<float>(cosf(endAngle), sinf(endAngle)) * Distance;
 
 		// 線分を生成。
-		lineSegments[index].Update(startPos, endPos, Vec2<float>(cosf(startAngle), sinf(startAngle)), Vec2<float>(cosf(endAngle), sinf(endAngle)), 0, id, handle);
+		lineSegments[index].Update(startPos, endPos, Vec2<float>(cosf(startAngle), sinf(startAngle)), Vec2<float>(cosf(endAngle), sinf(endAngle)), 250, id, handle);
 
 		// 角度を保存。
 		nowAngle = endAngle;
@@ -227,10 +229,10 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 		lineSegments[index].SetEnd(resultPos);
 
 		// スイング中だったら交点のところの線分を矢印にする。
-		if (IsSwing) {
-			lineSegments[index].SetID(SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW);
-			lineSegments[index].SetHandle(arrowHandle);
-		}
+		//if (IsSwing) {
+		lineSegments[index].SetID(SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW);
+		lineSegments[index].SetHandle(arrowHandle);
+		//}
 
 		isHitMapChip = true;
 
