@@ -212,29 +212,26 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 		anim.ChangeAnim(TIRED);
 	}
 
-	<<<<<< < HEAD
+	//ダッシュの残像
+	if (dashAftImgTimer)
+	{
+		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size;
+		AfterImageMgr::Instance()->Generate(pos, extRate, 0.0f, anim.GetGraphHandle(), GetTeamColor());
+		dashAftImgTimer--;
+	}
 
-		//ダッシュの残像
-		if (dashAftImgTimer)
-		{
-			Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size;
-			AfterImageMgr::Instance()->Generate(pos, extRate, 0.0f, anim.GetGraphHandle(), GetTeamColor());
-			dashAftImgTimer--;
-		}
-	====== =
-		// 振り回していなかったら
-		if (!nowSwing) {
+	// 振り回していなかったら
+	if (!nowSwing) {
 
-			if (anim.GetNowAnim() == HOLD)anim.ChangeAnim(DEFAULT_FRONT);
+		if (anim.GetNowAnim() == HOLD)anim.ChangeAnim(DEFAULT_FRONT);
 
-			// 紐つかみ状態(踏ん張り状態)を解除する。
-			isHold = false;
+		// 紐つかみ状態(踏ん張り状態)を解除する。
+		isHold = false;
 
-			tutorial.lock()->SetRstickInput(false);
+		tutorial.lock()->SetRstickInput(false);
 
-		}
+	}
 
-	>>>>>> > 蜿ｳ繧ｹ繝・ぅ繝・け縺ｧ謖ｯ繧雁屓縺玲婿蜷第欠螳・
 }
 
 void Player::OnUpdateNoRelatedSwing()
@@ -710,7 +707,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		prevInputRightStick = buff;
 
 		//煙
-		ParticleMgr::Instance()->Generate(pos, -inputVec, BULLET);
+		ParticleMgr::Instance()->Generate(pos, -inputLeftVec, BULLET);
 		//残像
 		dashAftImgTimer = 10;
 	}
