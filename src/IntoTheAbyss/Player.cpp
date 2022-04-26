@@ -114,6 +114,10 @@ void Player::OnInit()
 	swingVec = { -1.0f,0.0f };
 
 	inputInvalidTimerByCrash = 0;
+
+	isInputRightStick = false;
+	isPrevInputRightStick = false;
+	prevInputRightStick = {};
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -205,6 +209,18 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 		isGripPowerEmpty = true;
 		anim.ChangeAnim(TIRED);
+	}
+
+	// 振り回していなかったら
+	if (!nowSwing) {
+
+		if (anim.GetNowAnim() == HOLD)anim.ChangeAnim(DEFAULT_FRONT);
+
+		// 紐つかみ状態(踏ん張り状態)を解除する。
+		isHold = false;
+
+		tutorial.lock()->SetRstickInput(false);
+
 	}
 
 }
@@ -421,37 +437,45 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	const float INPUT_DEAD_LINE = 0.3f;
 
-	Vec2<float> inputVec;
+	Vec2<float> inputLeftVec;
 
-	inputVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
-	inputVec /= {32768.0f, 32768.0f};
+	inputLeftVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
+	inputLeftVec /= {32768.0f, 32768.0f};
+
+	Vec2<float> inputRightVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
+	inputRightVec /= {32768.0f, 32768.0f};
+
+	// 入力情報を保存する。
+	isPrevInputRightStick = isInputRightStick;
+	isInputRightStick = 0.9f < inputRightVec.Length();
+
 	// 入力のデッドラインを設ける。
-	float inputRate = inputVec.Length();
+	float inputRate = inputLeftVec.Length();
 	if (inputRate >= 0.5f) {
 
 		// 移動を受け付ける。
 		if (vel.Length() < MOVE_SPEED_PLAYER) {
-			vel.x = inputVec.x * (MOVE_SPEED_PLAYER * inputRate);
-			vel.y = inputVec.y * (MOVE_SPEED_PLAYER * inputRate);
+			vel.x = inputLeftVec.x * (MOVE_SPEED_PLAYER * inputRate);
+			vel.y = inputLeftVec.y * (MOVE_SPEED_PLAYER * inputRate);
 		}
 
 		// 右手の角度を更新
-		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
+		lHand->SetAngle(KuroFunc::GetAngle(inputLeftVec));
 
-		if (inputVec.x < 0)playerDirX = PLAYER_LEFT;
-		else if (0 < inputVec.x)playerDirX = PLAYER_RIGHT;
-		if (inputVec.y < 0)playerDirY = PLAYER_BACK;
-		else if (0 < inputVec.y)playerDirY = PLAYER_FRONT;
+		if (inputLeftVec.x < 0)playerDirX = PLAYER_LEFT;
+		else if (0 < inputLeftVec.x)playerDirX = PLAYER_RIGHT;
+		if (inputLeftVec.y < 0)playerDirY = PLAYER_BACK;
+		else if (0 < inputLeftVec.y)playerDirY = PLAYER_FRONT;
 	}
 
-	inputVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
-	inputVec /= {32768.0f, 32768.0f};
+	inputRightVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
+	inputRightVec /= {32768.0f, 32768.0f};
 
 	// 入力のデッドラインを設ける。
-	if (inputVec.Length() >= 0.5f) {
+	if (inputRightVec.Length() >= 0.5f) {
 
 		// 左手の角度を更新
-		rHand->SetAngle(KuroFunc::GetAngle(inputVec));
+		rHand->SetAngle(KuroFunc::GetAngle(inputRightVec));
 
 		// 一定時間入力がなかったら初期位置に戻す
 		//handReturnTimer = DEF_HAND_RETURN_TIMER;
@@ -461,7 +485,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	// [LTを押されたら] [握力が残っていたら] [握力を使い切ってから回復している状態じゃなかったら]
 	bool isInputLB = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
 	bool isInputRB = UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RB);
-	if ((isInputLB || isInputRB) && 0 < gripPowerTimer && !isGripPowerEmpty) {
+	if ((!isInputRightStick && isPrevInputRightStick) && 0 < gripPowerTimer && !isGripPowerEmpty) {
 
 		// 振り回されていたら
 		if (isSwingPartner) {
@@ -484,14 +508,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		}
 
 	}
-	else {
-		if (anim.GetNowAnim() == HOLD)anim.ChangeAnim(DEFAULT_FRONT);
 
-		// 紐つかみ状態(踏ん張り状態)を解除する。
-		isHold = false;
-
-		tutorial.lock()->SetRstickInput(false);
-	}
 
 	//チュートリアルの表示 / 非表示
 	if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::BACK))
@@ -601,49 +618,84 @@ void Player::Input(const vector<vector<int>>& MapData)
 	swingVec = (subPos).GetNormal();
 
 	// RTが押されたら
-	bool canSwing = swingCoolTime <= 0 && (isInputRB || isInputLB);
+	bool canSwing = (!isInputRightStick && isPrevInputRightStick);
 	if ((!isSwingPartner && canSwing || isAdvancedEntrySwing) && !isGripPowerEmpty) {
 
 		// 振り回しの処理
 
-		bool isClockWise = isInputRB;
+		// 外積の左右判定により、時計回りか反時計回り家を取得する。負の値が左、正の値が右。
+		Vec2<float> posBuff = partner.lock()->pos - pos;
+		posBuff.Normalize();
+		bool isClockWise = 0 < posBuff.Cross(prevInputRightStick);
 
 		SwingPartner({ swingVec }, isClockWise);
-
-		// クールタイムを設定。
-		swingCoolTime = SWING_COOLTIME;
 
 		isInputSwingRB = isInputRB;
 
 	}
-	else if (isSwingPartner && canSwing && !isGripPowerEmpty) {
+	else if (isSwingPartner && canSwing && !isGripPowerEmpty && isInputRightStick) {
 
 		// 先行入力を保存。
 		isAdvancedEntrySwing = true;
 		advancedEntrySwingTimer = ADVANCED_ENTRY_SWING_TIMER;
 
 	}
-	else {
 
-		nowSwing = false;
+
+	// 入力のデッドラインを設ける。
+	inputLeftVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
+	inputLeftVec /= {32768.0f, 32768.0f};
+	inputRate = inputLeftVec.Length();
+	if (isInputLB && 0.5f <= inputRate && !isGripPowerEmpty) {
+
+		// inputVec = ひだりスティックの入力方向
+		const float DASH_SPEED = 10.0f;
+		vel += inputLeftVec * DASH_SPEED;
+
+		// スタミナを消費
+		const int DASH_GRIP_POWER = 10;
+		gripPowerTimer -= DASH_GRIP_POWER;
 
 	}
 
+	// 右スティックが入力されていたら、予測線を出す。
+	if (isInputRightStick && !isGripPowerEmpty) {
 
+		// 時計回りかどうか。負の値が左、正の値が右。
+		inputRightVec.Normalize();
+		Vec2<float> posBuff = partner.lock()->pos - pos;
+		posBuff.Normalize();
+		bool isClockWise = 0 < posBuff.Cross(inputRightVec);
 
-	bool isInputA = UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::A);	// 入力のデッドラインを設ける。
-	inputVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
-	inputVec /= {32768.0f, 32768.0f};
-	inputRate = inputVec.Length();
-	if (isInputA && 0.5f <= inputRate && !isGripPowerEmpty) {
+		if (isClockWise) {
 
-		// inputVec = ひだりスティックの入力方向
-		const float DASH_SPEED = 20.0f;
-		vel += inputVec * DASH_SPEED;
+			CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+			CCWSwingSegmentMgr.Init();
 
-		// スタミナを消費
-		const int DASH_GRIP_POWER = 15;
-		gripPowerTimer -= DASH_GRIP_POWER;
+		}
+		else {
+
+			CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+			CWSwingSegmentMgr.Init();
+
+		}
+
+	}
+
+	// 入力されていなくて、スイング中じゃなかったら予測線を消す。
+	if (inputRightVec.Length() <= 0.5f && !nowSwing) {
+
+		CCWSwingSegmentMgr.Init();
+		CWSwingSegmentMgr.Init();
+
+	}
+
+	// 入力を保存。
+	Vec2<float> buff = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
+	buff /= {32768.0f, 32768.0f};
+	if (0.5f <= buff.Length()) {
+
+		prevInputRightStick = buff;
 
 	}
 
