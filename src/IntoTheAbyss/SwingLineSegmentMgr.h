@@ -102,7 +102,7 @@ public:
 	/// <param name="Distance"> U‚è‰ñ‚µ‘ÎÛ‚Ü‚Å‚Ì‹——£ </param>
 	/// <param name="IsSwing"> U‚è‰ñ‚µ‚ğ‚µ‚Ä‚¢‚é‚© </param>
 	/// <param name="NoMove"> ü•ª‚ÌXV‚ğ‚µ‚È‚¢‚© </param>
-	void Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const bool& IsSwing, const bool& NoMove, const std::vector<std::vector<int>>& mapData);
+	void Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const std::vector<std::vector<int>>& MapData);
 
 	// •`‰æˆ—
 	void Draw(const WHICH_TEAM& Team);
