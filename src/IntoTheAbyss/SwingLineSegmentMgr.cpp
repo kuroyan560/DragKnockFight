@@ -175,12 +175,12 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 		int handle = 0;
 		SwingLineSegment::SEGMENT_ID id;
 		// 最初は操作ボタンが書いてあるUIを描画する。
-		if (index == 0) {
-			handle = UIHandle;
-			id = SwingLineSegment::SEGMENT_ID::SEGMENT_ID_UI;
-		}
+		//if (index == 0) {
+		//	handle = UIHandle;
+		//	id = SwingLineSegment::SEGMENT_ID::SEGMENT_ID_UI;
+		//}
 		// 最後の線分は矢印を描画する。
-		else if (index == LINE_COUNT - 1) {
+		if (index == LINE_COUNT - 1) {
 			handle = arrowHandle;
 			id = SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW;
 		}
