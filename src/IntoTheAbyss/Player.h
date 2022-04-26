@@ -69,6 +69,7 @@ public:
 
 	Vec2<float> swingVec;	// 振り回しベクトル 移動方向の逆方向に出る。
 
+	bool isPrevLeftBottom;
 	bool isInputRightStick;
 	bool isPrevInputRightStick;
 	Vec2<float> prevInputRightStick;
