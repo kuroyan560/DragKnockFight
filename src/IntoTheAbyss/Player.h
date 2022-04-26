@@ -67,6 +67,15 @@ public:
 	int inputInvalidTimerByCrash;	// 当たり判定無効化タイマー
 	const int INPUT_INVALID_TIMER = 30;
 
+	Vec2<float> swingVec;	// 振り回しベクトル 移動方向の逆方向に出る。
+
+	bool isInputRightStick;
+	bool isPrevInputRightStick;
+	Vec2<float> prevInputRightStick;
+
+	//ダッシュ時残像を出すための変数
+	int dashAftImgTimer;
+
 public:
 
 	/*-- 定数 --*/
