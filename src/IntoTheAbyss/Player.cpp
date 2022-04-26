@@ -114,6 +114,11 @@ void Player::OnInit()
 	swingVec = { -1.0f,0.0f };
 
 	inputInvalidTimerByCrash = 0;
+
+	dashAftImgTimer = 0;
+	isInputRightStick = false;
+	isPrevInputRightStick = false;
+	prevInputRightStick = {};
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -200,18 +205,30 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 		}
 	}
 
-	// 振り回していたら
-	if (nowSwing) {
+	// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
+	if (gripPowerTimer <= 0) {
 
-		// 握力タイマーを0に近づける。
-		--gripPowerTimer;
+		isGripPowerEmpty = true;
+		anim.ChangeAnim(TIRED);
+	}
 
-		// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
-		if (gripPowerTimer <= 0) {
+	//ダッシュの残像
+	if (dashAftImgTimer)
+	{
+		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size;
+		AfterImageMgr::Instance()->Generate(pos, extRate, 0.0f, anim.GetGraphHandle(), GetTeamColor());
+		dashAftImgTimer--;
+	}
 
-			isGripPowerEmpty = true;
-			anim.ChangeAnim(TIRED);
-		}
+	// 振り回していなかったら
+	if (!nowSwing) {
+
+		if (anim.GetNowAnim() == HOLD)anim.ChangeAnim(DEFAULT_FRONT);
+
+		// 紐つかみ状態(踏ん張り状態)を解除する。
+		isHold = false;
+
+		tutorial.lock()->SetRstickInput(false);
 
 	}
 
@@ -224,7 +241,7 @@ void Player::OnUpdateNoRelatedSwing()
 	rHand->Update(pos + anim.GetHandCenterOffset());
 
 	// 握力タイマーを規定値に近づける。
-	if (!isHold && gripPowerTimer < MAX_GRIP_POWER_TIMER) {
+	if (!nowSwing && gripPowerTimer < MAX_GRIP_POWER_TIMER) {
 		gripPowerTimer += SlowMgr::Instance()->slowAmount;
 
 		// 最大値になったら握力を使い切ってから回復している状態フラグを折る。
@@ -315,7 +332,7 @@ void Player::OnDrawUI()
 		float dist = partner.lock()->pos.Distance(pos);
 		Vec2<float>target = pos + rightStickVec * dist;
 		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(target), COLOR_TEX[GetWhichTeam()], 2, AlphaBlendMode_Trans);
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), drawScale * 0.8f, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[team]));
+		//DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), drawScale * 0.8f, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[team]));
 
 		//振り回し方向描画
 		bool clockWise = 0 < rightStickVec.Cross(partner.lock()->pos - pos);
@@ -429,35 +446,45 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	const float INPUT_DEAD_LINE = 0.3f;
 
-	Vec2<float> inputVec;
+	Vec2<float> inputLeftVec;
 
-	inputVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
-	inputVec /= {32768.0f, 32768.0f};
+	inputLeftVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
+	inputLeftVec /= {32768.0f, 32768.0f};
+
+	Vec2<float> inputRightVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
+	inputRightVec /= {32768.0f, 32768.0f};
+
+	// 入力情報を保存する。
+	isPrevInputRightStick = isInputRightStick;
+	isInputRightStick = 0.9f < inputRightVec.Length();
+
 	// 入力のデッドラインを設ける。
-	float inputRate = inputVec.Length();
+	float inputRate = inputLeftVec.Length();
 	if (inputRate >= 0.5f) {
 
 		// 移動を受け付ける。
-		vel.x = inputVec.x * (MOVE_SPEED_PLAYER * inputRate);
-		vel.y = inputVec.y * (MOVE_SPEED_PLAYER * inputRate);
+		if (vel.Length() < MOVE_SPEED_PLAYER) {
+			vel.x = inputLeftVec.x * (MOVE_SPEED_PLAYER * inputRate);
+			vel.y = inputLeftVec.y * (MOVE_SPEED_PLAYER * inputRate);
+		}
 
 		// 右手の角度を更新
-		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
+		lHand->SetAngle(KuroFunc::GetAngle(inputLeftVec));
 
-		if (inputVec.x < 0)playerDirX = PLAYER_LEFT;
-		else if (0 < inputVec.x)playerDirX = PLAYER_RIGHT;
-		if (inputVec.y < 0)playerDirY = PLAYER_BACK;
-		else if (0 < inputVec.y)playerDirY = PLAYER_FRONT;
+		if (inputLeftVec.x < 0)playerDirX = PLAYER_LEFT;
+		else if (0 < inputLeftVec.x)playerDirX = PLAYER_RIGHT;
+		if (inputLeftVec.y < 0)playerDirY = PLAYER_BACK;
+		else if (0 < inputLeftVec.y)playerDirY = PLAYER_FRONT;
 	}
 
-	inputVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
-	inputVec /= {32768.0f, 32768.0f};
+	inputRightVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
+	inputRightVec /= {32768.0f, 32768.0f};
 
 	// 入力のデッドラインを設ける。
-	if (inputVec.Length() >= 0.5f) {
+	if (inputRightVec.Length() >= 0.5f) {
 
 		// 左手の角度を更新
-		rHand->SetAngle(KuroFunc::GetAngle(inputVec));
+		rHand->SetAngle(KuroFunc::GetAngle(inputRightVec));
 
 		// 一定時間入力がなかったら初期位置に戻す
 		//handReturnTimer = DEF_HAND_RETURN_TIMER;
@@ -466,7 +493,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	// [LTを押されたら] [握力が残っていたら] [握力を使い切ってから回復している状態じゃなかったら]
 	bool isInputLB = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
-	if (isInputLB && 0 < gripPowerTimer && !isGripPowerEmpty) {
+	bool isInputRB = UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RB);
+	if ((!isInputRightStick && isPrevInputRightStick) && 0 < gripPowerTimer && !isGripPowerEmpty) {
 
 		// 振り回されていたら
 		if (isSwingPartner) {
@@ -483,30 +511,13 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 			tutorial.lock()->SetRstickInput(true);
 
-			// 握力タイマーを0に近づける。
-			--gripPowerTimer;
-
 			// 移動量を0にする。
 			vel = {};
-
-			// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
-			if (gripPowerTimer <= 0) {
-
-				isGripPowerEmpty = true;
-				anim.ChangeAnim(TIRED);
-			}
 
 		}
 
 	}
-	else {
-		if (anim.GetNowAnim() == HOLD)anim.ChangeAnim(DEFAULT_FRONT);
 
-		// 紐つかみ状態(踏ん張り状態)を解除する。
-		isHold = false;
-
-		tutorial.lock()->SetRstickInput(false);
-	}
 
 	//チュートリアルの表示 / 非表示
 	if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::BACK))
@@ -616,31 +627,89 @@ void Player::Input(const vector<vector<int>>& MapData)
 	swingVec = (subPos).GetNormal();
 
 	// RTが押されたら
-	bool isInputRB = UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RB);
-	bool canSwing = swingCoolTime <= 0 && (isInputRB || isInputLB);
-	if (!isSwingPartner && canSwing || isAdvancedEntrySwing) {
+	bool canSwing = (!isInputRightStick && isPrevInputRightStick);
+	if ((!isSwingPartner && canSwing || isAdvancedEntrySwing) && !isGripPowerEmpty) {
 
 		// 振り回しの処理
 
-		bool isClockWise = isInputRB;
+		// 外積の左右判定により、時計回りか反時計回り家を取得する。負の値が左、正の値が右。
+		Vec2<float> posBuff = partner.lock()->pos - pos;
+		posBuff.Normalize();
+		bool isClockWise = 0 < posBuff.Cross(prevInputRightStick);
 
 		SwingPartner({ swingVec }, isClockWise);
 
-		// クールタイムを設定。
-		swingCoolTime = SWING_COOLTIME;
+		isInputSwingRB = isInputRB;
 
 	}
-	else if (isSwingPartner && canSwing) {
+	else if (isSwingPartner && canSwing && !isGripPowerEmpty && isInputRightStick) {
 
 		// 先行入力を保存。
 		isAdvancedEntrySwing = true;
 		advancedEntrySwingTimer = ADVANCED_ENTRY_SWING_TIMER;
 
 	}
-	else {
 
-		nowSwing = false;
 
+	// 入力のデッドラインを設ける。
+	inputLeftVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
+	inputLeftVec /= {32768.0f, 32768.0f};
+	inputRate = inputLeftVec.Length();
+	if (isInputLB && 0.5f <= inputRate && !isGripPowerEmpty) {
+
+		// inputVec = ひだりスティックの入力方向
+		const float DASH_SPEED = 10.0f;
+		vel += inputLeftVec * DASH_SPEED;
+
+		// スタミナを消費
+		const int DASH_GRIP_POWER = 10;
+		gripPowerTimer -= DASH_GRIP_POWER;
+
+	}
+
+	// 右スティックが入力されていたら、予測線を出す。
+	if (isInputRightStick && !isGripPowerEmpty) {
+
+		// 時計回りかどうか。負の値が左、正の値が右。
+		inputRightVec.Normalize();
+		Vec2<float> posBuff = partner.lock()->pos - pos;
+		posBuff.Normalize();
+		bool isClockWise = 0 < posBuff.Cross(inputRightVec);
+
+		if (isClockWise) {
+
+			CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+			CCWSwingSegmentMgr.Init();
+
+		}
+		else {
+
+			CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+			CWSwingSegmentMgr.Init();
+
+		}
+
+	}
+
+	// 入力されていなくて、スイング中じゃなかったら予測線を消す。
+	if (inputRightVec.Length() <= 0.5f && !nowSwing) {
+
+		CCWSwingSegmentMgr.Init();
+		CWSwingSegmentMgr.Init();
+
+	}
+
+	// 入力を保存。
+	Vec2<float> buff = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
+	buff /= {32768.0f, 32768.0f};
+	if (0.5f <= buff.Length()) {
+
+		prevInputRightStick = buff;
+
+		//煙
+		ParticleMgr::Instance()->Generate(pos, -inputLeftVec, BULLET);
+		//残像
+		dashAftImgTimer = 10;
 	}
 
 }
@@ -654,29 +723,29 @@ void Player::Move()
 	vel = KuroMath::Lerp(vel, { 0.0f,0.0f }, 0.05f);
 
 	// 移動量が限界を超えないようにする。
-	if (fabs(vel.x) > MAX_RECOIL_AMOUNT) {
+	//if (fabs(vel.x) > MAX_RECOIL_AMOUNT) {
 
-		// 符号を保存する。
-		bool sign = std::signbit(vel.x);
+	//	// 符号を保存する。
+	//	bool sign = std::signbit(vel.x);
 
-		// 上限を与える。
-		vel.x = MAX_RECOIL_AMOUNT;
+	//	// 上限を与える。
+	//	vel.x = MAX_RECOIL_AMOUNT;
 
-		// 符号をかける。
-		vel.x *= sign ? -1 : 1;
+	//	// 符号をかける。
+	//	vel.x *= sign ? -1 : 1;
 
-	}
-	if (fabs(vel.y) > MAX_RECOIL_AMOUNT) {
+	//}
+	//if (fabs(vel.y) > MAX_RECOIL_AMOUNT) {
 
-		// 符号を保存する。
-		bool sign = std::signbit(vel.y);
+	//	// 符号を保存する。
+	//	bool sign = std::signbit(vel.y);
 
-		// 上限を与える。
-		vel.y = MAX_RECOIL_AMOUNT;
+	//	// 上限を与える。
+	//	vel.y = MAX_RECOIL_AMOUNT;
 
-		// 符号をかける。
-		vel.y *= sign ? -1 : 1;
-	}
+	//	// 符号をかける。
+	//	vel.y *= sign ? -1 : 1;
+	//}
 }
 
 void Player::Shot(const Vec2<float>& GeneratePos, const float& ForwardAngle)

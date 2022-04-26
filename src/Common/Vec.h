@@ -13,18 +13,18 @@ struct Vec2
 
 	Vec2() {};
 	Vec2(T X, T Y) :x(X), y(Y) {};
-	float Length()const {
+	inline float Length()const {
 		return sqrt(pow(x, 2) + pow(y, 2));
 	};
-	float Distance(const Vec2& To)const {
+	inline float Distance(const Vec2& To)const {
 		return sqrt(pow(To.x - x, 2) + pow(To.y - y, 2));
 	};
-	Vec2<float> GetNormal()const {
+	inline Vec2<float> GetNormal()const {
 		float len = Length();
 		if (len == 0.0f)return Vec2<float>(0.0, 0.0);
 		return Vec2<float>(x / len, y / len);
 	};
-	void Normalize() {
+	inline void Normalize() {
 		float len = Length();
 		x /= len;
 		y /= len;

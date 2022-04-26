@@ -39,7 +39,7 @@ void MiniMap::Update()
 		nowValue = massDivX;
 	}
 
-	nowPos.x = 85.0f + nowValue * 1110.0f;
+	nowPos.x = 50.0f + nowValue * 1110.0f;
 }
 
 void MiniMap::Draw()
