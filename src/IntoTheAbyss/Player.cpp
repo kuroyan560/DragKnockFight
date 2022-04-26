@@ -30,7 +30,7 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player(const PLAYABLE_CHARACTER_NAME &CharacterName, const int &ControllerIdx, const std::shared_ptr<Tutorial> &Tutorial)
+Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx, const std::shared_ptr<Tutorial>& Tutorial)
 	:CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx), tutorial(Tutorial)
 {
 	/*====== コンストラクタ =====*/
@@ -111,10 +111,12 @@ void Player::OnInit()
 		charaColor = { 47, 255, 139,255 };
 	}
 
+	swingVec = { -1.0f,0.0f };
+
 	inputInvalidTimerByCrash = 0;
 }
 
-void Player::OnUpdate(const vector<vector<int>> &MapData)
+void Player::OnUpdate(const vector<vector<int>>& MapData)
 {
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
@@ -197,6 +199,22 @@ void Player::OnUpdate(const vector<vector<int>> &MapData)
 			anim.ChangeAnim(DEFAULT_FRONT);
 		}
 	}
+
+	// 振り回していたら
+	if (nowSwing) {
+
+		// 握力タイマーを0に近づける。
+		--gripPowerTimer;
+
+		// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
+		if (gripPowerTimer <= 0) {
+
+			isGripPowerEmpty = true;
+			anim.ChangeAnim(TIRED);
+		}
+
+	}
+
 }
 
 void Player::OnUpdateNoRelatedSwing()
@@ -297,7 +315,7 @@ void Player::OnDrawUI()
 		float dist = partner.lock()->pos.Distance(pos);
 		Vec2<float>target = pos + rightStickVec * dist;
 		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(target), COLOR_TEX[GetWhichTeam()], 2, AlphaBlendMode_Trans);
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), drawScale * 0.8f, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[team]));
+		//DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), drawScale * 0.8f, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[team]));
 
 		//振り回し方向描画
 		bool clockWise = 0 < rightStickVec.Cross(partner.lock()->pos - pos);
@@ -315,7 +333,7 @@ void Player::OnDrawUI()
 	tutorial.lock()->Draw(leftStickVec, rightStickVec, leftTrigger, rightTrigger);
 }
 
-void Player::OnHitMapChip(const HIT_DIR &Dir)
+void Player::OnHitMapChip(const HIT_DIR& Dir)
 {
 	if (Dir == TOP)
 	{
@@ -387,7 +405,7 @@ void Player::OnHitMapChip(const HIT_DIR &Dir)
 	}
 }
 
-void Player::Input(const vector<vector<int>> &MapData)
+void Player::Input(const vector<vector<int>>& MapData)
 {
 	/*===== 入力処理 =====*/
 
@@ -420,8 +438,10 @@ void Player::Input(const vector<vector<int>> &MapData)
 	if (inputRate >= 0.5f) {
 
 		// 移動を受け付ける。
-		vel.x = inputVec.x * (MOVE_SPEED_PLAYER * inputRate);
-		vel.y = inputVec.y * (MOVE_SPEED_PLAYER * inputRate);
+		if (vel.Length() < MOVE_SPEED_PLAYER) {
+			vel.x = inputVec.x * (MOVE_SPEED_PLAYER * inputRate);
+			vel.y = inputVec.y * (MOVE_SPEED_PLAYER * inputRate);
+		}
 
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
@@ -447,8 +467,9 @@ void Player::Input(const vector<vector<int>> &MapData)
 	}
 
 	// [LTを押されたら] [握力が残っていたら] [握力を使い切ってから回復している状態じゃなかったら]
-	bool isInputLT = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT);
-	if (isInputLT && 0 < gripPowerTimer && !isGripPowerEmpty) {
+	bool isInputLB = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
+	bool isInputRB = UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RB);
+	if ((isInputLB || isInputRB) && 0 < gripPowerTimer && !isGripPowerEmpty) {
 
 		// 振り回されていたら
 		if (isSwingPartner) {
@@ -590,19 +611,30 @@ void Player::Input(const vector<vector<int>> &MapData)
 
 #pragma endregion
 
+
+	// 入力を元に振り回しベクトルを更新。
+
+	// 相方との位置関係においての逆ベクトルに振り回す。
+	Vec2<float> subPos = pos - partner.lock()->pos;
+	swingVec = (subPos).GetNormal();
+
 	// RTが押されたら
-	bool canSwing = swingCoolTime <= 0 && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT);
-	if (!isSwingPartner && ((isHold && canSwing) || isAdvancedEntrySwing)) {
+	bool canSwing = swingCoolTime <= 0 && (isInputRB || isInputLB);
+	if (!isSwingPartner && canSwing || isAdvancedEntrySwing) {
 
 		// 振り回しの処理
 
-		SwingPartner({ cosf(rHand->GetAngle()), sinf(rHand->GetAngle()) });
+		bool isClockWise = isInputRB;
+
+		SwingPartner({ swingVec }, isClockWise);
 
 		// クールタイムを設定。
 		swingCoolTime = SWING_COOLTIME;
 
+		isInputSwingRB = isInputRB;
+
 	}
-	else if (isSwingPartner && isSwingPartnerHold && canSwing) {
+	else if (isSwingPartner && canSwing) {
 
 		// 先行入力を保存。
 		isAdvancedEntrySwing = true;
@@ -612,6 +644,20 @@ void Player::Input(const vector<vector<int>> &MapData)
 	else {
 
 		nowSwing = false;
+
+	}
+
+
+
+	bool isInputA = UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::A);	// 入力のデッドラインを設ける。
+	inputVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
+	inputVec /= {32768.0f, 32768.0f};
+	inputRate = inputVec.Length();
+	if (isInputA && 0.5f <= inputRate) {
+
+		// inputVec = ひだりスティックの入力方向
+		const float DASH_SPEED = 20.0f;
+		vel += inputVec * DASH_SPEED;
 
 	}
 
@@ -626,32 +672,32 @@ void Player::Move()
 	vel = KuroMath::Lerp(vel, { 0.0f,0.0f }, 0.05f);
 
 	// 移動量が限界を超えないようにする。
-	if (fabs(vel.x) > MAX_RECOIL_AMOUNT) {
+	//if (fabs(vel.x) > MAX_RECOIL_AMOUNT) {
 
-		// 符号を保存する。
-		bool sign = std::signbit(vel.x);
+	//	// 符号を保存する。
+	//	bool sign = std::signbit(vel.x);
 
-		// 上限を与える。
-		vel.x = MAX_RECOIL_AMOUNT;
+	//	// 上限を与える。
+	//	vel.x = MAX_RECOIL_AMOUNT;
 
-		// 符号をかける。
-		vel.x *= sign ? -1 : 1;
+	//	// 符号をかける。
+	//	vel.x *= sign ? -1 : 1;
 
-	}
-	if (fabs(vel.y) > MAX_RECOIL_AMOUNT) {
+	//}
+	//if (fabs(vel.y) > MAX_RECOIL_AMOUNT) {
 
-		// 符号を保存する。
-		bool sign = std::signbit(vel.y);
+	//	// 符号を保存する。
+	//	bool sign = std::signbit(vel.y);
 
-		// 上限を与える。
-		vel.y = MAX_RECOIL_AMOUNT;
+	//	// 上限を与える。
+	//	vel.y = MAX_RECOIL_AMOUNT;
 
-		// 符号をかける。
-		vel.y *= sign ? -1 : 1;
-	}
+	//	// 符号をかける。
+	//	vel.y *= sign ? -1 : 1;
+	//}
 }
 
-void Player::Shot(const Vec2<float> &GeneratePos, const float &ForwardAngle)
+void Player::Shot(const Vec2<float>& GeneratePos, const float& ForwardAngle)
 {
 	//弾速
 	static const float BULLET_SPEED = 30.0f;
@@ -733,7 +779,7 @@ void Player::PushBackWall()
 
 }
 
-void Player::CalculateStretch(const Vec2<float> &Move)
+void Player::CalculateStretch(const Vec2<float>& Move)
 {
 	Vec2<float> stretchRate = { abs(Move.x / MAX_RECOIL_AMOUNT),abs(Move.y / MAX_RECOIL_AMOUNT) };
 
@@ -828,7 +874,7 @@ Vec2<float> Player::GetPlayerGraphSize()
 	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 }
 
-void Player::CheckHitMapChipVel(const Vec2<float> &checkPos, const vector<vector<int>> &MapData)
+void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& MapData)
 {
 	// マップチップとプレイヤーの当たり判定 絶対に貫通させない為の処理
 	//Vec2<float> upperPlayerPos = pos - Vec2<float>(0, PLAYER_HIT_SIZE.y / 2.0f);

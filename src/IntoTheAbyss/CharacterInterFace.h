@@ -9,6 +9,8 @@
 #include "Intersected.h"
 #include"BulletMgrBase.h"
 #include"RunOutOfStaminaEffect.h"
+#include"SwingLineSegmentMgr.h"
+#include"TexHandleMgr.h"
 
 static const enum PLAYABLE_CHARACTER_NAME { PLAYABLE_LUNA, PLAYABLE_LACY, PLAYABLE_BOSS_0, PLAYABLE_CHARACTER_NUM, PLAYER_CHARACTER_NUM = PLAYABLE_LACY + 1 };
 static const enum WHICH_TEAM { LEFT_TEAM, RIGHT_TEAM, TEAM_NUM };
@@ -35,6 +37,7 @@ private:
 	Vec2<float> swingInertiaVec;// 振り回しの慣性の移動方向
 	float swingInertia;			// 振り回しの慣性
 	int afterSwingDelay;		// 振り回しのあとにボスを少し動けない状態にするためのタイマー
+	int swingTimer;				// 振り回しの経過時間
 
 	//演出などの動きの関係で動きを止める
 	bool canMove;
@@ -61,8 +64,18 @@ protected:
 	Vec2<float> swingTargetVec;		// 目標地点
 	float addSwingAngle;			// 振り回しで回転させる量 だんだん増える。
 	bool isSwingClockWise;			// この振り回しが時計回りかどうか true...時計回り...右回転  false...反時計回り...左回転
-	const float ADD_SWING_ANGLE = 0.002f;
-	const float MAX_SWING_ANGLE = 0.07f;
+	const float ADD_SWING_ANGLE = 0.008f;
+	const float MAX_SWING_ANGLE = 0.13f;
+
+	//振り回し可視化用線分クラス
+	SwingLineSegmentMgr CWSwingSegmentMgr;	// 時計回り
+	SwingLineSegmentMgr CCWSwingSegmentMgr;	// 反時計回り
+	bool isInputSwingRB;					// RBでスイングしたかどうか falseだったらLB
+	int rbHandle;
+	int lbHandle;
+	int lineHandle;
+	int arrowHandle;
+	int reticleHandle;
 
 
 protected:
@@ -78,6 +91,10 @@ protected:
 		bulletHitSphere.center = &pos;
 		bulletHitSphere.radius = size.x;
 		outOfStaminaEffect.Init();
+		rbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_RB.png");
+		lbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_LB.png");
+		lineHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_line.png");
+		arrowHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_arrow.png");
 	}
 
 	std::weak_ptr<CharacterInterFace>partner;
@@ -99,7 +116,7 @@ protected:
 
 	//[共通関数]
 	//振り回し
-	void SwingPartner(const Vec2<float>& SwingTargetVec);
+	void SwingPartner(const Vec2<float>& SwingTargetVec, const bool& IsClockWise);
 	//ゲッタ類
 	const Vec2<float>& GetPartnerPos()
 	{
