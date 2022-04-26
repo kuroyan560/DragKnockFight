@@ -114,6 +114,10 @@ void Player::OnInit()
 	swingVec = { -1.0f,0.0f };
 
 	inputInvalidTimerByCrash = 0;
+
+	oldMoveDashInput = { 0,0 };
+	moveDashPowerRate = 0.0f;
+	moveDashTimer = 0;
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -298,6 +302,7 @@ void Player::OnDrawUI()
 
 	const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0.5f,0.5f });
 
+	/*
 	if (isHold && !GetNowSwing() && !StunEffect::Instance()->isActive)
 	{
 		const Vec2<float>drawScale = { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom };
@@ -316,6 +321,15 @@ void Player::OnDrawUI()
 		Vec2<float>vec = partner.lock()->pos - pos;
 		vec.Normalize();
 		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos + vec * ARROW_DIST_OFFSET), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), { 0.0f,0.5f });
+	}
+	*/
+
+	static const float MOVE_DASH_ARROW_LEN = 100.0f;
+	if (moveDashTimer)
+	{
+		auto drawCenterPos = ScrollMgr::Instance()->Affect(pos);
+		auto toPos = drawCenterPos + UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.9f,0.9f }) * MOVE_DASH_ARROW_LEN * moveDashPowerRate;
+		DrawFunc::DrawLine2DGraph(drawCenterPos, toPos, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[GetWhichTeam()]), 32);
 	}
 
 	const auto leftStickVec = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
@@ -427,13 +441,34 @@ void Player::Input(const vector<vector<int>>& MapData)
 	inputVec /= {32768.0f, 32768.0f};
 	// 入力のデッドラインを設ける。
 	float inputRate = inputVec.Length();
-	if (inputRate >= 0.5f) {
+	//if (inputRate >= 0.5f) {
 
-		// 移動を受け付ける。
-		if (vel.Length() < MOVE_SPEED_PLAYER) {
-			vel.x = inputVec.x * (MOVE_SPEED_PLAYER * inputRate);
-			vel.y = inputVec.y * (MOVE_SPEED_PLAYER * inputRate);
+	//	// 移動を受け付ける。
+	//	if (vel.Length() < MOVE_SPEED_PLAYER) {
+	//		vel.x = inputVec.x * (MOVE_SPEED_PLAYER * inputRate);
+	//		vel.y = inputVec.y * (MOVE_SPEED_PLAYER * inputRate);
+	//	}
+
+	//	// 右手の角度を更新
+	//	lHand->SetAngle(KuroFunc::GetAngle(inputVec));
+
+	//	if (inputVec.x < 0)playerDirX = PLAYER_LEFT;
+	//	else if (0 < inputVec.x)playerDirX = PLAYER_RIGHT;
+	//	if (inputVec.y < 0)playerDirY = PLAYER_BACK;
+	//	else if (0 < inputVec.y)playerDirY = PLAYER_FRONT;
+	//}
+
+	static const int MOVE_DASH_TIME_MAX = 20;
+	if (0.9f <= inputRate)
+	{
+		oldMoveDashInput = inputVec;
+
+		if (moveDashTimer < MOVE_DASH_TIME_MAX)
+		{
+			moveDashTimer++;
 		}
+		moveDashPowerRate = moveDashTimer / (float)MOVE_DASH_TIME_MAX;
+		if (moveDashPowerRate < 0.2f)moveDashPowerRate = 0.2f;
 
 		// 右手の角度を更新
 		lHand->SetAngle(KuroFunc::GetAngle(inputVec));
@@ -442,6 +477,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 		else if (0 < inputVec.x)playerDirX = PLAYER_RIGHT;
 		if (inputVec.y < 0)playerDirY = PLAYER_BACK;
 		else if (0 < inputVec.y)playerDirY = PLAYER_FRONT;
+	}
+	else
+	{
+		moveDashTimer = 0;
+		// 移動を受け付ける。
+		vel.x = oldMoveDashInput.x * moveDashPowerRate * 90.0f;
+		vel.y = oldMoveDashInput.y * moveDashPowerRate * 90.0f;
+		moveDashPowerRate = KuroMath::Lerp(moveDashPowerRate, 0.0f, 0.08f);
 	}
 
 	inputVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);

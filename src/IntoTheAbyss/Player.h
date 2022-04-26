@@ -122,6 +122,11 @@ public:
 	//チュートリアルアイコン
 	std::weak_ptr<Tutorial>tutorial;
 
+	//モンスト動き
+	Vec2<float> oldMoveDashInput;
+	float moveDashPowerRate;
+	int moveDashTimer;
+
 public:
 
 	/*-- メンバ関数 --*/
