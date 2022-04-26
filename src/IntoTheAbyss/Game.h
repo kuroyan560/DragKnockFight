@@ -59,7 +59,6 @@ class Game
 	int oldRoomNum = -1;
 
 	vector<vector<MapChipDrawData>> mapChipDrawData;
-	std::vector<std::unique_ptr<ThornBlock>> thornBlocks;
 
 	int countStopNum = 0;
 	int countHitNum = 0;
@@ -111,6 +110,8 @@ class Game
 	Color playerHitColor;
 
 	ScreenEdgeEffect screenEdgeEffect;
+
+	Vec2<float>responeScrollPos;
 public:
 
 	HomeBase playerHomeBase, enemyHomeBase;

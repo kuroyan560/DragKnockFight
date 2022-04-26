@@ -197,19 +197,6 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	ShakeMgr::Instance()->Init();
 	ParticleMgr::Instance()->Init();
 
-	//棘ブロック
-	{
-		thornBlocks.clear();
-		const int dogeChipNum = MAPCHIP_BLOCK_THOWN;
-		std::vector<std::unique_ptr<MassChipData>> data = AddData(mapData, dogeChipNum);
-		for (int i = 0; i < data.size(); ++i)
-		{
-			thornBlocks.push_back(std::make_unique<ThornBlock>());
-			int thornBlocksArrayNum = thornBlocks.size() - 1;
-			thornBlocks[thornBlocksArrayNum]->Init(data[i]->leftUpPos, data[i]->rightDownPos);
-		}
-	}
-
 	initDeadFlag = false;
 	//giveDoorNumber = 0;
 	debugStageData[0] = stageNum;
@@ -270,16 +257,18 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 
 	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) * 0.5f, (mapData.size() * MAP_CHIP_SIZE) * 0.5f);
-	responePos -= 100;
 
-	lineCenterPos = responePos;
-	CharacterManager::Instance()->CharactersInit(responePos);
+	//スクロールを上にずらす用
+	//responePos.x -= 100;
+	//responePos.y += 50;
+	lineCenterPos = responePos - cameraBasePos;
+	CharacterManager::Instance()->CharactersInit(lineCenterPos);
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	Camera::Instance()->Init();
 
-	GameTimer::Instance()->Init({}, 120, {}, {});
+	GameTimer::Instance()->Init(120);
 	GameTimer::Instance()->Start();
 
 	ScoreManager::Instance()->Init();
@@ -304,9 +293,11 @@ Game::Game()
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(0, 0);
 
 	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) * 0.5f, (mapData.size() * MAP_CHIP_SIZE) * 0.5f);
-	responePos -= 100;
-	lineCenterPos = responePos;
-	ScrollMgr::Instance()->Init(lineCenterPos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
+	//スクロールを上にずらす用
+	responePos.x -= 25;
+	responePos.y += 50;
+	responeScrollPos = responePos;
+	ScrollMgr::Instance()->Init(responeScrollPos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
 
 	Camera::Instance()->Init();
 	SuperiorityGauge::Instance()->Init();
@@ -315,7 +306,7 @@ Game::Game()
 	//背景に星
 	BackGround::Instance()->Init(GetStageSize());
 
-	GameTimer::Instance()->Init({}, 120, {}, {});
+	GameTimer::Instance()->Init(120);
 	ScoreManager::Instance()->Init();
 
 }
@@ -488,9 +479,9 @@ void Game::Update()
 		winSize.x = static_cast<float>(WinApp::Instance()->GetWinSize().x);
 		winSize.y = static_cast<float>(WinApp::Instance()->GetWinSize().y);
 
-		Vec2<float> responePos = Vec2<float>(((mapData[0].size() * MAP_CHIP_SIZE) / 2.0f) - 100.0f, (mapData.size() * MAP_CHIP_SIZE) / 2.0f);
-		responePos.y -= -cameraBasePos.y * 2.0f;
-		ScrollMgr::Instance()->Warp(responePos);
+		//Vec2<float> responePos = Vec2<float>(((mapData[0].size() * MAP_CHIP_SIZE) / 2.0f) - 100.0f, (mapData.size() * MAP_CHIP_SIZE) / 2.0f);
+		//responePos.y -= -cameraBasePos.y * 2.0f;
+		ScrollMgr::Instance()->Warp(responeScrollPos);
 
 		//プレイヤーと敵の座標初期化
 		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initGameFlag)
@@ -683,10 +674,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 	DrawMapChip(mapData, mapChipDrawData, stageNum, roomNum);
 
-	for (int i = 0; i < thornBlocks.size(); ++i)
-	{
-		thornBlocks[i]->Draw();
-	}
 
 	playerHomeBase.Draw();
 	enemyHomeBase.Draw();
