@@ -184,6 +184,15 @@ public:
 	void FinishSwing();
 
 	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName; }
+	const Color& GetTeamColor()
+	{
+		static const Color TEAM_COLOR[TEAM_NUM] =
+		{
+			Color(47,255,139,255),
+			Color(239,1,144,255)
+		};
+		return TEAM_COLOR[team];
+	}
 
 	//ノックアウトされた側
 	virtual void OnKnockOut() = 0;

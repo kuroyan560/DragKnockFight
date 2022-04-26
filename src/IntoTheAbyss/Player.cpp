@@ -114,6 +114,8 @@ void Player::OnInit()
 	swingVec = { -1.0f,0.0f };
 
 	inputInvalidTimerByCrash = 0;
+
+	dashAftImgTimer = 0;
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -207,6 +209,14 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 		anim.ChangeAnim(TIRED);
 	}
 
+
+	//ダッシュの残像
+	if (dashAftImgTimer)
+	{
+		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size;
+		AfterImageMgr::Instance()->Generate(pos, extRate, 0.0f, anim.GetGraphHandle(), GetTeamColor());
+		dashAftImgTimer--;
+	}
 }
 
 void Player::OnUpdateNoRelatedSwing()
@@ -645,6 +655,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 		const int DASH_GRIP_POWER = 15;
 		gripPowerTimer -= DASH_GRIP_POWER;
 
+		//煙
+		ParticleMgr::Instance()->Generate(pos, -inputVec, BULLET);
+		//残像
+		dashAftImgTimer = 10;
 	}
 
 }
