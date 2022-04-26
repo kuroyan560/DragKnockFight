@@ -303,6 +303,9 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	if (nowSwing)
 	{
 		SwingUpdate();
+
+		// 握力タイマーを0に近づける。
+		--gripPowerTimer;
 	}
 
 	prevPos = pos;

@@ -200,19 +200,11 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 		}
 	}
 
-	// 振り回していたら
-	if (nowSwing) {
+	// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
+	if (gripPowerTimer <= 0) {
 
-		// 握力タイマーを0に近づける。
-		--gripPowerTimer;
-
-		// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
-		if (gripPowerTimer <= 0) {
-
-			isGripPowerEmpty = true;
-			anim.ChangeAnim(TIRED);
-		}
-
+		isGripPowerEmpty = true;
+		anim.ChangeAnim(TIRED);
 	}
 
 }
@@ -224,7 +216,7 @@ void Player::OnUpdateNoRelatedSwing()
 	rHand->Update(pos + anim.GetHandCenterOffset());
 
 	// 握力タイマーを規定値に近づける。
-	if (!isHold && gripPowerTimer < MAX_GRIP_POWER_TIMER) {
+	if (!nowSwing && gripPowerTimer < MAX_GRIP_POWER_TIMER) {
 		gripPowerTimer += SlowMgr::Instance()->slowAmount;
 
 		// 最大値になったら握力を使い切ってから回復している状態フラグを折る。
@@ -486,18 +478,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 			tutorial.lock()->SetRstickInput(true);
 
-			// 握力タイマーを0に近づける。
-			--gripPowerTimer;
-
 			// 移動量を0にする。
 			vel = {};
-
-			// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
-			if (gripPowerTimer <= 0) {
-
-				isGripPowerEmpty = true;
-				anim.ChangeAnim(TIRED);
-			}
 
 		}
 
@@ -620,7 +602,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	// RTが押されたら
 	bool canSwing = swingCoolTime <= 0 && (isInputRB || isInputLB);
-	if (!isSwingPartner && canSwing || isAdvancedEntrySwing) {
+	if ((!isSwingPartner && canSwing || isAdvancedEntrySwing) && !isGripPowerEmpty) {
 
 		// 振り回しの処理
 
@@ -634,7 +616,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		isInputSwingRB = isInputRB;
 
 	}
-	else if (isSwingPartner && canSwing) {
+	else if (isSwingPartner && canSwing && !isGripPowerEmpty) {
 
 		// 先行入力を保存。
 		isAdvancedEntrySwing = true;
@@ -653,11 +635,15 @@ void Player::Input(const vector<vector<int>>& MapData)
 	inputVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
 	inputVec /= {32768.0f, 32768.0f};
 	inputRate = inputVec.Length();
-	if (isInputA && 0.5f <= inputRate) {
+	if (isInputA && 0.5f <= inputRate && !isGripPowerEmpty) {
 
 		// inputVec = ひだりスティックの入力方向
 		const float DASH_SPEED = 20.0f;
 		vel += inputVec * DASH_SPEED;
+
+		// スタミナを消費
+		const int DASH_GRIP_POWER = 15;
+		gripPowerTimer -= DASH_GRIP_POWER;
 
 	}
 
