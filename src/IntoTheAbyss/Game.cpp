@@ -274,7 +274,6 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	firstLoadFlag = false;
 	lineExtendScale = lineExtendMaxScale;
 
-	navi.Init(mapData);
 }
 
 Game::Game()
@@ -309,6 +308,9 @@ Game::Game()
 
 	GameTimer::Instance()->Init(120);
 	ScoreManager::Instance()->Init();
+
+
+	navi.Init(mapData);
 }
 
 void Game::Init()

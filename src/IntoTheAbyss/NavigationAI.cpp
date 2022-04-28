@@ -2,15 +2,15 @@
 #include"../Engine/DrawFunc.h"
 #include"ScrollMgr.h"
 
+const float NavigationAI::SERACH_RADIUS = 200.0f;
+
 void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 {
-	const Vec2<float> MAPCHIP_SIZE = { 50.0f,50.0f };
-
 	SizeData wallMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
 	//座標の設定--------------------------
-	int xNum = (MAP_DATA[0].size() * MAPCHIP_SIZE.x) / WAYPOINT_MAX_Y;
-	int yNum = (MAP_DATA.size() * MAPCHIP_SIZE.y) / WAYPOINT_MAX_Y;
+	int xNum = (MAP_DATA[0].size() * MAP_CHIP_SIZE) / WAYPOINT_MAX_Y;
+	int yNum = (MAP_DATA.size() * MAP_CHIP_SIZE) / WAYPOINT_MAX_Y;
 
 	for (int y = 0; y < WAYPOINT_MAX_Y; ++y)
 	{
@@ -18,7 +18,7 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 		{
 			//一度ワールド座標に変換してからマップチップ座標に変換する
 			const Vec2<float> worldPos(xNum * x, yNum * y);
-			const Vec2<int> mapChipPos(GetMapChipNum(worldPos / MAPCHIP_SIZE));
+			const Vec2<int> mapChipPos(GetMapChipNum(worldPos / MAP_CHIP_SIZE));
 			if (MAP_DATA[0].size() <= mapChipPos.x || MAP_DATA.size() <= mapChipPos.y)
 			{
 				continue;
@@ -62,7 +62,13 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 	{
 		for (int x = 0; x < WAYPOINT_MAX_X; ++x)
 		{
-			
+			if (DontUse(wayPoints[y][x]))
+			{
+				SphereCollision data;
+				data.center = &wayPoints[y][x].pos;
+				data.radius = SERACH_RADIUS;
+				RegistHandle(data, &wayPoints[y][x]);
+			}
 		}
 	}
 	//近くにあるウェイポイントへの繋ぎ--------------------------
@@ -85,10 +91,54 @@ void NavigationAI::Draw()
 	{
 		for (int x = 0; x < wayPoints[y].size(); ++x)
 		{
-			DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), wayPoints[y][x].radius, Color(255, 255, 255, 255));
+			if (DontUse(wayPoints[y][x]))
+			{
+				if (wayPointFlag)
+				{
+					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), wayPoints[y][x].radius, Color(255, 255, 255, 255));
+				}
+				if (serachFlag)
+				{
+					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), SERACH_RADIUS, Color(255, 255, 255, 255));
+				}
+			}
+		}
+	}
+
+	//繋がりの描画
+	if (lineFlag)
+	{
+		for (int y = 0; y < wayPoints.size(); ++y)
+		{
+			for (int x = 0; x < wayPoints[y].size(); ++x)
+			{
+				if (DontUse(wayPoints[y][x]))
+				{
+					//登録したハンドルから線を繋げる
+					for (int i = 0; i < wayPoints[y][x].wayPointHandles.size(); ++i)
+					{
+						Vec2<int> endHandle = wayPoints[y][x].wayPointHandles[i];
+						DrawFunc::DrawLine2D
+						(
+							ScrollMgr::Instance()->Affect(wayPoints[y][x].pos),
+							ScrollMgr::Instance()->Affect(wayPoints[endHandle.y][endHandle.x].pos),
+							Color(0, 155, 0, 255)
+						);
+					}
+				}
+			}
 		}
 	}
 #endif
+}
+
+void NavigationAI::ImGuiDraw()
+{
+	ImGui::Begin("Navigation");
+	ImGui::Checkbox("SearchCircle", &serachFlag);
+	ImGui::Checkbox("WayPoint", &wayPointFlag);
+	ImGui::Checkbox("MoveLine", &lineFlag);
+	ImGui::End();
 }
 
 inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS)
@@ -122,4 +172,42 @@ inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS
 	}
 
 	return result;
+}
+
+inline bool NavigationAI::DontUse(const WayPointData &DATA)
+{
+	return DATA.handle.x != -1 && DATA.handle.y != -1;
+}
+
+inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, WayPointData *DATA)
+{
+	for (int y = 0; y < WAYPOINT_MAX_Y; ++y)
+	{
+		for (int x = 0; x < WAYPOINT_MAX_X; ++x)
+		{
+			//使用できるデータから判定を行う
+			if (DontUse(wayPoints[y][x]))
+			{
+				SphereCollision data;
+				data.center = &wayPoints[y][x].pos;
+				data.radius = SERACH_RADIUS;
+
+				//移動範囲内にウェイポイントがあるか
+				bool serachFlag = BulletCollision::Instance()->CheckSphereAndSphere(HANDLE, data);
+				//道中壁に当たっているかどうか
+				bool canMoveFlag = false;
+				if (serachFlag)
+				{
+					canMoveFlag = !CheckMapChipWallAndRay(*HANDLE.center, *data.center);
+				}
+
+				//探索範囲内&&直接行ける場所なら線を繋げる
+				if (serachFlag && canMoveFlag)
+				{
+					wayPoints[y][x].RegistHandle({ x,y });
+					DATA->RegistHandle({ x,y });
+				}
+			}
+		}
+	}
 }
