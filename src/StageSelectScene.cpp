@@ -14,6 +14,9 @@ StageSelectScene::StageSelectScene()
 
 	multiHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/players/multiPlay.png");
 	singleHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/players/singlePlay.png");
+	hitoriHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/players/singlePlay_str.png");
+	futariHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/players/multiPlay_str.png");
+	arrowHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/players/arrow.png");
 }
 
 void StageSelectScene::OnInitialize()
@@ -26,6 +29,8 @@ void StageSelectScene::OnInitialize()
 	easingTimer = 0;
 	singleTexturePos = CURRENT_DEF_POS;
 	multiTexturePos = BEHIND_DEF_POS;
+	invisibleArrowTimer = 0;
+	isInvisibleArrow = false;
 }
 
 void StageSelectScene::OnUpdate()
@@ -115,10 +120,31 @@ void StageSelectScene::OnDraw()
 	// マルチシングル選択画面だったら
 	if (isSelectMultiSingle) {
 
-		const Vec2<float> PLAY_STR_POS = { 1700,700 };							// 何人プレイかを描画する座標。
+		// マルチプレイを選択中だったら
+		bool isFirstHalf = easingTimer < 0.5f && 0.0f < easingTimer;
+		// 前半部分だったら
+		if (isFirstHalf) {
 
-			// マルチプレイを選択中だったら
-		if (isMulti) {
+			// マルチだったら
+			if (isMulti) {
+
+				// マルチの画像を表示
+				DrawFunc::DrawGraph(multiTexturePos, TexHandleMgr::GetTexBuffer(multiHandle));
+				// シングルの画像を表示
+				DrawFunc::DrawGraph(singleTexturePos, TexHandleMgr::GetTexBuffer(singleHandle));
+
+			}
+			else {
+
+				// シングルの画像を表示
+				DrawFunc::DrawGraph(singleTexturePos, TexHandleMgr::GetTexBuffer(singleHandle));
+				// マルチの画像を表示
+				DrawFunc::DrawGraph(multiTexturePos, TexHandleMgr::GetTexBuffer(multiHandle));
+
+			}
+
+		}
+		else if (isMulti) {
 
 			// シングルの画像を表示
 			DrawFunc::DrawGraph(singleTexturePos, TexHandleMgr::GetTexBuffer(singleHandle));
@@ -126,6 +152,7 @@ void StageSelectScene::OnDraw()
 			DrawFunc::DrawGraph(multiTexturePos, TexHandleMgr::GetTexBuffer(multiHandle));
 
 		}
+		// シングルプレイを選択中だったら
 		else if (isSingle) {
 
 			// マルチの画像を表示
@@ -135,7 +162,30 @@ void StageSelectScene::OnDraw()
 
 		}
 
+		// 何人プレイかを描画
+		if (isMulti) {
 
+			// 二人プレイを描画
+			DrawFunc::DrawGraph(PLAY_STR_POS, TexHandleMgr::GetTexBuffer(futariHandle));
+
+		}
+		else {
+
+			// 一人プレイを描画
+			DrawFunc::DrawGraph(PLAY_STR_POS, TexHandleMgr::GetTexBuffer(hitoriHandle));
+
+		}
+
+		// 矢を描画。
+		if (!isInvisibleArrow) {
+
+			const Vec2<float> LEFT_ARROW_POS = { 220,620 };
+			const Vec2<float> RIGHT_ARROW_POS = { 1200, 620 };
+
+			DrawFunc::DrawRotaGraph2D(LEFT_ARROW_POS, { 1,1 }, 3.14f, TexHandleMgr::GetTexBuffer(arrowHandle));
+			DrawFunc::DrawRotaGraph2D(RIGHT_ARROW_POS, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(arrowHandle));
+
+		}
 
 	}
 }
@@ -184,6 +234,26 @@ void StageSelectScene::SelectMultiSingleUpdate()
 			isMulti = true;
 			isSingle = false;
 
+			if (0 < inputLeftVec.x) {
+
+				// 右側に入力したら。
+				multiTextureInterimPos = BEHIND_INTERIM_POS;
+				multiTextureEndPos = CURRENT_DEF_POS;
+				singleTextureInterimPos = CURRENT_INTERIM_POS;
+				singleTextureEndPos = BEHIND_DEF_POS;
+
+			}
+			else {
+
+				// 左側に入力したら。
+				multiTextureInterimPos = CURRENT_INTERIM_POS;
+				multiTextureEndPos = BEHIND_DEF_POS;
+				singleTextureInterimPos = BEHIND_INTERIM_POS;
+				singleTextureEndPos = CURRENT_DEF_POS;
+
+
+			}
+
 		}
 		// 今のフラグがマルチプレイ描画中だったら。
 		else {
@@ -192,96 +262,98 @@ void StageSelectScene::SelectMultiSingleUpdate()
 			isMulti = false;
 			isSingle = true;
 
+			if (0 < inputLeftVec.x) {
+
+				// 右側に入力したら。
+				multiTextureInterimPos = CURRENT_INTERIM_POS;
+				multiTextureEndPos = BEHIND_DEF_POS;
+				singleTextureInterimPos = BEHIND_INTERIM_POS;
+				singleTextureEndPos = CURRENT_DEF_POS;
+
+			}
+			else {
+
+				// 左側に入力したら。
+				multiTextureInterimPos = BEHIND_INTERIM_POS;
+				multiTextureEndPos = BEHIND_DEF_POS;
+				singleTextureInterimPos = CURRENT_INTERIM_POS;
+				singleTextureEndPos = CURRENT_DEF_POS;
+
+
+			}
+
 		}
 
 		// イージングタイマーを進める。こうすることで自動的にイージングが始まる。
 		easingTimer += ADD_EASING_TIMER;
+
+		// 矢印を一旦消す。
+		isInvisibleArrow = true;
+		invisibleArrowTimer = 0;
 
 	}
 
 	// イージングタイマーが起動していたらイージングを進める。
 	if (easingTimer != 0) {
 
-		// 選択中だったのがシングルプレイだったら。
-		if (isSingle) {
+		// 画像を更新。
+		UpdateEasingMultiSingle(easingTimer, singleTexturePos, multiTexturePos,
+			CURRENT_DEF_POS, singleTextureInterimPos, singleTextureEndPos,
+			BEHIND_DEF_POS, multiTextureInterimPos, multiTextureEndPos);
 
-			// イージングのタイマーの値によって今が前半か後半かを取得する。
-			bool isFirstHalf = easingTimer < 0.5f;
+	}
 
-			// 前半だったら。
-			if (isFirstHalf) {
+	// イージングタイマーを更新。
+	easingTimer += ADD_EASING_TIMER;
+	if (1.0f <= easingTimer) {
 
-				float easingRate = easingTimer / 0.5f;
+		easingTimer = 0;
 
-				float easingAmount = KuroMath::Ease(Out, Sine, easingRate, 0.0f, 1.0f);
+	}
 
-				// シングルプレイを背面から正面に持ってくる。
-				singleTexturePos = BEHIND_DEF_POS + (CURRENT_INTERIM_POS - BEHIND_DEF_POS) * easingAmount;
+	// 矢不可視タイマーを更新。
+	++invisibleArrowTimer;
+	if (INVISIBLE_ARROW_TIMER <= invisibleArrowTimer) {
 
-				// マルチプレイを全面から背面に持ってくる。
-				multiTexturePos = CURRENT_DEF_POS + (BEHIND_INTERIM_POS - CURRENT_DEF_POS) * easingAmount;
+		isInvisibleArrow = isInvisibleArrow ? false : true;
+		invisibleArrowTimer = 0;
 
-			}
-			// 後半だったら。
-			else {
+	}
 
-				float easingRate = (easingTimer - 0.5f) / 0.5f;
+}
 
-				float easingAmount = KuroMath::Ease(In, Sine, easingRate, 0.0f, 1.0f);
+void StageSelectScene::UpdateEasingMultiSingle(const float& EasingRate, Vec2<float>& SinglePos, Vec2<float>& MultiPos, const Vec2<float>& SingleDefPos, const Vec2<float>& SingleIntermPos, const Vec2<float>& SingleEndPos, const Vec2<float>& MultiDefPos, const Vec2<float>& MultiIntermPos, const Vec2<float>& MultiEndPos)
+{
 
-				// シングルプレイを背面から正面に持ってくる。
-				singleTexturePos = CURRENT_INTERIM_POS + (CURRENT_DEF_POS - CURRENT_INTERIM_POS) * easingAmount;
+	// イージングのタイマーの値によって今が前半か後半かを取得する。
+	bool isFirstHalf = EasingRate < 0.5f;
 
-				// マルチプレイを全面から背面に持ってくる。
-				multiTexturePos = BEHIND_INTERIM_POS + (BEHIND_DEF_POS - BEHIND_INTERIM_POS) * easingAmount;
+	// 前半だったら。
+	if (isFirstHalf) {
 
-			}
+		float easingRate = easingTimer / 0.5f;
 
-		}
-		// 選択中だったのがマルチプレイだったら。
-		else {
+		float easingAmount = KuroMath::Ease(Out, Sine, easingRate, 0.0f, 1.0f);
 
-			// イージングのタイマーの値によって今が前半か後半かを取得する。
-			bool isFirstHalf = easingTimer < 0.5f;
+		// シングルプレイを背面から正面に持ってくる。
+		SinglePos = SingleDefPos + (SingleIntermPos - SingleDefPos) * easingAmount;
 
-			// 前半だったら。
-			if (isFirstHalf) {
+		// マルチプレイを全面から背面に持ってくる。
+		MultiPos = MultiDefPos + (MultiIntermPos - MultiDefPos) * easingAmount;
 
-				float easingRate = easingTimer / 0.5f;
+	}
+	// 後半だったら。
+	else {
 
-				float easingAmount = KuroMath::Ease(Out, Sine, easingRate, 0.0f, 1.0f);
+		float easingRate = (easingTimer - 0.5f) / 0.5f;
 
-				// シングルプレイを前面から背面に持っていく。
-				singleTexturePos = CURRENT_DEF_POS + (BEHIND_INTERIM_POS - CURRENT_DEF_POS) * easingAmount;
+		float easingAmount = KuroMath::Ease(In, Sine, easingRate, 0.0f, 1.0f);
 
-				// マルチプレイを背面から前面に持っていく。
-				multiTexturePos = BEHIND_DEF_POS + (CURRENT_INTERIM_POS - BEHIND_DEF_POS) * easingAmount;
+		// シングルプレイを背面から正面に持ってくる。
+		SinglePos = SingleIntermPos + (SingleEndPos - SingleIntermPos) * easingAmount;
 
-			}
-			// 後半だったら。
-			else {
-
-				float easingRate = (easingTimer - 0.5f) / 0.5f;
-
-				float easingAmount = KuroMath::Ease(In, Sine, easingRate, 0.0f, 1.0f);
-
-				// シングルプレイを前面から背面に持っていく。
-				singleTexturePos = BEHIND_INTERIM_POS + (BEHIND_DEF_POS - BEHIND_INTERIM_POS) * easingAmount;
-
-				// マルチプレイを全面から背面に持ってくる。
-				multiTexturePos = CURRENT_INTERIM_POS + (CURRENT_DEF_POS - CURRENT_INTERIM_POS) * easingAmount;
-
-			}
-
-		}
-
-		// イージングタイマーを更新。
-		easingTimer += ADD_EASING_TIMER;
-		if (1.0f <= easingTimer) {
-
-			easingTimer = 0;
-
-		}
+		// マルチプレイを全面から背面に持ってくる。
+		MultiPos = MultiIntermPos + (MultiEndPos - MultiIntermPos) * easingAmount;
 
 	}
 
