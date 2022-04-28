@@ -273,6 +273,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	firstLoadFlag = false;
 	lineExtendScale = lineExtendMaxScale;
+
+	navi.Init(mapData);
 }
 
 Game::Game()
@@ -307,7 +309,6 @@ Game::Game()
 
 	GameTimer::Instance()->Init(120);
 	ScoreManager::Instance()->Init();
-
 }
 
 void Game::Init()
@@ -834,6 +835,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
+	navi.Draw();
 }
 
 void Game::Scramble()

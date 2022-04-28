@@ -22,6 +22,8 @@ class RenderTarget;
 #include"RoundChangeEffect.h"
 #include"ScreenEdgeEffect.h"
 
+#include"NavigationAI.h"
+
 class CharacterInterFace;
 
 struct MassChipData
@@ -112,6 +114,9 @@ class Game
 	ScreenEdgeEffect screenEdgeEffect;
 
 	Vec2<float>responeScrollPos;
+
+	//テスト用
+	NavigationAI navi;
 public:
 
 	HomeBase playerHomeBase, enemyHomeBase;
