@@ -172,6 +172,7 @@ private:
 	{
 		// 入力受付無効化タイマーをセッティングする。
 		inputInvalidTimerByCrash = INPUT_INVALID_TIMER;
+		anim.ChangeAnim(SWINGED);
 	}
 
 	bool drawCursorFlag;
