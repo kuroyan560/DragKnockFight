@@ -8,14 +8,10 @@ std::shared_ptr<TextureBuffer>DrawFunc_Shadow::DEFAULT_NORMAL_MAP;
 std::shared_ptr<TextureBuffer>DrawFunc_Shadow::DEFAULT_EMISSIVE_MAP;
 
 //DrawExtendGraph
-std::shared_ptr<GraphicsPipeline>DrawFunc_Shadow::EXTEND_GRAPH_PIPELINE;
 int DrawFunc_Shadow::DRAW_EXTEND_GRAPH_COUNT = 0;
-std::vector<std::shared_ptr<VertexBuffer>>DrawFunc_Shadow::EXTEND_GRAPH_VERTEX_BUFF;
 
 //DrawRotaGraph
-std::shared_ptr<GraphicsPipeline>DrawFunc_Shadow::ROTA_GRAPH_PIPELINE;
 int DrawFunc_Shadow::DRAW_ROTA_GRAPH_COUNT = 0;
-std::vector<std::shared_ptr<VertexBuffer>>DrawFunc_Shadow::ROTA_GRAPH_VERTEX_BUFF;
 
 static std::vector<RootParam>ROOT_PARAMETER =
 {
@@ -73,6 +69,9 @@ void DrawFunc_Shadow::DrawExtendGraph2D(LightManager& LigManager, const Vec2<flo
 			depth(Depth), diffuse(Diffuse), specular(Specular), lim(Lim) {}
 	};
 
+	static std::shared_ptr<GraphicsPipeline>EXTEND_GRAPH_PIPELINE;
+	static std::vector<std::shared_ptr<VertexBuffer>>EXTEND_GRAPH_VERTEX_BUFF;
+
 	//パイプライン未生成
 	if (!EXTEND_GRAPH_PIPELINE)
 	{
@@ -82,9 +81,9 @@ void DrawFunc_Shadow::DrawExtendGraph2D(LightManager& LigManager, const Vec2<flo
 
 		//シェーダー情報
 		static Shaders SHADERS;
-		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawExtendGraph_Shadow.hlsl", "VSmain", "vs_5_0");
-		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawExtendGraph_Shadow.hlsl", "GSmain", "gs_5_0");
-		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawExtendGraph_Shadow.hlsl", "PSmain", "ps_5_0");
+		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/engine/DrawExtendGraph_Shadow.hlsl", "VSmain", "vs_5_0");
+		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/engine/DrawExtendGraph_Shadow.hlsl", "GSmain", "gs_5_0");
+		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/engine/DrawExtendGraph_Shadow.hlsl", "PSmain", "ps_5_0");
 
 		//インプットレイアウト
 		static std::vector<InputLayoutParam>INPUT_LAYOUT =
@@ -164,6 +163,9 @@ void DrawFunc_Shadow::DrawRotaGraph2D(LightManager& LigManager, const Vec2<float
 			depth(Depth), diffuse(Diffuse), specular(Specular), lim(Lim) {}
 	};
 
+	static std::shared_ptr<GraphicsPipeline>ROTA_GRAPH_PIPELINE;
+	static std::vector<std::shared_ptr<VertexBuffer>>ROTA_GRAPH_VERTEX_BUFF;
+
 	//パイプライン未生成
 	if (!ROTA_GRAPH_PIPELINE)
 	{
@@ -173,9 +175,9 @@ void DrawFunc_Shadow::DrawRotaGraph2D(LightManager& LigManager, const Vec2<float
 
 		//シェーダー情報
 		static Shaders SHADERS;
-		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph_Shadow.hlsl", "VSmain", "vs_5_0");
-		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph_Shadow.hlsl", "GSmain", "gs_5_0");
-		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph_Shadow.hlsl", "PSmain", "ps_5_0");
+		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/engine/DrawRotaGraph_Shadow.hlsl", "VSmain", "vs_5_0");
+		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/engine/DrawRotaGraph_Shadow.hlsl", "GSmain", "gs_5_0");
+		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/engine/DrawRotaGraph_Shadow.hlsl", "PSmain", "ps_5_0");
 
 		//インプットレイアウト
 		static std::vector<InputLayoutParam>INPUT_LAYOUT =

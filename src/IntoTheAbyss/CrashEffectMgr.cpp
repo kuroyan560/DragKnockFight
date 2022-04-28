@@ -93,7 +93,7 @@ void ClassEffect::Draw()
 		col = { 47, 255, 139,255 };
 	}
 
-	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(pos - size), ScrollMgr::Instance()->Affect(pos + size), col, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(pos - size), ScrollMgr::Instance()->Affect(pos + size), col, true);
 
 }
 

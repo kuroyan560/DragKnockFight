@@ -102,7 +102,7 @@ void AfterImageMgr::Draw()
 		// ExtendGraphƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚½‚çB
 		if (afterImages[index].isExtendGraph) {
 
-			DrawFunc_Color::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos - afterImages[index].size), ScrollMgr::Instance()->Affect(afterImages[index].pos + afterImages[index].size), TexHandleMgr::GetTexBuffer(afterImages[index].handle), texColor);
+			DrawFunc_Color::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos - afterImages[index].size), ScrollMgr::Instance()->Affect(afterImages[index].pos + afterImages[index].size), TexHandleMgr::GetTexBuffer(afterImages[index].handle), texColor, AlphaBlendMode_None);
 
 		}
 		else {
