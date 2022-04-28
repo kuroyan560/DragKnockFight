@@ -146,7 +146,7 @@ public:
 	bool isHold;				// つかんでいるかフラグ
 	bool isGripPowerEmpty;		// 握力タイマーを使い切ってから回復するまでを判断するためのフラグ
 	float gripPowerTimer;			// 握力タイマー
-	const int MAX_GRIP_POWER_TIMER = 40;
+	const int MAX_GRIP_POWER_TIMER = 90;
 	RunOutOfStaminaEffect outOfStaminaEffect;
 
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team, const PLAYABLE_CHARACTER_NAME& Name)

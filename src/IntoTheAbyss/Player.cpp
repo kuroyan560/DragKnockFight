@@ -662,7 +662,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		vel += inputLeftVec * DASH_SPEED;
 
 		// スタミナを消費
-		const int DASH_GRIP_POWER = 20;
+		const int DASH_GRIP_POWER = 30;
 		gripPowerTimer -= DASH_GRIP_POWER;
 
 		//煙

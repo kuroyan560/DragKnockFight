@@ -700,7 +700,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				Crash(vec);
 				//CrashMgr::Instance()->Crash(pos, crashDevice, ext);
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
-				SuperiorityGauge::Instance()->AddGauge(team, -10);
+				//SuperiorityGauge::Instance()->AddGauge(team, -10);
 				partner.lock()->FinishSwing();
 
 				// チームに応じてクラッシュ数を加算する変数を変える。
@@ -735,7 +735,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				//CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
-				SuperiorityGauge::Instance()->AddGauge(team, -20);
+				//SuperiorityGauge::Instance()->AddGauge(team, -20);
 				Crash({ winRight ? 1.0f : -1.0f , 0.0f });
 
 				// チームに応じてクラッシュ数を加算する変数を変える。
@@ -758,7 +758,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				//CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
-				SuperiorityGauge::Instance()->AddGauge(team, -20);
+				//SuperiorityGauge::Instance()->AddGauge(team, -20);
 				Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
 
 				// チームに応じてクラッシュ数を加算する変数を変える。
@@ -787,4 +787,7 @@ void CharacterInterFace::FinishSwing()
 	partner.lock()->stagingDevice.StopSpin();
 	partner.lock()->OnSwingedFinish();
 
+
+	gripPowerTimer = 0;
+	isGripPowerEmpty = true;
 }
