@@ -473,7 +473,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	isInputRightStick = 0.9f < inputRightVec.Length();
 
 	// 入力のデッドラインを設ける。
-	float inputRate = inputVec.Length();
+	float inputRate = inputLeftVec.Length();
 	//if (inputRate >= 0.5f) {
 
 	//	// 移動を受け付ける。
@@ -494,7 +494,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	static const int MOVE_DASH_TIME_MAX = 20;
 	if (0.9f <= inputRate)
 	{
-		oldMoveDashInput = inputVec;
+		oldMoveDashInput = inputLeftVec;
 
 		if (moveDashTimer < MOVE_DASH_TIME_MAX)
 		{
