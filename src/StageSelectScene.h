@@ -10,6 +10,13 @@ class StageSelectScene : public BaseScene
 	//キャラクター選択中フラグ
 	bool charactersSelect;
 
+	// マルチシングル選択画面かフラグ
+	bool isSelectMultiSingle;
+
+	// マルチかシングルか
+	bool isMulti;
+	bool isSingle;
+
 public:
 	StageSelectScene();
 	void OnInitialize()override;
