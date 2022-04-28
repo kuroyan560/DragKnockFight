@@ -62,6 +62,7 @@ protected:
 	Vec2<float> swingTargetVec;		// 目標地点
 	float addSwingAngle;			// 振り回しで回転させる量 だんだん増える。
 	bool isSwingClockWise;			// この振り回しが時計回りかどうか true...時計回り...右回転  false...反時計回り...左回転
+	float addSwingRate;				// 振り回し速度に加算する量 近い時に回転が遅い問題を解決する。
 	const float ADD_SWING_ANGLE = 0.008f;
 	const float MAX_SWING_ANGLE = 0.13f;
 
@@ -184,6 +185,15 @@ public:
 	void FinishSwing();
 
 	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName; }
+	const Color& GetTeamColor()
+	{
+		static const Color TEAM_COLOR[TEAM_NUM] =
+		{
+			Color(47,255,139,255),
+			Color(239,1,144,255)
+		};
+		return TEAM_COLOR[team];
+	}
 
 	//ノックアウトされた側
 	virtual void OnKnockOut() = 0;

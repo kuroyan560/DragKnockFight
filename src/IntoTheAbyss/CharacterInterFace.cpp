@@ -16,7 +16,7 @@ void CharacterInterFace::SwingUpdate()
 	/*===== 振り回し中に呼ばれる処理 =====*/
 
 	// 角度に加算する量を更新。
-	addSwingAngle += ADD_SWING_ANGLE;
+	addSwingAngle += ADD_SWING_ANGLE * addSwingRate;
 
 	// 振り回しの経過時間を設定。
 	++swingTimer;
@@ -86,7 +86,7 @@ void CharacterInterFace::SwingUpdate()
 
 
 	// 紐つかみ状態を削除。 この新仕様の振り回しで行くとしたらこの変数はいらないので削除する。
-	isHold = false;
+	//isHold = false;
 
 }
 
@@ -176,7 +176,7 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 
 		targetAngle += pi45;
 
-		swingTargetVec = {cosf(targetAngle),sinf(targetAngle)};
+		//swingTargetVec = {cosf(targetAngle),sinf(targetAngle)};
 
 	}
 	else if (IsClockWise) {
@@ -189,10 +189,9 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 
 		targetAngle -= pi45;
 
-		swingTargetVec = {cosf(targetAngle),sinf(targetAngle)};
+		//swingTargetVec = {cosf(targetAngle),sinf(targetAngle)};
 
 	}
-	crossResult = nowSwingVec.Cross(swingTargetVec);
 
 	// 角度への加算量を初期化。
 	addSwingAngle = 0;
@@ -203,6 +202,25 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 	swingTimer = 0;
 
 	partner.lock()->stagingDevice.StartSpin(isSwingClockWise);
+
+	// 角度に加算する量の割合を決める。
+	float partnerDistance = (pos - partner.lock()->pos).Length();
+
+	const float MAX_LENGTH = 150.0f;
+
+	// 距離が規定値以上だったら1.0fを代入する。
+	if (MAX_LENGTH < partnerDistance) {
+
+		addSwingRate = 1.0f;
+
+	}
+	else {
+
+		// 割合を求める。
+		addSwingRate = (partnerDistance / MAX_LENGTH) * 2.0f + 1.0f;
+
+	}
+
 }
 
 void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine)
@@ -263,6 +281,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	CWSwingSegmentMgr.Setting(true, rbHandle, arrowHandle, lineHandle, RETICLE_GRAPH[team]);
 	CCWSwingSegmentMgr.Setting(false, lbHandle, arrowHandle, lineHandle, RETICLE_GRAPH[team]);
 	isInputSwingRB = false;
+
+	addSwingRate = 0;
 
 }
 
@@ -347,14 +367,14 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	stagingDevice.Update();
 
 	// 振り回し可視化用のクラスを更新。
-	if (nowSwing) {
+	/*if (nowSwing) {
 		CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), !isInputSwingRB, true, MapData);
 		CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), isInputSwingRB, true, MapData);
 	}
 	else {
 		CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), false, false, MapData);
 		CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), false, false, MapData);
-	}
+	}*/
 
 }
 
@@ -447,7 +467,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 	Vec2<float> moveDir = pos - prevPos;
 	float velOffset = 3.0f;
 	moveDir.Normalize();
-	INTERSECTED_LINE intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(pos, prevPos, moveDir * size, size, MapData, false);
+	INTERSECTED_LINE intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(pos, prevPos, moveDir * size, size, MapData, true);
 	isHitTop = intersectedLine == INTERSECTED_TOP;
 	isHitRight = intersectedLine == INTERSECTED_RIGHT;
 	isHitLeft = intersectedLine == INTERSECTED_LEFT;
@@ -455,7 +475,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 	// 左上
 	Vec2<float> velPosBuff = pos - size + Vec2<float>(velOffset, velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos - size + Vec2<float>(velOffset, velOffset), {}, {}, MapData, false);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos - size + Vec2<float>(velOffset, velOffset), {}, {}, MapData, true);
 	pos = velPosBuff + size - Vec2<float>(velOffset, velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
@@ -464,7 +484,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 	// 右上
 	velPosBuff = pos + Vec2<float>(size.x, -size.y) + Vec2<float>(-velOffset, velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(size.x, -size.y) + Vec2<float>(-velOffset, velOffset), {}, {}, MapData, false);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(size.x, -size.y) + Vec2<float>(-velOffset, velOffset), {}, {}, MapData, true);
 	pos = velPosBuff - Vec2<float>(size.x, -size.y) - Vec2<float>(-velOffset, velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
@@ -473,7 +493,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 	// 右下
 	velPosBuff = pos + size + Vec2<float>(-velOffset, -velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + size + Vec2<float>(-velOffset, -velOffset), {}, {}, MapData, false);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + size + Vec2<float>(-velOffset, -velOffset), {}, {}, MapData, true);
 	pos = velPosBuff - size - Vec2<float>(-velOffset, -velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
@@ -482,7 +502,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 	// 左下
 	velPosBuff = pos + Vec2<float>(-size.x, size.y) + Vec2<float>(velOffset, -velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(-size.x, size.y) + Vec2<float>(velOffset, -velOffset), {}, {}, MapData, false);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(-size.x, size.y) + Vec2<float>(velOffset, -velOffset), {}, {}, MapData, true);
 	pos = velPosBuff - Vec2<float>(-size.x, size.y) - Vec2<float>(velOffset, -velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;

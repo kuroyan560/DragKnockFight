@@ -69,6 +69,14 @@ public:
 
 	Vec2<float> swingVec;	// 振り回しベクトル 移動方向の逆方向に出る。
 
+	bool isPrevLeftBottom;
+	bool isInputRightStick;
+	bool isPrevInputRightStick;
+	Vec2<float> prevInputRightStick;
+
+	//ダッシュ時残像を出すための変数
+	int dashAftImgTimer;
+
 public:
 
 	/*-- 定数 --*/
@@ -169,6 +177,7 @@ private:
 	{
 		// 入力受付無効化タイマーをセッティングする。
 		inputInvalidTimerByCrash = INPUT_INVALID_TIMER;
+		anim.ChangeAnim(SWINGED);
 	}
 
 	bool drawCursorFlag;
