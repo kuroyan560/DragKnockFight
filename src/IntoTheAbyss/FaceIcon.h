@@ -15,6 +15,7 @@ class FaceIcon : public Singleton<FaceIcon>
 	{
 		std::vector<int>graph;
 		int interval;
+		bool mirrorX = false;
 	};
 
 	Anim animasions[PLAYABLE_CHARACTER_NUM][FACE_STATUS_NUM];
