@@ -16,7 +16,7 @@ void CharacterInterFace::SwingUpdate()
 	/*===== 振り回し中に呼ばれる処理 =====*/
 
 	// 角度に加算する量を更新。
-	addSwingAngle += ADD_SWING_ANGLE;
+	addSwingAngle += ADD_SWING_ANGLE * addSwingRate;
 
 	// 振り回しの経過時間を設定。
 	++swingTimer;
@@ -176,7 +176,7 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 
 		targetAngle += pi45;
 
-		swingTargetVec = {cosf(targetAngle),sinf(targetAngle)};
+		//swingTargetVec = {cosf(targetAngle),sinf(targetAngle)};
 
 	}
 	else if (IsClockWise) {
@@ -189,10 +189,9 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 
 		targetAngle -= pi45;
 
-		swingTargetVec = {cosf(targetAngle),sinf(targetAngle)};
+		//swingTargetVec = {cosf(targetAngle),sinf(targetAngle)};
 
 	}
-	crossResult = nowSwingVec.Cross(swingTargetVec);
 
 	// 角度への加算量を初期化。
 	addSwingAngle = 0;
@@ -203,6 +202,25 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 	swingTimer = 0;
 
 	partner.lock()->stagingDevice.StartSpin(isSwingClockWise);
+
+	// 角度に加算する量の割合を決める。
+	float partnerDistance = (pos - partner.lock()->pos).Length();
+
+	const float MAX_LENGTH = 150.0f;
+
+	// 距離が規定値以上だったら1.0fを代入する。
+	if (MAX_LENGTH < partnerDistance) {
+
+		addSwingRate = 1.0f;
+
+	}
+	else {
+
+		// 割合を求める。
+		addSwingRate = (partnerDistance / MAX_LENGTH) * 2.0f + 1.0f;
+
+	}
+
 }
 
 void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine)
@@ -263,6 +281,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	CWSwingSegmentMgr.Setting(true, rbHandle, arrowHandle, lineHandle, RETICLE_GRAPH[team]);
 	CCWSwingSegmentMgr.Setting(false, lbHandle, arrowHandle, lineHandle, RETICLE_GRAPH[team]);
 	isInputSwingRB = false;
+
+	addSwingRate = 0;
 
 }
 

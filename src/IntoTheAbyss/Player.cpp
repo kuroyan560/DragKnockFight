@@ -655,15 +655,20 @@ void Player::Input(const vector<vector<int>>& MapData)
 	inputLeftVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
 	inputLeftVec /= {32768.0f, 32768.0f};
 	inputRate = inputLeftVec.Length();
-	if (isInputLB && 0.5f <= inputRate && !isGripPowerEmpty) {
+	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && !isGripPowerEmpty) {
 
 		// inputVec = ひだりスティックの入力方向
-		const float DASH_SPEED = 10.0f;
+		const float DASH_SPEED = 30.0f;
 		vel += inputLeftVec * DASH_SPEED;
 
 		// スタミナを消費
-		const int DASH_GRIP_POWER = 10;
+		const int DASH_GRIP_POWER = 20;
 		gripPowerTimer -= DASH_GRIP_POWER;
+
+		//煙
+		ParticleMgr::Instance()->Generate(pos, -inputLeftVec, BULLET);
+		//残像
+		dashAftImgTimer = 10;
 
 	}
 
@@ -706,11 +711,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		prevInputRightStick = buff;
 
-		//煙
-		ParticleMgr::Instance()->Generate(pos, -inputLeftVec, BULLET);
-		//残像
-		dashAftImgTimer = 10;
 	}
+
+	// 左ショルダーの入力情報を保存。
+	isPrevLeftBottom = isInputLB;
 
 }
 

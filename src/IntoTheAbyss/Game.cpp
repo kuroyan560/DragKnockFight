@@ -875,6 +875,8 @@ void Game::Scramble()
 	// どちらかが踏ん張っているか。
 	bool isHoldNow = CharacterManager::Instance()->Left()->isHold || CharacterManager::Instance()->Right()->isHold;
 
+	// どちらかが振り回しているか。
+	bool isSwingNow = CharacterManager::Instance()->Left()->GetNowSwing() || CharacterManager::Instance()->Right()->GetNowSwing();
 
 	// どちらかが踏ん張っていたら。
 	if (isHoldNow) {
@@ -1047,7 +1049,7 @@ void Game::Scramble()
 	// 引っかかり判定じゃなかったらだんだん短くする。
 	Vec2<float> movedVel = (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Right()->prevPos);
 	// 右側の紐の処理
-	if (!isCatchMapChipBoss && 0 < CharacterManager::Instance()->Right()->addLineLength && movedVel.Length() <= 0.0f) {
+	if (!isCatchMapChipBoss && 0 < CharacterManager::Instance()->Right()->addLineLength && movedVel.Length() <= 0.5f && !isSwingNow) {
 
 		CharacterManager::Instance()->Right()->addLineLength -= 5.0f;
 
@@ -1090,7 +1092,7 @@ void Game::Scramble()
 
 	movedVel = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos);
 	// 左側の紐の処理
-	if (!isCatchMapChipPlayer && 0 < CharacterManager::Instance()->Left()->addLineLength && movedVel.Length() <= 0.0f) {
+	if (!isCatchMapChipPlayer && 0 < CharacterManager::Instance()->Left()->addLineLength && movedVel.Length() <= 0.5f && !isSwingNow) {
 
 		CharacterManager::Instance()->Left()->addLineLength -= 5.0f;
 
