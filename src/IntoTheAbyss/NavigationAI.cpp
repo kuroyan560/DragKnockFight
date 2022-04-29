@@ -157,18 +157,6 @@ void NavigationAI::Update(const Vec2<float> &POS)
 	{
 		AStart(startPoint, endPoint);
 	}
-
-
-
-	//優先度付きキュー
-	std::priority_queue<std::tuple<int, int, float>> hoge;
-	std::tuple<int, int, float> data1(0, 0, 10.0f);
-	std::tuple<int, int, float> data2(0, 1, 10.0f);
-	std::tuple<int, int, float> data3(1, 1, 10.0f);
-	hoge.push(data1);
-	hoge.push(data2);
-	hoge.push(data3);
-	std::tuple<int, int, float> data = hoge.top();
 }
 
 void NavigationAI::Draw()
@@ -189,6 +177,23 @@ void NavigationAI::Draw()
 					bool isCheckingFlag = false;
 					Color color = debugColor[y][x];
 
+					//その場所がマウスカーソルと合ったら確認中の場所だと認識する
+					isCheckingFlag = checkingHandle.x == wayPoints[y][x].handle.x && checkingHandle.y == wayPoints[y][x].handle.y;
+					if (isCheckingFlag)
+					{
+						color = Color(255, 0, 0, 255);
+					}
+
+					//最短ルートの描画
+					for (int i = 0; i < queue.size(); ++i)
+					{
+						if (queue[i].handle == wayPoints[y][x].handle)
+						{
+							color = Color(255, 0, 255, 255);
+							break;
+						}
+					}
+
 					//その場所がスタート地点なら色を変える
 					isCheckingFlag = startPoint.handle.x == wayPoints[y][x].handle.x && startPoint.handle.y == wayPoints[y][x].handle.y;
 					if (isCheckingFlag)
@@ -201,13 +206,6 @@ void NavigationAI::Draw()
 					if (isCheckingFlag)
 					{
 						color = Color(0, 255, 255, 255);
-					}
-
-					//その場所がマウスカーソルと合ったら確認中の場所だと認識する
-					isCheckingFlag = checkingHandle.x == wayPoints[y][x].handle.x && checkingHandle.y == wayPoints[y][x].handle.y;
-					if (isCheckingFlag)
-					{
-						color = Color(255, 0, 0, 255);
 					}
 
 					//ウェイポイントの描画
@@ -421,6 +419,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 			break;
 		}
 	}
+
 
 	queue = SortQueue(queue);
 
