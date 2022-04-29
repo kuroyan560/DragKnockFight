@@ -259,6 +259,8 @@ private:
 	inline bool CheckQueue(const Vec2<int> &HANDLE);
 
 
+	std::vector<QueueData> SortQueue(const std::vector<QueueData> &QUEUE);
+
 	WayPointData startPoint, endPoint;
 	WayPointData oldStartPoint, oldEndPoint;
 

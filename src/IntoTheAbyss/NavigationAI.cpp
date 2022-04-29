@@ -283,6 +283,20 @@ void NavigationAI::ImGuiDraw()
 	}
 	ImGui::End();
 
+
+	ImGui::Begin("Queue");
+	for (int i = 0; i < queue.size(); ++i)
+	{
+		Vec2<int>handle = queue[i].handle;
+		std::string name = "Handle:" + std::to_string(i) + ",X:" +
+			std::to_string(handle.x) + ",Y:" +
+			std::to_string(handle.y) + ",Distance+Pass:" + std::to_string(queue[i].sum);
+		ImGui::Text(name.c_str());
+	}
+	ImGui::End();
+
+
+
 	if (checkingHandle.x != -1 && checkingHandle.y != -1)
 	{
 		Vec2<int>handle = checkingHandle;
@@ -298,6 +312,7 @@ void NavigationAI::ImGuiDraw()
 				std::to_string(wayPoints[handle.y][handle.x].wayPointHandles[i].y);
 			ImGui::Text(name.c_str());
 		}
+		ImGui::Text("PassNum:%d", wayPoints[handle.y][handle.x].passNum);
 		ImGui::End();
 	}
 }
@@ -389,9 +404,13 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 					searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
 
 					//キューにはハンドルとヒューリスティック推定値+パス数の合計値をスタックする
-					queue.push_back(QueueData(handle, nextHeuristicValue));
+					queue.push_back(QueueData(handle, nextHeuristicValue + static_cast<float>(startPoint[startPointIndex].passNum)));
 					//次に探索する地点を記録する
 					nextPoint.push_back(wayPoints[handle.y][handle.x]);
+
+					//パス数の記録
+					wayPoints[handle.y][handle.x].passNum = startPoint[startPointIndex].passNum;
+					++wayPoints[handle.y][handle.x].passNum;
 				}
 			}
 		}
@@ -402,6 +421,9 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 			break;
 		}
 	}
+
+	queue = SortQueue(queue);
+
 }
 
 inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
@@ -414,6 +436,32 @@ inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
 		}
 	}
 	return false;
+}
+
+std::vector<NavigationAI::QueueData> NavigationAI::SortQueue(const std::vector<QueueData> &QUEUE)
+{
+	std::vector<float>sumArray;
+	for (int i = 0; i < QUEUE.size(); ++i)
+	{
+		sumArray.push_back(QUEUE[i].sum);
+	}
+
+	std::sort(sumArray.begin(), sumArray.end());
+
+	std::vector<QueueData> result;
+	for (int sumIndex = 0; sumIndex < sumArray.size(); ++sumIndex)
+	{
+		for (int queueIndex = 0; queueIndex < QUEUE.size(); ++queueIndex)
+		{
+			//ソート順に並べる
+			if (QUEUE[queueIndex].sum == sumArray[sumIndex])
+			{
+				result.push_back(QUEUE[queueIndex]);
+			}
+		}
+	}
+
+	return result;
 }
 
 inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, WayPointData *DATA)
