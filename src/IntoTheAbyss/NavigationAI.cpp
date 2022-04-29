@@ -402,13 +402,9 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 					searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
 
 					//キューにはハンドルとヒューリスティック推定値+パス数の合計値をスタックする
-					queue.push_back(QueueData(handle, nextHeuristicValue + static_cast<float>(startPoint[startPointIndex].passNum)));
+					queue.push_back(QueueData(handle, nextHeuristicValue));
 					//次に探索する地点を記録する
 					nextPoint.push_back(wayPoints[handle.y][handle.x]);
-
-					//パス数の記録
-					wayPoints[handle.y][handle.x].passNum = startPoint[startPointIndex].passNum;
-					++wayPoints[handle.y][handle.x].passNum;
 				}
 			}
 		}
