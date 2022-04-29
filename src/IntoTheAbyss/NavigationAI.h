@@ -65,12 +65,11 @@ private:
 	static const int WAYPOINT_MAX_Y = 10;	 //Y軸のウェイポイントの数
 	static const float SERACH_RADIUS;//ウェイポイント同士のリンク付けする範囲
 
+	static const float WAYPOINT_RADIUS;//ウェイポイントのデバック描画の大きさ
+
 	static const int MAP_CHIP_SIZE = 50;
 	static const int MAP_CHIP_HALF_SIZE = MAP_CHIP_SIZE / 2;
 
-	bool serachFlag;
-	bool lineFlag;
-	bool wayPointFlag;
 
 
 	std::array<std::array<WayPointData, WAYPOINT_MAX_Y>, WAYPOINT_MAX_X> wayPoints;//ウェイポイントの配列
@@ -233,7 +232,57 @@ private:
 	}
 
 
-	Vec2<int> checkingHandle;
-	int checkTimer;
+	//A*-------------------------------
+	/// <summary>
+	/// 探索する際にキューに詰め込むべき情報
+	/// </summary>
+	struct QueueData
+	{
+		Vec2<int>handle;
+		float sum;
+		QueueData(const Vec2<int> &HANDLE, float SUM) :handle(HANDLE), sum(SUM)
+		{
+		};
+	};
+	std::vector<QueueData>queue;	//探索用のキュー
+
+	/// <summary>
+	/// Aスターによる探索を行う関数
+	/// </summary>
+	/// <param name="START_POINT">スタート地点</param>
+	/// <param name="END_POINT">ゴール地点</param>
+	void AStart(const WayPointData &START_POINT, const WayPointData &END_POINT);
+
+	/// <summary>
+	/// 同じハンドルがスタックされているかどうか
+	/// </summary>
+	inline bool CheckQueue(const Vec2<int> &HANDLE);
+
+
+	WayPointData startPoint, endPoint;
+	WayPointData oldStartPoint, oldEndPoint;
+
+
+	//デバック--------------------------
+
+	Vec2<int> checkingHandle;	//マウスカーソルで参照しているウェイポイント
+	int checkTimer;				//ウェイポイントを参照している時間
+
+	bool serachFlag;
+	bool lineFlag;
+	bool wayPointFlag;
+
+	std::array<std::array<Color, WAYPOINT_MAX_Y>, WAYPOINT_MAX_X> debugColor;
+
+	struct SearchMapData
+	{
+		Vec2<int>handle;
+		Color color;
+		SearchMapData(const Vec2<int> &HANDLE, const Color &COLOR) :handle(HANDLE), color(COLOR)
+		{
+		}
+	};
+	std::vector<std::vector<SearchMapData>>searchMap;
+	int layerNum;
 };
 

@@ -2,8 +2,10 @@
 #include"../Engine/DrawFunc.h"
 #include"ScrollMgr.h"
 #include"../Engine/UsersInput.h"
+#include"../IntoTheAbyss/DebugKeyManager.h"
 
-const float NavigationAI::SERACH_RADIUS = 200.0f;
+const float NavigationAI::SERACH_RADIUS = 180.0f;
+const float NavigationAI::WAYPOINT_RADIUS = 20.0f;
 
 void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 {
@@ -17,19 +19,14 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 	{
 		for (int x = 0; x < WAYPOINT_MAX_X; ++x)
 		{
+			debugColor[y][x] = Color(255, 255, 255, 255);
+
 			//一度ワールド座標に変換してからマップチップ座標に変換する
 			const Vec2<float> worldPos(xNum * x, yNum * y);
 			const Vec2<int> mapChipPos(GetMapChipNum(worldPos / MAP_CHIP_SIZE));
 			if (MAP_DATA[0].size() <= mapChipPos.x || MAP_DATA.size() <= mapChipPos.y)
 			{
 				continue;
-			}
-
-			float radisu = 3.0f;
-			//32が真ん中
-			if (mapChipPos.y == 25 && mapChipPos.x == 32)
-			{
-				radisu = 10.0f;
 			}
 
 
@@ -50,7 +47,7 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 			{
 				//等間隔で開ける
 				wayPoints[y][x].pos = worldPos;
-				wayPoints[y][x].radius = radisu;
+				wayPoints[y][x].radius = WAYPOINT_RADIUS;
 				wayPoints[y][x].handle = { x,y };
 			}
 		}
@@ -101,13 +98,25 @@ void NavigationAI::Update(const Vec2<float> &POS)
 				data1.center = &ScrollMgr::Instance()->Affect(wayPoints[y][x].pos);
 				data1.radius = wayPoints[y][x].radius;
 				data2.center = &pos;
-				data2.radius = 10.0f;
+				data2.radius = WAYPOINT_RADIUS;
 
-				if (BulletCollision::Instance()->CheckSphereAndSphere(data1, data2))
+				bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(data1, data2);
+
+				//マウスカーソルと合ったらウェイポイントの情報を参照する
+				if (hitFlag)
 				{
 					checkingHandle = wayPoints[y][x].handle;
 					checkTimer = 0;
-					break;
+				}
+				//右クリックしたらスタート地点に設定する
+				if (hitFlag && DebugKeyManager::Instance()->DebugKeyTrigger(DIK_H, "SetStart", "DIK_H"))
+				{
+					startPoint = wayPoints[y][x];
+				}
+				//左クリックしたらゴール地点に設定する
+				if (hitFlag && DebugKeyManager::Instance()->DebugKeyTrigger(DIK_N, "SetGoal", "DIK_N"))
+				{
+					endPoint = wayPoints[y][x];
 				}
 			}
 		}
@@ -118,12 +127,46 @@ void NavigationAI::Update(const Vec2<float> &POS)
 	{
 		checkingHandle = { -1,-1 };
 	}
+
+	//スタート地点かゴール地点を変える際は白統一する
+	if (startPoint.handle != oldStartPoint.handle || endPoint.handle != oldEndPoint.handle)
+	{
+		for (int y = 0; y < wayPoints.size(); ++y)
+		{
+			for (int x = 0; x < wayPoints[y].size(); ++x)
+			{
+				debugColor[y][x] = Color(255, 255, 255, 255);
+			}
+		}
+	}
+
+	//段階に分けて探索する色を出す
+	if (searchMap.size() <= layerNum)
+	{
+		layerNum = searchMap.size() - 1;
+	}
+	for (int layer = 0; layer < layerNum; ++layer)
+	{
+		for (int num = 0; num < searchMap[layer].size(); ++num)
+		{
+			Vec2<int>handle = searchMap[layer][num].handle;
+			debugColor[handle.y][handle.x] = searchMap[layer][num].color;
+		}
+	}
+
+	//スタートとゴールを設定したらAスターの探索を開始する
+	if (startPoint.handle.x != -1 && startPoint.handle.y != -1 &&
+		endPoint.handle.x != -1 && endPoint.handle.y != -1)
+	{
+		AStart(startPoint, endPoint);
+	}
 }
 
 void NavigationAI::Draw()
 {
 	//デバックの時のみ表示
 #ifdef  _DEBUG
+
 	//ウェイポイントの描画
 	for (int y = 0; y < wayPoints.size(); ++y)
 	{
@@ -133,14 +176,30 @@ void NavigationAI::Draw()
 			{
 				if (wayPointFlag)
 				{
-					//その場所がマウスカーソルと合ったら確認中の場所だと認識する--------------
-					bool isCheckingFlag = checkingHandle.x == wayPoints[y][x].handle.x && checkingHandle.y == wayPoints[y][x].handle.y;
-					Color color(255, 255, 255, 255);
+
+					bool isCheckingFlag = false;
+					Color color = debugColor[y][x];
+
+					//その場所がスタート地点なら色を変える
+					isCheckingFlag = startPoint.handle.x == wayPoints[y][x].handle.x && startPoint.handle.y == wayPoints[y][x].handle.y;
+					if (isCheckingFlag)
+					{
+						color = Color(255, 255, 0, 255);
+					}
+
+					//その場所がゴール地点なら色を変える
+					isCheckingFlag = endPoint.handle.x == wayPoints[y][x].handle.x && endPoint.handle.y == wayPoints[y][x].handle.y;
+					if (isCheckingFlag)
+					{
+						color = Color(0, 255, 255, 255);
+					}
+
+					//その場所がマウスカーソルと合ったら確認中の場所だと認識する
+					isCheckingFlag = checkingHandle.x == wayPoints[y][x].handle.x && checkingHandle.y == wayPoints[y][x].handle.y;
 					if (isCheckingFlag)
 					{
 						color = Color(255, 0, 0, 255);
 					}
-					//その場所がマウスカーソルと合ったら確認中の場所だと認識する--------------
 
 					//ウェイポイントの描画
 					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), wayPoints[y][x].radius, color);
@@ -180,7 +239,10 @@ void NavigationAI::Draw()
 	}
 
 	//マウスカーソル
-	DrawFunc::DrawCircle2D(UsersInput::Instance()->GetMousePos(), 10.0f, Color(0, 0, 255, 255));
+	DrawFunc::DrawCircle2D(UsersInput::Instance()->GetMousePos(), WAYPOINT_RADIUS, Color(0, 0, 255, 255));
+
+
+
 #endif
 }
 
@@ -190,6 +252,10 @@ void NavigationAI::ImGuiDraw()
 	ImGui::Checkbox("SearchCircle", &serachFlag);
 	ImGui::Checkbox("WayPoint", &wayPointFlag);
 	ImGui::Checkbox("MoveLine", &lineFlag);
+	ImGui::InputInt("LayerNumber", &layerNum);
+	ImGui::Text("A*Data");
+	ImGui::Text("StartHandle,X:%d,Y:%d", startPoint.handle.x, startPoint.handle.y);
+	ImGui::Text("EndHandle,X:%d,Y:%d", endPoint.handle.x, endPoint.handle.y);
 	ImGui::End();
 
 	if (checkingHandle.x != -1 && checkingHandle.y != -1)
@@ -247,6 +313,80 @@ inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS
 inline bool NavigationAI::DontUse(const WayPointData &DATA)
 {
 	return DATA.handle.x != -1 && DATA.handle.y != -1;
+}
+
+void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &END_POINT)
+{
+	std::vector<WayPointData>startPoint;//ウェイポイントの探索開始位置
+	std::vector<WayPointData>nextPoint; //次のウェイポイントの探索開始位置
+	nextPoint.push_back(START_POINT);
+	searchMap.clear();
+	queue.clear();
+
+	//次に向かうべき場所を探索する
+	while (1)
+	{
+		//次に探索するウェイポイントのデータをスタート地点とする
+		startPoint = nextPoint;
+		//次のウェイポイントの情報を蓄える為に空きを用意する
+		nextPoint.clear();
+
+		bool goalFlag = false;
+
+		//現在追跡中のルート分探索
+		for (int startPointIndex = 0; startPointIndex < startPoint.size(); ++startPointIndex)
+		{
+			searchMap.push_back({});
+			for (int i = 0; i < startPoint[startPointIndex].wayPointHandles.size(); ++i)
+			{
+				//参照するウェイポイントの指定
+				Vec2<int>handle(startPoint[startPointIndex].wayPointHandles[i]);
+				//ヒューリスティック推定値から探索するべきかどうか判断する
+				float nowHeuristicValue = startPoint[startPointIndex].pos.Distance(END_POINT.pos);						//現在地からのゴールまでのヒューリスティック推定値
+				float nextHeuristicValue = wayPoints[handle.y][handle.x].pos.Distance(END_POINT.pos);	//参照しているウェイポイントからゴールまでのヒューリスティック推定値
+
+				//debugColor[handle.y][handle.x]
+				int layerArrayNum = searchMap.size() - 1;
+				int nowHandleArrayNum = searchMap[layerArrayNum].size();
+				searchMap[layerArrayNum].push_back(SearchMapData(handle, Color(0, 255, 0, 255)));
+
+				//ヒューリスティックが0ならゴールにたどり着いた事になるので探索しない
+				if (nowHeuristicValue <= 0.0f)
+				{
+					continue;
+				}
+				//現在地よりヒューリスティック推定値が小さい&&キューにスタックしてないならスタックする
+				if (nextHeuristicValue <= nowHeuristicValue && !CheckQueue(handle))
+				{
+					//debugColor[handle.y][handle.x] = Color(223, 144, 53, 255);
+					searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
+					
+					//キューにはハンドルとヒューリスティック推定値+パス数の合計値をスタックする
+					queue.push_back(QueueData(handle, nextHeuristicValue));
+					//次に探索する地点を記録する
+					nextPoint.push_back(wayPoints[handle.y][handle.x]);
+				}
+			}
+		}
+
+		//次に探索できる場所が無ければ探索終了
+		if (nextPoint.size() == 0)
+		{
+			break;
+		}
+	}
+}
+
+inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
+{
+	for (int i = 0; i < queue.size(); ++i)
+	{
+		if (queue[i].handle == HANDLE)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, WayPointData *DATA)
