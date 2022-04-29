@@ -232,5 +232,8 @@ private:
 		return 0 < shortestPoints.size();
 	}
 
+
+	Vec2<int> checkingHandle;
+	int checkTimer;
 };
 

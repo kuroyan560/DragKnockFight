@@ -1,6 +1,7 @@
 #include "NavigationAI.h"
 #include"../Engine/DrawFunc.h"
 #include"ScrollMgr.h"
+#include"../Engine/UsersInput.h"
 
 const float NavigationAI::SERACH_RADIUS = 200.0f;
 
@@ -75,11 +76,48 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 
 	//ゴール地点への探索--------------------------
 	//ゴール地点への探索--------------------------
+
+	wayPointFlag = true;
+	serachFlag = true;
+	lineFlag = true;
+
+	checkingHandle = { -1,-1 };
+	checkTimer = 0;
 }
 
 void NavigationAI::Update(const Vec2<float> &POS)
 {
+	Vec2<float>pos = UsersInput::Instance()->GetMousePos();
 
+	for (int y = 0; y < wayPoints.size(); ++y)
+	{
+		for (int x = 0; x < wayPoints[y].size(); ++x)
+		{
+			if (DontUse(wayPoints[y][x]))
+			{
+				SphereCollision data1, data2;
+
+				//スクリーン座標と判定を取る為にスクリーン座標に変換する
+				data1.center = &ScrollMgr::Instance()->Affect(wayPoints[y][x].pos);
+				data1.radius = wayPoints[y][x].radius;
+				data2.center = &pos;
+				data2.radius = 10.0f;
+
+				if (BulletCollision::Instance()->CheckSphereAndSphere(data1, data2))
+				{
+					checkingHandle = wayPoints[y][x].handle;
+					checkTimer = 0;
+					break;
+				}
+			}
+		}
+	}
+
+	++checkTimer;
+	if (60 * 5 <= checkTimer)
+	{
+		checkingHandle = { -1,-1 };
+	}
 }
 
 void NavigationAI::Draw()
@@ -95,8 +133,19 @@ void NavigationAI::Draw()
 			{
 				if (wayPointFlag)
 				{
-					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), wayPoints[y][x].radius, Color(255, 255, 255, 255));
+					//その場所がマウスカーソルと合ったら確認中の場所だと認識する--------------
+					bool isCheckingFlag = checkingHandle.x == wayPoints[y][x].handle.x && checkingHandle.y == wayPoints[y][x].handle.y;
+					Color color(255, 255, 255, 255);
+					if (isCheckingFlag)
+					{
+						color = Color(255, 0, 0, 255);
+					}
+					//その場所がマウスカーソルと合ったら確認中の場所だと認識する--------------
+
+					//ウェイポイントの描画
+					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), wayPoints[y][x].radius, color);
 				}
+				//探索範囲の描画
 				if (serachFlag)
 				{
 					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), SERACH_RADIUS, Color(255, 255, 255, 255));
@@ -129,6 +178,9 @@ void NavigationAI::Draw()
 			}
 		}
 	}
+
+	//マウスカーソル
+	DrawFunc::DrawCircle2D(UsersInput::Instance()->GetMousePos(), 10.0f, Color(0, 0, 255, 255));
 #endif
 }
 
@@ -139,6 +191,24 @@ void NavigationAI::ImGuiDraw()
 	ImGui::Checkbox("WayPoint", &wayPointFlag);
 	ImGui::Checkbox("MoveLine", &lineFlag);
 	ImGui::End();
+
+	if (checkingHandle.x != -1 && checkingHandle.y != -1)
+	{
+		Vec2<int>handle = checkingHandle;
+		ImGui::Begin("WayPointData");
+		ImGui::Text("Handle:X%d,Y:%d", wayPoints[handle.y][handle.x].handle.x, wayPoints[handle.y][handle.x].handle.y);
+		ImGui::Text("Pos:X%f,Y:%f", wayPoints[handle.y][handle.x].pos.x, wayPoints[handle.y][handle.x].pos.y);
+		ImGui::Text("Radius:%f", wayPoints[handle.y][handle.x].radius);
+		ImGui::Text("RelateHandles");
+		for (int i = 0; i < wayPoints[handle.y][handle.x].wayPointHandles.size(); ++i)
+		{
+			std::string name = "Handle:" + std::to_string(i) + ",X:" +
+				std::to_string(wayPoints[handle.y][handle.x].wayPointHandles[i].x) + ",Y:" +
+				std::to_string(wayPoints[handle.y][handle.x].wayPointHandles[i].y);
+			ImGui::Text(name.c_str());
+		}
+		ImGui::End();
+	}
 }
 
 inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS)

@@ -115,9 +115,10 @@ class Game
 
 	Vec2<float>responeScrollPos;
 
+
+public:
 	//テスト用
 	NavigationAI navi;
-public:
 
 	HomeBase playerHomeBase, enemyHomeBase;
 
