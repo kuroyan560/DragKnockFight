@@ -256,6 +256,18 @@ void NavigationAI::ImGuiDraw()
 	ImGui::Text("A*Data");
 	ImGui::Text("StartHandle,X:%d,Y:%d", startPoint.handle.x, startPoint.handle.y);
 	ImGui::Text("EndHandle,X:%d,Y:%d", endPoint.handle.x, endPoint.handle.y);
+	ImGui::Text("SearchHandle");
+	if (0 <= layerNum && searchMap[layerNum].size() != 0)
+	{
+		for (int i = 0; i < searchMap[layerNum].size(); ++i)
+		{
+			Vec2<int>handle = searchMap[layerNum][i].handle;
+			std::string name = "Handle:" + std::to_string(i) + ",X:" +
+				std::to_string(handle.x) + ",Y:" +
+				std::to_string(handle.y);
+			ImGui::Text(name.c_str());
+		}
+	}
 	ImGui::End();
 
 	if (checkingHandle.x != -1 && checkingHandle.y != -1)
@@ -333,10 +345,10 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 
 		bool goalFlag = false;
 
+		searchMap.push_back({});
 		//現在追跡中のルート分探索
 		for (int startPointIndex = 0; startPointIndex < startPoint.size(); ++startPointIndex)
 		{
-			searchMap.push_back({});
 			for (int i = 0; i < startPoint[startPointIndex].wayPointHandles.size(); ++i)
 			{
 				//参照するウェイポイントの指定
@@ -345,20 +357,23 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 				float nowHeuristicValue = startPoint[startPointIndex].pos.Distance(END_POINT.pos);						//現在地からのゴールまでのヒューリスティック推定値
 				float nextHeuristicValue = wayPoints[handle.y][handle.x].pos.Distance(END_POINT.pos);	//参照しているウェイポイントからゴールまでのヒューリスティック推定値
 
-				//debugColor[handle.y][handle.x]
-				int layerArrayNum = searchMap.size() - 1;
-				int nowHandleArrayNum = searchMap[layerArrayNum].size();
-				searchMap[layerArrayNum].push_back(SearchMapData(handle, Color(0, 255, 0, 255)));
 
 				//ヒューリスティックが0ならゴールにたどり着いた事になるので探索しない
 				if (nowHeuristicValue <= 0.0f)
 				{
 					continue;
 				}
+
+				int layerArrayNum = searchMap.size() - 1;
+				int nowHandleArrayNum = searchMap[layerArrayNum].size();
+				//探索していなかったらデバック情報を追加する
+				if (!CheckQueue(handle))
+				{
+					searchMap[layerArrayNum].push_back(SearchMapData(handle, Color(0, 255, 0, 255)));
+				}
 				//現在地よりヒューリスティック推定値が小さい&&キューにスタックしてないならスタックする
 				if (nextHeuristicValue <= nowHeuristicValue && !CheckQueue(handle))
 				{
-					//debugColor[handle.y][handle.x] = Color(223, 144, 53, 255);
 					searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
 					
 					//キューにはハンドルとヒューリスティック推定値+パス数の合計値をスタックする
