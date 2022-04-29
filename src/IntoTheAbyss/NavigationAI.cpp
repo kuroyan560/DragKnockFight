@@ -448,18 +448,40 @@ std::vector<NavigationAI::QueueData> NavigationAI::SortQueue(const std::vector<Q
 
 	std::sort(sumArray.begin(), sumArray.end());
 
+	int resultHandle = 0;
 	std::vector<QueueData> result;
+	//ソート順に並べる&&前のウェイポイントと繋がっている箇所を繋げていく
 	for (int sumIndex = 0; sumIndex < sumArray.size(); ++sumIndex)
 	{
 		for (int queueIndex = 0; queueIndex < QUEUE.size(); ++queueIndex)
 		{
-			//ソート順に並べる
-			if (QUEUE[queueIndex].sum == sumArray[sumIndex])
+			//ソート順に並べる合図
+			bool sameSumFlag = QUEUE[queueIndex].sum == sumArray[sumIndex];
+			if (sameSumFlag)
 			{
-				result.push_back(QUEUE[queueIndex]);
+				//前のウェイポイントと繋がっているかどうか
+				if (result.size() != 0)
+				{
+					Vec2<int>handle(QUEUE[queueIndex].handle);
+					for (int linkHandle = 0; linkHandle < wayPoints[handle.y][handle.x].wayPointHandles.size(); ++linkHandle)
+					{
+						if (wayPoints[handle.y][handle.x].wayPointHandles[linkHandle] == result[resultHandle].handle)
+						{
+							result.push_back(QUEUE[queueIndex]);
+							++resultHandle;
+						}
+					}
+				}
+				else
+				{
+					result.push_back(QUEUE[queueIndex]);
+				}
 			}
 		}
 	}
+
+	QueueData startPoint(startPoint.handle, 0.0f);
+	result.push_back(startPoint);
 
 	return result;
 }
