@@ -17,10 +17,10 @@ struct WayPointData
 	Vec2<int> handle;						//ハンドル
 	Vec2<float> pos;						//座標
 	float radius;							//大きさ
-	std::vector<Vec2<int>> wayPointHandles;		//どの方向に行けるかハンドル取ったもの
-	std::array<int, GOAL_MAX_NUM> passNum;	//目標地点までのパス数
+	std::vector<Vec2<int>> wayPointHandles;	//どの方向に行けるかハンドル取ったもの
+	int passNum;							//目標地点までのパス数
 
-	WayPointData() :handle(Vec2<int>(-1, -1))
+	WayPointData() :handle(Vec2<int>(-1, -1)), passNum(0)
 	{
 	}
 

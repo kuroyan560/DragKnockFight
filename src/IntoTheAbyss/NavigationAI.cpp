@@ -370,7 +370,6 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 				float nowHeuristicValue = startPoint[startPointIndex].pos.Distance(END_POINT.pos);						//現在地からのゴールまでのヒューリスティック推定値
 				float nextHeuristicValue = wayPoints[handle.y][handle.x].pos.Distance(END_POINT.pos);	//参照しているウェイポイントからゴールまでのヒューリスティック推定値
 
-
 				//ヒューリスティックが0ならゴールにたどり着いた事になるので探索しない
 				if (nowHeuristicValue <= 0.0f)
 				{
