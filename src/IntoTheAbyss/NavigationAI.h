@@ -28,14 +28,14 @@ struct WayPointData
 	{
 		for (int i = 0; i < wayPointHandles.size(); ++i)
 		{
-			bool sameFlag = wayPointHandles[i].x == HANDLE.x && wayPointHandles[i].x == HANDLE.y;
+			bool sameFlag = wayPointHandles[i] == HANDLE;
 			if (sameFlag)
 			{
 				return;
 			}
 		}
 
-		bool mineFlag = handle.x == HANDLE.x && handle.y == HANDLE.y;
+		bool mineFlag = handle == HANDLE;
 		if (mineFlag)
 		{
 			return;

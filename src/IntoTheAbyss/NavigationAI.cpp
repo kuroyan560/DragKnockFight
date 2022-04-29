@@ -3,6 +3,7 @@
 #include"ScrollMgr.h"
 #include"../Engine/UsersInput.h"
 #include"../IntoTheAbyss/DebugKeyManager.h"
+#include<queue>
 
 const float NavigationAI::SERACH_RADIUS = 180.0f;
 const float NavigationAI::WAYPOINT_RADIUS = 20.0f;
@@ -141,10 +142,6 @@ void NavigationAI::Update(const Vec2<float> &POS)
 	}
 
 	//段階に分けて探索する色を出す
-	if (searchMap.size() <= layerNum)
-	{
-		layerNum = searchMap.size() - 1;
-	}
 	for (int layer = 0; layer < layerNum; ++layer)
 	{
 		for (int num = 0; num < searchMap[layer].size(); ++num)
@@ -160,6 +157,18 @@ void NavigationAI::Update(const Vec2<float> &POS)
 	{
 		AStart(startPoint, endPoint);
 	}
+
+
+
+	//優先度付きキュー
+	std::priority_queue<std::tuple<int, int, float>> hoge;
+	std::tuple<int, int, float> data1(0, 0, 10.0f);
+	std::tuple<int, int, float> data2(0, 1, 10.0f);
+	std::tuple<int, int, float> data3(1, 1, 10.0f);
+	hoge.push(data1);
+	hoge.push(data2);
+	hoge.push(data3);
+	std::tuple<int, int, float> data = hoge.top();
 }
 
 void NavigationAI::Draw()
@@ -257,6 +266,10 @@ void NavigationAI::ImGuiDraw()
 	ImGui::Text("StartHandle,X:%d,Y:%d", startPoint.handle.x, startPoint.handle.y);
 	ImGui::Text("EndHandle,X:%d,Y:%d", endPoint.handle.x, endPoint.handle.y);
 	ImGui::Text("SearchHandle");
+	if (searchMap.size() <= layerNum)
+	{
+		layerNum = searchMap.size() - 1;
+	}
 	if (0 <= layerNum && searchMap[layerNum].size() != 0)
 	{
 		for (int i = 0; i < searchMap[layerNum].size(); ++i)
@@ -375,7 +388,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 				if (nextHeuristicValue <= nowHeuristicValue && !CheckQueue(handle))
 				{
 					searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
-					
+
 					//キューにはハンドルとヒューリスティック推定値+パス数の合計値をスタックする
 					queue.push_back(QueueData(handle, nextHeuristicValue));
 					//次に探索する地点を記録する
@@ -429,7 +442,7 @@ inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, WayPointDa
 				//探索範囲内&&直接行ける場所なら線を繋げる
 				if (serachFlag && canMoveFlag)
 				{
-					wayPoints[y][x].RegistHandle({ x,y });
+					wayPoints[y][x].RegistHandle(DATA->handle);
 					DATA->RegistHandle({ x,y });
 				}
 			}
