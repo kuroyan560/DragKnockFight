@@ -346,74 +346,6 @@ void Player::OnDrawUI()
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)
 {
-	//if (Dir == TOP)
-	//{
-	//	// Y方向の移動量を減らす。
-	//	vel.y /= 2.0f;
-	//}
-	//else if (Dir == BOTTOM)
-	//{
-	//	stretch_RB.y = 0.0f;
-
-	//	// 接地フラグを立てる。
-	//	//onGround = true;
-
-	//	// X軸の移動量の合計が一定以上だったら摩擦を作る。
-	//	if (fabs(vel.x) >= STOP_DEADLINE_X) {
-
-	//		// 摩擦をつける。
-	//		vel.y *= VEL_MUL_AMOUNT;
-	//		vel.x *= VEL_MUL_AMOUNT;
-	//	}
-	//	else {
-
-	//		// X方向の移動量を無効化する。
-	//		vel.x = 0;
-	//		vel.y = 0;
-
-	//		//摩擦無いときはストレッチを弱くする
-	//		stretch_RB.x /= STRETCH_DIV_RATE;
-	//		stretch_LU.x /= STRETCH_DIV_RATE;
-
-	//		//待機アニメーションに戻す
-	//		//anim.ChangeAnim(ON_GROUND_WAIT);
-	//	}
-
-	//	vel.y = 0;
-
-	//	// 移動量が一定以下になったら0にする。
-	//	if (fabs(vel.x) <= 1.0f) vel.x = 0;
-	//}
-	//else if (Dir == LEFT)
-	//{
-	//	stretch_LU.x = 0.0f;
-
-	//	// X方向の移動量を無効化する。
-	//	vel.x = 0;
-	//	//vel.y = 0;
-
-	//	//摩擦無いときはストレッチを弱くする
-	//	stretch_RB.y /= STRETCH_DIV_RATE;
-	//	stretch_LU.y /= STRETCH_DIV_RATE;
-
-	//	//壁貼り付きアニメーション
-	//	//anim.ChangeAnim(ON_WALL_WAIT);
-	//}
-	//else if (Dir == RIGHT)
-	//{
-	//	stretch_RB.x = 0.0f;
-
-	//	// X方向の移動量を無効化する。
-	//	vel.x = 0;
-	//	//vel.y = 0;
-
-	//	//摩擦無いときはストレッチを弱くする
-	//	stretch_RB.y /= STRETCH_DIV_RATE;
-	//	stretch_LU.y /= STRETCH_DIV_RATE;
-
-	//	//壁貼り付きアニメーション
-	//	//anim.ChangeAnim(ON_WALL_WAIT);
-	//}
 }
 
 void Player::Input(const vector<vector<int>>& MapData)
@@ -519,101 +451,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 		tutorial.lock()->TurnActive();
 	}
 
-#pragma region itiou nokosite okimasu
-
-	// LBが押されたら反動をつける。
-	//if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
-
-	//	// 反動をつける。
-	//	float rHandAngle = lHand->GetAngle();
-
-	//	// Getした値は手の向いている方向なので、-180度する。
-	//	rHandAngle -= Angle::PI();
-
-	//	// onGroundがtrueだったら移動量を加算しない。
-	//	//if (!onGround || sinf(rHandAngle) < 0.5f) {
-	//	].x += cosf(rHandAngle) * RECOIL_AMOUNT;
-	//	//}
-
-	//	vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
-
-	//	// プレイヤーの腕を動かす。
-	//	lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
-
-
-	//	// 弾を生成する。
-	//	const float ARM_DISTANCE = 20.0f;
-	//	const float OFFSET_Y = -14.0f;
-	//	const float OFFSET_X = 12.0f;
-
-	//	float angle = lHand->GetAngle();
-
-	//	AudioApp::Instance()->PlayWave(shotSE);
-	//	Shot(lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle);
-
-	//	// 連射タイマーをセット
-	//	rapidFireTimerLeft = RAPID_FIRE_TIMER;
-
-	//	//ストレッチ
-	//	CalculateStretch(vel);
-	//}
-
-	//// RBが押されたら反動をつける。
-	//if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
-
-	//	// 反動をつける。
-	//	float lHandAngle = rHand->GetAngle();
-
-	//	// Getした値は手の向いている方向なので、-180度する。
-	//	lHandAngle -= Angle::PI();
-
-	//	// プレイヤーのひとつ上のブロックを検索する為の処理。
-	//	int mapX = pos.x / MAP_CHIP_SIZE;
-	//	int mapY = pos.y / MAP_CHIP_SIZE;
-	//	if (mapX <= 0) mapX = 1;
-	//	if (mapX >= MapData[0].size()) mapX = MapData[0].size() - 1;
-	//	if (mapY <= 0) mapY = 1;
-	//	if (mapY >= MapData.size()) mapY = MapData.size() - 1;
-
-	//	// onGroundがtrueだったら移動量を加算しない。
-	//		//if (!onGround || sinf(lHandAngle) < 0) {
-	//	vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
-
-
-
-	//	vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
-
-	//	// プレイヤーの腕を動かす。
-	//	rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
-
-
-	//	// 弾を生成する。
-	//	const float ARM_DISTANCE = 20.0f;
-	//	const float OFFSET_Y = -14.0f;
-	//	const float OFFSET_X = -12.0f;
-
-	//	float angle = rHand->GetAngle();
-
-	//	AudioApp::Instance()->PlayWave(shotSE);
-	//	Shot(rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle);
-
-	//	// 連射タイマーをセット
-	//	rapidFireTimerRight = RAPID_FIRE_TIMER;
-
-	//	//ストレッチ
-	//	CalculateStretch(vel);
-	//}
-
-	// 移動速度が限界値を超えないようにする。
-	//if (vel.x >= MAX_RECOIL_AMOUNT) vel.x = MAX_RECOIL_AMOUNT;
-	//if (vel.x <= -MAX_RECOIL_AMOUNT) vel.x = -MAX_RECOIL_AMOUNT;
-	//if (vel.y >= MAX_RECOIL_AMOUNT) vel.y = MAX_RECOIL_AMOUNT;
-	//if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
-
-
-#pragma endregion
-
-
 	// 入力を元に振り回しベクトルを更新。
 
 	// 相方との位置関係においての逆ベクトルに振り回す。
@@ -654,6 +491,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// inputVec = ひだりスティックの入力方向
 		const float DASH_SPEED = 30.0f;
 		vel += inputLeftVec * DASH_SPEED;
+
+		// 移動量が限界を超えないようにする。
+		if (DASH_SPEED < vel.Length()) {
+
+			vel.Normalize();
+			vel *= DASH_SPEED;
+
+		}
 
 		// スタミナを消費
 		const int DASH_GRIP_POWER = 20;
