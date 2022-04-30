@@ -48,6 +48,11 @@ private:
 	//ダメージ用タイマー
 	int damageTimer;
 
+	// 優勢ゲージがデフォルトに戻るまでのタイマー
+	int gaugeReturnTimer;		// クラッシュなどした際に数値が代入され、0の時にデフォルトのゲージ量に戻る。
+	const int GAUGE_RETURN_TIMER = 60;
+
+
 protected:
 	BulletMgrBase bulletMgr;
 	bool nowSwing;

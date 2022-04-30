@@ -280,6 +280,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	addSwingRate = 0;
 
+	gaugeReturnTimer = 0;
+
 }
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
@@ -364,6 +366,51 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), false, false, MapData);
 		CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), false, false, MapData);
 	}*/
+
+	// 体幹ゲージをデフォルトに戻すタイマーが0だったら
+	if (gaugeReturnTimer <= 0) {
+
+		static const int DEF_GAUGE = 50;
+		static const float RETURN_AMOUNT = 0.1f;
+
+		// 右側のチームで、右側のゲージ量がデフォルト以下だったら右側のゲージを足す。
+		float nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeValue;
+		if (GetWhichTeam() == RIGHT_TEAM && nowGaugeValue < DEF_GAUGE) {
+
+			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, RETURN_AMOUNT);
+
+			// 足す過程で限界を超えないようにする。
+			nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeValue;
+			if (DEF_GAUGE < nowGaugeValue) {
+
+				SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DEF_GAUGE - nowGaugeValue);
+
+			}
+
+		}
+
+		// 左側のチームで、左側のゲージ量がデフォルト以下だったら左側のゲージを足す。
+		nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeValue;
+		if (GetWhichTeam() == LEFT_TEAM && nowGaugeValue < DEF_GAUGE) {
+
+			SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, RETURN_AMOUNT);
+
+			// 足す過程で限界を超えないようにする。
+			nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeValue;
+			if (DEF_GAUGE < nowGaugeValue) {
+
+				SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DEF_GAUGE - nowGaugeValue);
+
+			}
+
+		}
+
+	}
+	else {
+
+		--gaugeReturnTimer;
+
+	}
 
 }
 
@@ -674,6 +721,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 			}
 
+			// ゲージがデフォルトに戻るまでのタイマーを更新。
+			gaugeReturnTimer = GAUGE_RETURN_TIMER;
+
 		}
 		else {
 
@@ -704,6 +754,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				CrashEffectMgr::Instance()->Generate(pos);
 
 			}
+
+			// ゲージがデフォルトに戻るまでのタイマーを更新。
+			gaugeReturnTimer = GAUGE_RETURN_TIMER;
 
 		}
 
