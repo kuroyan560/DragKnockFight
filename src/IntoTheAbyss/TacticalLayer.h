@@ -34,4 +34,6 @@ private:
 	Vec2<float>startPos, endPos;
 	int routeHandle;
 
+	bool goalFlag;
+
 };

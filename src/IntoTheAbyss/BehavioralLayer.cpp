@@ -33,15 +33,17 @@ void MovingBetweenTwoPoints::Update()
 
 AiResult MovingBetweenTwoPoints::CurrentProgress()
 {
-	//たどり着いたら成功、時間内にたどり着かなかったら失敗、それ以外は実行中
+	//たどり着いたら成功
 	if (BulletCollision::Instance()->CheckSphereAndSphere(startColision, endColision))
 	{
 		return AiResult::OPERATE_SUCCESS;
 	}
+	//時間内にたどり着かなかったら失敗
 	else if (timeOver <= timer)
 	{
 		return AiResult::OPERATE_FAIL;
 	}
+	//実行中
 	else
 	{
 		return AiResult::OPERATE_INPROCESS;

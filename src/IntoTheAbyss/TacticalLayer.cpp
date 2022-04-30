@@ -9,25 +9,24 @@ void FollowPath::Init(const std::vector<WayPointData> &ROUTE)
 {
 	route = ROUTE;
 	routeHandle = 0;
+	goalFlag = false;
 	operateFollow->Init(route[0].pos, route[1].pos);
 }
 
 void FollowPath::Update()
 {
 	//初手ウェイポイントと離れていたら近づく
-
-
 	//二点間の移動
 	operateFollow->Update();
 
-	//成功したら別の二点を移動する
+	//成功したら別の二点間の移動を行う
 	if (operateFollow->CurrentProgress() == AiResult::OPERATE_SUCCESS)
 	{
 		++routeHandle;
 		//最短ルートのゴールまで辿り着いた
 		if (route.size() <= routeHandle || route.size() <= routeHandle + 1)
 		{
-			bool debug(false);
+			goalFlag = true;
 		}
 		//たどり着くまで二点間の移動の続ける
 		else
@@ -39,5 +38,12 @@ void FollowPath::Update()
 
 AiResult FollowPath::CurrentProgress()
 {
-	return AiResult();
+	if (goalFlag)
+	{
+		return AiResult::OPERATE_SUCCESS;
+	}
+	else
+	{
+		return AiResult::OPERATE_INPROCESS;
+	}
 }

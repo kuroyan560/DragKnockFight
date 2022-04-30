@@ -8,6 +8,7 @@ OperateMove::OperateMove(const std::shared_ptr<Vec2<float>> &POS)
 
 void OperateMove::Update(const Vec2<float> &VELOCITY)
 {
+	//ˆÚ“®
 	oldPos = *pos;
 	*pos += VELOCITY;
 }

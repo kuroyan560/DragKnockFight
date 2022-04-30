@@ -87,6 +87,7 @@ void NavigationAI::Update(const Vec2<float> &POS)
 {
 #ifdef _DEBUG
 
+	resetSearchFlag = false;
 	Vec2<float>pos = UsersInput::Instance()->GetMousePos();
 
 	for (int y = 0; y < wayPoints.size(); ++y)
@@ -134,12 +135,16 @@ void NavigationAI::Update(const Vec2<float> &POS)
 	//スタート地点かゴール地点を変える際は白統一する
 	if (startPoint.handle != oldStartPoint.handle || endPoint.handle != oldEndPoint.handle)
 	{
-		for (int y = 0; y < wayPoints.size(); ++y)
+		resetSearchFlag = true;
+	}
+	oldStartPoint = startPoint;
+	oldEndPoint = endPoint;
+
+	for (int y = 0; y < wayPoints.size(); ++y)
+	{
+		for (int x = 0; x < wayPoints[y].size(); ++x)
 		{
-			for (int x = 0; x < wayPoints[y].size(); ++x)
-			{
-				debugColor[y][x] = Color(255, 255, 255, 255);
-			}
+			debugColor[y][x] = Color(255, 255, 255, 255);
 		}
 	}
 
@@ -317,6 +322,19 @@ void NavigationAI::ImGuiDraw()
 		ImGui::Text("PassNum:%d", wayPoints[handle.y][handle.x].passNum);
 		ImGui::End();
 	}
+}
+
+std::vector<WayPointData> NavigationAI::GetShortestRoute()
+{
+	std::vector<WayPointData>result;
+	for (int i = queue.size() - 1; 0 <= i; --i)
+	{
+		int x = queue[i].handle.x;
+		int y = queue[i].handle.y;
+		result.push_back(wayPoints[y][x]);
+	}
+
+	return result;
 }
 
 inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS)

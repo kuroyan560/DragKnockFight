@@ -391,6 +391,15 @@ void Game::Update()
 	}
 #pragma endregion
 
+	chara.shortestData = navi.GetShortestRoute();
+
+	if (chara.shortestData.size() != 0 && navi.resetSearchFlag)
+	{
+		chara.Init();
+		*chara.pos = chara.shortestData[0].pos;
+	}
+	chara.Update();
+
 	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0, BACK);
 	if (resetInput)
 	{
@@ -840,6 +849,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	}
 
 	navi.Draw();
+	chara.Draw();
 }
 
 void Game::Scramble()

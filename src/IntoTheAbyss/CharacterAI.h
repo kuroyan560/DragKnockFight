@@ -11,6 +11,8 @@
 class CharacterAI
 {
 public:
+	CharacterAI();
+
 	void Init();
 	void Update();
 	void Draw();

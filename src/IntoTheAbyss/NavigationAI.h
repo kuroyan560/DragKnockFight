@@ -59,6 +59,22 @@ public:
 	void Draw();
 
 	void ImGuiDraw();
+
+	std::vector<WayPointData> GetShortestRoute();
+
+	/// <summary>
+	/// 探索する際にキューに詰め込むべき情報
+	/// </summary>
+	struct QueueData
+	{
+		Vec2<int>handle;
+		float sum;
+		QueueData(const Vec2<int> &HANDLE, float SUM) :handle(HANDLE), sum(SUM)
+		{
+		};
+	};
+
+	bool resetSearchFlag;
 private:
 
 	static const int WAYPOINT_MAX_X = 10;	 //X軸のウェイポイントの数
@@ -233,17 +249,6 @@ private:
 
 
 	//A*-------------------------------
-	/// <summary>
-	/// 探索する際にキューに詰め込むべき情報
-	/// </summary>
-	struct QueueData
-	{
-		Vec2<int>handle;
-		float sum;
-		QueueData(const Vec2<int> &HANDLE, float SUM) :handle(HANDLE), sum(SUM)
-		{
-		};
-	};
 	std::vector<QueueData>queue;	//探索用のキュー
 
 	/// <summary>

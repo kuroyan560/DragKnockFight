@@ -23,6 +23,7 @@ class RenderTarget;
 #include"ScreenEdgeEffect.h"
 
 #include"NavigationAI.h"
+#include"CharacterAI.h"
 
 class CharacterInterFace;
 
@@ -119,6 +120,7 @@ class Game
 public:
 	//テスト用
 	NavigationAI navi;
+	CharacterAI chara;
 
 	HomeBase playerHomeBase, enemyHomeBase;
 
