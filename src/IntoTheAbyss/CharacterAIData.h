@@ -1,0 +1,18 @@
+#pragma once
+
+/// <summary>
+/// äeÉSÅ[ÉãÇÃêiíª
+/// </summary>
+enum class AiResult :int
+{
+	OPERATE_FAIL = -1,
+	OPERATE_INPROCESS,
+	OPERATE_SUCCESS
+};
+
+/// <summary>
+/// é¿ëïñ¢íË
+/// </summary>
+class IOprate
+{
+};
