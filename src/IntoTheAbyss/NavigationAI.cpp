@@ -85,6 +85,8 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 
 void NavigationAI::Update(const Vec2<float> &POS)
 {
+#ifdef _DEBUG
+
 	Vec2<float>pos = UsersInput::Instance()->GetMousePos();
 
 	for (int y = 0; y < wayPoints.size(); ++y)
@@ -151,9 +153,11 @@ void NavigationAI::Update(const Vec2<float> &POS)
 		}
 	}
 
+#endif // DEBUG
+
 	//スタートとゴールを設定したらAスターの探索を開始する
-	if (startPoint.handle.x != -1 && startPoint.handle.y != -1 &&
-		endPoint.handle.x != -1 && endPoint.handle.y != -1)
+	if (startPoint.handle != Vec2<int>(-1, -1) &&
+		endPoint.handle != Vec2<int>(-1, -1))
 	{
 		AStart(startPoint, endPoint);
 	}
@@ -162,7 +166,7 @@ void NavigationAI::Update(const Vec2<float> &POS)
 void NavigationAI::Draw()
 {
 	//デバックの時のみ表示
-#ifdef  _DEBUG
+#ifdef _DEBUG
 
 	//ウェイポイントの描画
 	for (int y = 0; y < wayPoints.size(); ++y)
