@@ -22,6 +22,7 @@
 #include"CrashMgr.h"
 #include"Tutorial.h"
 #include "AfterImage.h"
+#include "DrawFunc.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -80,10 +81,6 @@ void Player::OnInit()
 	rapidFireTimerLeft = 0;
 	rapidFireTimerRight = 0;
 
-	// 手を初期位置に戻す。
-	rHand->SetAngle(DEF_RIGHT_HAND_ANGLE);
-	lHand->SetAngle(DEF_LEFT_HAND_ANGLE);
-
 	//ストレッチ初期化
 	stretch_LU = { 0.0f,0.0f };
 	stretch_RB = { 0.0f,0.0f };
@@ -126,12 +123,9 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
 
-	ADD_GRAVITY = data->ADD_GRAVITY;
-	MAX_GRAVITY = data->MAX_GRAVITY;
 	RECOIL_AMOUNT = data->RECOIL_AMOUNT;
 	FIRST_RECOIL_AMOUNT = data->FIRST_RECOIL_AMOUNT;
 	MAX_RECOIL_AMOUNT = data->MAX_RECOIL_AMOUNT;
-	RAPID_FIRE_TIMER = data->RAPID_FIRE_TIMER;
 
 
 	/*===== 入力処理 =====*/
@@ -352,74 +346,74 @@ void Player::OnDrawUI()
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)
 {
-	if (Dir == TOP)
-	{
-		// Y方向の移動量を減らす。
-		vel.y /= 2.0f;
-	}
-	else if (Dir == BOTTOM)
-	{
-		stretch_RB.y = 0.0f;
+	//if (Dir == TOP)
+	//{
+	//	// Y方向の移動量を減らす。
+	//	vel.y /= 2.0f;
+	//}
+	//else if (Dir == BOTTOM)
+	//{
+	//	stretch_RB.y = 0.0f;
 
-		// 接地フラグを立てる。
-		//onGround = true;
+	//	// 接地フラグを立てる。
+	//	//onGround = true;
 
-		// X軸の移動量の合計が一定以上だったら摩擦を作る。
-		if (fabs(vel.x) >= STOP_DEADLINE_X) {
+	//	// X軸の移動量の合計が一定以上だったら摩擦を作る。
+	//	if (fabs(vel.x) >= STOP_DEADLINE_X) {
 
-			// 摩擦をつける。
-			vel.y *= VEL_MUL_AMOUNT;
-			vel.x *= VEL_MUL_AMOUNT;
-		}
-		else {
+	//		// 摩擦をつける。
+	//		vel.y *= VEL_MUL_AMOUNT;
+	//		vel.x *= VEL_MUL_AMOUNT;
+	//	}
+	//	else {
 
-			// X方向の移動量を無効化する。
-			vel.x = 0;
-			vel.y = 0;
+	//		// X方向の移動量を無効化する。
+	//		vel.x = 0;
+	//		vel.y = 0;
 
-			//摩擦無いときはストレッチを弱くする
-			stretch_RB.x /= STRETCH_DIV_RATE;
-			stretch_LU.x /= STRETCH_DIV_RATE;
+	//		//摩擦無いときはストレッチを弱くする
+	//		stretch_RB.x /= STRETCH_DIV_RATE;
+	//		stretch_LU.x /= STRETCH_DIV_RATE;
 
-			//待機アニメーションに戻す
-			//anim.ChangeAnim(ON_GROUND_WAIT);
-		}
+	//		//待機アニメーションに戻す
+	//		//anim.ChangeAnim(ON_GROUND_WAIT);
+	//	}
 
-		vel.y = 0;
+	//	vel.y = 0;
 
-		// 移動量が一定以下になったら0にする。
-		if (fabs(vel.x) <= 1.0f) vel.x = 0;
-	}
-	else if (Dir == LEFT)
-	{
-		stretch_LU.x = 0.0f;
+	//	// 移動量が一定以下になったら0にする。
+	//	if (fabs(vel.x) <= 1.0f) vel.x = 0;
+	//}
+	//else if (Dir == LEFT)
+	//{
+	//	stretch_LU.x = 0.0f;
 
-		// X方向の移動量を無効化する。
-		vel.x = 0;
-		//vel.y = 0;
+	//	// X方向の移動量を無効化する。
+	//	vel.x = 0;
+	//	//vel.y = 0;
 
-		//摩擦無いときはストレッチを弱くする
-		stretch_RB.y /= STRETCH_DIV_RATE;
-		stretch_LU.y /= STRETCH_DIV_RATE;
+	//	//摩擦無いときはストレッチを弱くする
+	//	stretch_RB.y /= STRETCH_DIV_RATE;
+	//	stretch_LU.y /= STRETCH_DIV_RATE;
 
-		//壁貼り付きアニメーション
-		//anim.ChangeAnim(ON_WALL_WAIT);
-	}
-	else if (Dir == RIGHT)
-	{
-		stretch_RB.x = 0.0f;
+	//	//壁貼り付きアニメーション
+	//	//anim.ChangeAnim(ON_WALL_WAIT);
+	//}
+	//else if (Dir == RIGHT)
+	//{
+	//	stretch_RB.x = 0.0f;
 
-		// X方向の移動量を無効化する。
-		vel.x = 0;
-		//vel.y = 0;
+	//	// X方向の移動量を無効化する。
+	//	vel.x = 0;
+	//	//vel.y = 0;
 
-		//摩擦無いときはストレッチを弱くする
-		stretch_RB.y /= STRETCH_DIV_RATE;
-		stretch_LU.y /= STRETCH_DIV_RATE;
+	//	//摩擦無いときはストレッチを弱くする
+	//	stretch_RB.y /= STRETCH_DIV_RATE;
+	//	stretch_LU.y /= STRETCH_DIV_RATE;
 
-		//壁貼り付きアニメーション
-		//anim.ChangeAnim(ON_WALL_WAIT);
-	}
+	//	//壁貼り付きアニメーション
+	//	//anim.ChangeAnim(ON_WALL_WAIT);
+	//}
 }
 
 void Player::Input(const vector<vector<int>>& MapData)

@@ -69,7 +69,7 @@ void CharacterInterFace::SwingUpdate()
 	if (isSwingClockWise && crossResult < 0 && 15 < swingTimer) {
 
 		// パートナーに慣性を与える。
-		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 1.0f;
+		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 0.5f;
 
 		// 振り回し終わり！
 		FinishSwing();
@@ -78,7 +78,7 @@ void CharacterInterFace::SwingUpdate()
 	if (!isSwingClockWise && 0 < crossResult && 15 < swingTimer) {
 
 		// パートナーに慣性を与える。
-		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 1.0f;
+		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 0.5f;
 
 		// 振り回し終わり！
 		FinishSwing();
@@ -247,10 +247,6 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	addLineLength = 0.0f;
 
-	swingInertia = 0;
-	swingInertiaVec = {};
-	afterSwingDelay = 0;
-
 	//登場演出のため最初は動けない
 	canMove = false;
 	//登場演出のため最初は当たり判定とらない
@@ -311,13 +307,6 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 			FaceIcon::Instance()->Change(team, FACE_STATUS::DEFAULT);
 		}
 	}
-	// 慣性を更新。
-	if (0 < swingInertia) {
-		swingInertia -= swingInertia / 5.0f;
-	}
-
-	// 振り回し直後の硬直のタイマーを更新。
-	if (0 < afterSwingDelay) --afterSwingDelay;
 
 	//自身が振り回し中
 	if (nowSwing)

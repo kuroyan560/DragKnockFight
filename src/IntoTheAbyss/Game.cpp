@@ -851,9 +851,9 @@ void Game::Scramble()
 
 	// 移動量を取得。 優勢ゲージはここで更新。
 	double leftVel = CharacterManager::Instance()->Left()->vel.Length() * SlowMgr::Instance()->slowAmount;
-	leftVelGauge = (CharacterManager::Instance()->Left()->vel * SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	leftVelGauge = CharacterManager::Instance()->Left()->vel * SlowMgr::Instance()->slowAmount;
 	double rightVel = CharacterManager::Instance()->Right()->vel.Length() * SlowMgr::Instance()->slowAmount;
-	rightVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	rightVelGauge = CharacterManager::Instance()->Right()->vel * SlowMgr::Instance()->slowAmount;
 	double subVel = fabs(fabs(leftVel) - fabs(rightVel));
 
 	// [スタン演出中] は移動させない。 踏ん張り中の場合は、どちらにせよ移動量が限りなく0に近いので移動させても問題がない。

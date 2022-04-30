@@ -31,10 +31,6 @@ private:
 	//弾との当たり判定
 	SphereCollision bulletHitSphere;
 
-	const int AFTER_SWING_DELAY = 15;
-	Vec2<float> swingInertiaVec;// 振り回しの慣性の移動方向
-	float swingInertia;			// 振り回しの慣性
-	int afterSwingDelay;		// 振り回しのあとにボスを少し動けない状態にするためのタイマー
 	int swingTimer;				// 振り回しの経過時間
 
 	//演出などの動きの関係で動きを止める
@@ -121,10 +117,6 @@ protected:
 	{
 		return partner.lock()->pos;
 	}
-	//振り回しによる慣性
-	Vec2<float>GetSwingInertia() { return swingInertiaVec * swingInertia; }
-	//振り回し直後の硬直中か
-	bool GetSwingRigor() { return 0 < afterSwingDelay; }
 	//左チームか右チームか
 	const WHICH_TEAM& GetWhichTeam() { return team; }
 
