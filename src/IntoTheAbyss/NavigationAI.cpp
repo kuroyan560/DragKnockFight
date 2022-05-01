@@ -379,9 +379,11 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 {
 	std::vector<WayPointData>startPoint;//ウェイポイントの探索開始位置
 	std::vector<WayPointData>nextPoint; //次のウェイポイントの探索開始位置
+	std::vector<WayPointData>failPoint; //探索候補外のウェイポイント
 	nextPoint.push_back(START_POINT);
 	searchMap.clear();
 	queue.clear();
+	bool failFlag = false;
 
 	//次に向かうべき場所を探索する
 	while (1)
@@ -390,8 +392,6 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 		startPoint = nextPoint;
 		//次のウェイポイントの情報を蓄える為に空きを用意する
 		nextPoint.clear();
-
-		bool goalFlag = false;
 
 		searchMap.push_back({});
 		//現在追跡中のルート分探索
@@ -406,7 +406,8 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 				float nextHeuristicValue = wayPoints[handle.y][handle.x].pos.Distance(END_POINT.pos);	//参照しているウェイポイントからゴールまでのヒューリスティック推定値
 
 				//ヒューリスティックが0ならゴールにたどり着いた事になるので探索しない
-				if (nowHeuristicValue <= 0.0f)
+				//スタート地点を二回キューに入れない
+				if (nowHeuristicValue <= 0.0f || wayPoints[handle.y][handle.x].handle == START_POINT.handle)
 				{
 					continue;
 				}
@@ -417,19 +418,36 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 				if (!CheckQueue(handle))
 				{
 					searchMap[layerArrayNum].push_back(SearchMapData(handle, Color(0, 255, 0, 255)));
-					//キューにはハンドルと現在地からゴールまでの距離(ヒューリスティック推定値)+スタートから現在地の距離の合計値をスタックする
-					queue.push_back(QueueData(handle, nextHeuristicValue));
+
 					//現在地よりヒューリスティック推定値が小さいしてないならスタックする
 					if (nextHeuristicValue <= nowHeuristicValue)
 					{
-						searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
+						//探索失敗直後から始めている際は、参照したウェイポイントが成功した際、前のウェイポイントも候補に加える
+						if (failFlag)
+						{
+							//キューにはハンドルと現在地からゴールまでの距離(ヒューリスティック推定値)をスタックする
+							queue.push_back(QueueData(startPoint[startPointIndex].handle, nowHeuristicValue));
+						}
 
+
+						searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
+						//パス数の記録
+						wayPoints[handle.y][handle.x].passNum = startPoint[startPointIndex].passNum + 1;
+						//キューにはハンドルと現在地からゴールまでの距離(ヒューリスティック推定値)をスタックする
+						queue.push_back(QueueData(handle, nextHeuristicValue + wayPoints[handle.y][handle.x].passNum));
 						//次に探索する地点を記録する
 						nextPoint.push_back(wayPoints[handle.y][handle.x]);
 					}
+					else
+					{
+						failPoint.push_back(wayPoints[handle.y][handle.x]);
+					}
 				}
+				
 			}
 		}
+
+		failFlag = false;
 
 		//次に探索できる場所が無ければゴールまでたどり着いているか確認する
 		if (nextPoint.size() == 0)
@@ -452,11 +470,8 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 			//そうでなければ次に大きい合計値をnextPointに入れて再探索する
 			else
 			{
-				for (int i = 0; i < queue.size(); ++i)
-				{
-					Vec2<int>handle = queue[i].handle;
-					nextPoint.push_back(wayPoints[handle.y][handle.x]);
-				}
+				nextPoint = failPoint;
+				failFlag = true;
 			}
 		}
 	}
@@ -490,34 +505,79 @@ std::vector<NavigationAI::QueueData> NavigationAI::SortQueue(const std::vector<Q
 
 	int resultHandle = 0;
 	std::vector<QueueData> result;
-	//ソート順に並べる&&前のウェイポイントと繋がっている箇所を繋げていく
-	for (int sumIndex = 0; sumIndex < sumArray.size(); ++sumIndex)
+	std::vector<QueueData> fail;
+
+	while (1)
 	{
-		for (int queueIndex = 0; queueIndex < QUEUE.size(); ++queueIndex)
+		//ソート順に並べる&&前のウェイポイントと繋がっている箇所を繋げていく
+		for (int sumIndex = 0; sumIndex < sumArray.size(); ++sumIndex)
 		{
-			//ソート順に並べる合図
-			bool sameSumFlag = QUEUE[queueIndex].sum == sumArray[sumIndex];
-			if (sameSumFlag)
+			for (int queueIndex = 0; queueIndex < QUEUE.size(); ++queueIndex)
 			{
-				//前のウェイポイントと繋がっているかどうか
-				if (result.size() != 0)
+				//ソート順に並べる合図
+				bool sameSumFlag = QUEUE[queueIndex].sum == sumArray[sumIndex];
+				if (sameSumFlag)
 				{
-					Vec2<int>handle(QUEUE[queueIndex].handle);
-					for (int linkHandle = 0; linkHandle < wayPoints[handle.y][handle.x].wayPointHandles.size(); ++linkHandle)
+					//前のウェイポイントと繋がっているかどうか
+					if (result.size() != 0)
 					{
-						if (wayPoints[handle.y][handle.x].wayPointHandles[linkHandle] == result[resultHandle].handle)
+						Vec2<int>handle(QUEUE[queueIndex].handle);
+						for (int linkHandle = 0; linkHandle < wayPoints[handle.y][handle.x].wayPointHandles.size(); ++linkHandle)
 						{
-							result.push_back(QUEUE[queueIndex]);
-							++resultHandle;
+							//ウェイポイントが繋がっているかどうか
+							bool linkFlag = wayPoints[handle.y][handle.x].wayPointHandles[linkHandle] == result[resultHandle].handle;
+
+							//ヒューリスティックは現在地より小さいか
+							bool distanceFlag = true;
+
+							//成功
+							if (linkFlag && distanceFlag)
+							{
+								result.push_back(QUEUE[queueIndex]);
+								++resultHandle;
+							}
+							//失敗
+							else if (linkFlag)
+							{
+								fail.push_back(QUEUE[queueIndex]);
+							}
 						}
 					}
-				}
-				else
-				{
-					result.push_back(QUEUE[queueIndex]);
+					else
+					{
+						result.push_back(QUEUE[queueIndex]);
+					}
 				}
 			}
 		}
+
+		bool startFlag = false;
+		bool goalFlag = false;
+		//スタートとゴールが繋がっていなければ探索し直し
+		for (int i = 0; i < result.size(); ++i)
+		{
+			if (result[i].handle == Vec2<int>())
+			{
+
+			}
+			if (result[i].handle == Vec2<int>())
+			{
+
+			}
+		}
+
+		//スタートからゴールまで繋がったら成功、最短ルートして扱う
+		if (startFlag && goalFlag)
+		{
+
+		}
+		//失敗したらfailから候補を探す
+		else
+		{
+
+		}
+
+		break;
 	}
 
 	QueueData startPoint(startPoint.handle, 0.0f);
