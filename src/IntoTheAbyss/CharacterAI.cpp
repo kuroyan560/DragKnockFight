@@ -5,10 +5,23 @@
 
 CharacterAI::CharacterAI()
 {
-	pos = std::make_unique<Vec2<float>>();
-	move = std::make_unique<OperateMove>(pos);
-	betweenPoints = std::make_unique<MovingBetweenTwoPoints>(move);
+	pos = std::make_shared<Vec2<float>>();
+
+	//‘€ì‘w‚Ì¶¬--------------------------
+	move = std::make_shared<OperateMove>(pos);
+	//‘€ì‘w‚Ì¶¬--------------------------
+
+	//U‚é•‘‚¢‘w‚Ì¶¬--------------------------
+	betweenPoints = std::make_shared<MovingBetweenTwoPoints>(move);
+	//U‚é•‘‚¢‘w‚Ì¶¬--------------------------
+
+	//íp‘w‚Ì¶¬--------------------------
 	moveToGoal = std::make_unique<FollowPath>(betweenPoints);
+	//íp‘w‚Ì¶¬--------------------------
+
+
+	//í—ª‘w‚Ì¶¬--------------------------
+	//í—ª‘w‚Ì¶¬--------------------------
 }
 
 void CharacterAI::Init()

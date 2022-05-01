@@ -76,7 +76,7 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 	//ÉSÅ[Éãínì_Ç÷ÇÃíTçı--------------------------
 
 	wayPointFlag = true;
-	serachFlag = true;
+	serachFlag = false;
 	lineFlag = true;
 
 	checkingHandle = { -1,-1 };
@@ -372,7 +372,7 @@ inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS
 
 inline bool NavigationAI::DontUse(const WayPointData &DATA)
 {
-	return DATA.handle.x != -1 && DATA.handle.y != -1;
+	return DATA.handle != Vec2<int>(-1, -1);
 }
 
 void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &END_POINT)
