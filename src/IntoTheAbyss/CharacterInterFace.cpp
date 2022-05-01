@@ -151,6 +151,9 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 	//振り回し処理が既に走っている場合は、重ねて振り回せない
 	if (partner.lock()->nowSwing || nowSwing)return;
 
+	//パイロット切り離し中なら使えない
+	if (isPilotDetached)return;
+
 	partner.lock()->OnSwinged();
 
 	AudioApp::Instance()->PlayWave(SE);
@@ -223,6 +226,32 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 
 }
 
+void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
+{
+	if (isPilotDetached == Flg)return;
+
+	static const float PILOT_RETURN_DIST_BASE = 128.0f;
+	static const int PILOT_RETURN_TOTAL_TIME_BASE = 5;	// PILOT_RETURN_DIST_BASE の距離をこのフレームで帰る速さ
+
+	//切り離した瞬間
+	if (Flg)
+	{
+		if (!IsPilotOutSide())
+		{
+			pilotPos = pos;	//ロボの座標からスタート
+		}
+		OnPilotLeave();
+	}
+	//ロボに戻る処理の初期化
+	else
+	{
+		pilotReturnTimer = 0;
+		pilotReturnStartPos = pilotPos;
+		pilotReturnTotalTime = PILOT_RETURN_TOTAL_TIME_BASE * (pilotPos.Distance(pos) / PILOT_RETURN_DIST_BASE);
+	}
+	isPilotDetached = Flg;
+}
+
 void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine)
 {
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_TOP) isHitTop = true;
@@ -284,11 +313,13 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	addSwingRate = 0;
 
+	isPilotDetached = false;
+	pilotReturnTimer = 0;
+	pilotReturnTotalTime = 0;
 }
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
-
 	//スタン状態更新
 	if (stanTimer)
 	{
@@ -326,6 +357,24 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 		// 握力タイマーを0に近づける。
 		--gripPowerTimer;
+	}
+
+	//パイロット切り離し中
+	if (isPilotDetached)
+	{
+		OnPilotControl();
+	}
+	//パイロットが戻ってくる処理
+	if (pilotReturnTimer < pilotReturnTotalTime)
+	{
+		pilotReturnTimer++;
+		pilotPos = KuroMath::Ease(Out, Circ, pilotReturnTimer, pilotReturnTotalTime, pilotReturnStartPos, Vec2<float>(pos));
+
+		//パイロットがロボにたどり着く
+		if (pilotReturnTotalTime <= pilotReturnTimer)
+		{
+			OnPilotReturn();
+		}
 	}
 
 	prevPos = pos;
@@ -386,6 +435,16 @@ void CharacterInterFace::Draw()
 	CWSwingSegmentMgr.Draw(team);
 	CCWSwingSegmentMgr.Draw(team);
 	OnDraw();
+
+	//デバッグパイロット描画
+	if (IsPilotOutSide())
+	{
+		const auto pilotDrawPos = ScrollMgr::Instance()->Affect(pilotPos);
+		const auto teamColor = GetTeamColor();
+		DrawFunc::DrawLine2D(pilotDrawPos, ScrollMgr::Instance()->Affect(pos), teamColor);
+		DrawFunc::DrawCircle2D(pilotDrawPos, 32.0f, teamColor, true);
+	}
+
 	bulletMgr.Draw();
 }
 

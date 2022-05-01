@@ -52,6 +52,12 @@ private:
 	//ダメージ用タイマー
 	int damageTimer;
 
+	//パイロット切り離し
+	bool isPilotDetached = false;	// パイロット切り離し中かのフラグ
+	Vec2<float>pilotReturnStartPos;	//パイロットがロボに戻る直前の座標
+	int pilotReturnTimer;	//パイロットが戻る処理の時間計測タイマー
+	int pilotReturnTotalTime;	//パイロットがロボに戻るまでの時間
+
 protected:
 	BulletMgrBase bulletMgr;
 	bool nowSwing;
@@ -76,6 +82,7 @@ protected:
 	int arrowHandle;
 	int reticleHandle;
 
+	Vec2<float>pilotPos;	// パイロットの座標
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
@@ -112,10 +119,16 @@ protected:
 	virtual void OnSwinged() = 0;
 	virtual void OnSwingedFinish() = 0;
 	virtual void OnCrash() = 0;
+	virtual void OnPilotLeave() = 0;	//パイロットがロボから離れた瞬間
+	virtual void OnPilotControl() = 0;		//パイロットを動かす処理
+	virtual void OnPilotReturn() = 0;	//パイロットがロボに戻った瞬間
 
 	//[共通関数]
 	//振り回し
 	void SwingPartner(const Vec2<float>& SwingTargetVec, const bool& IsClockWise);
+	//パイロット切り離し
+	void SetPilotDetachedFlg(const bool& Flg);
+
 	//ゲッタ類
 	const Vec2<float>& GetPartnerPos()
 	{
@@ -127,6 +140,8 @@ protected:
 	bool GetSwingRigor() { return 0 < afterSwingDelay; }
 	//左チームか右チームか
 	const WHICH_TEAM& GetWhichTeam() { return team; }
+	//パイロットがロボの外にいるか
+	bool IsPilotOutSide() { return isPilotDetached || pilotReturnTimer < pilotReturnTotalTime; }
 
 	// 当たり判定情報保存。
 	void SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine);
