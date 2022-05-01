@@ -13,6 +13,8 @@
 #include"TexHandleMgr.h"
 #include"CharacterInfo.h"
 
+class Stamina;
+
 class CharacterInterFace
 {
 
@@ -141,9 +143,9 @@ public:
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
 	bool isHold;				// つかんでいるかフラグ
-	bool isGripPowerEmpty;		// 握力タイマーを使い切ってから回復するまでを判断するためのフラグ
-	float gripPowerTimer;			// 握力タイマー
-	const int MAX_GRIP_POWER_TIMER = 40;
+	std::vector<std::shared_ptr<Stamina>> staminaGauge;	// スタミナゲージクラス
+	const int SWING_STAMINA = 2;	// 振り回し時の消費スタミナ
+	const int DASH_STAMINA = 1;		// ダッシュ時の消費スタミナ
 	RunOutOfStaminaEffect outOfStaminaEffect;
 
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team, const PLAYABLE_CHARACTER_NAME& Name)
@@ -194,5 +196,8 @@ public:
 
 	//ノックアウトされた側
 	virtual void OnKnockOut() = 0;
+
+	// スタミナを消費
+	void ConsumesStamina(const int& ConsumesStamina);
 };
 
