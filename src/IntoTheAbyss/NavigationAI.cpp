@@ -478,7 +478,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 					searchMap[layerArrayNum].push_back(SearchMapData(handle, Color(0, 255, 0, 255)));
 
 					//現在地よりヒューリスティック推定値が小さいしてないならスタックする
-					if (nextHeuristicValue <= nowHeuristicValue)
+					if (nextHeuristicValue < nowHeuristicValue)
 					{
 						//探索失敗直後から始めている際は、参照したウェイポイントが成功した際、前のウェイポイントも候補に加える
 						if (failFlag)
