@@ -417,24 +417,47 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 				if (!CheckQueue(handle))
 				{
 					searchMap[layerArrayNum].push_back(SearchMapData(handle, Color(0, 255, 0, 255)));
-				}
-				//現在地よりヒューリスティック推定値が小さい&&キューにスタックしてないならスタックする
-				if (nextHeuristicValue <= nowHeuristicValue && !CheckQueue(handle))
-				{
-					searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
-
-					//キューにはハンドルとヒューリスティック推定値+パス数の合計値をスタックする
+					//キューにはハンドルと現在地からゴールまでの距離(ヒューリスティック推定値)+スタートから現在地の距離の合計値をスタックする
 					queue.push_back(QueueData(handle, nextHeuristicValue));
-					//次に探索する地点を記録する
-					nextPoint.push_back(wayPoints[handle.y][handle.x]);
+					//現在地よりヒューリスティック推定値が小さいしてないならスタックする
+					if (nextHeuristicValue <= nowHeuristicValue)
+					{
+						searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
+
+						//次に探索する地点を記録する
+						nextPoint.push_back(wayPoints[handle.y][handle.x]);
+					}
 				}
 			}
 		}
 
-		//次に探索できる場所が無ければ探索終了
+		//次に探索できる場所が無ければゴールまでたどり着いているか確認する
 		if (nextPoint.size() == 0)
 		{
-			break;
+			bool goalFlag = false;
+			for (int i = 0; i < queue.size(); ++i)
+			{
+				if (queue[i].handle == END_POINT.handle)
+				{
+					goalFlag = true;
+					break;
+				}
+			}
+
+			//目的地までたどり着いていたら探索を終える
+			if (goalFlag)
+			{
+				break;
+			}
+			//そうでなければ次に大きい合計値をnextPointに入れて再探索する
+			else
+			{
+				for (int i = 0; i < queue.size(); ++i)
+				{
+					Vec2<int>handle = queue[i].handle;
+					nextPoint.push_back(wayPoints[handle.y][handle.x]);
+				}
+			}
 		}
 	}
 
