@@ -472,6 +472,12 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 			{
 				nextPoint = failPoint;
 				failFlag = true;
+
+				//ソートする際に順番がずれないよう今までのキューに調整を入れる
+				for (int i = 0; i < queue.size(); ++i)
+				{
+					queue[i].sum += 15.0f;
+				}
 			}
 		}
 	}
@@ -500,8 +506,22 @@ std::vector<NavigationAI::QueueData> NavigationAI::SortQueue(const std::vector<Q
 	{
 		sumArray.push_back(QUEUE[i].sum);
 	}
-
 	std::sort(sumArray.begin(), sumArray.end());
+
+	//ソートした順に並び替え
+	std::vector<QueueData>sortData;
+	for (int sumIndex = 0; sumIndex < sumArray.size(); ++sumIndex)
+	{
+		for (int queueIndex = 0; queueIndex < QUEUE.size(); ++queueIndex)
+		{
+			bool sameSumFlag = QUEUE[queueIndex].sum == sumArray[sumIndex];
+			if (sameSumFlag)
+			{
+				sortData.push_back(QUEUE[queueIndex]);
+			}
+		}
+	}
+
 
 	int resultHandle = 0;
 	std::vector<QueueData> result;
@@ -509,47 +529,81 @@ std::vector<NavigationAI::QueueData> NavigationAI::SortQueue(const std::vector<Q
 
 	while (1)
 	{
-		//ソート順に並べる&&前のウェイポイントと繋がっている箇所を繋げていく
-		for (int sumIndex = 0; sumIndex < sumArray.size(); ++sumIndex)
+		for (int sortIndex = 0; sortIndex < sortData.size(); ++sortIndex)
 		{
-			for (int queueIndex = 0; queueIndex < QUEUE.size(); ++queueIndex)
+			Vec2<int>handle(sortData[sortIndex].handle);
+
+			//前のウェイポイントと繋がっているかどうか
+			if (result.size() != 0)
 			{
-				//ソート順に並べる合図
-				bool sameSumFlag = QUEUE[queueIndex].sum == sumArray[sumIndex];
-				if (sameSumFlag)
+				for (int linkHandle = 0; linkHandle < wayPoints[handle.y][handle.x].wayPointHandles.size(); ++linkHandle)
 				{
-					//前のウェイポイントと繋がっているかどうか
-					if (result.size() != 0)
+					//ウェイポイントが繋がっているかどうか
+					bool linkFlag = wayPoints[handle.y][handle.x].wayPointHandles[linkHandle] == result[resultHandle].handle;
+
+					//成功
+					if (linkFlag)
 					{
-						Vec2<int>handle(QUEUE[queueIndex].handle);
-						for (int linkHandle = 0; linkHandle < wayPoints[handle.y][handle.x].wayPointHandles.size(); ++linkHandle)
-						{
-							//ウェイポイントが繋がっているかどうか
-							bool linkFlag = wayPoints[handle.y][handle.x].wayPointHandles[linkHandle] == result[resultHandle].handle;
-
-							//ヒューリスティックは現在地より小さいか
-							bool distanceFlag = true;
-
-							//成功
-							if (linkFlag && distanceFlag)
-							{
-								result.push_back(QUEUE[queueIndex]);
-								++resultHandle;
-							}
-							//失敗
-							else if (linkFlag)
-							{
-								fail.push_back(QUEUE[queueIndex]);
-							}
-						}
+						result.push_back(sortData[sortIndex]);
+						++resultHandle;
 					}
-					else
+					//失敗
+					else if (linkFlag)
 					{
-						result.push_back(QUEUE[queueIndex]);
+						fail.push_back(sortData[sortIndex]);
 					}
 				}
 			}
+			else
+			{
+				result.push_back(sortData[sortIndex]);
+			}
 		}
+
+
+
+
+		////ソート順に並べる&&前のウェイポイントと繋がっている箇所を繋げていく
+		//for (int sumIndex = 0; sumIndex < sumArray.size(); ++sumIndex)
+		//{
+		//	for (int queueIndex = 0; queueIndex < QUEUE.size(); ++queueIndex)
+		//	{
+		//		//ソート順に並べる合図
+		//		bool sameSumFlag = QUEUE[queueIndex].sum == sumArray[sumIndex];
+		//		if (sameSumFlag)
+		//		{
+		//			//前のウェイポイントと繋がっているかどうか
+		//			if (result.size() != 0)
+		//			{
+		//				Vec2<int>handle(QUEUE[queueIndex].handle);
+		//				for (int linkHandle = 0; linkHandle < wayPoints[handle.y][handle.x].wayPointHandles.size(); ++linkHandle)
+		//				{
+		//					//ウェイポイントが繋がっているかどうか
+		//					bool linkFlag = wayPoints[handle.y][handle.x].wayPointHandles[linkHandle] == result[resultHandle].handle;
+
+		//					//ヒューリスティックは現在地より小さいか
+		//					bool distanceFlag = true;
+
+		//					//成功
+		//					if (linkFlag && distanceFlag)
+		//					{
+		//						result.push_back(QUEUE[queueIndex]);
+		//						++resultHandle;
+		//					}
+		//					//失敗
+		//					else if (linkFlag)
+		//					{
+		//						fail.push_back(QUEUE[queueIndex]);
+		//					}
+		//				}
+		//			}
+		//			else
+		//			{
+		//				result.push_back(QUEUE[queueIndex]);
+		//			}
+		//		}
+		//	}
+		//}
 
 		bool startFlag = false;
 		bool goalFlag = false;
