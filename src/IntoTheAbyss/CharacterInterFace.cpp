@@ -280,13 +280,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	gaugeReturnTimer = 0;
 
 	// 各キャラによってスタミナゲージのデフォルト量を決定。
-	const int KARI = 5;
-	for (int index = 0; index < KARI; ++index) {
-		staminaGauge.push_back(std::make_shared<Stamina>());
-	}
-
-	staminaGauge[4]->AddNowGauge(-100);
-	staminaGauge[3]->AddNowGauge(-100);
+	staminaGauge = std::make_shared<StaminaMgr>();
+	staminaGauge->Init();
 
 }
 
@@ -320,10 +315,6 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	if (nowSwing)
 	{
 		SwingUpdate();
-
-		// 握力タイマーを0に近づける。
-		//--gripPowerTimer;
-		// 握力タイマーを規定値に近づける処理は各クラス内で書いてます。
 
 	}
 
@@ -420,24 +411,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	}
 
-	// スタミナゲージは無いもしてなくても少しずつ回復する。
-	const int STAMINA_COUNT = staminaGauge.size();
-	for (int index = 0; index < STAMINA_COUNT; ++index) {
-
-		// 既にマックスだったら処理を飛ばす。
-		if (staminaGauge[index]->GetIsActivate()) continue;
-
-		staminaGauge[index]->AddNowGauge(0.1f);
-
-		// 手前側から一つずつ順々に回復していくため、リターン。
-		break;
-
-	}
-	for (int index = 0; index < STAMINA_COUNT; ++index) {
-
-		staminaGauge[index]->Update();
-
-	}
+	staminaGauge->Update();
 
 }
 
@@ -457,27 +431,8 @@ void CharacterInterFace::DrawUI()
 	//握力ゲージ描画
 	static Color GAUGE_COLOR[TEAM_NUM] = { Color(47,255,139,255),Color(239,1,144,255) };
 	static Color GAUGE_SHADOW_COLOR[TEAM_NUM] = { Color(41,166,150,255),Color(162,27,108,255) };
-	static const int STAMINA_GAUGE_WIDTH = 60;
-	static const int STAMINA_GAUGE_WIDTH_PER_ONE = 20;
-	static const int STAMINA_GAUGE_HEIGHT = 5;
-	static const int STAMINA_GAUGE_OFFSET_Y = -64;
-	static const int STAMINA_GAUGE_OFFSET_X = 5;
-	{
 
-		const int STAMINA_COUNT = staminaGauge.size();
-		for (int index = 0; index < STAMINA_COUNT; ++index) {
-
-			// 描画する座標を計算。
-			Vec2<float> drawPos = pos;
-			drawPos.y += STAMINA_GAUGE_OFFSET_Y;
-			drawPos.x = (drawPos.x - STAMINA_GAUGE_WIDTH) + (index * STAMINA_GAUGE_WIDTH_PER_ONE) + (index * STAMINA_GAUGE_OFFSET_X);
-
-			// 描画する座標を渡して描画！
-			staminaGauge[index]->Draw(drawPos, STAMINA_GAUGE_WIDTH_PER_ONE, STAMINA_GAUGE_HEIGHT);
-
-		}
-
-	}
+	staminaGauge->Draw(pos);
 
 	OnDrawUI();
 }
@@ -866,41 +821,3 @@ void CharacterInterFace::FinishSwing()
 
 }
 
-void CharacterInterFace::ConsumesStamina(const int& ConsumesStamina)
-{
-
-	/*===== スタミナを消費 =====*/
-
-	// スタミナを消費。
-	float saveStamina = 0;	// 先頭にあるたまりきっていないスタミナを消さないようにするための変数。
-	for (int stamina = 0; stamina < ConsumesStamina; ++stamina) {
-
-		for (int index = staminaGauge.size() - 1; 0 <= index; --index) {
-
-			// たまりきっていなかったら処理を飛ばす。
-			if (!staminaGauge[index]->GetIsActivate()) {
-
-				// 値がちょっとでも入っていたら保存しておく。
-				saveStamina = staminaGauge[index]->GetNowGauge();
-				staminaGauge[index]->Empty();
-
-				continue;
-			}
-
-			// 溜まっていたら値を消す。
-			staminaGauge[index]->Empty();
-			break;
-
-		}
-
-	}
-
-	// 最後尾にセーブしておいたスタミナを追加。
-	for (int index = 0; index < staminaGauge.size(); ++index)
-	{
-		if (staminaGauge[index]->GetIsActivate())continue;
-		staminaGauge[index]->AddNowGauge(saveStamina);
-		break;
-	}
-
-}

@@ -435,13 +435,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 	swingVec = (subPos).GetNormal();
 
 	// スタミナが残っているか？
-	int stainaCounter = 0;
-	for (int index = 0; index < staminaGauge.size(); ++index) stainaCounter += staminaGauge[index]->GetIsActivate() ? 1 : 0;
-	bool isSwingStamina = SWING_STAMINA <= stainaCounter;
+	bool isSwingStamina = staminaGauge->CheckCanAction(SWING_STAMINA);
 
 	// RTが押されたら
 	bool canSwing = (!isInputRightStick && isPrevInputRightStick) && isSwingStamina;
-	//if ((!isSwingPartner && canSwing || isAdvancedEntrySwing) && !isGripPowerEmpty) {
 	if ((!isSwingPartner && canSwing || isAdvancedEntrySwing)) {
 
 		// 振り回しの処理
@@ -456,7 +453,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		isInputSwingRB = isInputRB;
 
 		// スタミナを消費
-		ConsumesStamina(SWING_STAMINA);
+		staminaGauge->ConsumesStamina(SWING_STAMINA);
 
 	}
 	//else if (isSwingPartner && canSwing && !isGripPowerEmpty && isInputRightStick) {
@@ -469,15 +466,12 @@ void Player::Input(const vector<vector<int>>& MapData)
 	}
 
 	// スタミナが残っているか？
-	stainaCounter = 0;
-	for (int index = 0; index < staminaGauge.size(); ++index) stainaCounter += staminaGauge[index]->GetIsActivate() ? 1 : 0;
-	bool isDashStamina = DASH_STAMINA <= stainaCounter;
+	bool isDashStamina = staminaGauge->CheckCanAction(DASH_STAMINA);
 
 	// 入力のデッドラインを設ける。
 	inputLeftVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
 	inputLeftVec /= {32768.0f, 32768.0f};
 	inputRate = inputLeftVec.Length();
-	//if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && !isGripPowerEmpty) {
 	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && isDashStamina) {
 
 		// inputVec = ひだりスティックの入力方向
@@ -501,17 +495,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 		dashAftImgTimer = 10;
 
 		// スタミナを消費
-		ConsumesStamina(DASH_STAMINA);
+		staminaGauge->ConsumesStamina(DASH_STAMINA);
 
 	}
 
 	// スタミナが残っているか？
-	stainaCounter = 0;
-	for (int index = 0; index < staminaGauge.size(); ++index) stainaCounter += staminaGauge[index]->GetIsActivate() ? 1 : 0;
-	isSwingStamina = SWING_STAMINA <= stainaCounter;
+	isSwingStamina = staminaGauge->CheckCanAction(DASH_STAMINA);
 
 	// 右スティックが入力されていたら、予測線を出す。
-	//if (isInputRightStick && !isGripPowerEmpty) {
 	if (isInputRightStick && isSwingStamina) {
 
 		// 時計回りかどうか。負の値が左、正の値が右。

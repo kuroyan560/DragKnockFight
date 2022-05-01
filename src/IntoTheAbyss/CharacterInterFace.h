@@ -13,7 +13,7 @@
 #include"TexHandleMgr.h"
 #include"CharacterInfo.h"
 
-class Stamina;
+class StaminaMgr;
 
 class CharacterInterFace
 {
@@ -143,7 +143,7 @@ public:
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
 	bool isHold;				// つかんでいるかフラグ
-	std::vector<std::shared_ptr<Stamina>> staminaGauge;	// スタミナゲージクラス
+	std::shared_ptr<StaminaMgr> staminaGauge;	// スタミナゲージクラス
 	const int SWING_STAMINA = 2;	// 振り回し時の消費スタミナ
 	const int DASH_STAMINA = 1;		// ダッシュ時の消費スタミナ
 	RunOutOfStaminaEffect outOfStaminaEffect;
@@ -197,7 +197,5 @@ public:
 	//ノックアウトされた側
 	virtual void OnKnockOut() = 0;
 
-	// スタミナを消費
-	void ConsumesStamina(const int& ConsumesStamina);
 };
 
