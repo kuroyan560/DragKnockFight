@@ -72,9 +72,6 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 	}
 	//近くにあるウェイポイントへの繋ぎ--------------------------
 
-	//ゴール地点への探索--------------------------
-	//ゴール地点への探索--------------------------
-
 	wayPointFlag = true;
 	serachFlag = false;
 	lineFlag = true;
@@ -126,20 +123,24 @@ void NavigationAI::Update(const Vec2<float> &POS)
 		}
 	}
 
+	//五秒以上どのウェイポイントも参照しなかったらウェイポイント情報を描画しない--------------------------
 	++checkTimer;
 	if (60 * 5 <= checkTimer)
 	{
 		checkingHandle = { -1,-1 };
 	}
+	//五秒以上どのウェイポイントも参照しなかったらウェイポイント情報を描画しない--------------------------
+
 
 	//スタート地点かゴール地点を変える際は白統一する
-	if (startPoint.handle != oldStartPoint.handle || endPoint.handle != oldEndPoint.handle)
+	if (startPoint.handle != prevStartPoint.handle || endPoint.handle != prevEndPoint.handle)
 	{
 		resetSearchFlag = true;
 	}
-	oldStartPoint = startPoint;
-	oldEndPoint = endPoint;
+	prevStartPoint = startPoint;
+	prevEndPoint = endPoint;
 
+	//毎フレーム白に初期化する
 	for (int y = 0; y < wayPoints.size(); ++y)
 	{
 		for (int x = 0; x < wayPoints[y].size(); ++x)
@@ -148,7 +149,7 @@ void NavigationAI::Update(const Vec2<float> &POS)
 		}
 	}
 
-	//段階に分けて探索する色を出す
+	//段階に分けて探索する色を出力する
 	for (int layer = 0; layer < layerNum; ++layer)
 	{
 		for (int num = 0; num < searchMap[layer].size(); ++num)
@@ -182,7 +183,6 @@ void NavigationAI::Draw()
 			{
 				if (wayPointFlag)
 				{
-
 					bool isCheckingFlag = false;
 					Color color = debugColor[y][x];
 
@@ -326,6 +326,7 @@ void NavigationAI::ImGuiDraw()
 
 std::vector<WayPointData> NavigationAI::GetShortestRoute()
 {
+	//キューからウェイポイントの配列に変換する
 	std::vector<WayPointData>result;
 	for (int i = queue.size() - 1; 0 <= i; --i)
 	{
@@ -333,7 +334,6 @@ std::vector<WayPointData> NavigationAI::GetShortestRoute()
 		int y = queue[i].handle.y;
 		result.push_back(wayPoints[y][x]);
 	}
-
 	return result;
 }
 
@@ -446,7 +446,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 				
 			}
 		}
-
+		//次の場所を探索した後failFlagが立っていたら下ろす
 		failFlag = false;
 
 		//次に探索できる場所が無ければゴールまでたどり着いているか確認する
@@ -467,23 +467,23 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 			{
 				break;
 			}
-			//そうでなければ次に大きい合計値をnextPointに入れて再探索する
+			//そうでなければ探索に失敗したウェイポイント達をnextPointに入れて再探索する
 			else
 			{
 				nextPoint = failPoint;
 				failFlag = true;
-
 				//ソートする際に順番がずれないよう今までのキューに調整を入れる
+				//現在のウェイポイントの間隔から算出している
 				for (int i = 0; i < queue.size(); ++i)
 				{
-					queue[i].sum += 15.0f;
+					queue[i].sum += 325.0f / 2.0f;
 				}
 			}
 		}
 	}
 
-
-	queue = SortQueue(queue);
+	//今までの候補から最短ルートを作る
+	queue = ConvertToShortestRoute(queue);
 
 }
 
@@ -499,7 +499,7 @@ inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
 	return false;
 }
 
-std::vector<NavigationAI::QueueData> NavigationAI::SortQueue(const std::vector<QueueData> &QUEUE)
+std::vector<NavigationAI::QueueData> NavigationAI::ConvertToShortestRoute(const std::vector<QueueData> &QUEUE)
 {
 	std::vector<float>sumArray;
 	for (int i = 0; i < QUEUE.size(); ++i)

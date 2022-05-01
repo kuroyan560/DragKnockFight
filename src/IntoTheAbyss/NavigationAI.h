@@ -60,6 +60,10 @@ public:
 
 	void ImGuiDraw();
 
+	/// <summary>
+	/// 最短ルートを受け取る
+	/// </summary>
+	/// <returns></returns>
 	std::vector<WayPointData> GetShortestRoute();
 
 	/// <summary>
@@ -90,12 +94,33 @@ private:
 
 	std::array<std::array<WayPointData, WAYPOINT_MAX_Y>, WAYPOINT_MAX_X> wayPoints;//ウェイポイントの配列
 
+	/// <summary>
+	/// マップチップ座標に変換しfloatからintに切り替える際に切り落とすか切り上げるかを判断する
+	/// </summary>
+	/// <param name="WORLD_POS">ワールド座標</param>
+	/// <returns>マップチップ座標</returns>
 	inline const Vec2<int> &GetMapChipNum(const Vec2<float> &WORLD_POS);
 
+	/// <summary>
+	/// 引数に渡したウェイポイントを周りのウェイポイントと繋げる
+	/// </summary>
+	/// <param name="HANDLE">ウェイポイントを繋げる為の判定</param>
+	/// <param name="DATA">リンク付けする対象</param>
 	inline void RegistHandle(const SphereCollision &HANDLE, WayPointData *DATA);
 
+	/// <summary>
+	/// 使用しているウェイポイントかどうか
+	/// </summary>
+	/// <param name="DATA">ウェイポイントのデータ</param>
+	/// <returns>true...使われている,false...使われていない</returns>
 	inline bool DontUse(const WayPointData &DATA);
 
+	/// <summary>
+	/// マップチップとレイの判定
+	/// </summary>
+	/// <param name="START_POS">始点</param>
+	/// <param name="END_POS">終点</param>
+	/// <returns>true...当たった、false...当たっていない</returns>
 	bool CheckMapChipWallAndRay(const Vec2<float> &START_POS, const Vec2<float> &END_POS)
 	{
 		//どうやって使うか
@@ -249,7 +274,7 @@ private:
 
 
 	//A*-------------------------------
-	std::vector<QueueData>queue;	//探索用のキュー
+	std::vector<QueueData>queue;	//最短ルートの候補を纏めた配列
 
 	/// <summary>
 	/// Aスターによる探索を行う関数
@@ -259,27 +284,33 @@ private:
 	void AStart(const WayPointData &START_POINT, const WayPointData &END_POINT);
 
 	/// <summary>
-	/// 同じハンドルがスタックされているかどうか
+	/// キューに同じハンドルがスタックされているかどうか
 	/// </summary>
+	/// <param name="HANDLE">ウェイポイントのハンドル</param>
 	inline bool CheckQueue(const Vec2<int> &HANDLE);
 
+	/// <summary>
+	/// 探索した際の最短ルート候補から最短ルートに絞る
+	/// </summary>
+	/// <param name="QUEUE">最短ルート候補</param>
+	/// <returns>スタートからゴールまでの最短ルート</returns>
+	std::vector<QueueData> ConvertToShortestRoute(const std::vector<QueueData> &QUEUE);
 
-	std::vector<QueueData> SortQueue(const std::vector<QueueData> &QUEUE);
-
-	WayPointData startPoint, endPoint;
-	WayPointData oldStartPoint, oldEndPoint;
+	WayPointData startPoint;	//探索する際のスタート地点
+	WayPointData endPoint;		//探索する際のゴール地点
+	WayPointData prevStartPoint;//探索する際の前フレームのスタート地点
+	WayPointData prevEndPoint;	//探索する際の前フレームのゴール地点
 
 
 	//デバック--------------------------
-
 	Vec2<int> checkingHandle;	//マウスカーソルで参照しているウェイポイント
 	int checkTimer;				//ウェイポイントを参照している時間
 
-	bool serachFlag;
-	bool lineFlag;
-	bool wayPointFlag;
+	bool serachFlag;			//ウェイポイント同士のリンク付けする為の判定の描画
+	bool lineFlag;				//ウェイポイント同士のリンクしているかの確認
+	bool wayPointFlag;			//ウェイポイントの描画
 
-	std::array<std::array<Color, WAYPOINT_MAX_Y>, WAYPOINT_MAX_X> debugColor;
+	std::array<std::array<Color, WAYPOINT_MAX_Y>, WAYPOINT_MAX_X> debugColor;	//ウェイポイントの色
 
 	struct SearchMapData
 	{
@@ -289,7 +320,7 @@ private:
 		{
 		}
 	};
-	std::vector<std::vector<SearchMapData>>searchMap;
-	int layerNum;
+	std::vector<std::vector<SearchMapData>>searchMap;	//
+	int layerNum;										//探索数を指定する用の変数
 };
 
