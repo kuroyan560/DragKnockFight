@@ -291,5 +291,38 @@ private:
 	};
 	std::vector<std::vector<SearchMapData>>searchMap;
 	int layerNum;
+
+
+	bool CheckHitLineCircle(const Vec2<float> &LineStartPos, const Vec2<float> &LineEndPos, const Vec2<float> &CircleCenterPos, const float &CircleRadius) {
+
+		// 始点から終点までのベクトルを正規化する。
+		Vec2<float> &startEndPos = LineEndPos - LineStartPos;
+		startEndPos.Normalize();
+
+		// [始点から終点までのベクトル]と、[始点から円の中心までのベクトル]の結果の外積が円の半径よりも小さかったら判定の第一段階クリア！
+		if (fabs(startEndPos.Cross(CircleCenterPos - LineStartPos)) < CircleRadius) {
+
+			// [始点から終点までのベクトルと始点から円の中心までのベクトルの内積] と [始点から終点までのベクトルと終点から円の中心までのベクトルの内積] のかけた値が-だったら当たっている！
+			if ((LineEndPos - LineStartPos).Dot(CircleCenterPos - LineStartPos) * (LineEndPos - LineStartPos).Dot(CircleCenterPos - LineEndPos) < 0) {
+
+				return true;
+
+			}
+			else {
+
+				// 上の条件式で当たっていなかった場合でも、始点終点からの距離が円の半径よりも小さかったら当たっている。
+				float startCenterDistance = (LineStartPos - CircleCenterPos).Length();
+				float endCenterDistance = (LineEndPos - CircleCenterPos).Length();
+				if (fabs(startCenterDistance) < CircleRadius || fabs(endCenterDistance) < CircleRadius) {
+
+					return true;
+
+				}
+
+			}
+
+		}
+		return false;
+	}
 };
 

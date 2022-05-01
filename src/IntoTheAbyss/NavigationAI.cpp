@@ -223,7 +223,65 @@ void NavigationAI::Draw()
 				//探索範囲の描画
 				if (serachFlag)
 				{
-					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), SERACH_RADIUS, Color(255, 255, 255, 255));
+					for (int i = 0; i < 8; ++i)
+					{
+						int angle = i * (360.0f / 8.0f);
+						float distance = 250.0f;
+
+						int adj = 15;
+						float upDown = 250.0f;
+						float leftRight = 400.0f;
+						float naname = 400.0f;
+
+						if (angle == 0)
+						{
+							distance = leftRight;
+						}
+						else if (angle == 45)
+						{
+							angle += adj;
+							distance = naname;
+						}
+						else if (angle == 90)
+						{
+							distance = upDown;
+						}
+						else if (angle == 135)
+						{
+							angle += adj;
+							distance = naname;
+						}
+						else if (angle == 180)
+						{
+							distance = leftRight;
+						}
+						else if (angle == 225)
+						{
+							angle -= adj;
+							distance = naname;
+						}
+						else if (angle == 270)
+						{
+							distance = upDown;
+						}
+						else if (angle == 315)
+						{
+							angle += adj;
+							distance = naname;
+						}
+						else
+						{
+							distance = leftRight;
+						}
+
+						float dir = Angle::ConvertToRadian(angle);
+
+
+
+
+						Vec2<float>lineEndPos(cosf(dir), sinf(dir));
+						DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), ScrollMgr::Instance()->Affect(wayPoints[y][x].pos + lineEndPos * distance), Color(255, 255, 255, 255));
+					}
 				}
 			}
 		}
@@ -443,7 +501,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 						failPoint.push_back(wayPoints[handle.y][handle.x]);
 					}
 				}
-				
+
 			}
 		}
 
@@ -649,17 +707,78 @@ inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, WayPointDa
 			//使用できるデータから判定を行う
 			if (DontUse(wayPoints[y][x]))
 			{
-				SphereCollision data;
-				data.center = &wayPoints[y][x].pos;
-				data.radius = SERACH_RADIUS;
-
 				//移動範囲内にウェイポイントがあるか
-				bool serachFlag = BulletCollision::Instance()->CheckSphereAndSphere(HANDLE, data);
+				Vec2<float>lineStartPos = DATA->pos;
+				Vec2<float>circlePos = wayPoints[y][x].pos;
+				float r = wayPoints[y][x].radius;
+
+				bool serachFlag = false;
+				//中心から八方向に伸びた線とウェイポイントの判定
+				for (int i = 0; i < 8; ++i)
+				{
+					int angle = i * (360.0f / 8.0f);
+					float distance = 0.0f;
+
+					int adj = 15;
+
+					float upDown = 250.0f;
+					float leftRight = 400.0f;
+					float naname = 400.0f;
+
+					if (angle == 0)
+					{
+						distance = leftRight;
+					}
+					else if (angle == 45)
+					{
+						angle += adj;
+						distance = naname;
+					}
+					else if (angle == 90)
+					{
+						distance = upDown;
+					}
+					else if (angle == 135)
+					{
+						angle += adj;
+						distance = naname;
+					}
+					else if (angle == 180)
+					{
+						distance = leftRight;
+					}
+					else if (angle == 225)
+					{
+						angle -= adj;
+						distance = naname;
+					}
+					else if (angle == 270)
+					{
+						distance = upDown;
+					}
+					else if (angle == 315)
+					{
+						angle += adj;
+						distance = naname;
+					}
+					else
+					{
+						distance = leftRight;
+					}
+					float dir = Angle::ConvertToRadian(angle);
+					Vec2<float>lineEndPos(cosf(dir), sinf(dir));
+					if (CheckHitLineCircle(lineStartPos, lineStartPos + lineEndPos * distance, circlePos, r))
+					{
+						serachFlag = true;
+						break;
+					}
+				}
+
 				//道中壁に当たっているかどうか
 				bool canMoveFlag = false;
 				if (serachFlag)
 				{
-					canMoveFlag = !CheckMapChipWallAndRay(*HANDLE.center, *data.center);
+					canMoveFlag = !CheckMapChipWallAndRay(*HANDLE.center, circlePos);
 				}
 
 				//探索範囲内&&直接行ける場所なら線を繋げる
