@@ -11,6 +11,7 @@
 #include"SelectStage.h"
 #include"AfterImage.h"
 #include"CrashEffectMgr.h"
+#include"Stamina.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -43,6 +44,7 @@
 #include"DebugKeyManager.h"
 
 #include"CharacterManager.h"
+#include "StaminaItemMgr.h"
 
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
@@ -660,6 +662,14 @@ void Game::Update()
 	// クラッシュ時の演出の更新処理。
 	CrashEffectMgr::Instance()->Update();
 
+	// スタミナアイテムの更新処理
+	StaminaItemMgr::Instance()->Update();
+	// スタミナアイテムの当たり判定処理
+	int healAmount = StaminaItemMgr::Instance()->CheckHit(CharacterManager::Instance()->Left()->pos, 30, StaminaItem::CHARA_ID::LEFT);
+	CharacterManager::Instance()->Left()->staminaGauge->AddStamina(healAmount);
+	healAmount = StaminaItemMgr::Instance()->CheckHit(CharacterManager::Instance()->Right()->pos, 30, StaminaItem::CHARA_ID::RIGHT);
+	CharacterManager::Instance()->Right()->staminaGauge->AddStamina(healAmount);
+
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -677,6 +687,9 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	playerHomeBase.Draw();
 	enemyHomeBase.Draw();
+
+	// スタミナアイテムの描画処理
+	StaminaItemMgr::Instance()->Draw();
 
 	static int CENTER_CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static int PLAYER_CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain_player.png");

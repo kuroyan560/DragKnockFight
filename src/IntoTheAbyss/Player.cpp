@@ -500,7 +500,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	}
 
 	// スタミナが残っているか？
-	isSwingStamina = staminaGauge->CheckCanAction(DASH_STAMINA);
+	isSwingStamina = staminaGauge->CheckCanAction(SWING_STAMINA);
 
 	// 右スティックが入力されていたら、予測線を出す。
 	if (isInputRightStick && isSwingStamina) {

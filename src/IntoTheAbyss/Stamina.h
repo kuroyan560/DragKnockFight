@@ -37,7 +37,7 @@ public:
 };
 
 // スタミナ管理クラス
-class StaminaMgr{
+class StaminaMgr {
 
 public:
 
@@ -57,6 +57,9 @@ public:
 
 	// スタミナを消費
 	void ConsumesStamina(const int& ConsumesStamina);
+
+	// スタミナを加算
+	void AddStamina(const int& AddStamina);
 
 	// 指定したアクションができるか。
 	bool CheckCanAction(const int& ConsumesStamina);

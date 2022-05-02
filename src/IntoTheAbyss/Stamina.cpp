@@ -138,7 +138,7 @@ void StaminaMgr::Update()
 		// 既にマックスだったら処理を飛ばす。
 		if (stamina[index].GetIsActivate()) continue;
 
-		stamina[index].AddNowGauge(0.1f);
+		stamina[index].AddNowGauge(0.5f);
 
 		// 手前側から一つずつ順々に回復していくため、リターン。
 		break;
@@ -217,6 +217,42 @@ void StaminaMgr::ConsumesStamina(const int& ConsumesStamina)
 		stamina[index].AddNowGauge(saveStamina);
 		break;
 	}
+}
+
+void StaminaMgr::AddStamina(const int& AddStamina)
+{
+
+	/*===== スタミナを回復させる =====*/
+
+	int addStamina = AddStamina;
+
+	const int STAMINA_COUNT = stamina.size();
+	for (int index = 0; index < STAMINA_COUNT; ++index) {
+
+		// 既にマックスだったら処理を飛ばす。
+		if (stamina[index].GetIsActivate()) continue;
+
+		// オーバーして回復しないようにする。
+		if (addStamina < 100.0f - stamina[index].GetNowGauge()) {
+
+			stamina[index].AddNowGauge(addStamina);
+
+			break;
+
+		}
+		// オーバーしていたら。
+		else {
+
+			// オーバーしている量を保存する。
+			addStamina -= 100.0f - stamina[index].GetNowGauge();
+
+			// 回復する。
+			stamina[index].AddNowGauge(100.0f - stamina[index].GetNowGauge());
+
+		}
+
+	}
+
 }
 
 bool StaminaMgr::CheckCanAction(const int& ConsumesStamina)

@@ -458,6 +458,7 @@ void CharacterInterFace::Damage()
 
 #include"Intersected.h"
 #include"MapChipCollider.h"
+#include "StaminaItemMgr.h"
 void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
 
@@ -742,6 +743,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				// クラッシュ演出を追加。
 				CrashEffectMgr::Instance()->Generate(pos);
+
+				// アイテムを生成する。
+				StaminaItem::CHARA_ID charaID;
+				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::LEFT;
+				if (team != WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::RIGHT;
+				StaminaItemMgr::Instance()->Generate(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID);
 
 			}
 
