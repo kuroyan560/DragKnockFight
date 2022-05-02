@@ -310,6 +310,23 @@ void NavigationAI::ImGuiDraw()
 	ImGui::End();
 
 
+	//ImGui::Begin("ShortestRoute");
+	//for (int branchNum = 0; branchNum < branchQueue.size(); ++branchNum)
+	//{
+	//	ImGui::Text("Route:%d", branchNum);
+	//	for (int route = 0; route < branchQueue[branchNum].size(); ++route)
+	//	{
+	//		ImGui::Text("Handle:%d,X:%d,Y:%d",
+	//			route,
+	//			branchQueue[branchNum][route]->handle.x,
+	//			branchQueue[branchNum][route]->handle.y
+	//		);
+	//	}
+	//}
+	//ImGui::End();
+
+
+
 
 	if (checkingHandle.x != -1 && checkingHandle.y != -1)
 	{
