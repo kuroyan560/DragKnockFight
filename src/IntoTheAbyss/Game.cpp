@@ -664,10 +664,11 @@ void Game::Update()
 
 	// スタミナアイテムの更新処理
 	StaminaItemMgr::Instance()->Update();
+
 	// スタミナアイテムの当たり判定処理
-	int healAmount = StaminaItemMgr::Instance()->CheckHit(CharacterManager::Instance()->Left()->pos, 30, StaminaItem::CHARA_ID::LEFT);
+	int healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Left()->pos, 30, StaminaItem::CHARA_ID::LEFT, Color(0x02, 0xFF, 0x8B, 0xFF));
 	CharacterManager::Instance()->Left()->staminaGauge->AddStamina(healAmount);
-	healAmount = StaminaItemMgr::Instance()->CheckHit(CharacterManager::Instance()->Right()->pos, 30, StaminaItem::CHARA_ID::RIGHT);
+	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 30, StaminaItem::CHARA_ID::RIGHT, Color(0xEF, 0x01, 0x90, 0xFF));
 	CharacterManager::Instance()->Right()->staminaGauge->AddStamina(healAmount);
 
 }

@@ -13,7 +13,7 @@ void StaminaItemMgr::Init()
 
 }
 
-void StaminaItemMgr::Generate(const Vec2<float>& GeneratePos, GENERATE_STATUS Status, Vec2<float>* CharaPos, StaminaItem::CHARA_ID CharaID)
+void StaminaItemMgr::Generate(const Vec2<float>& GeneratePos, GENERATE_STATUS Status, Vec2<float>* CharaPos, Color CharaColor, StaminaItem::CHARA_ID CharaID)
 {
 
 	/*===== 生成処理 =====*/
@@ -36,7 +36,7 @@ void StaminaItemMgr::Generate(const Vec2<float>& GeneratePos, GENERATE_STATUS St
 				randomVec.Normalize();
 
 				// 生成する。
-				item[index].Generate(GeneratePos, randomVec, HEAL_AMOUNT, CRASH_VEL, StaminaItem::STAMINA_ITEM_ID::CRASH_ITEM, true, CharaPos);
+				item[index].Generate(GeneratePos, randomVec, HEAL_AMOUNT, CRASH_VEL, StaminaItem::STAMINA_ITEM_ID::CRASH_ITEM, true, CharaPos,CharaColor);
 
 				break;
 
@@ -73,6 +73,18 @@ void StaminaItemMgr::Update()
 
 	/*===== 更新処理 =====*/
 
+	// 自動スポーンに関する更新を行う。
+	++sponeTimer;
+	if (SPONE_TIMER <= sponeTimer) {
+
+		Vec2<float> randomSponePos = { KuroFunc::GetRand(0.0f, 2000.0f), KuroFunc::GetRand(0.0f,1000.0f) };
+
+		Generate(randomSponePos, StaminaItemMgr::GENERATE_STATUS::SPONE);
+
+		sponeTimer = 0;
+
+	}
+
 	for (int index = 0; index < ITEM_COUNT; ++index) {
 
 		// 未生成だったら処理を飛ばす。
@@ -100,10 +112,12 @@ void StaminaItemMgr::Draw()
 
 }
 
-int StaminaItemMgr::CheckHit(const Vec2<float>& CharaPos, const float& CharaRadius, StaminaItem::CHARA_ID CharaID)
+int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, StaminaItem::CHARA_ID CharaID, Color CharaColor)
 {
 
 	/*===== 当たり判定を行い、スタミナの回復量を取得する =====*/
+
+	if (CharaPos == nullptr) return 0;
 
 	int healAmount = 0;
 
@@ -124,7 +138,13 @@ int StaminaItemMgr::CheckHit(const Vec2<float>& CharaPos, const float& CharaRadi
 			item[index].Init();
 
 		}
-		// ここに取得されていなかったら移動量を調整したりどうたらこうたらって処理を書く。
+		// 取得されていなかったら。
+		if (isHit && !item[index].GetIsAcquired()) {
+
+			// 取得された状態にする。
+			item[index].Acquire(CharaPos, CharaID, CharaColor);
+
+		}
 
 	}
 

@@ -748,7 +748,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				StaminaItem::CHARA_ID charaID;
 				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::LEFT;
 				if (team != WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::RIGHT;
-				StaminaItemMgr::Instance()->Generate(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID);
+				Color charaColor;
+				if (team == WHICH_TEAM::LEFT_TEAM) charaColor = Color(0xEF, 0x01, 0x90, 0xFF);
+				if (team != WHICH_TEAM::LEFT_TEAM) charaColor = Color(0x02, 0xFF, 0x8B, 0xFF);
+				StaminaItemMgr::Instance()->Generate(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaColor, charaID);
 
 			}
 

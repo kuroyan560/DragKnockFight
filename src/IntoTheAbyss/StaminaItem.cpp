@@ -20,7 +20,7 @@ void StaminaItem::Init()
 
 }
 
-void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& ForwardVec, const float& HealAmount, const float& Vel, STAMINA_ITEM_ID ItemID, const bool& IsAcquired, Vec2<float>* CharaPos, CHARA_ID CharaID)
+void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& ForwardVec, const float& HealAmount, const float& Vel, STAMINA_ITEM_ID ItemID, const bool& IsAcquired, Vec2<float>* CharaPos, Color CharaColor, CHARA_ID CharaID)
 {
 
 	/*===== 生成処理 =====*/
@@ -33,6 +33,7 @@ void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& Fo
 	isAcquired = IsAcquired;
 	itemID = ItemID;
 	charaID = CharaID;
+	itemColor = CharaColor;
 	isActive = true;
 
 	// 初めから取得されている状態だったら参照を保存する。
@@ -59,11 +60,21 @@ void StaminaItem::Update()
 
 		/*-- スポーンしたアイテムだったら --*/
 
-		// 取得されたら。
-		if (isAcquired && charaPos != nullptr) {
+		// 取得されていなかったら処理を飛ばす。
+		if (!isAcquired) break;
+
+		// 移動量を0に近づける。
+		vel -= vel / 10.0f;
+		if (vel < 1.0f) vel = 0;
+
+		// 移動量を足す。
+		pos += forwardVec * vel;
+
+		// [移動量が0] 且つ [動きを止めるタイマーが起動していなかったら] キャラクターに向かって追尾させる。
+		if (vel <= 0 && charaPos != nullptr) {
 
 			// 移動すべき角度を求める。
-			float moveAngle = atan2f(charaPos->y - pos.y, charaPos->x - pos.x);
+			moveAngle = atan2f(charaPos->y - pos.y, charaPos->x - pos.x);
 
 			pos += {cosf(moveAngle)* TRACING_SPEED, sinf(moveAngle)* TRACING_SPEED};
 
@@ -75,28 +86,12 @@ void StaminaItem::Update()
 
 		/*-- クラッシュ時などに出るアイテムだったら --*/
 
-		// 一定時間動きを止めるタイマーが起動していたら処理を飛ばす。
-		if (0 < stopTimer) {
-
-			--stopTimer;
-			break;
-
-		}
-
 		// 移動量を0に近づける。
-		prevVel = vel;
 		vel -= vel / 10.0f;
-		if (vel < 0.1f) vel = 0;
+		if (vel < 0.5f) vel = 0;
 
 		// 移動量を足す。
 		pos += forwardVec * vel;
-
-		// 移動量が限りなく0になったら一定時間動きを止めるタイマーを起動する。トリガー判定。
-		if (vel <= 0 && 0 < vel) {
-
-			stopTimer = STOP_TIMER;
-
-		}
 
 		// [移動量が0] 且つ [動きを止めるタイマーが起動していなかったら] キャラクターに向かって追尾させる。
 		if (vel <= 0 && charaPos != nullptr) {
@@ -121,12 +116,17 @@ void StaminaItem::Draw()
 
 	/*===== 描画処理 =====*/
 
-	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(pos), DRAW_RADIUS, itemColor);
+	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(pos), DRAW_RADIUS, itemColor, isAcquired);
 
 }
 
-bool StaminaItem::CheckHit(const Vec2<float>& CharaPos, const float& CharaRadius, CHARA_ID CharaID)
+bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, CHARA_ID CharaID)
 {
+
+	if (CharaPos == nullptr) return false;
+
+	// 移動中だったら当たり判定を行わない。
+	if (0 < vel) return false;
 
 	// 回収されていたら。
 	if (isAcquired) {
@@ -135,10 +135,10 @@ bool StaminaItem::CheckHit(const Vec2<float>& CharaPos, const float& CharaRadius
 		if (charaID == CharaID) {
 
 			// 2点間の距離を求める。
-			float distance = (pos - CharaPos).Length();
+			float distance = (pos - *CharaPos).Length();
 
 			// 2点間の距離が半径よりも小さかったら。
-			if (distance <= CharaRadius + HIT_RADIUS) {
+			if (distance <= CharaRadius + HIT_RADIUS / 2.0f) {
 
 				return true;
 
@@ -148,11 +148,34 @@ bool StaminaItem::CheckHit(const Vec2<float>& CharaPos, const float& CharaRadius
 
 	}
 	// 回収されていなかったら。
-	else{
-	
-		
-	
+	else {
+
+		// 2点間の距離を求める。
+		float distance = (pos - *CharaPos).Length();
+
+		// 2点間の距離が半径よりも小さかったら。
+		if (distance <= CharaRadius + HIT_RADIUS) {
+
+			return true;
+
+		}
+
 	}
 
 	return false;
+}
+
+void StaminaItem::Acquire(Vec2<float>* CharaPos, CHARA_ID CharaID, Color CharaColor)
+{
+
+	/*===== 取得された状態にする =====*/
+
+	isAcquired = true;
+	charaPos = CharaPos;
+	forwardVec = pos - *CharaPos;
+	forwardVec.Normalize();
+	vel = ACQUIRED_VEL;
+	charaID = CharaID;
+	itemColor = CharaColor;
+
 }
