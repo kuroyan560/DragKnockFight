@@ -342,9 +342,9 @@ void Player::OnHitMapChip(const HIT_DIR& Dir)
 }
 void Player::OnPilotControl()
 {
-	static const float PILOT_SPEED = 10.0f;
+	static const float PILOT_SPEED = 20.0f;
 	const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0.5f,0.5f });
-	auto move = rightStickVec.GetNormal() * PILOT_SPEED;
+	auto move = rightStickVec * PILOT_SPEED;
 	pilotPos += move;
 }
 
@@ -400,6 +400,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		if (inputLeftVec.y < 0)playerDirY = PLAYER_BACK;
 		else if (0 < inputLeftVec.y)playerDirY = PLAYER_FRONT;
 	}
+	/* ※オートパイロットやるづらく感じたので、一旦コメントアウト
 	//オートパイロット
 	else if (IsPilotOutSide())
 	{
@@ -411,6 +412,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		if (autoPilotMove.y < 0)playerDirY = PLAYER_BACK;
 		else if (0 < autoPilotMove.y)playerDirY = PLAYER_FRONT;
 	}
+	*/
 
 	// 入力を受け付ける変数
 	bool isInputLB = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
@@ -431,7 +433,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	bool isSwingStamina = staminaGauge->CheckCanAction(SWING_STAMINA);
 
 	// RTが押されたら
-	bool canSwing = (!isInputRightStick && isPrevInputRightStick) && isSwingStamina && !IsPilotOutSide;
+	bool canSwing = (!isInputRightStick && isPrevInputRightStick) && isSwingStamina && !IsPilotOutSide();
 	if ((!isSwingPartner && canSwing || isAdvancedEntrySwing)) {
 
 		// 振り回しの処理

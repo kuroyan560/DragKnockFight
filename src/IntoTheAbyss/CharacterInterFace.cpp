@@ -353,6 +353,12 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	if (isPilotDetached)
 	{
 		OnPilotControl();
+		//スタミナ消費
+		if (!staminaGauge->ConsumesStaminaByGauge(0.5f))
+		{
+			//強制的にパイロットを戻す
+			SetPilotDetachedFlg(false);
+		}
 	}
 	//パイロットが戻ってくる処理
 	if (pilotReturnTimer < pilotReturnTotalTime)
@@ -460,7 +466,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	}
 
-	staminaGauge->Update();
+	staminaGauge->Update(!isPilotDetached);
 
 }
 

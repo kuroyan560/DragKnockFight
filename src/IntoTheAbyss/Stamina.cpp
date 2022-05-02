@@ -88,8 +88,8 @@ float Stamina::AddNowGauge(const float& Add)
 
 	nowGauge += Add;
 
-	// 限界を超えていたら差分をリターンする。
-	if (MAX_GAUGE < nowGauge) {
+	// 上限を超えていたら差分をリターンする。
+	if (MAX_GAUGE <= nowGauge) {
 
 		float sub = nowGauge - MAX_GAUGE;
 
@@ -99,7 +99,16 @@ float Stamina::AddNowGauge(const float& Add)
 
 		// 超過量を返す。このゲージの次のゲージに足すため。
 		return sub;
+	}
 
+	//下限を超えていたら差分をリターンする
+	if (nowGauge < 0) {
+
+		float sub = 0 - nowGauge;
+
+		nowGauge += sub;
+
+		return sub;
 	}
 
 	return 0;
@@ -128,21 +137,25 @@ void StaminaMgr::Init()
 
 }
 
-void StaminaMgr::Update()
+void StaminaMgr::Update(const bool& Heal)
 {
-
+	static const float HEAL_AMOUNT = 1.0f;
 	// スタミナゲージは何もしてなくても少しずつ回復する。
 	const int STAMINA_COUNT = stamina.size();
-	for (int index = 0; index < STAMINA_COUNT; ++index) {
 
-		// 既にマックスだったら処理を飛ばす。
-		if (stamina[index].GetIsActivate()) continue;
+	if (Heal)
+	{
+		for (int index = 0; index < STAMINA_COUNT; ++index) {
 
-		stamina[index].AddNowGauge(0.1f);
+			// 既にマックスだったら処理を飛ばす。
+			if (stamina[index].GetIsActivate()) continue;
 
-		// 手前側から一つずつ順々に回復していくため、リターン。
-		break;
+			stamina[index].AddNowGauge(HEAL_AMOUNT);
 
+			// 手前側から一つずつ順々に回復していくため、リターン。
+			break;
+
+		}
 	}
 
 	// 更新処理
@@ -235,4 +248,27 @@ bool StaminaMgr::CheckCanAction(const int& ConsumesStamina)
 
 	return ConsumesStamina <= stainaCounter;
 
+}
+
+bool StaminaMgr::ConsumesStaminaByGauge(const float& CounsumeStaminaGauge)
+{
+	float consumeAmount = CounsumeStaminaGauge;
+
+	for (int index = stamina.size() - 1; 0 <= index; --index) {
+
+		//少しでも残っていたら消費
+		if (stamina[index].GetNowGauge()) {
+
+			consumeAmount = stamina[index].AddNowGauge(-consumeAmount);
+
+			//消費完了
+			if (consumeAmount <= 0)
+			{
+				return true;
+			}
+		}
+	}
+
+	//消費しきれなかった
+	return false;
 }
