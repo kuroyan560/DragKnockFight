@@ -56,7 +56,7 @@ public:
 
 	StaminaMgr();
 	void Init();
-	void Update();
+	void Update(const bool& Heal);
 	void Draw(const Vec2<float>& CharaPos);
 
 	// スタミナを消費
@@ -68,4 +68,6 @@ public:
 	// 指定したアクションができるか。
 	bool CheckCanAction(const int& ConsumesStamina);
 
+	//バー単位ではなくゲージ消費(パイロット引き離し用)、足りなかったらfalseを返す
+	bool ConsumesStaminaByGauge(const float& CounsumeStaminaGauge);
 };

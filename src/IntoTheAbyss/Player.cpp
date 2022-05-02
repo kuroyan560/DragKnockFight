@@ -42,11 +42,7 @@ Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& Controll
 		"luna",
 		"lacy"
 	};
-	const int ARM_GRAPH_L = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/arm_L.png");
-	const int ARM_GRAPH_R = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/arm_R.png");
 	const int AIM_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/aim.png");
-	lHand = make_unique<PlayerHand>(ARM_GRAPH_L, AIM_GRAPH);
-	rHand = make_unique<PlayerHand>(ARM_GRAPH_R, AIM_GRAPH);
 
 	// 画像をロード
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
@@ -74,9 +70,6 @@ void Player::OnInit()
 
 	// 腕をセット
 	static const float OFFSET = -8.0f;
-
-	lHand->Init(-GetPlayerGraphSize().x + OFFSET);
-	rHand->Init(GetPlayerGraphSize().x - OFFSET);
 
 	// 連射タイマーを初期化
 	rapidFireTimerLeft = 0;
@@ -117,6 +110,8 @@ void Player::OnInit()
 	isInputRightStick = false;
 	isPrevInputRightStick = false;
 	prevInputRightStick = {};
+
+	autoPilotMove = { 0,0 };
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -231,10 +226,6 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 void Player::OnUpdateNoRelatedSwing()
 {
-	// 腕を更新
-	lHand->Update(pos + anim.GetHandCenterOffset());
-	rHand->Update(pos + anim.GetHandCenterOffset());
-
 	// 握力タイマーを規定値に近づける。
 	//if (!nowSwing && gripPowerTimer < MAX_GRIP_POWER_TIMER) {
 	//	gripPowerTimer += SlowMgr::Instance()->slowAmount;
@@ -349,6 +340,13 @@ void Player::OnDrawUI()
 void Player::OnHitMapChip(const HIT_DIR& Dir)
 {
 }
+void Player::OnPilotControl()
+{
+	static const float PILOT_SPEED = 20.0f;
+	const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0.5f,0.5f });
+	auto move = rightStickVec * PILOT_SPEED;
+	pilotPos += move;
+}
 
 void Player::Input(const vector<vector<int>>& MapData)
 {
@@ -394,30 +392,27 @@ void Player::Input(const vector<vector<int>>& MapData)
 		if (vel.Length() < MOVE_SPEED_PLAYER) {
 			vel.x = inputLeftVec.x * (MOVE_SPEED_PLAYER * inputRate);
 			vel.y = inputLeftVec.y * (MOVE_SPEED_PLAYER * inputRate);
+			autoPilotMove = vel;
 		}
-
-		// 右手の角度を更新
-		lHand->SetAngle(KuroFunc::GetAngle(inputLeftVec));
 
 		if (inputLeftVec.x < 0)playerDirX = PLAYER_LEFT;
 		else if (0 < inputLeftVec.x)playerDirX = PLAYER_RIGHT;
 		if (inputLeftVec.y < 0)playerDirY = PLAYER_BACK;
 		else if (0 < inputLeftVec.y)playerDirY = PLAYER_FRONT;
 	}
+	/* ※オートパイロットやるづらく感じたので、一旦コメントアウト
+	//オートパイロット
+	else if (IsPilotOutSide())
+	{
+		static const float AUTO_PILOT_SPEED = 10.0f;
+		vel = autoPilotMove.GetNormal() * AUTO_PILOT_SPEED;
 
-	inputRightVec = UsersInput::Instance()->GetRightStickVecFuna(controllerIdx);
-	inputRightVec /= {32768.0f, 32768.0f};
-
-	// 入力のデッドラインを設ける。
-	if (inputRightVec.Length() >= 0.5f) {
-
-		// 左手の角度を更新
-		rHand->SetAngle(KuroFunc::GetAngle(inputRightVec));
-
-		// 一定時間入力がなかったら初期位置に戻す
-		//handReturnTimer = DEF_HAND_RETURN_TIMER;
-
+		if (autoPilotMove.x < 0)playerDirX = PLAYER_LEFT;
+		else if (0 < autoPilotMove.x)playerDirX = PLAYER_RIGHT;
+		if (autoPilotMove.y < 0)playerDirY = PLAYER_BACK;
+		else if (0 < autoPilotMove.y)playerDirY = PLAYER_FRONT;
 	}
+	*/
 
 	// 入力を受け付ける変数
 	bool isInputLB = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
@@ -438,7 +433,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	bool isSwingStamina = staminaGauge->CheckCanAction(SWING_STAMINA);
 
 	// RTが押されたら
-	bool canSwing = (!isInputRightStick && isPrevInputRightStick) && isSwingStamina;
+	bool canSwing = (!isInputRightStick && isPrevInputRightStick) && isSwingStamina && !IsPilotOutSide();
 	if ((!isSwingPartner && canSwing || isAdvancedEntrySwing)) {
 
 		// 振り回しの処理
@@ -462,7 +457,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// 先行入力を保存。
 		isAdvancedEntrySwing = true;
 		advancedEntrySwingTimer = ADVANCED_ENTRY_SWING_TIMER;
-
 	}
 
 	// スタミナが残っているか？
@@ -525,13 +519,21 @@ void Player::Input(const vector<vector<int>>& MapData)
 		}
 
 	}
+	else
+	{
+		if (!IsPilotOutSide())
+		{
+			//パイロット切り離し
+			if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT))SetPilotDetachedFlg(true);
+		}
+	}
+	if (UsersInput::Instance()->ControllerOffTrigger(controllerIdx, XBOX_BUTTON::RT))SetPilotDetachedFlg(false);
 
 	// 入力されていなくて、スイング中じゃなかったら予測線を消す。
-	if (inputRightVec.Length() <= 0.5f && !nowSwing) {
+	if ((inputRightVec.Length() <= 0.5f && !nowSwing) || IsPilotOutSide()) {
 
 		CCWSwingSegmentMgr.Init();
 		CWSwingSegmentMgr.Init();
-
 	}
 
 	// 入力を保存。

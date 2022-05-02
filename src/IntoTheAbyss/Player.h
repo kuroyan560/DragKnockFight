@@ -28,10 +28,6 @@ public:
 	int rapidFireTimerLeft;			// 連射タイマー左手
 	int rapidFireTimerRight;		// 連射タイマー右手
 
-	// プレイヤーの腕
-	unique_ptr<PlayerHand> lHand;	// 左手
-	unique_ptr<PlayerHand> rHand;	// 右手
-
 	// このキャラの色
 	Color charaColor;
 
@@ -76,6 +72,9 @@ public:
 
 	//ダッシュ時残像を出すための変数
 	int dashAftImgTimer;
+
+	//直前の通常移動量（オートパイロット用）
+	Vec2<float>autoPilotMove;
 
 public:
 
@@ -154,6 +153,15 @@ private:
 		// 入力受付無効化タイマーをセッティングする。
 		inputInvalidTimerByCrash = INPUT_INVALID_TIMER;
 		anim.ChangeAnim(SWINGED);
+	}
+	void OnPilotLeave()override	//パイロットがロボから離れた瞬間
+	{
+
+	}
+	void OnPilotControl()override;		//パイロットを動かす処理
+	void OnPilotReturn()override	//パイロットがロボに戻った瞬間
+	{
+
 	}
 
 	bool drawCursorFlag;
