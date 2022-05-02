@@ -505,7 +505,7 @@ void CharacterInterFace::Draw()
 		const auto pilotDrawPos = ScrollMgr::Instance()->Affect(pilotPos);
 		const auto teamColor = GetTeamColor();
 		DrawFunc::DrawLine2D(pilotDrawPos, ScrollMgr::Instance()->Affect(pos), teamColor);
-		DrawFunc::DrawCircle2D(pilotDrawPos, 32.0f, teamColor, true);
+		DrawFunc::DrawCircle2D(pilotDrawPos, 32.0f * ScrollMgr::Instance()->zoom, teamColor, true);
 	}
 
 	bulletMgr.Draw();
