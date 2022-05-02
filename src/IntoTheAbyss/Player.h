@@ -80,29 +80,10 @@ public:
 
 	/*-- 定数 --*/
 
-	//const float ADD_GRAVITY = 0.5f;				// プレイヤーにかける重力
-	float ADD_GRAVITY = 0.1f;				// プレイヤーにかける重力
-	float MAX_GRAVITY = 15.0f;			// プレイヤーにかける重力の最大量
-	float RECOIL_AMOUNT = 30.0f;			// 弾を撃った際の反動
-	float FIRST_RECOIL_AMOUNT = 35.0;		// 弾を撃った際の反動
-	//const float FIRST_RECOIL_AMOUNT = 15.0;		// 弾を撃った際の反動
-	//const float RECOIL_AMOUNT = FIRST_RECOIL_AMOUNT;			// 弾を撃った際の反動
-	float MAX_RECOIL_AMOUNT = 30.0f;		// 弾を撃った際の反動の最大値
-	//const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
-	//const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+	float RECOIL_AMOUNT = 15.0f;			// 弾を撃った際の反動
+	float FIRST_RECOIL_AMOUNT = 15.0;		// 弾を撃った際の反動
+	float MAX_RECOIL_AMOUNT = 15.0f;		// 弾を撃った際の反動の最大値
 	static Vec2<float>GetGeneratePos();
-	int RAPID_FIRE_TIMER = 4;			// 連射タイマー
-	const int GRAVITY_INVALID_TIMER = 20;		// 重力無効化タイマー
-
-	// コヨーテ的なやつのためのパラメーター
-	const float STOP_DEADLINE_Y = 5.0f;		// Y軸の移動量がコレ以下だったら移動量を0にする。
-	const float STOP_DEADLINE_X = 3.0f;		// X軸の移動量がコレ以下だったら移動量を0にする。
-	const float VEL_MUL_AMOUNT = 0.95f;	//摩擦係数
-
-	// 左手の初期位置
-	const float DEF_LEFT_HAND_ANGLE = 2.35619f;
-	// 右手の初期位置
-	const float DEF_RIGHT_HAND_ANGLE = 0.785398f;
 
 	// 振り回しのクールタイム
 	int swingCoolTime;

@@ -13,6 +13,8 @@
 #include"TexHandleMgr.h"
 #include"CharacterInfo.h"
 
+class StaminaMgr;
+
 class CharacterInterFace
 {
 
@@ -31,10 +33,6 @@ private:
 	//弾との当たり判定
 	SphereCollision bulletHitSphere;
 
-	const int AFTER_SWING_DELAY = 15;
-	Vec2<float> swingInertiaVec;// 振り回しの慣性の移動方向
-	float swingInertia;			// 振り回しの慣性
-	int afterSwingDelay;		// 振り回しのあとにボスを少し動けない状態にするためのタイマー
 	int swingTimer;				// 振り回しの経過時間
 
 	//演出などの動きの関係で動きを止める
@@ -57,6 +55,11 @@ private:
 	Vec2<float>pilotReturnStartPos;	//パイロットがロボに戻る直前の座標
 	int pilotReturnTimer;	//パイロットが戻る処理の時間計測タイマー
 	int pilotReturnTotalTime;	//パイロットがロボに戻るまでの時間
+
+	// 優勢ゲージがデフォルトに戻るまでのタイマー
+	int gaugeReturnTimer;		// クラッシュなどした際に数値が代入され、0の時にデフォルトのゲージ量に戻る。
+	const int GAUGE_RETURN_TIMER = 60;
+
 
 protected:
 	BulletMgrBase bulletMgr;
@@ -134,10 +137,6 @@ protected:
 	{
 		return partner.lock()->pos;
 	}
-	//振り回しによる慣性
-	Vec2<float>GetSwingInertia() { return swingInertiaVec * swingInertia; }
-	//振り回し直後の硬直中か
-	bool GetSwingRigor() { return 0 < afterSwingDelay; }
 	//左チームか右チームか
 	const WHICH_TEAM& GetWhichTeam() { return team; }
 	//パイロットがロボの外にいるか
@@ -159,9 +158,9 @@ public:
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
 	bool isHold;				// つかんでいるかフラグ
-	bool isGripPowerEmpty;		// 握力タイマーを使い切ってから回復するまでを判断するためのフラグ
-	float gripPowerTimer;			// 握力タイマー
-	const int MAX_GRIP_POWER_TIMER = 40;
+	std::shared_ptr<StaminaMgr> staminaGauge;	// スタミナゲージクラス
+	const int SWING_STAMINA = 2;	// 振り回し時の消費スタミナ
+	const int DASH_STAMINA = 1;		// ダッシュ時の消費スタミナ
 	RunOutOfStaminaEffect outOfStaminaEffect;
 
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team, const PLAYABLE_CHARACTER_NAME& Name)
@@ -212,5 +211,6 @@ public:
 
 	//ノックアウトされた側
 	virtual void OnKnockOut() = 0;
+
 };
 

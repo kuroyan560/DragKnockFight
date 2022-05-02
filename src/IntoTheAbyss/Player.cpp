@@ -22,6 +22,8 @@
 #include"CrashMgr.h"
 #include"Tutorial.h"
 #include "AfterImage.h"
+#include "DrawFunc.h"
+#include "Stamina.h"
 
 Vec2<float> Player::GetGeneratePos()
 {
@@ -117,12 +119,9 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
 
-	ADD_GRAVITY = data->ADD_GRAVITY;
-	MAX_GRAVITY = data->MAX_GRAVITY;
 	RECOIL_AMOUNT = data->RECOIL_AMOUNT;
 	FIRST_RECOIL_AMOUNT = data->FIRST_RECOIL_AMOUNT;
 	MAX_RECOIL_AMOUNT = data->MAX_RECOIL_AMOUNT;
-	RAPID_FIRE_TIMER = data->RAPID_FIRE_TIMER;
 
 
 	/*===== 入力処理 =====*/
@@ -154,10 +153,10 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	//移動に関する処理
 	Move();
 
-	if (isGripPowerEmpty)
+	/*if (isGripPowerEmpty)
 	{
 		outOfStaminaEffect.Start(pos, MAX_GRIP_POWER_TIMER);
-	}
+	}*/
 	outOfStaminaEffect.baseEmptyStringPos = pos;
 	outOfStaminaEffect.baseMaxStringPos = pos;
 	outOfStaminaEffect.Update();
@@ -197,11 +196,11 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	}
 
 	// グリップ力タイマーが0になったら、完全に回復するまで踏ん張れないようにする。
-	if (gripPowerTimer <= 0) {
+	/*if (gripPowerTimer <= 0) {
 
 		isGripPowerEmpty = true;
 		anim.ChangeAnim(TIRED);
-	}
+	}*/
 
 	//ダッシュの残像
 	if (dashAftImgTimer)
@@ -228,17 +227,17 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 void Player::OnUpdateNoRelatedSwing()
 {
 	// 握力タイマーを規定値に近づける。
-	if (!nowSwing && gripPowerTimer < MAX_GRIP_POWER_TIMER) {
-		gripPowerTimer += SlowMgr::Instance()->slowAmount;
+	//if (!nowSwing && gripPowerTimer < MAX_GRIP_POWER_TIMER) {
+	//	gripPowerTimer += SlowMgr::Instance()->slowAmount;
 
-		// 最大値になったら握力を使い切ってから回復している状態フラグを折る。
-		if (MAX_GRIP_POWER_TIMER <= gripPowerTimer) {
+	//	// 最大値になったら握力を使い切ってから回復している状態フラグを折る。
+	//	if (MAX_GRIP_POWER_TIMER <= gripPowerTimer) {
 
-			gripPowerTimer = MAX_GRIP_POWER_TIMER;
-			isGripPowerEmpty = false;
-			anim.ChangeAnim(DEFAULT_FRONT);
-		}
-	}
+	//		gripPowerTimer = MAX_GRIP_POWER_TIMER;
+	//		isGripPowerEmpty = false;
+	//		anim.ChangeAnim(DEFAULT_FRONT);
+	//	}
+	//}
 
 	//ストレッチ更新
 	UpdateStretch();
@@ -252,7 +251,8 @@ void Player::OnDraw()
 	//if (vel.y < 0)playerDir = BACK;
 	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
 
-	if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty && 20 <= moveTimer)
+	//if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty && 20 <= moveTimer)
+	if (!isHold && anim.GetNowAnim() != SWINGED && 20 <= moveTimer)
 	{
 		if (moveInput.x)
 		{
@@ -339,76 +339,7 @@ void Player::OnDrawUI()
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)
 {
-	if (Dir == TOP)
-	{
-		// Y方向の移動量を減らす。
-		vel.y /= 2.0f;
-	}
-	else if (Dir == BOTTOM)
-	{
-		stretch_RB.y = 0.0f;
-
-		// 接地フラグを立てる。
-		//onGround = true;
-
-		// X軸の移動量の合計が一定以上だったら摩擦を作る。
-		if (fabs(vel.x) >= STOP_DEADLINE_X) {
-
-			// 摩擦をつける。
-			vel.y *= VEL_MUL_AMOUNT;
-			vel.x *= VEL_MUL_AMOUNT;
-		}
-		else {
-
-			// X方向の移動量を無効化する。
-			vel.x = 0;
-			vel.y = 0;
-
-			//摩擦無いときはストレッチを弱くする
-			stretch_RB.x /= STRETCH_DIV_RATE;
-			stretch_LU.x /= STRETCH_DIV_RATE;
-
-			//待機アニメーションに戻す
-			//anim.ChangeAnim(ON_GROUND_WAIT);
-		}
-
-		vel.y = 0;
-
-		// 移動量が一定以下になったら0にする。
-		if (fabs(vel.x) <= 1.0f) vel.x = 0;
-	}
-	else if (Dir == LEFT)
-	{
-		stretch_LU.x = 0.0f;
-
-		// X方向の移動量を無効化する。
-		vel.x = 0;
-		//vel.y = 0;
-
-		//摩擦無いときはストレッチを弱くする
-		stretch_RB.y /= STRETCH_DIV_RATE;
-		stretch_LU.y /= STRETCH_DIV_RATE;
-
-		//壁貼り付きアニメーション
-		//anim.ChangeAnim(ON_WALL_WAIT);
-	}
-	else if (Dir == RIGHT)
-	{
-		stretch_RB.x = 0.0f;
-
-		// X方向の移動量を無効化する。
-		vel.x = 0;
-		//vel.y = 0;
-
-		//摩擦無いときはストレッチを弱くする
-		stretch_RB.y /= STRETCH_DIV_RATE;
-		stretch_LU.y /= STRETCH_DIV_RATE;
-
-		//壁貼り付きアニメーション
-		//anim.ChangeAnim(ON_WALL_WAIT);
-	}
 }
-
 void Player::OnPilotControl()
 {
 	static const float PILOT_SPEED = 10.0f;
@@ -481,33 +412,9 @@ void Player::Input(const vector<vector<int>>& MapData)
 		else if (0 < autoPilotMove.y)playerDirY = PLAYER_FRONT;
 	}
 
-	// [LTを押されたら] [握力が残っていたら] [握力を使い切ってから回復している状態じゃなかったら]
+	// 入力を受け付ける変数
 	bool isInputLB = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
 	bool isInputRB = UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RB);
-	if ((!isInputRightStick && isPrevInputRightStick) && 0 < gripPowerTimer && !isGripPowerEmpty) {
-
-		// 振り回されていたら
-		if (isSwingPartner) {
-
-			isSwingPartnerHold = true;
-
-		}
-		else {
-
-			anim.ChangeAnim(HOLD);
-
-			// 紐つかみ状態(踏ん張り状態)にする。
-			isHold = true;
-
-			tutorial.lock()->SetRstickInput(true);
-
-			// 移動量を0にする。
-			vel = {};
-
-		}
-
-	}
-
 
 	//チュートリアルの表示 / 非表示
 	if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::BACK))
@@ -515,109 +422,17 @@ void Player::Input(const vector<vector<int>>& MapData)
 		tutorial.lock()->TurnActive();
 	}
 
-#pragma region itiou nokosite okimasu
-
-	// LBが押されたら反動をつける。
-	//if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB) && rapidFireTimerLeft <= 0) {
-
-	//	// 反動をつける。
-	//	float rHandAngle = lHand->GetAngle();
-
-	//	// Getした値は手の向いている方向なので、-180度する。
-	//	rHandAngle -= Angle::PI();
-
-	//	// onGroundがtrueだったら移動量を加算しない。
-	//	//if (!onGround || sinf(rHandAngle) < 0.5f) {
-	//	].x += cosf(rHandAngle) * RECOIL_AMOUNT;
-	//	//}
-
-	//	vel.y += sinf(rHandAngle) * RECOIL_AMOUNT;
-
-	//	// プレイヤーの腕を動かす。
-	//	lHand->Shot(Vec2<float>(cosf(rHandAngle), sinf(rHandAngle)), false);
-
-
-	//	// 弾を生成する。
-	//	const float ARM_DISTANCE = 20.0f;
-	//	const float OFFSET_Y = -14.0f;
-	//	const float OFFSET_X = 12.0f;
-
-	//	float angle = lHand->GetAngle();
-
-	//	AudioApp::Instance()->PlayWave(shotSE);
-	//	Shot(lHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle);
-
-	//	// 連射タイマーをセット
-	//	rapidFireTimerLeft = RAPID_FIRE_TIMER;
-
-	//	//ストレッチ
-	//	CalculateStretch(vel);
-	//}
-
-	//// RBが押されたら反動をつける。
-	//if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB) && rapidFireTimerRight <= 0) {
-
-	//	// 反動をつける。
-	//	float lHandAngle = rHand->GetAngle();
-
-	//	// Getした値は手の向いている方向なので、-180度する。
-	//	lHandAngle -= Angle::PI();
-
-	//	// プレイヤーのひとつ上のブロックを検索する為の処理。
-	//	int mapX = pos.x / MAP_CHIP_SIZE;
-	//	int mapY = pos.y / MAP_CHIP_SIZE;
-	//	if (mapX <= 0) mapX = 1;
-	//	if (mapX >= MapData[0].size()) mapX = MapData[0].size() - 1;
-	//	if (mapY <= 0) mapY = 1;
-	//	if (mapY >= MapData.size()) mapY = MapData.size() - 1;
-
-	//	// onGroundがtrueだったら移動量を加算しない。
-	//		//if (!onGround || sinf(lHandAngle) < 0) {
-	//	vel.x += cosf(lHandAngle) * RECOIL_AMOUNT;
-
-
-
-	//	vel.y += sinf(lHandAngle) * RECOIL_AMOUNT;
-
-	//	// プレイヤーの腕を動かす。
-	//	rHand->Shot(Vec2<float>(cosf(lHandAngle), sinf(lHandAngle)), false);
-
-
-	//	// 弾を生成する。
-	//	const float ARM_DISTANCE = 20.0f;
-	//	const float OFFSET_Y = -14.0f;
-	//	const float OFFSET_X = -12.0f;
-
-	//	float angle = rHand->GetAngle();
-
-	//	AudioApp::Instance()->PlayWave(shotSE);
-	//	Shot(rHand->handPos + Vec2<float>(cosf(angle) * ARM_DISTANCE + OFFSET_X, sinf(angle) * ARM_DISTANCE + OFFSET_Y), angle);
-
-	//	// 連射タイマーをセット
-	//	rapidFireTimerRight = RAPID_FIRE_TIMER;
-
-	//	//ストレッチ
-	//	CalculateStretch(vel);
-	//}
-
-	// 移動速度が限界値を超えないようにする。
-	//if (vel.x >= MAX_RECOIL_AMOUNT) vel.x = MAX_RECOIL_AMOUNT;
-	//if (vel.x <= -MAX_RECOIL_AMOUNT) vel.x = -MAX_RECOIL_AMOUNT;
-	//if (vel.y >= MAX_RECOIL_AMOUNT) vel.y = MAX_RECOIL_AMOUNT;
-	//if (vel.y <= -MAX_RECOIL_AMOUNT) vel.y = -MAX_RECOIL_AMOUNT;
-
-
-#pragma endregion
-
-
-	// 入力を元に振り回しベクトルを更新。
 
 	// 相方との位置関係においての逆ベクトルに振り回す。
 	Vec2<float> subPos = pos - partner.lock()->pos;
 	swingVec = (subPos).GetNormal();
 
-	bool canSwing = (!isInputRightStick && isPrevInputRightStick);
-	if (((!isSwingPartner && canSwing || isAdvancedEntrySwing) && !isGripPowerEmpty) && !IsPilotOutSide()) {
+	// スタミナが残っているか？
+	bool isSwingStamina = staminaGauge->CheckCanAction(SWING_STAMINA);
+
+	// RTが押されたら
+	bool canSwing = (!isInputRightStick && isPrevInputRightStick) && isSwingStamina && !IsPilotOutSide;
+	if ((!isSwingPartner && canSwing || isAdvancedEntrySwing)) {
 
 		// 振り回しの処理
 
@@ -630,37 +445,57 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		isInputSwingRB = isInputRB;
 
+		// スタミナを消費
+		staminaGauge->ConsumesStamina(SWING_STAMINA);
+
 	}
-	else if (isSwingPartner && canSwing && !isGripPowerEmpty && isInputRightStick) {
+	//else if (isSwingPartner && canSwing && !isGripPowerEmpty && isInputRightStick) {
+	else if (isSwingPartner && canSwing && isInputRightStick) {
 
 		// 先行入力を保存。
 		isAdvancedEntrySwing = true;
 		advancedEntrySwingTimer = ADVANCED_ENTRY_SWING_TIMER;
 	}
 
+	// スタミナが残っているか？
+	bool isDashStamina = staminaGauge->CheckCanAction(DASH_STAMINA);
+
 	// 入力のデッドラインを設ける。
 	inputLeftVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
 	inputLeftVec /= {32768.0f, 32768.0f};
 	inputRate = inputLeftVec.Length();
-	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && !isGripPowerEmpty) {
+	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && isDashStamina) {
 
 		// inputVec = ひだりスティックの入力方向
 		const float DASH_SPEED = 30.0f;
 		vel += inputLeftVec * DASH_SPEED;
 
+		// 移動量が限界を超えないようにする。
+		if (DASH_SPEED < vel.Length()) {
+
+			vel.Normalize();
+			vel *= DASH_SPEED;
+
+		}
+
 		// スタミナを消費
 		const int DASH_GRIP_POWER = 20;
-		gripPowerTimer -= DASH_GRIP_POWER;
 
 		//煙
 		ParticleMgr::Instance()->Generate(pos, -inputLeftVec, BULLET);
 		//残像
 		dashAftImgTimer = 10;
 
+		// スタミナを消費
+		staminaGauge->ConsumesStamina(DASH_STAMINA);
+
 	}
 
+	// スタミナが残っているか？
+	isSwingStamina = staminaGauge->CheckCanAction(DASH_STAMINA);
+
 	// 右スティックが入力されていたら、予測線を出す。
-	if (isInputRightStick && !isGripPowerEmpty) {
+	if (isInputRightStick && isSwingStamina) {
 
 		// 時計回りかどうか。負の値が左、正の値が右。
 		inputRightVec.Normalize();

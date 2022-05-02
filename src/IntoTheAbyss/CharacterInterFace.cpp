@@ -9,6 +9,7 @@
 #include "ResultTransfer.h"
 #include "AfterImage.h"
 #include "CrashEffectMgr.h"
+#include "Stamina.h"
 
 void CharacterInterFace::SwingUpdate()
 {
@@ -69,7 +70,7 @@ void CharacterInterFace::SwingUpdate()
 	if (isSwingClockWise && crossResult < 0 && 15 < swingTimer) {
 
 		// パートナーに慣性を与える。
-		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 1.0f;
+		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 0.5f;
 
 		// 振り回し終わり！
 		FinishSwing();
@@ -78,7 +79,7 @@ void CharacterInterFace::SwingUpdate()
 	if (!isSwingClockWise && 0 < crossResult && 15 < swingTimer) {
 
 		// パートナーに慣性を与える。
-		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 1.0f;
+		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 0.5f;
 
 		// 振り回し終わり！
 		FinishSwing();
@@ -276,10 +277,6 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 	addLineLength = 0.0f;
 
-	swingInertia = 0;
-	swingInertiaVec = {};
-	afterSwingDelay = 0;
-
 	//登場演出のため最初は動けない
 	canMove = false;
 	//登場演出のため最初は当たり判定とらない
@@ -294,10 +291,6 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	OnInit();
 
 	isHold = false;
-
-	gripPowerTimer = MAX_GRIP_POWER_TIMER;
-
-	isGripPowerEmpty = false;
 
 	advancedEntrySwingTimer = 0;
 	isAdvancedEntrySwing = false;
@@ -316,6 +309,12 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	isPilotDetached = false;
 	pilotReturnTimer = 0;
 	pilotReturnTotalTime = 0;
+	gaugeReturnTimer = 0;
+
+	// 各キャラによってスタミナゲージのデフォルト量を決定。
+	staminaGauge = std::make_shared<StaminaMgr>();
+	staminaGauge->Init();
+
 }
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
@@ -342,21 +341,12 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 			FaceIcon::Instance()->Change(team, FACE_STATUS::DEFAULT);
 		}
 	}
-	// 慣性を更新。
-	if (0 < swingInertia) {
-		swingInertia -= swingInertia / 5.0f;
-	}
-
-	// 振り回し直後の硬直のタイマーを更新。
-	if (0 < afterSwingDelay) --afterSwingDelay;
 
 	//自身が振り回し中
 	if (nowSwing)
 	{
 		SwingUpdate();
 
-		// 握力タイマーを0に近づける。
-		--gripPowerTimer;
 	}
 
 	//パイロット切り離し中
@@ -425,6 +415,53 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), false, false, MapData);
 	}*/
 
+	// 体幹ゲージをデフォルトに戻すタイマーが0だったら
+	if (gaugeReturnTimer <= 0) {
+
+		static const int DEF_GAUGE = 50;
+		static const float RETURN_AMOUNT = 0.1f;
+
+		// 右側のチームで、右側のゲージ量がデフォルト以下だったら右側のゲージを足す。
+		float nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeValue;
+		if (GetWhichTeam() == RIGHT_TEAM && nowGaugeValue < DEF_GAUGE) {
+
+			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, RETURN_AMOUNT);
+
+			// 足す過程で限界を超えないようにする。
+			nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeValue;
+			if (DEF_GAUGE < nowGaugeValue) {
+
+				SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DEF_GAUGE - nowGaugeValue);
+
+			}
+
+		}
+
+		// 左側のチームで、左側のゲージ量がデフォルト以下だったら左側のゲージを足す。
+		nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeValue;
+		if (GetWhichTeam() == LEFT_TEAM && nowGaugeValue < DEF_GAUGE) {
+
+			SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, RETURN_AMOUNT);
+
+			// 足す過程で限界を超えないようにする。
+			nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeValue;
+			if (DEF_GAUGE < nowGaugeValue) {
+
+				SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DEF_GAUGE - nowGaugeValue);
+
+			}
+
+		}
+
+	}
+	else {
+
+		--gaugeReturnTimer;
+
+	}
+
+	staminaGauge->Update();
+
 }
 
 #include "DrawFunc.h"
@@ -453,19 +490,8 @@ void CharacterInterFace::DrawUI()
 	//握力ゲージ描画
 	static Color GAUGE_COLOR[TEAM_NUM] = { Color(47,255,139,255),Color(239,1,144,255) };
 	static Color GAUGE_SHADOW_COLOR[TEAM_NUM] = { Color(41,166,150,255),Color(162,27,108,255) };
-	static const int STAMINA_GAUGE_WIDTH = 110;
-	static const int STAMINA_GAUGE_HEIGHT = 5;
-	static const int STAMINA_GAUGE_OFFSET_Y = -64;
-	static const Vec2<float> STAMINA_SHADOW_OFFSET_SIZE = { 4.0f,4.0f };
-	{
-		const float drawWidth = STAMINA_GAUGE_WIDTH * ((float)gripPowerTimer / MAX_GRIP_POWER_TIMER);
-		const Vec2<float>leftUp = pos + Vec2<float>(-STAMINA_GAUGE_WIDTH / 2.0f, STAMINA_GAUGE_OFFSET_Y - STAMINA_GAUGE_HEIGHT);
-		const Vec2<float>rightBottom = pos + Vec2<float>(-STAMINA_GAUGE_WIDTH / 2.0f + drawWidth, STAMINA_GAUGE_OFFSET_Y + STAMINA_GAUGE_HEIGHT);
 
-
-		if (isHold && 0.0f < drawWidth)DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUp - STAMINA_SHADOW_OFFSET_SIZE), ScrollMgr::Instance()->Affect(rightBottom + STAMINA_SHADOW_OFFSET_SIZE), GAUGE_SHADOW_COLOR[team], true);
-		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUp), ScrollMgr::Instance()->Affect(rightBottom), GAUGE_COLOR[team], true);
-	}
+	staminaGauge->Draw(pos);
 
 	OnDrawUI();
 }
@@ -744,6 +770,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 			}
 
+			// ゲージがデフォルトに戻るまでのタイマーを更新。
+			gaugeReturnTimer = GAUGE_RETURN_TIMER;
+
 		}
 		else {
 
@@ -775,63 +804,66 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 			}
 
+			// ゲージがデフォルトに戻るまでのタイマーを更新。
+			gaugeReturnTimer = GAUGE_RETURN_TIMER;
+
 		}
 
 		// 壁はさみの判定
-		if (stackWindowTimer <= 0) {
+		//if (stackWindowTimer <= 0) {
 
-			Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
-			windowSize *= Vec2<int>(2, 2);
+		//	Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
+		//	windowSize *= Vec2<int>(2, 2);
 
-			// ウィンドウ左右
-			float windowOffset = 100.0f;
-			bool winLeft = pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x <= -windowOffset;
-			bool winRight = windowSize.x + windowOffset <= pos.x + size.x - ScrollMgr::Instance()->scrollAmount.x;
-			if (winRight || winLeft) {
+		//	// ウィンドウ左右
+		//	float windowOffset = 100.0f;
+		//	bool winLeft = pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x <= -windowOffset;
+		//	bool winRight = windowSize.x + windowOffset <= pos.x + size.x - ScrollMgr::Instance()->scrollAmount.x;
+		//	if (winRight || winLeft) {
 
-				stackWindowTimer = STACK_WINDOW_TIMER;
+		//		stackWindowTimer = STACK_WINDOW_TIMER;
 
 
-				//CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
-				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
-				SuperiorityGauge::Instance()->AddGauge(team, -20);
-				Crash({ winRight ? 1.0f : -1.0f , 0.0f });
+		//		//CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
+		//		//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
+		//		SuperiorityGauge::Instance()->AddGauge(team, -20);
+		//		Crash({ winRight ? 1.0f : -1.0f , 0.0f });
 
-				// チームに応じてクラッシュ数を加算する変数を変える。
-				if (team == WHICH_TEAM::LEFT_TEAM) {
-					++ResultTransfer::Instance()->leftCrashCount;
-				}
-				else {
-					++ResultTransfer::Instance()->rightCrashCount;
-				}
+		//		// チームに応じてクラッシュ数を加算する変数を変える。
+		//		if (team == WHICH_TEAM::LEFT_TEAM) {
+		//			++ResultTransfer::Instance()->leftCrashCount;
+		//		}
+		//		else {
+		//			++ResultTransfer::Instance()->rightCrashCount;
+		//		}
 
-				// クラッシュ演出を追加。
-				CrashEffectMgr::Instance()->Generate(pos);
-			}
-			// ウィンドウ上下
-			bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= -windowOffset;
-			bool winBottom = windowSize.y + windowOffset <= pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y;
-			if (winBottom || winTop) {
+		//		// クラッシュ演出を追加。
+		//		CrashEffectMgr::Instance()->Generate(pos);
+		//	}
+		//	// ウィンドウ上下
+		//	bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= -windowOffset;
+		//	bool winBottom = windowSize.y + windowOffset <= pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y;
+		//	if (winBottom || winTop) {
 
-				stackWindowTimer = STACK_WINDOW_TIMER;
+		//		stackWindowTimer = STACK_WINDOW_TIMER;
 
-				//CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
-				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
-				SuperiorityGauge::Instance()->AddGauge(team, -20);
-				Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
+		//		//CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
+		//		//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
+		//		SuperiorityGauge::Instance()->AddGauge(team, -20);
+		//		Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
 
-				// チームに応じてクラッシュ数を加算する変数を変える。
-				if (team == WHICH_TEAM::LEFT_TEAM) {
-					++ResultTransfer::Instance()->leftCrashCount;
-				}
-				else {
-					++ResultTransfer::Instance()->rightCrashCount;
-				}
+		//		// チームに応じてクラッシュ数を加算する変数を変える。
+		//		if (team == WHICH_TEAM::LEFT_TEAM) {
+		//			++ResultTransfer::Instance()->leftCrashCount;
+		//		}
+		//		else {
+		//			++ResultTransfer::Instance()->rightCrashCount;
+		//		}
 
-				// クラッシュ演出を追加。
-				CrashEffectMgr::Instance()->Generate(pos);
-			}
-		}
+		//		// クラッシュ演出を追加。
+		//		CrashEffectMgr::Instance()->Generate(pos);
+		//	}
+		//}
 
 	}
 
@@ -847,3 +879,4 @@ void CharacterInterFace::FinishSwing()
 	partner.lock()->OnSwingedFinish();
 
 }
+
