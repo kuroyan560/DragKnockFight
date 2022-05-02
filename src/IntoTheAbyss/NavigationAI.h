@@ -287,6 +287,7 @@ private:
 
 	/// <summary>
 	/// キューに同じハンドルがスタックされているかどうか
+	/// ゴール地点は複数スタックしても良い
 	/// </summary>
 	/// <param name="HANDLE">ウェイポイントのハンドル</param>
 	inline bool CheckQueue(const Vec2<int> &HANDLE);

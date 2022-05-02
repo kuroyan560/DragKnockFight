@@ -310,20 +310,20 @@ void NavigationAI::ImGuiDraw()
 	ImGui::End();
 
 
-	//ImGui::Begin("ShortestRoute");
-	//for (int branchNum = 0; branchNum < branchQueue.size(); ++branchNum)
-	//{
-	//	ImGui::Text("Route:%d", branchNum);
-	//	for (int route = 0; route < branchQueue[branchNum].size(); ++route)
-	//	{
-	//		ImGui::Text("Handle:%d,X:%d,Y:%d",
-	//			route,
-	//			branchQueue[branchNum][route]->handle.x,
-	//			branchQueue[branchNum][route]->handle.y
-	//		);
-	//	}
-	//}
-	//ImGui::End();
+	ImGui::Begin("ShortestRoute");
+	for (int branchNum = 0; branchNum < branchQueue.size(); ++branchNum)
+	{
+		ImGui::Text("Route:%d", branchNum);
+		for (int route = 0; route < branchQueue[branchNum].size(); ++route)
+		{
+			ImGui::Text("Handle:%d,X:%d,Y:%d",
+				route,
+				branchQueue[branchNum][route]->handle.x,
+				branchQueue[branchNum][route]->handle.y
+			);
+		}
+	}
+	ImGui::End();
 
 
 
@@ -446,7 +446,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 
 				//ヒューリスティックが0ならゴールにたどり着いた事になるので探索しない
 				//スタート地点を二回キューに入れない
-				if (nowHeuristicValue <= 0.0f || wayPoints[handle.y][handle.x]->handle == START_POINT.handle)
+				if (wayPoints[handle.y][handle.x]->handle == START_POINT.handle)
 				{
 					continue;
 				}
@@ -477,12 +477,11 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 						nextPoint.push_back(std::make_shared<WayPointData>());
 						nextPoint[nextPoint.size() - 1] = wayPoints[handle.y][handle.x];
 
-
+						//現在地のウェイポイントのブランチのハンドルを見る
+						Vec2<int>startHandle(startPoint[startPointIndex]->handle);
 						//探索中のルートを保存する
 						if (wayPoints[handle.y][handle.x]->branchHandle == -1)
 						{
-							//現在地のウェイポイントのブランチのハンドルを見る
-							Vec2<int>startHandle(startPoint[startPointIndex]->handle);
 							//そのブランチの探索された回数が一回なら追加する
 							if (wayPoints[startHandle.y][startHandle.x]->branchReferenceCount < 1)
 							{
@@ -503,10 +502,18 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 								wayPoints[handle.y][handle.x]->branchHandle = newbranchHandle;
 
 								int branchHandle = wayPoints[startHandle.y][startHandle.x]->branchHandle;
-								//既に別のウェイポイントが追加されているので最後から二番目の場所に上書きする
+								//既に別のウェイポイントが追加されているので最後の場所に上書きする
 								branchQueue[newbranchHandle] = branchQueue[branchHandle];
-								branchQueue[newbranchHandle][branchQueue[branchHandle].size() - 2] = wayPoints[handle.y][handle.x];
+								branchQueue[newbranchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 							}
+						}
+						//現在地がゴールでブランチが追加済みの場合、他のブランチにも追加できるようにする
+						else if (wayPoints[handle.y][handle.x]->branchHandle != -1 && endPoint.handle == handle)
+						{
+							//現在地のウェイポイントのブランチハンドルから参照先のウェイポイントにブランチハンドルを渡した後、ルート追加
+							int branchHandle = wayPoints[startHandle.y][startHandle.x]->branchHandle;
+							branchQueue[branchHandle].push_back(std::make_shared<WayPointData>());
+							branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 						}
 					}
 					else
@@ -566,7 +573,7 @@ inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
 {
 	for (int i = 0; i < queue.size(); ++i)
 	{
-		if (queue[i]->handle == HANDLE)
+		if (queue[i]->handle == HANDLE && endPoint.handle != HANDLE)
 		{
 			return true;
 		}
