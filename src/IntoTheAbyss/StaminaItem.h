@@ -38,7 +38,7 @@ private:
 
 	/*===== 定数 =====*/
 
-	const float HIT_RADIUS = 30;	// 当たり判定を行う際の半径 大きめにしている。
+	const float HIT_RADIUS = 60;	// 当たり判定を行う際の半径 大きめにしている。
 	const float DRAW_RADIUS = 10;	// アイテムを描画するサイズ いずれは画像になるので不要になる。
 	const float TRACING_SPEED = 30;	// 取得されて追跡するときのスピード。(演出用？)
 	const float ACQUIRED_VEL = 20;	// 通常スポーンのアイテムが取得された時に広がる移動量。(演出用)

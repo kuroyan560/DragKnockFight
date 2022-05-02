@@ -138,7 +138,7 @@ bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, CHAR
 			float distance = (pos - *CharaPos).Length();
 
 			// 2“_ŠÔ‚Ì‹——£‚ª”¼Œa‚æ‚è‚à¬‚³‚©‚Á‚½‚çB
-			if (distance <= CharaRadius + HIT_RADIUS / 2.0f) {
+			if (distance <= CharaRadius) {
 
 				return true;
 
