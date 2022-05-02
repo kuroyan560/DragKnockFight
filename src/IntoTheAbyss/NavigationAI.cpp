@@ -201,9 +201,9 @@ void NavigationAI::Draw()
 					}
 
 					//最短ルートの描画
-					for (int i = 0; i < queue.size(); ++i)
+					for (int i = 0; i < shortestRoute.size(); ++i)
 					{
-						if (queue[i]->handle == wayPoints[y][x]->handle)
+						if (shortestRoute[i]->handle == wayPoints[y][x]->handle)
 						{
 							color = Color(255, 0, 255, 255);
 							break;
@@ -311,9 +311,20 @@ void NavigationAI::ImGuiDraw()
 
 
 	ImGui::Begin("ShortestRoute");
+	ImGui::Text("ShortestRoute");
+	for (int branch = 0; branch < shortestRoute.size(); ++branch)
+	{
+		ImGui::Text("Handle:%d,X:%d,Y:%d", branch, shortestRoute[branch]->handle.x, shortestRoute[branch]->handle.y);
+	}
+	ImGui::Text("");
 	for (int branchNum = 0; branchNum < branchQueue.size(); ++branchNum)
 	{
 		ImGui::Text("Route:%d", branchNum);
+		if (reachToGoalFlag[branchNum])
+		{
+			ImGui::SameLine();
+			ImGui::Text("Reach!!!");
+		}
 		for (int route = 0; route < branchQueue[branchNum].size(); ++route)
 		{
 			ImGui::Text("Handle:%d,X:%d,Y:%d",
@@ -322,6 +333,7 @@ void NavigationAI::ImGuiDraw()
 				branchQueue[branchNum][route]->handle.y
 			);
 		}
+		ImGui::Text("");
 	}
 	ImGui::End();
 
@@ -594,6 +606,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 
 	//今までの候補から最短ルートを作る
 	queue = ConvertToShortestRoute(queue);
+	shortestRoute = ConvertToShortestRoute2(branchQueue);
 }
 
 void NavigationAI::RegistBranch(const WayPointData &DATA)
@@ -751,6 +764,44 @@ std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToSho
 	result.push_back(startPoint);
 
 	return result;
+}
+
+std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &QUEUE)
+{
+	std::vector<std::vector<std::shared_ptr<WayPointData>>> route;
+
+	reachToGoalFlag.clear();
+	reachToGoalFlag.reserve(QUEUE.size());
+	reachToGoalFlag.resize(QUEUE.size());
+	//スタート地点からゴール地点まで繋がっているルートを探す
+	for (int branch = 0; branch < QUEUE.size(); ++branch)
+	{
+		if (QUEUE[branch][0]->handle == startPoint.handle &&
+			QUEUE[branch][QUEUE[branch].size() - 1]->handle == endPoint.handle)
+		{
+			route.push_back(QUEUE[branch]);
+			reachToGoalFlag[branch] = true;
+		}
+		else
+		{
+			reachToGoalFlag[branch] = false;
+		}
+	}
+
+
+	int minSize = 100000;
+	int shortestRoute = 0;
+	//ゴールまでのパス数を比較し、一番少ないパス数のルートを最短距離とする
+	for (int i = 0; i < route.size(); ++i)
+	{
+		if (route[i].size() < minSize)
+		{
+			shortestRoute = i;
+			minSize = route[i].size();
+		}
+	}
+
+	return route[shortestRoute];
 }
 
 inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, std::shared_ptr<WayPointData> DATA)

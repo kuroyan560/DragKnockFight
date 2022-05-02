@@ -299,6 +299,8 @@ private:
 	/// <returns>スタートからゴールまでの最短ルート</returns>
 	std::vector<std::shared_ptr<QueueData>> ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>> &QUEUE);
 
+	std::vector<std::shared_ptr<WayPointData>> ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &QUEUE);
+
 
 	void RegistBranch(const WayPointData &DATA);
 
@@ -308,8 +310,8 @@ private:
 	WayPointData prevEndPoint;	//探索する際の前フレームのゴール地点
 
 	std::vector<std::vector<std::shared_ptr<WayPointData>>> branchQueue;//探索中のルートを保存する
-
-
+	std::vector<std::shared_ptr<WayPointData>> shortestRoute;
+	std::vector<bool> reachToGoalFlag;
 
 	//デバック--------------------------
 	Vec2<int> checkingHandle;	//マウスカーソルで参照しているウェイポイント
