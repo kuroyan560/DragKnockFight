@@ -466,6 +466,9 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 						{
 							//キューにはハンドルと現在地からゴールまでの距離(ヒューリスティック推定値)をスタックする
 							queue.push_back(std::make_shared<QueueData>(startPoint[startPointIndex]->handle, nowHeuristicValue));
+							//int branchHandle = wayPoints[handle.y][handle.x]->branchHandle;
+							//branchQueue[branchHandle].push_back(std::make_shared<WayPointData>());
+							//branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 						}
 
 						searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
@@ -507,19 +510,46 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 								branchQueue[newbranchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 							}
 						}
-						//現在地がゴールでブランチが追加済みの場合、他のブランチにも追加できるようにする
+						//現在地がゴールでそのゴールが他のブランチにも追加済みの場合、他のブランチにも追加できるようにする
 						else if (wayPoints[handle.y][handle.x]->branchHandle != -1 && endPoint.handle == handle)
 						{
-							//現在地のウェイポイントのブランチハンドルから参照先のウェイポイントにブランチハンドルを渡した後、ルート追加
 							int branchHandle = wayPoints[startHandle.y][startHandle.x]->branchHandle;
 							branchQueue[branchHandle].push_back(std::make_shared<WayPointData>());
 							branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 						}
 					}
+					//探索に失敗したウェイポイントを記録する
 					else
 					{
 						failPoint.push_back(std::make_shared<WayPointData>());
 						failPoint[failPoint.size() - 1] = wayPoints[handle.y][handle.x];
+						//failPoint[failPoint.size() - 1]->branchHandle = startPoint[startPointIndex]->branchHandle;
+						Vec2<int>startHandle(startPoint[startPointIndex]->handle);
+
+						//そのブランチの探索された回数が一回なら追加する
+						if (wayPoints[startHandle.y][startHandle.x]->branchReferenceCount < 1)
+						{
+							//現在地のウェイポイントのブランチハンドルから参照先のウェイポイントにブランチハンドルを渡した後、ルート追加
+							int branchHandle = wayPoints[startHandle.y][startHandle.x]->branchHandle;
+							wayPoints[handle.y][handle.x]->branchHandle = branchHandle;
+							++wayPoints[startHandle.y][startHandle.x]->branchReferenceCount;
+
+							branchQueue[branchHandle].push_back(std::make_shared<WayPointData>());
+							branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
+						}
+						//二回以上探索されたら別のブランチを作成し、今までのルートを渡し追加する
+						else
+						{
+							//ブランチを追加し、ハンドルを渡す
+							branchQueue.push_back({});
+							int newbranchHandle = branchQueue.size() - 1;
+							wayPoints[handle.y][handle.x]->branchHandle = newbranchHandle;
+
+							int branchHandle = wayPoints[startHandle.y][startHandle.x]->branchHandle;
+							//既に別のウェイポイントが追加されているので最後の場所に上書きする
+							branchQueue[newbranchHandle] = branchQueue[branchHandle];
+							branchQueue[newbranchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
+						}
 					}
 				}
 
