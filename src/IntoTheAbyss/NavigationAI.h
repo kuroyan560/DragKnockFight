@@ -19,8 +19,10 @@ struct WayPointData
 	float radius;							//大きさ
 	std::vector<Vec2<int>> wayPointHandles;	//どの方向に行けるかハンドル取ったもの
 	int passNum;							//目標地点までのパス数
+	int branchHandle;						//探索中の分岐のハンドル
+	int branchReferenceCount;				//何回その分岐を参照したか
 
-	WayPointData() :handle(Vec2<int>(-1, -1)), passNum(0)
+	WayPointData() :handle(Vec2<int>(-1, -1)), passNum(0), branchHandle(-1), branchReferenceCount(0), radius(0.0f)
 	{
 	}
 
@@ -92,7 +94,7 @@ private:
 
 
 
-	std::array<std::array<WayPointData, WAYPOINT_MAX_Y>, WAYPOINT_MAX_X> wayPoints;//ウェイポイントの配列
+	std::array<std::array<std::shared_ptr<WayPointData>, WAYPOINT_MAX_Y>, WAYPOINT_MAX_X> wayPoints;//ウェイポイントの配列
 
 	/// <summary>
 	/// マップチップ座標に変換しfloatからintに切り替える際に切り落とすか切り上げるかを判断する
@@ -106,14 +108,14 @@ private:
 	/// </summary>
 	/// <param name="HANDLE">ウェイポイントを繋げる為の判定</param>
 	/// <param name="DATA">リンク付けする対象</param>
-	inline void RegistHandle(const SphereCollision &HANDLE, WayPointData *DATA);
+	inline void RegistHandle(const SphereCollision &HANDLE, std::shared_ptr<WayPointData> DATA);
 
 	/// <summary>
 	/// 使用しているウェイポイントかどうか
 	/// </summary>
 	/// <param name="DATA">ウェイポイントのデータ</param>
 	/// <returns>true...使われている,false...使われていない</returns>
-	inline bool DontUse(const WayPointData &DATA);
+	inline bool DontUse(const Vec2<int> &HANDLE);
 
 	/// <summary>
 	/// マップチップとレイの判定
@@ -274,7 +276,7 @@ private:
 
 
 	//A*-------------------------------
-	std::vector<QueueData>queue;	//最短ルートの候補を纏めた配列
+	std::vector<std::shared_ptr<QueueData>>queue;	//最短ルートの候補を纏めた配列
 
 	/// <summary>
 	/// Aスターによる探索を行う関数
@@ -294,12 +296,18 @@ private:
 	/// </summary>
 	/// <param name="QUEUE">最短ルート候補</param>
 	/// <returns>スタートからゴールまでの最短ルート</returns>
-	std::vector<QueueData> ConvertToShortestRoute(const std::vector<QueueData> &QUEUE);
+	std::vector<std::shared_ptr<QueueData>> ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>> &QUEUE);
+
+
+	void RegistBranch(const WayPointData &DATA);
 
 	WayPointData startPoint;	//探索する際のスタート地点
 	WayPointData endPoint;		//探索する際のゴール地点
 	WayPointData prevStartPoint;//探索する際の前フレームのスタート地点
 	WayPointData prevEndPoint;	//探索する際の前フレームのゴール地点
+
+	std::vector<std::vector<std::shared_ptr<WayPointData>>> branchQueue;//探索中のルートを保存する
+
 
 
 	//デバック--------------------------
@@ -322,5 +330,7 @@ private:
 	};
 	std::vector<std::vector<SearchMapData>>searchMap;	//
 	int layerNum;										//探索数を指定する用の変数
+
+
 };
 

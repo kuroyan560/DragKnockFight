@@ -46,10 +46,15 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 
 			if (!wallFlag)
 			{
+				wayPoints[y][x] = std::make_shared<WayPointData>();
 				//等間隔で開ける
-				wayPoints[y][x].pos = worldPos;
-				wayPoints[y][x].radius = WAYPOINT_RADIUS;
-				wayPoints[y][x].handle = { x,y };
+				wayPoints[y][x]->pos = worldPos;
+				wayPoints[y][x]->radius = WAYPOINT_RADIUS;
+				wayPoints[y][x]->handle = { x,y };
+			}
+			else
+			{
+				wayPoints[y][x] = std::make_shared<WayPointData>();
 			}
 		}
 	}
@@ -61,12 +66,12 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 	{
 		for (int x = 0; x < WAYPOINT_MAX_X; ++x)
 		{
-			if (DontUse(wayPoints[y][x]))
+			if (DontUse(wayPoints[y][x]->handle))
 			{
 				SphereCollision data;
-				data.center = &wayPoints[y][x].pos;
+				data.center = &wayPoints[y][x]->pos;
 				data.radius = SERACH_RADIUS;
-				RegistHandle(data, &wayPoints[y][x]);
+				RegistHandle(data, wayPoints[y][x]);
 			}
 		}
 	}
@@ -91,13 +96,13 @@ void NavigationAI::Update(const Vec2<float> &POS)
 	{
 		for (int x = 0; x < wayPoints[y].size(); ++x)
 		{
-			if (DontUse(wayPoints[y][x]))
+			if (DontUse(wayPoints[y][x]->handle))
 			{
 				SphereCollision data1, data2;
 
 				//スクリーン座標と判定を取る為にスクリーン座標に変換する
-				data1.center = &ScrollMgr::Instance()->Affect(wayPoints[y][x].pos);
-				data1.radius = wayPoints[y][x].radius;
+				data1.center = &ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos);
+				data1.radius = wayPoints[y][x]->radius;
 				data2.center = &pos;
 				data2.radius = WAYPOINT_RADIUS;
 
@@ -106,18 +111,18 @@ void NavigationAI::Update(const Vec2<float> &POS)
 				//マウスカーソルと合ったらウェイポイントの情報を参照する
 				if (hitFlag)
 				{
-					checkingHandle = wayPoints[y][x].handle;
+					checkingHandle = wayPoints[y][x]->handle;
 					checkTimer = 0;
 				}
 				//右クリックしたらスタート地点に設定する
 				if (hitFlag && DebugKeyManager::Instance()->DebugKeyTrigger(DIK_H, "SetStart", "DIK_H"))
 				{
-					startPoint = wayPoints[y][x];
+					startPoint = *wayPoints[y][x];
 				}
 				//左クリックしたらゴール地点に設定する
 				if (hitFlag && DebugKeyManager::Instance()->DebugKeyTrigger(DIK_N, "SetGoal", "DIK_N"))
 				{
-					endPoint = wayPoints[y][x];
+					endPoint = *wayPoints[y][x];
 				}
 			}
 		}
@@ -140,12 +145,14 @@ void NavigationAI::Update(const Vec2<float> &POS)
 	prevStartPoint = startPoint;
 	prevEndPoint = endPoint;
 
-	//毎フレーム白に初期化する
+	//毎フレーム初期化の必要のある物を初期化する
 	for (int y = 0; y < wayPoints.size(); ++y)
 	{
 		for (int x = 0; x < wayPoints[y].size(); ++x)
 		{
 			debugColor[y][x] = Color(255, 255, 255, 255);
+			wayPoints[y][x]->branchReferenceCount = 0;
+			wayPoints[y][x]->branchHandle = -1;
 		}
 	}
 
@@ -179,7 +186,7 @@ void NavigationAI::Draw()
 	{
 		for (int x = 0; x < wayPoints[y].size(); ++x)
 		{
-			if (DontUse(wayPoints[y][x]))
+			if (DontUse(wayPoints[y][x]->handle))
 			{
 				if (wayPointFlag)
 				{
@@ -187,7 +194,7 @@ void NavigationAI::Draw()
 					Color color = debugColor[y][x];
 
 					//その場所がマウスカーソルと合ったら確認中の場所だと認識する
-					isCheckingFlag = checkingHandle.x == wayPoints[y][x].handle.x && checkingHandle.y == wayPoints[y][x].handle.y;
+					isCheckingFlag = checkingHandle == wayPoints[y][x]->handle;
 					if (isCheckingFlag)
 					{
 						color = Color(255, 0, 0, 255);
@@ -196,7 +203,7 @@ void NavigationAI::Draw()
 					//最短ルートの描画
 					for (int i = 0; i < queue.size(); ++i)
 					{
-						if (queue[i].handle == wayPoints[y][x].handle)
+						if (queue[i]->handle == wayPoints[y][x]->handle)
 						{
 							color = Color(255, 0, 255, 255);
 							break;
@@ -204,26 +211,26 @@ void NavigationAI::Draw()
 					}
 
 					//その場所がスタート地点なら色を変える
-					isCheckingFlag = startPoint.handle.x == wayPoints[y][x].handle.x && startPoint.handle.y == wayPoints[y][x].handle.y;
+					isCheckingFlag = startPoint.handle == wayPoints[y][x]->handle;
 					if (isCheckingFlag)
 					{
 						color = Color(255, 255, 0, 255);
 					}
 
 					//その場所がゴール地点なら色を変える
-					isCheckingFlag = endPoint.handle.x == wayPoints[y][x].handle.x && endPoint.handle.y == wayPoints[y][x].handle.y;
+					isCheckingFlag = endPoint.handle == wayPoints[y][x]->handle;
 					if (isCheckingFlag)
 					{
 						color = Color(0, 255, 255, 255);
 					}
 
 					//ウェイポイントの描画
-					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), wayPoints[y][x].radius, color);
+					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos), wayPoints[y][x]->radius, color);
 				}
 				//探索範囲の描画
 				if (serachFlag)
 				{
-					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x].pos), SERACH_RADIUS, Color(255, 255, 255, 255));
+					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos), SERACH_RADIUS, Color(255, 255, 255, 255));
 				}
 			}
 		}
@@ -236,16 +243,16 @@ void NavigationAI::Draw()
 		{
 			for (int x = 0; x < wayPoints[y].size(); ++x)
 			{
-				if (DontUse(wayPoints[y][x]))
+				if (DontUse(wayPoints[y][x]->handle))
 				{
 					//登録したハンドルから線を繋げる
-					for (int i = 0; i < wayPoints[y][x].wayPointHandles.size(); ++i)
+					for (int i = 0; i < wayPoints[y][x]->wayPointHandles.size(); ++i)
 					{
-						Vec2<int> endHandle = wayPoints[y][x].wayPointHandles[i];
+						Vec2<int> endHandle = wayPoints[y][x]->wayPointHandles[i];
 						DrawFunc::DrawLine2D
 						(
-							ScrollMgr::Instance()->Affect(wayPoints[y][x].pos),
-							ScrollMgr::Instance()->Affect(wayPoints[endHandle.y][endHandle.x].pos),
+							ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos),
+							ScrollMgr::Instance()->Affect(wayPoints[endHandle.y][endHandle.x]->pos),
 							Color(0, 155, 0, 255)
 						);
 					}
@@ -294,10 +301,10 @@ void NavigationAI::ImGuiDraw()
 	ImGui::Begin("Queue");
 	for (int i = 0; i < queue.size(); ++i)
 	{
-		Vec2<int>handle = queue[i].handle;
+		Vec2<int>handle = queue[i]->handle;
 		std::string name = "Handle:" + std::to_string(i) + ",X:" +
 			std::to_string(handle.x) + ",Y:" +
-			std::to_string(handle.y) + ",Distance+Pass:" + std::to_string(queue[i].sum);
+			std::to_string(handle.y) + ",Distance+Pass:" + std::to_string(queue[i]->sum);
 		ImGui::Text(name.c_str());
 	}
 	ImGui::End();
@@ -308,18 +315,18 @@ void NavigationAI::ImGuiDraw()
 	{
 		Vec2<int>handle = checkingHandle;
 		ImGui::Begin("WayPointData");
-		ImGui::Text("Handle:X%d,Y:%d", wayPoints[handle.y][handle.x].handle.x, wayPoints[handle.y][handle.x].handle.y);
-		ImGui::Text("Pos:X%f,Y:%f", wayPoints[handle.y][handle.x].pos.x, wayPoints[handle.y][handle.x].pos.y);
-		ImGui::Text("Radius:%f", wayPoints[handle.y][handle.x].radius);
+		ImGui::Text("Handle:X%d,Y:%d", wayPoints[handle.y][handle.x]->handle.x, wayPoints[handle.y][handle.x]->handle.y);
+		ImGui::Text("Pos:X%f,Y:%f", wayPoints[handle.y][handle.x]->pos.x, wayPoints[handle.y][handle.x]->pos.y);
+		ImGui::Text("Radius:%f", wayPoints[handle.y][handle.x]->radius);
 		ImGui::Text("RelateHandles");
-		for (int i = 0; i < wayPoints[handle.y][handle.x].wayPointHandles.size(); ++i)
+		for (int i = 0; i < wayPoints[handle.y][handle.x]->wayPointHandles.size(); ++i)
 		{
 			std::string name = "Handle:" + std::to_string(i) + ",X:" +
-				std::to_string(wayPoints[handle.y][handle.x].wayPointHandles[i].x) + ",Y:" +
-				std::to_string(wayPoints[handle.y][handle.x].wayPointHandles[i].y);
+				std::to_string(wayPoints[handle.y][handle.x]->wayPointHandles[i].x) + ",Y:" +
+				std::to_string(wayPoints[handle.y][handle.x]->wayPointHandles[i].y);
 			ImGui::Text(name.c_str());
 		}
-		ImGui::Text("PassNum:%d", wayPoints[handle.y][handle.x].passNum);
+		ImGui::Text("PassNum:%d", wayPoints[handle.y][handle.x]->passNum);
 		ImGui::End();
 	}
 }
@@ -330,9 +337,9 @@ std::vector<WayPointData> NavigationAI::GetShortestRoute()
 	std::vector<WayPointData>result;
 	for (int i = queue.size() - 1; 0 <= i; --i)
 	{
-		int x = queue[i].handle.x;
-		int y = queue[i].handle.y;
-		result.push_back(wayPoints[y][x]);
+		int x = queue[i]->handle.x;
+		int y = queue[i]->handle.y;
+		//result.push_back(*wayPoints[y][x]);
 	}
 	return result;
 }
@@ -370,20 +377,31 @@ inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS
 	return result;
 }
 
-inline bool NavigationAI::DontUse(const WayPointData &DATA)
+inline bool NavigationAI::DontUse(const Vec2<int> &HANDLE)
 {
-	return DATA.handle != Vec2<int>(-1, -1);
+	return HANDLE != Vec2<int>(-1, -1);
 }
 
 void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &END_POINT)
 {
-	std::vector<WayPointData>startPoint;//ウェイポイントの探索開始位置
-	std::vector<WayPointData>nextPoint; //次のウェイポイントの探索開始位置
-	std::vector<WayPointData>failPoint; //探索候補外のウェイポイント
-	nextPoint.push_back(START_POINT);
+	std::vector<std::shared_ptr<WayPointData>>startPoint;//ウェイポイントの探索開始位置
+	std::vector<std::shared_ptr<WayPointData>>nextPoint; //次のウェイポイントの探索開始位置
+	std::vector<std::shared_ptr<WayPointData>>failPoint; //探索候補外のウェイポイント
+
+	Vec2<int>sHandle(START_POINT.handle);
+
+	nextPoint.push_back(std::make_shared<WayPointData>());
+	nextPoint[0] = wayPoints[sHandle.y][sHandle.x];
 	searchMap.clear();
 	queue.clear();
+	branchQueue.clear();
 	bool failFlag = false;
+
+	//最初のブランチを作る
+	branchQueue.push_back({});
+	branchQueue[0].push_back(std::make_shared<WayPointData>());
+	branchQueue[0][0] = wayPoints[sHandle.y][sHandle.x];
+	branchQueue[0][0]->branchHandle = 0;
 
 	//次に向かうべき場所を探索する
 	while (1)
@@ -391,23 +409,27 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 		//次に探索するウェイポイントのデータをスタート地点とする
 		startPoint = nextPoint;
 		//次のウェイポイントの情報を蓄える為に空きを用意する
-		nextPoint.clear();
+		for (int i = 0; i < nextPoint.size(); ++i)
+		{
+			nextPoint.pop_back();
+		}
+
 
 		searchMap.push_back({});
 		//現在追跡中のルート分探索
 		for (int startPointIndex = 0; startPointIndex < startPoint.size(); ++startPointIndex)
 		{
-			for (int i = 0; i < startPoint[startPointIndex].wayPointHandles.size(); ++i)
+			for (int i = 0; i < startPoint[startPointIndex]->wayPointHandles.size(); ++i)
 			{
 				//参照するウェイポイントの指定
-				Vec2<int>handle(startPoint[startPointIndex].wayPointHandles[i]);
+				Vec2<int>handle(startPoint[startPointIndex]->wayPointHandles[i]);
 				//ヒューリスティック推定値から探索するべきかどうか判断する
-				float nowHeuristicValue = startPoint[startPointIndex].pos.Distance(END_POINT.pos);						//現在地からのゴールまでのヒューリスティック推定値
-				float nextHeuristicValue = wayPoints[handle.y][handle.x].pos.Distance(END_POINT.pos);	//参照しているウェイポイントからゴールまでのヒューリスティック推定値
+				float nowHeuristicValue = startPoint[startPointIndex]->pos.Distance(END_POINT.pos);						//現在地からのゴールまでのヒューリスティック推定値
+				float nextHeuristicValue = wayPoints[handle.y][handle.x]->pos.Distance(END_POINT.pos);	//参照しているウェイポイントからゴールまでのヒューリスティック推定値
 
 				//ヒューリスティックが0ならゴールにたどり着いた事になるので探索しない
 				//スタート地点を二回キューに入れない
-				if (nowHeuristicValue <= 0.0f || wayPoints[handle.y][handle.x].handle == START_POINT.handle)
+				if (nowHeuristicValue <= 0.0f || wayPoints[handle.y][handle.x]->handle == START_POINT.handle)
 				{
 					continue;
 				}
@@ -426,24 +448,57 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 						if (failFlag)
 						{
 							//キューにはハンドルと現在地からゴールまでの距離(ヒューリスティック推定値)をスタックする
-							queue.push_back(QueueData(startPoint[startPointIndex].handle, nowHeuristicValue));
+							queue.push_back(std::make_shared<QueueData>(startPoint[startPointIndex]->handle, nowHeuristicValue));
 						}
-
 
 						searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
 						//パス数の記録
-						wayPoints[handle.y][handle.x].passNum = startPoint[startPointIndex].passNum + 1;
+						wayPoints[handle.y][handle.x]->passNum = startPoint[startPointIndex]->passNum + 1;
 						//キューにはハンドルと現在地からゴールまでの距離(ヒューリスティック推定値)をスタックする
-						queue.push_back(QueueData(handle, nextHeuristicValue + wayPoints[handle.y][handle.x].passNum));
+						queue.push_back(std::make_shared<QueueData>(handle, nextHeuristicValue + wayPoints[handle.y][handle.x]->passNum));
 						//次に探索する地点を記録する
-						nextPoint.push_back(wayPoints[handle.y][handle.x]);
+						nextPoint.push_back(std::make_shared<WayPointData>());
+						nextPoint[nextPoint.size() - 1] = wayPoints[handle.y][handle.x];
+
+
+						//探索中のルートを保存する
+						if (wayPoints[handle.y][handle.x]->branchHandle == -1)
+						{
+							//現在地のウェイポイントのブランチのハンドルを見る
+							Vec2<int>startHandle(startPoint[startPointIndex]->handle);
+							//そのブランチの探索された回数が一回なら追加する
+							if (wayPoints[startHandle.y][startHandle.x]->branchReferenceCount < 1)
+							{
+								//現在地のウェイポイントのブランチハンドルから参照先のウェイポイントにブランチハンドルを渡した後、ルート追加
+								int branchHandle = wayPoints[startHandle.y][startHandle.x]->branchHandle;
+								wayPoints[handle.y][handle.x]->branchHandle = branchHandle;
+								++wayPoints[startHandle.y][startHandle.x]->branchReferenceCount;
+
+								branchQueue[branchHandle].push_back(std::make_shared<WayPointData>());
+								branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
+							}
+							//二回以上探索されたら別のブランチを作成し、今までのルートを渡し追加する
+							else
+							{
+								//ブランチを追加し、ハンドルを渡す
+								branchQueue.push_back({});
+								int newbranchHandle = branchQueue.size() - 1;
+								wayPoints[handle.y][handle.x]->branchHandle = newbranchHandle;
+
+								int branchHandle = wayPoints[startHandle.y][startHandle.x]->branchHandle;
+								//既に別のウェイポイントが追加されているので最後から二番目の場所に上書きする
+								branchQueue[newbranchHandle] = branchQueue[branchHandle];
+								branchQueue[newbranchHandle][branchQueue[branchHandle].size() - 2] = wayPoints[handle.y][handle.x];
+							}
+						}
 					}
 					else
 					{
-						failPoint.push_back(wayPoints[handle.y][handle.x]);
+						failPoint.push_back(std::make_shared<WayPointData>());
+						failPoint[failPoint.size() - 1] = wayPoints[handle.y][handle.x];
 					}
 				}
-				
+
 			}
 		}
 		//次の場所を探索した後failFlagが立っていたら下ろす
@@ -455,7 +510,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 			bool goalFlag = false;
 			for (int i = 0; i < queue.size(); ++i)
 			{
-				if (queue[i].handle == END_POINT.handle)
+				if (queue[i]->handle == END_POINT.handle)
 				{
 					goalFlag = true;
 					break;
@@ -476,7 +531,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 				//現在のウェイポイントの間隔から算出している
 				for (int i = 0; i < queue.size(); ++i)
 				{
-					queue[i].sum += 325.0f / 2.0f;
+					queue[i]->sum += 325.0f / 2.0f;
 				}
 			}
 		}
@@ -484,14 +539,17 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 
 	//今までの候補から最短ルートを作る
 	queue = ConvertToShortestRoute(queue);
+}
 
+void NavigationAI::RegistBranch(const WayPointData &DATA)
+{
 }
 
 inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
 {
 	for (int i = 0; i < queue.size(); ++i)
 	{
-		if (queue[i].handle == HANDLE)
+		if (queue[i]->handle == HANDLE)
 		{
 			return true;
 		}
@@ -499,22 +557,22 @@ inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
 	return false;
 }
 
-std::vector<NavigationAI::QueueData> NavigationAI::ConvertToShortestRoute(const std::vector<QueueData> &QUEUE)
+std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>> &QUEUE)
 {
 	std::vector<float>sumArray;
 	for (int i = 0; i < QUEUE.size(); ++i)
 	{
-		sumArray.push_back(QUEUE[i].sum);
+		sumArray.push_back(QUEUE[i]->sum);
 	}
 	std::sort(sumArray.begin(), sumArray.end());
 
 	//ソートした順に並び替え
-	std::vector<QueueData>sortData;
+	std::vector<std::shared_ptr<QueueData>>sortData;
 	for (int sumIndex = 0; sumIndex < sumArray.size(); ++sumIndex)
 	{
 		for (int queueIndex = 0; queueIndex < QUEUE.size(); ++queueIndex)
 		{
-			bool sameSumFlag = QUEUE[queueIndex].sum == sumArray[sumIndex];
+			bool sameSumFlag = QUEUE[queueIndex]->sum == sumArray[sumIndex];
 			if (sameSumFlag)
 			{
 				sortData.push_back(QUEUE[queueIndex]);
@@ -524,22 +582,22 @@ std::vector<NavigationAI::QueueData> NavigationAI::ConvertToShortestRoute(const 
 
 
 	int resultHandle = 0;
-	std::vector<QueueData> result;
-	std::vector<QueueData> fail;
+	std::vector<std::shared_ptr<QueueData>> result;
+	std::vector<std::shared_ptr<QueueData>> fail;
 
 	while (1)
 	{
 		for (int sortIndex = 0; sortIndex < sortData.size(); ++sortIndex)
 		{
-			Vec2<int>handle(sortData[sortIndex].handle);
+			Vec2<int>handle(sortData[sortIndex]->handle);
 
 			//前のウェイポイントと繋がっているかどうか
 			if (result.size() != 0)
 			{
-				for (int linkHandle = 0; linkHandle < wayPoints[handle.y][handle.x].wayPointHandles.size(); ++linkHandle)
+				for (int linkHandle = 0; linkHandle < wayPoints[handle.y][handle.x]->wayPointHandles.size(); ++linkHandle)
 				{
 					//ウェイポイントが繋がっているかどうか
-					bool linkFlag = wayPoints[handle.y][handle.x].wayPointHandles[linkHandle] == result[resultHandle].handle;
+					bool linkFlag = wayPoints[handle.y][handle.x]->wayPointHandles[linkHandle] == result[resultHandle]->handle;
 
 					//成功
 					if (linkFlag)
@@ -610,11 +668,11 @@ std::vector<NavigationAI::QueueData> NavigationAI::ConvertToShortestRoute(const 
 		//スタートとゴールが繋がっていなければ探索し直し
 		for (int i = 0; i < result.size(); ++i)
 		{
-			if (result[i].handle == Vec2<int>())
+			if (result[i]->handle == Vec2<int>())
 			{
 
 			}
-			if (result[i].handle == Vec2<int>())
+			if (result[i]->handle == Vec2<int>())
 			{
 
 			}
@@ -634,23 +692,23 @@ std::vector<NavigationAI::QueueData> NavigationAI::ConvertToShortestRoute(const 
 		break;
 	}
 
-	QueueData startPoint(startPoint.handle, 0.0f);
+	std::shared_ptr<QueueData> startPoint(std::make_shared<QueueData>(startPoint.handle, 0.0f));
 	result.push_back(startPoint);
 
 	return result;
 }
 
-inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, WayPointData *DATA)
+inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, std::shared_ptr<WayPointData> DATA)
 {
 	for (int y = 0; y < WAYPOINT_MAX_Y; ++y)
 	{
 		for (int x = 0; x < WAYPOINT_MAX_X; ++x)
 		{
 			//使用できるデータから判定を行う
-			if (DontUse(wayPoints[y][x]))
+			if (DontUse(wayPoints[y][x]->handle))
 			{
 				SphereCollision data;
-				data.center = &wayPoints[y][x].pos;
+				data.center = &wayPoints[y][x]->pos;
 				data.radius = SERACH_RADIUS;
 
 				//移動範囲内にウェイポイントがあるか
@@ -665,7 +723,7 @@ inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, WayPointDa
 				//探索範囲内&&直接行ける場所なら線を繋げる
 				if (serachFlag && canMoveFlag)
 				{
-					wayPoints[y][x].RegistHandle(DATA->handle);
+					wayPoints[y][x]->RegistHandle(DATA->handle);
 					DATA->RegistHandle({ x,y });
 				}
 			}
