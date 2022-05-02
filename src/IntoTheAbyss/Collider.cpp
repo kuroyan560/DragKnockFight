@@ -379,6 +379,5 @@ Vec2<float> Collider::CalIntersectPoint(Vec2<float> posA1, Vec2<float> posA2, Ve
 	double d1 = fabs(buff.Cross(Vec2<float>(posA1.x - posB1.x, posA1.y - posB1.y)));
 	double d2 = fabs(buff.Cross(Vec2<float>(posA2.x - posB1.x, posA2.y - posB1.y)));
 	double t = d1 / (d1 + d2);
-
 	return Vec2<float>(posA1.x + (posA2.x - posA1.x) * t, posA1.y + (posA2.y - posA1.y) * t);
 }

@@ -7,6 +7,9 @@
 
 const float NavigationAI::SERACH_RADIUS = 180.0f;
 const float NavigationAI::WAYPOINT_RADIUS = 20.0f;
+const float NavigationAI::SERACH_LAY_UPDOWN_DISTANCE = 300.0f;
+const float NavigationAI::SERACH_LAY_LEFTRIGHT_DISTANCE = 350.0f;
+const float NavigationAI::SERACH_LAY_NANAME_DISTANCE = 400.0f;
 
 void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 {
@@ -232,62 +235,9 @@ void NavigationAI::Draw()
 				{
 					for (int i = 0; i < 8; ++i)
 					{
-						int angle = i * (360.0f / 8.0f);
-						float distance = 250.0f;
+						Vec2<float>endPos = CaluLine(wayPoints[y][x]->pos, i * (360.0f / 8.0f));
 
-						int adj = 15;
-						float upDown = 250.0f;
-						float leftRight = 400.0f;
-						float naname = 400.0f;
-
-						if (angle == 0)
-						{
-							distance = leftRight;
-						}
-						else if (angle == 45)
-						{
-							angle += adj;
-							distance = naname;
-						}
-						else if (angle == 90)
-						{
-							distance = upDown;
-						}
-						else if (angle == 135)
-						{
-							angle += adj;
-							distance = naname;
-						}
-						else if (angle == 180)
-						{
-							distance = leftRight;
-						}
-						else if (angle == 225)
-						{
-							angle -= adj;
-							distance = naname;
-						}
-						else if (angle == 270)
-						{
-							distance = upDown;
-						}
-						else if (angle == 315)
-						{
-							angle += adj;
-							distance = naname;
-						}
-						else
-						{
-							distance = leftRight;
-						}
-
-						float dir = Angle::ConvertToRadian(angle);
-
-
-
-
-						Vec2<float>lineEndPos(cosf(dir), sinf(dir));
-						DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos), ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos + lineEndPos * distance), Color(255, 255, 255, 255));
+						DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos), ScrollMgr::Instance()->Affect(endPos), Color(255, 255, 255, 255));
 					}
 				}
 			}
@@ -824,6 +774,62 @@ std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToSho
 	return result;
 }
 
+Vec2<float> NavigationAI::CaluLine(const Vec2<float> &CENTRAL_POS, int angle)
+{
+	float distance = 0.0f;
+
+	int adj = 15;
+
+	float upDown = SERACH_LAY_UPDOWN_DISTANCE;
+	float leftRight = SERACH_LAY_LEFTRIGHT_DISTANCE;
+	float naname = SERACH_LAY_NANAME_DISTANCE;
+
+	if (angle == 0)
+	{
+		distance = leftRight;
+	}
+	else if (angle == 45)
+	{
+		angle -= adj;
+		distance = naname;
+	}
+	else if (angle == 90)
+	{
+		distance = upDown;
+	}
+	else if (angle == 135)
+	{
+		angle += adj;
+		distance = naname;
+	}
+	else if (angle == 180)
+	{
+		distance = leftRight;
+	}
+	else if (angle == 225)
+	{
+		angle -= adj;
+		distance = naname;
+	}
+	else if (angle == 270)
+	{
+		distance = upDown;
+	}
+	else if (angle == 315)
+	{
+		angle += adj;
+		distance = naname;
+	}
+	else
+	{
+		distance = leftRight;
+	}
+	float dir = Angle::ConvertToRadian(angle);
+	Vec2<float>lineEndPos(cosf(dir), sinf(dir));
+
+	return CENTRAL_POS + lineEndPos * distance;
+}
+
 std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &QUEUE)
 {
 	std::vector<std::vector<std::shared_ptr<WayPointData>>> route;
@@ -880,58 +886,8 @@ inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, std::share
 				//中心から八方向に伸びた線とウェイポイントの判定
 				for (int i = 0; i < 8; ++i)
 				{
-					int angle = i * (360.0f / 8.0f);
-					float distance = 0.0f;
-
-					int adj = 15;
-
-					float upDown = 250.0f;
-					float leftRight = 400.0f;
-					float naname = 400.0f;
-
-					if (angle == 0)
-					{
-						distance = leftRight;
-					}
-					else if (angle == 45)
-					{
-						angle += adj;
-						distance = naname;
-					}
-					else if (angle == 90)
-					{
-						distance = upDown;
-					}
-					else if (angle == 135)
-					{
-						angle += adj;
-						distance = naname;
-					}
-					else if (angle == 180)
-					{
-						distance = leftRight;
-					}
-					else if (angle == 225)
-					{
-						angle -= adj;
-						distance = naname;
-					}
-					else if (angle == 270)
-					{
-						distance = upDown;
-					}
-					else if (angle == 315)
-					{
-						angle += adj;
-						distance = naname;
-					}
-					else
-					{
-						distance = leftRight;
-					}
-					float dir = Angle::ConvertToRadian(angle);
-					Vec2<float>lineEndPos(cosf(dir), sinf(dir));
-					if (CheckHitLineCircle(lineStartPos, lineStartPos + lineEndPos * distance, circlePos, r))
+					Vec2<float>endPos = CaluLine(lineStartPos, i * (360.0f / 8.0f));
+					if (CheckHitLineCircle(lineStartPos, endPos, circlePos, r))
 					{
 						serachFlag = true;
 						break;
@@ -942,7 +898,7 @@ inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, std::share
 				bool canMoveFlag = false;
 				if (serachFlag)
 				{
-					canMoveFlag = !CheckMapChipWallAndRay(*HANDLE.center, circlePos);
+					canMoveFlag = !CheckMapChipWallAndRay(circlePos, lineStartPos);
 				}
 
 				//探索範囲内&&直接行ける場所なら線を繋げる
