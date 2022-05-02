@@ -618,7 +618,7 @@ void Game::Update()
 
 	// スクロール量の更新処理
 	//ScrollManager::Instance()->Update();
-	ScrollMgr::Instance()->Update();
+	ScrollMgr::Instance()->Update(lineCenterPos);
 
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
@@ -670,6 +670,26 @@ void Game::Update()
 	CharacterManager::Instance()->Left()->staminaGauge->AddStamina(healAmount);
 	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 30, StaminaItem::CHARA_ID::RIGHT, Color(0xEF, 0x01, 0x90, 0xFF));
 	CharacterManager::Instance()->Right()->staminaGauge->AddStamina(healAmount);
+
+	if (!Camera::Instance()->Active()) {
+
+		// 紐の伸び具合によってカメラのズーム率を変える。
+		float addLineValue = CharacterManager::Instance()->Left()->addLineLength + CharacterManager::Instance()->Right()->addLineLength;
+		const float MAX_ADD_ZOOM = 1300.0f;
+		float zoomRate = 1.0f;
+		// 限界より伸びていたら。
+		if (MAX_ADD_ZOOM < addLineValue) {
+			zoomRate = 1.0f;
+		}
+		else {
+			zoomRate = addLineValue / MAX_ADD_ZOOM;
+		}
+		Camera::Instance()->zoom = 1.0f - zoomRate;
+
+		// カメラのズームが0.1f未満にならないようにする。
+		if (Camera::Instance()->zoom < 0.1f) Camera::Instance()->zoom = 1.0f;
+
+	}
 
 }
 

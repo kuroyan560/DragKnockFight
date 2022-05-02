@@ -12,7 +12,7 @@ public:
 	ScrollMgr() :zoom(1.0f)
 	{};
 	void Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, const Vec2<float> &ADJ);
-	void Update();
+	void Update(const Vec2<float>& LineCenterPos);
 	void CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS);
 	Vec2<float>Affect(const Vec2<float> &Pos);//スクロールとズームを適用させる
 
@@ -22,6 +22,9 @@ public:
 	Vec2<float> honraiScrollAmount;	//本来スクロール量
 	Vec2<float> scrollAmount;		//スクロール量
 	float zoom;						//ズーム倍率
+
+	Vec2<float> lineCenterOffset;	// 紐の中心を画面の中心に持ってくるためのオフセット 中心からずれていたらこの値を使って中心に持ってくる。
+
 private:
 
 	Vec2<int>windowSize;

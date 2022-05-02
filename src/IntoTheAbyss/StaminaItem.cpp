@@ -116,7 +116,7 @@ void StaminaItem::Draw()
 
 	/*===== •`‰æˆ— =====*/
 
-	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(pos), DRAW_RADIUS, itemColor, isAcquired);
+	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(pos), DRAW_RADIUS * Camera::Instance()->zoom, itemColor, isAcquired);
 
 }
 

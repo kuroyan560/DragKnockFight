@@ -10,7 +10,7 @@ class Camera : public Singleton<Camera>
 
 	// If camera focuses on something, it will be active.
 	int active;
-
+public:
 	// Info to focus.
 	Vec2<float>target;
 	float zoom;
