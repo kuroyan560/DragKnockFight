@@ -74,19 +74,22 @@ void Stamina::Draw(const Vec2<float>& DrawPos, const float& Width, const float& 
 
 		// アウトライン
 		Vec2<float> offset = { 2,2 };
-		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(DrawPos - offset - expAmount), ScrollMgr::Instance()->Affect(DrawPos + Vec2<float>(Width, Height) + offset + expAmount), Color(0x29, 0xC9, 0xB4, 0xFF), true);
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(DrawPos - offset - expAmount), ScrollMgr::Instance()->Affect(DrawPos + Vec2<float>(Width, Height) + offset + expAmount), outerColor, true);
 
 		// 内側に明るい四角形を描画
-		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(DrawPos - expAmount), ScrollMgr::Instance()->Affect(DrawPos + Vec2<float>(Width, Height) + expAmount), Color(0x2F, 0xFF, 0x8B, 0xFF), true);
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(DrawPos - expAmount), ScrollMgr::Instance()->Affect(DrawPos + Vec2<float>(Width, Height) + expAmount), innerColor, true);
 
 	}
 	else {
 
 		Vec2<float> nowGaugePos = DrawPos + Vec2<float>(Width * per, 0);
-		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(DrawPos - expAmount), ScrollMgr::Instance()->Affect(nowGaugePos + Vec2<float>(0, Height) + expAmount), Color(0x2F, 0xFF, 0x8B, 0xFF), true);
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(DrawPos - expAmount), ScrollMgr::Instance()->Affect(nowGaugePos + Vec2<float>(0, Height) + expAmount), innerColor, true);
 
 		// スタミナが溜まっていない部分を描画
-		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(nowGaugePos - expAmount), ScrollMgr::Instance()->Affect(DrawPos + Vec2<float>(Width, Height) + expAmount), Color(0x2F, 0xFF, 0x8B, 0x55), true, AlphaBlendMode_Trans);
+		Color outerColorBuff = outerColor;
+		outerColorBuff /= 3.0f;
+		outerColorBuff.Alpha() = 50;
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(nowGaugePos - expAmount), ScrollMgr::Instance()->Affect(DrawPos + Vec2<float>(Width, Height) + expAmount), outerColorBuff, true, AlphaBlendMode_Trans);
 
 	}
 
@@ -107,6 +110,9 @@ float Stamina::AddNowGauge(const float& Add)
 		nowGauge -= sub;
 
 		isActivate = true;
+
+		// ゲージがマックスになったので拡大する演出をつける。
+		SetExp(true);
 
 		// 超過量を返す。このゲージの次のゲージに足すため。
 		return sub;
@@ -135,6 +141,14 @@ void Stamina::SetExp(const bool& isBig)
 	else {
 		expAmount = { EXP_AMOUNT,EXP_AMOUNT };
 	}
+
+}
+
+void Stamina::SetColor(const Color& InnerColor, const Color& OuterColor)
+{
+
+	innerColor = InnerColor;
+	outerColor = OuterColor;
 
 }
 
@@ -212,6 +226,18 @@ void StaminaMgr::Draw(const Vec2<float>& CharaPos)
 			stamina[index].Draw(drawPos, STAMINA_GAUGE_WIDTH_PER_ONE, STAMINA_GAUGE_HEIGHT);
 
 		}
+
+	}
+
+}
+
+void StaminaMgr::SetColor(const Color& InnerColor, const Color& OuterColor)
+{
+
+	const int STAMINA_COUNT = stamina.size();
+	for (int index = 0; index < STAMINA_COUNT; ++index) {
+
+		stamina[index].SetColor(InnerColor, OuterColor);
 
 	}
 

@@ -1,4 +1,5 @@
 #include "Vec.h"
+#include "Color.h"
 #include <memory>
 #include <vector>
 
@@ -11,6 +12,8 @@ private:
 	float nowGauge;			// 現在のゲージ量 0 ~ 100 の値
 	bool isActivate;		// ゲージ量が最大値に達していて、振り回しやダッシュが行える状態かのフラグ
 	Vec2<float> expAmount;	// 回復した際にちょっと拡大する演出に使用する変数。
+	Color innerColor;		// ゲージの内側の色
+	Color outerColor;		// ゲージの外側の色
 
 
 private:
@@ -37,6 +40,7 @@ public:
 	inline const float& GetNowGauge() { return nowGauge; }
 	float AddNowGauge(const float& Add);
 	void SetExp(const bool& isBig = false);
+	void SetColor(const Color& InnerColor, const Color& OuterColor);
 
 };
 
@@ -58,6 +62,9 @@ public:
 	void Init();
 	void Update(const bool& Heal);
 	void Draw(const Vec2<float>& CharaPos);
+	
+	// 色を設定。
+	void SetColor(const Color& InnerColor, const Color& OuterColor);
 
 	// スタミナを消費
 	void ConsumesStamina(const int& ConsumesStamina);
@@ -70,4 +77,5 @@ public:
 
 	//バー単位ではなくゲージ消費(パイロット引き離し用)、足りなかったらfalseを返す
 	bool ConsumesStaminaByGauge(const float& CounsumeStaminaGauge);
+
 };

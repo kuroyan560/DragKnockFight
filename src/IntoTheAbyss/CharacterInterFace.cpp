@@ -311,9 +311,29 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 	pilotReturnTotalTime = 0;
 	gaugeReturnTimer = 0;
 
-	// 各キャラによってスタミナゲージのデフォルト量を決定。
+	// 各キャラによってスタミナゲージのデフォルト量を決定する予定。
 	staminaGauge = std::make_shared<StaminaMgr>();
 	staminaGauge->Init();
+
+	// キャラに寄ってスタミナゲージの色を設定する。
+	bool isLeft = GetWhichTeam() == WHICH_TEAM::LEFT_TEAM;
+	Color innerColor = Color();
+	Color outerColor = Color();
+	if (isLeft) {
+
+		// 緑
+		outerColor = Color(0x29, 0xC9, 0xB4, 0xFF);
+		innerColor = Color(0x2F, 0xFF, 0x8B, 0xFF);
+
+	}
+	else {
+
+		// 赤
+		outerColor = Color(0xA2, 0x1B, 0x6C, 0xFF);
+		innerColor = Color(0xEF, 0x01, 0x90, 0xFF);
+
+	}
+	staminaGauge->SetColor(innerColor, outerColor);
 
 }
 
