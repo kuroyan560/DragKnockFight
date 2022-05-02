@@ -393,8 +393,6 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		}
 	}
 
-	prevPos = pos;
-
 
 	if (SuperiorityGauge::Instance()->GetGaugeData(team).gaugeValue)
 	{

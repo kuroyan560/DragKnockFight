@@ -528,6 +528,11 @@ void Game::Update()
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
 	{
+
+		// 座標を保存。
+		CharacterManager::Instance()->Left()->SavePrevFramePos();
+		CharacterManager::Instance()->Right()->SavePrevFramePos();
+
 		CharacterManager::Instance()->Left()->Update(mapData, lineCenterPos);
 
 		// ボスの更新処理

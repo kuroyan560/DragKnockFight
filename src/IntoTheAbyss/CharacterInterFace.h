@@ -149,6 +149,9 @@ public:
 	//登場演出が完了したか
 	virtual bool Appear() = 0;
 
+	// 前フレームの座標を保存。
+	inline void SavePrevFramePos() { prevPos = pos; }
+
 public:
 	static const int LINE_LENGTH = 150;
 	static const int ADD_LINE_LENGTH_VEL = 100;	// 移動量に応じて伸びるaddLineLengthの最大量
