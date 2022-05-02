@@ -466,9 +466,6 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 						{
 							//キューにはハンドルと現在地からゴールまでの距離(ヒューリスティック推定値)をスタックする
 							queue.push_back(std::make_shared<QueueData>(startPoint[startPointIndex]->handle, nowHeuristicValue));
-							//int branchHandle = wayPoints[handle.y][handle.x]->branchHandle;
-							//branchQueue[branchHandle].push_back(std::make_shared<WayPointData>());
-							//branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 						}
 
 						searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
@@ -476,9 +473,13 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 						wayPoints[handle.y][handle.x]->passNum = startPoint[startPointIndex]->passNum + 1;
 						//キューにはハンドルと現在地からゴールまでの距離(ヒューリスティック推定値)をスタックする
 						queue.push_back(std::make_shared<QueueData>(handle, nextHeuristicValue + wayPoints[handle.y][handle.x]->passNum));
-						//次に探索する地点を記録する
-						nextPoint.push_back(std::make_shared<WayPointData>());
-						nextPoint[nextPoint.size() - 1] = wayPoints[handle.y][handle.x];
+
+						//次に探索する地点を記録する,ゴールの場合は次の探索の候補にしない
+						if (endPoint.handle != handle)
+						{
+							nextPoint.push_back(std::make_shared<WayPointData>());
+							nextPoint[nextPoint.size() - 1] = wayPoints[handle.y][handle.x];
+						}
 
 						//現在地のウェイポイントのブランチのハンドルを見る
 						Vec2<int>startHandle(startPoint[startPointIndex]->handle);
