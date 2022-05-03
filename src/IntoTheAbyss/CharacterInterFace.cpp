@@ -827,6 +827,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				// クラッシュ演出を追加。
 				CrashEffectMgr::Instance()->Generate(pos);
 
+				// スタミナを消費
+				partner.lock()->staminaGauge->ConsumesStamina(SWING_STAMINA);
+
 				// アイテムを生成する。
 				StaminaItem::CHARA_ID charaID;
 				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::LEFT;

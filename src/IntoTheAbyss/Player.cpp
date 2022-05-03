@@ -447,8 +447,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		isInputSwingRB = isInputRB;
 
-		// スタミナを消費
-		staminaGauge->ConsumesStamina(SWING_STAMINA);
+		// スタミナを消費 振り回しが終わった際にスタミナを消費するようにしました。
+		//staminaGauge->ConsumesStamina(SWING_STAMINA);
 
 	}
 	//else if (isSwingPartner && canSwing && !isGripPowerEmpty && isInputRightStick) {
