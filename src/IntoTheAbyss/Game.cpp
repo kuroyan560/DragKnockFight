@@ -11,6 +11,7 @@
 #include"SelectStage.h"
 #include"AfterImage.h"
 #include"CrashEffectMgr.h"
+#include"Stamina.h"
 
 #include"KuroFunc.h"
 #include"KuroEngine.h"
@@ -43,6 +44,7 @@
 #include"DebugKeyManager.h"
 
 #include"CharacterManager.h"
+#include "StaminaItemMgr.h"
 
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
@@ -409,7 +411,6 @@ void Game::Update()
 		//sceneChangeDeadFlag = player.isDead;
 	}
 
-
 	//プレイヤー陣地と敵の判定
 	if (playerHomeBase.Collision(CharacterManager::Instance()->Right()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
@@ -537,6 +538,11 @@ void Game::Update()
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
 	{
+
+		// 座標を保存。
+		CharacterManager::Instance()->Left()->SavePrevFramePos();
+		CharacterManager::Instance()->Right()->SavePrevFramePos();
+
 		CharacterManager::Instance()->Left()->Update(mapData, lineCenterPos);
 
 		// ボスの更新処理
@@ -629,7 +635,7 @@ void Game::Update()
 
 	// スクロール量の更新処理
 	//ScrollManager::Instance()->Update();
-	ScrollMgr::Instance()->Update();
+	ScrollMgr::Instance()->Update(lineCenterPos);
 
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
@@ -673,6 +679,40 @@ void Game::Update()
 	// クラッシュ時の演出の更新処理。
 	CrashEffectMgr::Instance()->Update();
 
+	// スタミナアイテムの更新処理
+	StaminaItemMgr::Instance()->Update();
+
+	// スタミナアイテムの当たり判定処理
+	int healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Left()->pos, 30, StaminaItem::CHARA_ID::LEFT, Color(0x02, 0xFF, 0x8B, 0xFF));
+	CharacterManager::Instance()->Left()->staminaGauge->AddStamina(healAmount);
+	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 30, StaminaItem::CHARA_ID::RIGHT, Color(0xEF, 0x01, 0x90, 0xFF));
+	CharacterManager::Instance()->Right()->staminaGauge->AddStamina(healAmount);
+
+	if (!Camera::Instance()->Active()) {
+
+		// 紐の伸び具合によってカメラのズーム率を変える。
+		float addLineValue = CharacterManager::Instance()->Left()->addLineLength + CharacterManager::Instance()->Right()->addLineLength;
+		const float MAX_ADD_ZOOM = 1300.0f;
+		float zoomRate = 1.0f;
+		// 限界より伸びていたら。
+		if (MAX_ADD_ZOOM < addLineValue) {
+			zoomRate = 1.0f;
+		}
+		else {
+			zoomRate = addLineValue / MAX_ADD_ZOOM;
+		}
+		static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
+		Camera::Instance()->zoom = 1.0f - zoomRate + ZOOM_OFFSET;
+
+		// カメラのズームが0.1f未満にならないようにする。
+		if (Camera::Instance()->zoom < 0.1f) Camera::Instance()->zoom = 1.0f;
+
+	}else{
+	
+		ScrollMgr::Instance()->lineCenterOffset = {};
+	
+	}
+
 }
 
 void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
@@ -690,6 +730,9 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 
 	playerHomeBase.Draw();
 	enemyHomeBase.Draw();
+
+	// スタミナアイテムの描画処理
+	StaminaItemMgr::Instance()->Draw();
 
 	static int CENTER_CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain.png");
 	static int PLAYER_CHAIN_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/chain_player.png");
@@ -866,9 +909,9 @@ void Game::Scramble()
 
 	// 移動量を取得。 優勢ゲージはここで更新。
 	double leftVel = CharacterManager::Instance()->Left()->vel.Length() * SlowMgr::Instance()->slowAmount;
-	leftVelGauge = (CharacterManager::Instance()->Left()->vel * SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	leftVelGauge = CharacterManager::Instance()->Left()->vel * SlowMgr::Instance()->slowAmount;
 	double rightVel = CharacterManager::Instance()->Right()->vel.Length() * SlowMgr::Instance()->slowAmount;
-	rightVelGauge = (CharacterManager::Instance()->Right()->vel * SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeDivValue) * SlowMgr::Instance()->slowAmount;
+	rightVelGauge = CharacterManager::Instance()->Right()->vel * SlowMgr::Instance()->slowAmount;
 	double subVel = fabs(fabs(leftVel) - fabs(rightVel));
 
 	// [スタン演出中] は移動させない。 踏ん張り中の場合は、どちらにせよ移動量が限りなく0に近いので移動させても問題がない。

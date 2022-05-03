@@ -197,17 +197,9 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
 
-	// 移動量の総量を求める。
-	auto swingAffect = GetSwingInertia();
-	if (GetSwingRigor())
-	{
-		// 振り回し直後の硬直が残っている場合は、慣性のみを移動量とする。
-		vel = swingAffect;
-	}
-	else
-	{
-		vel = moveVel + swingAffect;
-	}
+
+	// 移動量に関する変数をここで全てvelに代入する。
+	vel = moveVel;
 
 }
 

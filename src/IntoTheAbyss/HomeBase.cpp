@@ -56,7 +56,7 @@ void HomeBase::Draw()
 	static Color ENEMY_COLOR = Color(239, 1, 144, AREA_ALPHA);
 
 	//—Ìˆæ•`‰æ
-	DrawFunc::DrawBox2D(drawLeftUpPos, drawRightDownPos, leftPlayer ? PLAYER_COLOR : ENEMY_COLOR, DXGI_FORMAT_R8G8B8A8_UNORM, true, AlphaBlendMode_Trans);
+	DrawFunc::DrawBox2D(drawLeftUpPos, drawRightDownPos, leftPlayer ? PLAYER_COLOR : ENEMY_COLOR, true, AlphaBlendMode_Trans);
 
 	//‹«ŠE•`‰æ
 	static const int PLAYER_BORDER = TexHandleMgr::LoadGraph("resource/ChainCombat/borderLine_player.png");

@@ -58,6 +58,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//ƒ‹[ƒv
 	while (1)
 	{
+
 		DebugKeyManager::Instance()->CountReset();
 
 		KuroEngine::Instance().Update();
