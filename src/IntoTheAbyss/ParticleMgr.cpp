@@ -180,12 +180,13 @@ void ParticleMgr::Draw()
 	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
+	Vec2<float>scroll = -scrollShakeZoom + ScrollMgr::Instance()->lineCenterOffset;
 
 	static GameInfo ZOOM_AND_SCROLL;
-	if (ZOOM_AND_SCROLL.zoom != ScrollMgr::Instance()->zoom || ZOOM_AND_SCROLL.scroll != scrollShakeZoom || ZOOM_AND_SCROLL.gameSpeed != SlowMgr::Instance()->slowAmount)
+	if (ZOOM_AND_SCROLL.zoom != ScrollMgr::Instance()->zoom || ZOOM_AND_SCROLL.scroll != scroll || ZOOM_AND_SCROLL.gameSpeed != SlowMgr::Instance()->slowAmount)
 	{
 		ZOOM_AND_SCROLL.zoom = ScrollMgr::Instance()->zoom;
-		ZOOM_AND_SCROLL.scroll = scrollShakeZoom;
+		ZOOM_AND_SCROLL.scroll = scroll;
 		ZOOM_AND_SCROLL.gameSpeed = SlowMgr::Instance()->slowAmount;
 		zoomAndScroll->Mapping(&ZOOM_AND_SCROLL);
 	}

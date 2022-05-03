@@ -400,7 +400,7 @@ void Game::Update()
 		//sceneChangeDeadFlag = player.isDead;
 	}
 
-
+	/*
 	//プレイヤー陣地と敵の判定
 	if (playerHomeBase.Collision(CharacterManager::Instance()->Right()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
 	{
@@ -429,6 +429,7 @@ void Game::Update()
 
 		screenEdgeEffect.RightPlayerWin(120);
 	}
+	*/
 
 	//ラウンド終了演出開始
 	if (roundFinishFlag)
