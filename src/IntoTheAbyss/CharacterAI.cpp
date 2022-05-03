@@ -1,5 +1,4 @@
 #include "CharacterAI.h"
-#include"BehavioralLayer.h"
 #include"../Engine/DrawFunc.h"
 #include"ScrollMgr.h"
 

@@ -1,7 +1,8 @@
 #pragma once
 #include"../KuroEngine.h"
-#include"../IntoTheAbyss/TacticalLayer.h"
-#include"../IntoTheAbyss/OperatingLayer.h"
+#include"TacticalLayer.h"
+#include"BehavioralLayer.h"
+#include"OperatingLayer.h"
 #include<memory>
 
 /// <summary>
