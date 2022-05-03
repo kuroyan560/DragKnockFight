@@ -837,7 +837,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				Color charaColor;
 				if (team == WHICH_TEAM::LEFT_TEAM) charaColor = Color(0xEF, 0x01, 0x90, 0xFF);
 				if (team != WHICH_TEAM::LEFT_TEAM) charaColor = Color(0x02, 0xFF, 0x8B, 0xFF);
-				StaminaItemMgr::Instance()->Generate(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaColor, charaID);
+				StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaColor, charaID, partner.lock()->pos);
 
 			}
 
@@ -846,66 +846,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 		}
 
-		// 壁はさみの判定
-		//if (stackWindowTimer <= 0) {
-
-		//	Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
-		//	windowSize *= Vec2<int>(2, 2);
-
-		//	// ウィンドウ左右
-		//	float windowOffset = 100.0f;
-		//	bool winLeft = pos.x - size.x - ScrollMgr::Instance()->scrollAmount.x <= -windowOffset;
-		//	bool winRight = windowSize.x + windowOffset <= pos.x + size.x - ScrollMgr::Instance()->scrollAmount.x;
-		//	if (winRight || winLeft) {
-
-		//		stackWindowTimer = STACK_WINDOW_TIMER;
-
-
-		//		//CrashMgr::Instance()->Crash(pos, crashDevice, { false,true });
-		//		//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
-		//		SuperiorityGauge::Instance()->AddGauge(team, -20);
-		//		Crash({ winRight ? 1.0f : -1.0f , 0.0f });
-
-		//		// チームに応じてクラッシュ数を加算する変数を変える。
-		//		if (team == WHICH_TEAM::LEFT_TEAM) {
-		//			++ResultTransfer::Instance()->leftCrashCount;
-		//		}
-		//		else {
-		//			++ResultTransfer::Instance()->rightCrashCount;
-		//		}
-
-		//		// クラッシュ演出を追加。
-		//		CrashEffectMgr::Instance()->Generate(pos);
-		//	}
-		//	// ウィンドウ上下
-		//	bool winTop = pos.y - size.y - ScrollMgr::Instance()->scrollAmount.y <= -windowOffset;
-		//	bool winBottom = windowSize.y + windowOffset <= pos.y + size.y - ScrollMgr::Instance()->scrollAmount.y;
-		//	if (winBottom || winTop) {
-
-		//		stackWindowTimer = STACK_WINDOW_TIMER;
-
-		//		//CrashMgr::Instance()->Crash(pos, crashDevice, { true,false });
-		//		//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->enemyClashDamageValue);
-		//		SuperiorityGauge::Instance()->AddGauge(team, -20);
-		//		Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
-
-		//		// チームに応じてクラッシュ数を加算する変数を変える。
-		//		if (team == WHICH_TEAM::LEFT_TEAM) {
-		//			++ResultTransfer::Instance()->leftCrashCount;
-		//		}
-		//		else {
-		//			++ResultTransfer::Instance()->rightCrashCount;
-		//		}
-
-		//		// クラッシュ演出を追加。
-		//		CrashEffectMgr::Instance()->Generate(pos);
-		//	}
-		//}
-
 	}
-
-	//prevIntersectedLine = intersectedBuff;
-
 
 }
 

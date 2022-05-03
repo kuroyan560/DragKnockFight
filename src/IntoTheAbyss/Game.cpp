@@ -327,6 +327,8 @@ void Game::Init()
 	readyToStartRoundFlag = true;
 	CrashEffectMgr::Instance()->Init();
 	screenEdgeEffect.Init();
+
+	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 }
 
 void Game::Update()
@@ -694,10 +696,11 @@ void Game::Update()
 		// カメラのズームが0.1f未満にならないようにする。
 		if (Camera::Instance()->zoom < 0.1f) Camera::Instance()->zoom = 1.0f;
 
-	}else{
-	
+	}
+	else {
+
 		ScrollMgr::Instance()->lineCenterOffset = {};
-	
+
 	}
 
 }

@@ -2,6 +2,12 @@
 #include "KuroMath.h"
 #include "KuroFunc.h"
 
+void StaminaItemMgr::SetArea(const float& LeftUpPos, const float& RightDownPos)
+{
+	areaLeftPos = LeftUpPos;
+	areaRighPos = RightDownPos;
+}
+
 void StaminaItemMgr::Init()
 {
 
@@ -13,58 +19,88 @@ void StaminaItemMgr::Init()
 
 }
 
-void StaminaItemMgr::Generate(const Vec2<float>& GeneratePos, GENERATE_STATUS Status, Vec2<float>* CharaPos, Color CharaColor, StaminaItem::CHARA_ID CharaID)
+void StaminaItemMgr::GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STATUS Status, Vec2<float>* CharaPos, Color CharaColor, StaminaItem::CHARA_ID CharaID, const Vec2<float>& SwingCharaPos)
 {
 
 	/*===== 生成処理 =====*/
 
-	// ステータスに寄って処理を分ける。
-	switch (Status)
+	// 生成するデフォルト量をセット。
+	int generateCount = GENERATE_CRASH;
+
+	// 戦闘エリアの中心地点。
+	float areaHalfPos = areaRighPos / 2.0f;
+	float rate = 0;
+
+	// 位置関係に応じて生成する量を増やす。
+	switch (CharaID)
 	{
-	case StaminaItemMgr::GENERATE_STATUS::CRASH:
+	case StaminaItem::CHARA_ID::LEFT:
 
-		for (int generate = 0; generate < GENERATE_CRASH; ++generate) {
+		// 半分より左に行ってなかったら処理を飛ばす。
+		if (areaHalfPos < SwingCharaPos.x) break;
 
-			for (int index = 0; index < ITEM_COUNT; ++index) {
+		// 増やすべき割合を求める。
+		rate = SwingCharaPos.x / areaHalfPos;
 
-				// 生成済みだったら処理を飛ばす。
-				if (item[index].GetIsActive()) continue;
-
-				//ランダムな角度を求める。
-				Vec2<float> randomVec;
-				randomVec = { KuroFunc::GetRand(-100.0f,100.0f),KuroFunc::GetRand(-100.0f,100.0f) };
-				randomVec.Normalize();
-
-				// 生成する。
-				item[index].Generate(GeneratePos, randomVec, HEAL_AMOUNT, CRASH_VEL, StaminaItem::STAMINA_ITEM_ID::CRASH_ITEM, true, CharaPos,CharaColor);
-
-				break;
-
-			}
-
-		}
-
+		// 増やす。
+		generateCount += (1.0f - rate) * ADD_GENERATE_CRASH;
 
 		break;
-	case StaminaItemMgr::GENERATE_STATUS::SPONE:
+	case StaminaItem::CHARA_ID::RIGHT:
 
-		for (int index = 0; index < ITEM_COUNT; ++index) {
+		// 半分より右に行ってなかったら処理を飛ばす。
+		if (SwingCharaPos.x < areaHalfPos) break;
 
-			// 生成済みだったら処理を飛ばす。
-			if (item[index].GetIsActive()) continue;
+		// 増やすべき割合を求める。
+		rate = (SwingCharaPos.x - areaHalfPos) / areaHalfPos;
 
-			// 生成する。
-			item[index].Generate(GeneratePos, Vec2<float>(0, 0), HEAL_AMOUNT, 0, StaminaItem::STAMINA_ITEM_ID::SPONE_ITEM);
-
-			break;
-
-		}
+		// 増やす。
+		generateCount += rate * ADD_GENERATE_CRASH;
 
 		break;
 	default:
 		break;
 	}
 
+	for (int generate = 0; generate < generateCount; ++generate) {
+
+		for (int index = 0; index < ITEM_COUNT; ++index) {
+
+			// 生成済みだったら処理を飛ばす。
+			if (item[index].GetIsActive()) continue;
+
+			//ランダムな角度を求める。
+			Vec2<float> randomVec;
+			randomVec = { KuroFunc::GetRand(-100.0f,100.0f),KuroFunc::GetRand(-100.0f,100.0f) };
+			randomVec.Normalize();
+
+			// 生成する。
+			item[index].Generate(GeneratePos, randomVec, HEAL_AMOUNT, CRASH_VEL, StaminaItem::STAMINA_ITEM_ID::CRASH_ITEM, true, CharaPos, CharaColor);
+
+			break;
+
+		}
+
+	}
+
+}
+
+void StaminaItemMgr::GenerateSpone(const Vec2<float>& GeneratePos)
+{
+
+	/*===== 生成処理 =====*/
+
+	for (int index = 0; index < ITEM_COUNT; ++index) {
+
+		// 生成済みだったら処理を飛ばす。
+		if (item[index].GetIsActive()) continue;
+
+		// 生成する。
+		item[index].Generate(GeneratePos, Vec2<float>(0, 0), HEAL_AMOUNT, 0, StaminaItem::STAMINA_ITEM_ID::SPONE_ITEM);
+
+		break;
+
+	}
 
 }
 
@@ -79,7 +115,7 @@ void StaminaItemMgr::Update()
 
 		Vec2<float> randomSponePos = { KuroFunc::GetRand(0.0f, 2000.0f), KuroFunc::GetRand(0.0f,1000.0f) };
 
-		Generate(randomSponePos, StaminaItemMgr::GENERATE_STATUS::SPONE);
+		GenerateSpone(randomSponePos);
 
 		sponeTimer = 0;
 
