@@ -11,7 +11,7 @@ const float NavigationAI::SERACH_LAY_UPDOWN_DISTANCE = 300.0f;
 const float NavigationAI::SERACH_LAY_LEFTRIGHT_DISTANCE = 350.0f;
 const float NavigationAI::SERACH_LAY_NANAME_DISTANCE = 400.0f;
 
-void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
+void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 {
 	SizeData wallMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
@@ -69,13 +69,12 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 	{
 		for (int x = 0; x < WAYPOINT_MAX_X; ++x)
 		{
-			if (DontUse(wayPoints[y][x]->handle))
-			{
-				SphereCollision data;
-				data.center = &wayPoints[y][x]->pos;
-				data.radius = SERACH_RADIUS;
-				RegistHandle(data, wayPoints[y][x]);
-			}
+
+			if (!DontUse(wayPoints[y][x]->handle)) continue;
+			SphereCollision data;
+			data.center = &wayPoints[y][x]->pos;
+			data.radius = SERACH_RADIUS;
+			RegistHandle(data, wayPoints[y][x]);
 		}
 	}
 	//近くにあるウェイポイントへの繋ぎ--------------------------
@@ -88,7 +87,7 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 	checkTimer = 0;
 }
 
-void NavigationAI::Update(const Vec2<float> &POS)
+void NavigationAI::Update(const Vec2<float>& POS)
 {
 #ifdef _DEBUG
 
@@ -381,7 +380,7 @@ std::vector<WayPointData> NavigationAI::GetShortestRoute()
 	return result;
 }
 
-inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS)
+inline const Vec2<int>& NavigationAI::GetMapChipNum(const Vec2<float>& WORLD_POS)
 {
 	//浮動小数点を切り下げる処理
 	Vec2<float> num =
@@ -414,12 +413,12 @@ inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS
 	return result;
 }
 
-inline bool NavigationAI::DontUse(const Vec2<int> &HANDLE)
+inline bool NavigationAI::DontUse(const Vec2<int>& HANDLE)
 {
 	return HANDLE != Vec2<int>(-1, -1);
 }
 
-void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &END_POINT)
+void NavigationAI::AStart(const WayPointData& START_POINT, const WayPointData& END_POINT)
 {
 	std::vector<std::shared_ptr<WayPointData>>startPoint;//ウェイポイントの探索開始位置
 	std::vector<std::shared_ptr<WayPointData>>nextPoint; //次のウェイポイントの探索開始位置
@@ -617,11 +616,11 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 	shortestRoute = ConvertToShortestRoute2(branchQueue);
 }
 
-void NavigationAI::RegistBranch(const WayPointData &DATA)
+void NavigationAI::RegistBranch(const WayPointData& DATA)
 {
 }
 
-inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
+inline bool NavigationAI::CheckQueue(const Vec2<int>& HANDLE)
 {
 	for (int i = 0; i < queue.size(); ++i)
 	{
@@ -633,7 +632,7 @@ inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
 	return false;
 }
 
-std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>> &QUEUE)
+std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>>& QUEUE)
 {
 	std::vector<float>sumArray;
 	for (int i = 0; i < QUEUE.size(); ++i)
@@ -774,7 +773,7 @@ std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToSho
 	return result;
 }
 
-Vec2<float> NavigationAI::CaluLine(const Vec2<float> &CENTRAL_POS, int angle)
+Vec2<float> NavigationAI::CaluLine(const Vec2<float>& CENTRAL_POS, int angle)
 {
 	float distance = 0.0f;
 
@@ -830,7 +829,7 @@ Vec2<float> NavigationAI::CaluLine(const Vec2<float> &CENTRAL_POS, int angle)
 	return CENTRAL_POS + lineEndPos * distance;
 }
 
-std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &QUEUE)
+std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>>& QUEUE)
 {
 	std::vector<std::vector<std::shared_ptr<WayPointData>>> route;
 
@@ -868,45 +867,45 @@ std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2
 	return route[shortestRoute];
 }
 
-inline void NavigationAI::RegistHandle(const SphereCollision &HANDLE, std::shared_ptr<WayPointData> DATA)
+inline void NavigationAI::RegistHandle(const SphereCollision& HANDLE, std::shared_ptr<WayPointData> DATA)
 {
 	for (int y = 0; y < WAYPOINT_MAX_Y; ++y)
 	{
 		for (int x = 0; x < WAYPOINT_MAX_X; ++x)
 		{
+
 			//使用できるデータから判定を行う
-			if (DontUse(wayPoints[y][x]->handle))
+			if (!DontUse(wayPoints[y][x]->handle)) continue;
+
+			//移動範囲内にウェイポイントがあるか
+			Vec2<float>lineStartPos = DATA->pos;
+			Vec2<float>circlePos = wayPoints[y][x]->pos;
+			float r = wayPoints[y][x]->radius;
+
+			bool serachFlag = false;
+			//中心から八方向に伸びた線とウェイポイントの判定
+			for (int i = 0; i < 8; ++i)
 			{
-				//移動範囲内にウェイポイントがあるか
-				Vec2<float>lineStartPos = DATA->pos;
-				Vec2<float>circlePos = wayPoints[y][x]->pos;
-				float r = wayPoints[y][x]->radius;
-
-				bool serachFlag = false;
-				//中心から八方向に伸びた線とウェイポイントの判定
-				for (int i = 0; i < 8; ++i)
+				Vec2<float>endPos = CaluLine(lineStartPos, i * (360.0f / 8.0f));
+				if (CheckHitLineCircle(lineStartPos, endPos, circlePos, r))
 				{
-					Vec2<float>endPos = CaluLine(lineStartPos, i * (360.0f / 8.0f));
-					if (CheckHitLineCircle(lineStartPos, endPos, circlePos, r))
-					{
-						serachFlag = true;
-						break;
-					}
+					serachFlag = true;
+					break;
 				}
+			}
 
-				//道中壁に当たっているかどうか
-				bool canMoveFlag = false;
-				if (serachFlag)
-				{
-					canMoveFlag = !CheckMapChipWallAndRay(circlePos, lineStartPos);
-				}
+			//道中壁に当たっているかどうか
+			bool canMoveFlag = false;
+			if (serachFlag)
+			{
+				canMoveFlag = !CheckMapChipWallAndRay(circlePos, lineStartPos);
+			}
 
-				//探索範囲内&&直接行ける場所なら線を繋げる
-				if (serachFlag && canMoveFlag)
-				{
-					wayPoints[y][x]->RegistHandle(DATA->handle);
-					DATA->RegistHandle({ x,y });
-				}
+			//探索範囲内&&直接行ける場所なら線を繋げる
+			if (serachFlag && canMoveFlag)
+			{
+				wayPoints[y][x]->RegistHandle(DATA->handle);
+				DATA->RegistHandle({ x,y });
 			}
 		}
 	}
