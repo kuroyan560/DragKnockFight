@@ -26,7 +26,7 @@ struct WayPointData
 	{
 	}
 
-	void RegistHandle(const Vec2<int> &HANDLE)
+	void RegistHandle(const Vec2<int>& HANDLE)
 	{
 		for (int i = 0; i < wayPointHandles.size(); ++i)
 		{
@@ -54,9 +54,9 @@ public:
 	/// ポイントの生成
 	/// </summary>
 	/// <param name="MAP_DATA">ステージのCSV</param>
-	void Init(const RoomMapChipArray &MAP_DATA);
+	void Init(const RoomMapChipArray& MAP_DATA);
 
-	void Update(const Vec2<float> &POS);
+	void Update(const Vec2<float>& POS);
 
 	void Draw();
 
@@ -75,7 +75,7 @@ public:
 	{
 		Vec2<int>handle;
 		float sum;
-		QueueData(const Vec2<int> &HANDLE, float SUM) :handle(HANDLE), sum(SUM)
+		QueueData(const Vec2<int>& HANDLE, float SUM) :handle(HANDLE), sum(SUM)
 		{
 		};
 	};
@@ -105,21 +105,21 @@ private:
 	/// </summary>
 	/// <param name="WORLD_POS">ワールド座標</param>
 	/// <returns>マップチップ座標</returns>
-	inline const Vec2<int> &GetMapChipNum(const Vec2<float> &WORLD_POS);
+	inline const Vec2<int>& GetMapChipNum(const Vec2<float>& WORLD_POS);
 
 	/// <summary>
 	/// 引数に渡したウェイポイントを周りのウェイポイントと繋げる
 	/// </summary>
 	/// <param name="HANDLE">ウェイポイントを繋げる為の判定</param>
 	/// <param name="DATA">リンク付けする対象</param>
-	inline void RegistHandle(const SphereCollision &HANDLE, std::shared_ptr<WayPointData> DATA);
+	inline void RegistHandle(const SphereCollision& HANDLE, std::shared_ptr<WayPointData> DATA);
 
 	/// <summary>
 	/// 使用しているウェイポイントかどうか
 	/// </summary>
 	/// <param name="DATA">ウェイポイントのデータ</param>
 	/// <returns>true...使われている,false...使われていない</returns>
-	inline bool DontUse(const Vec2<int> &HANDLE);
+	inline bool DontUse(const Vec2<int>& HANDLE);
 
 	/// <summary>
 	/// マップチップとレイの判定
@@ -127,23 +127,14 @@ private:
 	/// <param name="START_POS">始点</param>
 	/// <param name="END_POS">終点</param>
 	/// <returns>true...当たった、false...当たっていない</returns>
-	bool CheckMapChipWallAndRay(const Vec2<float> &START_POS, const Vec2<float> &END_POS)
+	bool CheckMapChipWallAndRay(const Vec2<float>& START_POS, const Vec2<float>& END_POS)
 	{
-		//どうやって使うか
-		Vec2<float>handSegmentStart(START_POS), handSegmentEnd(END_POS);//線分
-		Vec2<float>handSegmentDir(END_POS - START_POS);					//線分の方向
-		Vec2<float>handPos(START_POS);									//線分の始点
-		Vec2<float>sightPos;						//求められた交点の中の最短距離
+
+		// マップチップの情報。
 		RoomMapChipArray mapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());					//マップ
-		//どうやって使うか
 
-
-		// 最短距離を保存するようの配列。
-		std::vector<std::pair<Vec2<float>, float>> shortestPoints;
-
-		// 照準のレイの方向によって当たり判定を無効化する為のフラグをセットする。
-		bool isTop = handSegmentDir.y < 0;
-		bool isLeft = handSegmentDir.x < 0;
+		// マップチップの識別用データ
+		SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
 		// 次にマップチップとの最短距離を求める。
 		const int MAP_Y = mapData.size();
@@ -153,7 +144,7 @@ private:
 			for (int width = 0; width < MAP_X; ++width) {
 
 				// このマップチップが1~9以外だったら判定を飛ばす。
-				if (mapData[height][width] < 1 || mapData[height][width] > 9) continue;
+				if (!(mapChipSizeData.min <= mapData[height][width] && mapData[height][width] <= mapChipSizeData.max)) continue;
 
 				// このインデックスのブロックの座標を取得。
 				const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);
@@ -161,133 +152,57 @@ private:
 				Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
 
 				// 一定範囲以外だったら処理を飛ばす。
-				bool checkInsideTop = BLOCK_POS.y < handPos.y - windowSize.y;
-				bool checkInsideBottom = handPos.y + windowSize.y > BLOCK_POS.y;
-				bool checkInsideLeft = BLOCK_POS.x < handPos.x + windowSize.x;
-				bool checkInsideRight = handPos.x + windowSize.x > BLOCK_POS.x;
+				bool checkInsideTop = BLOCK_POS.y < START_POS.y - windowSize.y;
+				bool checkInsideBottom = START_POS.y + windowSize.y > BLOCK_POS.y;
+				bool checkInsideLeft = BLOCK_POS.x < START_POS.x + windowSize.x;
+				bool checkInsideRight = START_POS.x + windowSize.x > BLOCK_POS.x;
 				if (checkInsideTop && checkInsideBottom && checkInsideLeft && checkInsideRight) {
-					//player.onGround = false;
 					continue;
 				}
 
 				// そのブロックが内包されているブロックだったら処理を飛ばす。
 				Vec2<int> mapChipIndex = { width, height };
 				if (StageMgr::Instance()->IsItWallIn(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), mapChipIndex)) {
-
 					continue;
-
 				}
-
-				// レイの方向とブロックの位置関係で処理を飛ばす。ウィンドウを4分割するやつ
-				float offsetHandPos = MAP_CHIP_SIZE;
-				if (isLeft && handPos.x + offsetHandPos < BLOCK_POS.x) continue;
-				if (!isLeft && BLOCK_POS.x < handPos.x - offsetHandPos) continue;
-				if (isTop && handPos.y + offsetHandPos < BLOCK_POS.y) continue;
-				if (!isTop && BLOCK_POS.y < handPos.y - offsetHandPos) continue;
-
 
 				// 四辺分交点を求める。
 
-				// 交点保存用
-				vector<Vec2<float>> intersectedPos;
-
 				// 上方向
-				if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE))) {
+				if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE))) {
 
-					// 交点を求めて保存する。
-					Vec2<float> buff = Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE));
-					if (!isnan(buff.x) && !isnan(buff.y))
-					{
-						intersectedPos.push_back(buff);
-					}
+					// 当たった判定
+					return true;
+
 				}
 				// 右方向
-				if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+				if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
 
-					// 交点を求めて保存する。
-					Vec2<float> buff = Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE));
-					if (!isnan(buff.x) && !isnan(buff.y))
-					{
-						intersectedPos.push_back(buff);
-					}
+					// 当たった判定
+					return true;
+
 				}
 				// 下方向
-				if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+				if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
 
-					// 交点を求めて保存する。
-					Vec2<float> buff = Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE));					
-					if (!isnan(buff.x) && !isnan(buff.y))
-					{
-						intersectedPos.push_back(buff);
-					}
+					// 当たった判定
+					return true;
+
 				}
 				// 左方向
-				if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+				if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
 
-					// 交点を求めて保存する。
-					Vec2<float> buff = Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE));
-					if (!isnan(buff.x) && !isnan(buff.y))
-					{
-						intersectedPos.push_back(buff);
-					}
-				}
-
-				// 最短距離を求める。
-				Vec2<float> shortestPos = {};
-				float shoterstLength = 1000000.0f;
-
-				// サイズが0だったら処理を飛ばす。
-				const int INTERSECTED_COUNT = intersectedPos.size();
-				if (INTERSECTED_COUNT <= 0) continue;
-
-				// 最短距離を求める。
-				for (int index = 0; index < INTERSECTED_COUNT; ++index) {
-
-					// 保存されているデータより大きかったら処理を飛ばす。
-					float lengthBuff = Vec2<float>(intersectedPos[index] - handPos).Length();
-					if (lengthBuff >= shoterstLength) continue;
-
-					// データを保存する。
-					shoterstLength = lengthBuff;
-					shortestPos = intersectedPos[index];
+					// 当たった判定
+					return true;
 
 				}
 
-				// 最短の距離を保存する。
-				pair<Vec2<float>, float> buff = { shortestPos, shoterstLength };
-				shortestPoints.push_back(buff);
 			}
+
 		}
 
+		return false;
 
-		/*-- ここまでの過程で様々な最短を求めることができた。 --*/
-
-		// 最短の座標を保存する用変数。
-		float shortestLength = 100000.0f;
-
-		// 全ての最短の中から最も短いものを求める。
-		const int SHORTEST_COUNT = shortestPoints.size();
-
-		// サイズが0だったら照準をどっかに飛ばしてリターン。
-		if (SHORTEST_COUNT <= 0) {
-
-			sightPos = { -100,-100 };
-			return false;
-		}
-
-		for (int index = 0; index < SHORTEST_COUNT; ++index) {
-
-			// 保存されているデータより大きかったら処理を飛ばす。
-			if (shortestPoints[index].second >= shortestLength) continue;
-
-			// データを保存する。
-			shortestLength = shortestPoints[index].second;
-			sightPos = shortestPoints[index].first;
-		}
-
-
-		//最短距離が一つでも算出されたら当たり判定を出す
-		return 0 < shortestPoints.size();
 	}
 
 
@@ -299,26 +214,26 @@ private:
 	/// </summary>
 	/// <param name="START_POINT">スタート地点</param>
 	/// <param name="END_POINT">ゴール地点</param>
-	void AStart(const WayPointData &START_POINT, const WayPointData &END_POINT);
+	void AStart(const WayPointData& START_POINT, const WayPointData& END_POINT);
 
 	/// <summary>
 	/// キューに同じハンドルがスタックされているかどうか
 	/// ゴール地点は複数スタックしても良い
 	/// </summary>
 	/// <param name="HANDLE">ウェイポイントのハンドル</param>
-	inline bool CheckQueue(const Vec2<int> &HANDLE);
+	inline bool CheckQueue(const Vec2<int>& HANDLE);
 
 	/// <summary>
 	/// 探索した際の最短ルート候補から最短ルートに絞る
 	/// </summary>
 	/// <param name="QUEUE">最短ルート候補</param>
 	/// <returns>スタートからゴールまでの最短ルート</returns>
-	std::vector<std::shared_ptr<QueueData>> ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>> &QUEUE);
+	std::vector<std::shared_ptr<QueueData>> ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>>& QUEUE);
 
-	std::vector<std::shared_ptr<WayPointData>> ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &QUEUE);
+	std::vector<std::shared_ptr<WayPointData>> ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>>& QUEUE);
 
 
-	void RegistBranch(const WayPointData &DATA);
+	void RegistBranch(const WayPointData& DATA);
 
 	WayPointData startPoint;	//探索する際のスタート地点
 	WayPointData endPoint;		//探索する際のゴール地点
@@ -343,7 +258,7 @@ private:
 	{
 		Vec2<int>handle;
 		Color color;
-		SearchMapData(const Vec2<int> &HANDLE, const Color &COLOR) :handle(HANDLE), color(COLOR)
+		SearchMapData(const Vec2<int>& HANDLE, const Color& COLOR) :handle(HANDLE), color(COLOR)
 		{
 		}
 	};
@@ -351,10 +266,10 @@ private:
 	int layerNum;
 
 
-	bool CheckHitLineCircle(const Vec2<float> &LineStartPos, const Vec2<float> &LineEndPos, const Vec2<float> &CircleCenterPos, const float &CircleRadius) {
+	bool CheckHitLineCircle(const Vec2<float>& LineStartPos, const Vec2<float>& LineEndPos, const Vec2<float>& CircleCenterPos, const float& CircleRadius) {
 
 		// 始点から終点までのベクトルを正規化する。
-		Vec2<float> &startEndPos = LineEndPos - LineStartPos;
+		Vec2<float>& startEndPos = LineEndPos - LineStartPos;
 		startEndPos.Normalize();
 
 		// [始点から終点までのベクトル]と、[始点から円の中心までのベクトル]の結果の外積が円の半径よりも小さかったら判定の第一段階クリア！
@@ -384,6 +299,6 @@ private:
 	}
 
 
-	Vec2<float>CaluLine(const Vec2<float> &CENTRAL_POS, int angle);
+	Vec2<float>CaluLine(const Vec2<float>& CENTRAL_POS, int angle);
 };
 
