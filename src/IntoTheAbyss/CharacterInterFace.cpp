@@ -22,6 +22,14 @@ void CharacterInterFace::SwingUpdate()
 	// 振り回しの経過時間を設定。
 	++swingTimer;
 
+	// このタイミングでスタミナを消費する。
+	if (swingTimer == 5) {
+
+		// スタミナを消費
+		staminaGauge->ConsumesStamina(SWING_STAMINA);
+
+	}
+
 	// 限界を超えていたら修正。
 	if (MAX_SWING_ANGLE < addSwingAngle) {
 
@@ -826,9 +834,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				// クラッシュ演出を追加。
 				CrashEffectMgr::Instance()->Generate(pos);
 
-				// スタミナを消費
-				partner.lock()->staminaGauge->ConsumesStamina(SWING_STAMINA);
-
 				// アイテムを生成する。
 				StaminaItem::CHARA_ID charaID;
 				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::LEFT;
@@ -852,8 +857,4 @@ void CharacterInterFace::FinishSwing()
 	partner.lock()->stagingDevice.StopSpin();
 	partner.lock()->OnSwingedFinish();
 
-	// スタミナを消費
-	staminaGauge->ConsumesStamina(SWING_STAMINA);
-
 }
-
