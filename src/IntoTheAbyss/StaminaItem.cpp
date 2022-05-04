@@ -1,6 +1,7 @@
 #include "StaminaItem.h"
 #include "ScrollMgr.h"
 #include "DrawFunc.h"
+#include "BulletCollision.h"
 
 StaminaItem::StaminaItem()
 {
@@ -8,6 +9,10 @@ StaminaItem::StaminaItem()
 	/*===== èâä˙âª =====*/
 
 	isActive = false;
+
+	collisionData = std::make_shared<SphereCollision>();
+	collisionData->center = &pos;
+	collisionData->radius = DRAW_RADIUS;
 
 }
 

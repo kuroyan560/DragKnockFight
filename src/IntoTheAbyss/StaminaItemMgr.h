@@ -42,4 +42,7 @@ public:
 	// 当たり判定を行い、スタミナの回復量を取得する。
 	int CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, StaminaItem::CHARA_ID CharaID, Color CharaColor);
 
+	// アイテム配列のゲッタ
+	inline const std::array<StaminaItem, ITEM_COUNT> GetItemArray() { return item; }
+
 };
