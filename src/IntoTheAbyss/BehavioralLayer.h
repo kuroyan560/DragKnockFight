@@ -4,6 +4,7 @@
 #include"../IntoTheAbyss/CharacterAIData.h"
 #include<memory>
 #include"BulletCollision.h"
+#include"../IntoTheAbyss/NavigationAI.h"
 /// <summary>
 /// 振る舞い層
 /// </summary>
@@ -45,3 +46,29 @@ private:
 	SphereCollision startColision,endColision;
 };
 
+
+/// <summary>
+/// 現在いる地点から最も近いウェイポイントの検索
+/// </summary>
+class SearchWayPoint
+{
+public:
+	SearchWayPoint(const std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> &WAY_POINTS);
+
+	void Init(const Vec2<float> &START_POS);
+
+	/// <summary>
+	/// 実行,最も近いウェイポイントのハンドルを返す
+	/// </summary>
+	const WayPointData &Update();
+
+	/// <summary>
+	/// 現在実行している処理の進捗
+	/// </summary>
+	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
+	AiResult CurrentProgress();
+private:
+	std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> wayPoints;
+	Vec2<float>startPos;
+	
+};

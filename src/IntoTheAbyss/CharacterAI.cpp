@@ -15,25 +15,31 @@ CharacterAI::CharacterAI()
 	//U‚é•‘‚¢‘w‚Ì¶¬--------------------------
 
 	//íp‘w‚Ì¶¬--------------------------
-	moveToGoal = std::make_unique<FollowPath>(betweenPoints);
+	moveToGoal = std::make_shared<FollowPath>(betweenPoints);
 	//íp‘w‚Ì¶¬--------------------------
 
 
 	//í—ª‘w‚Ì¶¬--------------------------
+
 	//í—ª‘w‚Ì¶¬--------------------------
 }
 
 void CharacterAI::Init()
 {
-	moveToGoal->Init(shortestData);
+	//restoreStamina->Init();
+		//‰¼’u‚«
+	restoreStamina = std::make_unique<RestoreStamina>
+		(moveToGoal, betweenPoints, wayPoints);
+	restoreStamina->dStartPos = *pos;
 	initFlag = true;
 }
 
 void CharacterAI::Update()
 {
-	if (initFlag && moveToGoal->CurrentProgress() == AiResult::OPERATE_INPROCESS)
+	if (initFlag)
 	{
-		moveToGoal->Update();
+		restoreStamina->route = shortestData;
+		restoreStamina->Update();
 	}
 }
 

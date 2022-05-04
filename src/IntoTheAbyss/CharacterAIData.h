@@ -1,5 +1,5 @@
 #pragma once
-
+#include<memory>
 /// <summary>
 /// ŠeƒS[ƒ‹‚Ìi’»
 /// </summary>

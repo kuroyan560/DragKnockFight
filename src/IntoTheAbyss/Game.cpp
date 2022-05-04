@@ -394,12 +394,22 @@ void Game::Update()
 #pragma endregion
 
 	chara.shortestData = navi.GetShortestRoute();
+	chara.wayPoints = navi.wayPoints;
 
-	if (chara.shortestData.size() != 0 && navi.resetSearchFlag)
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
+		*chara.pos = CharacterManager::Instance()->Right()->pos;
 		chara.Init();
-		*chara.pos = chara.shortestData[0].pos;
 	}
+
+	if (chara.restoreStamina != nullptr)
+	{
+		navi.startPoint = chara.restoreStamina->startPoint;
+		navi.endPoint = chara.restoreStamina->endPoint;
+		navi.startFlag = chara.restoreStamina->startFlag;
+	}
+
+
 	chara.Update();
 
 	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0, BACK);

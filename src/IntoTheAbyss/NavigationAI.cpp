@@ -85,6 +85,7 @@ void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 
 	checkingHandle = { -1,-1 };
 	checkTimer = 0;
+	startFlag = false;
 }
 
 void NavigationAI::Update(const Vec2<float>& POS)
@@ -171,8 +172,7 @@ void NavigationAI::Update(const Vec2<float>& POS)
 #endif // DEBUG
 
 	//スタートとゴールを設定したらAスターの探索を開始する
-	if (startPoint.handle != Vec2<int>(-1, -1) &&
-		endPoint.handle != Vec2<int>(-1, -1))
+	if (startFlag)
 	{
 		AStart(startPoint, endPoint);
 	}
@@ -371,13 +371,14 @@ std::vector<WayPointData> NavigationAI::GetShortestRoute()
 {
 	//キューからウェイポイントの配列に変換する
 	std::vector<WayPointData>result;
-	for (int i = queue.size() - 1; 0 <= i; --i)
+	for (int i = 0; i < shortestRoute.size(); ++i)
 	{
-		int x = queue[i]->handle.x;
-		int y = queue[i]->handle.y;
-		//result.push_back(*wayPoints[y][x]);
+		int x = shortestRoute[i]->handle.x;
+		int y = shortestRoute[i]->handle.y;
+		result.push_back(*wayPoints[y][x]);
 	}
 	return result;
+	
 }
 
 inline const Vec2<int>& NavigationAI::GetMapChipNum(const Vec2<float>& WORLD_POS)

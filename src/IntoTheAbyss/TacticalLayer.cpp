@@ -3,6 +3,7 @@
 FollowPath::FollowPath(const std::shared_ptr<MovingBetweenTwoPoints> &OPERATE)
 {
 	operateFollow = OPERATE;
+	goalFlag = false;
 }
 
 void FollowPath::Init(const std::vector<WayPointData> &ROUTE)

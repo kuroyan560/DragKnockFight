@@ -17,7 +17,7 @@ void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float
 	startColision.center = operateMove->pos.get();
 	startColision.radius = 5.0f;
 	endColision.center = &endPos;
-	endColision.radius = 5.0f;
+	endColision.radius = 20.0f;
 }
 
 void MovingBetweenTwoPoints::Update()
@@ -48,4 +48,42 @@ AiResult MovingBetweenTwoPoints::CurrentProgress()
 	{
 		return AiResult::OPERATE_INPROCESS;
 	}
+}
+
+SearchWayPoint::SearchWayPoint(const std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> &WAY_POINTS) :wayPoints(WAY_POINTS)
+{
+}
+
+void SearchWayPoint::Init(const Vec2<float> &START_POS)
+{
+	startPos = START_POS;
+}
+
+const WayPointData &SearchWayPoint::Update()
+{
+	float minDistance = 1000000.0f;
+	Vec2<int>handle;
+	//最も近いウェイポイントの探索
+	for (int y = 0; y < wayPoints.size(); ++y)
+	{
+		for (int x = 0; x < wayPoints[y].size(); ++x)
+		{
+			if (wayPoints[y][x]->handle != Vec2<int>(-1, -1))
+			{
+				float distance = startPos.Distance(wayPoints[y][x]->pos);
+				if (distance < minDistance)
+				{
+					minDistance = distance;
+					handle = { x,y };
+				}
+			}
+		}
+	}
+
+	return *wayPoints[handle.y][handle.x];
+}
+
+AiResult SearchWayPoint::CurrentProgress()
+{
+	return AiResult();
 }

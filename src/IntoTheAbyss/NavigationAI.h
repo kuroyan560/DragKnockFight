@@ -81,10 +81,17 @@ public:
 	};
 
 	bool resetSearchFlag;
-private:
-
 	static const int WAYPOINT_MAX_X = 10;	 //X軸のウェイポイントの数
 	static const int WAYPOINT_MAX_Y = 10;	 //Y軸のウェイポイントの数
+
+
+	std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> wayPoints;//ウェイポイントの配列
+
+	WayPointData startPoint;	//探索する際のスタート地点
+	WayPointData endPoint;		//探索する際のゴール地点
+
+	bool startFlag;
+private:
 
 	static const float SERACH_RADIUS;//ウェイポイント同士のリンク付けする範囲
 	static const float SERACH_LAY_UPDOWN_DISTANCE;//ウェイポイント同士のリンク付けする範囲
@@ -97,8 +104,6 @@ private:
 	static const int MAP_CHIP_HALF_SIZE = MAP_CHIP_SIZE / 2;
 
 
-
-	std::array<std::array<std::shared_ptr<WayPointData>, WAYPOINT_MAX_Y>, WAYPOINT_MAX_X> wayPoints;//ウェイポイントの配列
 
 	/// <summary>
 	/// マップチップ座標に変換しfloatからintに切り替える際に切り落とすか切り上げるかを判断する
@@ -235,8 +240,7 @@ private:
 
 	void RegistBranch(const WayPointData& DATA);
 
-	WayPointData startPoint;	//探索する際のスタート地点
-	WayPointData endPoint;		//探索する際のゴール地点
+	
 	WayPointData prevStartPoint;//探索する際の前フレームのスタート地点
 	WayPointData prevEndPoint;	//探索する際の前フレームのゴール地点
 

@@ -1,5 +1,6 @@
 #pragma once
 #include"../KuroEngine.h"
+#include"StrategicLayer.h"
 #include"TacticalLayer.h"
 #include"BehavioralLayer.h"
 #include"OperatingLayer.h"
@@ -17,12 +18,16 @@ public:
 	void Init();
 	void Update();
 	void Draw();
-	std::unique_ptr<FollowPath> moveToGoal;
+	std::shared_ptr<FollowPath> moveToGoal;
 	std::shared_ptr<MovingBetweenTwoPoints> betweenPoints;
 	std::shared_ptr<OperateMove>move;
 
 	std::shared_ptr<Vec2<float>>pos;
 	std::vector<WayPointData> shortestData;
+
+	std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> wayPoints;
+
+	std::unique_ptr<RestoreStamina>restoreStamina;
 
 	bool initFlag = false;
 };
