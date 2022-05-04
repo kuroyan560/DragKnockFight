@@ -88,14 +88,14 @@ void FaceIcon::Draw()
 	bool mirrorX = false;
 	if (animasions[character[LEFT_TEAM]]->mirrorX)mirrorX = !mirrorX;
 	DrawFunc_FillTex::DrawGraph(POS, TexHandleMgr::GetTexBuffer(backGraph), BACK_COLOR[status[LEFT_TEAM]], 1.0f);
-	DrawFunc::DrawGraph({ POS.x + OFFSET_X - FACE_ICON_OFFSET,POS.y }, TexHandleMgr::GetTexBuffer(animasions[character[LEFT_TEAM]][status[LEFT_TEAM]].graph[graphIdx[LEFT_TEAM]]), AlphaBlendMode_Trans, { mirrorX, false });
+	DrawFunc::DrawGraph({ POS.x + OFFSET_X - FACE_ICON_OFFSET,POS.y }, TexHandleMgr::GetTexBuffer(animasions[character[LEFT_TEAM]][status[LEFT_TEAM]].graph[graphIdx[LEFT_TEAM]]), Color(), { mirrorX, false });
 
 	//‰E
 	static const float RIGHT_X = WinApp::Instance()->GetExpandWinSize().x - POS.x - BACK_WIDTH;
 	DrawFunc_FillTex::DrawGraph({ RIGHT_X ,POS.y }, TexHandleMgr::GetTexBuffer(backGraph), BACK_COLOR[status[RIGHT_TEAM]], 1.0f, { true,false });
 	mirrorX = true;
 	if (animasions[character[RIGHT_TEAM]]->mirrorX)mirrorX = !mirrorX;
-	DrawFunc::DrawGraph({ RIGHT_X + OFFSET_X + FACE_ICON_OFFSET,POS.y }, TexHandleMgr::GetTexBuffer(animasions[character[RIGHT_TEAM]][status[RIGHT_TEAM]].graph[graphIdx[RIGHT_TEAM]]), AlphaBlendMode_Trans, { mirrorX,false });
+	DrawFunc::DrawGraph({ RIGHT_X + OFFSET_X + FACE_ICON_OFFSET,POS.y }, TexHandleMgr::GetTexBuffer(animasions[character[RIGHT_TEAM]][status[RIGHT_TEAM]].graph[graphIdx[RIGHT_TEAM]]), Color(), { mirrorX,false });
 }
 
 void FaceIcon::Change(const WHICH_TEAM& WhichTeam, const FACE_STATUS& Status)

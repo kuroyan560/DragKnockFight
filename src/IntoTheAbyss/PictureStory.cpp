@@ -129,7 +129,7 @@ void PictureStory::Draw()
 		//ç∂ë§
 		if (0 < pictureArrayHandle)
 		{
-			DrawFunc::DrawRotaGraph2D({ ARROR_X_OFFSET,winCenter.y + offsetY }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(ARROW_GRAPH), { 0.5f,0.5f }, AlphaBlendMode_Trans, { true,false });
+			DrawFunc::DrawRotaGraph2D({ ARROR_X_OFFSET,winCenter.y + offsetY }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(ARROW_GRAPH), Color(), { 0.5f,0.5f }, { true,false });
 		}
 		//âEë§
 		if (pictureArrayHandle < pictureHandle.size() - 1)

@@ -190,13 +190,13 @@ void ResultScene::OnDraw()
 
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 	//DrawFunc::DrawBox2D(Vec2<float>(0, 0), windowSize, Color(0, 0, 0, 255), DXGI_FORMAT_R8G8B8A8_UNORM);
-	DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(winnerFrameHandle), AlphaBlendMode_Trans);
-	DrawFunc::DrawGraph({ 25.0f,30.0f }, TexHandleMgr::GetTexBuffer(winnerGraph[winnerName]), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(winnerFrameHandle));
+	DrawFunc::DrawGraph({ 25.0f,30.0f }, TexHandleMgr::GetTexBuffer(winnerGraph[winnerName]));
 
 	// [RESULT] と [BREAK]の描画処理
 	{
 		float easingPosX = resultEasingAmount * (RESULT_POS.x - windowSize.x);
-		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX, RESULT_POS.y), TexHandleMgr::GetTexBuffer(resultHandle), AlphaBlendMode_Trans);
+		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX, RESULT_POS.y), TexHandleMgr::GetTexBuffer(resultHandle));
 		DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, breakEnemyHandle, breakEnemyAmount);
 		DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, crashEnemyHandle, crashEnemyAmount);
 		DrawBREAK(BREAK_PLAYER_POS, breakPlayerEasingAmount, breakPlayerHandle, breakPlayerAmount);
@@ -224,11 +224,11 @@ void ResultScene::DrawBREAK(const Vec2<float>& targetPosm, const float& easingTi
 	// イージングをかけた位置を求めて[BREAK]を描画をする。
 	float easingPosX = easingTimer * (targetPosm.x - windowSize.x);
 	Vec2<float> drawPos = Vec2<float>(windowSize.x + easingPosX, targetPosm.y);
-	DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(graphHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(graphHandle));
 
 	// BREAKの画像サイズ分右に動かした位置に*を描画する。
 	drawPos = drawPos + Vec2<float>(292.0f, 0.0f);
-	DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(blueNumberHandle[blueNumberHandle.size() - 1]), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(blueNumberHandle[blueNumberHandle.size() - 1]));
 
 	// 数字のフォント分移動させる。
 	const int FONT_SIZE = 66.3f;
@@ -240,7 +240,7 @@ void ResultScene::DrawBREAK(const Vec2<float>& targetPosm, const float& easingTi
 		// 数字を求めて描画する。
 		int disit = GetDisit(breakCount, index);
 
-		DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(blueNumberHandle[disit]), AlphaBlendMode_Trans);
+		DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(blueNumberHandle[disit]));
 
 		// フォントサイズ分移動させる。
 		drawPos.x += FONT_SIZE;
@@ -262,7 +262,7 @@ void ResultScene::DrawSCORE(const float& easingTimer, const double& scoreEffectE
 
 	float easingPosX = scoreEasingAmount * (SCORE_POS.x - windowSize.x);
 	Vec2<float> drawPos = Vec2<float>(windowSize.x + easingPosX, SCORE_POS.y);
-	DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(scoreHandle), AlphaBlendMode_Trans);
+	DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(scoreHandle));
 
 	// 数字のフォントサイズ
 	const int FONT_SIZE = 66.3f;

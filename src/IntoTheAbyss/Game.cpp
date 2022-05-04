@@ -20,7 +20,7 @@
 #include"ParticleMgr.h"
 
 #include"SuperiorityGauge.h"
-#include"BackGround.h"
+//#include"BackGround.h"
 #include"Camera.h"
 #include"GameTimer.h"
 #include"ScoreManager.h"
@@ -306,7 +306,7 @@ Game::Game()
 
 	readyToStartRoundFlag = true;
 	//背景に星
-	BackGround::Instance()->Init(GetStageSize());
+	//BackGround::Instance()->Init(GetStageSize());
 
 	GameTimer::Instance()->Init(120);
 	ScoreManager::Instance()->Init();
@@ -625,7 +625,7 @@ void Game::Update()
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
 
-	BackGround::Instance()->Update();
+	//BackGround::Instance()->Update();
 	Camera::Instance()->Update();
 	FaceIcon::Instance()->Update();
 	WinCounter::Instance()->Update();
@@ -668,9 +668,9 @@ void Game::Update()
 	StaminaItemMgr::Instance()->Update();
 
 	// スタミナアイテムの当たり判定処理
-	int healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Left()->pos, 30, StaminaItem::CHARA_ID::LEFT, Color(0x02, 0xFF, 0x8B, 0xFF));
+	int healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Left()->pos, 30, StaminaItem::CHARA_ID::LEFT);
 	CharacterManager::Instance()->Left()->staminaGauge->AddStamina(healAmount);
-	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 30, StaminaItem::CHARA_ID::RIGHT, Color(0xEF, 0x01, 0x90, 0xFF));
+	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 30, StaminaItem::CHARA_ID::RIGHT);
 	CharacterManager::Instance()->Right()->staminaGauge->AddStamina(healAmount);
 
 	if (!Camera::Instance()->Active()) {
@@ -707,7 +707,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	int roomNum = SelectStage::Instance()->GetRoomNum();
 
 	/*===== 描画処理 =====*/
-	BackGround::Instance()->Draw();
+	//BackGround::Instance()->Draw();
 
 
 	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
