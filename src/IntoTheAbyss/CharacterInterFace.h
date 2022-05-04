@@ -8,7 +8,6 @@
 #include<array>
 #include "Intersected.h"
 #include"BulletMgrBase.h"
-#include"RunOutOfStaminaEffect.h"
 #include"SwingLineSegmentMgr.h"
 #include"TexHandleMgr.h"
 #include"CharacterInfo.h"
@@ -86,6 +85,7 @@ protected:
 	int reticleHandle;
 
 	Vec2<float>pilotPos;	// パイロットの座標
+	Vec2<float>pilotSize = { 64.0f,64.0f };	//パイロットのサイズ
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
@@ -99,7 +99,6 @@ protected:
 		areaHitBox.size = size;
 		bulletHitSphere.center = &pos;
 		bulletHitSphere.radius = size.x;
-		outOfStaminaEffect.Init();
 		rbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_RB.png");
 		lbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_LB.png");
 		lineHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_line.png");
@@ -164,14 +163,12 @@ public:
 	std::shared_ptr<StaminaMgr> staminaGauge;	// スタミナゲージクラス
 	const int SWING_STAMINA = 2;	// 振り回し時の消費スタミナ
 	const int DASH_STAMINA = 1;		// ダッシュ時の消費スタミナ
-	RunOutOfStaminaEffect outOfStaminaEffect;
 
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team, const PLAYABLE_CHARACTER_NAME& Name)
 	{
 		partner = Partner;
 		team = Team;
 		characterName = Name;
-		outOfStaminaEffect.Init();
 	}
 	void Init(const Vec2<float>& GeneratePos);	//ラウンド開始時に呼び出される
 	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
@@ -195,6 +192,13 @@ public:
 	const bool& GetStackFlag() { return stackMapChip; }
 	const bool& GetNowBreak() { return stanTimer; }
 	BulletMgrBase& GetBulletMgr() { return bulletMgr; }
+
+	//パイロットの座標（切り離ししてないときはnullptrを返す）
+	const Vec2<float>* GetPilotPosPtr() 
+	{
+		if (!isPilotDetached)return nullptr;
+		return &pilotPos; 
+	}
 
 	void SetCanMove(const bool& Flg) { canMove = Flg; }
 	void SetHitCheck(const bool& Flg) { hitCheck = Flg; }

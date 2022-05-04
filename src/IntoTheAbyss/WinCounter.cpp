@@ -84,14 +84,14 @@ void WinCounter::Draw()
 
 	for (int i = 0; i < drawCountLeft; ++i)
 	{
-		DrawFunc::DrawGraph(GetWinCountPos(true, i), TexHandleMgr::GetTexBuffer(winCountGraph_Left), AlphaBlendMode_Trans);
+		DrawFunc::DrawGraph(GetWinCountPos(true, i), TexHandleMgr::GetTexBuffer(winCountGraph_Left));
 	}
 
 	//勝利数カウント(右)
 
 	for (int i = 0; i < drawCountRight; ++i)
 	{
-		DrawFunc::DrawGraph(GetWinCountPos(false, i), TexHandleMgr::GetTexBuffer(winCountGraph_Right), AlphaBlendMode_Trans);
+		DrawFunc::DrawGraph(GetWinCountPos(false, i), TexHandleMgr::GetTexBuffer(winCountGraph_Right));
 	}
 
 	if (!animation)return;

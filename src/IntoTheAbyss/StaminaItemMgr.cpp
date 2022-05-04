@@ -19,7 +19,7 @@ void StaminaItemMgr::Init()
 
 }
 
-void StaminaItemMgr::GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STATUS Status, Vec2<float>* CharaPos, Color CharaColor, StaminaItem::CHARA_ID CharaID, const Vec2<float>& SwingCharaPos)
+void StaminaItemMgr::GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STATUS Status, Vec2<float>* CharaPos, StaminaItem::CHARA_ID CharaID, const Vec2<float>& SwingCharaPos)
 {
 
 	/*===== 生成処理 =====*/
@@ -75,7 +75,7 @@ void StaminaItemMgr::GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STAT
 			randomVec.Normalize();
 
 			// 生成する。
-			item[index].Generate(GeneratePos, randomVec, HEAL_AMOUNT, CRASH_VEL, StaminaItem::STAMINA_ITEM_ID::CRASH_ITEM, true, CharaPos, CharaColor);
+			item[index].Generate(GeneratePos, randomVec, HEAL_AMOUNT, CRASH_VEL, StaminaItem::STAMINA_ITEM_ID::CRASH_ITEM, true, CharaPos);
 
 			break;
 
@@ -148,7 +148,7 @@ void StaminaItemMgr::Draw()
 
 }
 
-int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, StaminaItem::CHARA_ID CharaID, Color CharaColor)
+int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, const float& PilotRadius, StaminaItem::CHARA_ID CharaID, const Vec2<float>* PilotPos)
 {
 
 	/*===== 当たり判定を行い、スタミナの回復量を取得する =====*/
@@ -163,7 +163,7 @@ int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, St
 		if (!item[index].GetIsActive()) continue;
 
 		// 当たり判定を行う。
-		bool isHit = item[index].CheckHit(CharaPos, CharaRadius, CharaID);
+		bool isHit = item[index].CheckHit(CharaPos, CharaRadius, PilotRadius, CharaID, PilotPos);
 
 		// 当たっていて、アイテムが取得されている状態だったら回復量を加算する。
 		if (isHit && item[index].GetIsAcquired()) {
@@ -178,8 +178,7 @@ int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, St
 		if (isHit && !item[index].GetIsAcquired()) {
 
 			// 取得された状態にする。
-			item[index].Acquire(CharaPos, CharaID, CharaColor);
-
+			item[index].Acquire(CharaPos, CharaID);
 		}
 
 	}

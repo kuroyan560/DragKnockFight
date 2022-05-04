@@ -7,6 +7,7 @@ struct VSOutput
 {
     float4 leftUpPos : POSITION_L_U;
     float4 rightBottomPos : POSITION_R_B;
+    float4 emitColor : EMIT_COLOR;
     int2 miror : MIROR;
 };
 
@@ -19,6 +20,7 @@ struct GSOutput
 {
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD;
+    float4 emitColor : EMIT_COLOR;
 };
 
 
@@ -31,6 +33,7 @@ void GSmain(
     float width = input[0].rightBottomPos.x - input[0].leftUpPos.x;
     
     GSOutput element;
+    element.emitColor = input[0].emitColor;
         
     //ç∂â∫
     element.pos = input[0].rightBottomPos;
@@ -64,7 +67,7 @@ SamplerState smp : register(s0);
 
 float4 PSmain(GSOutput input) : SV_TARGET
 {
-    return tex.Sample(smp, input.uv);
+    return tex.Sample(smp, input.uv) * input.emitColor;
 }
 
 float4 main(float4 pos : POSITION) : SV_POSITION

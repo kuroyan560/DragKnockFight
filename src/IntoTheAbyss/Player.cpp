@@ -67,6 +67,7 @@ void Player::OnInit()
 
 	//アニメーション初期化
 	anim.Init();
+	tiredTimer = TIRED_DRAW_TIME;
 
 	// 腕をセット
 	static const float OFFSET = -8.0f;
@@ -153,15 +154,6 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	//移動に関する処理
 	Move();
 
-	/*if (isGripPowerEmpty)
-	{
-		outOfStaminaEffect.Start(pos, MAX_GRIP_POWER_TIMER);
-	}*/
-	outOfStaminaEffect.baseEmptyStringPos = pos;
-	outOfStaminaEffect.baseMaxStringPos = pos;
-	outOfStaminaEffect.Update();
-
-
 	// 連射タイマーを更新
 	if (rapidFireTimerLeft > 0) --rapidFireTimerLeft;
 	if (rapidFireTimerRight > 0) --rapidFireTimerRight;
@@ -244,6 +236,18 @@ void Player::OnUpdateNoRelatedSwing()
 
 	//アニメーション更新
 	anim.Update();
+
+	if (tiredTimer < TIRED_DRAW_TIME)
+	{
+		tiredTimer++;
+		if (TIRED_DRAW_TIME <= tiredTimer)anim.ChangeAnim(DEFAULT_FRONT);
+	}
+
+	if (staminaGauge->emptyTrigger)
+	{
+		tiredTimer = 0;
+		anim.ChangeAnim(TIRED);
+	}
 }
 
 void Player::OnDraw()
@@ -252,7 +256,7 @@ void Player::OnDraw()
 	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
 
 	//if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty && 20 <= moveTimer)
-	if (!isHold && anim.GetNowAnim() != SWINGED && 20 <= moveTimer)
+	if (!isHold && anim.GetNowAnim() != SWINGED && anim.GetNowAnim() != TIRED && 20 <= moveTimer)
 	{
 		if (moveInput.x)
 		{
@@ -291,7 +295,7 @@ void Player::OnDraw()
 	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	bool mirorX = playerDirX == PLAYER_RIGHT || (isHold && (partner.lock()->pos - pos).x < 0);
-	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size,
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * size * staminaGauge->outOfStaminaEffect.GetSize(),
 		stagingDevice.GetSpinRadian(), bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
 }
 
@@ -327,7 +331,7 @@ void Player::OnDrawUI()
 		Angle rotateAngle = arrowPosAngle + Angle(90 * (clockWise ? -1 : 1));
 		Vec2<float>vec = partner.lock()->pos - pos;
 		vec.Normalize();
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos + vec * ARROW_DIST_OFFSET), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), { 0.0f,0.5f });
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos + vec * ARROW_DIST_OFFSET), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), Color(), { 0.0f,0.5f });
 	}
 
 	const auto leftStickVec = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });

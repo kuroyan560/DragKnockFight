@@ -12,8 +12,9 @@ public:
 	void Update();
 	void Draw();
 
-	void Start(const Vec2<float> &POS, int MAX_TIEMR);
-	bool isDraw();
+	void Empty();
+	void Full();
+	//void Start(const Vec2<float> &POS, int MAX_TIEMR);
 	Vec2<float>GetSize()
 	{
 		return playerSize;
@@ -30,10 +31,8 @@ private:
 
 	int emptyHande;
 	int maxHande;
-	bool startFlag;
 	int timer;
 	int finishTimer;
-	bool drawFlag;
 	bool drawEmptyFlag;
 	bool drawMaxFlag;
 

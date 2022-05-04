@@ -40,12 +40,12 @@ public:
 
 	void SetArea(const float& LeftUpPos, const float& RightDownPos);
 	void Init();
-	void GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STATUS Status, Vec2<float>* CharaPos, Color CharaColor, StaminaItem::CHARA_ID CharaID, const Vec2<float>& SwingCharaPos);
+	void GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STATUS Status, Vec2<float>* CharaPos, StaminaItem::CHARA_ID CharaID, const Vec2<float>& SwingCharaPos);
 	void GenerateSpone(const Vec2<float>& GeneratePos);
 	void Update();
 	void Draw();
 
 	// 当たり判定を行い、スタミナの回復量を取得する。
-	int CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, StaminaItem::CHARA_ID CharaID, Color CharaColor);
+	int CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, const float& PilotRadius, StaminaItem::CHARA_ID CharaID, const Vec2<float>* PilotPos = nullptr);
 
 };

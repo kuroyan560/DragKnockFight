@@ -1,9 +1,16 @@
 #include "StaminaItem.h"
 #include "ScrollMgr.h"
 #include "DrawFunc.h"
+#include"TexHandleMgr.h"
+
+int StaminaItem::GRAPH_HANDLE[STAR_COLOR::GRAPH_NUM] = { -1 };
 
 StaminaItem::StaminaItem()
 {
+	if (GRAPH_HANDLE[0] == -1)
+	{
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/background_star.png", 4, { 4,1 }, GRAPH_HANDLE);
+	}
 
 	/*===== 初期化 =====*/
 
@@ -20,7 +27,7 @@ void StaminaItem::Init()
 
 }
 
-void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& ForwardVec, const float& HealAmount, const float& Vel, STAMINA_ITEM_ID ItemID, const bool& IsAcquired, Vec2<float>* CharaPos, Color CharaColor, CHARA_ID CharaID)
+void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& ForwardVec, const float& HealAmount, const float& Vel, STAMINA_ITEM_ID ItemID, const bool& IsAcquired, Vec2<float>* CharaPos, CHARA_ID CharaID)
 {
 
 	/*===== 生成処理 =====*/
@@ -33,7 +40,7 @@ void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& Fo
 	isAcquired = IsAcquired;
 	itemID = ItemID;
 	charaID = CharaID;
-	itemColor = CharaColor;
+	graph = GRAPH_HANDLE[STAR_COLOR::NONE];
 	isActive = true;
 
 	// 初めから取得されている状態だったら参照を保存する。
@@ -41,8 +48,17 @@ void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& Fo
 
 		charaPos = CharaPos;
 
+		if (CharaID == CHARA_ID::LEFT)
+		{
+			graph = GRAPH_HANDLE[STAR_COLOR::LEFT];
+		}
+		else
+		{
+			graph = GRAPH_HANDLE[STAR_COLOR::RIGHT];
+		}
 	}
 
+	flashRad = Angle(KuroFunc::GetRand(0, 360));
 }
 
 void StaminaItem::Update()
@@ -60,8 +76,13 @@ void StaminaItem::Update()
 
 		/*-- スポーンしたアイテムだったら --*/
 
-		// 取得されていなかったら処理を飛ばす。
-		if (!isAcquired) break;
+		// 取得されていなかったら点滅
+		if (!isAcquired)
+		{
+			flashRad += Angle::ConvertToRadian(1.0f);
+			if (Angle(180) < flashRad)flashRad = 0.0f;
+			break;
+		}
 
 		// 移動量を0に近づける。
 		vel -= vel / 10.0f;
@@ -116,14 +137,18 @@ void StaminaItem::Draw()
 
 	/*===== 描画処理 =====*/
 
-	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(pos), DRAW_RADIUS * Camera::Instance()->zoom, itemColor, isAcquired);
+	//DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(pos), DRAW_RADIUS * Camera::Instance()->zoom, itemColor, isAcquired);
+	const float extDiffer = isAcquired ? 1.0f : 0.75f;
+	const Vec2<float>extRate = { Camera::Instance()->zoom * extDiffer,Camera::Instance()->zoom * extDiffer };
+	static const float ALPHA_MIN = 0.6f;
+	const float alpha = isAcquired ? 1.0f : (sin(flashRad) * (1.0f - ALPHA_MIN) + ALPHA_MIN);
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), extRate, 0.0f, TexHandleMgr::GetTexBuffer(graph), Color(1.0f, 1.0f, 1.0f, alpha));
 
 }
 
-bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, CHARA_ID CharaID)
+bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, const float& PilotRadius, CHARA_ID CharaID, const Vec2<float>* PilotPos)
 {
-
-	if (CharaPos == nullptr) return false;
+	if (CharaPos == nullptr && PilotPos) return false;
 
 	// 移動中だったら当たり判定を行わない。
 	if (0 < vel) return false;
@@ -144,6 +169,13 @@ bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, CHAR
 
 			}
 
+			//パイロットとの判定
+			if (PilotPos != nullptr)
+			{
+				distance = PilotPos->Distance(pos);
+
+				if (distance <= PilotRadius)return true;
+			}
 		}
 
 	}
@@ -160,12 +192,19 @@ bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, CHAR
 
 		}
 
+		//パイロットとの判定
+		if (PilotPos != nullptr)
+		{
+			distance = PilotPos->Distance(pos);
+
+			if (distance <= PilotRadius)return true;
+		}
 	}
 
 	return false;
 }
 
-void StaminaItem::Acquire(Vec2<float>* CharaPos, CHARA_ID CharaID, Color CharaColor)
+void StaminaItem::Acquire(Vec2<float>* CharaPos, CHARA_ID CharaID)
 {
 
 	/*===== 取得された状態にする =====*/
@@ -176,6 +215,13 @@ void StaminaItem::Acquire(Vec2<float>* CharaPos, CHARA_ID CharaID, Color CharaCo
 	forwardVec.Normalize();
 	vel = ACQUIRED_VEL;
 	charaID = CharaID;
-	itemColor = CharaColor;
+	if (CharaID == CHARA_ID::LEFT)
+	{
+		graph = GRAPH_HANDLE[STAR_COLOR::LEFT];
+	}
+	else
+	{
+		graph = GRAPH_HANDLE[STAR_COLOR::RIGHT];
+	}
 
 }

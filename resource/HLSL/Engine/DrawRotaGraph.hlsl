@@ -8,6 +8,7 @@ struct VSOutput
     float4 center : CENTER;
     float2 extRate : EXT_RATE;
     float radian : RADIAN;
+    float4 emitColor : EMIT_COLOR;
     float2 rotaCenterUV : ROTA_CENTER_UV;
     int2 miror : MIROR;
 };
@@ -21,6 +22,7 @@ struct GSOutput
 {
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD;
+    float4 emitColor : EMIT_COLOR;
 };
 
 Texture2D<float4> tex : register(t0);
@@ -50,6 +52,7 @@ void GSmain(
     rotateCenter += texSize.xy * input[0].extRate * (input[0].rotaCenterUV - float2(0.5f, 0.5f));
     
     GSOutput element;
+    element.emitColor = input[0].emitColor;
         
     //ç∂â∫
     element.pos = input[0].center;
@@ -90,7 +93,7 @@ void GSmain(
 
 float4 PSmain(GSOutput input) : SV_TARGET
 {
-    return tex.Sample(smp, input.uv);
+    return tex.Sample(smp, input.uv) * input.emitColor;
 }
 
 float4 main(float4 pos : POSITION) : SV_POSITION

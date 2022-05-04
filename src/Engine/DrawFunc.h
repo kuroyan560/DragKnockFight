@@ -77,8 +77,12 @@ public:
 	/// </summary>
 	/// <param name="LeftUpPos">矩形の左上座標</param>
 	/// <param name="Tex">テクスチャ</param>
+	/// <param name="EmitColor">出力する量</param>
+	/// <param name="Mirror">左右反転フラグ</param>
 	/// <param name="BlendMode">ブレンドモード</param>
-	static void DrawGraph(const Vec2<float>& LeftUpPos, const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode = AlphaBlendMode_None, const Vec2<bool>& Miror = { false,false });
+	static void DrawGraph(const Vec2<float>& LeftUpPos, const std::shared_ptr<TextureBuffer>& Tex, const Color& EmitColor = Color(), 
+		const Vec2<bool>& Miror = { false,false },
+		const AlphaBlendMode& BlendMode = AlphaBlendMode_Trans);
 
 	/// <summary>
 	/// 拡大縮小描画
@@ -86,9 +90,12 @@ public:
 	/// <param name="LeftUpPos">矩形の左上座標</param>
 	/// <param name="RightBottomPos">矩形の右上座標</param>
 	/// <param name="Tex">テクスチャ</param>
+	/// <param name="EmitColor">出力する量</param>
+	/// <param name="Mirror">左右反転フラグ</param>
 	/// <param name="BlendMode">ブレンドモード</param>
 	static void DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos,
-		const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode = AlphaBlendMode_None, const Vec2<bool>& Miror = { false,false });
+		const std::shared_ptr<TextureBuffer>& Tex, const Color& EmitColor = Color(), 
+		const Vec2<bool>& Miror = { false,false },const AlphaBlendMode& BlendMode = AlphaBlendMode_Trans);
 
 	/// <summary>
 	/// ２D画像回転描画
@@ -97,9 +104,10 @@ public:
 	/// <param name="ExtRate">拡大率</param>
 	/// <param name="Radian">回転角度</param>
 	/// <param name="Tex">テクスチャ</param>
+	/// <param name="EmitColor">出力する量</param>
 	/// <param name="BlendMode">ブレンドモード</param>
-	/// <param name="LRTurn">左右反転フラグ</param>
+	/// <param name="Mirror">左右反転フラグ</param>
 	static void DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian,
-		const std::shared_ptr<TextureBuffer>& Tex, const Vec2<float>& RotaCenterUV = { 0.5f,0.5f },
-		const AlphaBlendMode& BlendMode = AlphaBlendMode_Trans, const Vec2<bool>& Mirror = { false,false });
+		const std::shared_ptr<TextureBuffer>& Tex, const Color& EmitColor = Color(), const Vec2<float>& RotaCenterUV = { 0.5f,0.5f },
+		const Vec2<bool>& Mirror = { false,false }, const AlphaBlendMode& BlendMode = AlphaBlendMode_Trans);
 };

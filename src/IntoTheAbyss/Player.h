@@ -49,6 +49,8 @@ public:
 	//enum DRAW_DIR { FRONT, BACK, DIR_NUM, DEFAULT = FRONT }playerDir = DEFAULT;
 	//アニメーション統括
 	PlayerAnimation anim;
+	static const int TIRED_DRAW_TIME = 90;
+	int tiredTimer = TIRED_DRAW_TIME;
 
 	//残像
 	AfterImg afImg;

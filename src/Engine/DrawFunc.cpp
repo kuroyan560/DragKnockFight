@@ -89,7 +89,7 @@ void DrawFunc::DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float>& To
 	Vec2<float>expRate = { distance / graphSize.x,Thickness / graphSize.y };
 	Vec2<float>centerPos = FromPos + vec * distance / 2;
 
-	DrawRotaGraph2D(centerPos, expRate, KuroFunc::GetAngle(vec), Tex, { 0.5f,0.5f }, BlendMode, Mirror);
+	DrawRotaGraph2D(centerPos, expRate, KuroFunc::GetAngle(vec), Tex, Color(), { 0.5f,0.5f }, Mirror, BlendMode);
 }
 
 
@@ -247,12 +247,12 @@ void DrawFunc::DrawCircle2D(const Vec2<float>& Center, const float& Radius, cons
 	DRAW_CIRCLE_COUNT++;
 }
 
-void DrawFunc::DrawGraph(const Vec2<float>& LeftUpPos, const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode, const Vec2<bool>& Miror)
+void DrawFunc::DrawGraph(const Vec2<float>& LeftUpPos, const std::shared_ptr<TextureBuffer>& Tex, const Color& EmitColor, const Vec2<bool>& Miror, const AlphaBlendMode& BlendMode)
 {
-	DrawExtendGraph2D(LeftUpPos, LeftUpPos + Tex->GetGraphSize().Float(), Tex, BlendMode, Miror);
+	DrawExtendGraph2D(LeftUpPos, LeftUpPos + Tex->GetGraphSize().Float(), Tex, EmitColor, Miror, BlendMode);
 }
 
-void DrawFunc::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const std::shared_ptr<TextureBuffer>& Tex, const AlphaBlendMode& BlendMode, const Vec2<bool>& Miror)
+void DrawFunc::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const std::shared_ptr<TextureBuffer>& Tex, const Color& EmitColor, const Vec2<bool>& Miror, const AlphaBlendMode& BlendMode)
 {
 	static std::shared_ptr<GraphicsPipeline>EXTEND_GRAPH_PIPELINE[AlphaBlendModeNum];
 	static std::vector<std::shared_ptr<VertexBuffer>>EXTEND_GRAPH_VERTEX_BUFF;
@@ -263,9 +263,10 @@ void DrawFunc::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>
 	public:
 		Vec2<float>leftUpPos;
 		Vec2<float>rightBottomPos;
+		Color emitColor;
 		Vec2<int> miror;
-		ExtendGraphVertex(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Vec2<bool>& Miror)
-			:leftUpPos(LeftUpPos), rightBottomPos(RightBottomPos), miror({ Miror.x ? 1 : 0 ,Miror.y ? 1 : 0 }) {}
+		ExtendGraphVertex(const Vec2<float>& LeftUpPos, const Vec2<float>& RightBottomPos, const Color& EmitColor, const Vec2<bool>& Miror)
+			:leftUpPos(LeftUpPos), rightBottomPos(RightBottomPos), emitColor(EmitColor), miror({ Miror.x ? 1 : 0 ,Miror.y ? 1 : 0 }) {}
 	};
 
 	//パイプライン未生成
@@ -286,6 +287,7 @@ void DrawFunc::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>
 		{
 			InputLayoutParam("POSITION_L_U",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("POSITION_R_B",DXGI_FORMAT_R32G32_FLOAT),
+			InputLayoutParam("EMIT_COLOR",DXGI_FORMAT_R32G32B32A32_FLOAT),
 			InputLayoutParam("MIROR",DXGI_FORMAT_R32G32_SINT)
 		};
 
@@ -309,7 +311,7 @@ void DrawFunc::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>
 		EXTEND_GRAPH_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(ExtendGraphVertex), 1, nullptr, ("DrawExtendGraph -" + std::to_string(DRAW_EXTEND_GRAPH_COUNT)).c_str()));
 	}
 
-	ExtendGraphVertex vertex(LeftUpPos, RightBottomPos, Miror);
+	ExtendGraphVertex vertex(LeftUpPos, RightBottomPos, EmitColor, Miror);
 	EXTEND_GRAPH_VERTEX_BUFF[DRAW_EXTEND_GRAPH_COUNT]->Mapping(&vertex);
 
 	KuroEngine::Instance().Graphics().ObjectRender(EXTEND_GRAPH_VERTEX_BUFF[DRAW_EXTEND_GRAPH_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff(),Tex }, { CBV,SRV }, 0.0f, true);
@@ -318,7 +320,7 @@ void DrawFunc::DrawExtendGraph2D(const Vec2<float>& LeftUpPos, const Vec2<float>
 }
 
 void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian,
-	const std::shared_ptr<TextureBuffer>& Tex, const Vec2<float>& RotaCenterUV, const AlphaBlendMode& BlendMode, const Vec2<bool>& Miror)
+	const std::shared_ptr<TextureBuffer>& Tex, const Color& EmitColor, const Vec2<float>& RotaCenterUV, const Vec2<bool>& Miror, const AlphaBlendMode& BlendMode)
 {
 	static std::shared_ptr<GraphicsPipeline>ROTA_GRAPH_PIPELINE[AlphaBlendModeNum];
 	static std::vector<std::shared_ptr<VertexBuffer>>ROTA_GRAPH_VERTEX_BUFF;
@@ -330,11 +332,12 @@ void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& Ext
 		Vec2<float>center;
 		Vec2<float> extRate;
 		float radian;
+		Color emitColor;
 		Vec2<float>rotaCenterUV;
 		Vec2<int> miror;
-		RotaGraphVertex(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian,
+		RotaGraphVertex(const Vec2<float>& Center, const Vec2<float>& ExtRate, const float& Radian, const Color& EmitColor,
 			const Vec2<float>& RotaCenterUV, const Vec2<bool>& Miror)
-			:center(Center), extRate(ExtRate), radian(Radian),rotaCenterUV(RotaCenterUV), miror({ Miror.x ? 1 : 0,Miror.y ? 1 : 0 }) {}
+			:center(Center), extRate(ExtRate), radian(Radian), emitColor(EmitColor), rotaCenterUV(RotaCenterUV), miror({ Miror.x ? 1 : 0,Miror.y ? 1 : 0 }) {}
 	};
 
 	//パイプライン未生成
@@ -356,6 +359,7 @@ void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& Ext
 			InputLayoutParam("CENTER",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("EXT_RATE",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("RADIAN",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("EMIT_COLOR",DXGI_FORMAT_R32G32B32A32_FLOAT),
 			InputLayoutParam("ROTA_CENTER_UV",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("MIROR",DXGI_FORMAT_R32G32_SINT)
 		};
@@ -380,7 +384,7 @@ void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& Ext
 		ROTA_GRAPH_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(RotaGraphVertex), 1, nullptr, ("DrawRotaGraph -" + std::to_string(DRAW_ROTA_GRAPH_COUNT)).c_str()));
 	}
 
-	RotaGraphVertex vertex(Center, ExtRate, Radian,RotaCenterUV, Miror);
+	RotaGraphVertex vertex(Center, ExtRate, Radian, EmitColor, RotaCenterUV, Miror);
 	ROTA_GRAPH_VERTEX_BUFF[DRAW_ROTA_GRAPH_COUNT]->Mapping(&vertex);
 
 	KuroEngine::Instance().Graphics().ObjectRender(ROTA_GRAPH_VERTEX_BUFF[DRAW_ROTA_GRAPH_COUNT], { KuroEngine::Instance().GetParallelMatProjBuff(),Tex }, { CBV,SRV }, 0.0f, true);

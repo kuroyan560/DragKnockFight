@@ -117,6 +117,6 @@ void Bullet::Draw()
 	Vec2<float>rightBottom = { pos.x + MAX_RADIUS,pos.y + MAX_RADIUS };
 	rightBottom = ScrollMgr::Instance()->Affect(rightBottom);
 
-	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(graph), AlphaBlendMode_Trans);
+	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(graph));
 	//DrawFunc::DrawBox2D(leftUp, rightBottom, Color(217, 26, 96, (int)alpha), D3D12App::Instance()->GetBackBuffFormat(), true, AlphaBlendMode_Trans);
 }

@@ -172,10 +172,15 @@ void StaminaMgr::Init()
 		stamina[index].Init();
 	}
 
+	outOfStaminaEffect.Init();
+	emptyTrigger = false;
 }
 
-void StaminaMgr::Update(const bool& Heal)
+#include"SlowMgr.h"
+void StaminaMgr::Update(const bool& Heal, const Vec2<float>& CharacterPos)
 {
+	const bool oldFullFlg = 100.0f <= stamina.back().GetNowGauge();
+
 	static const float HEAL_AMOUNT = 1.0f;
 	// スタミナゲージは何もしてなくても少しずつ回復する。
 	const int STAMINA_COUNT = stamina.size();
@@ -187,7 +192,7 @@ void StaminaMgr::Update(const bool& Heal)
 			// 既にマックスだったら処理を飛ばす。
 			if (stamina[index].GetIsActivate()) continue;
 
-			stamina[index].AddNowGauge(HEAL_AMOUNT);
+			stamina[index].AddNowGauge(HEAL_AMOUNT * SlowMgr::Instance()->slowAmount);
 
 			// 手前側から一つずつ順々に回復していくため、リターン。
 			break;
@@ -202,6 +207,15 @@ void StaminaMgr::Update(const bool& Heal)
 
 	}
 
+	//スタミナ演出
+	static const float OFFSET_Y = -32.0f;
+	outOfStaminaEffect.baseEmptyStringPos = { CharacterPos.x,CharacterPos.y + OFFSET_Y };
+	outOfStaminaEffect.baseMaxStringPos = { CharacterPos.x,CharacterPos.y + OFFSET_Y };
+	outOfStaminaEffect.Update();
+
+	emptyTrigger = false;
+
+	if (!oldFullFlg && 100.0f <= stamina.back().GetNowGauge())outOfStaminaEffect.Full();
 }
 
 void StaminaMgr::Draw(const Vec2<float>& CharaPos)
@@ -226,9 +240,9 @@ void StaminaMgr::Draw(const Vec2<float>& CharaPos)
 			stamina[index].Draw(drawPos, STAMINA_GAUGE_WIDTH_PER_ONE, STAMINA_GAUGE_HEIGHT);
 
 		}
-
 	}
 
+	outOfStaminaEffect.Draw();
 }
 
 void StaminaMgr::SetColor(const Color& InnerColor, const Color& OuterColor)
@@ -247,6 +261,9 @@ void StaminaMgr::ConsumesStamina(const int& ConsumesStamina)
 {
 
 	/*===== スタミナを消費 =====*/
+
+	//元々空っぽか
+	const bool oldEmptyFlg = stamina.front().GetNowGauge() <= 0.0f;
 
 	// スタミナを消費。
 	float saveStamina = 0;	// 先頭にあるたまりきっていないスタミナを消さないようにするための変数。
@@ -277,16 +294,26 @@ void StaminaMgr::ConsumesStamina(const int& ConsumesStamina)
 	{
 		if (stamina[index].GetIsActivate())continue;
 		stamina[index].AddNowGauge(saveStamina);
+
 		break;
+	}
+
+	//空っぽ
+	if (!oldEmptyFlg && stamina.front().GetNowGauge() <= 0.0f)
+	{
+		emptyTrigger = true;
+		outOfStaminaEffect.Empty();
 	}
 }
 
 void StaminaMgr::AddStamina(const int& AddStamina)
 {
-
 	/*===== スタミナを回復させる =====*/
 
 	if (AddStamina <= 0) return;
+
+	//元々最大か
+	const bool oldFullFlg = 100.0f <= stamina.back().GetNowGauge();
 
 	int addStamina = AddStamina;
 
@@ -316,9 +343,10 @@ void StaminaMgr::AddStamina(const int& AddStamina)
 			stamina[index].SetExp(true);
 
 		}
-
 	}
 
+	//最大になった
+	if (!oldFullFlg && 100.0f <= stamina.back().GetNowGauge())outOfStaminaEffect.Full();
 }
 
 bool StaminaMgr::CheckCanAction(const int& ConsumesStamina)
@@ -341,6 +369,9 @@ bool StaminaMgr::CheckCanAction(const int& ConsumesStamina)
 
 bool StaminaMgr::ConsumesStaminaByGauge(const float& CounsumeStaminaGauge)
 {
+	//元々空っぽか
+	const bool oldEmptyFlg = stamina.front().GetNowGauge() <= 0.0f;
+
 	float consumeAmount = CounsumeStaminaGauge;
 
 	for (int index = stamina.size() - 1; 0 <= index; --index) {
@@ -356,6 +387,13 @@ bool StaminaMgr::ConsumesStaminaByGauge(const float& CounsumeStaminaGauge)
 				return true;
 			}
 		}
+	}
+
+	//空っぽ
+	if (!oldEmptyFlg && stamina.front().GetNowGauge() <= 0.0f)
+	{
+		emptyTrigger = true;
+		outOfStaminaEffect.Empty();
 	}
 
 	//消費しきれなかった

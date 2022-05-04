@@ -484,8 +484,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	}
 
-	staminaGauge->Update(!isPilotDetached);
-
+	staminaGauge->Update(!isPilotDetached, pos);
 }
 
 #include "DrawFunc.h"
@@ -503,7 +502,7 @@ void CharacterInterFace::Draw()
 		const auto pilotDrawPos = ScrollMgr::Instance()->Affect(pilotPos);
 		const auto teamColor = GetTeamColor();
 		DrawFunc::DrawLine2D(pilotDrawPos, ScrollMgr::Instance()->Affect(pos), teamColor);
-		DrawFunc::DrawCircle2D(pilotDrawPos, 32.0f * ScrollMgr::Instance()->zoom, teamColor, true);
+		DrawFunc::DrawBox2D(pilotDrawPos - pilotSize / 2.0f, pilotDrawPos + pilotSize / 2.0f, teamColor, true);
 	}
 
 	bulletMgr.Draw();
@@ -834,10 +833,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				StaminaItem::CHARA_ID charaID;
 				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::LEFT;
 				if (team != WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::RIGHT;
-				Color charaColor;
-				if (team == WHICH_TEAM::LEFT_TEAM) charaColor = Color(0xEF, 0x01, 0x90, 0xFF);
-				if (team != WHICH_TEAM::LEFT_TEAM) charaColor = Color(0x02, 0xFF, 0x8B, 0xFF);
-				StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaColor, charaID, partner.lock()->pos);
+				StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
 
 			}
 
