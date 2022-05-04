@@ -549,6 +549,7 @@ void CharacterInterFace::Damage()
 #include"Intersected.h"
 #include"MapChipCollider.h"
 #include "StaminaItemMgr.h"
+#include <IntoTheAbyss/StageMgr.h>
 void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
 
@@ -847,6 +848,174 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 		}
 
+	}
+
+	// 引っかかり判定の更新
+	CheckHitStuck(MapData);
+
+}
+
+void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>>& MapData)
+{
+
+	/*===== 引っかかり判定の更新処理 =====*/
+
+	// マップチップの番号のデータ
+	SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
+
+	// マップチップの要素数
+	const int MAX_X = MapData[0].size() - 1;
+	const int MAX_Y = MapData.size() - 1;
+
+	// 検索する量。
+	float searchOffset = MAP_CHIP_SIZE;
+
+	// 上側の判定を行う。
+	bool isHitTop = false;
+
+	// 上側の座標を取得する。
+	Vec2<float> searchPos = pos + Vec2<float>(0, -size.y - searchOffset);
+
+	// 検索座標のマップチップ番号を求める。
+	Vec2<float> searchChipIndex = { searchPos.x / MAP_CHIP_SIZE, searchPos.y / MAP_CHIP_SIZE };
+
+	// 検索座標のマップチップ番号が配列外だったら処理を飛ばす。
+	if (!(searchChipIndex.x < 0 || MAX_X < searchChipIndex.x || searchChipIndex.y < 0 || MAX_Y < searchChipIndex.y)) {
+
+		// そのマップチップの番号がブロックかどうかをチェック。
+		isHitTop = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x] && MapData[searchChipIndex.y][searchChipIndex.x] <= mapChipSizeData.max;
+
+	}
+
+	// 下側の判定を行う。
+	bool isHitBottom = false;
+
+	// 下側の座標を取得する。
+	searchPos = pos + Vec2<float>(0, size.y + searchOffset);
+
+	// 検索座標のマップチップ番号を求める。
+	searchChipIndex = { searchPos.x / MAP_CHIP_SIZE, searchPos.y / MAP_CHIP_SIZE };
+
+	// 検索座標のマップチップ番号が配列外だったら処理を飛ばす。
+	if (!(searchChipIndex.x < 0 || MAX_X < searchChipIndex.x || searchChipIndex.y < 0 || MAX_Y < searchChipIndex.y)) {
+
+		// そのマップチップの番号がブロックかどうかをチェック。
+		isHitBottom = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x] && MapData[searchChipIndex.y][searchChipIndex.x] <= mapChipSizeData.max;
+
+	}
+
+	// 右側の判定を行う。
+	bool isHitRight = false;
+
+	// 右側の座標を取得する。
+	searchPos = pos + Vec2<float>(size.x + searchOffset, 0);
+
+	// 検索座標のマップチップ番号を求める。
+	searchChipIndex = { searchPos.x / MAP_CHIP_SIZE, searchPos.y / MAP_CHIP_SIZE };
+	Vec2<float> posIndex = { pos.x / MAP_CHIP_SIZE, pos.y / MAP_CHIP_SIZE };
+
+	// 検索座標のマップチップ番号が配列外だったら処理を飛ばす。
+	if (!(searchChipIndex.x < 0 || MAX_X < searchChipIndex.x || searchChipIndex.y < 0 || MAX_Y < searchChipIndex.y)) {
+
+		// そのマップチップの番号がブロックかどうかをチェック。
+		isHitRight = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x] && MapData[searchChipIndex.y][searchChipIndex.x] <= mapChipSizeData.max;
+
+	}
+
+	// 左側の判定を行う。
+	bool isHitLeft = false;
+
+	// 左側の座標を取得する。
+	searchPos = pos + Vec2<float>(-size.x - searchOffset, 0);
+
+	// 検索座標のマップチップ番号を求める。
+	searchChipIndex = { searchPos.x / MAP_CHIP_SIZE, searchPos.y / MAP_CHIP_SIZE };
+
+	// 検索座標のマップチップ番号が配列外だったら処理を飛ばす。
+	if (!(searchChipIndex.x < 0 || MAX_X < searchChipIndex.x || searchChipIndex.y < 0 || MAX_Y < searchChipIndex.y)) {
+
+		// そのマップチップの番号がブロックかどうかをチェック。
+		isHitLeft = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x] && MapData[searchChipIndex.y][searchChipIndex.x] <= mapChipSizeData.max;
+
+	}
+
+	// 相手との角度
+	const auto partnerPos = partner.lock()->pos;
+	float partnerAngle = atan2(partnerPos.y - pos.y, partnerPos.x - pos.x);
+
+	// 角度が-だったら180度以上
+	if (partnerAngle < 0) {
+
+		float angleBuff = 3.14f - fabs(partnerAngle);
+
+		partnerAngle = 3.14f + angleBuff;
+
+	}
+
+	if (isHitBottom) {
+
+		// マップチップの上にあたっていたということは、プレイヤーが下方向にいればOK！
+		// 下方向の具体的な値は
+		const float MIN_ANGLE = 0.785398f;
+		const float MAX_ANGLE = 2.35619f;
+
+		// 角度がこの値の間だったら
+		if (MIN_ANGLE <= partnerAngle && partnerAngle <= MAX_ANGLE) {
+
+			// 引っかかっている。
+			stackMapChip = true;
+
+		}
+
+	}
+
+	if (isHitTop) {
+
+		// マップチップの下にあたっていたということは、プレイヤーが上方向にいればOK！
+		// 上方向の具体的な値は
+		const float MIN_ANGLE = 3.92699f;
+		const float MAX_ANGLE = 5.49779f;
+
+		// 角度がこの値の間だったら
+		if (MIN_ANGLE <= partnerAngle && partnerAngle <= MAX_ANGLE) {
+
+			// 引っかかっている。
+			stackMapChip = true;
+
+		}
+
+	}
+
+	if (isHitLeft) {
+
+		// マップチップの右にあたっていたということは、プレイヤーが左方向にいればOK！
+		// 左方向の具体的な値は
+		const float MIN_ANGLE = 2.35619f;
+		const float MAX_ANGLE = 3.92699f;
+
+		// 角度がこの値の間だったら
+		if (MIN_ANGLE <= partnerAngle && partnerAngle <= MAX_ANGLE) {
+
+			// 引っかかっている。
+			stackMapChip = true;
+		}
+
+	}
+
+	if (isHitRight) {
+
+		// マップチップの左にあたっていたということは、プレイヤーが右方向にいればOK！
+		// 右方向の具体的な値は
+		const float MIN_ANGLE = 0.785398f;
+		const float MAX_ANGLE = 5.49779f;
+
+		// 角度がこの値の間だったら
+		if (MAX_ANGLE <= partnerAngle || partnerAngle <= MIN_ANGLE) {
+
+			// 引っかかっている。
+			stackMapChip = true;
+
+		}
 	}
 
 }

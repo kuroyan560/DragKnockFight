@@ -176,6 +176,7 @@ public:
 	void DrawUI();
 	//“–‚½‚è”»’è
 	void CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
+	void CheckHitStuck(const std::vector<std::vector<int>>& MapData);
 
 	//ƒXƒ^ƒ“
 	void Break();

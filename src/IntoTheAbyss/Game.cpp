@@ -1076,39 +1076,13 @@ void Game::Scramble()
 		}
 
 	}
-	//// どちらかの線が伸びていたら。
-	//else if (0 < CharacterManager::Instance()->Left()->addLineLength + CharacterManager::Instance()->Right()->addLineLength) {
 
-	//	// 伸びてる量を求める。
-	//	float addLineLegnth = CharacterManager::Instance()->Left()->addLineLength + CharacterManager::Instance()->Right()->addLineLength + CharacterInterFace::LINE_LENGTH * 2.0f;
-
-	//	// 現在の距離。
-	//	float nowLength = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
-
-	//	// 伸びている量と現在の距離を求める。
-	//	float subLength = addLineLegnth - nowLength;
-
-	//	if (0 < subLength) {
-
-	//		// お互いに引くべき量を求める。
-	//		float halfSubLength = subLength / 2.0f;
-
-	//		// お互いのベクトルを求める。
-	//		Vec2<float> rightToLeftDir = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal();
-	//		Vec2<float> leftToRightDir = (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal();
-
-	//		// 移動させる。
-	//		CharacterManager::Instance()->Left()->pos += leftToRightDir * halfSubLength;
-	//		CharacterManager::Instance()->Right()->pos += rightToLeftDir * halfSubLength;
-
-	//	}
-
-	//}
-
+	// どちらのキャラも引っかかっているか
+	bool isBothStuck = CharacterManager::Instance()->Right()->GetStackFlag() && CharacterManager::Instance()->Left()->GetStackFlag();
 	// 引っかかり判定じゃなかったらだんだん短くする。
 	Vec2<float> movedVel = (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Right()->prevPos);
 	// 右側の紐の処理
-	if (!isCatchMapChipBoss && 0 < CharacterManager::Instance()->Right()->addLineLength && movedVel.Length() <= 0.5f && !isSwingNow) {
+	if (!isBothStuck && 0 < CharacterManager::Instance()->Right()->addLineLength && movedVel.Length() <= 0.5f && !isSwingNow) {
 
 		CharacterManager::Instance()->Right()->addLineLength -= 5.0f;
 
@@ -1128,30 +1102,13 @@ void Game::Scramble()
 		}
 
 	}
-	// ウィンドウに挟まったら
-	if (0 < CharacterManager::Instance()->Right()->GetStackWinTimer()) {
-
-		if (CharacterManager::Instance()->Right()->addLineLength < 20.0f) {
-
-			CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * CharacterManager::Instance()->Right()->addLineLength;
-			CharacterManager::Instance()->Right()->addLineLength = 0;
-
-		}
-		else {
-
-			CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * 20.0f;
-			CharacterManager::Instance()->Right()->addLineLength -= 20.0f;
-
-		}
-
-	}
 
 	if (CharacterManager::Instance()->Right()->addLineLength < 0) CharacterManager::Instance()->Right()->addLineLength = 0;
 
 
 	movedVel = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos);
 	// 左側の紐の処理
-	if (!isCatchMapChipPlayer && 0 < CharacterManager::Instance()->Left()->addLineLength && movedVel.Length() <= 0.5f && !isSwingNow) {
+	if (!isBothStuck && 0 < CharacterManager::Instance()->Left()->addLineLength && movedVel.Length() <= 0.5f && !isSwingNow) {
 
 		CharacterManager::Instance()->Left()->addLineLength -= 5.0f;
 
@@ -1168,23 +1125,6 @@ void Game::Scramble()
 			else {
 				CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * 5.0f;
 			}
-		}
-
-	}
-	// ウィンドウに挟まったら
-	if (0 < CharacterManager::Instance()->Left()->GetStackWinTimer()) {
-
-		if (CharacterManager::Instance()->Left()->addLineLength < 20.0f) {
-
-			CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * CharacterManager::Instance()->Left()->addLineLength;
-			CharacterManager::Instance()->Left()->addLineLength = 0;
-
-		}
-		else {
-
-			CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * 20.0f;
-			CharacterManager::Instance()->Left()->addLineLength -= 20.0f;
-
 		}
 
 	}
