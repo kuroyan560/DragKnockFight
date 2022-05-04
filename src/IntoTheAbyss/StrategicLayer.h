@@ -55,3 +55,25 @@ private:
 	bool initFlag;
 	bool initRouteFlag;
 };
+
+/// <summary>
+/// 自陣に向かう
+/// </summary>
+class GoToTheField
+{
+public:
+	GoToTheField();
+
+	/// <summary>
+	/// 実行
+	/// </summary>
+	void Update();
+
+	/// <summary>
+	/// 現在実行している処理の進捗
+	/// </summary>
+	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
+	AiResult CurrentProgress();
+
+private:
+};

@@ -11,6 +11,7 @@ void OperateMove::Update(const Vec2<float> &VELOCITY)
 	//ˆÚ“®
 	oldPos = *pos;
 	*pos += VELOCITY;
+	vel = oldPos - *pos;
 }
 
 AiResult OperateMove::CurrentProgress()

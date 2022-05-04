@@ -31,6 +31,7 @@ public:
 	AiResult CurrentProgress();
 
 	std::shared_ptr<Vec2<float>>pos;
+	Vec2<float> vel;
 private:
 
 	Vec2<float>oldPos;

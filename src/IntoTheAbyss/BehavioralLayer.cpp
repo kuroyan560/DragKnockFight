@@ -12,7 +12,9 @@ void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float
 	//距離を時間で割ってスピードを出す
 	float time = static_cast<float>(timeOver);
 	endPos = END_POS;
-	vel = Vec2<float>((END_POS - START_POS) / time);
+	Vec2<float>normal((END_POS - START_POS));
+	normal.Normalize();
+	vel = normal * Vec2<float>(14.0f, 14.0f);
 
 	startColision.center = operateMove->pos.get();
 	startColision.radius = 5.0f;

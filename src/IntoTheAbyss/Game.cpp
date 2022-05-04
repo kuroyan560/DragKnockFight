@@ -393,24 +393,6 @@ void Game::Update()
 	}
 #pragma endregion
 
-	chara.shortestData = navi.GetShortestRoute();
-	chara.wayPoints = navi.wayPoints;
-
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
-	{
-		*chara.pos = CharacterManager::Instance()->Right()->pos;
-		chara.Init();
-	}
-
-	if (chara.restoreStamina != nullptr)
-	{
-		navi.startPoint = chara.restoreStamina->startPoint;
-		navi.endPoint = chara.restoreStamina->endPoint;
-		navi.startFlag = chara.restoreStamina->startFlag;
-	}
-
-
-	chara.Update();
 
 	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0, BACK);
 	if (resetInput)
@@ -559,8 +541,33 @@ void Game::Update()
 		CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
 	}
 
+	chara.shortestData = navi.GetShortestRoute();
+	chara.wayPoints = navi.wayPoints;
+
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
+	{
+		chara.Init();
+	}
+
+	if (chara.restoreStamina != nullptr)
+	{
+		*chara.pos = CharacterManager::Instance()->Right()->pos;
+		navi.startPoint = chara.restoreStamina->startPoint;
+		navi.endPoint = chara.restoreStamina->endPoint;
+		navi.startFlag = chara.restoreStamina->startFlag;
+	}
+
+	chara.Update();
+
+	if (chara.restoreStamina != nullptr)
+	{
+		CharacterManager::Instance()->Right()->vel = chara.move->vel;
+	}
+
+
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
+
 
 	// プレイヤーとボスの当たり判定処理
 	CharacterManager::Instance()->Left()->CheckHit(mapData, lineCenterPos);
