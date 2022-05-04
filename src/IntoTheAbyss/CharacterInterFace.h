@@ -85,6 +85,7 @@ protected:
 	int reticleHandle;
 
 	Vec2<float>pilotPos;	// パイロットの座標
+	Vec2<float>pilotSize;	//パイロットのサイズ
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };

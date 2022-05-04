@@ -176,6 +176,7 @@ void StaminaMgr::Init()
 	emptyTrigger = false;
 }
 
+#include"SlowMgr.h"
 void StaminaMgr::Update(const bool& Heal, const Vec2<float>& CharacterPos)
 {
 	const bool oldFullFlg = 100.0f <= stamina.back().GetNowGauge();
@@ -191,7 +192,7 @@ void StaminaMgr::Update(const bool& Heal, const Vec2<float>& CharacterPos)
 			// 既にマックスだったら処理を飛ばす。
 			if (stamina[index].GetIsActivate()) continue;
 
-			stamina[index].AddNowGauge(HEAL_AMOUNT);
+			stamina[index].AddNowGauge(HEAL_AMOUNT * SlowMgr::Instance()->slowAmount);
 
 			// 手前側から一つずつ順々に回復していくため、リターン。
 			break;
