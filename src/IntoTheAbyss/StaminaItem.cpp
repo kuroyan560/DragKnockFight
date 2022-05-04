@@ -146,10 +146,9 @@ void StaminaItem::Draw()
 
 }
 
-bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, CHARA_ID CharaID)
+bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, const float& PilotRadius, CHARA_ID CharaID, const Vec2<float>* PilotPos)
 {
-
-	if (CharaPos == nullptr) return false;
+	if (CharaPos == nullptr && PilotPos) return false;
 
 	// 移動中だったら当たり判定を行わない。
 	if (0 < vel) return false;
@@ -170,6 +169,13 @@ bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, CHAR
 
 			}
 
+			//パイロットとの判定
+			if (PilotPos != nullptr)
+			{
+				distance = PilotPos->Distance(pos);
+
+				if (distance <= PilotRadius)return true;
+			}
 		}
 
 	}
@@ -186,6 +192,13 @@ bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, CHAR
 
 		}
 
+		//パイロットとの判定
+		if (PilotPos != nullptr)
+		{
+			distance = PilotPos->Distance(pos);
+
+			if (distance <= PilotRadius)return true;
+		}
 	}
 
 	return false;

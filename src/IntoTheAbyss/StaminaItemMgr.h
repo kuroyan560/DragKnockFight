@@ -46,6 +46,6 @@ public:
 	void Draw();
 
 	// 当たり判定を行い、スタミナの回復量を取得する。
-	int CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, StaminaItem::CHARA_ID CharaID);
+	int CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, const float& PilotRadius, StaminaItem::CHARA_ID CharaID, const Vec2<float>* PilotPos = nullptr);
 
 };

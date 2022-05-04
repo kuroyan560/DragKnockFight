@@ -193,6 +193,13 @@ public:
 	const bool& GetNowBreak() { return stanTimer; }
 	BulletMgrBase& GetBulletMgr() { return bulletMgr; }
 
+	//パイロットの座標（切り離ししてないときはnullptrを返す）
+	const Vec2<float>* GetPilotPosPtr() 
+	{
+		if (!isPilotDetached)return nullptr;
+		return &pilotPos; 
+	}
+
 	void SetCanMove(const bool& Flg) { canMove = Flg; }
 	void SetHitCheck(const bool& Flg) { hitCheck = Flg; }
 

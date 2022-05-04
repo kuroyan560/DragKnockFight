@@ -59,7 +59,7 @@ public:
 	void Draw();
 
 	// キャラクターとの当たり判定
-	bool CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, CHARA_ID CharaID);
+	bool CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, const float& PilotRadius, CHARA_ID CharaID, const Vec2<float>* PilotPos = nullptr);
 
 	// 取得された状態にする。
 	void Acquire(Vec2<float>* CharaPos, CHARA_ID CharaID);

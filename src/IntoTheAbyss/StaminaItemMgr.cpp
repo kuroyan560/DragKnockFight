@@ -148,7 +148,7 @@ void StaminaItemMgr::Draw()
 
 }
 
-int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, StaminaItem::CHARA_ID CharaID)
+int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, const float& PilotRadius, StaminaItem::CHARA_ID CharaID, const Vec2<float>* PilotPos)
 {
 
 	/*===== 当たり判定を行い、スタミナの回復量を取得する =====*/
@@ -163,7 +163,7 @@ int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, St
 		if (!item[index].GetIsActive()) continue;
 
 		// 当たり判定を行う。
-		bool isHit = item[index].CheckHit(CharaPos, CharaRadius, CharaID);
+		bool isHit = item[index].CheckHit(CharaPos, CharaRadius, PilotRadius, CharaID, PilotPos);
 
 		// 当たっていて、アイテムが取得されている状態だったら回復量を加算する。
 		if (isHit && item[index].GetIsAcquired()) {
