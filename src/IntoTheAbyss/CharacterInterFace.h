@@ -194,10 +194,10 @@ public:
 	BulletMgrBase& GetBulletMgr() { return bulletMgr; }
 
 	//パイロットの座標（切り離ししてないときはnullptrを返す）
-	const Vec2<float>* GetPilotPosPtr() 
+	const Vec2<float>* GetPilotPosPtr()
 	{
 		if (!isPilotDetached)return nullptr;
-		return &pilotPos; 
+		return &pilotPos;
 	}
 
 	void SetCanMove(const bool& Flg) { canMove = Flg; }
