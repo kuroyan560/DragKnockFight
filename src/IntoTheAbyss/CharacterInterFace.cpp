@@ -856,5 +856,8 @@ void CharacterInterFace::FinishSwing()
 	partner.lock()->stagingDevice.StopSpin();
 	partner.lock()->OnSwingedFinish();
 
+	// スタミナを消費
+	staminaGauge->ConsumesStamina(SWING_STAMINA);
+
 }
 
