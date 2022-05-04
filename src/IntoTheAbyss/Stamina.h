@@ -2,6 +2,7 @@
 #include "Color.h"
 #include <memory>
 #include <vector>
+#include"RunOutOfStaminaEffect.h"
 
 // スタミナクラス
 class Stamina {
@@ -52,7 +53,8 @@ public:
 	/*===== メンバ変数 =====*/
 
 	std::vector<Stamina> stamina;
-
+	RunOutOfStaminaEffect outOfStaminaEffect;
+	bool emptyTrigger;
 
 public:
 
@@ -60,7 +62,7 @@ public:
 
 	StaminaMgr();
 	void Init();
-	void Update(const bool& Heal);
+	void Update(const bool& Heal, const Vec2<float>& CharacterPos);
 	void Draw(const Vec2<float>& CharaPos);
 	
 	// 色を設定。

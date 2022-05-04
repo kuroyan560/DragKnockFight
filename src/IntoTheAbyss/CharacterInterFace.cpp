@@ -484,8 +484,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	}
 
-	staminaGauge->Update(!isPilotDetached);
-
+	staminaGauge->Update(!isPilotDetached, pos);
 }
 
 #include "DrawFunc.h"

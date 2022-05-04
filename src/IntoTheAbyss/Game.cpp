@@ -473,10 +473,6 @@ void Game::Update()
 	//ラウンド開始時の演出開始
 	if (readyToStartRoundFlag)
 	{
-		CharacterManager::Instance()->Left()->outOfStaminaEffect.Init();
-		CharacterManager::Instance()->Right()->outOfStaminaEffect.Init();
-
-
 		roundChangeEffect.Start(WinCounter::Instance()->GetNowRound(), playerOrEnemeyWinFlag);
 		Vec2<float>winSize;
 		winSize.x = static_cast<float>(WinApp::Instance()->GetWinSize().x);
@@ -832,10 +828,6 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	CrashEffectMgr::Instance()->Draw();
 
 	ParticleMgr::Instance()->Draw();
-
-	CharacterManager::Instance()->Left()->outOfStaminaEffect.Draw();
-	CharacterManager::Instance()->Right()->outOfStaminaEffect.Draw();
-
 
 	CrashMgr::Instance()->Draw();
 
