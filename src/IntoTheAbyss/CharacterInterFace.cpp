@@ -502,7 +502,7 @@ void CharacterInterFace::Draw()
 		const auto pilotDrawPos = ScrollMgr::Instance()->Affect(pilotPos);
 		const auto teamColor = GetTeamColor();
 		DrawFunc::DrawLine2D(pilotDrawPos, ScrollMgr::Instance()->Affect(pos), teamColor);
-		DrawFunc::DrawBox2D(pilotDrawPos, pilotDrawPos + pilotSize, teamColor, true);
+		DrawFunc::DrawBox2D(pilotDrawPos - pilotSize / 2.0f, pilotDrawPos + pilotSize / 2.0f, teamColor, true);
 	}
 
 	bulletMgr.Draw();
