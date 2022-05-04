@@ -1,6 +1,9 @@
 #pragma once
 #include "Vec.h"
 #include "Color.h"
+#include <memory>
+
+struct SphereCollision;
 
 // スタミナアイテム
 class StaminaItem {
@@ -17,6 +20,7 @@ private:
 	float healAmount;		// このアイテムの回復量
 	bool isActive;			// 有効化フラグ
 	bool isAcquired;		// 取得されたかフラグ
+	std::shared_ptr<SphereCollision> collisionData;	// 当たり判定データ
 
 public:
 	enum class STAMINA_ITEM_ID {
@@ -61,9 +65,10 @@ public:
 	void Acquire(Vec2<float>* CharaPos, CHARA_ID CharaID, Color CharaColor);
 
 	// 各種アクセッタ
-	inline const bool& GetIsActive() { return isActive; }
-	inline const bool& GetIsAcquired() { return isAcquired; }
-	inline const float& GetHealAmount() { return healAmount; }
-	inline const CHARA_ID& GetCharaID() { return charaID; }
+	inline const bool& GetIsActive() { return isActive; }		// 生存フラグのゲッタ
+	inline const bool& GetIsAcquired() { return isAcquired; }	// 取得されているかフラグ trueになっていたら取得されています。	 取得されている状態→取得したキャラに追尾している状態。
+	inline const float& GetHealAmount() { return healAmount; }	// ヒール量のゲッタ
+	inline const CHARA_ID& GetCharaID() { return charaID; }		// 取得したキャラのID 右か左か
+	inline const std::shared_ptr<SphereCollision> GetCollisionData() { return collisionData; }	// 当たり判定データのゲッタ
 
 };
