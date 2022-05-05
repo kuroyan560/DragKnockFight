@@ -183,6 +183,13 @@ void NavigationAI::Update(const Vec2<float>& POS)
 
 #endif // DEBUG
 
+	if (startPoint.handle != Vec2<int>(-1, -1)&&
+		endPoint.handle != Vec2<int>(-1, -1))
+	{
+		startFlag = true;
+	}
+
+
 	//スタートとゴールを設定したらAスターの探索を開始する
 	if (startFlag)
 	{
