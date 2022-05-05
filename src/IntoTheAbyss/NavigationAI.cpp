@@ -466,6 +466,11 @@ void NavigationAI::AStart(const WayPointData& START_POINT, const WayPointData& E
 	branchQueue[0][0] = wayPoints[sHandle.y][sHandle.x];
 	branchQueue[0][0]->branchHandle = 0;
 
+	if (START_POINT.handle == END_POINT.handle || START_POINT.isWall || END_POINT.isWall)
+	{
+		return;
+	}
+
 	//Ÿ‚ÉŒü‚©‚¤‚×‚«êŠ‚ğ’Tõ‚·‚é
 	while (1)
 	{

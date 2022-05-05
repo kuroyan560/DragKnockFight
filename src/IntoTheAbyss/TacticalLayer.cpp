@@ -1,4 +1,6 @@
 #include "TacticalLayer.h"
+#include"CharacterManager.h"
+#include"StageMgr.h"
 
 FollowPath::FollowPath(const std::shared_ptr<MovingBetweenTwoPoints> &OPERATE)
 {
@@ -47,4 +49,45 @@ AiResult FollowPath::CurrentProgress()
 	{
 		return AiResult::OPERATE_INPROCESS;
 	}
+}
+
+
+
+MoveToOwnGround::MoveToOwnGround(const std::shared_ptr<FollowPath> &OPERATE)
+{
+	followPath = OPERATE;
+	searchPoint = std::make_shared<SearchWayPoint>(CharacterAIData::Instance()->wayPoints);
+}
+
+void MoveToOwnGround::Init()
+{
+}
+
+void MoveToOwnGround::Update()
+{
+	//探索開始
+	if (route.size() != 0 && (startPoint.handle != prevStartHandle || endPoint.handle != prevEndHandle))
+	{
+		followPath->Init(route);
+	}
+	prevStartHandle = startPoint.handle;
+	prevEndHandle = endPoint.handle;
+	followPath->Update();
+
+
+	//スタート始点の探索
+	searchPoint->Init(CharacterManager::Instance()->Right()->pos);
+	startPoint = searchPoint->Update();
+
+	//ゴール地点の探索
+	Vec2<float>goalPos(CharacterManager::Instance()->Right()->pos);
+	//X軸は自陣、Y軸はボスの座標に合わせた座標
+	goalPos.x = (StageMgr::Instance()->GetMapChipData(0, 0)[0].size() * 50.0f) - 150.0f;
+	searchPoint->Init(goalPos);
+	endPoint = searchPoint->Update();
+}
+
+AiResult MoveToOwnGround::CurrentProgress()
+{
+	return AiResult();
 }

@@ -33,7 +33,7 @@ public:
 	std::shared_ptr<Vec2<float>>pos;
 	Vec2<float> vel;
 private:
-
+	bool initFlag;
 	Vec2<float>oldPos;
 
 };

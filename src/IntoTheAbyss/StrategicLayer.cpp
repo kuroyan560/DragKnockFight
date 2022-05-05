@@ -6,16 +6,17 @@
 
 const float RestoreStamina::SEARCH_RADIUS = 500.0f;
 
-RestoreStamina::RestoreStamina(const std::shared_ptr<FollowPath> &FOLLOW_PATH, const std::shared_ptr<MovingBetweenTwoPoints> &MOVING_BETWEEN_TOW_POINTS, const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAYPOINTS) :followPath(FOLLOW_PATH), moveToOhterPlace(MOVING_BETWEEN_TOW_POINTS)
+RestoreStamina::RestoreStamina(const std::shared_ptr<FollowPath> &FOLLOW_PATH, const std::shared_ptr<MovingBetweenTwoPoints> &MOVING_BETWEEN_TOW_POINTS, const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAYPOINTS) :followPath(FOLLOW_PATH)
 {
 	searchStartPoint = std::make_unique<SearchWayPoint>(WAYPOINTS);
 	searchGoalPoint = std::make_unique<SearchWayPoint>(WAYPOINTS);
 	readyToFollowPathFlag = false;
 	readyToGoToGoalFlag = false;
-	initRouteFlag = false;
+	initRouteFlag = true;
 
 	seachItemFlag = true;
 	searchItemIndex = -1;
+	prevItemIndex = -1;
 	prevStartHandle = startPoint.handle;
 
 	searchArea.center = &CharacterManager::Instance()->Right()->pos;
@@ -23,92 +24,92 @@ RestoreStamina::RestoreStamina(const std::shared_ptr<FollowPath> &FOLLOW_PATH, c
 
 	initFlag = true;
 	getFlag = false;
+
+	moveToOnwGround = std::make_unique<MoveToOwnGround>(followPath);
+	startFlag = true;
+
 }
 
 void RestoreStamina::Update()
 {
 	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
 
-	if (!getFlag)
+	//アイテム探索を開始
+	if (seachItemFlag)
 	{
-		//アイテム探索を開始
-		if (seachItemFlag)
-		{
-			SearchData result = SearchItem(searchArea);
+		SearchData result = SearchItem(searchArea);
 
-			if (result.itemIndex != -1)
-			{
-				seachItemFlag = false;
-				initFlag = false;
-				//ボスから最も近いウェイポイントをスタート地点とする------------------------
-				searchStartPoint->Init(*searchArea.center);
-				startPoint = searchStartPoint->Update();
-				startPos = startPoint.pos;
-				//ボスから最も近いウェイポイントをスタート地点とする------------------------
-				//ゴール地点から最も近いウェイポイントをゴール地点とする--------------------------
-				searchGoalPoint->Init(*item[searchItemIndex].GetCollisionData()->center);
-				endPoint = searchGoalPoint->Update();
-				endPos = endPoint.pos;
-				//ゴール地点から最も近いウェイポイントをゴール地点とする--------------------------
-			}
-		}
-		else
+		if (result.itemIndex != -1 && result.itemIndex != prevItemIndex)
 		{
-			//探索範囲内に指定のアイテムがあるかどうか見る
-			//無くなったら再検索をかける
-			if (!BulletCollision::Instance()->CheckSphereAndSphere(*item[searchItemIndex].GetCollisionData(), searchArea))
-			{
-				seachItemFlag = true;
-			}
-		}
+			searchItemIndex = result.itemIndex;
+			seachItemFlag = false;
+			initFlag = false;
+			//ゴール地点から最も近いウェイポイントをゴール地点とする--------------------------
+			searchGoalPoint->Init(*item[searchItemIndex].GetCollisionData()->center);
+			endPoint = searchGoalPoint->Update();
+			endPos = endPoint.pos;
+			//ゴール地点から最も近いウェイポイントをゴール地点とする--------------------------
 
-		//スタート地点が変わったらその場所に向かうよう初期化する
-		if (!initFlag)
-		{
-			//ボスの現在の座標とスタート地点の移動
-			moveToOhterPlace->Init(*searchArea.center, startPos);
-			initFlag = true;
+			prevItemIndex = result.itemIndex;
+			initRouteFlag = false;
+			getFlag = true;
 		}
-		prevStartHandle = startPoint.handle;
-		moveToOhterPlace->Update();
-
-
-		//探索を開始し、向かう--------------------------
-		//近くのウェイポイントに移動する
-		if (moveToOhterPlace->CurrentProgress() == AiResult::OPERATE_SUCCESS && !readyToFollowPathFlag)
+	}
+	else
+	{
+		//探索範囲内に指定のアイテムがあるかどうか見る
+		//無くなったら再検索をかける
+		if (!BulletCollision::Instance()->CheckSphereAndSphere(*item[searchItemIndex].GetCollisionData(), searchArea))
 		{
-			readyToFollowPathFlag = true;
-			startFlag = true;
+			seachItemFlag = true;
 		}
-		if (route.size() != 0 && !initRouteFlag)
-		{
-			followPath->Init(route);
-			initRouteFlag = true;
-		}
-
-		//ウェイポイントに沿って移動する
-		if (readyToFollowPathFlag && !readyToGoToGoalFlag && route.size() != 0)
-		{
-			followPath->Update();
-		}
-		//ゴールまでたどり着いたら目的地まで向かう
-		if (followPath->CurrentProgress() == AiResult::OPERATE_SUCCESS && !readyToGoToGoalFlag)
-		{
-			readyToGoToGoalFlag = true;
-			moveToOhterPlace->Init(endPos, *item[searchItemIndex].GetCollisionData()->center);
-		}
-
-		//探索を開始し、向かう--------------------------
 	}
 
-	//時間内に獲得したらまた近くのアイテムを探す。一定時間内にたどり着かなければ失敗
-	if (!seachItemFlag && item[searchItemIndex].GetIsAcquired())
+
+
+	//アイテムが無い場合は基本陣地に向かう
+	if (!getFlag)
 	{
-		getFlag = true;
+		moveToOnwGround->route = route;
+		moveToOnwGround->Update();
+		startPoint = moveToOnwGround->startPoint;
+		endPoint = moveToOnwGround->endPoint;
+	}
+	//アイテムが見つかったらその方向に向かう
+	else
+	{
+		//ボスから最も近いウェイポイントをスタート地点とする------------------------
+		if (startPoint.handle != endPoint.handle)
+		{
+			searchStartPoint->Init(*searchArea.center);
+			startPoint = searchStartPoint->Update();
+			startPos = startPoint.pos;
+		}
+		//ボスから最も近いウェイポイントをスタート地点とする------------------------
+
+		//探索を開始し、向かう--------------------------
+		if (route.size() != 0 && (!initRouteFlag || prevStartHandle != startPoint.handle))
+		{
+			followPath->Init(route);
+			readyToFollowPathFlag = true;
+			initRouteFlag = true;
+		}
+		prevStartHandle = startPoint.handle;
+
+		//ウェイポイントに沿って移動する
+		followPath->Update();
+		//探索を開始し、向かう--------------------------
+
+
+		//時間内に獲得したらまた近くのアイテムを探す。一定時間内にたどり着かなければ失敗
+		if (!seachItemFlag && item[searchItemIndex].GetIsAcquired())
+		{
+			seachItemFlag = true;
+			getFlag = false;
+		}
 	}
 
 	//一定時間内に一定量回復したら成功、出来なければ失敗
-
 
 }
 
@@ -217,14 +218,13 @@ RestoreStamina::SearchData RestoreStamina::SearchItem(const SphereCollision &DAT
 
 	//探索範囲内から一番近いアイテムを見る
 	SearchData result;
-	result.distance = -1.0f;
+	result.distance = 10000.0f;
 	result.itemIndex = -1;
-	float minDistance = 10000.0f;
 	for (int i = 0; i < distance.size(); ++i)
 	{
-		if (distance[i] < minDistance)
+		if (distance[i] < result.distance)
 		{
-			result.distance = minDistance;
+			result.distance = distance[i];
 			result.itemIndex = itemId[i];
 		}
 	}

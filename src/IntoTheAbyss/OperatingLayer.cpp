@@ -1,23 +1,28 @@
 #include "OperatingLayer.h"
-
+#include"CharacterManager.h"
 OperateMove::OperateMove(const std::shared_ptr<Vec2<float>> &POS)
 {
-	pos = POS;
-	oldPos = *pos;
+	//pos = POS;
+	//oldPos = CharacterManager::Instance()->Right()->pos;
+	initFlag = false;
 }
 
 void OperateMove::Update(const Vec2<float> &VELOCITY)
 {
 	//ˆÚ“®
-	oldPos = *pos;
-	*pos += VELOCITY;
-	vel = *pos - oldPos;
+	if (!initFlag)
+	{
+		oldPos = CharacterManager::Instance()->Right()->pos;
+		initFlag = true;
+	}
+	vel = VELOCITY;
+	oldPos = CharacterManager::Instance()->Right()->pos;
 }
 
 AiResult OperateMove::CurrentProgress()
 {
 	//À•W‚ª“®‚¢‚Ä‚¢‚½‚ç¬Œ÷AŽ~‚Ü‚Á‚Ä‚¢‚½‚çŽ¸”s
-	if (*pos != oldPos)
+	if (CharacterManager::Instance()->Right()->pos != oldPos)
 	{
 		return AiResult::OPERATE_SUCCESS;
 	}

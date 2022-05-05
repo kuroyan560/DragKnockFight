@@ -17,7 +17,7 @@ class RestoreStamina
 public:
 	RestoreStamina(
 		const std::shared_ptr<FollowPath> &FOLLOW_PATH,
-		const std::shared_ptr<MovingBetweenTwoPoints>& MOVING_BETWEEN_TOW_POINTS,
+		const std::shared_ptr<MovingBetweenTwoPoints> &MOVING_BETWEEN_TOW_POINTS,
 		const const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAYPOINTS
 	);
 
@@ -39,14 +39,14 @@ public:
 
 
 	Vec2<float>startPos, endPos;
-	Vec2<int>startHandle,endHandle;
+	Vec2<int>startHandle, endHandle;
 	WayPointData startPoint, endPoint;
 	bool startFlag;
 	std::vector<WayPointData> route;
 private:
 	std::shared_ptr<FollowPath> followPath;
-	std::shared_ptr<MovingBetweenTwoPoints> moveToOhterPlace;
-	std::unique_ptr<SearchWayPoint> searchStartPoint,searchGoalPoint;
+	std::unique_ptr<SearchWayPoint> searchStartPoint, searchGoalPoint;
+	std::unique_ptr<MoveToOwnGround> moveToOnwGround;
 
 	bool readyToFollowPathFlag;
 	bool readyToGoToGoalFlag;
@@ -65,7 +65,7 @@ private:
 	static const float SEARCH_RADIUS;
 
 	bool getFlag;
-
+	int prevItemIndex;
 	struct SearchData
 	{
 		float distance;
