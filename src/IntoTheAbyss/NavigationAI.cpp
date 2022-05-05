@@ -57,20 +57,12 @@ void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 				}
 			}
 
-
-
-			if (!wallFlag)
-			{
-				wayPoints[y][x] = std::make_shared<WayPointData>();
-				//等間隔で開ける
-				wayPoints[y][x]->pos = worldPos;
-				wayPoints[y][x]->radius = WAYPOINT_RADIUS;
-				wayPoints[y][x]->handle = { x,y };
-			}
-			else
-			{
-				wayPoints[y][x] = std::make_shared<WayPointData>();
-			}
+			wayPoints[y][x] = std::make_shared<WayPointData>();
+			//等間隔で開ける
+			wayPoints[y][x]->pos = worldPos;
+			wayPoints[y][x]->radius = WAYPOINT_RADIUS;
+			wayPoints[y][x]->handle = { x,y };
+			wayPoints[y][x]->isWall = wallFlag;
 		}
 	}
 	//座標の設定--------------------------
@@ -83,10 +75,8 @@ void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 		{
 			if (wayPoints[y][x].get() == nullptr) continue;
 			if (!DontUse(wayPoints[y][x]->handle)) continue;
-			SphereCollision data;
-			data.center = &wayPoints[y][x]->pos;
-			data.radius = SERACH_RADIUS;
-			RegistHandle(data, wayPoints[y][x]);
+			if (wayPoints[y][x]->isWall) continue;		// 壁の場合は繋げない。
+			RegistHandle(wayPoints[y][x]);
 		}
 	}
 	//近くにあるウェイポイントへの繋ぎ--------------------------
@@ -112,6 +102,7 @@ void NavigationAI::Update(const Vec2<float>& POS)
 		for (int x = 0; x < wayPointXCount; ++x)
 		{
 			if (wayPoints[y][x].get() == nullptr) continue;
+			if (wayPoints[y][x]->isWall) continue;
 			if (DontUse(wayPoints[y][x]->handle))
 			{
 				SphereCollision data1, data2;
@@ -167,6 +158,7 @@ void NavigationAI::Update(const Vec2<float>& POS)
 		for (int x = 0; x < wayPointXCount; ++x)
 		{
 			if (wayPoints[y][x].get() == nullptr) continue;
+			if (wayPoints[y][x]->isWall) continue;
 			debugColor[y][x] = Color(255, 255, 255, 255);
 			wayPoints[y][x]->branchReferenceCount = 0;
 			wayPoints[y][x]->branchHandle = -1;
@@ -203,6 +195,7 @@ void NavigationAI::Draw()
 		for (int x = 0; x < wayPointXCount; ++x)
 		{
 			if (wayPoints[y][x].get() == nullptr) continue;
+			if (wayPoints[y][x]->isWall) continue;
 			if (DontUse(wayPoints[y][x]->handle))
 			{
 				if (wayPointFlag)
@@ -258,31 +251,31 @@ void NavigationAI::Draw()
 		}
 	}
 
-	//繋がりの描画
-	if (lineFlag)
-	{
-		for (int y = 0; y < wayPointYCount; ++y)
-		{
-			for (int x = 0; x < wayPointXCount; ++x)
-			{
-				if (wayPoints[y][x].get() == nullptr) continue;
-				if (DontUse(wayPoints[y][x]->handle))
-				{
-					//登録したハンドルから線を繋げる
-					for (int i = 0; i < wayPoints[y][x]->wayPointHandles.size(); ++i)
-					{
-						Vec2<int> endHandle = wayPoints[y][x]->wayPointHandles[i];
-						DrawFunc::DrawLine2D
-						(
-							ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos),
-							ScrollMgr::Instance()->Affect(wayPoints[endHandle.y][endHandle.x]->pos),
-							Color(0, 155, 0, 255)
-						);
-					}
-				}
-			}
-		}
-	}
+	////繋がりの描画
+	//if (lineFlag)
+	//{
+	//	for (int y = 0; y < wayPointYCount; ++y)
+	//	{
+	//		for (int x = 0; x < wayPointXCount; ++x)
+	//		{
+	//			if (wayPoints[y][x].get() == nullptr) continue;
+	//			if (DontUse(wayPoints[y][x]->handle))
+	//			{
+	//				//登録したハンドルから線を繋げる
+	//				for (int i = 0; i < wayPoints[y][x]->wayPointHandles.size(); ++i)
+	//				{
+	//					Vec2<int> endHandle = wayPoints[y][x]->wayPointHandles[i];
+	//					DrawFunc::DrawLine2D
+	//					(
+	//						ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos),
+	//						ScrollMgr::Instance()->Affect(wayPoints[endHandle.y][endHandle.x]->pos),
+	//						Color(0, 155, 0, 255)
+	//					);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 	//マウスカーソル
 	DrawFunc::DrawCircle2D(UsersInput::Instance()->GetMousePos(), WAYPOINT_RADIUS, Color(0, 0, 255, 255));
@@ -846,6 +839,27 @@ Vec2<float> NavigationAI::CaluLine(const Vec2<float>& CENTRAL_POS, int angle)
 	return CENTRAL_POS + lineEndPos * distance;
 }
 
+bool NavigationAI::ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<int>& SEARCH_OFFSET, const SizeData& CHIP_DATA)
+{
+
+	Vec2<float> searchHandle = { (float)DATA->handle.x + SEARCH_OFFSET.x, (float)DATA->handle.y + SEARCH_OFFSET.y };
+	int chipData = StageMgr::Instance()->GetMapChipBlock(0, 0, searchHandle);
+
+	// 検索する座標が壁じゃなかったら接続する。
+	if (!(CHIP_DATA.min <= chipData && chipData <= CHIP_DATA.max)) {
+
+		// 接続する。
+		wayPoints[(int)searchHandle.y][(int)searchHandle.x]->RegistHandle(DATA->handle);
+		DATA->RegistHandle({ (int)searchHandle.x,(int)searchHandle.y });
+
+		return true;
+
+	}
+
+	return false;
+
+}
+
 std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>>& QUEUE)
 {
 	std::vector<std::vector<std::shared_ptr<WayPointData>>> route;
@@ -884,47 +898,48 @@ std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2
 	return route[shortestRoute];
 }
 
-inline void NavigationAI::RegistHandle(const SphereCollision& HANDLE, std::shared_ptr<WayPointData> DATA)
+inline void NavigationAI::RegistHandle(std::shared_ptr<WayPointData> DATA)
 {
-	//for (int y = 0; y < WAYPOINT_MAX_Y; ++y)
-	//{
-	//	for (int x = 0; x < WAYPOINT_MAX_X; ++x)
-	//	{
 
-	//		//使用できるデータから判定を行う
-	//		if (wayPoints[y][x].get() == nullptr) continue;
-	//		if (!DontUse(wayPoints[y][x]->handle)) continue;
+	// ウェイポイントを繋げる処理。
 
-	//		//移動範囲内にウェイポイントがあるか
-	//		Vec2<float>lineStartPos = DATA->pos;
-	//		Vec2<float>circlePos = wayPoints[y][x]->pos;
-	//		float r = wayPoints[y][x]->radius;
+	SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
-	//		bool serachFlag = false;
-	//		//中心から八方向に伸びた線とウェイポイントの判定
-	//		for (int i = 0; i < 8; ++i)
-	//		{
-	//			Vec2<float>endPos = CaluLine(lineStartPos, i * (360.0f / 8.0f));
-	//			if (CheckHitLineCircle(lineStartPos, endPos, circlePos, r))
-	//			{
-	//				serachFlag = true;
-	//				break;
-	//			}
-	//		}
 
-	//		//道中壁に当たっているかどうか
-	//		bool canMoveFlag = false;
-	//		if (serachFlag)
-	//		{
-	//			canMoveFlag = !CheckMapChipWallAndRay(circlePos, lineStartPos);
-	//		}
+	// まずは上下左右から繋げる。
+	bool isLeft = false;
+	isLeft = ConnectWayPoint(DATA, { -1,0 }, mapChipSizeData);
+	bool isRight = false;
+	isRight = ConnectWayPoint(DATA, { 1,0 }, mapChipSizeData);
+	bool isTop = false;
+	isTop = ConnectWayPoint(DATA, { 0,-1 }, mapChipSizeData);
+	bool isBottom = false;
+	isBottom = ConnectWayPoint(DATA, { 0,1 }, mapChipSizeData);
 
-	//		//探索範囲内&&直接行ける場所なら線を繋げる
-	//		if (serachFlag && canMoveFlag)
-	//		{
-	//			wayPoints[y][x]->RegistHandle(DATA->handle);
-	//			DATA->RegistHandle({ x,y });
-	//		}
-	//	}
-	//}
+	// 次に斜めに繋げる。
+	if (isLeft && isTop) {
+
+		// 左上に繋げる。
+		ConnectWayPoint(DATA, { -1,-1 }, mapChipSizeData);
+
+	}
+	if (isRight && isTop) {
+
+		// 右上に繋げる。
+		ConnectWayPoint(DATA, { 1,-1 }, mapChipSizeData);
+
+	}
+	if (isLeft && isBottom) {
+
+		// 左下に繋げる。
+		ConnectWayPoint(DATA, { -1,1 }, mapChipSizeData);
+
+	}
+	if (isRight && isBottom) {
+
+		// 右下に繋げる。
+		ConnectWayPoint(DATA, { 1,1 }, mapChipSizeData);
+
+	}
+
 }

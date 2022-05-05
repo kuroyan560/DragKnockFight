@@ -21,6 +21,7 @@ struct WayPointData
 	int passNum;							//目標地点までのパス数
 	int branchHandle;						//探索中の分岐のハンドル
 	int branchReferenceCount;				//何回その分岐を参照したか
+	bool isWall;							//壁かどうか 今までは壁にはウェイポイントを配置しないという処理になっていたが、接続の探索のしやすさから壁にもウェイポイントを設置するようにしました。
 
 	WayPointData() :handle(Vec2<int>(-1, -1)), passNum(0), branchHandle(-1), branchReferenceCount(0), radius(0.0f)
 	{
@@ -117,7 +118,7 @@ private:
 	/// </summary>
 	/// <param name="HANDLE">ウェイポイントを繋げる為の判定</param>
 	/// <param name="DATA">リンク付けする対象</param>
-	inline void RegistHandle(const SphereCollision& HANDLE, std::shared_ptr<WayPointData> DATA);
+	inline void RegistHandle(std::shared_ptr<WayPointData> DATA);
 
 	/// <summary>
 	/// 使用しているウェイポイントかどうか
@@ -304,5 +305,14 @@ private:
 
 
 	Vec2<float>CaluLine(const Vec2<float>& CENTRAL_POS, int angle);
+
+	/// <summary>
+	/// ウェイポイントを繋げる処理
+	/// </summary>
+	/// <param name="DATA"> 検索する基準のウェイポイント </param>
+	/// <param name="SEARCH_OFFSET"> 検索するマップチップの位置 (DATAを基準としてどこを検索するかの値) </param>
+	/// <param name="CHIP_DATA"> マップチップのブロックのIDを取得して壁判定するためのデータ </param>
+	/// <returns> 繋げられたかが返される。 繋げる処理はこの関数の内部にある。 </returns>
+	bool ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<int>& SEARCH_OFFSET, const SizeData& CHIP_DATA);
 };
 
