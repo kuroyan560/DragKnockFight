@@ -1,8 +1,10 @@
 #include "BehavioralLayer.h"
+#include"CharacterManager.h"
 
 MovingBetweenTwoPoints::MovingBetweenTwoPoints(const std::shared_ptr<OperateMove> &OPERATION)
 {
 	operateMove = OPERATION;
+	initFlag = false;
 }
 
 void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float> &END_POS)
@@ -16,10 +18,11 @@ void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float
 	normal.Normalize();
 	vel = normal * Vec2<float>(14.0f, 14.0f);
 
-	startColision.center = operateMove->pos.get();
+	startColision.center = &CharacterManager::Instance()->Right()->pos;
 	startColision.radius = 5.0f;
 	endColision.center = &endPos;
 	endColision.radius = 20.0f;
+	initFlag = true;
 }
 
 void MovingBetweenTwoPoints::Update()
@@ -35,20 +38,23 @@ void MovingBetweenTwoPoints::Update()
 
 AiResult MovingBetweenTwoPoints::CurrentProgress()
 {
-	//‚½‚Ç‚è’…‚¢‚½‚ç¬Œ÷
-	if (BulletCollision::Instance()->CheckSphereAndSphere(startColision, endColision))
+	if (initFlag)
 	{
-		return AiResult::OPERATE_SUCCESS;
-	}
-	//ŽžŠÔ“à‚É‚½‚Ç‚è’…‚©‚È‚©‚Á‚½‚çŽ¸”s
-	else if (timeOver <= timer)
-	{
-		return AiResult::OPERATE_FAIL;
-	}
-	//ŽÀs’†
-	else
-	{
-		return AiResult::OPERATE_INPROCESS;
+		//‚½‚Ç‚è’…‚¢‚½‚ç¬Œ÷
+		if (BulletCollision::Instance()->CheckSphereAndSphere(startColision, endColision))
+		{
+			return AiResult::OPERATE_SUCCESS;
+		}
+		//ŽžŠÔ“à‚É‚½‚Ç‚è’…‚©‚È‚©‚Á‚½‚çŽ¸”s
+		else if (timeOver <= timer)
+		{
+			return AiResult::OPERATE_FAIL;
+		}
+		//ŽÀs’†
+		else
+		{
+			return AiResult::OPERATE_INPROCESS;
+		}
 	}
 }
 

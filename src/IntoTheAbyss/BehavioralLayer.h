@@ -44,6 +44,7 @@ private:
 	int timeOver;
 
 	SphereCollision startColision,endColision;
+	bool initFlag;
 };
 
 

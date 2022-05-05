@@ -36,7 +36,6 @@ public:
 
 
 	Vec2<float>startPos, endPos;
-	Vec2<float>dStartPos, dEndPos;
 	Vec2<int>startHandle,endHandle;
 	WayPointData startPoint, endPoint;
 	bool startFlag;
@@ -52,8 +51,16 @@ private:
 	std::vector<Vec2<float>>itemList;
 	float serachItemRadius;
 
-	bool initFlag;
 	bool initRouteFlag;
+
+
+	SphereCollision searchArea;
+	int searchItemIndex;
+	bool seachItemFlag;
+	bool initFlag;
+	Vec2<int>prevStartHandle;
+
+	bool getFlag;
 };
 
 /// <summary>

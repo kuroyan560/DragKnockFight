@@ -561,9 +561,9 @@ void Game::Update()
 
 	if (chara.restoreStamina != nullptr)
 	{
-		CharacterManager::Instance()->Right()->vel = chara.move->vel;
+	//	CharacterManager::Instance()->Right()->vel = chara.move->vel;
 	}
-
+	CharacterManager::Instance()->Right()->vel = chara.move->vel;
 
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();

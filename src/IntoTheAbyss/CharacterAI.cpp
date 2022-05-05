@@ -27,10 +27,9 @@ CharacterAI::CharacterAI()
 void CharacterAI::Init()
 {
 	//restoreStamina->Init();
-		//‰¼’u‚«
+	//‰¼’u‚«
 	restoreStamina = std::make_unique<RestoreStamina>
 		(moveToGoal, betweenPoints, wayPoints);
-	restoreStamina->dStartPos = *pos;
 	initFlag = true;
 }
 
@@ -38,9 +37,10 @@ void CharacterAI::Update()
 {
 	if (initFlag)
 	{
-		restoreStamina->route = shortestData;
-		restoreStamina->Update();
+		//restoreStamina->route = shortestData;
+		//restoreStamina->Update();
 	}
+	move->Update(Vec2<float>(15.0f, 0.0f));
 }
 
 void CharacterAI::Draw()
