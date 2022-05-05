@@ -58,7 +58,7 @@ AiResult MovingBetweenTwoPoints::CurrentProgress()
 	}
 }
 
-SearchWayPoint::SearchWayPoint(const std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> &WAY_POINTS) :wayPoints(WAY_POINTS)
+SearchWayPoint::SearchWayPoint(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAY_POINTS) :wayPoints(WAY_POINTS)
 {
 }
 

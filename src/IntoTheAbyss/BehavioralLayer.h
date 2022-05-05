@@ -54,7 +54,7 @@ private:
 class SearchWayPoint
 {
 public:
-	SearchWayPoint(const std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> &WAY_POINTS);
+	SearchWayPoint(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAY_POINTS);
 
 	void Init(const Vec2<float> &START_POS);
 
@@ -69,7 +69,7 @@ public:
 	/// <returns>FAIL...é∏îs,INPROCESS...é¿çsíÜ,SUCCESS...ê¨å˜</returns>
 	AiResult CurrentProgress();
 private:
-	std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> wayPoints;
+	const std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
 	Vec2<float>startPos;
 	
 };

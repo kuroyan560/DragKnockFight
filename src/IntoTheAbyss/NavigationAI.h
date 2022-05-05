@@ -21,6 +21,14 @@ struct WayPointData
 	int passNum;							//目標地点までのパス数
 	int branchHandle;						//探索中の分岐のハンドル
 	int branchReferenceCount;				//何回その分岐を参照したか
+	bool isWall;							//壁かどうか 今までは壁にはウェイポイントを配置しないという処理になっていたが、接続の探索のしやすさから壁にもウェイポイントを設置するようにしました。
+
+	int numberOfItemHeld;					// 保持アイテム数	
+
+	float wallDistanceTop;					//上方向の壁までの距離
+	float wallDistanceBottom;				//下方向の壁までの距離
+	float wallDistanceLeft;					//左方向の壁までの距離
+	float wallDistanceRight;				//右方向の壁までの距離
 
 	WayPointData() :handle(Vec2<int>(-1, -1)), passNum(0), branchHandle(-1), branchReferenceCount(0), radius(0.0f)
 	{
@@ -81,11 +89,11 @@ public:
 	};
 
 	bool resetSearchFlag;
-	static const int WAYPOINT_MAX_X = 10;	 //X軸のウェイポイントの数
-	static const int WAYPOINT_MAX_Y = 10;	 //Y軸のウェイポイントの数
 
 
-	std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> wayPoints;//ウェイポイントの配列
+	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;//ウェイポイントの配列
+	int wayPointXCount;
+	int wayPointYCount;
 
 	WayPointData startPoint;	//探索する際のスタート地点
 	WayPointData endPoint;		//探索する際のゴール地点
@@ -117,7 +125,7 @@ private:
 	/// </summary>
 	/// <param name="HANDLE">ウェイポイントを繋げる為の判定</param>
 	/// <param name="DATA">リンク付けする対象</param>
-	inline void RegistHandle(const SphereCollision& HANDLE, std::shared_ptr<WayPointData> DATA);
+	inline void RegistHandle(std::shared_ptr<WayPointData> DATA);
 
 	/// <summary>
 	/// 使用しているウェイポイントかどうか
@@ -240,7 +248,7 @@ private:
 
 	void RegistBranch(const WayPointData& DATA);
 
-	
+
 	WayPointData prevStartPoint;//探索する際の前フレームのスタート地点
 	WayPointData prevEndPoint;	//探索する際の前フレームのゴール地点
 
@@ -256,7 +264,7 @@ private:
 	bool lineFlag;				//ウェイポイント同士のリンクしているかの確認
 	bool wayPointFlag;			//ウェイポイントの描画
 
-	std::array<std::array<Color, WAYPOINT_MAX_Y>, WAYPOINT_MAX_X> debugColor;	//ウェイポイントの色
+	std::vector<std::vector<Color>> debugColor;	//ウェイポイントの色
 
 	struct SearchMapData
 	{
@@ -304,5 +312,26 @@ private:
 
 
 	Vec2<float>CaluLine(const Vec2<float>& CENTRAL_POS, int angle);
+
+	/// <summary>
+	/// ウェイポイントを繋げる処理
+	/// </summary>
+	/// <param name="DATA"> 検索する基準のウェイポイント </param>
+	/// <param name="SEARCH_OFFSET"> 検索するマップチップの位置 (DATAを基準としてどこを検索するかの値) </param>
+	/// <param name="CHIP_DATA"> マップチップのブロックのIDを取得して壁判定するためのデータ </param>
+	/// <returns> 繋げられたかが返される。 繋げる処理はこの関数の内部にある。 </returns>
+	bool ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<int>& SEARCH_OFFSET, const SizeData& CHIP_DATA);
+
+	/// <summary>
+	/// ウェイポイントから壁までの距離を計算する処理
+	/// </summary>
+	/// <param name="DATA"> 検索する基準のウェイポイント </param>
+	/// <param name="SEARCH_DIR"> 検索する方向 </param>
+	/// <param name="CHIP_DATA"> マップチップのブロックのIDを取得して壁判定するためのデータ </param>
+	/// <returns> 検索した方向での壁までの距離を返す。 </returns>
+	float SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
+
+	void CheckNumberOfItemHeldCount();
+
 };
 

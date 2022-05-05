@@ -25,7 +25,7 @@ public:
 	std::shared_ptr<Vec2<float>>pos;
 	std::vector<WayPointData> shortestData;
 
-	std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> wayPoints;
+	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
 
 	std::unique_ptr<RestoreStamina>restoreStamina;
 
