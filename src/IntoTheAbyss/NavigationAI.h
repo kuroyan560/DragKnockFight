@@ -322,8 +322,16 @@ private:
 	/// <returns> 繋げられたかが返される。 繋げる処理はこの関数の内部にある。 </returns>
 	bool ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<int>& SEARCH_OFFSET, const SizeData& CHIP_DATA);
 
-
+	/// <summary>
+	/// ウェイポイントから壁までの距離を計算する処理
+	/// </summary>
+	/// <param name="DATA"> 検索する基準のウェイポイント </param>
+	/// <param name="SEARCH_DIR"> 検索する方向 </param>
+	/// <param name="CHIP_DATA"> マップチップのブロックのIDを取得して壁判定するためのデータ </param>
+	/// <returns> 検索した方向での壁までの距離を返す。 </returns>
 	float SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
+
+	void CheckNumberOfItemHeldCount();
 
 };
 

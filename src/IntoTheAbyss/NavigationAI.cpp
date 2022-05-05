@@ -95,39 +95,8 @@ void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 void NavigationAI::Update(const Vec2<float>& POS)
 {
 
-	// 一度アイテム保持数を0にする。
-	for (int y = 0; y < wayPointYCount; ++y)
-	{
-		for (int x = 0; x < wayPointXCount; ++x)
-		{
-			if (wayPoints[y][x].get() == nullptr) continue;
-			if (wayPoints[y][x]->isWall) continue;
-			if (DontUse(wayPoints[y][x]->handle))
-			{
-				wayPoints[y][x]->numberOfItemHeld = 0;
-			}
-		}
-	}
-
-	// スタミナアイテムのいちに応じてWayPointのアイテム保持数を変更する。
-	std::array<StaminaItem, 100> staminaItem = StaminaItemMgr::Instance()->GetItemArray();
-	const int ITEM_COUNT = staminaItem.size();
-	for (int index = 0; index < ITEM_COUNT; ++index) {
-
-		// 生成されていない or 取得されている だったら処理を飛ばす。
-		if (!staminaItem[index].GetIsActive() || staminaItem[index].GetIsAcquired()) continue;
-
-		// アイテムのマップチップインデックス番号を求める。
-		Vec2<int> mapChipIndex = { (int)(staminaItem[index].GetPos().x / MAP_CHIP_SIZE), (int)(staminaItem[index].GetPos().y / MAP_CHIP_SIZE) };
-
-		// 各インデックスが既定値を超えてないかをチェック。
-		if (mapChipIndex.x < 0 || wayPointXCount <= mapChipIndex.x) continue;
-		if (mapChipIndex.y < 0 || wayPointYCount <= mapChipIndex.y) continue;
-
-		// 相当するウェイポイントにアイテム数を追加。
-		++wayPoints[mapChipIndex.y][mapChipIndex.x]->numberOfItemHeld;
-
-	}
+	// ウェイポイントのアイテム保持数を計算する。
+	CheckNumberOfItemHeldCount();
 
 #ifdef _DEBUG
 
@@ -925,6 +894,46 @@ float NavigationAI::SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<fl
 		if (100000 < searchCounter) assert(0);
 
 	}
+}
+
+// ウェイポイントのアイテム保持数を計算する。
+void NavigationAI::CheckNumberOfItemHeldCount()
+{
+
+	// 一度アイテム保持数を0にする。
+	for (int y = 0; y < wayPointYCount; ++y)
+	{
+		for (int x = 0; x < wayPointXCount; ++x)
+		{
+			if (wayPoints[y][x].get() == nullptr) continue;
+			if (wayPoints[y][x]->isWall) continue;
+			if (DontUse(wayPoints[y][x]->handle))
+			{
+				wayPoints[y][x]->numberOfItemHeld = 0;
+			}
+		}
+	}
+
+	// スタミナアイテムのいちに応じてWayPointのアイテム保持数を変更する。
+	std::array<StaminaItem, 100> staminaItem = StaminaItemMgr::Instance()->GetItemArray();
+	const int ITEM_COUNT = staminaItem.size();
+	for (int index = 0; index < ITEM_COUNT; ++index) {
+
+		// 生成されていない or 取得されている だったら処理を飛ばす。
+		if (!staminaItem[index].GetIsActive() || staminaItem[index].GetIsAcquired()) continue;
+
+		// アイテムのマップチップインデックス番号を求める。
+		Vec2<int> mapChipIndex = { (int)(staminaItem[index].GetPos().x / MAP_CHIP_SIZE), (int)(staminaItem[index].GetPos().y / MAP_CHIP_SIZE) };
+
+		// 各インデックスが既定値を超えてないかをチェック。
+		if (mapChipIndex.x < 0 || wayPointXCount <= mapChipIndex.x) continue;
+		if (mapChipIndex.y < 0 || wayPointYCount <= mapChipIndex.y) continue;
+
+		// 相当するウェイポイントにアイテム数を追加。
+		++wayPoints[mapChipIndex.y][mapChipIndex.x]->numberOfItemHeld;
+
+	}
+
 }
 
 std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>>& QUEUE)
