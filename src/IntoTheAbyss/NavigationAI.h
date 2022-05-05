@@ -81,11 +81,11 @@ public:
 	};
 
 	bool resetSearchFlag;
-	static const int WAYPOINT_MAX_X = 100;	 //X軸のウェイポイントの数
-	static const int WAYPOINT_MAX_Y = 100;	 //Y軸のウェイポイントの数
 
 
-	std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> wayPoints;//ウェイポイントの配列
+	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;//ウェイポイントの配列
+	int wayPointXCount;
+	int wayPointYCount;
 
 	WayPointData startPoint;	//探索する際のスタート地点
 	WayPointData endPoint;		//探索する際のゴール地点
@@ -256,7 +256,7 @@ private:
 	bool lineFlag;				//ウェイポイント同士のリンクしているかの確認
 	bool wayPointFlag;			//ウェイポイントの描画
 
-	std::array<std::array<Color, WAYPOINT_MAX_Y>, WAYPOINT_MAX_X> debugColor;	//ウェイポイントの色
+	std::vector<std::vector<Color>> debugColor;	//ウェイポイントの色
 
 	struct SearchMapData
 	{

@@ -18,7 +18,7 @@ public:
 	RestoreStamina(
 		const std::shared_ptr<FollowPath> &FOLLOW_PATH,
 		const std::shared_ptr<MovingBetweenTwoPoints>& MOVING_BETWEEN_TOW_POINTS,
-		const std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> &WAYPOINTS
+		const const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAYPOINTS
 	);
 
 	void Init(const Vec2<float> &START_POS, const Vec2<float> &END_POS);

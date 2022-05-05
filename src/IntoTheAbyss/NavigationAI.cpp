@@ -19,11 +19,23 @@ void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 	int xNum = MAP_DATA[0].size();
 	int yNum = MAP_DATA.size();
 
+	// マップチップの数分ウェイポイントを生成。
+	wayPoints.resize(yNum);
+	debugColor.resize(yNum);
+	for (int index = 0; index < yNum; ++index) {
+		wayPoints[index].resize(xNum);
+		debugColor[index].resize(xNum);
+	}
+
+	// ウェイポイントの数を保存。
+	wayPointXCount = wayPoints[0].size() - 1;
+	wayPointYCount = wayPoints.size() - 1;
+
 	for (int y = 0; y < yNum; ++y)
 	{
 		for (int x = 0; x < xNum; ++x)
 		{
-			//debugColor[y][x] = Color(255, 255, 255, 255);
+			debugColor[y][x] = Color(255, 255, 255, 255);
 
 			//一度ワールド座標に変換してからマップチップ座標に変換する
 			const Vec2<float> worldPos(MAP_CHIP_SIZE * x, MAP_CHIP_SIZE * y);
@@ -65,9 +77,9 @@ void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 
 
 	//近くにあるウェイポイントへの繋ぎ--------------------------
-	for (int y = 0; y < WAYPOINT_MAX_Y; ++y)
+	for (int y = 0; y < wayPointYCount; ++y)
 	{
-		for (int x = 0; x < WAYPOINT_MAX_X; ++x)
+		for (int x = 0; x < wayPointXCount; ++x)
 		{
 			if (wayPoints[y][x].get() == nullptr) continue;
 			if (!DontUse(wayPoints[y][x]->handle)) continue;
@@ -95,9 +107,9 @@ void NavigationAI::Update(const Vec2<float>& POS)
 	resetSearchFlag = false;
 	Vec2<float>pos = UsersInput::Instance()->GetMousePos();
 
-	for (int y = 0; y < wayPoints.size(); ++y)
+	for (int y = 0; y < wayPointYCount; ++y)
 	{
-		for (int x = 0; x < wayPoints[y].size(); ++x)
+		for (int x = 0; x < wayPointXCount; ++x)
 		{
 			if (wayPoints[y][x].get() == nullptr) continue;
 			if (DontUse(wayPoints[y][x]->handle))
@@ -150,9 +162,9 @@ void NavigationAI::Update(const Vec2<float>& POS)
 	prevEndPoint = endPoint;
 
 	//毎フレーム初期化の必要のある物を初期化する
-	for (int y = 0; y < wayPoints.size(); ++y)
+	for (int y = 0; y < wayPointYCount; ++y)
 	{
-		for (int x = 0; x < wayPoints[y].size(); ++x)
+		for (int x = 0; x < wayPointXCount; ++x)
 		{
 			if (wayPoints[y][x].get() == nullptr) continue;
 			debugColor[y][x] = Color(255, 255, 255, 255);
@@ -186,9 +198,9 @@ void NavigationAI::Draw()
 #ifdef _DEBUG
 
 	//ウェイポイントの描画
-	for (int y = 0; y < wayPoints.size(); ++y)
+	for (int y = 0; y < wayPointYCount; ++y)
 	{
-		for (int x = 0; x < wayPoints[y].size(); ++x)
+		for (int x = 0; x < wayPointXCount; ++x)
 		{
 			if (wayPoints[y][x].get() == nullptr) continue;
 			if (DontUse(wayPoints[y][x]->handle))
@@ -249,9 +261,9 @@ void NavigationAI::Draw()
 	//繋がりの描画
 	if (lineFlag)
 	{
-		for (int y = 0; y < wayPoints.size(); ++y)
+		for (int y = 0; y < wayPointYCount; ++y)
 		{
-			for (int x = 0; x < wayPoints[y].size(); ++x)
+			for (int x = 0; x < wayPointXCount; ++x)
 			{
 				if (wayPoints[y][x].get() == nullptr) continue;
 				if (DontUse(wayPoints[y][x]->handle))
