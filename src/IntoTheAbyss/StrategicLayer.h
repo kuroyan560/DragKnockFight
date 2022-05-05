@@ -17,11 +17,11 @@ class RestoreStamina
 public:
 	RestoreStamina(
 		const std::shared_ptr<FollowPath> &FOLLOW_PATH,
-		const std::shared_ptr<MovingBetweenTwoPoints> &MOVING_BETWEEN_TOW_POINTS,
+		const std::shared_ptr<MovingBetweenTwoPoints>& MOVING_BETWEEN_TOW_POINTS,
 		const const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAYPOINTS
 	);
 
-	void Init(const Vec2<float> &START_POS, const Vec2<float> &END_POS);
+	void Init();
 
 	/// <summary>
 	/// 実行
@@ -39,24 +39,21 @@ public:
 
 
 	Vec2<float>startPos, endPos;
-	Vec2<int>startHandle, endHandle;
+	Vec2<int>startHandle,endHandle;
 	WayPointData startPoint, endPoint;
 	bool startFlag;
 	std::vector<WayPointData> route;
 private:
 	std::shared_ptr<FollowPath> followPath;
-	std::unique_ptr<SearchWayPoint> searchStartPoint, searchGoalPoint;
-	std::unique_ptr<MoveToOwnGround> moveToOnwGround;
-
-	bool readyToFollowPathFlag;
-	bool readyToGoToGoalFlag;
+	std::unique_ptr<SearchWayPoint> searchStartPoint,searchGoalPoint;
+	std::unique_ptr < MoveToOwnGround> moveToOnwGround;
 
 	std::vector<Vec2<float>>itemList;
-	float serachItemRadius;
-
 	bool initRouteFlag;
 
 
+
+	//アイテム探索--------------------------
 	SphereCollision searchArea;
 	int searchItemIndex;
 	bool seachItemFlag;
@@ -72,6 +69,14 @@ private:
 		int itemIndex;
 	};
 	RestoreStamina::SearchData SearchItem(const SphereCollision &DATA);
+	//アイテム探索--------------------------
+
+	//成否--------------------------
+	int staminaGauge;
+	int timer;
+	int timeOver;
+	static const int SUCCEED_GAIN_STAMINA_VALUE;//どれぐらいの値
+
 };
 
 /// <summary>

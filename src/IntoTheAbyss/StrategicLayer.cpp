@@ -5,13 +5,12 @@
 #include"../IntoTheAbyss/CharacterManager.h"
 
 const float RestoreStamina::SEARCH_RADIUS = 500.0f;
+const int RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 3;
 
 RestoreStamina::RestoreStamina(const std::shared_ptr<FollowPath> &FOLLOW_PATH, const std::shared_ptr<MovingBetweenTwoPoints> &MOVING_BETWEEN_TOW_POINTS, const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAYPOINTS) :followPath(FOLLOW_PATH)
 {
 	searchStartPoint = std::make_unique<SearchWayPoint>(WAYPOINTS);
 	searchGoalPoint = std::make_unique<SearchWayPoint>(WAYPOINTS);
-	readyToFollowPathFlag = false;
-	readyToGoToGoalFlag = false;
 	initRouteFlag = true;
 
 	seachItemFlag = true;
@@ -30,9 +29,17 @@ RestoreStamina::RestoreStamina(const std::shared_ptr<FollowPath> &FOLLOW_PATH, c
 
 }
 
+void RestoreStamina::Init()
+{
+	staminaGauge = CharacterAIData::Instance()->bossData.stamineGauge;
+	timer = 0;
+	timeOver = 60 * 10;
+}
+
 void RestoreStamina::Update()
 {
 	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
+
 
 	//アイテム探索を開始
 	if (seachItemFlag)
@@ -66,7 +73,6 @@ void RestoreStamina::Update()
 	}
 
 
-
 	//アイテムが無い場合は基本陣地に向かう
 	if (!getFlag)
 	{
@@ -91,7 +97,6 @@ void RestoreStamina::Update()
 		if (route.size() != 0 && (!initRouteFlag || prevStartHandle != startPoint.handle))
 		{
 			followPath->Init(route);
-			readyToFollowPathFlag = true;
 			initRouteFlag = true;
 		}
 		prevStartHandle = startPoint.handle;
@@ -109,13 +114,26 @@ void RestoreStamina::Update()
 		}
 	}
 
-	//一定時間内に一定量回復したら成功、出来なければ失敗
-
+	//戦略実行からの経過時間
+	++timer;
 }
 
 AiResult RestoreStamina::CurrentProgress()
 {
-	return AiResult();
+	//一定時間内に一定量回復したら成功、出来なければ失敗
+	int sub = staminaGauge - CharacterAIData::Instance()->bossData.stamineGauge;
+	if (SUCCEED_GAIN_STAMINA_VALUE <= sub && timer < timeOver)
+	{
+		return AiResult::OPERATE_SUCCESS;
+	}
+	else if (timeOver <= timer)
+	{
+		return AiResult::OPERATE_FAIL;
+	}
+	else
+	{
+		return AiResult::OPERATE_INPROCESS;
+	}
 }
 
 float RestoreStamina::EvaluationFunction()
