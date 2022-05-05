@@ -35,6 +35,9 @@ public:
 	AiResult CurrentProgress();
 
 
+	float EvaluationFunction();
+
+
 	Vec2<float>startPos, endPos;
 	Vec2<int>startHandle,endHandle;
 	WayPointData startPoint, endPoint;
@@ -59,8 +62,16 @@ private:
 	bool seachItemFlag;
 	bool initFlag;
 	Vec2<int>prevStartHandle;
+	static const float SEARCH_RADIUS;
 
 	bool getFlag;
+
+	struct SearchData
+	{
+		float distance;
+		int itemIndex;
+	};
+	RestoreStamina::SearchData SearchItem(const SphereCollision &DATA);
 };
 
 /// <summary>
@@ -70,6 +81,30 @@ class GoToTheField
 {
 public:
 	GoToTheField();
+
+	/// <summary>
+	/// 実行
+	/// </summary>
+	void Update();
+
+	/// <summary>
+	/// 現在実行している処理の進捗
+	/// </summary>
+	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
+	AiResult CurrentProgress();
+
+private:
+};
+
+
+
+/// <summary>
+/// 優勢ゲージを獲得する
+/// </summary>
+class AcquireASuperiorityGauge
+{
+public:
+	AcquireASuperiorityGauge();
 
 	/// <summary>
 	/// 実行

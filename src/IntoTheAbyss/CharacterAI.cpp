@@ -1,6 +1,8 @@
 #include "CharacterAI.h"
 #include"../Engine/DrawFunc.h"
 #include"ScrollMgr.h"
+#include"CharacterManager.h"
+#include"Stamina.h"
 
 CharacterAI::CharacterAI()
 {
@@ -35,6 +37,31 @@ void CharacterAI::Init()
 
 void CharacterAI::Update()
 {
+	//キャラクターAIに必要なデータ集め--------------------------
+	CharacterAIData::Instance()->playerData.stamineGauge = 0;
+	for (int i = 0; i < CharacterManager::Instance()->Left()->staminaGauge->stamina.size(); ++i)
+	{
+		if (CharacterManager::Instance()->Left()->staminaGauge->stamina[i].GetIsActivate())
+		{
+			++CharacterAIData::Instance()->playerData.stamineGauge;
+		}
+	}
+
+	CharacterAIData::Instance()->bossData.stamineGauge = 0;
+	for (int i = 0; i < CharacterManager::Instance()->Right()->staminaGauge->stamina.size(); ++i)
+	{
+		if (CharacterManager::Instance()->Right()->staminaGauge->stamina[i].GetIsActivate())
+		{
+			++CharacterAIData::Instance()->bossData.stamineGauge;
+		}
+	}
+
+
+	//敵とプレイヤーとの距離
+	CharacterAIData::Instance()->distance = CharacterManager::Instance()->Left()->pos.Distance(CharacterManager::Instance()->Right()->pos);
+	//キャラクターAIに必要なデータ集め--------------------------
+
+
 	if (initFlag)
 	{
 		//restoreStamina->route = shortestData;

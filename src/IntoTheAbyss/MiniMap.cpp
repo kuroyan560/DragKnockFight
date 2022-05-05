@@ -1,6 +1,7 @@
 #include "MiniMap.h"
 #include"../Engine/DrawFunc.h"
 #include"../IntoTheAbyss/TexHandleMgr.h"
+#include"CharacterAIData.h"
 MiniMap::MiniMap()
 {
 	nowPosHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/position_gauge_now.png");
@@ -40,6 +41,8 @@ void MiniMap::Update()
 	}
 
 	nowPos.x = 50.0f + nowValue * 1110.0f;
+
+	CharacterAIData::Instance()->position = nowValue;
 }
 
 void MiniMap::Draw()

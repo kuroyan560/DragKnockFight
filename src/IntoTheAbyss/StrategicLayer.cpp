@@ -4,6 +4,8 @@
 #include"BulletCollision.h"
 #include"../IntoTheAbyss/CharacterManager.h"
 
+const float RestoreStamina::SEARCH_RADIUS = 500.0f;
+
 RestoreStamina::RestoreStamina(const std::shared_ptr<FollowPath> &FOLLOW_PATH, const std::shared_ptr<MovingBetweenTwoPoints> &MOVING_BETWEEN_TOW_POINTS, const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAYPOINTS) :followPath(FOLLOW_PATH), moveToOhterPlace(MOVING_BETWEEN_TOW_POINTS)
 {
 	searchStartPoint = std::make_unique<SearchWayPoint>(WAYPOINTS);
@@ -17,7 +19,7 @@ RestoreStamina::RestoreStamina(const std::shared_ptr<FollowPath> &FOLLOW_PATH, c
 	prevStartHandle = startPoint.handle;
 
 	searchArea.center = &CharacterManager::Instance()->Right()->pos;
-	searchArea.radius = 500.0f;
+	searchArea.radius = SEARCH_RADIUS;
 
 	initFlag = true;
 	getFlag = false;
@@ -32,35 +34,12 @@ void RestoreStamina::Update()
 		//アイテム探索を開始
 		if (seachItemFlag)
 		{
-			std::vector<float>distance;
-			std::vector<int>itemId;
-			//探索範囲内にアイテムがあるのか調べる
-			for (int i = 0; i < item.size(); ++i)
-			{
-				//アイテムを一つ以上見つけたら探索準備をする
-				//そして距離を測る
-				if (BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), searchArea))
-				{
-					distance.push_back(searchArea.center->Distance(*item[i].GetCollisionData()->center));
-					itemId.push_back(i);
-					seachItemFlag = false;
-					initFlag = false;
-				}
-			}
+			SearchData result = SearchItem(searchArea);
 
-			//探索範囲内から一番近いアイテムを見る
-			float minDistance = 10000.0f;
-			for (int i = 0; i < distance.size(); ++i)
+			if (result.itemIndex != -1)
 			{
-				if (distance[i] < minDistance)
-				{
-					minDistance = distance[i];
-					searchItemIndex = itemId[i];
-				}
-			}
-
-			if (distance.size() != 0)
-			{
+				seachItemFlag = false;
+				initFlag = false;
 				//ボスから最も近いウェイポイントをスタート地点とする------------------------
 				searchStartPoint->Init(*searchArea.center);
 				startPoint = searchStartPoint->Update();
@@ -136,4 +115,119 @@ void RestoreStamina::Update()
 AiResult RestoreStamina::CurrentProgress()
 {
 	return AiResult();
+}
+
+float RestoreStamina::EvaluationFunction()
+{
+	CharacterAIData *data = CharacterAIData::Instance();
+	//評価値
+	int evaluationValue = 0;
+	//マップチップ番号
+	Vec2<int>bossHandle;
+	bossHandle.x = static_cast<int>(CharacterManager::Instance()->Right()->pos.x / 50.0f);
+	bossHandle.y = static_cast<int>(CharacterManager::Instance()->Right()->pos.y / 50.0f);
+	Vec2<int>playerHandle;
+	playerHandle.x = static_cast<int>(CharacterManager::Instance()->Left()->pos.x / 50.0f);
+	playerHandle.y = static_cast<int>(CharacterManager::Instance()->Left()->pos.y / 50.0f);
+
+
+
+	//優勢ゲージ n6~7
+	if (0.6f <= data->bossData.gaugeValue && data->bossData.gaugeValue <= 0.7f)
+	{
+		evaluationValue += 2;
+	}
+	//スタミナが自分＜敵
+	if (data->playerData.stamineGauge < data->bossData.stamineGauge)
+	{
+		evaluationValue += 2;
+	}
+
+	const float nearDistance = 200.0f;
+	//自分と壁との距離が近い
+	if (!data->wayPoints[bossHandle.y][bossHandle.x]->isWall)
+	{
+		bool nearTopFlag = data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceTop < nearDistance;
+		bool nearBottomFlag = data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceBottom < nearDistance;
+		bool nearLeftFlag = data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceLeft < nearDistance;
+		bool nearRightFlag = data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceRight < nearDistance;
+
+		if (nearTopFlag || nearBottomFlag || nearLeftFlag || nearRightFlag)
+		{
+			evaluationValue += 2;
+		}
+	}
+	//敵と壁との距離が近くない
+	if (!data->wayPoints[playerHandle.y][playerHandle.x]->isWall)
+	{
+		bool farTopFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceTop;
+		bool farBottomFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceBottom;
+		bool farLeftFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceLeft;
+		bool farRightFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceRight;
+
+		if (farTopFlag || farBottomFlag || farLeftFlag || farRightFlag)
+		{
+			evaluationValue += 1;
+		}
+	}
+
+	//敵より自分の方がアイテムが近い
+	//自分側
+	SearchData bossResult = SearchItem(searchArea);
+	//敵側
+	SphereCollision hitBox;
+	hitBox.center = &CharacterManager::Instance()->Left()->pos;
+	hitBox.radius = SEARCH_RADIUS;
+	SearchData playerResult = SearchItem(hitBox);
+	if (playerResult.distance < bossResult.distance)
+	{
+		evaluationValue += 2;
+	}
+
+	//敵の振り回し入力があった
+	if (data->swingFlag)
+	{
+		evaluationValue += 2;
+	}
+
+
+	//自陣へのウェイポイントが少ない
+
+
+	return static_cast<float>(evaluationValue / 10);
+}
+
+RestoreStamina::SearchData RestoreStamina::SearchItem(const SphereCollision &DATA)
+{
+	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
+
+	std::vector<float>distance;
+	std::vector<int>itemId;
+	//探索範囲内にアイテムがあるのか調べる
+	for (int i = 0; i < item.size(); ++i)
+	{
+		//アイテムを一つ以上見つけたら探索準備をする
+		//そして距離を測る
+		if (BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), DATA))
+		{
+			distance.push_back(DATA.center->Distance(*item[i].GetCollisionData()->center));
+			itemId.push_back(i);
+		}
+	}
+
+	//探索範囲内から一番近いアイテムを見る
+	SearchData result;
+	result.distance = -1.0f;
+	result.itemIndex = -1;
+	float minDistance = 10000.0f;
+	for (int i = 0; i < distance.size(); ++i)
+	{
+		if (distance[i] < minDistance)
+		{
+			result.distance = minDistance;
+			result.itemIndex = itemId[i];
+		}
+	}
+
+	return result;
 }

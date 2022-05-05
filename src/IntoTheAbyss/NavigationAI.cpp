@@ -5,6 +5,7 @@
 #include"../IntoTheAbyss/DebugKeyManager.h"
 #include<queue>
 #include "StaminaItemMgr.h"
+#include"CharacterAIData.h"
 
 const float NavigationAI::SERACH_RADIUS = 180.0f;
 const float NavigationAI::WAYPOINT_RADIUS = 20.0f;
@@ -195,6 +196,9 @@ void NavigationAI::Update(const Vec2<float>& POS)
 	{
 		AStart(startPoint, endPoint);
 	}
+
+
+	CharacterAIData::Instance()->wayPoints = wayPoints;
 }
 
 void NavigationAI::Draw()
