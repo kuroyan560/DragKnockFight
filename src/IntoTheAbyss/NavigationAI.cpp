@@ -860,6 +860,36 @@ bool NavigationAI::ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec
 
 }
 
+float NavigationAI::SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA)
+{
+	int searchCounter = 0;
+	Vec2<float> searchIndex = { (float)DATA->handle.x, (float)DATA->handle.y };
+
+	// マップの四方か壁で囲まれているため、配列外へオーバーすることがないと思うので配列外への対処の処理は書かないでおきます！例外スローしたら書きます…。
+	while (1) {
+
+		// 検索対象のマップチップ番号のブロック番号を検索する。
+		int chipData = StageMgr::Instance()->GetMapChipBlock(0, 0, searchIndex);
+
+		// ブロックじゃなかったらIdnexを動かして次へ。
+		if (CHIP_DATA.min <= chipData && chipData <= CHIP_DATA.max) {
+
+			// ブロックだったら距離を計算する。
+			return MAP_CHIP_SIZE * searchCounter;
+
+		}
+		else {
+			searchIndex += SEARCH_DIR;
+		}
+
+		++searchCounter;
+
+		// サーチ回数が100000回を超えたら(上下左右100000ブロックの間に壁がないということ)明らかにそれはバグなのでアサート。
+		if (100000 < searchCounter) assert(0);
+
+	}
+}
+
 std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>>& QUEUE)
 {
 	std::vector<std::vector<std::shared_ptr<WayPointData>>> route;
@@ -941,5 +971,18 @@ inline void NavigationAI::RegistHandle(std::shared_ptr<WayPointData> DATA)
 		ConnectWayPoint(DATA, { 1,1 }, mapChipSizeData);
 
 	}
+
+
+	// 次に各方向の壁までの距離を求める。
+	
+	// 上方向に検索する。
+	DATA->wallDistanceTop = SearchWall(DATA, Vec2<float>(0, -1), mapChipSizeData);
+	// 下方向に検索する。
+	DATA->wallDistanceBottom = SearchWall(DATA, Vec2<float>(0, 1), mapChipSizeData);
+	// 右方向に検索する。
+	DATA->wallDistanceRight = SearchWall(DATA, Vec2<float>(1, 0), mapChipSizeData);
+	// 左方向に検索する。
+	DATA->wallDistanceLeft = SearchWall(DATA, Vec2<float>(-1, 0), mapChipSizeData);
+
 
 }

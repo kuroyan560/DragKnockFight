@@ -23,6 +23,11 @@ struct WayPointData
 	int branchReferenceCount;				//何回その分岐を参照したか
 	bool isWall;							//壁かどうか 今までは壁にはウェイポイントを配置しないという処理になっていたが、接続の探索のしやすさから壁にもウェイポイントを設置するようにしました。
 
+	float wallDistanceTop;					//上方向の壁までの距離
+	float wallDistanceBottom;				//下方向の壁までの距離
+	float wallDistanceLeft;					//左方向の壁までの距離
+	float wallDistanceRight;				//右方向の壁までの距離
+
 	WayPointData() :handle(Vec2<int>(-1, -1)), passNum(0), branchHandle(-1), branchReferenceCount(0), radius(0.0f)
 	{
 	}
@@ -241,7 +246,7 @@ private:
 
 	void RegistBranch(const WayPointData& DATA);
 
-	
+
 	WayPointData prevStartPoint;//探索する際の前フレームのスタート地点
 	WayPointData prevEndPoint;	//探索する際の前フレームのゴール地点
 
@@ -314,5 +319,9 @@ private:
 	/// <param name="CHIP_DATA"> マップチップのブロックのIDを取得して壁判定するためのデータ </param>
 	/// <returns> 繋げられたかが返される。 繋げる処理はこの関数の内部にある。 </returns>
 	bool ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<int>& SEARCH_OFFSET, const SizeData& CHIP_DATA);
+
+
+	float SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
+
 };
 
