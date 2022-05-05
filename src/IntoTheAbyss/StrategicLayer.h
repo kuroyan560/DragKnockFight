@@ -111,6 +111,8 @@ class AcquireASuperiorityGauge
 public:
 	AcquireASuperiorityGauge();
 
+	void Init();
+
 	/// <summary>
 	/// 実行
 	/// </summary>
@@ -123,4 +125,16 @@ public:
 	AiResult CurrentProgress();
 
 private:
+	static const float SUCCEED_GAUGE_VALUE;//どこまで回復したら成功とするか
+	float nowGauge;//戦略開始時の優勢ゲージ
+	int timer;
+	int timeOver;
+
+	//クラッシュさせる--------------------------
+	bool crashEnemyFlag;
+
+
+
+	//クラッシュされないようにする--------------------------
+	bool dontCrashFlag;
 };

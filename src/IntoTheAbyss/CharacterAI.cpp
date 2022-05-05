@@ -62,14 +62,19 @@ void CharacterAI::Update()
 	//キャラクターAIに必要なデータ集め--------------------------
 
 
-	if (initFlag)
+	if (initFlag && !staminaInit)
 	{
 		float value = restoreStamina->EvaluationFunction();
+		restoreStamina->Init();
+		staminaInit = true;
+	}
+	//move->Update(Vec2<float>(15.0f, 0.0f));
 
+	if (initFlag)
+	{
 		restoreStamina->route = shortestData;
 		restoreStamina->Update();
 	}
-	//move->Update(Vec2<float>(15.0f, 0.0f));
 }
 
 void CharacterAI::Draw()

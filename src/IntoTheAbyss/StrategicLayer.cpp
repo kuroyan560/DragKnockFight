@@ -249,3 +249,63 @@ RestoreStamina::SearchData RestoreStamina::SearchItem(const SphereCollision &DAT
 
 	return result;
 }
+
+const float AcquireASuperiorityGauge::SUCCEED_GAUGE_VALUE = 0.3f;
+
+AcquireASuperiorityGauge::AcquireASuperiorityGauge()
+{
+}
+
+void AcquireASuperiorityGauge::Init()
+{
+	nowGauge = CharacterAIData::Instance()->bossData.gaugeValue;
+	timer = 0;
+	timeOver = 60 * 10;
+
+	crashEnemyFlag = false;
+	dontCrashFlag = false;
+}
+
+void AcquireASuperiorityGauge::Update()
+{
+	//ウェイポイント
+	const std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints = CharacterAIData::Instance()->wayPoints;
+
+	//自分が有利不利か判断する
+	//クラッシュされる位置かされない位置かで判断する
+
+
+	//自分が有利ならクラッシュしに行く
+	if (crashEnemyFlag)
+	{
+
+	}
+
+	//自分が不利ならクラッシュされないように立ち回る
+	if (dontCrashFlag)
+	{
+
+	}
+
+
+	//戦略実行中
+	++timer;
+}
+
+AiResult AcquireASuperiorityGauge::CurrentProgress()
+{
+	//一定時間内に一定量回復したら成功、出来なければ失敗
+	int sub = nowGauge - CharacterAIData::Instance()->bossData.gaugeValue;
+	if (SUCCEED_GAUGE_VALUE <= sub && timer < timeOver)
+	{
+		return AiResult::OPERATE_SUCCESS;
+	}
+	else if (timeOver <= timer)
+	{
+		return AiResult::OPERATE_FAIL;
+	}
+	else
+	{
+		return AiResult::OPERATE_INPROCESS;
+	}
+}

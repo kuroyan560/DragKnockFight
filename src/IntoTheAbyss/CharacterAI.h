@@ -30,5 +30,6 @@ public:
 	std::unique_ptr<RestoreStamina>restoreStamina;
 
 	bool initFlag = false;
+	bool staminaInit = false;
 };
 
