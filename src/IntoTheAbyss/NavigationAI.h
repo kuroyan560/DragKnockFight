@@ -81,8 +81,8 @@ public:
 	};
 
 	bool resetSearchFlag;
-	static const int WAYPOINT_MAX_X = 10;	 //X軸のウェイポイントの数
-	static const int WAYPOINT_MAX_Y = 10;	 //Y軸のウェイポイントの数
+	static const int WAYPOINT_MAX_X = 100;	 //X軸のウェイポイントの数
+	static const int WAYPOINT_MAX_Y = 100;	 //Y軸のウェイポイントの数
 
 
 	std::array<std::array<std::shared_ptr<WayPointData>, NavigationAI::WAYPOINT_MAX_Y>, NavigationAI::WAYPOINT_MAX_X> wayPoints;//ウェイポイントの配列
