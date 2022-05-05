@@ -32,4 +32,6 @@ public:
 	float position;	//Œ»İ’n
 
 	bool swingFlag;//U‚è‰ñ‚µ“ü—Í
+
+	const int EVALUATION_MAX_VALUE = 10;
 };

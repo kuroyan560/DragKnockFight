@@ -64,10 +64,12 @@ void CharacterAI::Update()
 
 	if (initFlag)
 	{
+		float value = restoreStamina->EvaluationFunction();
+
 		//restoreStamina->route = shortestData;
 		//restoreStamina->Update();
 	}
-	move->Update(Vec2<float>(15.0f, 0.0f));
+	//move->Update(Vec2<float>(15.0f, 0.0f));
 }
 
 void CharacterAI::Draw()

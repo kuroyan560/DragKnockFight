@@ -194,7 +194,7 @@ float RestoreStamina::EvaluationFunction()
 	//自陣へのウェイポイントが少ない
 
 
-	return static_cast<float>(evaluationValue / 10);
+	return static_cast<float>(evaluationValue / data->EVALUATION_MAX_VALUE);
 }
 
 RestoreStamina::SearchData RestoreStamina::SearchItem(const SphereCollision &DATA)
