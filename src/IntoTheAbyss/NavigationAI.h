@@ -23,6 +23,8 @@ struct WayPointData
 	int branchReferenceCount;				//何回その分岐を参照したか
 	bool isWall;							//壁かどうか 今までは壁にはウェイポイントを配置しないという処理になっていたが、接続の探索のしやすさから壁にもウェイポイントを設置するようにしました。
 
+	int numberOfItemHeld;					// 保持アイテム数	
+
 	float wallDistanceTop;					//上方向の壁までの距離
 	float wallDistanceBottom;				//下方向の壁までの距離
 	float wallDistanceLeft;					//左方向の壁までの距離

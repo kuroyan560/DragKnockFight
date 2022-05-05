@@ -70,5 +70,6 @@ public:
 	inline const float& GetHealAmount() { return healAmount; }	// ヒール量のゲッタ
 	inline const CHARA_ID& GetCharaID() { return charaID; }		// 取得したキャラのID 右か左か
 	inline const std::shared_ptr<SphereCollision> GetCollisionData() { return collisionData; }	// 当たり判定データのゲッタ
+	inline const Vec2<float>& GetPos() { return pos; }			// 座標のゲッタ
 
 };

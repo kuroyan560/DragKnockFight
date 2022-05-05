@@ -44,5 +44,6 @@ public:
 
 	// アイテム配列のゲッタ
 	inline const std::array<StaminaItem, ITEM_COUNT> GetItemArray() { return item; }
+	inline const Vec2<float> GetPos(const int& Index){return item[Index].GetPos();}
 
 };
