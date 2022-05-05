@@ -346,10 +346,19 @@ void Player::OnHitMapChip(const HIT_DIR& Dir)
 }
 void Player::OnPilotControl()
 {
-	static const float PILOT_SPEED = 20.0f;
-	const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0.5f,0.5f });
-	auto move = rightStickVec * PILOT_SPEED;
-	pilotPos += move;
+	const auto rightStickVec = UsersInput::Instance()->GetRightStickVec(controllerIdx, { 0.9f,0.9f });
+	//static const float PILOT_SPEED = 18.0f;
+	//auto move = rightStickVec * PILOT_SPEED;
+	//pilotPos += move;
+	const float PILOT_ACCEL_SPEED = 4.0f;
+	//const auto accel = rightStickVec * PILOT_ACCEL_SPEED;
+	//pilotVel += accel;
+	pilotAccel = KuroMath::Lerp(pilotAccel, rightStickVec * PILOT_ACCEL_SPEED, 0.3f);
+	pilotVel += pilotAccel;
+	pilotPos += pilotVel;
+
+	//ãÛãCíÔçRÇ≈å∏ë¨
+	pilotVel = KuroMath::Lerp(pilotVel, { 0,0 }, 0.1f);
 }
 
 void Player::Input(const vector<vector<int>>& MapData)

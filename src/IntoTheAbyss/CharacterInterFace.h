@@ -84,6 +84,8 @@ protected:
 	int arrowHandle;
 	int reticleHandle;
 
+	//パイロットがロボから離れられる最大距離
+	const float PILOT_RANGE = 300.0f;
 	Vec2<float>pilotPos;	// パイロットの座標
 	Vec2<float>pilotSize = { 64.0f,64.0f };	//パイロットのサイズ
 

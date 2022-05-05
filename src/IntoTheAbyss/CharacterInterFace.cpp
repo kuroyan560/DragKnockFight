@@ -381,6 +381,13 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	if (isPilotDetached)
 	{
 		OnPilotControl();
+
+		const auto vec = pilotPos - pos;
+		if (PILOT_RANGE < vec.Length())
+		{
+			pilotPos = pos + vec.GetNormal() * PILOT_RANGE;
+		}
+
 		//スタミナ消費
 		if (!staminaGauge->ConsumesStaminaByGauge(0.5f))
 		{
@@ -510,7 +517,8 @@ void CharacterInterFace::Draw()
 		const auto pilotDrawPos = ScrollMgr::Instance()->Affect(pilotPos);
 		const auto teamColor = GetTeamColor();
 		DrawFunc::DrawLine2D(pilotDrawPos, ScrollMgr::Instance()->Affect(pos), teamColor);
-		DrawFunc::DrawBox2D(pilotDrawPos - pilotSize / 2.0f, pilotDrawPos + pilotSize / 2.0f, teamColor, true);
+		const auto sizeHalf = pilotSize * ScrollMgr::Instance()->zoom / 2.0f;
+		DrawFunc::DrawBox2D(pilotDrawPos - sizeHalf, pilotDrawPos + sizeHalf, teamColor, true);
 	}
 
 	bulletMgr.Draw();

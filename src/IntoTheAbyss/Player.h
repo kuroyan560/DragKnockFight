@@ -112,6 +112,10 @@ public:
 	//チュートリアルアイコン
 	std::weak_ptr<Tutorial>tutorial;
 
+	//パイロットの移動速度
+	Vec2<float>pilotVel;
+	Vec2<float>pilotAccel;
+
 public:
 
 	/*-- メンバ関数 --*/
@@ -158,7 +162,7 @@ private:
 	}
 	void OnPilotLeave()override	//パイロットがロボから離れた瞬間
 	{
-
+		pilotVel = { 0,0 };
 	}
 	void OnPilotControl()override;		//パイロットを動かす処理
 	void OnPilotReturn()override	//パイロットがロボに戻った瞬間
