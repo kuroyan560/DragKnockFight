@@ -39,7 +39,7 @@ void ScrollMgr::Update(const Vec2<float>& LineCenterPos)
 	Vec2<float> lineCenterOffsetBuff = Vec2<float>((float)windowCenter.x, (float)windowCenter.y) - lineCenterPos;
 
 	// •âŠ®‚ğ‚©‚¯‚éB
-	lineCenterOffset += ( lineCenterOffsetBuff - lineCenterOffset ) / 5.0f;
+	lineCenterOffset += (lineCenterOffsetBuff - lineCenterOffset) / 5.0f;
 
 }
 

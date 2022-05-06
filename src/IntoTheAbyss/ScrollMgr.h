@@ -11,10 +11,10 @@ class ScrollMgr : public Singleton<ScrollMgr> {
 public:
 	ScrollMgr() :zoom(1.0f)
 	{};
-	void Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, const Vec2<float> &ADJ);
+	void Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, const Vec2<float>& ADJ);
 	void Update(const Vec2<float>& LineCenterPos);
-	void CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS);
-	Vec2<float>Affect(const Vec2<float> &Pos);//スクロールとズームを適用させる
+	void CalucurateScroll(const Vec2<float>& VEL, const Vec2<float>& PLAYER_POS);
+	Vec2<float>Affect(const Vec2<float>& Pos);//スクロールとズームを適用させるk
 
 	void Warp(const Vec2<float> POS);
 	void Reset();
@@ -35,7 +35,7 @@ private:
 
 	Vec2<float>resetAmount;
 public:
-	Vec2<float> CaluStartScrollLine(const Vec2<float> &SIZE)
+	Vec2<float> CaluStartScrollLine(const Vec2<float>& SIZE)
 	{
 		Vec2<float> distance(0.0f, 0.0f);
 		Vec2<float> startPos;
@@ -46,7 +46,7 @@ public:
 	};
 
 
-	Vec2<float> CaluEndScrollLine(const Vec2<float> &SIZE)
+	Vec2<float> CaluEndScrollLine(const Vec2<float>& SIZE)
 	{
 		Vec2<float> distance(mapSize.x, mapSize.y);
 		Vec2<float> endPos;
