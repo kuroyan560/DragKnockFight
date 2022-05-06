@@ -8,40 +8,71 @@
 /// 戦術層
 /// </summary>
 
-
 /// <summary>
-/// スタミナの回復
+/// 戦略層の抽象クラス
 /// </summary>
-class RestoreStamina
+class IStrategicLayer
 {
-public:
-	RestoreStamina();
-
-	void Init();
+	virtual void Init() = 0;
 
 	/// <summary>
 	/// 実行
 	/// </summary>
-	void Update();
+	virtual void Update() = 0;
 
 	/// <summary>
 	/// 現在実行している処理の進捗
 	/// </summary>
 	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
-	AiResult CurrentProgress();
+	virtual AiResult CurrentProgress() = 0;
 
+	/// <summary>
+	/// 評価値の算出
+	/// </summary>
+	/// <returns>評価値</returns>
+	virtual float EvaluationFunction() = 0;
 
-	float EvaluationFunction();
-
-
-	Vec2<float>startPos, endPos;
-	Vec2<int>startHandle,endHandle;
+public:
 	WayPointData startPoint, endPoint;
-	bool startFlag;
 	std::vector<WayPointData> route;
+	bool startFlag;
+
+protected:
+	int timer;
+	int timeOver;
+};
+
+
+
+
+/// <summary>
+/// スタミナの回復
+/// </summary>
+class RestoreStamina :public IStrategicLayer
+{
+public:
+	RestoreStamina();
+
+	void Init()override;
+
+	/// <summary>
+	/// 実行
+	/// </summary>
+	void Update()override;
+
+	/// <summary>
+	/// 現在実行している処理の進捗
+	/// </summary>
+	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
+	AiResult CurrentProgress()override;
+
+
+	float EvaluationFunction()override;
+
+
 private:
 	FollowPath followPath;
-	SearchWayPoint searchStartPoint,searchGoalPoint;
+	SearchWayPoint searchStartPoint, searchGoalPoint;
 	MoveToOwnGround moveToOnwGround;
 
 	std::vector<Vec2<float>>itemList;
@@ -69,8 +100,6 @@ private:
 
 	//成否--------------------------
 	int staminaGauge;
-	int timer;
-	int timeOver;
 	static const int SUCCEED_GAIN_STAMINA_VALUE;//どれぐらいの値
 
 };
@@ -78,32 +107,28 @@ private:
 /// <summary>
 /// 自陣に向かう
 /// </summary>
-class GoToTheField
+class GoToTheField :public IStrategicLayer
 {
 public:
 	GoToTheField();
 
-	void Init();
+	void Init()override;
 
 	/// <summary>
 	/// 実行
 	/// </summary>
-	void Update();
+	void Update()override;
 
 	/// <summary>
 	/// 現在実行している処理の進捗
 	/// </summary>
 	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
-	AiResult CurrentProgress();
+	AiResult CurrentProgress()override;
 
-	WayPointData startPoint, endPoint;
-	bool startFlag;
-	std::vector<WayPointData>route;
+	float EvaluationFunction();
+
 	MoveToOwnGround moveToOnwGround;
 private:
-	int timer;
-	int timeOver;
-
 	bool goToTheFieldFlag;
 
 };
@@ -113,7 +138,7 @@ private:
 /// <summary>
 /// 優勢ゲージを獲得する
 /// </summary>
-class AcquireASuperiorityGauge
+class AcquireASuperiorityGauge :public IStrategicLayer
 {
 public:
 	AcquireASuperiorityGauge();
@@ -131,12 +156,11 @@ public:
 	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
 	AiResult CurrentProgress();
 
+	float EvaluationFunction();
+
 private:
 	static const float SUCCEED_GAUGE_VALUE;//どこまで回復したら成功とするか
 	float nowGauge;//戦略開始時の優勢ゲージ
-	int timer;
-	int timeOver;
-
 	//クラッシュさせる--------------------------
 	bool crashEnemyFlag;
 

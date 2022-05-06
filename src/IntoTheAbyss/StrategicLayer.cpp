@@ -50,7 +50,6 @@ void RestoreStamina::Update()
 			//ゴール地点から最も近いウェイポイントをゴール地点とする--------------------------
 			searchGoalPoint.Init(*item[searchItemIndex].GetCollisionData()->center);
 			endPoint = searchGoalPoint.Update();
-			endPos = endPoint.pos;
 			//ゴール地点から最も近いウェイポイントをゴール地点とする--------------------------
 
 			prevItemIndex = result.itemIndex;
@@ -85,7 +84,6 @@ void RestoreStamina::Update()
 		{
 			searchStartPoint.Init(*searchArea.center);
 			startPoint = searchStartPoint.Update();
-			startPos = startPoint.pos;
 		}
 		//ボスから最も近いウェイポイントをスタート地点とする------------------------
 
@@ -306,11 +304,12 @@ AiResult AcquireASuperiorityGauge::CurrentProgress()
 	}
 }
 
-GoToTheField::GoToTheField()
+float AcquireASuperiorityGauge::EvaluationFunction()
 {
+	return 0.0f;
 }
 
-void GoToTheField::Init()
+GoToTheField::GoToTheField()
 {
 	timer = 0;
 	timeOver = 60 * 10;
@@ -318,14 +317,19 @@ void GoToTheField::Init()
 	goToTheFieldFlag = true;
 }
 
+void GoToTheField::Init()
+{
+
+}
+
 void GoToTheField::Update()
 {
 	//自分が自陣に近づく
 	if (goToTheFieldFlag)
 	{
-		//moveToOnwGround.Update();
-		//startPoint = moveToOnwGround.startPoint;
-		//endPoint = moveToOnwGround.endPoint;
+		moveToOnwGround.Update();
+		startPoint = moveToOnwGround.startPoint;
+		endPoint = moveToOnwGround.endPoint;
 		startFlag = true;
 	}
 	//自分が敵陣に近づかない
@@ -357,4 +361,9 @@ AiResult GoToTheField::CurrentProgress()
 	{
 		return AiResult::OPERATE_INPROCESS;
 	}
+}
+
+float GoToTheField::EvaluationFunction()
+{
+	return 0.0f;
 }
