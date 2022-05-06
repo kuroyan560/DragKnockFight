@@ -1,9 +1,8 @@
 #include "BehavioralLayer.h"
 #include"CharacterManager.h"
 
-MovingBetweenTwoPoints::MovingBetweenTwoPoints(const std::shared_ptr<OperateMove> &OPERATION)
+MovingBetweenTwoPoints::MovingBetweenTwoPoints()
 {
-	operateMove = OPERATION;
 	initFlag = false;
 }
 
@@ -28,9 +27,9 @@ void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float
 void MovingBetweenTwoPoints::Update()
 {
 	++timer;
-	operateMove->Update(vel);
+	operateMove.Update(vel);
 	//移動に成功
-	if (operateMove->CurrentProgress() == AiResult::OPERATE_SUCCESS)
+	if (operateMove.CurrentProgress() == AiResult::OPERATE_SUCCESS)
 	{
 		bool debug = false;
 	}
@@ -58,7 +57,7 @@ AiResult MovingBetweenTwoPoints::CurrentProgress()
 	}
 }
 
-SearchWayPoint::SearchWayPoint(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAY_POINTS) :wayPoints(WAY_POINTS)
+SearchWayPoint::SearchWayPoint()
 {
 }
 
@@ -69,6 +68,7 @@ void SearchWayPoint::Init(const Vec2<float> &START_POS)
 
 const WayPointData &SearchWayPoint::Update()
 {
+	wayPoints = CharacterAIData::Instance()->wayPoints;
 	float minDistance = 1000000.0f;
 	Vec2<int>handle;
 	//最も近いウェイポイントの探索

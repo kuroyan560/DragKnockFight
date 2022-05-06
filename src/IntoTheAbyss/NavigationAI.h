@@ -58,6 +58,8 @@ struct WayPointData
 class NavigationAI
 {
 public:
+	NavigationAI();
+
 	/// <summary>
 	/// ƒ|ƒCƒ“ƒg‚Ì¶¬
 	/// </summary>

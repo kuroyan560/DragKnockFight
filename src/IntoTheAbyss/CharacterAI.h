@@ -18,17 +18,10 @@ public:
 	void Init();
 	void Update();
 	void Draw();
-	std::shared_ptr<FollowPath> moveToGoal;
-	std::shared_ptr<MovingBetweenTwoPoints> betweenPoints;
-	std::shared_ptr<OperateMove>move;
 
-	std::shared_ptr<Vec2<float>>pos;
 	std::vector<WayPointData> shortestData;
-
-	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
-
-	std::unique_ptr<RestoreStamina>restoreStamina;
-	std::unique_ptr<GoToTheField>goToTheField;
+	RestoreStamina restoreStamina;
+	GoToTheField goToTheField;
 
 	bool initFlag = false;
 	bool staminaInit = false;

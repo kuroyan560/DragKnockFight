@@ -15,11 +15,7 @@
 class RestoreStamina
 {
 public:
-	RestoreStamina(
-		const std::shared_ptr<FollowPath> &FOLLOW_PATH,
-		const std::shared_ptr<MovingBetweenTwoPoints>& MOVING_BETWEEN_TOW_POINTS,
-		const const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAYPOINTS
-	);
+	RestoreStamina();
 
 	void Init();
 
@@ -44,9 +40,9 @@ public:
 	bool startFlag;
 	std::vector<WayPointData> route;
 private:
-	std::shared_ptr<FollowPath> followPath;
-	std::unique_ptr<SearchWayPoint> searchStartPoint,searchGoalPoint;
-	std::unique_ptr<MoveToOwnGround> moveToOnwGround;
+	FollowPath followPath;
+	SearchWayPoint searchStartPoint,searchGoalPoint;
+	MoveToOwnGround moveToOnwGround;
 
 	std::vector<Vec2<float>>itemList;
 	bool initRouteFlag;
@@ -85,7 +81,7 @@ private:
 class GoToTheField
 {
 public:
-	GoToTheField(const std::shared_ptr<FollowPath> &OPERATE);
+	GoToTheField();
 
 	void Init();
 
@@ -103,7 +99,7 @@ public:
 	WayPointData startPoint, endPoint;
 	bool startFlag;
 	std::vector<WayPointData>route;
-	std::unique_ptr<MoveToOwnGround> moveToOnwGround;
+	MoveToOwnGround moveToOnwGround;
 private:
 	int timer;
 	int timeOver;

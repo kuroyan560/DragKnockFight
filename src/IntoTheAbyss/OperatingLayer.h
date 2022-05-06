@@ -12,12 +12,7 @@
 class OperateMove
 {
 public:
-	/// <summary>
-	/// 生成する際、座標と移動量を渡す
-	/// </summary>
-	/// <param name="POS">対象のキャラクターの座標</param>
-	/// <param name="VELOCITY">移動量</param>
-	OperateMove(const std::shared_ptr<Vec2<float>> &POS);
+	OperateMove();
 
 	/// <summary>
 	/// 実行
@@ -29,9 +24,6 @@ public:
 	/// </summary>
 	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
 	AiResult CurrentProgress();
-
-	std::shared_ptr<Vec2<float>>pos;
-	Vec2<float> vel;
 private:
 	bool initFlag;
 	Vec2<float>oldPos;

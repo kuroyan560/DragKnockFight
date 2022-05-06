@@ -13,6 +13,11 @@ const float NavigationAI::SERACH_LAY_UPDOWN_DISTANCE = 300.0f;
 const float NavigationAI::SERACH_LAY_LEFTRIGHT_DISTANCE = 350.0f;
 const float NavigationAI::SERACH_LAY_NANAME_DISTANCE = 400.0f;
 
+NavigationAI::NavigationAI()
+{
+	startFlag = false;
+}
+
 void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 {
 	SizeData wallMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);

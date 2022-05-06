@@ -13,7 +13,7 @@
 class FollowPath
 {
 public:
-	FollowPath(const std::shared_ptr<MovingBetweenTwoPoints> &OPERATE);
+	FollowPath();
 
 	void Init(const std::vector<WayPointData> &ROUTE);
 
@@ -29,7 +29,7 @@ public:
 	AiResult CurrentProgress();
 
 private:
-	std::shared_ptr<MovingBetweenTwoPoints> operateFollow;
+	MovingBetweenTwoPoints operateFollow;
 	std::vector<WayPointData> route;
 	Vec2<float>startPos, endPos;
 	int routeHandle;
@@ -45,7 +45,7 @@ private:
 class MoveToOwnGround
 {
 public:
-	MoveToOwnGround(const std::shared_ptr<FollowPath> &OPERATE);
+	MoveToOwnGround();
 
 	void Init();
 
@@ -63,8 +63,8 @@ public:
 	WayPointData startPoint, endPoint;
 	std::vector<WayPointData>route;
 private:
-	std::shared_ptr<FollowPath>followPath;
-	std::shared_ptr<SearchWayPoint> searchPoint;
+	FollowPath followPath;
+	SearchWayPoint searchPoint;
 
 	Vec2<int>prevStartHandle, prevEndHandle;
 	int timer, timeOver;

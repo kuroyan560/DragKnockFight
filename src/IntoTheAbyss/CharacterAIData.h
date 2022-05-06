@@ -35,4 +35,6 @@ public:
 	bool dashFlag;//ƒ_ƒbƒVƒ…“ü—Í
 
 	const int EVALUATION_MAX_VALUE = 10;
+
+	Vec2<float> vel;//ˆÚ“®—Ê
 };

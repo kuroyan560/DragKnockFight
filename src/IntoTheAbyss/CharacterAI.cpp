@@ -6,37 +6,19 @@
 
 CharacterAI::CharacterAI()
 {
-	pos = std::make_shared<Vec2<float>>();
-
-	//‘€ì‘w‚Ì¶¬--------------------------
-	move = std::make_shared<OperateMove>(pos);
-	//‘€ì‘w‚Ì¶¬--------------------------
-
-	//U‚é•‘‚¢‘w‚Ì¶¬--------------------------
-	betweenPoints = std::make_shared<MovingBetweenTwoPoints>(move);
-	//U‚é•‘‚¢‘w‚Ì¶¬--------------------------
-
-	//íp‘w‚Ì¶¬--------------------------
-	moveToGoal = std::make_shared<FollowPath>(betweenPoints);
-	//íp‘w‚Ì¶¬--------------------------
-
-
 	//í—ª‘w‚Ì¶¬--------------------------
 	
 	//í—ª‘w‚Ì¶¬--------------------------
+
+	startFlag = false;
 }
 
 void CharacterAI::Init()
 {
-	//restoreStamina->Init();
 	//‰¼’u‚«
-	restoreStamina = std::make_unique<RestoreStamina>
-		(moveToGoal, betweenPoints, wayPoints);
 	initFlag = true;
-
-
-	goToTheField = std::make_unique<GoToTheField>(moveToGoal);
-	goToTheField->Init();
+	restoreStamina.Init();
+	goToTheField.Init();
 }
 
 void CharacterAI::Update()
@@ -67,8 +49,8 @@ void CharacterAI::Update()
 
 	if (initFlag && !staminaInit)
 	{
-		float value = restoreStamina->EvaluationFunction();
-		restoreStamina->Init();
+		float value = restoreStamina.EvaluationFunction();
+		restoreStamina.Init();
 		staminaInit = true;
 	}
 	//move->Update(Vec2<float>(15.0f, 0.0f));
@@ -81,12 +63,12 @@ void CharacterAI::Update()
 		//endPoint = restoreStamina->endPoint;
 		//startFlag = restoreStamina->startFlag;
 
-		goToTheField->moveToOnwGround->route = shortestData;
-		goToTheField->Update();
-		startPoint = goToTheField->startPoint;
-		endPoint = goToTheField->endPoint;
-		startFlag = goToTheField->startFlag;
-		vel = move->vel;
+		goToTheField.moveToOnwGround.route = shortestData;
+		goToTheField.Update();
+		startPoint = goToTheField.startPoint;
+		endPoint = goToTheField.endPoint;
+		startFlag = goToTheField.startFlag;
+		CharacterManager::Instance()->Right()->vel = CharacterAIData::Instance()->vel;
 	}
 }
 
@@ -94,7 +76,5 @@ void CharacterAI::Draw()
 {
 	if (initFlag)
 	{
-		Vec2<float>drawPos = *pos;
-		DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(drawPos), 10.0f, Color(128, 0, 128, 255));
 	}
 }

@@ -20,7 +20,7 @@ public:
 	/// </summary>
 	/// <param name="POS">対象のキャラクターの座標</param>
 	/// <param name="VELOCITY">移動量</param>
-	MovingBetweenTwoPoints(const std::shared_ptr<OperateMove> &OPERATION);
+	MovingBetweenTwoPoints();
 
 	void Init(const Vec2<float> &START_POS, const Vec2<float> &END_POS);
 
@@ -36,7 +36,7 @@ public:
 	AiResult CurrentProgress();
 
 private:
-	std::shared_ptr<OperateMove> operateMove;
+	OperateMove operateMove;
 	Vec2<float>startPos;
 	Vec2<float>endPos;
 	Vec2<float>vel;
@@ -54,7 +54,7 @@ private:
 class SearchWayPoint
 {
 public:
-	SearchWayPoint(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAY_POINTS);
+	SearchWayPoint();
 
 	void Init(const Vec2<float> &START_POS);
 
@@ -69,7 +69,7 @@ public:
 	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
 	AiResult CurrentProgress();
 private:
-	const std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
+	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
 	Vec2<float>startPos;
 	
 };

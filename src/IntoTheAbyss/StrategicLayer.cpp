@@ -7,10 +7,8 @@
 const float RestoreStamina::SEARCH_RADIUS = 500.0f;
 const int RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 3;
 
-RestoreStamina::RestoreStamina(const std::shared_ptr<FollowPath> &FOLLOW_PATH, const std::shared_ptr<MovingBetweenTwoPoints> &MOVING_BETWEEN_TOW_POINTS, const std::vector<std::vector<std::shared_ptr<WayPointData>>> &WAYPOINTS) :followPath(FOLLOW_PATH)
+RestoreStamina::RestoreStamina()
 {
-	searchStartPoint = std::make_unique<SearchWayPoint>(WAYPOINTS);
-	searchGoalPoint = std::make_unique<SearchWayPoint>(WAYPOINTS);
 	initRouteFlag = true;
 
 	seachItemFlag = true;
@@ -24,7 +22,6 @@ RestoreStamina::RestoreStamina(const std::shared_ptr<FollowPath> &FOLLOW_PATH, c
 	initFlag = true;
 	getFlag = false;
 
-	moveToOnwGround = std::make_unique<MoveToOwnGround>(followPath);
 	startFlag = true;
 }
 
@@ -51,8 +48,8 @@ void RestoreStamina::Update()
 			seachItemFlag = false;
 			initFlag = false;
 			//ゴール地点から最も近いウェイポイントをゴール地点とする--------------------------
-			searchGoalPoint->Init(*item[searchItemIndex].GetCollisionData()->center);
-			endPoint = searchGoalPoint->Update();
+			searchGoalPoint.Init(*item[searchItemIndex].GetCollisionData()->center);
+			endPoint = searchGoalPoint.Update();
 			endPos = endPoint.pos;
 			//ゴール地点から最も近いウェイポイントをゴール地点とする--------------------------
 
@@ -75,10 +72,10 @@ void RestoreStamina::Update()
 	//アイテムが無い場合は基本陣地に向かう
 	if (!getFlag)
 	{
-		moveToOnwGround->route = route;
-		moveToOnwGround->Update();
-		startPoint = moveToOnwGround->startPoint;
-		endPoint = moveToOnwGround->endPoint;
+		moveToOnwGround.route = route;
+		moveToOnwGround.Update();
+		startPoint = moveToOnwGround.startPoint;
+		endPoint = moveToOnwGround.endPoint;
 	}
 	//アイテムが見つかったらその方向に向かう
 	else
@@ -86,8 +83,8 @@ void RestoreStamina::Update()
 		//ボスから最も近いウェイポイントをスタート地点とする------------------------
 		if (startPoint.handle != endPoint.handle)
 		{
-			searchStartPoint->Init(*searchArea.center);
-			startPoint = searchStartPoint->Update();
+			searchStartPoint.Init(*searchArea.center);
+			startPoint = searchStartPoint.Update();
 			startPos = startPoint.pos;
 		}
 		//ボスから最も近いウェイポイントをスタート地点とする------------------------
@@ -95,13 +92,13 @@ void RestoreStamina::Update()
 		//探索を開始し、向かう--------------------------
 		if (route.size() != 0 && (!initRouteFlag || prevStartHandle != startPoint.handle))
 		{
-			followPath->Init(route);
+			followPath.Init(route);
 			initRouteFlag = true;
 		}
 		prevStartHandle = startPoint.handle;
 
 		//ウェイポイントに沿って移動する
-		followPath->Update();
+		followPath.Update();
 		//探索を開始し、向かう--------------------------
 
 
@@ -309,9 +306,8 @@ AiResult AcquireASuperiorityGauge::CurrentProgress()
 	}
 }
 
-GoToTheField::GoToTheField(const std::shared_ptr<FollowPath> &OPERATE)
+GoToTheField::GoToTheField()
 {
-	moveToOnwGround = std::make_unique<MoveToOwnGround>(OPERATE);
 }
 
 void GoToTheField::Init()
@@ -327,9 +323,9 @@ void GoToTheField::Update()
 	//自分が自陣に近づく
 	if (goToTheFieldFlag)
 	{
-		moveToOnwGround->Update();
-		startPoint = moveToOnwGround->startPoint;
-		endPoint = moveToOnwGround->endPoint;
+		moveToOnwGround.Update();
+		startPoint = moveToOnwGround.startPoint;
+		endPoint = moveToOnwGround.endPoint;
 		startFlag = true;
 	}
 	//自分が敵陣に近づかない

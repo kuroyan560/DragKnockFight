@@ -544,24 +544,21 @@ void Game::Update()
 
 
 
-	chara.shortestData = navi.GetShortestRoute();
-	chara.wayPoints = navi.wayPoints;
+	//chara.shortestData = navi.GetShortestRoute();
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
-		chara.Init();
+		//chara.Init();
 	}
 
-	chara.Update();
+	//chara.Update();
 
 	//if (chara.restoreStamina != nullptr)
 	{
-
-		CharacterManager::Instance()->Right()->vel = chara.vel;
-		*chara.pos = CharacterManager::Instance()->Right()->pos;
-		navi.startPoint = chara.startPoint;
-		navi.endPoint = chara.endPoint;
-		navi.startFlag = chara.startFlag;
+		//navi.startPoint = chara.startPoint;
+		//navi.endPoint = chara.endPoint;
+		//navi.startFlag = chara.startFlag;
 	}
+	navi.Update({});
 
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
@@ -582,7 +579,6 @@ void Game::Update()
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();
 
-	navi.Update({});
 
 	// 振り回し管理クラスの更新処理
 	//SwingMgr::Instance()->Update(player.centerPos, boss.pos, lineLengthBoss + lineLengthPlayer + addLineLengthBoss + addLineLengthPlayer);
@@ -908,7 +904,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	}
 
 	navi.Draw();
-	chara.Draw();
+	//chara.Draw();
 }
 
 void Game::Scramble()

@@ -1,9 +1,8 @@
 #include "OperatingLayer.h"
 #include"CharacterManager.h"
-OperateMove::OperateMove(const std::shared_ptr<Vec2<float>> &POS)
+
+OperateMove::OperateMove()
 {
-	//pos = POS;
-	//oldPos = CharacterManager::Instance()->Right()->pos;
 	initFlag = false;
 }
 
@@ -15,7 +14,7 @@ void OperateMove::Update(const Vec2<float> &VELOCITY)
 		oldPos = CharacterManager::Instance()->Right()->pos;
 		initFlag = true;
 	}
-	vel = VELOCITY;
+	CharacterAIData::Instance()->vel = VELOCITY;
 	oldPos = CharacterManager::Instance()->Right()->pos;
 }
 
