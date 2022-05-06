@@ -13,6 +13,9 @@
 /// </summary>
 class IStrategicLayer
 {
+public:
+	~IStrategicLayer() {};
+
 	virtual void Init() = 0;
 
 	/// <summary>
@@ -32,7 +35,6 @@ class IStrategicLayer
 	/// <returns>•]‰¿’l</returns>
 	virtual float EvaluationFunction() = 0;
 
-public:
 	WayPointData startPoint, endPoint;
 	std::vector<WayPointData> route;
 	bool startFlag;

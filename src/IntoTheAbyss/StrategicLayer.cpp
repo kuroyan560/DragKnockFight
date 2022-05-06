@@ -327,6 +327,7 @@ void GoToTheField::Update()
 	//©•ª‚ª©w‚É‹ß‚Ã‚­
 	if (goToTheFieldFlag)
 	{
+		moveToOnwGround.route = route;
 		moveToOnwGround.Update();
 		startPoint = moveToOnwGround.startPoint;
 		endPoint = moveToOnwGround.endPoint;

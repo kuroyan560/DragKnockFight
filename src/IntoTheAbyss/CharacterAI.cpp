@@ -7,8 +7,8 @@
 CharacterAI::CharacterAI()
 {
 	//í—ª‘w‚Ì¶¬--------------------------
-	goToTheField = std::make_unique<GoToTheField>();
-	restoreStamina = std::make_unique<RestoreStamina>();
+	strategyArray[0] = std::make_unique<RestoreStamina>();
+	strategyArray[1] = std::make_unique<GoToTheField>();
 	//í—ª‘w‚Ì¶¬--------------------------
 
 	startFlag = false;
@@ -20,6 +20,8 @@ void CharacterAI::Init()
 	initFlag = true;
 	//restoreStamina.Init();
 	//goToTheField.Init();
+
+	StrategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
 }
 
 void CharacterAI::Update()
@@ -54,21 +56,17 @@ void CharacterAI::Update()
 		//restoreStamina.Init();
 		staminaInit = true;
 	}
-	//move->Update(Vec2<float>(15.0f, 0.0f));
 
 	if (initFlag)
 	{
-		//restoreStamina->route = shortestData;
-		//restoreStamina->Update();
-		//startPoint = restoreStamina->startPoint;
-		//endPoint = restoreStamina->endPoint;
-		//startFlag = restoreStamina->startFlag;
+		strategyArray[StrategyOfChoice]->route = shortestData;
+		strategyArray[StrategyOfChoice]->Update();
 
-		goToTheField->moveToOnwGround.route = shortestData;
-		goToTheField->Update();
-		startPoint = goToTheField->startPoint;
-		endPoint = goToTheField->endPoint;
-		startFlag = goToTheField->startFlag;
+
+		//ó‚¯“n‚µ-----------------------------------------------------
+		startPoint = strategyArray[StrategyOfChoice]->startPoint;
+		endPoint = strategyArray[StrategyOfChoice]->endPoint;
+		startFlag = strategyArray[StrategyOfChoice]->startFlag;
 		CharacterManager::Instance()->Right()->vel = CharacterAIData::Instance()->vel;
 	}
 }
