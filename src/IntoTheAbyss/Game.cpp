@@ -544,20 +544,19 @@ void Game::Update()
 
 
 
-	//chara.shortestData = navi.GetShortestRoute();
+	chara.shortestData = navi.GetShortestRoute();
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
-		//chara.Init();
+		chara.Init();
 	}
 
-	//chara.Update();
+	chara.Update();
 
-	//if (chara.restoreStamina != nullptr)
-	{
-		//navi.startPoint = chara.startPoint;
-		//navi.endPoint = chara.endPoint;
-		//navi.startFlag = chara.startFlag;
-	}
+
+	navi.startPoint = chara.startPoint;
+	navi.endPoint = chara.endPoint;
+	navi.startFlag = chara.startFlag;
+
 	navi.Update({});
 
 	// プレイヤーとボスの引っ張り合いの処理

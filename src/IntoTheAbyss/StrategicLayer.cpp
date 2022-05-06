@@ -323,15 +323,14 @@ void GoToTheField::Update()
 	//©•ª‚ª©w‚É‹ß‚Ã‚­
 	if (goToTheFieldFlag)
 	{
-		moveToOnwGround.Update();
-		startPoint = moveToOnwGround.startPoint;
-		endPoint = moveToOnwGround.endPoint;
+		//moveToOnwGround.Update();
+		//startPoint = moveToOnwGround.startPoint;
+		//endPoint = moveToOnwGround.endPoint;
 		startFlag = true;
 	}
 	//©•ª‚ª“Gw‚É‹ß‚Ã‚©‚È‚¢
 	else
 	{
-
 	}
 
 	//“G‚ğU‚è‰ñ‚µ‚ÅˆÚ“®‚³‚¹‚é

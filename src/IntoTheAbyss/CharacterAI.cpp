@@ -7,7 +7,8 @@
 CharacterAI::CharacterAI()
 {
 	//í—ª‘w‚Ì¶¬--------------------------
-	
+	goToTheField = std::make_unique<GoToTheField>();
+	restoreStamina = std::make_unique<RestoreStamina>();
 	//í—ª‘w‚Ì¶¬--------------------------
 
 	startFlag = false;
@@ -17,8 +18,8 @@ void CharacterAI::Init()
 {
 	//‰¼’u‚«
 	initFlag = true;
-	restoreStamina.Init();
-	goToTheField.Init();
+	//restoreStamina.Init();
+	//goToTheField.Init();
 }
 
 void CharacterAI::Update()
@@ -49,8 +50,8 @@ void CharacterAI::Update()
 
 	if (initFlag && !staminaInit)
 	{
-		float value = restoreStamina.EvaluationFunction();
-		restoreStamina.Init();
+		//float value = restoreStamina.EvaluationFunction();
+		//restoreStamina.Init();
 		staminaInit = true;
 	}
 	//move->Update(Vec2<float>(15.0f, 0.0f));
@@ -63,11 +64,11 @@ void CharacterAI::Update()
 		//endPoint = restoreStamina->endPoint;
 		//startFlag = restoreStamina->startFlag;
 
-		goToTheField.moveToOnwGround.route = shortestData;
-		goToTheField.Update();
-		startPoint = goToTheField.startPoint;
-		endPoint = goToTheField.endPoint;
-		startFlag = goToTheField.startFlag;
+		goToTheField->moveToOnwGround.route = shortestData;
+		goToTheField->Update();
+		startPoint = goToTheField->startPoint;
+		endPoint = goToTheField->endPoint;
+		startFlag = goToTheField->startFlag;
 		CharacterManager::Instance()->Right()->vel = CharacterAIData::Instance()->vel;
 	}
 }

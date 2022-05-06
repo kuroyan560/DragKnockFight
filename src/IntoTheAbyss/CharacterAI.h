@@ -20,8 +20,8 @@ public:
 	void Draw();
 
 	std::vector<WayPointData> shortestData;
-	RestoreStamina restoreStamina;
-	GoToTheField goToTheField;
+	std::unique_ptr<RestoreStamina> restoreStamina;
+	std::unique_ptr<GoToTheField> goToTheField;
 
 	bool initFlag = false;
 	bool staminaInit = false;

@@ -120,7 +120,7 @@ class Game
 public:
 	//テスト用
 	NavigationAI navi;
-	//CharacterAI chara;
+	CharacterAI chara;
 
 	HomeBase playerHomeBase, enemyHomeBase;
 
