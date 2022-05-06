@@ -26,7 +26,6 @@ RestoreStamina::RestoreStamina(const std::shared_ptr<FollowPath> &FOLLOW_PATH, c
 
 	moveToOnwGround = std::make_unique<MoveToOwnGround>(followPath);
 	startFlag = true;
-
 }
 
 void RestoreStamina::Init()
@@ -320,12 +319,13 @@ void GoToTheField::Init()
 	timer = 0;
 	timeOver = 60 * 10;
 	startFlag = false;
+	goToTheFieldFlag = true;
 }
 
 void GoToTheField::Update()
 {
 	//Ž©•ª‚ªŽ©w‚É‹ß‚Ã‚­
-	if (1)
+	if (goToTheFieldFlag)
 	{
 		moveToOnwGround->Update();
 		startPoint = moveToOnwGround->startPoint;
@@ -338,10 +338,13 @@ void GoToTheField::Update()
 
 	}
 
-	//“G‚ðˆÚ“®‚³‚¹‚é
-	if (1)
+	//“G‚ðU‚è‰ñ‚µ‚ÅˆÚ“®‚³‚¹‚é
+	if (!CharacterManager::Instance()->Right()->IsHitWall())
 	{
-
+	}
+	//“G‚ðƒ_ƒbƒVƒ…‚ÅˆÚ“®‚³‚¹‚é
+	if (CharacterAIData::Instance()->dashFlag)
+	{
 	}
 }
 

@@ -247,8 +247,15 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 		for (int index = 0; index < LINE_COUNT; ++index) {
 
 			// 線分は濃くしない。	橋本さんから貰う画像を入れる際はこの処理はいらなくなる。
-			if (lineSegments[index].GetID() == SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW) continue;
-
+			if (lineSegments[index].GetID() == SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW)
+			{
+				isHitWallFlag = true;
+				continue;
+			}
+			else
+			{
+				isHitWallFlag = false;
+			}
 			lineSegments[index].SetAlpha(200);
 
 		}
@@ -280,6 +287,10 @@ void SwingLineSegmentMgr::Draw(const WHICH_TEAM& Team)
 #include <IntoTheAbyss/StageMgr.h>
 #include "SelectStage.h"
 #include "Collider.h"
+bool SwingLineSegmentMgr::IsHitWall()
+{
+	return isHitWallFlag;
+}
 const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos)
 {
 	//どうやって使うか

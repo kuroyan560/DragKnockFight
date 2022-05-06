@@ -32,6 +32,7 @@ public:
 	float position;	//現在地
 
 	bool swingFlag;//振り回し入力
+	bool dashFlag;//ダッシュ入力
 
 	const int EVALUATION_MAX_VALUE = 10;
 };

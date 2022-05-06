@@ -108,6 +108,8 @@ private:
 	int timer;
 	int timeOver;
 
+	bool goToTheFieldFlag;
+
 };
 
 

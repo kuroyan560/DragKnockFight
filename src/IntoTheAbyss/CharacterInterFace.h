@@ -215,5 +215,13 @@ public:
 	//ノックアウトされた側
 	virtual void OnKnockOut() = 0;
 
+	/// <summary>
+	/// 時計回りもしくは反時計回り回した際に壁に当たるかどうか
+	/// </summary>
+	/// <returns></returns>
+	bool IsHitWall()
+	{
+		return CWSwingSegmentMgr.IsHitWall() || CCWSwingSegmentMgr.IsHitWall();
+	}
 };
 

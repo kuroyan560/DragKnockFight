@@ -22,6 +22,7 @@ CharacterAI::CharacterAI()
 
 
 	//í—ª‘w‚Ì¶¬--------------------------
+	
 	//í—ª‘w‚Ì¶¬--------------------------
 }
 
@@ -58,7 +59,6 @@ void CharacterAI::Update()
 			++CharacterAIData::Instance()->bossData.stamineGauge;
 		}
 	}
-
 
 	//“G‚ÆƒvƒŒƒCƒ„[‚Æ‚Ì‹——£
 	CharacterAIData::Instance()->distance = CharacterManager::Instance()->Left()->pos.Distance(CharacterManager::Instance()->Right()->pos);

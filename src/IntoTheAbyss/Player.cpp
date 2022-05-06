@@ -506,6 +506,11 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// スタミナを消費
 		staminaGauge->ConsumesStamina(DASH_STAMINA);
 
+		CharacterAIData::Instance()->dashFlag = true;
+	}
+	else
+	{
+		CharacterAIData::Instance()->dashFlag = false;
 	}
 
 	// スタミナが残っているか？
