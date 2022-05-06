@@ -18,7 +18,7 @@ NavigationAI::NavigationAI()
 	startFlag = false;
 }
 
-void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
+void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 {
 	SizeData wallMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
@@ -98,7 +98,7 @@ void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 	startFlag = false;
 }
 
-void NavigationAI::Update(const Vec2<float>& POS)
+void NavigationAI::Update(const Vec2<float> &POS)
 {
 
 	// ウェイポイントのアイテム保持数を計算する。
@@ -189,7 +189,7 @@ void NavigationAI::Update(const Vec2<float>& POS)
 
 #endif // DEBUG
 
-	if (startPoint.handle != Vec2<int>(-1, -1)&&
+	if (startPoint.handle != Vec2<int>(-1, -1) &&
 		endPoint.handle != Vec2<int>(-1, -1))
 	{
 		startFlag = true;
@@ -309,6 +309,7 @@ void NavigationAI::Draw()
 
 void NavigationAI::ImGuiDraw()
 {
+
 	ImGui::Begin("Navigation");
 	ImGui::Checkbox("SearchCircle", &serachFlag);
 	ImGui::Checkbox("WayPoint", &wayPointFlag);
@@ -334,46 +335,49 @@ void NavigationAI::ImGuiDraw()
 		}
 	}
 	ImGui::End();
-
-
-	ImGui::Begin("Queue");
-	for (int i = 0; i < queue.size(); ++i)
+	if (0)
 	{
-		Vec2<int>handle = queue[i]->handle;
-		std::string name = "Handle:" + std::to_string(i) + ",X:" +
-			std::to_string(handle.x) + ",Y:" +
-			std::to_string(handle.y) + ",Distance+Pass:" + std::to_string(queue[i]->sum);
-		ImGui::Text(name.c_str());
-	}
-	ImGui::End();
 
-
-	ImGui::Begin("ShortestRoute");
-	ImGui::Text("ShortestRoute");
-	for (int branch = 0; branch < shortestRoute.size(); ++branch)
-	{
-		ImGui::Text("Handle:%d,X:%d,Y:%d", branch, shortestRoute[branch]->handle.x, shortestRoute[branch]->handle.y);
-	}
-	ImGui::Text("");
-	for (int branchNum = 0; branchNum < branchQueue.size(); ++branchNum)
-	{
-		ImGui::Text("Route:%d", branchNum);
-		if (reachToGoalFlag[branchNum])
+		ImGui::Begin("Queue");
+		for (int i = 0; i < queue.size(); ++i)
 		{
-			ImGui::SameLine();
-			ImGui::Text("Reach!!!");
+			Vec2<int>handle = queue[i]->handle;
+			std::string name = "Handle:" + std::to_string(i) + ",X:" +
+				std::to_string(handle.x) + ",Y:" +
+				std::to_string(handle.y) + ",Distance+Pass:" + std::to_string(queue[i]->sum);
+			ImGui::Text(name.c_str());
 		}
-		for (int route = 0; route < branchQueue[branchNum].size(); ++route)
+		ImGui::End();
+
+
+
+		ImGui::Begin("ShortestRoute");
+		ImGui::Text("ShortestRoute");
+		for (int branch = 0; branch < shortestRoute.size(); ++branch)
 		{
-			ImGui::Text("Handle:%d,X:%d,Y:%d",
-				route,
-				branchQueue[branchNum][route]->handle.x,
-				branchQueue[branchNum][route]->handle.y
-			);
+			ImGui::Text("Handle:%d,X:%d,Y:%d", branch, shortestRoute[branch]->handle.x, shortestRoute[branch]->handle.y);
 		}
 		ImGui::Text("");
+		for (int branchNum = 0; branchNum < branchQueue.size(); ++branchNum)
+		{
+			ImGui::Text("Route:%d", branchNum);
+			if (reachToGoalFlag[branchNum])
+			{
+				ImGui::SameLine();
+				ImGui::Text("Reach!!!");
+			}
+			for (int route = 0; route < branchQueue[branchNum].size(); ++route)
+			{
+				ImGui::Text("Handle:%d,X:%d,Y:%d",
+					route,
+					branchQueue[branchNum][route]->handle.x,
+					branchQueue[branchNum][route]->handle.y
+				);
+			}
+			ImGui::Text("");
+		}
+		ImGui::End();
 	}
-	ImGui::End();
 
 
 
@@ -412,7 +416,7 @@ std::vector<WayPointData> NavigationAI::GetShortestRoute()
 
 }
 
-inline const Vec2<int>& NavigationAI::GetMapChipNum(const Vec2<float>& WORLD_POS)
+inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS)
 {
 	//浮動小数点を切り下げる処理
 	Vec2<float> num =
@@ -445,12 +449,12 @@ inline const Vec2<int>& NavigationAI::GetMapChipNum(const Vec2<float>& WORLD_POS
 	return result;
 }
 
-inline bool NavigationAI::DontUse(const Vec2<int>& HANDLE)
+inline bool NavigationAI::DontUse(const Vec2<int> &HANDLE)
 {
 	return HANDLE != Vec2<int>(-1, -1);
 }
 
-void NavigationAI::AStart(const WayPointData& START_POINT, const WayPointData& END_POINT)
+void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &END_POINT)
 {
 	std::vector<std::shared_ptr<WayPointData>>startPoint;//ウェイポイントの探索開始位置
 	std::vector<std::shared_ptr<WayPointData>>nextPoint; //次のウェイポイントの探索開始位置
@@ -649,15 +653,15 @@ void NavigationAI::AStart(const WayPointData& START_POINT, const WayPointData& E
 	}
 
 	//今までの候補から最短ルートを作る
-	queue = ConvertToShortestRoute(queue);
+	//queue = ConvertToShortestRoute(queue);
 	shortestRoute = ConvertToShortestRoute2(branchQueue);
 }
 
-void NavigationAI::RegistBranch(const WayPointData& DATA)
+void NavigationAI::RegistBranch(const WayPointData &DATA)
 {
 }
 
-inline bool NavigationAI::CheckQueue(const Vec2<int>& HANDLE)
+inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
 {
 	for (int i = 0; i < queue.size(); ++i)
 	{
@@ -669,7 +673,7 @@ inline bool NavigationAI::CheckQueue(const Vec2<int>& HANDLE)
 	return false;
 }
 
-std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>>& QUEUE)
+std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>> &QUEUE)
 {
 	std::vector<float>sumArray;
 	for (int i = 0; i < QUEUE.size(); ++i)
@@ -810,7 +814,7 @@ std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToSho
 	return result;
 }
 
-Vec2<float> NavigationAI::CaluLine(const Vec2<float>& CENTRAL_POS, int angle)
+Vec2<float> NavigationAI::CaluLine(const Vec2<float> &CENTRAL_POS, int angle)
 {
 	float distance = 0.0f;
 
@@ -866,7 +870,7 @@ Vec2<float> NavigationAI::CaluLine(const Vec2<float>& CENTRAL_POS, int angle)
 	return CENTRAL_POS + lineEndPos * distance;
 }
 
-bool NavigationAI::ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<int>& SEARCH_OFFSET, const SizeData& CHIP_DATA)
+bool NavigationAI::ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<int> &SEARCH_OFFSET, const SizeData &CHIP_DATA)
 {
 
 	Vec2<float> searchHandle = { (float)DATA->handle.x + SEARCH_OFFSET.x, (float)DATA->handle.y + SEARCH_OFFSET.y };
@@ -887,7 +891,7 @@ bool NavigationAI::ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec
 
 }
 
-float NavigationAI::SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA)
+float NavigationAI::SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float> &SEARCH_DIR, const SizeData &CHIP_DATA)
 {
 	int searchCounter = 0;
 	Vec2<float> searchIndex = { (float)DATA->handle.x, (float)DATA->handle.y };
@@ -957,7 +961,7 @@ void NavigationAI::CheckNumberOfItemHeldCount()
 
 }
 
-std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>>& QUEUE)
+std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &QUEUE)
 {
 	std::vector<std::vector<std::shared_ptr<WayPointData>>> route;
 
