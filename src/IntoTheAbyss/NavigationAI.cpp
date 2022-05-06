@@ -263,7 +263,7 @@ void NavigationAI::Draw()
 					}
 
 					//ウェイポイントの描画
-					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos), wayPoints[y][x]->radius, color);
+					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos), wayPoints[y][x]->radius * ScrollMgr::Instance()->zoom, color);
 				}
 				//探索範囲の描画
 				if (serachFlag)

@@ -21,8 +21,10 @@ void FollowPath::Update()
 	//二点間の移動
 	operateFollow.Update();
 
+	AiResult result = operateFollow.CurrentProgress();
+
 	//成功したら別の二点間の移動を行う
-	if (operateFollow.CurrentProgress() == AiResult::OPERATE_SUCCESS)
+	if (result == AiResult::OPERATE_SUCCESS)
 	{
 		++routeHandle;
 		//最短ルートのゴールまで辿り着いた
@@ -38,9 +40,10 @@ void FollowPath::Update()
 	}
 
 	//動きが止まっていることを確認したら現在地と次のウェイポイントに向かって進む
-	if (operateFollow.CurrentProgress() == AiResult::OPERATE_FAIL)
+	if (result == AiResult::OPERATE_FAIL && routeHandle < route.size())
 	{
-		operateFollow.Init(CharacterManager::Instance()->Right()->pos, route[routeHandle].pos);
+		//応急処置
+		operateFollow.Init(CharacterManager::Instance()->Right()->pos, route[routeHandle].pos + Vec2<float>(0.0f, 30.0f));
 	}
 }
 

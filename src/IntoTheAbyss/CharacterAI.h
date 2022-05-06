@@ -29,14 +29,13 @@ public:
 	std::vector<WayPointData> shortestData;
 
 	std::array<std::unique_ptr<IStrategicLayer>, 3> strategyArray;
-
-	bool initFlag = false;
-	bool staminaInit = false;
-
 	WayPointData startPoint, endPoint;
 	bool startFlag;
 	std::vector<WayPointData>route;
 	Vec2<float>vel;
 
 	AiStrategy strategyOfChoice,prevStrategyOfChoice;
+
+	int startTimer;
+	bool initFlag;
 };

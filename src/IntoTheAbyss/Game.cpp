@@ -541,23 +541,20 @@ void Game::Update()
 		CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
 	}
 
-
-
-
 	chara.shortestData = navi.GetShortestRoute();
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
 		chara.Init();
 	}
 
-	chara.Update();
-
-
 	navi.startPoint = chara.startPoint;
 	navi.endPoint = chara.endPoint;
 	navi.startFlag = chara.startFlag;
-
 	navi.Update({});
+
+	chara.Update();
+
+
 
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();

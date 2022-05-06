@@ -27,5 +27,4 @@ public:
 private:
 	bool initFlag;
 	Vec2<float>oldPos;
-
 };

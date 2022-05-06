@@ -28,11 +28,6 @@ void MovingBetweenTwoPoints::Update()
 {
 	++timer;
 	operateMove.Update(vel);
-	//ˆÚ“®‚É¬Œ÷
-	if (operateMove.CurrentProgress() == AiResult::OPERATE_SUCCESS)
-	{
-		bool debug = false;
-	}
 }
 
 AiResult MovingBetweenTwoPoints::CurrentProgress()
@@ -45,7 +40,7 @@ AiResult MovingBetweenTwoPoints::CurrentProgress()
 			return AiResult::OPERATE_SUCCESS;
 		}
 		//ŠÔ“à‚É‚½‚Ç‚è’…‚©‚È‚¢A‚à‚µ‚­‚Í“®‚«‚ª~‚Ü‚Á‚½‚ç¸”s
-		else if (timeOver <= timer || operateMove.CurrentProgress() == AiResult::OPERATE_SUCCESS)
+		else if (timeOver <= timer || operateMove.CurrentProgress() == AiResult::OPERATE_FAIL)
 		{
 			return AiResult::OPERATE_FAIL;
 		}

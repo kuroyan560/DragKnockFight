@@ -312,13 +312,13 @@ void GoToTheField::Update()
 	//“G‚ðU‚è‰ñ‚µ‚ÅˆÚ“®‚³‚¹‚é
 	if (canSwingClockWiseFlag && useSwingFlag)
 	{
-		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
-		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
+		//CharacterAIOrder::Instance()->swingClockWiseFlag = true;
+		//CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
 	}
 	else if (canSwingCClockWiseFlag && useSwingFlag)
 	{
-		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
-		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
+		//CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
+		//CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
 	}
 
 	//“G‚ðƒ_ƒbƒVƒ…‚ÅˆÚ“®‚³‚¹‚é
@@ -331,7 +331,7 @@ AiResult GoToTheField::CurrentProgress()
 {
 	if (timer < timeOver)
 	{
-		return AiResult::OPERATE_SUCCESS;
+		//return AiResult::OPERATE_SUCCESS;
 	}
 	else if (timeOver <= timer)
 	{
