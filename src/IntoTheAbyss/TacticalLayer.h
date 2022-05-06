@@ -64,8 +64,8 @@ public:
 	std::vector<WayPointData>route;
 private:
 	std::shared_ptr<FollowPath>followPath;
+	std::shared_ptr<SearchWayPoint> searchPoint;
 
 	Vec2<int>prevStartHandle, prevEndHandle;
-
-	std::shared_ptr<SearchWayPoint> searchPoint;
+	int timer, timeOver;
 };

@@ -541,24 +541,26 @@ void Game::Update()
 		CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
 	}
 
+
+
+
 	chara.shortestData = navi.GetShortestRoute();
 	chara.wayPoints = navi.wayPoints;
-
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
 		chara.Init();
 	}
 
-
 	chara.Update();
 
-	if (chara.restoreStamina != nullptr)
+	//if (chara.restoreStamina != nullptr)
 	{
-		CharacterManager::Instance()->Right()->vel = chara.move->vel;
+
+		CharacterManager::Instance()->Right()->vel = chara.vel;
 		*chara.pos = CharacterManager::Instance()->Right()->pos;
-		navi.startPoint = chara.restoreStamina->startPoint;
-		navi.endPoint = chara.restoreStamina->endPoint;
-		navi.startFlag = chara.restoreStamina->startFlag;
+		navi.startPoint = chara.startPoint;
+		navi.endPoint = chara.endPoint;
+		navi.startFlag = chara.startFlag;
 	}
 
 	// プレイヤーとボスの引っ張り合いの処理

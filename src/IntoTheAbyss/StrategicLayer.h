@@ -46,7 +46,7 @@ public:
 private:
 	std::shared_ptr<FollowPath> followPath;
 	std::unique_ptr<SearchWayPoint> searchStartPoint,searchGoalPoint;
-	std::unique_ptr < MoveToOwnGround> moveToOnwGround;
+	std::unique_ptr<MoveToOwnGround> moveToOnwGround;
 
 	std::vector<Vec2<float>>itemList;
 	bool initRouteFlag;
@@ -85,7 +85,9 @@ private:
 class GoToTheField
 {
 public:
-	GoToTheField();
+	GoToTheField(const std::shared_ptr<FollowPath> &OPERATE);
+
+	void Init();
 
 	/// <summary>
 	/// é¿çs
@@ -98,7 +100,14 @@ public:
 	/// <returns>FAIL...é∏îs,INPROCESS...é¿çsíÜ,SUCCESS...ê¨å˜</returns>
 	AiResult CurrentProgress();
 
+	WayPointData startPoint, endPoint;
+	bool startFlag;
+	std::vector<WayPointData>route;
+	std::unique_ptr<MoveToOwnGround> moveToOnwGround;
 private:
+	int timer;
+	int timeOver;
+
 };
 
 

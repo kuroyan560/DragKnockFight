@@ -22,7 +22,6 @@ CharacterAI::CharacterAI()
 
 
 	//í—ª‘w‚Ì¶¬--------------------------
-
 	//í—ª‘w‚Ì¶¬--------------------------
 }
 
@@ -33,6 +32,10 @@ void CharacterAI::Init()
 	restoreStamina = std::make_unique<RestoreStamina>
 		(moveToGoal, betweenPoints, wayPoints);
 	initFlag = true;
+
+
+	goToTheField = std::make_unique<GoToTheField>(moveToGoal);
+	goToTheField->Init();
 }
 
 void CharacterAI::Update()
@@ -72,8 +75,18 @@ void CharacterAI::Update()
 
 	if (initFlag)
 	{
-		restoreStamina->route = shortestData;
-		restoreStamina->Update();
+		//restoreStamina->route = shortestData;
+		//restoreStamina->Update();
+		//startPoint = restoreStamina->startPoint;
+		//endPoint = restoreStamina->endPoint;
+		//startFlag = restoreStamina->startFlag;
+
+		goToTheField->moveToOnwGround->route = shortestData;
+		goToTheField->Update();
+		startPoint = goToTheField->startPoint;
+		endPoint = goToTheField->endPoint;
+		startFlag = goToTheField->startFlag;
+		vel = move->vel;
 	}
 }
 

@@ -57,10 +57,13 @@ MoveToOwnGround::MoveToOwnGround(const std::shared_ptr<FollowPath> &OPERATE)
 {
 	followPath = OPERATE;
 	searchPoint = std::make_shared<SearchWayPoint>(CharacterAIData::Instance()->wayPoints);
+	timer = 0;
+	timeOver = 60 * 3;
 }
 
 void MoveToOwnGround::Init()
 {
+
 }
 
 void MoveToOwnGround::Update()
@@ -69,9 +72,9 @@ void MoveToOwnGround::Update()
 	if (route.size() != 0 && (startPoint.handle != prevStartHandle || endPoint.handle != prevEndHandle))
 	{
 		followPath->Init(route);
+		prevStartHandle = startPoint.handle;
+		prevEndHandle = endPoint.handle;
 	}
-	prevStartHandle = startPoint.handle;
-	prevEndHandle = endPoint.handle;
 	followPath->Update();
 
 
@@ -79,12 +82,18 @@ void MoveToOwnGround::Update()
 	searchPoint->Init(CharacterManager::Instance()->Right()->pos);
 	startPoint = searchPoint->Update();
 
-	//ゴール地点の探索
-	Vec2<float>goalPos(CharacterManager::Instance()->Right()->pos);
-	//X軸は自陣、Y軸はボスの座標に合わせた座標
-	goalPos.x = (StageMgr::Instance()->GetMapChipData(0, 0)[0].size() * 50.0f) - 150.0f;
-	searchPoint->Init(goalPos);
-	endPoint = searchPoint->Update();
+	//一定時間ごとに何処をゴールにするか切り替える
+	if (timeOver <= timer || timer == 0)
+	{
+		//ゴール地点の探索
+		Vec2<float>goalPos(CharacterManager::Instance()->Right()->pos);
+		//X軸は自陣、Y軸はボスの座標に合わせた座標
+		goalPos.x = (StageMgr::Instance()->GetMapChipData(0, 0)[0].size() * 50.0f) - 150.0f;
+		searchPoint->Init(goalPos);
+		endPoint = searchPoint->Update();
+		timer = 1;
+	}
+	++timer;
 }
 
 AiResult MoveToOwnGround::CurrentProgress()

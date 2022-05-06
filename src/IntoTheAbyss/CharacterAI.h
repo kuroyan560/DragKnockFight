@@ -28,8 +28,14 @@ public:
 	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
 
 	std::unique_ptr<RestoreStamina>restoreStamina;
+	std::unique_ptr<GoToTheField>goToTheField;
 
 	bool initFlag = false;
 	bool staminaInit = false;
+
+	WayPointData startPoint, endPoint;
+	bool startFlag;
+	std::vector<WayPointData>route;
+	Vec2<float>vel;
 };
 

@@ -309,3 +309,54 @@ AiResult AcquireASuperiorityGauge::CurrentProgress()
 		return AiResult::OPERATE_INPROCESS;
 	}
 }
+
+GoToTheField::GoToTheField(const std::shared_ptr<FollowPath> &OPERATE)
+{
+	moveToOnwGround = std::make_unique<MoveToOwnGround>(OPERATE);
+}
+
+void GoToTheField::Init()
+{
+	timer = 0;
+	timeOver = 60 * 10;
+	startFlag = false;
+}
+
+void GoToTheField::Update()
+{
+	//©•ª‚ª©w‚É‹ß‚Ã‚­
+	if (1)
+	{
+		moveToOnwGround->Update();
+		startPoint = moveToOnwGround->startPoint;
+		endPoint = moveToOnwGround->endPoint;
+		startFlag = true;
+	}
+	//©•ª‚ª“Gw‚É‹ß‚Ã‚©‚È‚¢
+	else
+	{
+
+	}
+
+	//“G‚ğˆÚ“®‚³‚¹‚é
+	if (1)
+	{
+
+	}
+}
+
+AiResult GoToTheField::CurrentProgress()
+{
+	if (timer < timeOver)
+	{
+		return AiResult::OPERATE_SUCCESS;
+	}
+	else if (timeOver <= timer)
+	{
+		return AiResult::OPERATE_FAIL;
+	}
+	else
+	{
+		return AiResult::OPERATE_INPROCESS;
+	}
+}
