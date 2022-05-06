@@ -322,7 +322,7 @@ private:
 	/// <param name="SEARCH_OFFSET"> 検索するマップチップの位置 (DATAを基準としてどこを検索するかの値) </param>
 	/// <param name="CHIP_DATA"> マップチップのブロックのIDを取得して壁判定するためのデータ </param>
 	/// <returns> 繋げられたかが返される。 繋げる処理はこの関数の内部にある。 </returns>
-	bool ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<int>& SEARCH_OFFSET, const SizeData& CHIP_DATA);
+	bool ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
 
 	/// <summary>
 	/// ウェイポイントから壁までの距離を計算する処理

@@ -6,6 +6,7 @@
 #include<queue>
 #include "StaminaItemMgr.h"
 #include"CharacterAIData.h"
+#include "MapChipCollider.h"
 
 const float NavigationAI::SERACH_RADIUS = 180.0f;
 const float NavigationAI::WAYPOINT_RADIUS = 20.0f;
@@ -18,13 +19,20 @@ NavigationAI::NavigationAI()
 	startFlag = false;
 }
 
-void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
+static const float BOSS_SIZE = 160.0f;
+
+void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 {
 	SizeData wallMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
 	//座標の設定--------------------------
-	int xNum = MAP_DATA[0].size();
-	int yNum = MAP_DATA.size();
+	int xNum = (MAP_DATA[0].size() * MAP_CHIP_SIZE) / BOSS_SIZE;
+	int yNum = (MAP_DATA.size() * MAP_CHIP_SIZE) / BOSS_SIZE;
+
+	++xNum;
+	++yNum;
+	++xNum;
+	++yNum;
 
 	// マップチップの数分ウェイポイントを生成。
 	wayPoints.resize(yNum);
@@ -45,24 +53,22 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 			debugColor[y][x] = Color(255, 255, 255, 255);
 
 			//一度ワールド座標に変換してからマップチップ座標に変換する
-			const Vec2<float> worldPos(MAP_CHIP_SIZE * x, MAP_CHIP_SIZE * y);
+			Vec2<float> worldPos(BOSS_SIZE * x, BOSS_SIZE * y);
 			const Vec2<int> mapChipPos(GetMapChipNum(worldPos / MAP_CHIP_SIZE));
 			if (MAP_DATA[0].size() <= mapChipPos.x || MAP_DATA.size() <= mapChipPos.y)
 			{
+				wayPoints[y][x] = std::make_shared<WayPointData>();
 				continue;
 			}
 
 
 			bool wallFlag = false;
-			//壁のある場所にポイントを設置しない
-			for (int wallIndex = wallMemorySize.min; wallIndex < wallMemorySize.max; ++wallIndex)
-			{
-				if (MAP_DATA[mapChipPos.y][mapChipPos.x] == wallIndex)
-				{
-					wallFlag = true;
-					break;
-				}
-			}
+
+			// 壁とウェイポイントの当たり判定を行う。
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_LEFT);
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_RIGHT);
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_TOP);
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_BOTTOM);
 
 			wayPoints[y][x] = std::make_shared<WayPointData>();
 			//等間隔で開ける
@@ -98,7 +104,7 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 	startFlag = false;
 }
 
-void NavigationAI::Update(const Vec2<float> &POS)
+void NavigationAI::Update(const Vec2<float>& POS)
 {
 
 	// ウェイポイントのアイテム保持数を計算する。
@@ -273,7 +279,7 @@ void NavigationAI::Draw()
 		}
 	}
 
-	////繋がりの描画
+	//繋がりの描画
 	//if (lineFlag)
 	//{
 	//	for (int y = 0; y < wayPointYCount; ++y)
@@ -416,7 +422,7 @@ std::vector<WayPointData> NavigationAI::GetShortestRoute()
 
 }
 
-inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS)
+inline const Vec2<int>& NavigationAI::GetMapChipNum(const Vec2<float>& WORLD_POS)
 {
 	//浮動小数点を切り下げる処理
 	Vec2<float> num =
@@ -449,12 +455,12 @@ inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS
 	return result;
 }
 
-inline bool NavigationAI::DontUse(const Vec2<int> &HANDLE)
+inline bool NavigationAI::DontUse(const Vec2<int>& HANDLE)
 {
 	return HANDLE != Vec2<int>(-1, -1);
 }
 
-void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &END_POINT)
+void NavigationAI::AStart(const WayPointData& START_POINT, const WayPointData& END_POINT)
 {
 	std::vector<std::shared_ptr<WayPointData>>startPoint;//ウェイポイントの探索開始位置
 	std::vector<std::shared_ptr<WayPointData>>nextPoint; //次のウェイポイントの探索開始位置
@@ -657,11 +663,11 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 	shortestRoute = ConvertToShortestRoute2(branchQueue);
 }
 
-void NavigationAI::RegistBranch(const WayPointData &DATA)
+void NavigationAI::RegistBranch(const WayPointData& DATA)
 {
 }
 
-inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
+inline bool NavigationAI::CheckQueue(const Vec2<int>& HANDLE)
 {
 	for (int i = 0; i < queue.size(); ++i)
 	{
@@ -673,7 +679,7 @@ inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
 	return false;
 }
 
-std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>> &QUEUE)
+std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>>& QUEUE)
 {
 	std::vector<float>sumArray;
 	for (int i = 0; i < QUEUE.size(); ++i)
@@ -814,7 +820,7 @@ std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToSho
 	return result;
 }
 
-Vec2<float> NavigationAI::CaluLine(const Vec2<float> &CENTRAL_POS, int angle)
+Vec2<float> NavigationAI::CaluLine(const Vec2<float>& CENTRAL_POS, int angle)
 {
 	float distance = 0.0f;
 
@@ -870,31 +876,38 @@ Vec2<float> NavigationAI::CaluLine(const Vec2<float> &CENTRAL_POS, int angle)
 	return CENTRAL_POS + lineEndPos * distance;
 }
 
-bool NavigationAI::ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<int> &SEARCH_OFFSET, const SizeData &CHIP_DATA)
+bool NavigationAI::ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA)
 {
 
-	Vec2<float> searchHandle = { (float)DATA->handle.x + SEARCH_OFFSET.x, (float)DATA->handle.y + SEARCH_OFFSET.y };
-	int chipData = StageMgr::Instance()->GetMapChipBlock(0, 0, searchHandle);
+	// 指定された方向に線分を伸ばす。
+	Vec2<float> startPos = DATA->pos;
+	Vec2<float> endPos = startPos + SEARCH_DIR * BOSS_SIZE;
 
-	// 検索する座標が壁じゃなかったら接続する。
-	if (!(CHIP_DATA.min <= chipData && chipData <= CHIP_DATA.max)) {
+	// 検索対象のハンドルが存在しているかをチェックする。
+	if (wayPoints[0].size() < DATA->handle.x + 1 || DATA->handle.x - 1 < 0) return false;
+	if (wayPoints.size() < DATA->handle.y + 1 || DATA->handle.y - 1 < 0) return false;
+
+	// 検索対象のハンドルが壁だったら判定を行わない。
+	if (wayPoints[(int)DATA->handle.y + SEARCH_DIR.y][(int)DATA->handle.x + SEARCH_DIR.x]->isWall) return false;
+
+	// その線分とマップチップの当たり判定を行う。
+	bool isHitWall = CheckMapChipWallAndRay(startPos, endPos);
+
+	// 壁にあたっていなかったら接続する。
+	if (!isHitWall) {
 
 		// 接続する。
-		wayPoints[(int)searchHandle.y][(int)searchHandle.x]->RegistHandle(DATA->handle);
-		DATA->RegistHandle({ (int)searchHandle.x,(int)searchHandle.y });
-
-		return true;
+		wayPoints[(int)DATA->handle.y + SEARCH_DIR.y][(int)DATA->handle.x + SEARCH_DIR.x]->RegistHandle(DATA->handle);
+		DATA->RegistHandle({ (int)(DATA->handle.x + SEARCH_DIR.x),(int)(DATA->handle.y + SEARCH_DIR.y) });
 
 	}
 
-	return false;
-
 }
 
-float NavigationAI::SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float> &SEARCH_DIR, const SizeData &CHIP_DATA)
+float NavigationAI::SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA)
 {
 	int searchCounter = 0;
-	Vec2<float> searchIndex = { (float)DATA->handle.x, (float)DATA->handle.y };
+	Vec2<float> searchIndex = { ((float)DATA->handle.x * BOSS_SIZE) / MAP_CHIP_SIZE, ((float)DATA->handle.y * BOSS_SIZE) / MAP_CHIP_SIZE };
 
 	// マップの四方か壁で囲まれているため、配列外へオーバーすることがないと思うので配列外への対処の処理は書かないでおきます！例外スローしたら書きます…。
 	while (1) {
@@ -961,7 +974,7 @@ void NavigationAI::CheckNumberOfItemHeldCount()
 
 }
 
-std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &QUEUE)
+std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>>& QUEUE)
 {
 	std::vector<std::vector<std::shared_ptr<WayPointData>>> route;
 
@@ -1018,30 +1031,30 @@ inline void NavigationAI::RegistHandle(std::shared_ptr<WayPointData> DATA)
 	isBottom = ConnectWayPoint(DATA, { 0,1 }, mapChipSizeData);
 
 	// 次に斜めに繋げる。
-	if (isLeft && isTop) {
+//	if (isLeft && isTop) {
 
 		// 左上に繋げる。
 		ConnectWayPoint(DATA, { -1,-1 }, mapChipSizeData);
 
-	}
-	if (isRight && isTop) {
+	//}
+//	if (isRight && isTop) {
 
 		// 右上に繋げる。
 		ConnectWayPoint(DATA, { 1,-1 }, mapChipSizeData);
 
-	}
-	if (isLeft && isBottom) {
+//	}
+//	if (isLeft && isBottom) {
 
 		// 左下に繋げる。
 		ConnectWayPoint(DATA, { -1,1 }, mapChipSizeData);
 
-	}
-	if (isRight && isBottom) {
+//	}
+//	if (isRight && isBottom) {
 
 		// 右下に繋げる。
 		ConnectWayPoint(DATA, { 1,1 }, mapChipSizeData);
 
-	}
+//	}
 
 
 	// 次に各方向の壁までの距離を求める。
