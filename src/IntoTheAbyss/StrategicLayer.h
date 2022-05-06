@@ -132,6 +132,7 @@ public:
 	MoveToOwnGround moveToOnwGround;
 private:
 	bool goToTheFieldFlag;
+	bool initFlag;
 
 };
 

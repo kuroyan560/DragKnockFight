@@ -4,6 +4,7 @@
 #include "ScrollMgr.h"
 #include "TexHandleMgr.h"
 #include "MapChipCollider.h"
+#include"StageMgr.h"
 
 void SwingLineSegment::Init()
 {
@@ -14,7 +15,7 @@ void SwingLineSegment::Init()
 
 }
 
-void SwingLineSegment::Update(const Vec2<float>& Start, const Vec2<float>& End, const Vec2<float>& StartDir, const Vec2<float>& EndDir, const int& Alpha, const SEGMENT_ID& ID, const int& Handle)
+void SwingLineSegment::Update(const Vec2<float> &Start, const Vec2<float> &End, const Vec2<float> &StartDir, const Vec2<float> &EndDir, const int &Alpha, const SEGMENT_ID &ID, const int &Handle)
 {
 
 	/*===== 更新処理 =====*/
@@ -30,7 +31,7 @@ void SwingLineSegment::Update(const Vec2<float>& Start, const Vec2<float>& End, 
 
 }
 
-void SwingLineSegment::Draw(const WHICH_TEAM& Team)
+void SwingLineSegment::Draw(const WHICH_TEAM &Team)
 {
 	static const int TEAM_COLOR_X[TEAM_NUM] = { 47,239 };
 	static const int TEAM_COLOR_Y[TEAM_NUM] = { 255,1 };
@@ -76,7 +77,7 @@ void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 
 }
 
-void SwingLineSegment::ResetDistance(const Vec2<float>& Pos, const float& Distance)
+void SwingLineSegment::ResetDistance(const Vec2<float> &Pos, const float &Distance)
 {
 
 	/*===== 距離修正 =====*/
@@ -86,7 +87,7 @@ void SwingLineSegment::ResetDistance(const Vec2<float>& Pos, const float& Distan
 
 }
 
-void SwingLineSegmentMgr::Setting(const bool& IsClockWise, const int& HandleUI, const int& HandleArrow, const int& HandleLine, const int& ReticleHandle)
+void SwingLineSegmentMgr::Setting(const bool &IsClockWise, const int &HandleUI, const int &HandleArrow, const int &HandleLine, const int &ReticleHandle)
 {
 
 	/*===== 前準備 =====*/
@@ -114,7 +115,7 @@ void SwingLineSegmentMgr::Init()
 
 }
 
-void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const vector<vector<int>>& MapData)
+void SwingLineSegmentMgr::Update(const Vec2<float> &Pos, const Vec2<float> &TargetVec, const float &Distance, const vector<vector<int>> &MapData)
 {
 
 	/*===== 更新処理 =====*/
@@ -242,8 +243,8 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 	}
 
 	// マップチップと当たっていたら、全ての線分の色をちょっとだけ濃くする。
+	isHitWallFlag = false;
 	if (isHitMapChip) {
-
 		for (int index = 0; index < LINE_COUNT; ++index) {
 
 			// 線分は濃くしない。	橋本さんから貰う画像を入れる際はこの処理はいらなくなる。
@@ -251,10 +252,6 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 			{
 				isHitWallFlag = true;
 				continue;
-			}
-			else
-			{
-				isHitWallFlag = false;
 			}
 			lineSegments[index].SetAlpha(200);
 
@@ -264,7 +261,7 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 
 }
 
-void SwingLineSegmentMgr::Draw(const WHICH_TEAM& Team)
+void SwingLineSegmentMgr::Draw(const WHICH_TEAM &Team)
 {
 
 	/*===== 描画処理 =====*/
@@ -291,7 +288,7 @@ bool SwingLineSegmentMgr::IsHitWall()
 {
 	return isHitWallFlag;
 }
-const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos)
+const Vec2<float> &SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float> &StartPos, const Vec2<float> &EndPos)
 {
 	//どうやって使うか
 	Vec2<float>handSegmentStart(StartPos), handSegmentEnd(EndPos);//線分
@@ -309,6 +306,8 @@ const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& Start
 	bool isTop = handSegmentDir.y < 0;
 	bool isLeft = handSegmentDir.x < 0;
 
+	SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
+
 	// 次にマップチップとの最短距離を求める。
 	const int MAP_Y = mapData.size();
 	for (int height = 0; height < MAP_Y; ++height) {
@@ -317,7 +316,11 @@ const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& Start
 		for (int width = 0; width < MAP_X; ++width) {
 
 			// このマップチップが1~9以外だったら判定を飛ばす。
-			if (mapData[height][width] < 1 || mapData[height][width] > 9) continue;
+			if (mapData[height][width] < mapChipSizeData.min ||
+				mapChipSizeData.max < mapData[height][width])
+			{
+				continue;
+			}
 
 			// このインデックスのブロックの座標を取得。
 			const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);

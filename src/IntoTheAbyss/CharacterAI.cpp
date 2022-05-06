@@ -67,7 +67,7 @@ void CharacterAI::Update()
 		startPoint = strategyArray[StrategyOfChoice]->startPoint;
 		endPoint = strategyArray[StrategyOfChoice]->endPoint;
 		startFlag = strategyArray[StrategyOfChoice]->startFlag;
-		CharacterManager::Instance()->Right()->vel = CharacterAIData::Instance()->vel;
+		CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
 	}
 }
 

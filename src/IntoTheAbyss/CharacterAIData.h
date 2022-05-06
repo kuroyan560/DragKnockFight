@@ -36,5 +36,12 @@ public:
 
 	const int EVALUATION_MAX_VALUE = 10;
 
+};
+
+class CharacterAIOrder :public Singleton<CharacterAIOrder>
+{
+public:
 	Vec2<float> vel;//ˆÚ“®—Ê
+	bool dashFlag;
+	bool swingFlag;
 };

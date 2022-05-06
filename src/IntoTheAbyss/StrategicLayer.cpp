@@ -315,6 +315,7 @@ GoToTheField::GoToTheField()
 	timeOver = 60 * 10;
 	startFlag = false;
 	goToTheFieldFlag = true;
+	initFlag = false;
 }
 
 void GoToTheField::Init()
@@ -327,11 +328,11 @@ void GoToTheField::Update()
 	//Ž©•ª‚ªŽ©w‚É‹ß‚Ã‚­
 	if (goToTheFieldFlag)
 	{
-		moveToOnwGround.route = route;
-		moveToOnwGround.Update();
-		startPoint = moveToOnwGround.startPoint;
-		endPoint = moveToOnwGround.endPoint;
-		startFlag = true;
+		//moveToOnwGround.route = route;
+		//moveToOnwGround.Update();
+		//startPoint = moveToOnwGround.startPoint;
+		//endPoint = moveToOnwGround.endPoint;
+		//startFlag = true;
 	}
 	//Ž©•ª‚ª“Gw‚É‹ß‚Ã‚©‚È‚¢
 	else
@@ -339,8 +340,10 @@ void GoToTheField::Update()
 	}
 
 	//“G‚ðU‚è‰ñ‚µ‚ÅˆÚ“®‚³‚¹‚é
-	if (!CharacterManager::Instance()->Right()->IsHitWall())
+	if (CharacterManager::Instance()->Right()->IsHitWall() && !CharacterManager::Instance()->Right()->GetNowSwing() && !initFlag)
 	{
+		CharacterAIOrder::Instance()->swingFlag = true;
+		//initFlag = true;
 	}
 	//“G‚ðƒ_ƒbƒVƒ…‚ÅˆÚ“®‚³‚¹‚é
 	if (CharacterAIData::Instance()->dashFlag)

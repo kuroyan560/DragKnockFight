@@ -14,7 +14,7 @@ void OperateMove::Update(const Vec2<float> &VELOCITY)
 		oldPos = CharacterManager::Instance()->Right()->pos;
 		initFlag = true;
 	}
-	CharacterAIData::Instance()->vel = VELOCITY;
+	CharacterAIOrder::Instance()->vel = VELOCITY;
 	oldPos = CharacterManager::Instance()->Right()->pos;
 }
 
