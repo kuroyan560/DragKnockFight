@@ -44,8 +44,8 @@ AiResult MovingBetweenTwoPoints::CurrentProgress()
 		{
 			return AiResult::OPERATE_SUCCESS;
 		}
-		//ŽžŠÔ“à‚É‚½‚Ç‚è’…‚©‚È‚©‚Á‚½‚çŽ¸”s
-		else if (timeOver <= timer)
+		//ŽžŠÔ“à‚É‚½‚Ç‚è’…‚©‚È‚¢A‚à‚µ‚­‚Í“®‚«‚ªŽ~‚Ü‚Á‚½‚çŽ¸”s
+		else if (timeOver <= timer || operateMove.CurrentProgress() == AiResult::OPERATE_SUCCESS)
 		{
 			return AiResult::OPERATE_FAIL;
 		}

@@ -495,9 +495,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		}
 
-		// スタミナを消費
-		const int DASH_GRIP_POWER = 20;
-
 		//煙
 		ParticleMgr::Instance()->Generate(pos, -inputLeftVec, BULLET);
 		//残像

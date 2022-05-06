@@ -38,5 +38,5 @@ public:
 	std::vector<WayPointData>route;
 	Vec2<float>vel;
 
-	AiStrategy StrategyOfChoice;
+	AiStrategy strategyOfChoice,prevStrategyOfChoice;
 };

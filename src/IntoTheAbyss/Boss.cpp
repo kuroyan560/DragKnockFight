@@ -181,18 +181,21 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	DebugParameter::Instance()->bossDebugData.bossNowStatus = static_cast<E_BossPattern>(bossPatternNow);
 
 
-	//振り回しの開始ベクトルを取得。
-	//if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_O, "SwingBoss", TO_STRING(DIK_O)))
-	if (CharacterAIOrder::Instance()->swingFlag)
+	//振り回し命令
+	if (CharacterAIOrder::Instance()->swingClockWiseFlag)
 	{
-		Vec2<float> dir = GetPartnerPos() - pos;
-		dir.Normalize();
-
 		// 振り回しのトリガー判定
-		SwingPartner({ 0,1 }, false);
-		patternData.swingFlag = false;
-		CharacterAIOrder::Instance()->swingFlag = false;
+		SwingPartner(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), true);
+		CharacterAIOrder::Instance()->swingClockWiseFlag = false;
+	}else if (CharacterAIOrder::Instance()->swingCounterClockWiseFlag)
+	{
+		// 振り回しのトリガー判定
+		SwingPartner(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), false);
+		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
 	}
+
+
+
 	CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
 	//CWSwingSegmentMgr.Init();
 	CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);

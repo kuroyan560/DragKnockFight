@@ -36,6 +36,12 @@ void FollowPath::Update()
 			operateFollow.Init(route[routeHandle].pos, route[routeHandle + 1].pos);
 		}
 	}
+
+	//動きが止まっていることを確認したら現在地と次のウェイポイントに向かって進む
+	if (operateFollow.CurrentProgress() == AiResult::OPERATE_FAIL)
+	{
+		operateFollow.Init(CharacterManager::Instance()->Right()->pos, route[routeHandle].pos);
+	}
 }
 
 AiResult FollowPath::CurrentProgress()

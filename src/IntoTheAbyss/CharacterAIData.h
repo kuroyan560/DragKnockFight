@@ -43,5 +43,6 @@ class CharacterAIOrder :public Singleton<CharacterAIOrder>
 public:
 	Vec2<float> vel;//ˆÚ“®—Ê
 	bool dashFlag;
-	bool swingFlag;
+	bool swingClockWiseFlag;
+	bool swingCounterClockWiseFlag;
 };

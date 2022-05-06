@@ -42,9 +42,16 @@ public:
 protected:
 	int timer;
 	int timeOver;
+
+	//アイテム探索
+	struct SearchData
+	{
+		float distance;
+		int itemIndex;
+	};
+	SearchData SearchItem(const SphereCollision &DATA);
+	static const float SEARCH_RADIUS;
 };
-
-
 
 
 /// <summary>
@@ -88,16 +95,9 @@ private:
 	bool seachItemFlag;
 	bool initFlag;
 	Vec2<int>prevStartHandle;
-	static const float SEARCH_RADIUS;
 
 	bool getFlag;
 	int prevItemIndex;
-	struct SearchData
-	{
-		float distance;
-		int itemIndex;
-	};
-	RestoreStamina::SearchData SearchItem(const SphereCollision &DATA);
 	//アイテム探索--------------------------
 
 	//成否--------------------------
@@ -132,7 +132,6 @@ public:
 	MoveToOwnGround moveToOnwGround;
 private:
 	bool goToTheFieldFlag;
-	bool initFlag;
 
 };
 

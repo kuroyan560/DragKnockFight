@@ -911,6 +911,5 @@ void CharacterInterFace::FinishSwing()
 	nowSwing = false;
 	partner.lock()->stagingDevice.StopSpin();
 	partner.lock()->OnSwingedFinish();
-
 }
 

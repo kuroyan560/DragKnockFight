@@ -21,7 +21,8 @@ void CharacterAI::Init()
 	//restoreStamina.Init();
 	//goToTheField.Init();
 
-	StrategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
+	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
+	strategyArray[strategyOfChoice]->Init();
 }
 
 void CharacterAI::Update()
@@ -57,18 +58,37 @@ void CharacterAI::Update()
 		staminaInit = true;
 	}
 
-	if (initFlag)
+	//ˆÓvŒˆ’è--------------------------
+	//í—ª‚ª¬Œ÷–”‚Í¸”s‚µ‚½Û
+	if (strategyArray[strategyOfChoice]->CurrentProgress() == AiResult::OPERATE_SUCCESS ||
+		strategyArray[strategyOfChoice]->CurrentProgress() == AiResult::OPERATE_FAIL)
 	{
-		strategyArray[StrategyOfChoice]->route = shortestData;
-		strategyArray[StrategyOfChoice]->Update();
-
-
-		//ó‚¯“n‚µ-----------------------------------------------------
-		startPoint = strategyArray[StrategyOfChoice]->startPoint;
-		endPoint = strategyArray[StrategyOfChoice]->endPoint;
-		startFlag = strategyArray[StrategyOfChoice]->startFlag;
-		CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
+		float min = 10.0f;
+		int selecting = 0;
+		//•]‰¿’l‚ÌÅ‘å’l‚©‚çí—ª‚ğŒˆ’è‚·‚é
+		for (int i = 0; i < strategyArray.size(); ++i)
+		{
+			float strategyEvaluationValue = strategyArray[i]->EvaluationFunction();
+			if (strategyEvaluationValue < min)
+			{
+				selecting = i;
+				min = strategyEvaluationValue;
+			}
+		}
+		strategyOfChoice = static_cast<AiStrategy>(selecting);
+		strategyArray[strategyOfChoice]->Init();
 	}
+	//ˆÓvŒˆ’è--------------------------
+
+	strategyArray[strategyOfChoice]->route = shortestData;
+	strategyArray[strategyOfChoice]->Update();
+
+
+	//ó‚¯“n‚µ-----------------------------------------------------
+	startPoint = strategyArray[strategyOfChoice]->startPoint;
+	endPoint = strategyArray[strategyOfChoice]->endPoint;
+	startFlag = strategyArray[strategyOfChoice]->startFlag;
+	CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
 }
 
 void CharacterAI::Draw()

@@ -216,12 +216,20 @@ public:
 	virtual void OnKnockOut() = 0;
 
 	/// <summary>
-	/// 時計回りもしくは反時計回り回した際に壁に当たるかどうか
+	/// 時計回りに壁に当たるかどうか
 	/// </summary>
 	/// <returns></returns>
-	bool IsHitWall()
+	bool ClockwiseHitsTheWall()
 	{
-		return CWSwingSegmentMgr.IsHitWall() || CCWSwingSegmentMgr.IsHitWall();
+		return CWSwingSegmentMgr.IsHitWall();
+	}
+	/// <summary>
+	/// 反時計回り回した際に当たるかどうか
+	/// </summary>
+	/// <returns></returns>
+	bool CounterClockwiseHitsTheWall()
+	{
+		return CCWSwingSegmentMgr.IsHitWall();
 	}
 };
 

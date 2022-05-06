@@ -3,8 +3,9 @@
 #include"StaminaItemMgr.h"
 #include"BulletCollision.h"
 #include"../IntoTheAbyss/CharacterManager.h"
+#include"Stamina.h"
 
-const float RestoreStamina::SEARCH_RADIUS = 500.0f;
+const float IStrategicLayer::SEARCH_RADIUS = 500.0f;
 const int RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 3;
 
 RestoreStamina::RestoreStamina()
@@ -207,41 +208,7 @@ float RestoreStamina::EvaluationFunction()
 	//自陣へのウェイポイントが少ない
 
 
-	return static_cast<float>(evaluationValue / data->EVALUATION_MAX_VALUE);
-}
-
-RestoreStamina::SearchData RestoreStamina::SearchItem(const SphereCollision &DATA)
-{
-	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
-
-	std::vector<float>distance;
-	std::vector<int>itemId;
-	//探索範囲内にアイテムがあるのか調べる
-	for (int i = 0; i < item.size(); ++i)
-	{
-		//アイテムを一つ以上見つけたら探索準備をする
-		//そして距離を測る
-		if (BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), DATA))
-		{
-			distance.push_back(DATA.center->Distance(*item[i].GetCollisionData()->center));
-			itemId.push_back(i);
-		}
-	}
-
-	//探索範囲内から一番近いアイテムを見る
-	SearchData result;
-	result.distance = 10000.0f;
-	result.itemIndex = -1;
-	for (int i = 0; i < distance.size(); ++i)
-	{
-		if (distance[i] < result.distance)
-		{
-			result.distance = distance[i];
-			result.itemIndex = itemId[i];
-		}
-	}
-
-	return result;
+	return static_cast<float>(evaluationValue) / static_cast<float>(data->EVALUATION_MAX_VALUE);
 }
 
 const float AcquireASuperiorityGauge::SUCCEED_GAUGE_VALUE = 0.3f;
@@ -315,7 +282,6 @@ GoToTheField::GoToTheField()
 	timeOver = 60 * 10;
 	startFlag = false;
 	goToTheFieldFlag = true;
-	initFlag = false;
 }
 
 void GoToTheField::Init()
@@ -328,23 +294,33 @@ void GoToTheField::Update()
 	//自分が自陣に近づく
 	if (goToTheFieldFlag)
 	{
-		//moveToOnwGround.route = route;
-		//moveToOnwGround.Update();
-		//startPoint = moveToOnwGround.startPoint;
-		//endPoint = moveToOnwGround.endPoint;
-		//startFlag = true;
+		moveToOnwGround.route = route;
+		moveToOnwGround.Update();
+		startPoint = moveToOnwGround.startPoint;
+		endPoint = moveToOnwGround.endPoint;
+		startFlag = true;
 	}
 	//自分が敵陣に近づかない
 	else
 	{
 	}
-
+	//振り回し可能か
+	bool canSwingClockWiseFlag = CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
+	bool canSwingCClockWiseFlag = CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
+	//スタミナがプレイヤーより多い
+	bool useSwingFlag = CharacterAIData::Instance()->playerData.stamineGauge <= CharacterAIData::Instance()->bossData.stamineGauge;
 	//敵を振り回しで移動させる
-	if (CharacterManager::Instance()->Right()->IsHitWall() && !CharacterManager::Instance()->Right()->GetNowSwing() && !initFlag)
+	if (canSwingClockWiseFlag && useSwingFlag)
 	{
-		CharacterAIOrder::Instance()->swingFlag = true;
-		//initFlag = true;
+		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
+		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
 	}
+	else if (canSwingCClockWiseFlag && useSwingFlag)
+	{
+		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
+		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
+	}
+
 	//敵をダッシュで移動させる
 	if (CharacterAIData::Instance()->dashFlag)
 	{
@@ -369,5 +345,114 @@ AiResult GoToTheField::CurrentProgress()
 
 float GoToTheField::EvaluationFunction()
 {
-	return 0.0f;
+	CharacterAIData *data = CharacterAIData::Instance();
+	//評価値
+	int evaluationValue = 0;
+	//マップチップ番号
+	Vec2<int>bossHandle;
+	bossHandle.x = static_cast<int>(CharacterManager::Instance()->Right()->pos.x / 50.0f);
+	bossHandle.y = static_cast<int>(CharacterManager::Instance()->Right()->pos.y / 50.0f);
+	Vec2<int>playerHandle;
+	playerHandle.x = static_cast<int>(CharacterManager::Instance()->Left()->pos.x / 50.0f);
+	playerHandle.y = static_cast<int>(CharacterManager::Instance()->Left()->pos.y / 50.0f);
+
+
+
+	//優勢ゲージ n6~7
+	if (60 <= data->bossData.gaugeValue && data->bossData.gaugeValue <= 70)
+	{
+		evaluationValue += 2;
+	}
+	//スタミナが自分＜敵
+	if (data->playerData.stamineGauge == data->bossData.stamineGauge)
+	{
+		evaluationValue += 1;
+	}
+
+	const float nearDistance = 200.0f;
+	//自分と壁との距離が近い
+	if (!data->wayPoints[bossHandle.y][bossHandle.x]->isWall)
+	{
+		bool farTopFlag = nearDistance < data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceTop;
+		bool farBottomFlag = nearDistance < data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceBottom;
+		bool farLeftFlag = nearDistance < data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceLeft;
+		bool farRightFlag = nearDistance < data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceRight;
+
+		if (farTopFlag || farBottomFlag || farLeftFlag || farRightFlag)
+		{
+			evaluationValue += 2;
+		}
+	}
+	//敵と壁との距離が近くない
+	if (!data->wayPoints[playerHandle.y][playerHandle.x]->isWall)
+	{
+		bool farTopFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceTop;
+		bool farBottomFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceBottom;
+		bool farLeftFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceLeft;
+		bool farRightFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceRight;
+
+		if (farTopFlag || farBottomFlag || farLeftFlag || farRightFlag)
+		{
+			evaluationValue += 1;
+		}
+	}
+
+	SphereCollision searchArea;
+	searchArea.center = &CharacterManager::Instance()->Right()->pos;
+	searchArea.radius = SEARCH_RADIUS;
+
+	//敵より自分の方がアイテムが近い
+	//自分側
+	SearchData bossResult = SearchItem(searchArea);
+	//敵側
+	SphereCollision hitBox;
+	hitBox.center = &CharacterManager::Instance()->Left()->pos;
+	hitBox.radius = SEARCH_RADIUS;
+	SearchData playerResult = SearchItem(hitBox);
+	const float distance = 200.0f;
+	//敵が一定以上アイテムから離れていたら、敵を移動させることを優勢できるように値を入れる
+	if (distance < playerResult.distance)
+	{
+		evaluationValue += 2;
+	}
+
+	//自陣へのウェイポイントが少ない
+
+
+	return static_cast<float>(evaluationValue) / static_cast<float>(data->EVALUATION_MAX_VALUE);
 }
+
+IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &DATA)
+{
+	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
+
+	std::vector<float>distance;
+	std::vector<int>itemId;
+	//探索範囲内にアイテムがあるのか調べる
+	for (int i = 0; i < item.size(); ++i)
+	{
+		//アイテムを一つ以上見つけたら探索準備をする
+		//そして距離を測る
+		if (BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), DATA))
+		{
+			distance.push_back(DATA.center->Distance(*item[i].GetCollisionData()->center));
+			itemId.push_back(i);
+		}
+	}
+
+	//探索範囲内から一番近いアイテムを見る
+	SearchData result;
+	result.distance = 10000.0f;
+	result.itemIndex = -1;
+	for (int i = 0; i < distance.size(); ++i)
+	{
+		if (distance[i] < result.distance)
+		{
+			result.distance = distance[i];
+			result.itemIndex = itemId[i];
+		}
+	}
+
+	return result;
+}
+
