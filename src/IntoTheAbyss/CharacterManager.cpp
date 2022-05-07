@@ -107,11 +107,11 @@ void CharacterManager::CharactersGenerate()
 	}
 }
 
-void CharacterManager::CharactersInit(const Vec2<float>& RespawnPos)
+void CharacterManager::CharactersInit(const Vec2<float>& RespawnPos, const bool& Appear)
 {
 	const auto offset = Vec2<float>(CharacterInterFace::LINE_LENGTH, 0.0f);
-	characters[LEFT_TEAM]->Init(RespawnPos - offset);
-	characters[RIGHT_TEAM]->Init(RespawnPos + offset);
+	characters[LEFT_TEAM]->Init(RespawnPos - offset, Appear);
+	characters[RIGHT_TEAM]->Init(RespawnPos + offset, Appear);
 }
 
 void CharacterManager::PracticeMode()

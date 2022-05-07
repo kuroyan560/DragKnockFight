@@ -25,7 +25,7 @@ public:
 	void CharactersSelectDraw();
 
 	void CharactersGenerate();
-	void CharactersInit(const Vec2<float>& RespawnPos);
+	void CharactersInit(const Vec2<float>& RespawnPos,const bool& Appear);
 	std::shared_ptr<CharacterInterFace>& Left() { return characters[LEFT_TEAM]; }
 	std::shared_ptr<CharacterInterFace>& Right() { return characters[RIGHT_TEAM]; }
 

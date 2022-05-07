@@ -112,6 +112,9 @@ class Game
 	ScreenEdgeEffect screenEdgeEffect;
 
 	Vec2<float>responeScrollPos;
+
+	//登場演出を行うかのフラグ
+	bool roundStartEffect = true;
 public:
 
 	HomeBase playerHomeBase, enemyHomeBase;

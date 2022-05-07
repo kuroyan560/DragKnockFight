@@ -271,10 +271,49 @@ void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& is
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_RIGHT) isHitRight = true;
 }
 
+void CharacterInterFace::Appear()
+{
+	if (CompleteAppear())
+	{
+		return;
+	}
+
+	//ƒTƒCƒY‚ª1.0f‚É‚È‚é‚Ü‚Å“®‚©‚È‚¢
+	if (1.0f < size.x && 1.0f < size.y)
+	{
+		float time = 30.0f;
+		size.x -= INIT_SIZE / time;
+		size.y -= INIT_SIZE / time;
+	}
+	else
+	{
+		if (!initPaticleFlag)
+		{
+			Vec2<float>radian(cosf(Angle::ConvertToRadian(0.0f)), sinf(Angle::ConvertToRadian(0.0f)));
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(90.0f)), sinf(Angle::ConvertToRadian(90.0f)) };
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(180.0f)), sinf(Angle::ConvertToRadian(180.0f)) };
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
+
+			radian = { cosf(Angle::ConvertToRadian(270.0f)), sinf(Angle::ConvertToRadian(270.0f)) };
+			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
+			initPaticleFlag = true;
+		}
+
+		size = { 1.0f,1.0f };
+		++moveTimer;
+	}
+}
+
 void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear)
 {
-	if (Appear)appearExpand = { 5.0f,5.0f };
-	else appearExpand = { 1.0f,1.0f };
+	if (Appear)size = { INIT_SIZE,INIT_SIZE };
+	else size = { 1.0f,1.0f };
+	initPaticleFlag = false;
+	moveTimer = 0;
 
 	pos = GeneratePos;
 	vel = { 0,0 };

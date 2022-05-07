@@ -59,6 +59,10 @@ private:
 	int gaugeReturnTimer;		// クラッシュなどした際に数値が代入され、0の時にデフォルトのゲージ量に戻る。
 	const int GAUGE_RETURN_TIMER = 60;
 
+	//登場演出
+	bool initPaticleFlag;
+	int moveTimer;
+
 
 protected:
 	BulletMgrBase bulletMgr;
@@ -149,7 +153,8 @@ protected:
 
 public:
 	//登場演出が完了したか
-	virtual bool Appear() = 0;
+	void Appear();
+	bool CompleteAppear() { return 20 <= moveTimer; }
 
 	// 前フレームの座標を保存。
 	inline void SavePrevFramePos() { prevPos = pos; }

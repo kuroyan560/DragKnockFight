@@ -42,8 +42,6 @@ public:
 	bool atackModeFlag;
 	//ボスのパターン制御-----------------------
 
-	bool initPaticleFlag;
-	int moveTimer;
 
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
@@ -91,6 +89,5 @@ private:
 
 	void Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed);
 public:
-	bool Appear()override;
 	void OnKnockOut()override {};
 };

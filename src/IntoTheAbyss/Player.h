@@ -106,8 +106,6 @@ public:
 	}playerDirY;
 
 	float sizeVel;
-	bool initPaticleFlag;
-	int moveTimer;
 
 	//チュートリアルアイコン
 	Tutorial tutorial;
@@ -204,6 +202,5 @@ private:
 	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
 
 public:
-	bool Appear()override;
 	void OnKnockOut()override { anim.ChangeAnim(KNOCK_OUT); }
 };

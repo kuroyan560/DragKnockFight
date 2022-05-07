@@ -43,15 +43,11 @@ void Boss::OnInit()
 {
 	/*===== ê∂ê¨èàóù =====*/
 
-	initScale = SCALE * 5.0f;
-	size = initScale;
 	moveVel = { 0,0 };
 	swingInertia = 0;
 	swingInertiaVec = {};
 	afterSwingDelay = 0;
 	prevIntersectedLine = INTERSECTED_NONE;
-	moveTimer = 0;
-	initPaticleFlag = false;
 
 	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 	patternTimer = 0;
@@ -545,41 +541,4 @@ void Boss::Shot(const Vec2<float>& generatePos, const float& forwardAngle, const
 {
 	static const int BULLET_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
 	bulletMgr.Generate(BULLET_GRAPH, generatePos, forwardAngle, speed);
-}
-
-bool Boss::Appear()
-{
-	if (20 <= moveTimer)
-	{
-		return true;
-	}
-
-	if (SCALE.x < size.x && SCALE.y < size.y)
-	{
-		float time = 30.0f;
-		size -= initScale / time;
-	}
-	else
-	{
-		if (!initPaticleFlag)
-		{
-			Vec2<float>radian(cosf(Angle::ConvertToRadian(0.0f)), sinf(Angle::ConvertToRadian(0.0f)));
-			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
-
-			radian = { cosf(Angle::ConvertToRadian(90.0f)), sinf(Angle::ConvertToRadian(90.0f)) };
-			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
-
-			radian = { cosf(Angle::ConvertToRadian(180.0f)), sinf(Angle::ConvertToRadian(180.0f)) };
-			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
-
-			radian = { cosf(Angle::ConvertToRadian(270.0f)), sinf(Angle::ConvertToRadian(270.0f)) };
-			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
-			initPaticleFlag = true;
-		}
-
-		size = { 80.0f,80.0f };
-		++moveTimer;
-	}
-
-	return false;
 }

@@ -264,7 +264,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//responePos.x -= 100;
 	//responePos.y += 50;
 	lineCenterPos = responePos - cameraBasePos;
-	CharacterManager::Instance()->CharactersInit(lineCenterPos);
+	CharacterManager::Instance()->CharactersInit(lineCenterPos, roundStartEffect);
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
@@ -315,6 +315,8 @@ Game::Game()
 
 void Game::Init(const bool& RoundStartEffect)
 {
+	roundStartEffect = RoundStartEffect;
+
 	WinCounter::Instance()->Reset();
 
 	turnResultScene = false;
@@ -324,7 +326,7 @@ void Game::Init(const bool& RoundStartEffect)
 	InitGame(0, 0);
 	ScrollMgr::Instance()->Reset();
 	roundChangeEffect.Init();
-	readyToStartRoundFlag = RoundStartEffect;
+	readyToStartRoundFlag = roundStartEffect;
 	CrashEffectMgr::Instance()->Init();
 	screenEdgeEffect.Init();
 
@@ -495,9 +497,9 @@ void Game::Update(const bool& Loop)
 		//登場演出
 		if (roundChangeEffect.initGameFlag)
 		{
-			bool leftAppear = CharacterManager::Instance()->Left()->Appear();
-			bool rightApperar = CharacterManager::Instance()->Right()->Appear();
-			if (leftAppear && rightApperar)	//どちらのキャラも登場演出完了
+			CharacterManager::Instance()->Left()->Appear();
+			CharacterManager::Instance()->Right()->Appear();
+			if (CharacterManager::Instance()->Left()->CompleteAppear() && CharacterManager::Instance()->Right()->CompleteAppear())	//どちらのキャラも登場演出完了
 			{
 				//ゲームスタート
 				readyToStartRoundFlag = false;

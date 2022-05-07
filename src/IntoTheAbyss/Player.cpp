@@ -86,8 +86,6 @@ void Player::OnInit()
 
 	size = { 1.0f,1.0f };
 	sizeVel = 120.0f;
-	initPaticleFlag = false;
-	moveTimer = 0;
 
 	playerDirX = GetWhichTeam() == LEFT_TEAM ? PLAYER_LEFT : PLAYER_RIGHT;
 	playerDirY = PLAYER_FRONT;
@@ -253,7 +251,7 @@ void Player::OnDraw()
 	//if (vel.y < 0)playerDir = BACK;
 	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
 
-	if (!isHold && !anim.Compare({ SWINGED,TIRED,NON_PILOT }) && 20 <= moveTimer)
+	if (!isHold && !anim.Compare({ SWINGED,TIRED,NON_PILOT }) && CompleteAppear())
 	{
 		if (moveInput.x)
 		{
@@ -876,43 +874,4 @@ void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector
 		vel.y *= 0.5f;
 	}
 
-}
-
-bool Player::Appear()
-{
-	if (20 <= moveTimer)
-	{
-		return true;
-	}
-
-	//ƒTƒCƒY‚ª1.0f‚É‚È‚é‚Ü‚Å“®‚©‚È‚¢
-	if (1.0f < size.x && 1.0f < size.y)
-	{
-		float time = 30.0f;
-		size.x -= INIT_SIZE / time;
-		size.y -= INIT_SIZE / time;
-	}
-	else
-	{
-		if (!initPaticleFlag)
-		{
-			Vec2<float>radian(cosf(Angle::ConvertToRadian(0.0f)), sinf(Angle::ConvertToRadian(0.0f)));
-			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
-
-			radian = { cosf(Angle::ConvertToRadian(90.0f)), sinf(Angle::ConvertToRadian(90.0f)) };
-			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
-
-			radian = { cosf(Angle::ConvertToRadian(180.0f)), sinf(Angle::ConvertToRadian(180.0f)) };
-			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
-
-			radian = { cosf(Angle::ConvertToRadian(270.0f)), sinf(Angle::ConvertToRadian(270.0f)) };
-			ParticleMgr::Instance()->Generate(pos, radian, BULLET);
-			initPaticleFlag = true;
-		}
-
-		size = { 1.0f,1.0f };
-		++moveTimer;
-	}
-
-	return false;
 }
