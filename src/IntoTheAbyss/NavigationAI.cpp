@@ -263,6 +263,8 @@ void NavigationAI::Draw()
 
 					//ウェイポイントの描画
 					DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos), wayPoints[y][x]->radius * ScrollMgr::Instance()->zoom, color);
+					// デバッグ用 アイテムが保持されているウェイポイントを塗りつぶす。
+					//DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(wayPoints[y][x]->pos), wayPoints[y][x]->radius * ScrollMgr::Instance()->zoom, color, wayPoints[y][x]->numberOfItemHeld ? true : false);
 				}
 				//探索範囲の描画
 				if (serachFlag)
@@ -959,15 +961,34 @@ void NavigationAI::CheckNumberOfItemHeldCount()
 		// 生成されていない or 取得されている だったら処理を飛ばす。
 		if (!staminaItem[index].GetIsActive() || staminaItem[index].GetIsAcquired()) continue;
 
-		// アイテムのマップチップインデックス番号を求める。
-		Vec2<int> mapChipIndex = { (int)(staminaItem[index].GetPos().x / MAP_CHIP_SIZE), (int)(staminaItem[index].GetPos().y / MAP_CHIP_SIZE) };
+		// アイテムの座標を取得。
+		Vec2<float> itemPos = staminaItem[index].GetPos();
 
-		// 各インデックスが既定値を超えてないかをチェック。
-		if (mapChipIndex.x < 0 || wayPointXCount <= mapChipIndex.x) continue;
-		if (mapChipIndex.y < 0 || wayPointYCount <= mapChipIndex.y) continue;
+		const int WAYPOINT_COUNT = wayPoints.size();
+		const float KILL_OFFSET = 500;
 
-		// 相当するウェイポイントにアイテム数を追加。
-		++wayPoints[mapChipIndex.y][mapChipIndex.x]->numberOfItemHeld;
+		for (int height = 0; height < WAYPOINT_COUNT; ++height) {
+
+			const int WAYPOINT_COUNT_X = wayPoints[height].size();
+
+			for (int width = 0; width < WAYPOINT_COUNT_X; ++width) {
+
+				// ウェイポイントが壁だったら処理を飛ばす。
+				if (wayPoints[height][width]->isWall) continue;
+
+				// 距離が一定以上離れていたら処理を飛ばす。軽量化のため。
+				if (itemPos.x - wayPoints[height][width]->pos.x < -KILL_OFFSET || KILL_OFFSET < itemPos.x - wayPoints[height][width]->pos.x)continue;
+				if (itemPos.y - wayPoints[height][width]->pos.y < -KILL_OFFSET || KILL_OFFSET < itemPos.y - wayPoints[height][width]->pos.y)continue;
+
+				// 当たり判定を行う。
+				if (!((itemPos - wayPoints[height][width]->pos).Length() < BOSS_SIZE * 0.5f)) continue;
+
+				// アイテム量を加算。
+				++wayPoints[height][width]->numberOfItemHeld;
+
+			}
+
+		}
 
 	}
 
@@ -1064,32 +1085,32 @@ inline void NavigationAI::RegistHandle(std::shared_ptr<WayPointData> DATA)
 //	if (isLeft && isTop) {
 
 		// 左上に繋げる。
-		ConnectWayPoint(DATA, { -1,-1 }, mapChipSizeData);
+	ConnectWayPoint(DATA, { -1,-1 }, mapChipSizeData);
 
 	//}
 //	if (isRight && isTop) {
 
 		// 右上に繋げる。
-		ConnectWayPoint(DATA, { 1,-1 }, mapChipSizeData);
+	ConnectWayPoint(DATA, { 1,-1 }, mapChipSizeData);
 
-//	}
-//	if (isLeft && isBottom) {
+	//	}
+	//	if (isLeft && isBottom) {
 
-		// 左下に繋げる。
-		ConnectWayPoint(DATA, { -1,1 }, mapChipSizeData);
+			// 左下に繋げる。
+	ConnectWayPoint(DATA, { -1,1 }, mapChipSizeData);
 
-//	}
-//	if (isRight && isBottom) {
+	//	}
+	//	if (isRight && isBottom) {
 
-		// 右下に繋げる。
-		ConnectWayPoint(DATA, { 1,1 }, mapChipSizeData);
+			// 右下に繋げる。
+	ConnectWayPoint(DATA, { 1,1 }, mapChipSizeData);
 
-//	}
+	//	}
 
 
-	// 次に各方向の壁までの距離を求める。
+		// 次に各方向の壁までの距離を求める。
 
-	// 上方向に検索する。
+		// 上方向に検索する。
 	DATA->wallDistanceTop = SearchWall(DATA, Vec2<float>(0, -1), mapChipSizeData);
 	// 下方向に検索する。
 	DATA->wallDistanceBottom = SearchWall(DATA, Vec2<float>(0, 1), mapChipSizeData);
