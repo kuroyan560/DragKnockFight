@@ -95,8 +95,8 @@ void DebugKeyManager::CheckKey(int KEY, const std::string &KEY_NAME, const std::
 		if (2 <= coundKyeUsedNum[i])
 		{
 			std::string name = debugStringData[i]->keyNumber + "は既に使われています。片方のみ別のキーを使用してください";
-			MessageBox(NULL, KuroFunc::GetWideStrFromStr(name).c_str(), TEXT("デバックキー被り"), MB_OK);
-			assert(0);
+			//MessageBox(NULL, KuroFunc::GetWideStrFromStr(name).c_str(), TEXT("デバックキー被り"), MB_OK);
+			//assert(0);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 #include "ScrollMgr.h"
 #include"../Engine/WinApp.h"
 
-void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, const Vec2<float> &ADJ)
+void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, const Vec2<float>& ADJ)
 {
 	mapSize = MAP_MAX_SIZE;
 	adjLine = ADJ;
@@ -21,13 +21,29 @@ void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, con
 	warpFlag = false;
 }
 
-void ScrollMgr::Update()
+void ScrollMgr::Update(const Vec2<float>& LineCenterPos)
 {
 	scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x - Camera::Instance()->scrollAffect.x) / 5.0f;
 	scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y - Camera::Instance()->scrollAffect.y) / 5.0f;
+
+	// 線の中心にスクロール量などをかける。
+	Vec2<float> scrollShakeZoom = scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	scrollShakeZoom.x *= zoom;
+	scrollShakeZoom.y *= zoom;
+	Vec2<float> lineCenterPos = LineCenterPos * zoom - scrollShakeZoom;
+
+	// 画面の中心を取得。
+	Vec2<int> windowCenter = WinApp::Instance()->GetWinCenter();
+
+	// 線の中心と画面の中心との差分を求める。
+	Vec2<float> lineCenterOffsetBuff = Vec2<float>((float)windowCenter.x, (float)windowCenter.y) - lineCenterPos;
+
+	// 補完をかける。
+	lineCenterOffset += ( lineCenterOffsetBuff - lineCenterOffset ) / 5.0f;
+
 }
 
-void ScrollMgr::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS)
+void ScrollMgr::CalucurateScroll(const Vec2<float>& VEL, const Vec2<float>& PLAYER_POS)
 {
 	//ワープした際は前フレーム計算の影響が出ないように処理を飛ばす
 
@@ -69,12 +85,12 @@ void ScrollMgr::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAY
 	warpFlag = false;
 }
 
-Vec2<float> ScrollMgr::Affect(const Vec2<float> &Pos)
+Vec2<float> ScrollMgr::Affect(const Vec2<float>& Pos)
 {
 	Vec2<float> scrollShakeZoom = scrollAmount + ShakeMgr::Instance()->shakeAmount;
 	scrollShakeZoom.x *= zoom;
 	scrollShakeZoom.y *= zoom;
-	return Pos * zoom - scrollShakeZoom;
+	return Pos * zoom - scrollShakeZoom + lineCenterOffset;
 }
 
 void ScrollMgr::Warp(const Vec2<float> POS)

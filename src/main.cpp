@@ -42,9 +42,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	std::vector<BaseScene*>sceneList =
 	{
+		new GameScene(),
 		new TitleScene(),
 		new StageSelectScene(),
-		new GameScene(),
 		new ResultScene(),
 		new TutorialScene()
 	};

@@ -132,7 +132,7 @@ VSOutput VSmain(VSInput input)
     VSOutput output;
     output.pos = input.pos;
     output.pos.xy *= zoom;
-    output.pos.xy -= scroll;
+    output.pos.xy += scroll;
     output.radian = input.radian;
     output.alpha = input.alpha;
     output.isAlive = input.isAlive;
