@@ -367,7 +367,7 @@ bool StaminaMgr::CheckCanAction(const int& ConsumesStamina)
 
 }
 
-bool StaminaMgr::ConsumesStaminaByGauge(const float& CounsumeStaminaGauge)
+void StaminaMgr::ConsumesStaminaByGauge(const float& CounsumeStaminaGauge)
 {
 	//å≥ÅXãÛÇ¡Ç€Ç©
 	const bool oldEmptyFlg = stamina.front().GetNowGauge() <= 0.0f;
@@ -384,7 +384,7 @@ bool StaminaMgr::ConsumesStaminaByGauge(const float& CounsumeStaminaGauge)
 			//è¡îÔäÆóπ
 			if (consumeAmount <= 0)
 			{
-				return true;
+				break;
 			}
 		}
 	}
@@ -396,6 +396,4 @@ bool StaminaMgr::ConsumesStaminaByGauge(const float& CounsumeStaminaGauge)
 		outOfStaminaEffect.Empty();
 	}
 
-	//è¡îÔÇµÇ´ÇÍÇ»Ç©Ç¡ÇΩ
-	return false;
 }

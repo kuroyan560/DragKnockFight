@@ -2,7 +2,6 @@
 #include"CharacterInterFace.h"
 #include"Singleton.h"
 #include<array>
-class Tutorial;
 
 class CharacterManager : public Singleton<CharacterManager>
 {
@@ -18,9 +17,6 @@ class CharacterManager : public Singleton<CharacterManager>
 
 	//キャラクター情報
 	std::array<std::shared_ptr<CharacterInterFace>, TEAM_NUM>characters;
-
-	//プレイヤー用チュートリアル
-	std::array<std::shared_ptr<Tutorial>, TEAM_NUM>tutorials;
 
 public:
 	//選択

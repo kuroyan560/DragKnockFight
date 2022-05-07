@@ -5,10 +5,6 @@
 
 CharacterManager::CharacterManager()
 {
-	for (int i = 0; i < TEAM_NUM; ++i)
-	{
-		tutorials[i] = std::make_shared<Tutorial>((WHICH_TEAM)i);
-	}
 }
 
 std::shared_ptr<CharacterInterFace> CharacterManager::CreateCharacter(const  PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& Team)
@@ -16,9 +12,9 @@ std::shared_ptr<CharacterInterFace> CharacterManager::CreateCharacter(const  PLA
 	switch (CharacterName)
 	{
 	case PLAYABLE_LUNA:
-		return std::make_shared<Player>(CharacterName, Team, tutorials[Team]);
+		return std::make_shared<Player>(CharacterName, Team);
 	case PLAYABLE_LACY:
-		return std::make_shared<Player>(CharacterName, Team, tutorials[Team]);
+		return std::make_shared<Player>(CharacterName, Team);
 	case PLAYABLE_BOSS_0:
 		return std::make_shared<Boss>();
 	}

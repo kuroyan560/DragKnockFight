@@ -10,15 +10,22 @@ class Tutorial
 	{
 		int stickHead;
 		int stickBase_L;
-		int stickBase_R;
-		int triggerOn_L;
-		int triggerOn_R;
-		int triggerOff_L;
-		int triggerOff_R;
+		//int stickBase_R;
+		int stickBaseSwing_R;
+		int stickBasePilot_R;
+		//int triggerOn_L;
+		//int triggerOn_R;
+		//int triggerOff_L;
+		//int triggerOff_R;
+		int buttonOn_L;
+		int buttonOn_R;
+		int buttonOff_L;
+		int buttonOff_R;
 	}iconGraphs;
 	WHICH_TEAM team;
 
-	bool rightStickInput = false;
+	//bool rightStickInput = false;
+	bool pilotLeave = false;
 
 	void DrawIcon(const Vec2<float>& Pos, const int& Handle);
 	void DrawIconNonActive(const Vec2<float>& Pos, const int& Handle);
@@ -26,9 +33,11 @@ class Tutorial
 
 public:
 	Tutorial(const WHICH_TEAM& Team);
-	void Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const bool& LTrigger, bool RTrigger);
+	//void Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const bool& LTrigger, bool RTrigger);
+	void Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const bool& LButton, bool RButton);
 
-	void SetRstickInput(const bool& IsActive) { rightStickInput = IsActive; }
+	//void SetRstickInput(const bool& IsActive) { rightStickInput = IsActive; }
+	void SetPilotLeave(const bool& IsLeave) { pilotLeave = IsLeave; }
 	void TurnActive() { active = !active; }
 };
 

@@ -15,7 +15,7 @@ class LightManager;
 #include"StagingInterFace.h"
 
 #include"CharacterInterFace.h"
-class Tutorial;
+#include"Tutorial.h"
 
 #include"RunOutOfStaminaEffect.h"
 
@@ -110,7 +110,7 @@ public:
 	int moveTimer;
 
 	//チュートリアルアイコン
-	std::weak_ptr<Tutorial>tutorial;
+	Tutorial tutorial;
 
 	//パイロットの移動速度
 	Vec2<float>pilotVel;
@@ -121,7 +121,7 @@ public:
 	/*-- メンバ関数 --*/
 
 	// コンストラクタ
-	Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx,const std::shared_ptr<Tutorial>&Tutorial);
+	Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& Team);
 	~Player();
 
 private:
@@ -164,11 +164,13 @@ private:
 	{
 		pilotVel = { 0,0 };
 		anim.ChangeAnim(NON_PILOT);
+		tutorial.SetPilotLeave(true);
 	}
 	void OnPilotControl()override;		//パイロットを動かす処理
 	void OnPilotReturn()override	//パイロットがロボに戻った瞬間
 	{
-		anim.ChangeAnim(DEFAULT_FRONT);
+		if (anim.GetNowAnim() != TIRED)anim.ChangeAnim(DEFAULT_FRONT);
+		tutorial.SetPilotLeave(false);
 	}
 
 	bool drawCursorFlag;

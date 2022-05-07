@@ -20,7 +20,6 @@
 #include"AudioApp.h"
 #include "SlowMgr.h"
 #include"CrashMgr.h"
-#include"Tutorial.h"
 #include "AfterImage.h"
 #include "DrawFunc.h"
 #include "Stamina.h"
@@ -32,8 +31,8 @@ Vec2<float> Player::GetGeneratePos()
 
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const int& ControllerIdx, const std::shared_ptr<Tutorial>& Tutorial)
-	:CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx(ControllerIdx), tutorial(Tutorial)
+Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& Team)
+	:CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx((int)Team), tutorial(Team)
 {
 	/*====== コンストラクタ =====*/
 	if (PLAYER_CHARACTER_NUM <= CharacterName)assert(0);
@@ -210,7 +209,7 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 		// 紐つかみ状態(踏ん張り状態)を解除する。
 		isHold = false;
 
-		tutorial.lock()->SetRstickInput(false);
+		//tutorial.lock()->SetRstickInput(false);
 
 	}
 
@@ -334,10 +333,13 @@ void Player::OnDrawUI()
 	}
 
 	const auto leftStickVec = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
-	const auto leftTrigger = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT);
-	const auto rightTrigger = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RT);
+	//const auto leftTrigger = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT);
+	//const auto rightTrigger = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RT);
+	const auto leftButton = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
+	const auto rightButton = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB);
 
-	tutorial.lock()->Draw(leftStickVec, rightStickVec, leftTrigger, rightTrigger);
+	//tutorial.lock()->Draw(leftStickVec, rightStickVec, leftTrigger, rightTrigger);
+	tutorial.Draw(leftStickVec, rightStickVec, leftButton, rightButton);
 }
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)
@@ -433,7 +435,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	//チュートリアルの表示 / 非表示
 	if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::BACK))
 	{
-		tutorial.lock()->TurnActive();
+		tutorial.TurnActive();
 	}
 
 

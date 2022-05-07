@@ -15,11 +15,17 @@ Tutorial::Tutorial(const WHICH_TEAM& Team) :team(Team)
 			std::string dir = "resource/ChainCombat/tutorial/icon/" + additionalDir[i];
 			ICON_GRAPHS[i].stickHead = TexHandleMgr::LoadGraph(dir + "stickHead.png");
 			ICON_GRAPHS[i].stickBase_L = TexHandleMgr::LoadGraph(dir + "L_stick_base.png");
-			ICON_GRAPHS[i].stickBase_R = TexHandleMgr::LoadGraph(dir + "R_stick_base.png");
-			ICON_GRAPHS[i].triggerOn_L = TexHandleMgr::LoadGraph(dir + "L_trigger_on.png");
-			ICON_GRAPHS[i].triggerOn_R = TexHandleMgr::LoadGraph(dir + "R_trigger_on.png");
-			ICON_GRAPHS[i].triggerOff_L = TexHandleMgr::LoadGraph(dir + "L_trigger_off.png");
-			ICON_GRAPHS[i].triggerOff_R = TexHandleMgr::LoadGraph(dir + "R_trigger_off.png");
+			//ICON_GRAPHS[i].stickBase_R = TexHandleMgr::LoadGraph(dir + "R_stick_base.png");
+			ICON_GRAPHS[i].stickBaseSwing_R = TexHandleMgr::LoadGraph(dir + "R_stick_base_swing.png");
+			ICON_GRAPHS[i].stickBasePilot_R = TexHandleMgr::LoadGraph(dir + "R_stick_base_pilot.png");
+			//ICON_GRAPHS[i].triggerOn_L = TexHandleMgr::LoadGraph(dir + "L_trigger_on.png");
+			//ICON_GRAPHS[i].triggerOn_R = TexHandleMgr::LoadGraph(dir + "R_trigger_on.png");
+			//ICON_GRAPHS[i].triggerOff_L = TexHandleMgr::LoadGraph(dir + "L_trigger_off.png");
+			//ICON_GRAPHS[i].triggerOff_R = TexHandleMgr::LoadGraph(dir + "R_trigger_off.png");
+			ICON_GRAPHS[i].buttonOn_L = TexHandleMgr::LoadGraph(dir + "L_button_on.png");
+			ICON_GRAPHS[i].buttonOn_R = TexHandleMgr::LoadGraph(dir + "R_button_on.png");
+			ICON_GRAPHS[i].buttonOff_L = TexHandleMgr::LoadGraph(dir + "L_button_off.png");
+			ICON_GRAPHS[i].buttonOff_R = TexHandleMgr::LoadGraph(dir + "R_button_off.png");
 		}
 		LOAD = true;
 	}
@@ -57,11 +63,11 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 {
 	if (!active)return;
 
-	if (!rightStickInput)
-	{
-		RStickVec = { 0,0 };
-		RTrigger = false;
-	}
+	//if (!rightStickInput)
+	//{
+		//RStickVec = { 0,0 };
+		//RTrigger = false;
+	//}
 
 
 	//右プレイヤーか左プレイヤーかでの位置オフセット
@@ -74,6 +80,7 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 	//左スティック
 	static const Vec2<float>LstickPos = { 47,0 };
 	static const Vec2<float>LstickOffset = { 3,19 };
+	//DrawIcon(LstickPos + LstickOffset + OFFSET[team], iconGraphs.stickBase_L);
 	DrawIcon(LstickPos + LstickOffset + OFFSET[team], iconGraphs.stickBase_L);
 	//左スティックヘッド
 	static const Vec2<float>LstickHeadCenterOffset = Vec2<float>(-48.0f, 2.0f) * SCALE;
@@ -82,7 +89,8 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 
 	//左トリガー
 	static const Vec2<float>LtriggerPos = { 22,ICON_OFFSET_Y + LstickPos.y };
-	DrawIcon(LtriggerPos + OFFSET[team], LTrigger ? iconGraphs.triggerOn_L : iconGraphs.triggerOff_L);
+	//DrawIcon(LtriggerPos + OFFSET[team], LTrigger ? iconGraphs.triggerOn_L : iconGraphs.triggerOff_L);
+	DrawIcon(LtriggerPos + OFFSET[team], LTrigger ? iconGraphs.buttonOn_L : iconGraphs.buttonOff_L);
 
 	//右スティック＆トリガーアイコンのオフセットX
 	static const float R_OFFSET_X = 20.0f;
@@ -92,13 +100,16 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 	static const Vec2<float>RstickPos = { 20 + R_OFFSET_X,R_OFFSET_Y + ICON_OFFSET_Y + LtriggerPos.y };
 	static const Vec2<float>RstickOffset = { -5,7 };
 	//右スティックヘッド
-	static const Vec2<float>RstickHeadCenterOffset = Vec2<float>(33.0f, 3.0f) * SCALE;
+	static const Vec2<float>RstickHeadCenterOffset = Vec2<float>(53.0f, 3.0f) * SCALE;
 	const Vec2<float>RstickHeadPos = RstickPos + RstickOffset + RstickHeadCenterOffset + RStickVec.GetNormal() * STICK_HEAD_RADIUS_OFFSET;
 
 	//右トリガー
 	static const Vec2<float>RtriggerPos = { 22 + R_OFFSET_X,ICON_OFFSET_Y + RstickPos.y - 20.0f };
-	DrawIcon(rightStickInput && (RStickVec.x  || RStickVec.y), RtriggerPos + OFFSET[team], RTrigger ? iconGraphs.triggerOn_R : iconGraphs.triggerOff_R);
+	//DrawIcon(rightStickInput && (RStickVec.x  || RStickVec.y), RtriggerPos + OFFSET[team], RTrigger ? iconGraphs.triggerOn_R : iconGraphs.triggerOff_R);
+	DrawIcon(RtriggerPos + OFFSET[team], RTrigger ? iconGraphs.buttonOn_R : iconGraphs.buttonOff_R);
 
-	DrawIcon(rightStickInput, RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBase_R);
-	DrawIcon(rightStickInput, RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
+	//DrawIcon(rightStickInput, RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBase_R);
+	//DrawIcon(rightStickInput, RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
+	DrawIcon(RstickPos + RstickOffset + OFFSET[team], pilotLeave ? iconGraphs.stickBasePilot_R : iconGraphs.stickBaseSwing_R);
+	DrawIcon(RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
 }

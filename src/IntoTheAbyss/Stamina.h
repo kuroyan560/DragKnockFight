@@ -78,6 +78,6 @@ public:
 	bool CheckCanAction(const int& ConsumesStamina);
 
 	//バー単位ではなくゲージ消費(パイロット引き離し用)、足りなかったらfalseを返す
-	bool ConsumesStaminaByGauge(const float& CounsumeStaminaGauge);
+	void ConsumesStaminaByGauge(const float& CounsumeStaminaGauge);
 
 };
