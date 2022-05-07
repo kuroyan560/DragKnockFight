@@ -8,10 +8,15 @@ struct VSOutput
     float4 leftUpPos : POSITION_L_U;
     float4 rightBottomPos : POSITION_R_B;
     float4 paintColor : PAINT_COLOR;
+    int paintBlend : PAINT_BLEND;
     int2 miror : MIROR;
     float2 leftUpPaintUV : PAINT_UV_L_U;
     float2 rightBottomPaintUV : PAINT_UV_R_B;
 };
+
+static const int BLEND_NONE = 0;
+static const int BLEND_TRANS = 1;
+static const int BLEND_ADD = 2;
 
 VSOutput VSmain(VSOutput input)
 {
@@ -23,6 +28,7 @@ struct GSOutput
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD;
     float4 paintColor : PAINT_COLOR;
+    int paintBlend : PAINT_BLEND;
     float2 leftUpPaintUV : PAINT_UV_L_U;
     float2 rightBottomPaintUV : PAINT_UV_R_B;
 };
@@ -38,6 +44,7 @@ void GSmain(
     
     GSOutput element;
     element.paintColor = input[0].paintColor;
+    element.paintBlend = input[0].paintBlend;
     element.leftUpPaintUV = input[0].leftUpPaintUV;
     element.rightBottomPaintUV = input[0].rightBottomPaintUV;
         
@@ -92,6 +99,13 @@ float4 PSmain(GSOutput input) : SV_TARGET
         return texCol;
     }
     
+    
+    if(input.paintBlend == BLEND_TRANS)
+    {
+        float4 srcCol = input.paintColor;
+        texCol.xyz = texCol.xyz * (1.0f - srcCol.w) + srcCol.xyz * srcCol.w;
+        return texCol;
+    }
     return float4(input.paintColor.xyz, texCol.w * input.paintColor.w);
 }
 

@@ -404,8 +404,8 @@ void CharacterInterFace::DrawUI()
 		const Vec2<float>rightBottom = pos + Vec2<float>(-STAMINA_GAUGE_WIDTH / 2.0f + drawWidth, STAMINA_GAUGE_OFFSET_Y + STAMINA_GAUGE_HEIGHT);
 
 
-		if (isHold && 0.0f < drawWidth)DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUp - STAMINA_SHADOW_OFFSET_SIZE), ScrollMgr::Instance()->Affect(rightBottom + STAMINA_SHADOW_OFFSET_SIZE), GAUGE_SHADOW_COLOR[team], D3D12App::Instance()->GetBackBuffFormat(), true);
-		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUp), ScrollMgr::Instance()->Affect(rightBottom), GAUGE_COLOR[team], D3D12App::Instance()->GetBackBuffFormat(), true);
+		if (isHold && 0.0f < drawWidth)DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUp - STAMINA_SHADOW_OFFSET_SIZE), ScrollMgr::Instance()->Affect(rightBottom + STAMINA_SHADOW_OFFSET_SIZE), GAUGE_SHADOW_COLOR[team], true);
+		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUp), ScrollMgr::Instance()->Affect(rightBottom), GAUGE_COLOR[team], true);
 	}
 
 	OnDrawUI();
@@ -467,7 +467,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 	Vec2<float> moveDir = pos - prevPos;
 	float velOffset = 3.0f;
 	moveDir.Normalize();
-	INTERSECTED_LINE intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(pos, prevPos, moveDir * size, size, MapData, false);
+	INTERSECTED_LINE intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(pos, prevPos, moveDir * size, size, MapData, true);
 	isHitTop = intersectedLine == INTERSECTED_TOP;
 	isHitRight = intersectedLine == INTERSECTED_RIGHT;
 	isHitLeft = intersectedLine == INTERSECTED_LEFT;
@@ -475,7 +475,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 	// ç∂è„
 	Vec2<float> velPosBuff = pos - size + Vec2<float>(velOffset, velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos - size + Vec2<float>(velOffset, velOffset), {}, {}, MapData, false);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos - size + Vec2<float>(velOffset, velOffset), {}, {}, MapData, true);
 	pos = velPosBuff + size - Vec2<float>(velOffset, velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
@@ -484,7 +484,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 	// âEè„
 	velPosBuff = pos + Vec2<float>(size.x, -size.y) + Vec2<float>(-velOffset, velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(size.x, -size.y) + Vec2<float>(-velOffset, velOffset), {}, {}, MapData, false);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(size.x, -size.y) + Vec2<float>(-velOffset, velOffset), {}, {}, MapData, true);
 	pos = velPosBuff - Vec2<float>(size.x, -size.y) - Vec2<float>(-velOffset, velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
@@ -493,7 +493,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 	// âEâ∫
 	velPosBuff = pos + size + Vec2<float>(-velOffset, -velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + size + Vec2<float>(-velOffset, -velOffset), {}, {}, MapData, false);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + size + Vec2<float>(-velOffset, -velOffset), {}, {}, MapData, true);
 	pos = velPosBuff - size - Vec2<float>(-velOffset, -velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
@@ -502,7 +502,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 	// ç∂â∫
 	velPosBuff = pos + Vec2<float>(-size.x, size.y) + Vec2<float>(velOffset, -velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(-size.x, size.y) + Vec2<float>(velOffset, -velOffset), {}, {}, MapData, false);
+	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(-size.x, size.y) + Vec2<float>(velOffset, -velOffset), {}, {}, MapData, true);
 	pos = velPosBuff - Vec2<float>(-size.x, size.y) - Vec2<float>(velOffset, -velOffset);
 	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
 	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
