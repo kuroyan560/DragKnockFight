@@ -147,29 +147,31 @@ class AcquireASuperiorityGauge :public IStrategicLayer
 public:
 	AcquireASuperiorityGauge();
 
-	void Init();
+	void Init()override;
 
 	/// <summary>
 	/// 実行
 	/// </summary>
-	void Update();
+	void Update()override;
 
 	/// <summary>
 	/// 現在実行している処理の進捗
 	/// </summary>
 	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
-	AiResult CurrentProgress();
+	AiResult CurrentProgress()override;
 
-	float EvaluationFunction();
+	float EvaluationFunction()override;
 
 private:
 	static const float SUCCEED_GAUGE_VALUE;//どこまで回復したら成功とするか
 	float nowGauge;//戦略開始時の優勢ゲージ
 	//クラッシュさせる--------------------------
 	bool crashEnemyFlag;
-
+	int swingCoolTime;
+	const int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
 
 
 	//クラッシュされないようにする--------------------------
 	bool dontCrashFlag;
+
 };

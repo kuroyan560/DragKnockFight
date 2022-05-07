@@ -13,12 +13,13 @@ CharacterAI::CharacterAI()
 void CharacterAI::Init()
 {
 	//êÌó™ëwÇÃê∂ê¨--------------------------
-	strategyArray[0] = std::make_unique<RestoreStamina>();
-	strategyArray[1] = std::make_unique<GoToTheField>();
+	strategyArray[STRATEGY_RESTORE_STAMINA] = std::make_unique<RestoreStamina>();
+	strategyArray[STRATEGY_GO_TO_THE_FIELD] = std::make_unique<GoToTheField>();
+	strategyArray[STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE] = std::make_unique<AcquireASuperiorityGauge>();
 	//êÌó™ëwÇÃê∂ê¨--------------------------
 
 	startFlag = false;
-	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
+	strategyOfChoice = STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE;
 	strategyArray[strategyOfChoice]->Init();
 	initFlag = true;
 }

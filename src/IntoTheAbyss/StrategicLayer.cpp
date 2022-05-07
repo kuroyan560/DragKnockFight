@@ -7,6 +7,8 @@
 
 const float IStrategicLayer::SEARCH_RADIUS = 500.0f;
 const float RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 0.4f;
+const float AcquireASuperiorityGauge::SUCCEED_GAUGE_VALUE = 0.3f;
+
 
 RestoreStamina::RestoreStamina()
 {
@@ -230,71 +232,6 @@ float RestoreStamina::EvaluationFunction()
 	return static_cast<float>(evaluationValue) / static_cast<float>(data->EVALUATION_MAX_VALUE);
 }
 
-const float AcquireASuperiorityGauge::SUCCEED_GAUGE_VALUE = 0.3f;
-
-AcquireASuperiorityGauge::AcquireASuperiorityGauge()
-{
-}
-
-void AcquireASuperiorityGauge::Init()
-{
-	nowGauge = CharacterAIData::Instance()->bossData.gaugeValue;
-	timer = 0;
-	timeOver = 60 * 10;
-
-	crashEnemyFlag = false;
-	dontCrashFlag = false;
-}
-
-void AcquireASuperiorityGauge::Update()
-{
-	//ウェイポイント
-	const std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints = CharacterAIData::Instance()->wayPoints;
-
-	//自分が有利不利か判断する
-	//クラッシュされる位置かされない位置かで判断する
-
-
-	//自分が有利ならクラッシュしに行く
-	if (crashEnemyFlag)
-	{
-
-	}
-
-	//自分が不利ならクラッシュされないように立ち回る
-	if (dontCrashFlag)
-	{
-
-	}
-
-
-	//戦略実行中
-	++timer;
-}
-
-AiResult AcquireASuperiorityGauge::CurrentProgress()
-{
-	//一定時間内に一定量回復したら成功、出来なければ失敗
-	int sub = nowGauge - CharacterAIData::Instance()->bossData.gaugeValue;
-	if (SUCCEED_GAUGE_VALUE <= sub && timer < timeOver)
-	{
-		return AiResult::OPERATE_SUCCESS;
-	}
-	else if (timeOver <= timer)
-	{
-		return AiResult::OPERATE_FAIL;
-	}
-	else
-	{
-		return AiResult::OPERATE_INPROCESS;
-	}
-}
-
-float AcquireASuperiorityGauge::EvaluationFunction()
-{
-	return 0.0f;
-}
-
 GoToTheField::GoToTheField()
 {
 }
@@ -469,38 +406,94 @@ float GoToTheField::EvaluationFunction()
 	return static_cast<float>(evaluationValue) / static_cast<float>(data->EVALUATION_MAX_VALUE);
 }
 
-IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &DATA)
+
+AcquireASuperiorityGauge::AcquireASuperiorityGauge()
 {
-	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
-
-	std::vector<float>distance;
-	std::vector<int>itemId;
-	//探索範囲内にアイテムがあるのか調べる
-	for (int i = 0; i < item.size(); ++i)
-	{
-		//アイテムを一つ以上見つけたら探索準備をする
-		//そして距離を測る
-		bool canGetFlag = item[i].GetIsActive() && !item[i].GetIsAcquired();
-		if (canGetFlag && BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), DATA))
-		{
-			distance.push_back(DATA.center->Distance(*item[i].GetCollisionData()->center));
-			itemId.push_back(i);
-		}
-	}
-
-	//探索範囲内から一番近いアイテムを見る
-	SearchData result;
-	result.distance = 10000.0f;
-	result.itemIndex = -1;
-	for (int i = 0; i < distance.size(); ++i)
-	{
-		if (distance[i] < result.distance)
-		{
-			result.distance = distance[i];
-			result.itemIndex = itemId[i];
-		}
-	}
-
-	return result;
 }
 
+void AcquireASuperiorityGauge::Init()
+{
+	nowGauge = CharacterAIData::Instance()->bossData.gaugeValue;
+	timer = 0;
+	timeOver = 60 * 10;
+
+	crashEnemyFlag = false;
+	dontCrashFlag = false;
+
+	swingCoolTime = 0;
+}
+
+void AcquireASuperiorityGauge::Update()
+{
+	////ウェイポイント
+	//const std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints = CharacterAIData::Instance()->wayPoints;
+
+	////自分が有利不利か判断する
+	////クラッシュされる位置かされない位置かで判断する
+
+	////自分が有利ならクラッシュしに行く
+	//if (crashEnemyFlag)
+	//{
+
+	//}
+
+	////自分が不利ならクラッシュされないように立ち回る
+	//if (dontCrashFlag)
+	//{
+
+	//}
+
+	//振り回し可能か
+	bool canSwingClockWiseFlag = CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
+	bool canSwingCClockWiseFlag = CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
+
+	//一定距離を保っているか
+	const float CERTAIN_DISTANCE = 200.0f;
+	bool keepACertainDistanceFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->distance;
+
+	const float STAMINA_VALUE = 0.5f;
+	//スタミナが多い
+	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge && SWING_MAX_COOL_TIME <= swingCoolTime;
+	//敵を振り回しで移動させる
+	if (canSwingClockWiseFlag && useSwingFlag && keepACertainDistanceFlag)
+	{
+		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
+		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
+		swingCoolTime = 0;
+	}
+	else if (canSwingCClockWiseFlag && useSwingFlag && keepACertainDistanceFlag)
+	{
+		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
+		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
+		swingCoolTime = 0;
+	}
+
+	++swingCoolTime;
+
+
+	//戦略実行中
+	++timer;
+}
+
+AiResult AcquireASuperiorityGauge::CurrentProgress()
+{
+	//一定時間内に一定量回復したら成功、出来なければ失敗
+	int sub = nowGauge - CharacterAIData::Instance()->bossData.gaugeValue;
+	if (SUCCEED_GAUGE_VALUE <= sub && timer < timeOver)
+	{
+		return AiResult::OPERATE_SUCCESS;
+	}
+	else if (timeOver <= timer)
+	{
+		return AiResult::OPERATE_FAIL;
+	}
+	else
+	{
+		return AiResult::OPERATE_INPROCESS;
+	}
+}
+
+float AcquireASuperiorityGauge::EvaluationFunction()
+{
+	return 2.0f;
+}
