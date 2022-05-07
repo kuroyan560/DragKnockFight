@@ -92,11 +92,11 @@ void MoveToOwnGround::Update()
 	if (timeOver <= timer || timer == 0)
 	{
 		//ゴール地点の探索
-		Vec2<float>goalPos(CharacterManager::Instance()->Right()->pos);
-		//X軸は自陣、Y軸はボスの座標に合わせた座標
-		goalPos.x = (StageMgr::Instance()->GetMapChipData(0, 0)[0].size() * 50.0f) - 150.0f;
-		searchPoint.Init(goalPos);
-		endPoint = searchPoint.Update();
+		int goalXPoint = CharacterAIData::Instance()->wayPoints[0].size() - 3;
+
+		//陣地側のY座標ランダムで取る
+		int goalYPoint = KuroFunc::GetRand(0, CharacterAIData::Instance()->wayPoints.size() - 1);
+		endPoint = *CharacterAIData::Instance()->wayPoints[goalYPoint][goalXPoint];
 		timer = 1;
 	}
 	++timer;
