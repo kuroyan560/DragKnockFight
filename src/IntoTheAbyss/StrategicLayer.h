@@ -133,6 +133,8 @@ public:
 private:
 	bool goToTheFieldFlag;
 
+	int swingCoolTime;
+	const int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
 };
 
 

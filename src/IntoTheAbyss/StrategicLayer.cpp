@@ -305,6 +305,7 @@ void GoToTheField::Init()
 	timeOver = 60 * 5;
 	startFlag = false;
 	goToTheFieldFlag = true;
+	swingCoolTime = 0;
 }
 
 void GoToTheField::Update()
@@ -325,19 +326,25 @@ void GoToTheField::Update()
 	//振り回し可能か
 	bool canSwingClockWiseFlag = CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
 	bool canSwingCClockWiseFlag = CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
-	//スタミナがプレイヤーより多い
-	bool useSwingFlag = CharacterAIData::Instance()->playerData.stamineGauge <= CharacterAIData::Instance()->bossData.stamineGauge;
+	
+	const float STAMINA_VALUE = 0.5f;
+	//スタミナが多い
+	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge && SWING_MAX_COOL_TIME <= swingCoolTime;
 	//敵を振り回しで移動させる
 	if (canSwingClockWiseFlag && useSwingFlag)
 	{
 		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
 		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
+		swingCoolTime = 0;
 	}
 	else if (canSwingCClockWiseFlag && useSwingFlag)
 	{
 		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
 		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
+		swingCoolTime = 0;
 	}
+
+	++swingCoolTime;
 
 	//敵をダッシュで移動させる
 	if (CharacterAIData::Instance()->dashFlag)
