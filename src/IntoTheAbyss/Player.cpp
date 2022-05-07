@@ -255,8 +255,7 @@ void Player::OnDraw()
 	//if (vel.y < 0)playerDir = BACK;
 	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
 
-	//if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty && 20 <= moveTimer)
-	if (!isHold && anim.GetNowAnim() != SWINGED && anim.GetNowAnim() != TIRED && 20 <= moveTimer)
+	if (!isHold && !anim.Compare({ SWINGED,TIRED,NON_PILOT }) && 20 <= moveTimer)
 	{
 		if (moveInput.x)
 		{
@@ -537,10 +536,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 		if (!IsPilotOutSide())
 		{
 			//パイロット切り離し
-			if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT))SetPilotDetachedFlg(true);
+			if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RB))SetPilotDetachedFlg(true);
 		}
 	}
-	if (UsersInput::Instance()->ControllerOffTrigger(controllerIdx, XBOX_BUTTON::RT))SetPilotDetachedFlg(false);
+	if (UsersInput::Instance()->ControllerOffTrigger(controllerIdx, XBOX_BUTTON::RB))SetPilotDetachedFlg(false);
 
 	// 入力されていなくて、スイング中じゃなかったら予測線を消す。
 	if ((inputRightVec.Length() <= 0.5f && !nowSwing) || IsPilotOutSide()) {

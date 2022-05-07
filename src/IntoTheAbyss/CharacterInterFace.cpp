@@ -238,6 +238,8 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 {
 	if (isPilotDetached == Flg)return;
+	//最低でもスタミナバー１個分必要
+	if (!staminaGauge->CheckCanAction(1))return;
 
 	static const float PILOT_RETURN_DIST_BASE = 128.0f;
 	static const int PILOT_RETURN_TOTAL_TIME_BASE = 5;	// PILOT_RETURN_DIST_BASE の距離をこのフレームで帰る速さ
@@ -256,7 +258,7 @@ void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 	{
 		pilotReturnTimer = 0;
 		pilotReturnStartPos = pilotPos;
-		pilotReturnTotalTime = PILOT_RETURN_TOTAL_TIME_BASE * (pilotPos.Distance(pos) / PILOT_RETURN_DIST_BASE);
+		pilotReturnTotalTime = max(PILOT_RETURN_TOTAL_TIME_BASE * (pilotPos.Distance(pos) / PILOT_RETURN_DIST_BASE), 1);
 	}
 	isPilotDetached = Flg;
 }

@@ -163,11 +163,12 @@ private:
 	void OnPilotLeave()override	//パイロットがロボから離れた瞬間
 	{
 		pilotVel = { 0,0 };
+		anim.ChangeAnim(NON_PILOT);
 	}
 	void OnPilotControl()override;		//パイロットを動かす処理
 	void OnPilotReturn()override	//パイロットがロボに戻った瞬間
 	{
-
+		anim.ChangeAnim(DEFAULT_FRONT);
 	}
 
 	bool drawCursorFlag;
