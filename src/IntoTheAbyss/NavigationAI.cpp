@@ -167,8 +167,6 @@ void NavigationAI::Update(const Vec2<float>& POS)
 	{
 		resetSearchFlag = true;
 	}
-	prevStartPoint = startPoint;
-	prevEndPoint = endPoint;
 
 	//毎フレーム初期化の必要のある物を初期化する
 	for (int y = 0; y < wayPointYCount; ++y)
@@ -207,7 +205,8 @@ void NavigationAI::Update(const Vec2<float>& POS)
 	{
 		AStart(startPoint, endPoint);
 	}
-
+	prevStartPoint = startPoint;
+	prevEndPoint = endPoint;
 
 	CharacterAIData::Instance()->wayPoints = wayPoints;
 }
@@ -981,6 +980,8 @@ std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2
 	reachToGoalFlag.clear();
 	reachToGoalFlag.reserve(QUEUE.size());
 	reachToGoalFlag.resize(QUEUE.size());
+	std::vector<int> size;
+
 	//スタート地点からゴール地点まで繋がっているルートを探す
 	for (int branch = 0; branch < QUEUE.size(); ++branch)
 	{
@@ -988,6 +989,8 @@ std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2
 			QUEUE[branch][QUEUE[branch].size() - 1]->handle == endPoint.handle)
 		{
 			route.push_back(QUEUE[branch]);
+			//パス数の保存
+			size.push_back(QUEUE[branch].size());
 			reachToGoalFlag[branch] = true;
 		}
 		else
@@ -997,19 +1000,45 @@ std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2
 	}
 
 
+	//パス数のソート
+	std::sort(size.begin(), size.end());
+
 	int minSize = 100000;
 	int shortestRoute = 0;
-	//ゴールまでのパス数を比較し、一番少ないパス数のルートを最短距離とする
+	std::vector<std::vector<std::shared_ptr<WayPointData>>> shortestRouteArray;
+
+	////ゴールまでのパス数を比較し、一番少ないパス数のルートを最短距離とする
+	//for (int i = 0; i < route.size(); ++i)
+	//{
+	//	if (route[i].size() < minSize)
+	//	{
+	//		shortestRoute = i;
+	//		minSize = route[i].size();
+	//	}
+	//}
+
+	//ソートした値と合うならプッシュバック
 	for (int i = 0; i < route.size(); ++i)
 	{
-		if (route[i].size() < minSize)
+		for (int sortIndex = 0; sortIndex < size.size(); ++sortIndex)
 		{
-			shortestRoute = i;
-			minSize = route[i].size();
+			if (route[i].size() == size[sortIndex])
+			{
+				shortestRouteArray.push_back(route[sortIndex]);
+				break;
+			}
 		}
 	}
 
-	return route[shortestRoute];
+	//ゴール地点が変わったらどの距離を選択するか決める
+	if (endPoint.handle != prevEndPoint.handle)
+	{
+		//割合からどれくらい最短距離から離れたルートを選択するか決める
+		routeRate = KuroFunc::GetRand(1.0f);
+	}
+
+	int diceideRoute = (shortestRouteArray.size() - 1) * routeRate;
+	return shortestRouteArray[diceideRoute];
 }
 
 inline void NavigationAI::RegistHandle(std::shared_ptr<WayPointData> DATA)

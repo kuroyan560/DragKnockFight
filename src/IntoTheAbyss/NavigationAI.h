@@ -224,6 +224,9 @@ private:
 	//A*-------------------------------
 	std::vector<std::shared_ptr<QueueData>>queue;	//最短ルートの候補を纏めた配列
 
+	float routeRate;	//ランダムでルートを取った際の数字
+	bool initRouteFlag;	//ゴール地点が変わった際にルート候補からランダムで選択する
+
 	/// <summary>
 	/// Aスターによる探索を行う関数
 	/// </summary>
