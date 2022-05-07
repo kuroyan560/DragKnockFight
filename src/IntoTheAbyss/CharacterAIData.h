@@ -14,8 +14,8 @@ enum class AiResult :int
 
 struct CommonParameter
 {
-	int stamineGauge;
-	float gaugeValue;	//ゲージ量
+	float stamineGauge;	//スタミナの割合
+	float gaugeValue;	//優勢ゲージの割合
 	int swingStamina;	//振り回し時のスタミナ消費
 	int dashStamina;	//ダッシュ時のスタミナ消費
 };

@@ -26,24 +26,31 @@ void CharacterAI::Init()
 void CharacterAI::Update()
 {
 	//キャラクターAIに必要なデータ集め--------------------------
-	CharacterAIData::Instance()->playerData.stamineGauge = 0;
-	for (int i = 0; i < CharacterManager::Instance()->Left()->staminaGauge->stamina.size(); ++i)
 	{
-		if (CharacterManager::Instance()->Left()->staminaGauge->stamina[i].GetIsActivate())
+		CharacterAIData::Instance()->playerData.stamineGauge = 0;
+		float staminaMaxGauge = 0;
+		for (int i = 0; i < CharacterManager::Instance()->Left()->staminaGauge->stamina.size(); ++i)
 		{
-			++CharacterAIData::Instance()->playerData.stamineGauge;
+			if (CharacterManager::Instance()->Left()->staminaGauge->stamina[i].GetIsActivate())
+			{
+				++staminaMaxGauge;
+			}
 		}
+		CharacterAIData::Instance()->playerData.stamineGauge = staminaMaxGauge / static_cast<float>(CharacterManager::Instance()->Left()->staminaGauge->stamina.size());
 	}
 
-	CharacterAIData::Instance()->bossData.stamineGauge = 0;
-	for (int i = 0; i < CharacterManager::Instance()->Right()->staminaGauge->stamina.size(); ++i)
 	{
-		if (CharacterManager::Instance()->Right()->staminaGauge->stamina[i].GetIsActivate())
+		CharacterAIData::Instance()->bossData.stamineGauge = 0;
+		float staminaMaxGauge = 0;
+		for (int i = 0; i < CharacterManager::Instance()->Right()->staminaGauge->stamina.size(); ++i)
 		{
-			++CharacterAIData::Instance()->bossData.stamineGauge;
+			if (CharacterManager::Instance()->Right()->staminaGauge->stamina[i].GetIsActivate())
+			{
+				++staminaMaxGauge;
+			}
 		}
+		CharacterAIData::Instance()->bossData.stamineGauge = staminaMaxGauge / static_cast<float>(CharacterManager::Instance()->Left()->staminaGauge->stamina.size());
 	}
-
 	//敵とプレイヤーとの距離
 	CharacterAIData::Instance()->distance = CharacterManager::Instance()->Left()->pos.Distance(CharacterManager::Instance()->Right()->pos);
 	//キャラクターAIに必要なデータ集め--------------------------
@@ -55,16 +62,16 @@ void CharacterAI::Update()
 		if (strategyArray[strategyOfChoice]->CurrentProgress() == AiResult::OPERATE_SUCCESS ||
 			strategyArray[strategyOfChoice]->CurrentProgress() == AiResult::OPERATE_FAIL)
 		{
-			float min = 10.0f;
+			float max = 0.0f;
 			int selecting = 0;
 			//評価値の最大値から戦略を決定する
 			for (int i = 0; i < strategyArray.size(); ++i)
 			{
 				float strategyEvaluationValue = strategyArray[i]->EvaluationFunction();
-				if (strategyEvaluationValue < min)
+				if (max < strategyEvaluationValue)
 				{
 					selecting = i;
-					min = strategyEvaluationValue;
+					max = strategyEvaluationValue;
 				}
 			}
 			strategyOfChoice = static_cast<AiStrategy>(selecting);

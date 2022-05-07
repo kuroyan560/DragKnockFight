@@ -101,8 +101,8 @@ private:
 	//アイテム探索--------------------------
 
 	//成否--------------------------
-	int staminaGauge;
-	static const int SUCCEED_GAIN_STAMINA_VALUE;//どれぐらいの値
+	float staminaGauge;
+	static const float SUCCEED_GAIN_STAMINA_VALUE;//どれぐらいの値
 
 };
 

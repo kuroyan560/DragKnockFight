@@ -78,8 +78,8 @@ void SuperiorityGauge::Update()
 
 
 	//キャラクターAI用のデータ集め
-	CharacterAIData::Instance()->playerData.gaugeValue = gaugeData[LEFT_TEAM].gaugeValue;
-	CharacterAIData::Instance()->bossData.gaugeValue = gaugeData[RIGHT_TEAM].gaugeValue;
+	CharacterAIData::Instance()->playerData.gaugeValue = gaugeData[LEFT_TEAM].gaugeDivValue;
+	CharacterAIData::Instance()->bossData.gaugeValue = gaugeData[RIGHT_TEAM].gaugeDivValue;
 }
 
 #include"D3D12App.h"

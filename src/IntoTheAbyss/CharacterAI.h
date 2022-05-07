@@ -11,6 +11,7 @@ enum AiStrategy
 	STRATEGY_NONE = -1,
 	STRATEGY_RESTORE_STAMINA,
 	STRATEGY_GO_TO_THE_FIELD,
+	STRATEGY_MAX,
 };
 
 /// <summary>
@@ -28,7 +29,7 @@ public:
 
 	std::vector<WayPointData> shortestData;
 
-	std::array<std::unique_ptr<IStrategicLayer>, 3> strategyArray;
+	std::array<std::unique_ptr<IStrategicLayer>, STRATEGY_MAX> strategyArray;
 	WayPointData startPoint, endPoint;
 	bool startFlag;
 	std::vector<WayPointData>route;

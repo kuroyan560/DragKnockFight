@@ -6,7 +6,7 @@
 #include"Stamina.h"
 
 const float IStrategicLayer::SEARCH_RADIUS = 500.0f;
-const int RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 3;
+const float RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 0.4f;
 
 RestoreStamina::RestoreStamina()
 {
@@ -56,6 +56,11 @@ void RestoreStamina::Update()
 			prevItemIndex = result.itemIndex;
 			initRouteFlag = false;
 			getFlag = true;
+		}
+		else
+		{
+			seachItemFlag = false;
+			getFlag = false;
 		}
 	}
 	else
@@ -116,7 +121,7 @@ void RestoreStamina::Update()
 AiResult RestoreStamina::CurrentProgress()
 {
 	//一定時間内に一定量回復したら成功、出来なければ失敗
-	int sub = staminaGauge - CharacterAIData::Instance()->bossData.stamineGauge;
+	float sub = CharacterAIData::Instance()->bossData.stamineGauge - staminaGauge;
 	if (SUCCEED_GAIN_STAMINA_VALUE <= sub && timer < timeOver)
 	{
 		return AiResult::OPERATE_SUCCESS;
@@ -136,48 +141,54 @@ float RestoreStamina::EvaluationFunction()
 	CharacterAIData *data = CharacterAIData::Instance();
 	//評価値
 	int evaluationValue = 0;
-	//マップチップ番号
-	Vec2<int>bossHandle;
-	bossHandle.x = static_cast<int>(CharacterManager::Instance()->Right()->pos.x / 50.0f);
-	bossHandle.y = static_cast<int>(CharacterManager::Instance()->Right()->pos.y / 50.0f);
-	Vec2<int>playerHandle;
-	playerHandle.x = static_cast<int>(CharacterManager::Instance()->Left()->pos.x / 50.0f);
-	playerHandle.y = static_cast<int>(CharacterManager::Instance()->Left()->pos.y / 50.0f);
-
-
 
 	//優勢ゲージ n6~7
 	if (0.6f <= data->bossData.gaugeValue && data->bossData.gaugeValue <= 0.7f)
 	{
 		evaluationValue += 2;
 	}
-	//スタミナが自分＜敵
-	if (data->playerData.stamineGauge < data->bossData.stamineGauge)
+
+	const float LESS_OF_MY_OWN_STAMINA = 0.5f;
+	//スタミナが少なくなった
+	if (data->bossData.stamineGauge < LESS_OF_MY_OWN_STAMINA)
 	{
 		evaluationValue += 2;
 	}
 
+
+	//ウェイポイント探索
+	SearchWayPoint search;
+
+	//ボスから近場のウェイポイント探索
+	search.Init(CharacterManager::Instance()->Right()->pos);
+	WayPointData bossNearWayPoint = search.Update();
+
 	const float nearDistance = 200.0f;
 	//自分と壁との距離が近い
-	if (!data->wayPoints[bossHandle.y][bossHandle.x]->isWall)
+	if (!bossNearWayPoint.isWall)
 	{
-		bool nearTopFlag = data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceTop < nearDistance;
-		bool nearBottomFlag = data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceBottom < nearDistance;
-		bool nearLeftFlag = data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceLeft < nearDistance;
-		bool nearRightFlag = data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceRight < nearDistance;
+		bool nearTopFlag = bossNearWayPoint.wallDistanceTop < nearDistance;
+		bool nearBottomFlag =bossNearWayPoint.wallDistanceBottom < nearDistance;
+		bool nearLeftFlag =bossNearWayPoint.wallDistanceLeft < nearDistance;
+		bool nearRightFlag =bossNearWayPoint.wallDistanceRight < nearDistance;
 
 		if (nearTopFlag || nearBottomFlag || nearLeftFlag || nearRightFlag)
 		{
 			evaluationValue += 2;
 		}
 	}
+
+
+	search.Init(CharacterManager::Instance()->Left()->pos);
+	WayPointData playerNearWayPoint = search.Update();
+
 	//敵と壁との距離が近くない
-	if (!data->wayPoints[playerHandle.y][playerHandle.x]->isWall)
+	if (!playerNearWayPoint.isWall)
 	{
-		bool farTopFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceTop;
-		bool farBottomFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceBottom;
-		bool farLeftFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceLeft;
-		bool farRightFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceRight;
+		bool farTopFlag = nearDistance < playerNearWayPoint.wallDistanceTop;
+		bool farBottomFlag = nearDistance < playerNearWayPoint.wallDistanceBottom;
+		bool farLeftFlag = nearDistance < playerNearWayPoint.wallDistanceLeft;
+		bool farRightFlag = nearDistance < playerNearWayPoint.wallDistanceRight;
 
 		if (farTopFlag || farBottomFlag || farLeftFlag || farRightFlag)
 		{
@@ -185,15 +196,9 @@ float RestoreStamina::EvaluationFunction()
 		}
 	}
 
-	//敵より自分の方がアイテムが近い
-	//自分側
+	//自分の方がアイテムが近い
 	SearchData bossResult = SearchItem(searchArea);
-	//敵側
-	SphereCollision hitBox;
-	hitBox.center = &CharacterManager::Instance()->Left()->pos;
-	hitBox.radius = SEARCH_RADIUS;
-	SearchData playerResult = SearchItem(hitBox);
-	if (playerResult.distance < bossResult.distance)
+	if (bossResult.distance < SEARCH_RADIUS)
 	{
 		evaluationValue += 2;
 	}
@@ -204,9 +209,23 @@ float RestoreStamina::EvaluationFunction()
 		evaluationValue += 2;
 	}
 
+	//自分と自陣との距離が近い
+	const float NEAR_LINE_RATE = 0.7f;
+	bool nearFlag = NEAR_LINE_RATE < CharacterAIData::Instance()->position;
+	if (nearFlag)
+	{
+		evaluationValue += 2;
+	}
 
-	//自陣へのウェイポイントが少ない
+	//敵と敵陣との距離が近い
+	const float FAR_LINE_RATE = 0.3f;
+	bool farFlag = 1.0f - CharacterAIData::Instance()->position < FAR_LINE_RATE;
+	if (farFlag)
+	{
+		evaluationValue += 2;
+	}
 
+	//自陣へのウェイポイント
 
 	return static_cast<float>(evaluationValue) / static_cast<float>(data->EVALUATION_MAX_VALUE);
 }
@@ -278,15 +297,14 @@ float AcquireASuperiorityGauge::EvaluationFunction()
 
 GoToTheField::GoToTheField()
 {
-	timer = 0;
-	timeOver = 60 * 10;
-	startFlag = false;
-	goToTheFieldFlag = true;
 }
 
 void GoToTheField::Init()
 {
-
+	timer = 0;
+	timeOver = 60 * 5;
+	startFlag = false;
+	goToTheFieldFlag = true;
 }
 
 void GoToTheField::Update()
@@ -312,28 +330,26 @@ void GoToTheField::Update()
 	//敵を振り回しで移動させる
 	if (canSwingClockWiseFlag && useSwingFlag)
 	{
-		//CharacterAIOrder::Instance()->swingClockWiseFlag = true;
-		//CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
+		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
+		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
 	}
 	else if (canSwingCClockWiseFlag && useSwingFlag)
 	{
-		//CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
-		//CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
+		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
+		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
 	}
 
 	//敵をダッシュで移動させる
 	if (CharacterAIData::Instance()->dashFlag)
 	{
 	}
+
+	++timer;
 }
 
 AiResult GoToTheField::CurrentProgress()
 {
-	if (timer < timeOver)
-	{
-		//return AiResult::OPERATE_SUCCESS;
-	}
-	else if (timeOver <= timer)
+	if (timeOver <= timer)
 	{
 		return AiResult::OPERATE_FAIL;
 	}
@@ -348,49 +364,53 @@ float GoToTheField::EvaluationFunction()
 	CharacterAIData *data = CharacterAIData::Instance();
 	//評価値
 	int evaluationValue = 0;
-	//マップチップ番号
-	Vec2<int>bossHandle;
-	bossHandle.x = static_cast<int>(CharacterManager::Instance()->Right()->pos.x / 50.0f);
-	bossHandle.y = static_cast<int>(CharacterManager::Instance()->Right()->pos.y / 50.0f);
-	Vec2<int>playerHandle;
-	playerHandle.x = static_cast<int>(CharacterManager::Instance()->Left()->pos.x / 50.0f);
-	playerHandle.y = static_cast<int>(CharacterManager::Instance()->Left()->pos.y / 50.0f);
-
-
 
 	//優勢ゲージ n6~7
-	if (60 <= data->bossData.gaugeValue && data->bossData.gaugeValue <= 70)
+	if (0.6f <= data->bossData.gaugeValue && data->bossData.gaugeValue <= 0.7f)
 	{
 		evaluationValue += 2;
 	}
-	//スタミナが自分＜敵
-	if (data->playerData.stamineGauge == data->bossData.stamineGauge)
+
+	const float MANY_OF_MY_OWN_STAMINA = 0.5f;
+	//スタミナが多い
+	if (MANY_OF_MY_OWN_STAMINA <= data->bossData.stamineGauge)
 	{
 		evaluationValue += 1;
 	}
 
+	//ウェイポイント探索
+	SearchWayPoint search;
+
+	//ボスから近場のウェイポイント探索
+	search.Init(CharacterManager::Instance()->Right()->pos);
+	WayPointData bossNearWayPoint = search.Update();
+
 	const float nearDistance = 200.0f;
 	//自分と壁との距離が近い
-	if (!data->wayPoints[bossHandle.y][bossHandle.x]->isWall)
+	if (!bossNearWayPoint.isWall)
 	{
-		bool farTopFlag = nearDistance < data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceTop;
-		bool farBottomFlag = nearDistance < data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceBottom;
-		bool farLeftFlag = nearDistance < data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceLeft;
-		bool farRightFlag = nearDistance < data->wayPoints[bossHandle.y][bossHandle.x]->wallDistanceRight;
+		bool farTopFlag = nearDistance < bossNearWayPoint.wallDistanceTop;
+		bool farBottomFlag = nearDistance < bossNearWayPoint.wallDistanceBottom;
+		bool farLeftFlag = nearDistance < bossNearWayPoint.wallDistanceLeft;
+		bool farRightFlag = nearDistance < bossNearWayPoint.wallDistanceRight;
 
 		if (farTopFlag || farBottomFlag || farLeftFlag || farRightFlag)
 		{
 			evaluationValue += 2;
 		}
 	}
-	//敵と壁との距離が近くない
-	if (!data->wayPoints[playerHandle.y][playerHandle.x]->isWall)
-	{
-		bool farTopFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceTop;
-		bool farBottomFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceBottom;
-		bool farLeftFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceLeft;
-		bool farRightFlag = nearDistance < data->wayPoints[playerHandle.y][playerHandle.x]->wallDistanceRight;
 
+	search.Init(CharacterManager::Instance()->Right()->pos);
+	WayPointData playerNearWayPoint = search.Update();
+
+	//敵と壁との距離が近くない
+	if (!playerNearWayPoint.isWall)
+	{
+		bool farTopFlag = nearDistance < playerNearWayPoint.wallDistanceTop;
+		bool farBottomFlag = nearDistance < playerNearWayPoint.wallDistanceBottom;
+		bool farLeftFlag = nearDistance < playerNearWayPoint.wallDistanceLeft;
+		bool farRightFlag = nearDistance < playerNearWayPoint.wallDistanceRight;
+		
 		if (farTopFlag || farBottomFlag || farLeftFlag || farRightFlag)
 		{
 			evaluationValue += 1;
@@ -416,6 +436,22 @@ float GoToTheField::EvaluationFunction()
 		evaluationValue += 2;
 	}
 
+	//自分と自陣との距離が近い
+	const float NEAR_LINE_RATE = 0.7f;
+	bool nearFlag = NEAR_LINE_RATE < CharacterAIData::Instance()->position;
+	if (nearFlag)
+	{
+		evaluationValue += 3;
+	}
+
+	//敵と敵陣との距離が近い
+	const float FAR_LINE_RATE = 0.3f;
+	bool farFlag = CharacterAIData::Instance()->position < FAR_LINE_RATE;
+	if (farFlag)
+	{
+		evaluationValue += 3;
+	}
+
 	//自陣へのウェイポイントが少ない
 
 
@@ -433,7 +469,8 @@ IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &D
 	{
 		//アイテムを一つ以上見つけたら探索準備をする
 		//そして距離を測る
-		if (BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), DATA))
+		bool canGetFlag = item[i].GetIsActive()&& !item[i].GetIsAcquired();
+		if (canGetFlag && BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), DATA))
 		{
 			distance.push_back(DATA.center->Distance(*item[i].GetCollisionData()->center));
 			itemId.push_back(i);
