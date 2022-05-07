@@ -222,5 +222,21 @@ public:
 	//ノックアウトされた側
 	virtual void OnKnockOut() = 0;
 
+	/// <summary>
+	/// 時計回りに壁に当たるかどうか
+	/// </summary>
+	/// <returns></returns>
+	bool ClockwiseHitsTheWall()
+	{
+		return CWSwingSegmentMgr.IsHitWall();
+	}
+	/// <summary>
+	/// 反時計回り回した際に当たるかどうか
+	/// </summary>
+	/// <returns></returns>
+	bool CounterClockwiseHitsTheWall()
+	{
+		return CCWSwingSegmentMgr.IsHitWall();
+	}
 };
 

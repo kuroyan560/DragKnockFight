@@ -46,7 +46,7 @@
 #include"CharacterManager.h"
 #include "StaminaItemMgr.h"
 
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -72,7 +72,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -102,7 +102,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				if (height < 0 || mapChipDrawData.size() <= height) continue;
 				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
@@ -161,7 +161,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -179,7 +179,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -269,13 +269,13 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
 	Camera::Instance()->Init();
-
 	GameTimer::Instance()->Init(120);
 	GameTimer::Instance()->Start();
-
 	ScoreManager::Instance()->Init();
+
 	firstLoadFlag = false;
 	lineExtendScale = lineExtendMaxScale;
+
 }
 
 Game::Game()
@@ -311,6 +311,8 @@ Game::Game()
 	GameTimer::Instance()->Init(120);
 	ScoreManager::Instance()->Init();
 
+
+	navi.Init(mapData);
 }
 
 void Game::Init()
@@ -392,6 +394,7 @@ void Game::Update()
 		//mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
 	}
 #pragma endregion
+
 
 	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0, BACK);
 	if (resetInput)
@@ -536,12 +539,28 @@ void Game::Update()
 		CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
 	}
 
+	chara.shortestData = navi.GetShortestRoute();
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
+	{
+		chara.Init();
+	}
+
+	navi.startPoint = chara.startPoint;
+	navi.endPoint = chara.endPoint;
+	navi.startFlag = chara.startFlag;
+	navi.Update({});
+
+	chara.Update();
+
+
+	CharacterAIData::Instance()->nowPos = CharacterManager::Instance()->Right()->pos;
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
 
 	// プレイヤーとボスの当たり判定処理
 	CharacterManager::Instance()->Left()->CheckHit(mapData, lineCenterPos);
 	CharacterManager::Instance()->Right()->CheckHit(mapData, lineCenterPos);
+	CharacterAIData::Instance()->prevPos = CharacterManager::Instance()->Right()->pos;
 
 	miniMap.Update();
 	screenEdgeEffect.Update();
@@ -553,6 +572,7 @@ void Game::Update()
 
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();
+
 
 	// 振り回し管理クラスの更新処理
 	//SwingMgr::Instance()->Update(player.centerPos, boss.pos, lineLengthBoss + lineLengthPlayer + addLineLengthBoss + addLineLengthPlayer);
@@ -572,10 +592,10 @@ void Game::Update()
 #pragma region 当たり判定
 
 	//左弾と右プレイヤーの判定
-	auto& leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
+	auto &leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
 	for (int index = 0; index < leftBulMgr.bullets.size(); ++index)
 	{
-		auto& bul = leftBulMgr.bullets[index];
+		auto &bul = leftBulMgr.bullets[index];
 		if (!bul.isActive)continue;
 
 		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
@@ -594,7 +614,7 @@ void Game::Update()
 	auto rightBulMgr = CharacterManager::Instance()->Right()->GetBulletMgr();
 	for (int index = 0; index < rightBulMgr.bullets.size(); ++index)
 	{
-		auto& bul = rightBulMgr.bullets[index];
+		auto &bul = rightBulMgr.bullets[index];
 		if (!bul.isActive)continue;
 
 		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
@@ -748,7 +768,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	if (roundChangeEffect.initGameFlag)
 	{
 		//左プレイヤー～中央のチェイン
-		auto& left = CharacterManager::Instance()->Left();
+		auto &left = CharacterManager::Instance()->Left();
 		Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
 		Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
 		if (0.0f < left->addLineLength)
@@ -758,7 +778,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		}
 
 		//右プレイヤー～中央のチェイン
-		auto& right = CharacterManager::Instance()->Right();
+		auto &right = CharacterManager::Instance()->Right();
 		Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
 		Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
 		if (0.0f < right->addLineLength)
@@ -893,6 +913,8 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
+	navi.Draw();
+	//chara.Draw();
 }
 
 void Game::Scramble()
@@ -1143,8 +1165,8 @@ void Game::CalCenterPos()
 
 	// 本当はScrambleの一番うしろに入れていた処理なんですが、押し戻しをした後に呼ぶ必要が出てきたので関数で分けました。
 
-	auto& left = CharacterManager::Instance()->Left();
-	auto& right = CharacterManager::Instance()->Right();
+	auto &left = CharacterManager::Instance()->Left();
+	auto &right = CharacterManager::Instance()->Right();
 
 	// 移動量に応じて本来あるべき長さにする。
 	Vec2<float> prevSubPos = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos;
@@ -1212,8 +1234,8 @@ void Game::CalCenterPos()
 		//else {
 			// 規定値以上だったら普通に場所を求める。
 
-		auto& right = CharacterManager::Instance()->Right();
-		auto& left = CharacterManager::Instance()->Left();
+		auto &right = CharacterManager::Instance()->Right();
+		auto &left = CharacterManager::Instance()->Left();
 
 		Vec2<float> rightPos = right->pos;
 		rightPos += (left->pos - right->pos).GetNormal() * right->addLineLength;

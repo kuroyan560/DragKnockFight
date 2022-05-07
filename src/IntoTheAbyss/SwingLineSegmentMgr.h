@@ -84,6 +84,7 @@ private:
 
 	const float ANGLE_DIFFERENCE = 0.349066f;	// 20‹
 
+	bool isHitWallFlag;//U‚è‰ñ‚µ‚½æ‚ª•Ç‚É“–‚½‚é‚©‚Ç‚¤‚©
 public:
 
 	/*===== ƒƒ“ƒoŠÖ” =====*/
@@ -106,6 +107,12 @@ public:
 
 	// •`‰æˆ—
 	void Draw(const WHICH_TEAM& Team);
+
+	/// <summary>
+	/// U‚è‰ñ‚µ‚½æ‚ª•Ç‚É“–‚½‚é‚©‚Ç‚¤‚©
+	/// </summary>
+	/// <returns>true...“–‚½‚é,false...“–‚½‚ç‚È‚¢</returns>
+	bool IsHitWall();
 
 private:
 
