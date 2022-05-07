@@ -13,6 +13,7 @@ static const enum PLAYER_ANIM
 	SWINGED,
 	TIRED,
 	KNOCK_OUT,
+	NON_PILOT,
 	PLAYER_ANIM_NUM
 };
 
@@ -23,7 +24,6 @@ class PlayerAnimation
 	{
 		std::vector<int> graph;
 		int interval;
-		Vec2<int>size;
 		bool loop;
 		Vec2<float>handCenterOffset = { 0,0 };
 	};
@@ -57,10 +57,7 @@ public:
 		return animations[status].graph[idx];
 	}
 
-	const Vec2<int>GetGraphSize()&
-	{
-		return animations[status].size;
-	}
+	Vec2<int>GetGraphSize();
 	
 	const Vec2<float>GetHandCenterOffset()&
 	{
@@ -68,5 +65,8 @@ public:
 	}
 
 	const PLAYER_ANIM& GetNowAnim() { return status; }
+
+	//‚Ç‚ê‚©‚Ð‚Æ‚Â‚Å‚à“–‚Ä‚Í‚Ü‚Á‚½‚çtrue‚ð•Ô‚·
+	bool Compare(const std::vector<PLAYER_ANIM>& Status);
 };
 

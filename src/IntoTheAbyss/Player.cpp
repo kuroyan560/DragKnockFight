@@ -255,8 +255,7 @@ void Player::OnDraw()
 	//if (vel.y < 0)playerDir = BACK;
 	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
 
-	//if (!isHold && anim.GetNowAnim() != SWINGED && !isGripPowerEmpty && 20 <= moveTimer)
-	if (!isHold && anim.GetNowAnim() != SWINGED && anim.GetNowAnim() != TIRED && 20 <= moveTimer)
+	if (!isHold && !anim.Compare({ SWINGED,TIRED,NON_PILOT }) && 20 <= moveTimer)
 	{
 		if (moveInput.x)
 		{

@@ -256,7 +256,7 @@ void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 	{
 		pilotReturnTimer = 0;
 		pilotReturnStartPos = pilotPos;
-		pilotReturnTotalTime = PILOT_RETURN_TOTAL_TIME_BASE * (pilotPos.Distance(pos) / PILOT_RETURN_DIST_BASE);
+		pilotReturnTotalTime = max(PILOT_RETURN_TOTAL_TIME_BASE * (pilotPos.Distance(pos) / PILOT_RETURN_DIST_BASE), 1);
 	}
 	isPilotDetached = Flg;
 }
