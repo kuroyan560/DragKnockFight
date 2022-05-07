@@ -67,7 +67,7 @@ void RestoreStamina::Update()
 	{
 		//探索範囲内に指定のアイテムがあるかどうか見る
 		//無くなったら再検索をかける
-		if (!BulletCollision::Instance()->CheckSphereAndSphere(*item[searchItemIndex].GetCollisionData(), searchArea))
+		if (searchItemIndex != -1 && !BulletCollision::Instance()->CheckSphereAndSphere(*item[searchItemIndex].GetCollisionData(), searchArea))
 		{
 			seachItemFlag = true;
 		}
@@ -168,9 +168,9 @@ float RestoreStamina::EvaluationFunction()
 	if (!bossNearWayPoint.isWall)
 	{
 		bool nearTopFlag = bossNearWayPoint.wallDistanceTop < nearDistance;
-		bool nearBottomFlag =bossNearWayPoint.wallDistanceBottom < nearDistance;
-		bool nearLeftFlag =bossNearWayPoint.wallDistanceLeft < nearDistance;
-		bool nearRightFlag =bossNearWayPoint.wallDistanceRight < nearDistance;
+		bool nearBottomFlag = bossNearWayPoint.wallDistanceBottom < nearDistance;
+		bool nearLeftFlag = bossNearWayPoint.wallDistanceLeft < nearDistance;
+		bool nearRightFlag = bossNearWayPoint.wallDistanceRight < nearDistance;
 
 		if (nearTopFlag || nearBottomFlag || nearLeftFlag || nearRightFlag)
 		{
@@ -410,7 +410,7 @@ float GoToTheField::EvaluationFunction()
 		bool farBottomFlag = nearDistance < playerNearWayPoint.wallDistanceBottom;
 		bool farLeftFlag = nearDistance < playerNearWayPoint.wallDistanceLeft;
 		bool farRightFlag = nearDistance < playerNearWayPoint.wallDistanceRight;
-		
+
 		if (farTopFlag || farBottomFlag || farLeftFlag || farRightFlag)
 		{
 			evaluationValue += 1;
@@ -469,7 +469,7 @@ IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &D
 	{
 		//アイテムを一つ以上見つけたら探索準備をする
 		//そして距離を測る
-		bool canGetFlag = item[i].GetIsActive()&& !item[i].GetIsAcquired();
+		bool canGetFlag = item[i].GetIsActive() && !item[i].GetIsAcquired();
 		if (canGetFlag && BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), DATA))
 		{
 			distance.push_back(DATA.center->Distance(*item[i].GetCollisionData()->center));
