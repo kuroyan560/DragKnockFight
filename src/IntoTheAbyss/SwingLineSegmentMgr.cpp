@@ -15,7 +15,7 @@ void SwingLineSegment::Init()
 
 }
 
-void SwingLineSegment::Update(const Vec2<float> &Start, const Vec2<float> &End, const Vec2<float> &StartDir, const Vec2<float> &EndDir, const int &Alpha, const SEGMENT_ID &ID, const int &Handle)
+void SwingLineSegment::Update(const Vec2<float>& Start, const Vec2<float>& End, const Vec2<float>& StartDir, const Vec2<float>& EndDir, const int& Alpha, const SEGMENT_ID& ID, const int& Handle)
 {
 
 	/*===== 更新処理 =====*/
@@ -31,7 +31,7 @@ void SwingLineSegment::Update(const Vec2<float> &Start, const Vec2<float> &End, 
 
 }
 
-void SwingLineSegment::Draw(const WHICH_TEAM &Team)
+void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 {
 	static const int TEAM_COLOR_X[TEAM_NUM] = { 47,239 };
 	static const int TEAM_COLOR_Y[TEAM_NUM] = { 255,1 };
@@ -77,7 +77,7 @@ void SwingLineSegment::Draw(const WHICH_TEAM &Team)
 
 }
 
-void SwingLineSegment::ResetDistance(const Vec2<float> &Pos, const float &Distance)
+void SwingLineSegment::ResetDistance(const Vec2<float>& Pos, const float& Distance)
 {
 
 	/*===== 距離修正 =====*/
@@ -87,7 +87,7 @@ void SwingLineSegment::ResetDistance(const Vec2<float> &Pos, const float &Distan
 
 }
 
-void SwingLineSegmentMgr::Setting(const bool &IsClockWise, const int &HandleUI, const int &HandleArrow, const int &HandleLine, const int &ReticleHandle)
+void SwingLineSegmentMgr::Setting(const bool& IsClockWise, const int& HandleUI, const int& HandleArrow, const int& HandleLine, const int& ReticleHandle)
 {
 
 	/*===== 前準備 =====*/
@@ -115,7 +115,7 @@ void SwingLineSegmentMgr::Init()
 
 }
 
-void SwingLineSegmentMgr::Update(const Vec2<float> &Pos, const Vec2<float> &TargetVec, const float &Distance, const vector<vector<int>> &MapData)
+void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const vector<vector<int>>& MapData)
 {
 
 	/*===== 更新処理 =====*/
@@ -133,22 +133,6 @@ void SwingLineSegmentMgr::Update(const Vec2<float> &Pos, const Vec2<float> &Targ
 
 	// 全ての線分を生成する。
 	for (int index = 0; index < LINE_COUNT; ++index) {
-
-		//// 動かさないフラグが立っていたらfor分を抜ける。
-		//if (IsSwing) {
-
-		//	lineSegments[index].SetAlpha(250);
-		//	lineSegments[index].ResetDistance(Pos, Distance);
-		//	continue;
-
-		//}
-		//else if (NoMove) {
-
-		//	lineSegments[index].SetAlpha(0);
-		//	lineSegments[index].ResetDistance(Pos, Distance);
-		//	continue;
-
-		//}
 
 		// 開始時角度と終了時角度を求める。
 		float startAngle = nowAngle;
@@ -175,11 +159,6 @@ void SwingLineSegmentMgr::Update(const Vec2<float> &Pos, const Vec2<float> &Targ
 		// 使用する画像を決める。
 		int handle = 0;
 		SwingLineSegment::SEGMENT_ID id;
-		// 最初は操作ボタンが書いてあるUIを描画する。
-		//if (index == 0) {
-		//	handle = UIHandle;
-		//	id = SwingLineSegment::SEGMENT_ID::SEGMENT_ID_UI;
-		//}
 		// 最後の線分は矢印を描画する。
 		if (index == LINE_COUNT - 1) {
 			handle = arrowHandle;
@@ -261,7 +240,7 @@ void SwingLineSegmentMgr::Update(const Vec2<float> &Pos, const Vec2<float> &Targ
 
 }
 
-void SwingLineSegmentMgr::Draw(const WHICH_TEAM &Team)
+void SwingLineSegmentMgr::Draw(const WHICH_TEAM& Team)
 {
 
 	/*===== 描画処理 =====*/
@@ -288,7 +267,25 @@ bool SwingLineSegmentMgr::IsHitWall()
 {
 	return isHitWallFlag;
 }
-const Vec2<float> &SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float> &StartPos, const Vec2<float> &EndPos)
+float SwingLineSegmentMgr::CalSwingEndDistance(const Vec2<float>& CharaPos, const Vec2<float>& SwingTargetVec, const float& Distance)
+{
+
+	// レティクルの位置がふっとばされていたら。
+	if (reticlePos.x < -100 || reticlePos.y < -100) {
+
+		// 開始地点から終了地点までの距離を求めて、それを返す。
+		Vec2<float> endPos = CharaPos + SwingTargetVec * Distance;
+		return (swingStartPos - endPos).Length();
+
+	}
+	else {
+
+		return (reticlePos - swingStartPos).Length();
+
+	}
+
+}
+const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos)
 {
 	//どうやって使うか
 	Vec2<float>handSegmentStart(StartPos), handSegmentEnd(EndPos);//線分

@@ -196,9 +196,9 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 
 
-	CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+	//CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
 	//CWSwingSegmentMgr.Init();
-	CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+	//CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
 	//CCWSwingSegmentMgr.Init();
 
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;

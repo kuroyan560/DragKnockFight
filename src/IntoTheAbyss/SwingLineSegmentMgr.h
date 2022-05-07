@@ -74,6 +74,7 @@ private:
 	static const int LINE_COUNT = 9;	// 線分の数
 	std::array<SwingLineSegment, LINE_COUNT> lineSegments;	// 線分
 	Vec2<float> reticlePos;	// 照準座標
+	Vec2<float> swingStartPos;	// 振り回し時の振り回されているキャラの開始座標
 
 	int UIHandle;		// ボタンのUIの画像
 	int arrowHandle;	// 矢印画像
@@ -113,6 +114,14 @@ public:
 	/// </summary>
 	/// <returns>true...当たる,false...当たらない</returns>
 	bool IsHitWall();
+
+	// 振り回しの開始座標を設定。 引数はパートナーの座標。
+	void SetSwingStartPos(const Vec2<float>& StartPos) { swingStartPos = StartPos; }
+
+	// 振り回しの開始座標から終了座標までの直線距離を計算。
+	// CharaPosは振り回している側の座標。SwingTargetVecはCharacterInterfaceのメンバ変数にあるやつ。Distanceはキャラ間の距離。
+	// 振り回し中にのみ呼んでください！
+	float CalSwingEndDistance(const Vec2<float>& CharaPos, const Vec2<float>& SwingTargetVec, const float& Distance);
 
 private:
 

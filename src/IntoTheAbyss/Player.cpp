@@ -255,6 +255,7 @@ void Player::OnUpdateNoRelatedSwing()
 		tiredTimer = 0;
 		anim.ChangeAnim(TIRED);
 	}
+
 }
 
 void Player::OnDraw()
@@ -469,9 +470,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		isInputSwingRB = isInputRB;
 
-		// スタミナを消費 振り回しが終わった際にスタミナを消費するようにしました。
-		//staminaGauge->ConsumesStamina(SWING_STAMINA);
-
 		//キャラクターAI用のデータ集め
 		CharacterAIData::Instance()->swingFlag = true;
 	}
@@ -539,12 +537,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 		if (isClockWise) {
 
 			CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+			CWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 			CCWSwingSegmentMgr.Init();
 
 		}
 		else {
 
 			CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+			CCWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 			CWSwingSegmentMgr.Init();
 
 		}
