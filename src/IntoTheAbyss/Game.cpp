@@ -712,7 +712,7 @@ void Game::Update()
 		Camera::Instance()->zoom = 1.0f - zoomRate + ZOOM_OFFSET;
 
 		// カメラのズームが0.1f未満にならないようにする。
-		if (Camera::Instance()->zoom < 0.1f) Camera::Instance()->zoom = 1.0f;
+		if (Camera::Instance()->zoom < 0.1f) Camera::Instance()->zoom = 0.1f;
 
 	}
 	else {
