@@ -324,20 +324,24 @@ void GoToTheField::Update()
 	{
 	}
 	//U‚è‰ñ‚µ‰Â”\‚©
-	bool canSwingClockWiseFlag = CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
-	bool canSwingCClockWiseFlag = CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
-	
+	bool canSwingClockWiseFlag = !CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
+	bool canSwingCClockWiseFlag = !CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
+
+	//ˆê’è‹——£‚ð•Û‚Á‚Ä‚¢‚é‚©
+	const float CERTAIN_DISTANCE = 200.0f;
+	bool keepACertainDistanceFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->distance;
+
 	const float STAMINA_VALUE = 0.5f;
 	//ƒXƒ^ƒ~ƒi‚ª‘½‚¢
 	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge && SWING_MAX_COOL_TIME <= swingCoolTime;
 	//“G‚ðU‚è‰ñ‚µ‚ÅˆÚ“®‚³‚¹‚é
-	if (canSwingClockWiseFlag && useSwingFlag)
+	if (canSwingClockWiseFlag && useSwingFlag && keepACertainDistanceFlag)
 	{
 		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
 		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
 		swingCoolTime = 0;
 	}
-	else if (canSwingCClockWiseFlag && useSwingFlag)
+	else if (canSwingCClockWiseFlag && useSwingFlag && keepACertainDistanceFlag)
 	{
 		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
 		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
