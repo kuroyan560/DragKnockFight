@@ -555,14 +555,14 @@ void Game::Update()
 	chara.Update();
 
 
-
+	CharacterAIData::Instance()->nowPos = CharacterManager::Instance()->Right()->pos;
 	// プレイヤーとボスの引っ張り合いの処理
 	Scramble();
-
 
 	// プレイヤーとボスの当たり判定処理
 	CharacterManager::Instance()->Left()->CheckHit(mapData, lineCenterPos);
 	CharacterManager::Instance()->Right()->CheckHit(mapData, lineCenterPos);
+	CharacterAIData::Instance()->prevPos = CharacterManager::Instance()->Right()->pos;
 
 	miniMap.Update();
 	screenEdgeEffect.Update();

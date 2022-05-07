@@ -30,12 +30,17 @@ public:
 
 private:
 	MovingBetweenTwoPoints operateFollow;
+	MoveToNotStack dontStack;
 	std::vector<WayPointData> route;
 	Vec2<float>startPos, endPos;
 	int routeHandle;
 
 	bool goalFlag;
 
+	bool stackFlag;
+
+
+	bool initFlag;
 };
 
 

@@ -10,13 +10,14 @@ void OperateMove::Update(const Vec2<float> &VELOCITY)
 {
 	//ˆÚ“®
 	CharacterAIOrder::Instance()->vel = VELOCITY;
+
 }
 
 AiResult OperateMove::CurrentProgress()
 {
 	bool succeedFlag = false;
 	//À•W‚ª“®‚¢‚Ä‚¢‚½‚ç¬Œ÷AŽ~‚Ü‚Á‚Ä‚¢‚½‚çŽ¸”s
-	if (CharacterManager::Instance()->Right()->pos != oldPos)
+	if (CharacterAIData::Instance()->nowPos != CharacterAIData::Instance()->prevPos)
 	{
 		succeedFlag = true;
 	}
@@ -24,7 +25,6 @@ AiResult OperateMove::CurrentProgress()
 	{
 		succeedFlag = false;
 	}
-	oldPos = CharacterManager::Instance()->Right()->pos;
 
 	if (succeedFlag)
 	{

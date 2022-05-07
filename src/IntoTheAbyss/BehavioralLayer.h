@@ -15,14 +15,9 @@
 class MovingBetweenTwoPoints
 {
 public:
-	/// <summary>
-	/// 生成する際、二点間の座標を渡す
-	/// </summary>
-	/// <param name="POS">対象のキャラクターの座標</param>
-	/// <param name="VELOCITY">移動量</param>
 	MovingBetweenTwoPoints();
 
-	void Init(const Vec2<float> &START_POS, const Vec2<float> &END_POS);
+	void Init(const Vec2<float> &START_POS, const Vec2<float> &END_POS, bool STACK_FLAG = false);
 
 	/// <summary>
 	/// 実行
@@ -72,4 +67,51 @@ private:
 	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
 	Vec2<float>startPos;
 	
+};
+
+/// <summary>
+/// スタックしない場所を探す
+/// </summary>
+class SearchingToNotGetStuck
+{
+public:
+	SearchingToNotGetStuck();
+
+	const WayPointData &Update(const Vec2<float> START_POS);
+
+	/// <summary>
+	/// 現在実行している処理の進捗
+	/// </summary>
+	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
+	AiResult CurrentProgress();
+private:
+	SearchWayPoint search;
+	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
+};
+
+/// <summary>
+/// スタックしない場所に向かう
+/// </summary>
+class MoveToNotStack
+{
+public:
+	MoveToNotStack();
+
+	/// <summary>
+	/// スタート地点を設定し、スタックしない場所まで移動する
+	/// </summary>
+	/// <param name="START_POS">スタート地点</param>
+	void Init(const Vec2<float> &START_POS);
+
+	void Update();
+
+	/// <summary>
+	/// 現在実行している処理の進捗
+	/// </summary>
+	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
+	AiResult CurrentProgress();
+
+private:
+	SearchingToNotGetStuck searchToNotStack;
+	MovingBetweenTwoPoints operateFollow;
 };

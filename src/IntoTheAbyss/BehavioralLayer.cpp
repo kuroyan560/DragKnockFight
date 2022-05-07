@@ -6,7 +6,7 @@ MovingBetweenTwoPoints::MovingBetweenTwoPoints()
 	initFlag = false;
 }
 
-void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float> &END_POS)
+void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float> &END_POS, bool STACK_FLAG)
 {
 	timer = 0;
 	timeOver = 120;
@@ -16,6 +16,10 @@ void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float
 	Vec2<float>normal((END_POS - START_POS));
 	normal.Normalize();
 	vel = normal * Vec2<float>(14.0f, 14.0f);
+	if (STACK_FLAG)
+	{
+		vel.x = 0.0f;
+	}
 
 	startColision.center = &CharacterManager::Instance()->Right()->pos;
 	startColision.radius = 5.0f;
@@ -89,4 +93,104 @@ const WayPointData &SearchWayPoint::Update()
 AiResult SearchWayPoint::CurrentProgress()
 {
 	return AiResult();
+}
+
+SearchingToNotGetStuck::SearchingToNotGetStuck()
+{
+}
+
+const WayPointData &SearchingToNotGetStuck::Update(const Vec2<float> START_POS)
+{
+	search.Init(START_POS);
+	WayPointData startWayPoint = search.Update();
+	wayPoints = CharacterAIData::Instance()->wayPoints;
+
+	Vec2<int>handle = startWayPoint.handle;
+
+	int downIndex = 0;
+	WayPointData downResult;
+	//下方向の探索
+	while (true)
+	{
+		WayPointData check = *wayPoints[handle.y + downIndex][handle.x];
+		//壁なら探索しない
+		if (check.isWall)
+		{
+			downIndex = 0;
+			break;
+		}
+		//右側の壁の距離が一定以上離れていたら候補として選択する
+		else if (200 <= check.wallDistanceRight)
+		{
+			downResult = check;
+			break;
+		}
+		++downIndex;
+	}
+
+
+
+	int topIndex = 0;
+	WayPointData topResult;
+	//上方向の探索
+	while (true)
+	{
+		WayPointData check = *wayPoints[handle.y + topIndex][handle.x];
+		//壁なら探索しない
+		if (check.isWall)
+		{
+			topIndex = 0;
+			break;
+		}
+		//右側の壁の距離が一定以上離れていたら候補として選択する
+		else if (200 <= check.wallDistanceRight)
+		{
+			topResult = check;
+			break;
+		}
+		++topIndex;
+	}
+
+	//上方向のウェイポイントより下方向のウェイポイントが右の壁との距離が遠かったらスタックしない場所として採用する
+	if (topIndex < downIndex)
+	{
+		return topResult;
+	}
+	else
+	{
+		return downResult;
+	}
+}
+
+AiResult SearchingToNotGetStuck::CurrentProgress()
+{
+	return AiResult();
+}
+
+
+MoveToNotStack::MoveToNotStack()
+{
+}
+
+void MoveToNotStack::Init(const Vec2<float> &START_POS)
+{
+	WayPointData endPoint = searchToNotStack.Update(START_POS);
+	operateFollow.Init(START_POS, endPoint.pos, true);
+}
+
+void MoveToNotStack::Update()
+{
+	operateFollow.Update();
+}
+
+AiResult MoveToNotStack::CurrentProgress()
+{
+	if (operateFollow.CurrentProgress() == AiResult::OPERATE_SUCCESS)
+	{
+		return AiResult::OPERATE_SUCCESS;
+	}
+	else
+	{
+		return AiResult::OPERATE_INPROCESS;
+	}
 }

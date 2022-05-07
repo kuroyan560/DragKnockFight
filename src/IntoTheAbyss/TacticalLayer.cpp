@@ -12,14 +12,23 @@ void FollowPath::Init(const std::vector<WayPointData> &ROUTE)
 	route = ROUTE;
 	routeHandle = 0;
 	goalFlag = false;
+	stackFlag = false;
 	operateFollow.Init(route[0].pos, route[1].pos);
+
+	initFlag = false;
 }
 
 void FollowPath::Update()
 {
-	//初手ウェイポイントと離れていたら近づく
-	//二点間の移動
-	operateFollow.Update();
+	//スタック判定が出たらスタック用の処理を動かし、それ以外はパスを辿る
+	if (!stackFlag)
+	{
+		operateFollow.Update();
+	}
+	else
+	{
+		dontStack.Update();
+	}
 
 	AiResult result = operateFollow.CurrentProgress();
 
@@ -39,12 +48,22 @@ void FollowPath::Update()
 		}
 	}
 
-	//動きが止まっていることを確認したら現在地と次のウェイポイントに向かって進む
-	if (result == AiResult::OPERATE_FAIL && routeHandle < route.size())
+	//ボスが何かしらの方法で動きが制限されていない
+	bool canMoveFlag = CharacterManager::Instance()->Right()->GetNowSwing();
+
+	//動きが止まっていることを確認したらスタックしない場所を探す
+	if (result == AiResult::OPERATE_FAIL && routeHandle < route.size() && initFlag)
 	{
-		//応急処置
-		operateFollow.Init(CharacterManager::Instance()->Right()->pos, route[routeHandle].pos + Vec2<float>(0.0f, 30.0f));
+		dontStack.Init(CharacterManager::Instance()->Right()->pos);
+		stackFlag = true;
 	}
+	//成功でも失敗でもスタック状態から移動した判定
+	if (dontStack.CurrentProgress() != AiResult::OPERATE_INPROCESS)
+	{
+		stackFlag = false;
+	}
+
+	initFlag = true;
 }
 
 AiResult FollowPath::CurrentProgress()
@@ -96,6 +115,10 @@ void MoveToOwnGround::Update()
 
 		//陣地側のY座標ランダムで取る
 		int goalYPoint = KuroFunc::GetRand(0, CharacterAIData::Instance()->wayPoints.size() - 1);
+		while (CharacterAIData::Instance()->wayPoints[goalYPoint][goalXPoint]->isWall)
+		{
+			goalYPoint = KuroFunc::GetRand(0, CharacterAIData::Instance()->wayPoints.size() - 1);
+		}
 		endPoint = *CharacterAIData::Instance()->wayPoints[goalYPoint][goalXPoint];
 		timer = 1;
 	}
