@@ -75,8 +75,8 @@ void CharacterAI::Update()
 					max = strategyEvaluationValue;
 				}
 			}
-			strategyOfChoice = static_cast<AiStrategy>(selecting);
-			strategyArray[strategyOfChoice]->Init();
+			//strategyOfChoice = static_cast<AiStrategy>(selecting);
+			//strategyArray[strategyOfChoice]->Init();
 		}
 		//ˆÓŽvŒˆ’è--------------------------
 

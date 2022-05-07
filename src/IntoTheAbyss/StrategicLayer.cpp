@@ -9,6 +9,40 @@ const float IStrategicLayer::SEARCH_RADIUS = 500.0f;
 const float RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 0.4f;
 const float AcquireASuperiorityGauge::SUCCEED_GAUGE_VALUE = 0.3f;
 
+IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &DATA)
+{
+	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
+
+	std::vector<float>distance;
+	std::vector<int>itemId;
+	//探索範囲内にアイテムがあるのか調べる
+	for (int i = 0; i < item.size(); ++i)
+	{
+		//アイテムを一つ以上見つけたら探索準備をする
+		//そして距離を測る
+		bool canGetFlag = item[i].GetIsActive() && !item[i].GetIsAcquired();
+		if (canGetFlag && BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), DATA))
+		{
+			distance.push_back(DATA.center->Distance(*item[i].GetCollisionData()->center));
+			itemId.push_back(i);
+		}
+	}
+
+	//探索範囲内から一番近いアイテムを見る
+	SearchData result;
+	result.distance = 10000.0f;
+	result.itemIndex = -1;
+	for (int i = 0; i < distance.size(); ++i)
+	{
+		if (distance[i] < result.distance)
+		{
+			result.distance = distance[i];
+			result.itemIndex = itemId[i];
+		}
+	}
+
+	return result;
+}
 
 RestoreStamina::RestoreStamina()
 {
@@ -440,8 +474,13 @@ void AcquireASuperiorityGauge::Update()
 	////自分が不利ならクラッシュされないように立ち回る
 	//if (dontCrashFlag)
 	//{
-
 	//}
+
+	moveToOnwGround.route = route;
+	moveToOnwGround.Update();
+	startPoint = moveToOnwGround.startPoint;
+	endPoint = moveToOnwGround.endPoint;
+	startFlag = true;
 
 	//振り回し可能か
 	bool canSwingClockWiseFlag = CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();

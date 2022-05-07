@@ -164,12 +164,14 @@ public:
 
 private:
 	static const float SUCCEED_GAUGE_VALUE;//どこまで回復したら成功とするか
-	float nowGauge;//戦略開始時の優勢ゲージ
+	float nowGauge;							//戦略開始時の優勢ゲージ
 	//クラッシュさせる--------------------------
 	bool crashEnemyFlag;
 	int swingCoolTime;
 	const int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
 
+
+	MoveToOwnGround moveToOnwGround;
 
 	//クラッシュされないようにする--------------------------
 	bool dontCrashFlag;
