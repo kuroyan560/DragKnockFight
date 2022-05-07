@@ -536,10 +536,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 		if (!IsPilotOutSide())
 		{
 			//パイロット切り離し
-			if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RT))SetPilotDetachedFlg(true);
+			if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RB))SetPilotDetachedFlg(true);
 		}
 	}
-	if (UsersInput::Instance()->ControllerOffTrigger(controllerIdx, XBOX_BUTTON::RT))SetPilotDetachedFlg(false);
+	if (UsersInput::Instance()->ControllerOffTrigger(controllerIdx, XBOX_BUTTON::RB))SetPilotDetachedFlg(false);
 
 	// 入力されていなくて、スイング中じゃなかったら予測線を消す。
 	if ((inputRightVec.Length() <= 0.5f && !nowSwing) || IsPilotOutSide()) {
