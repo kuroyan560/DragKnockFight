@@ -84,8 +84,7 @@ void Player::OnInit()
 
 	swingCoolTime = 0;
 
-	initSize = { 5.0f,5.0f };
-	size = initSize;
+	size = { 1.0f,1.0f };
 	sizeVel = 120.0f;
 	initPaticleFlag = false;
 	moveTimer = 0;
@@ -890,7 +889,8 @@ bool Player::Appear()
 	if (1.0f < size.x && 1.0f < size.y)
 	{
 		float time = 30.0f;
-		size -= initSize / time;
+		size.x -= INIT_SIZE / time;
+		size.y -= INIT_SIZE / time;
 	}
 	else
 	{

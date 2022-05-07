@@ -175,8 +175,6 @@ private:
 
 	bool drawCursorFlag;
 
-	Vec2<float>size;
-	Vec2<float>initSize;
 private:
 	/*-- クラス内で使用する関数 --*/
 

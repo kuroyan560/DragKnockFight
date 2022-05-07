@@ -313,7 +313,7 @@ Game::Game()
 
 }
 
-void Game::Init()
+void Game::Init(const bool& RoundStartEffect)
 {
 	WinCounter::Instance()->Reset();
 
@@ -324,14 +324,14 @@ void Game::Init()
 	InitGame(0, 0);
 	ScrollMgr::Instance()->Reset();
 	roundChangeEffect.Init();
-	readyToStartRoundFlag = true;
+	readyToStartRoundFlag = RoundStartEffect;
 	CrashEffectMgr::Instance()->Init();
 	screenEdgeEffect.Init();
 
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 }
 
-void Game::Update()
+void Game::Update(const bool& Loop)
 {
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 
@@ -448,7 +448,7 @@ void Game::Update()
 		{
 
 			//‚Ç‚¿‚ç‚©‚ª‚RŸ‚Æ‚Á‚½‚çƒQ[ƒ€I—¹
-			if (WinCounter::Instance()->GetGameFinish())
+			if (WinCounter::Instance()->GetGameFinish() && !Loop)
 			{
 				ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
 				if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
@@ -458,6 +458,9 @@ void Game::Update()
 			//ŽŸ‚Ìƒ‰ƒEƒ“ƒh‚Ö
 			else
 			{
+				//—ûKƒ‚[ƒh
+				if (Loop)WinCounter::Instance()->Reset();
+
 				++roundTimer;
 
 				if (60 <= roundTimer)
@@ -721,7 +724,7 @@ void Game::Update()
 
 }
 
-void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
+void Game::Draw()
 {
 	int stageNum = SelectStage::Instance()->GetStageNum();
 	int roomNum = SelectStage::Instance()->GetRoomNum();

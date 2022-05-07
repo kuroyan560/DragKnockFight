@@ -16,18 +16,6 @@
 
 GameScene::GameScene()
 {
-	static const float BACK_GROUND_DEPTH = 7.0f;
-	auto backColor = D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, 255));
-	backGround = std::make_shared<Sprite>(backColor, "BackGround");
-	backGround->mesh.SetZLayer(BACK_GROUND_DEPTH);
-	backGround->mesh.SetSize(WinApp::Instance()->GetExpandWinSize());
-
-	gaussianBlur = std::make_shared<GaussianBlur>(WinApp::Instance()->GetWinSize(), DXGI_FORMAT_R32G32B32A32_FLOAT);
-
-	emissiveMap = D3D12App::Instance()->GenerateRenderTarget(DXGI_FORMAT_R32G32B32A32_FLOAT, Color(0.0f, 0.0f, 0.0f, 1.0f),
-		WinApp::Instance()->GetWinSize(), L"EmissiveMap");
-
-
 	addValue = 10.0f;
 
 	sceneChange = std::make_shared<SceneCange>();
@@ -70,14 +58,8 @@ void GameScene::OnUpdate()
 
 void GameScene::OnDraw()
 {
-	emissiveMap->Clear(D3D12App::Instance()->GetCmdList());
-
-	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget(),emissiveMap });
-	backGround->Draw();
-	game.Draw(emissiveMap);
-
-	gaussianBlur->Register(emissiveMap);
-	gaussianBlur->DrawResult(AlphaBlendMode_Add);
+	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
+	game.Draw();
 
 	// スクショを保存。
 	if (isSS) {

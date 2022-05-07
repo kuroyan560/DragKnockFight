@@ -113,3 +113,9 @@ void CharacterManager::CharactersInit(const Vec2<float>& RespawnPos)
 	characters[LEFT_TEAM]->Init(RespawnPos - offset);
 	characters[RIGHT_TEAM]->Init(RespawnPos + offset);
 }
+
+void CharacterManager::PracticeMode()
+{
+	characterName[LEFT_TEAM] = PLAYABLE_LUNA;
+	characterName[RIGHT_TEAM] = PLAYABLE_LACY;
+}

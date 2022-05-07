@@ -2,6 +2,8 @@
 #include"IntoTheAbyss/TexHandleMgr.h"
 #include"KuroFunc.h"
 #include<sys/stat.h>
+#include"IntoTheAbyss/CharacterManager.h"
+#include"IntoTheAbyss/Tutorial.h"
 
 int TutorialScene::LoadPngFile(const std::string& Dir, const int& Num)
 {
@@ -73,11 +75,16 @@ TutorialScene::TutorialScene()
 
 void TutorialScene::OnInitialize()
 {
+	CharacterManager::Instance()->PracticeMode();
 	pictureStory.InitScene();
+	game.Init();
+	Tutorial::SetStaticActiveAll(false);
 }
 
 void TutorialScene::OnUpdate()
 {
+	game.Update(true);
+
 	pictureStory.Update();
 
 	if (pictureStory.goToTitleSceneFlag)
@@ -89,8 +96,7 @@ void TutorialScene::OnUpdate()
 void TutorialScene::OnDraw()
 {
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
-	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
-
+	game.Draw();
 	pictureStory.Draw();
 }
 
@@ -100,4 +106,5 @@ void TutorialScene::OnImguiDebug()
 
 void TutorialScene::OnFinalize()
 {
+	Tutorial::SetStaticActiveAll(true);
 }

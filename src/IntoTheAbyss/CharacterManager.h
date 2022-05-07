@@ -28,4 +28,6 @@ public:
 	void CharactersInit(const Vec2<float>& RespawnPos);
 	std::shared_ptr<CharacterInterFace>& Left() { return characters[LEFT_TEAM]; }
 	std::shared_ptr<CharacterInterFace>& Right() { return characters[RIGHT_TEAM]; }
+
+	void PracticeMode();
 };

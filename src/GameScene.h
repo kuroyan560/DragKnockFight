@@ -11,10 +11,6 @@ class RenderTarget;
 
 class GameScene : public BaseScene
 {
-	std::shared_ptr<Sprite>backGround;
-	std::shared_ptr<GaussianBlur>gaussianBlur;
-	std::shared_ptr<RenderTarget>emissiveMap;
-
 	Game game;
 	float addValue;
 	bool isSS;		// スクショを撮るかのフラグ

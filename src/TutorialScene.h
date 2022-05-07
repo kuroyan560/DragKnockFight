@@ -2,9 +2,12 @@
 #include"KuroEngine.h"
 #include"../src/IntoTheAbyss/SceneCange.h"
 #include"../src/IntoTheAbyss/StoryMgr.h"
+#include"IntoTheAbyss/Game.h"
 
 class TutorialScene :public BaseScene
 {
+	Game game;
+
 	int LoadPngFile(const std::string& Dir, const int& Num);
 	bool ExistDir(const std::string& Dir);
 public:

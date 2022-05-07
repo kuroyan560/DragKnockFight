@@ -120,9 +120,9 @@ public:
 	int nowSelectNum = 0;
 
 	Game();
-	void Init();
-	void Update();
-	void Draw(std::weak_ptr<RenderTarget>EmissiveMap);
+	void Init(const bool& RoundStartEffect = true);
+	void Update(const bool& Loop = false);
+	void Draw();
 	void Scramble();
 	void CalCenterPos();
 

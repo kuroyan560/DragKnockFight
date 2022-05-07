@@ -2,6 +2,8 @@
 #include"TexHandleMgr.h"
 static const float SCALE = 0.8f;
 
+bool Tutorial::ACTIVE[TUTORIAL_TYPE_NUM] = { true };
+
 Tutorial::Tutorial(const WHICH_TEAM& Team) :team(Team)
 {
 	static bool LOAD = false;
@@ -59,7 +61,7 @@ void Tutorial::DrawIcon(const bool& IsActive, const Vec2<float>& Pos, const int&
 	else DrawIconNonActive(Pos, Handle);
 }
 
-void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const bool& LTrigger, bool RTrigger)
+void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const bool& LButton, bool RButton)
 {
 	if (!active)return;
 
@@ -77,20 +79,25 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 	//アイコンごとのオフセット
 	static const float ICON_OFFSET_Y = 80.0f * SCALE;
 
-	//左スティック
 	static const Vec2<float>LstickPos = { 47,0 };
 	static const Vec2<float>LstickOffset = { 3,19 };
-	//DrawIcon(LstickPos + LstickOffset + OFFSET[team], iconGraphs.stickBase_L);
-	DrawIcon(LstickPos + LstickOffset + OFFSET[team], iconGraphs.stickBase_L);
-	//左スティックヘッド
 	static const Vec2<float>LstickHeadCenterOffset = Vec2<float>(-48.0f, 2.0f) * SCALE;
 	const Vec2<float>LstickHeadPos = LstickPos + LstickHeadCenterOffset + LStickVec.GetNormal() * STICK_HEAD_RADIUS_OFFSET;
-	DrawIcon(LstickHeadPos + LstickOffset + OFFSET[team], iconGraphs.stickHead);
+	if (ACTIVE[MOVE])
+	{
+		//左スティック
+		DrawIcon(LstickPos + LstickOffset + OFFSET[team], iconGraphs.stickBase_L);
+		//左スティックヘッド
+		DrawIcon(LstickHeadPos + LstickOffset + OFFSET[team], iconGraphs.stickHead);
+	}
 
-	//左トリガー
+	//LB
 	static const Vec2<float>LtriggerPos = { 22,ICON_OFFSET_Y + LstickPos.y };
-	//DrawIcon(LtriggerPos + OFFSET[team], LTrigger ? iconGraphs.triggerOn_L : iconGraphs.triggerOff_L);
-	DrawIcon(LtriggerPos + OFFSET[team], LTrigger ? iconGraphs.buttonOn_L : iconGraphs.buttonOff_L);
+	if (ACTIVE[DASH])
+	{
+		//DrawIcon(LtriggerPos + OFFSET[team], LTrigger ? iconGraphs.triggerOn_L : iconGraphs.triggerOff_L);
+		DrawIcon(LtriggerPos + OFFSET[team], LButton ? iconGraphs.buttonOn_L : iconGraphs.buttonOff_L);
+	}
 
 	//右スティック＆トリガーアイコンのオフセットX
 	static const float R_OFFSET_X = 20.0f;
@@ -103,13 +110,20 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 	static const Vec2<float>RstickHeadCenterOffset = Vec2<float>(53.0f, 3.0f) * SCALE;
 	const Vec2<float>RstickHeadPos = RstickPos + RstickOffset + RstickHeadCenterOffset + RStickVec.GetNormal() * STICK_HEAD_RADIUS_OFFSET;
 
-	//右トリガー
 	static const Vec2<float>RtriggerPos = { 22 + R_OFFSET_X,ICON_OFFSET_Y + RstickPos.y - 20.0f };
 	//DrawIcon(rightStickInput && (RStickVec.x  || RStickVec.y), RtriggerPos + OFFSET[team], RTrigger ? iconGraphs.triggerOn_R : iconGraphs.triggerOff_R);
-	DrawIcon(RtriggerPos + OFFSET[team], RTrigger ? iconGraphs.buttonOn_R : iconGraphs.buttonOff_R);
 
 	//DrawIcon(rightStickInput, RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBase_R);
 	//DrawIcon(rightStickInput, RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
-	DrawIcon(RstickPos + RstickOffset + OFFSET[team], pilotLeave ? iconGraphs.stickBasePilot_R : iconGraphs.stickBaseSwing_R);
-	DrawIcon(RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
+	if (pilotLeave && ACTIVE[PILOT])
+	{
+		DrawIcon(RtriggerPos + OFFSET[team], RButton ? iconGraphs.buttonOn_R : iconGraphs.buttonOff_R);
+		DrawIcon(RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBasePilot_R);
+		DrawIcon(RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
+	}
+	else if (ACTIVE[SWING])
+	{
+		//スウィング
+		DrawIcon(RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBaseSwing_R);
+	}
 }

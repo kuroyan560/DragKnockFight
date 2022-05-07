@@ -36,8 +36,6 @@ void StoryMgr::InitScene()
 #include"AudioApp.h"
 void StoryMgr::Update()
 {
-	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/select.wav");
-
 	if (story[storyHandle]->GoToNextScene())
 	{
 		++storyHandle;
@@ -50,12 +48,6 @@ void StoryMgr::Update()
 		{
 			story[storyHandle]->Start();
 		}
-	}
-
-	if (story[storyHandle]->OneLooped() && !story[storyHandle]->NextFlg() && UsersInput::Instance()->ControllerOnTrigger(0, A))
-	{
-		AudioApp::Instance()->PlayWave(SE);
-		story[storyHandle]->GotoNextString();
 	}
 
 	story[storyHandle]->Update();

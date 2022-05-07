@@ -75,8 +75,8 @@ void WinApp::Initialize(const std::string& WinName, const Vec2<int>WinSize, cons
     hwnd = CreateWindow(wc.lpszClassName,  //クラス名
         winWideName.c_str(),    //タイトルバー
         dwStyle,    //ウィンドウスタイル
-        CW_USEDEFAULT,  //表示X座標（OSに任せる）
-        CW_USEDEFAULT,  //表示Y座標（OSに任せる）
+        /*CW_USEDEFAULT*/0,  //表示X座標（OSに任せる）
+        /*CW_USEDEFAULT*/0,  //表示Y座標（OSに任せる）
         rect.right - rect.left, //ウィンドウ横幅
         rect.bottom - rect.top, //ウィンドウ縦幅
         nullptr,    //親ウィンドウハンドル

@@ -109,6 +109,7 @@ protected:
 
 	std::weak_ptr<CharacterInterFace>partner;
 	StagingInterFace stagingDevice;
+	static const int INIT_SIZE = 5;
 	Vec2<float>size;	//サイズ
 
 	//[キャラごとに違う関数]
@@ -172,7 +173,7 @@ public:
 		team = Team;
 		characterName = Name;
 	}
-	void Init(const Vec2<float>& GeneratePos);	//ラウンド開始時に呼び出される
+	void Init(const Vec2<float>& GeneratePos, const bool& Appear);	//ラウンド開始時に呼び出される
 	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
 	void Draw();
 	void DrawUI();

@@ -15,16 +15,16 @@ public:
 
 	void Start();
 	const bool& OneLooped() { return oneLoop; }
-	const bool& NextFlg() { return nextFlag; }
-	void GotoNextString();
+	//const bool& NextFlg() { return nextFlag; }
+	//void GotoNextString();
 
 	bool GoToNextScene();
 private:
 	bool startFlag;
 
-	std::vector<Vec2<float>>picturePos;
-	std::vector<int>pictureHandle;
-	int pictureArrayHandle;
+	//std::vector<Vec2<float>>picturePos;
+	//std::vector<int>pictureHandle;
+	//int pictureArrayHandle;
 	
 
 	Vec2<float>basePos;

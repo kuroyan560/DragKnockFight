@@ -271,8 +271,11 @@ void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& is
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_RIGHT) isHitRight = true;
 }
 
-void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
+void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear)
 {
+	if (Appear)appearExpand = { 5.0f,5.0f };
+	else appearExpand = { 1.0f,1.0f };
+
 	pos = GeneratePos;
 	vel = { 0,0 };
 

@@ -9,14 +9,14 @@ PictureStory::PictureStory()
 
 void PictureStory::Init(const std::vector<int> &PICTURE_HANDLE, const std::vector<int> &STRING_HANDLE)
 {
-	pictureHandle = PICTURE_HANDLE;
+	//pictureHandle = PICTURE_HANDLE;
 	stringHandle = STRING_HANDLE;
 
-	picturePos.resize(PICTURE_HANDLE.size());
+	//picturePos.resize(PICTURE_HANDLE.size());
 	stringPos.resize(STRING_HANDLE.size());
 
 	basePos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x / 2);
-	basePos.y = -50.0f;
+	basePos.y = 900;
 }
 
 void PictureStory::InitScene()
@@ -31,20 +31,43 @@ void PictureStory::InitScene()
 void PictureStory::Update()
 {
 	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/select.wav");
+
+
+
 	if (startFlag)
 	{
-		if (!finishFlag)
+		if (!finishFlag && !nextFlag)
 		{
-			if (0 < pictureArrayHandle && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
+			////if (0 < pictureArrayHandle && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
+			//if (0 < pictureArrayHandle && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::LT))
+			//{
+			//	pictureArrayHandle--;
+			//	AudioApp::Instance()->PlayWave(SE);
+			//}
+			//if (pictureArrayHandle < pictureHandle.size() - 1 && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::RT))
+			//{
+			//	pictureArrayHandle++;
+			//	AudioApp::Instance()->PlayWave(SE);
+			//}
+			
+			//string
+			if (stringArrayHandle < stringHandle.size() - 1 && UsersInput::Instance()->ControllerOnTrigger(0, RT))
 			{
-				pictureArrayHandle--;
+				stringArrayHandle++;
 				AudioApp::Instance()->PlayWave(SE);
+				nextFlag = true;
 			}
-			if (pictureArrayHandle < pictureHandle.size() - 1 && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_RIGHT))
+			if (0 < stringArrayHandle && UsersInput::Instance()->ControllerOnTrigger(0, LT))
 			{
-				pictureArrayHandle++;
+				stringArrayHandle--;
 				AudioApp::Instance()->PlayWave(SE);
+				nextFlag = true;
 			}
+		}
+
+		if (oneLoop && UsersInput::Instance()->ControllerOnTrigger(0,A))
+		{
+			finishFlag = true;
 		}
 
 		//ìríÜââèo
@@ -53,14 +76,14 @@ void PictureStory::Update()
 			Rate(&stringNextRate, 5.0f);
 			if (1.0f <= stringNextRate)
 			{
-				++stringArrayHandle;
+				//++stringArrayHandle;
 				nextFlag = false;
 
-				if (stringHandle.size() <= stringArrayHandle)
-				{
-					stringArrayHandle--;	//ç≈å„ÇÃâÊëúÇÃÇ‹Ç‹
-					finishFlag = true;
-				}
+				//if (stringHandle.size() <= stringArrayHandle)
+				//{
+				//	stringArrayHandle--;	//ç≈å„ÇÃâÊëúÇÃÇ‹Ç‹
+				//	finishFlag = true;
+				//}
 			}
 		}
 		else
@@ -71,7 +94,7 @@ void PictureStory::Update()
 		//ìoèÍââèo
 		Rate(&stringAppearRate, 60.0f);
 		stringPos[stringArrayHandle] = basePos;
-		stringPos[stringArrayHandle].y += KuroMath::Ease(Out, Elastic, stringAppearRate, 0.0f, 1.0f) * 200.0f;
+		stringPos[stringArrayHandle].y += KuroMath::Ease(Out, Elastic, stringAppearRate, 0.0f, 1.0f) * -330.0f;
 
 		//ìríÜââèoÇÃâ¡éZ
 		stringPos[stringArrayHandle].y += -KuroMath::Ease(Out, Cubic, stringNextRate, 0.0f, 1.0f) * 10.0f;
@@ -85,13 +108,17 @@ void PictureStory::Update()
 				startCountDownTogoToNextSceneFlag = true;
 			}
 		}
-		stringPos[stringArrayHandle].y += -KuroMath::Ease(In, Cubic, stringFinishRate, 0.0f, 1.0f) * 300.0f;
+		stringPos[stringArrayHandle].y += KuroMath::Ease(In, Cubic, stringFinishRate, 0.0f, 1.0f) * 300.0f;
 
 
 
 
 		//ç≈å„ÇÃâÊëúÇ‹Ç≈å©ÇΩ
-		if (pictureHandle.size() - 1 <= pictureArrayHandle)
+		//if (pictureHandle.size() - 1 <= pictureArrayHandle)
+		//{
+		//	if (!oneLoop)oneLoop = true;
+		//}
+		if (stringHandle.size() - 1 <= stringArrayHandle)
 		{
 			if (!oneLoop)oneLoop = true;
 		}
@@ -100,7 +127,7 @@ void PictureStory::Update()
 		{
 			++countDownTimer;
 		}
-		if (60 <= countDownTimer)
+		if (20 <= countDownTimer)
 		{
 			goToNextSceneFlag = true;
 		}
@@ -121,18 +148,20 @@ void PictureStory::Draw()
 	{
 		//adjPos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x / 2);
 		//adjPos.y = static_cast<float>(WinApp::Instance()->GetWinSize().y / 2);
-		DrawFunc::DrawRotaGraph2D(picturePos[pictureArrayHandle] + winCenter, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(pictureHandle[pictureArrayHandle]));
+		//DrawFunc::DrawRotaGraph2D(picturePos[pictureArrayHandle] + winCenter, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(pictureHandle[pictureArrayHandle]));
 		DrawFunc::DrawRotaGraph2D(stringPos[stringArrayHandle], Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(stringHandle[stringArrayHandle]));
 
 		//ñÓàÛÇÃï`âÊ
-		const float offsetY = ARROW_FLOAT_Y * cos(ARROW_FLOAT_RADIAN);
+		const float offsetY = ARROW_FLOAT_Y * cos(ARROW_FLOAT_RADIAN) - 100.0f;
 		//ç∂ë§
-		if (0 < pictureArrayHandle)
+		//if (0 < pictureArrayHandle)
+		if (0 < stringArrayHandle)
 		{
 			DrawFunc::DrawRotaGraph2D({ ARROR_X_OFFSET,winCenter.y + offsetY }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(ARROW_GRAPH), Color(), { 0.5f,0.5f }, { true,false });
 		}
 		//âEë§
-		if (pictureArrayHandle < pictureHandle.size() - 1)
+		//if (pictureArrayHandle < pictureHandle.size() - 1)
+		if (stringArrayHandle < stringHandle.size() - 1)
 		{
 			DrawFunc::DrawRotaGraph2D({ winCenter.x * 2 - ARROR_X_OFFSET,winCenter.y + offsetY }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(ARROW_GRAPH));
 		}
@@ -143,7 +172,7 @@ void PictureStory::Start()
 {
 	if (!startFlag)
 	{
-		pictureArrayHandle = 0;
+		//pictureArrayHandle = 0;
 
 		//ï∂éöï`âÊÇÃèâä˙âª
 		stringArrayHandle = 0;
@@ -158,11 +187,6 @@ void PictureStory::Start()
 		finishFlag = false;
 		startFlag = true;
 	}
-}
-
-void PictureStory::GotoNextString()
-{
-	nextFlag = true;
 }
 
 bool PictureStory::GoToNextScene()

@@ -32,6 +32,11 @@ class Tutorial
 	void DrawIcon(const bool& IsActive, const Vec2<float>& Pos, const int& Handle);
 
 public:
+	static const enum TUTORIAL_TYPE { MOVE, DASH, SWING, PILOT, TUTORIAL_TYPE_NUM };
+	static bool ACTIVE[TUTORIAL_TYPE_NUM];
+	static void SetStaticActive(const TUTORIAL_TYPE& Type, const bool& Active) { ACTIVE[Type] = Active; }
+	static void SetStaticActiveAll(const bool& Active) { for (auto& a : ACTIVE)a = Active; }
+
 	Tutorial(const WHICH_TEAM& Team);
 	//void Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const bool& LTrigger, bool RTrigger);
 	void Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const bool& LButton, bool RButton);
