@@ -262,9 +262,9 @@ float RestoreStamina::EvaluationFunction()
 	}
 
 	//自陣へのウェイポイント
-
 	return static_cast<float>(evaluationValue) / static_cast<float>(data->EVALUATION_MAX_VALUE);
 }
+
 
 GoToTheField::GoToTheField()
 {
