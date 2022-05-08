@@ -115,7 +115,7 @@ void StaminaItemMgr::Update()
 
 		Vec2<float> randomSponePos = { KuroFunc::GetRand(0.0f, 2000.0f), KuroFunc::GetRand(0.0f,1000.0f) };
 
-		GenerateSpone(randomSponePos);
+		//GenerateSpone(randomSponePos);
 
 		sponeTimer = 0;
 
