@@ -333,6 +333,10 @@ void Game::Init()
 
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 
+	if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
+	{
+		chara.Init();
+	}
 }
 
 void Game::Update()
