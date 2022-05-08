@@ -5,6 +5,7 @@
 MovingBetweenTwoPoints::MovingBetweenTwoPoints()
 {
 	initFlag = false;
+	dashTimer = 0;
 }
 
 void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float> &END_POS, bool STACK_FLAG)
@@ -27,7 +28,7 @@ void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float
 	endColision.center = &endPos;
 	endColision.radius = 20.0f;
 	initFlag = true;
-	dashTimer = 0;
+
 }
 
 void MovingBetweenTwoPoints::Update()
@@ -37,19 +38,20 @@ void MovingBetweenTwoPoints::Update()
 	//プレイヤーがダッシュしたらその後に遅れてダッシュする
 	if (CharacterAIData::Instance()->dashFlag)
 	{
-		//dashFlag = true;
-		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterAIData::Instance()->bossData.dashStamina);
+		dashFlag = true;
 		operateDash.Init(vel / 2.0f);
 	}
-	//if (dashFlag)
-	//{
-	//	++dashTimer;
-	//}
-	//if (20 <= dashTimer)
-	//{
-	//	operateDash.Init(5.0f);
-	//	dashFlag = false;
-	//}
+	if (dashFlag)
+	{
+		++dashTimer;
+	}
+	//スタミナの減算は若干遅れて行う
+	if (15 <= dashTimer)
+	{
+		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterAIData::Instance()->playerData.dashStamina);
+		dashTimer = 0;
+		dashFlag = false;
+	}
 
 	operateMove.Update(vel + operateDash.Update());
 }
