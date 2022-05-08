@@ -91,7 +91,7 @@ void StaminaItem::Update()
 
 		// ˆÚ“®—Ê‚ğ0‚É‹ß‚Ã‚¯‚éB
 		vel -= vel / 10.0f;
-		if (vel < 1.0f) vel = 0;
+		if (vel < 3.0f) vel = 0;
 
 		// ˆÚ“®—Ê‚ğ‘«‚·B
 		pos += forwardVec * vel;

@@ -17,7 +17,7 @@ private:
 	float areaRighPos;		// 戦闘エリアの右の座標
 
 	int sponeTimer = 0;
-	const int SPONE_TIMER = 120;	// アイテムが自動スポーンするタイマー
+	const int SPONE_TIMER = 60;	// アイテムが自動スポーンするタイマー
 
 	const int GENERATE_CRASH = 5;		// クラッシュ時に生成するアイテム
 	const int ADD_GENERATE_CRASH = 10;	// クラッシュ時に生成するアイテム
