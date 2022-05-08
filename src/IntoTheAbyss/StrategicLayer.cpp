@@ -295,6 +295,13 @@ void GoToTheField::Update()
 	{
 	}
 
+
+	if (CharacterManager::Instance()->Right()->GetNowSwing())
+	{
+		swingCoolTime = 0;
+	}
+
+
 	//振り回した際に一定距離以上離れれるか
 	const float CERTAIN_DISTANCE = 100.0f;
 	bool haveAdvantageToSwingClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->cDistance;
@@ -304,7 +311,8 @@ void GoToTheField::Update()
 	const float STAMINA_VALUE = 0.5f;
 	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge;
 	//振り回しのクールタイムが終わった
-	bool timeToSiwngFlag = SWING_MAX_COOL_TIME <= swingCoolTime;;
+	bool timeToSiwngFlag = SWING_MAX_COOL_TIME <= swingCoolTime;
+
 
 	//スタミナが多く振り回しのクールタイムが終わった際、一定距離離れていたら実行
 	if (useSwingFlag && timeToSiwngFlag && (haveAdvantageToSwingClockWiseFlag || haveAdvantageToSwingCClockWiseFlag))
@@ -313,14 +321,13 @@ void GoToTheField::Update()
 		if (CharacterAIData::Instance()->cCDistance < CharacterAIData::Instance()->cDistance)
 		{
 			CharacterAIOrder::Instance()->swingClockWiseFlag = true;
-			swingCoolTime = 0;
 		}
 		else
 		{
 			CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
-			swingCoolTime = 0;
 		}
 	}
+
 	++swingCoolTime;
 
 	//敵をダッシュで移動させる

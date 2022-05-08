@@ -276,6 +276,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	firstLoadFlag = false;
 	lineExtendScale = lineExtendMaxScale;
 
+	gameStartFlag = false;
+
 }
 
 Game::Game()
@@ -311,7 +313,6 @@ Game::Game()
 	GameTimer::Instance()->Init(120);
 	ScoreManager::Instance()->Init();
 
-
 	navi.Init(mapData);
 }
 
@@ -331,6 +332,8 @@ void Game::Init()
 	screenEdgeEffect.Init();
 
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
+
+	chara.Init();
 }
 
 void Game::Update()
@@ -542,7 +545,6 @@ void Game::Update()
 	chara.shortestData = navi.GetShortestRoute();
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
-		chara.Init();
 	}
 
 	navi.startPoint = chara.startPoint;
