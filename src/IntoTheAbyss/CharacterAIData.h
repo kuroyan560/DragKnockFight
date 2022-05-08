@@ -34,6 +34,9 @@ public:
 	bool swingFlag;//U‚è‰ñ‚µ“ü—Í
 	bool dashFlag;//ƒ_ƒbƒVƒ…“ü—Í
 
+	float cDistance;
+	float cCDistance;
+
 	const int EVALUATION_MAX_VALUE = 10;
 
 	Vec2<float>nowPos,prevPos;

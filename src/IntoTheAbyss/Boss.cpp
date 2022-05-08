@@ -24,7 +24,8 @@
 #include"AfterImage.h"
 
 #include"CharacterAIData.h"
-
+#include"CharacterManager.h"
+#include"Stamina.h"
 
 static const Vec2<float> SCALE = { 80.0f,80.0f };
 Boss::Boss() :CharacterInterFace(SCALE)
@@ -187,18 +188,22 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		// U‚è‰ñ‚µ‚ÌƒgƒŠƒK[”»’è
 		SwingPartner(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), true);
 		CharacterAIOrder::Instance()->swingClockWiseFlag = false;
-	}else if (CharacterAIOrder::Instance()->swingCounterClockWiseFlag)
+	}
+	else if (CharacterAIOrder::Instance()->swingCounterClockWiseFlag)
 	{
 		// U‚è‰ñ‚µ‚ÌƒgƒŠƒK[”»’è
 		SwingPartner(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), false);
 		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
 	}
 
-
-
-	//CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+	CWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
+	CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+	CharacterAIData::Instance()->cDistance = CWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
 	//CWSwingSegmentMgr.Init();
-	//CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+
+	CCWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
+	CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+	CharacterAIData::Instance()->cCDistance = CCWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
 	//CCWSwingSegmentMgr.Init();
 
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;

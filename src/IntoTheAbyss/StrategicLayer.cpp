@@ -294,31 +294,33 @@ void GoToTheField::Update()
 	else
 	{
 	}
-	//振り回し可能か
-	bool canSwingClockWiseFlag = !CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
-	bool canSwingCClockWiseFlag = !CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
 
-	//一定距離を保っているか
-	const float CERTAIN_DISTANCE = 200.0f;
-	bool keepACertainDistanceFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->distance;
+	//振り回した際に一定距離以上離れれるか
+	const float CERTAIN_DISTANCE = 100.0f;
+	bool haveAdvantageToSwingClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->cDistance;
+	bool haveAdvantageToSwingCClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->cCDistance;
 
-	const float STAMINA_VALUE = 0.5f;
 	//スタミナが多い
-	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge && SWING_MAX_COOL_TIME <= swingCoolTime;
-	//敵を振り回しで移動させる
-	if (canSwingClockWiseFlag && useSwingFlag && keepACertainDistanceFlag)
-	{
-		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
-		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
-		swingCoolTime = 0;
-	}
-	else if (canSwingCClockWiseFlag && useSwingFlag && keepACertainDistanceFlag)
-	{
-		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
-		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
-		swingCoolTime = 0;
-	}
+	const float STAMINA_VALUE = 0.5f;
+	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge;
+	//振り回しのクールタイムが終わった
+	bool timeToSiwngFlag = SWING_MAX_COOL_TIME <= swingCoolTime;;
 
+	//スタミナが多く振り回しのクールタイムが終わった際、一定距離離れていたら実行
+	if (useSwingFlag && timeToSiwngFlag && (haveAdvantageToSwingClockWiseFlag || haveAdvantageToSwingCClockWiseFlag))
+	{
+		//敵を振り回しで移動させる距離が大きい方に振り回す
+		if (CharacterAIData::Instance()->cCDistance < CharacterAIData::Instance()->cDistance)
+		{
+			CharacterAIOrder::Instance()->swingClockWiseFlag = true;
+			swingCoolTime = 0;
+		}
+		else
+		{
+			CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
+			swingCoolTime = 0;
+		}
+	}
 	++swingCoolTime;
 
 	//敵をダッシュで移動させる
@@ -493,6 +495,7 @@ void AcquireASuperiorityGauge::Update()
 	const float STAMINA_VALUE = 0.5f;
 	//スタミナが多い
 	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge && SWING_MAX_COOL_TIME <= swingCoolTime;
+
 	//敵を振り回しで移動させる
 	if (canSwingClockWiseFlag && useSwingFlag)
 	{
@@ -594,8 +597,6 @@ float AcquireASuperiorityGauge::EvaluationFunction()
 	{
 		evaluationValue += 2;
 	}
-
-
 
 
 	{

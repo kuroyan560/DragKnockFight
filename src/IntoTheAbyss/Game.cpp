@@ -550,8 +550,10 @@ void Game::Update()
 	navi.startFlag = chara.startFlag;
 	navi.Update({});
 
-	chara.Update();
-
+	if (gameStartFlag)
+	{
+		chara.Update();
+	}
 
 	CharacterAIData::Instance()->nowPos = CharacterManager::Instance()->Right()->pos;
 	// プレイヤーとボスの引っ張り合いの処理
