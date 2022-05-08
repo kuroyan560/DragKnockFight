@@ -19,7 +19,7 @@ void CharacterAI::Init()
 	//í—ª‘w‚Ì¶¬--------------------------
 
 	startFlag = false;
-	strategyOfChoice = STRATEGY_RESTORE_STAMINA;
+	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
 	strategyArray[strategyOfChoice]->Init();
 	initFlag = true;
 }
@@ -75,8 +75,8 @@ void CharacterAI::Update()
 					max = strategyEvaluationValue;
 				}
 			}
-			//strategyOfChoice = selecting;
-			//strategyArray[strategyOfChoice]->Init();
+			strategyOfChoice = selecting;
+			strategyArray[strategyOfChoice]->Init();
 		}
 		//ˆÓŽvŒˆ’è--------------------------
 
