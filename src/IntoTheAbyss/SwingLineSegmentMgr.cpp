@@ -221,6 +221,13 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 
 	}
 
+	// 照準の位置がふっとばされていたら、線分の終端に置く。
+	if (reticlePos.x < -100) {
+
+		reticlePos = lineSegments[LINE_COUNT - 1].GetEnd();
+
+	}
+
 	// マップチップと当たっていたら、全ての線分の色をちょっとだけ濃くする。
 	isHitWallFlag = false;
 	if (isHitMapChip) {
@@ -275,12 +282,14 @@ float SwingLineSegmentMgr::CalSwingEndDistance(const Vec2<float>& CharaPos, cons
 
 		// 開始地点から終了地点までの距離を求めて、それを返す。
 		Vec2<float> endPos = CharaPos + SwingTargetVec * Distance;
-		return (swingStartPos - endPos).Length();
+		float buff = (swingStartPos - endPos).Length();
+		return buff;
 
 	}
 	else {
 
-		return (reticlePos - swingStartPos).Length();
+		float buff = (reticlePos - swingStartPos).Length();
+		return buff;
 
 	}
 
