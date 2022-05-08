@@ -94,6 +94,7 @@ void CharacterAI::Update()
 
 void CharacterAI::Draw()
 {
+#ifdef DEBUG
 	if (initFlag)
 	{
 		for (int i = 0; i < strategyArray.size(); ++i)
@@ -101,4 +102,5 @@ void CharacterAI::Draw()
 			strategyArray[i]->Draw();
 		}
 	}
+#endif
 }

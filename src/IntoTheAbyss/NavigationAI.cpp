@@ -214,7 +214,7 @@ void NavigationAI::Update(const Vec2<float>& POS)
 void NavigationAI::Draw()
 {
 	//デバックの時のみ表示
-#ifdef _DEBUG
+#ifdef DEBUG
 
 	//ウェイポイントの描画
 	for (int y = 0; y < wayPointYCount; ++y)
@@ -316,6 +316,7 @@ void NavigationAI::Draw()
 
 void NavigationAI::ImGuiDraw()
 {
+#ifdef DEBUG
 
 	ImGui::Begin("Navigation");
 	ImGui::Checkbox("SearchCircle", &serachFlag);
@@ -407,6 +408,8 @@ void NavigationAI::ImGuiDraw()
 		ImGui::Text("PassNum:%d", wayPoints[handle.y][handle.x]->passNum);
 		ImGui::End();
 	}
+#endif
+
 }
 
 std::vector<WayPointData> NavigationAI::GetShortestRoute()
