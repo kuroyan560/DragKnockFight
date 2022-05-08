@@ -1,5 +1,6 @@
 #include "BehavioralLayer.h"
 #include"CharacterManager.h"
+#include"Stamina.h"
 
 MovingBetweenTwoPoints::MovingBetweenTwoPoints()
 {
@@ -26,12 +27,31 @@ void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float
 	endColision.center = &endPos;
 	endColision.radius = 20.0f;
 	initFlag = true;
+	dashTimer = 0;
 }
 
 void MovingBetweenTwoPoints::Update()
 {
 	++timer;
-	operateMove.Update(vel);
+
+	//プレイヤーがダッシュしたらその後に遅れてダッシュする
+	if (CharacterAIData::Instance()->dashFlag)
+	{
+		//dashFlag = true;
+		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterAIData::Instance()->bossData.dashStamina);
+		operateDash.Init(vel / 2.0f);
+	}
+	//if (dashFlag)
+	//{
+	//	++dashTimer;
+	//}
+	//if (20 <= dashTimer)
+	//{
+	//	operateDash.Init(5.0f);
+	//	dashFlag = false;
+	//}
+
+	operateMove.Update(vel + operateDash.Update());
 }
 
 AiResult MovingBetweenTwoPoints::CurrentProgress()

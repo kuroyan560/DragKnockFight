@@ -35,3 +35,29 @@ AiResult OperateMove::CurrentProgress()
 		return AiResult::OPERATE_FAIL;
 	}
 }
+
+OperateDash::OperateDash()
+{
+	dashSpeed = { 0.0f,0.0f };
+	rate = 1.0f;
+	timer = 30.0f;
+}
+
+void OperateDash::Init(const Vec2<float> &DASH_SPEED)
+{
+	dashSpeed = DASH_SPEED;
+	rate = 1.0f;
+}
+
+const Vec2<float> &OperateDash::Update()
+{
+	if (0.0f < rate)
+	{
+		rate += -(1.0f / timer);
+	}
+	else
+	{
+		rate = 0.0f;
+	}
+	return dashSpeed * rate;
+}

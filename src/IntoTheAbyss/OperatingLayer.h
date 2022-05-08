@@ -27,4 +27,22 @@ public:
 private:
 	bool initFlag;
 	Vec2<float>oldPos;
+}; 
+
+
+//ダッシュ
+class OperateDash
+{
+public:
+	OperateDash();
+
+	//ダッシュを開始する
+	void Init(const Vec2<float> &DASH_SPEED);
+
+	//今のスピードからどれくらいダッシュするか
+	const Vec2<float> &Update();
+private:
+	float rate;
+	Vec2<float> dashSpeed;
+	float timer;
 };

@@ -540,12 +540,11 @@ void Game::Update()
 		// ボスの更新処理
 		CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
 	}
-
-	chara.shortestData = navi.GetShortestRoute();
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
 		chara.Init();
 	}
+	chara.shortestData = navi.GetShortestRoute();
 
 	navi.startPoint = chara.startPoint;
 	navi.endPoint = chara.endPoint;

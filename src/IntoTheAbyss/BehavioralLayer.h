@@ -32,6 +32,9 @@ public:
 
 private:
 	OperateMove operateMove;
+	OperateDash operateDash;
+	bool dashFlag;
+	int dashTimer;
 	Vec2<float>startPos;
 	Vec2<float>endPos;
 	Vec2<float>vel;
