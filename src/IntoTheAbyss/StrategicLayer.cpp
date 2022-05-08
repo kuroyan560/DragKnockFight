@@ -178,6 +178,7 @@ float RestoreStamina::EvaluationFunction()
 	//評価値
 	int evaluationValue = 0;
 
+
 	//優勢ゲージ n6~7
 	if (0.6f <= data->bossData.gaugeValue && data->bossData.gaugeValue <= 0.7f)
 	{
@@ -262,6 +263,7 @@ float RestoreStamina::EvaluationFunction()
 	}
 
 	//自陣へのウェイポイント
+
 	return static_cast<float>(evaluationValue) / static_cast<float>(data->EVALUATION_MAX_VALUE);
 }
 
@@ -346,6 +348,9 @@ float GoToTheField::EvaluationFunction()
 	CharacterAIData *data = CharacterAIData::Instance();
 	//評価値
 	int evaluationValue = 0;
+
+	//
+	evaluationValue += 1;
 
 	//優勢ゲージ n6~7
 	if (0.6f <= data->bossData.gaugeValue && data->bossData.gaugeValue <= 0.7f)
@@ -435,7 +440,6 @@ float GoToTheField::EvaluationFunction()
 	}
 
 	//自陣へのウェイポイントが少ない
-
 
 	return static_cast<float>(evaluationValue) / static_cast<float>(data->EVALUATION_MAX_VALUE);
 }
