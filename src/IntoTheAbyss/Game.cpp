@@ -257,6 +257,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		isCatchMapChipPlayer = false;
 	}
 
+	StaminaItemMgr::Instance()->Init();
 
 	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) * 0.5f, (mapData.size() * MAP_CHIP_SIZE) * 0.5f);
 
