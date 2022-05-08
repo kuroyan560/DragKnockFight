@@ -279,11 +279,11 @@ void CharacterInterFace::Appear()
 	}
 
 	//ƒTƒCƒY‚ª1.0f‚É‚È‚é‚Ü‚Å“®‚©‚È‚¢
-	if (1.0f < size.x && 1.0f < size.y)
+	if (1.0f < appearExtRate.x && 1.0f < appearExtRate.y)
 	{
 		float time = 30.0f;
-		size.x -= INIT_SIZE / time;
-		size.y -= INIT_SIZE / time;
+		appearExtRate.x -= INIT_SIZE / time;
+		appearExtRate.y -= INIT_SIZE / time;
 	}
 	else
 	{
@@ -303,15 +303,15 @@ void CharacterInterFace::Appear()
 			initPaticleFlag = true;
 		}
 
-		size = { 1.0f,1.0f };
+		appearExtRate = { 1.0f,1.0f };
 		++moveTimer;
 	}
 }
 
 void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear)
 {
-	if (Appear)size = { INIT_SIZE,INIT_SIZE };
-	else size = { 1.0f,1.0f };
+	if (Appear)appearExtRate = { INIT_SIZE,INIT_SIZE };
+	else appearExtRate = { 1.0f,1.0f };
 	initPaticleFlag = false;
 	moveTimer = 0;
 

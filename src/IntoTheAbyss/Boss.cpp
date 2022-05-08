@@ -209,7 +209,7 @@ void Boss::OnDraw()
 	if (vel.y < 0)dir = BACK;
 
 	auto drawPos = pos + stagingDevice.GetShake();
-	auto drawScale = size * stagingDevice.GetExtRate();
+	auto drawScale = stagingDevice.GetExtRate() * SCALE * appearExtRate;
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
 	if (DebugParameter::Instance()->bossDebugData.drawBossFlag)

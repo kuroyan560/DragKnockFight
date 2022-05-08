@@ -115,6 +115,7 @@ protected:
 	StagingInterFace stagingDevice;
 	static const int INIT_SIZE = 5;
 	Vec2<float>size;	//サイズ
+	Vec2<float>appearExtRate;	//登場演出
 
 	//[キャラごとに違う関数]
 	virtual void OnInit() = 0;
