@@ -13,6 +13,21 @@ IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &D
 {
 	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
 
+	float position = CharacterAIData::Instance()->position;
+	float rate = 1.0f;
+	//ポジションゲージが0.5以下の場合、敵陣に近づいている事のなので座標を動かす準備をする
+	if (position <= 0.5f)
+	{
+		rate = CharacterAIData::Instance()->position / 0.5f;
+	}
+
+	SphereCollision collision;
+	Vec2<float> adjPos = *DATA.center + Vec2<float>((SEARCH_RADIUS / 2.0f) * rate, 0.0f);
+	collision.center = &adjPos;
+	collision.radius = SEARCH_RADIUS;
+
+
+
 	std::vector<float>distance;
 	std::vector<int>itemId;
 	//探索範囲内にアイテムがあるのか調べる
@@ -21,7 +36,7 @@ IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &D
 		//アイテムを一つ以上見つけたら探索準備をする
 		//そして距離を測る
 		bool canGetFlag = item[i].GetIsActive() && !item[i].GetIsAcquired();
-		if (canGetFlag && BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), DATA))
+		if (canGetFlag && BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), collision))
 		{
 			distance.push_back(DATA.center->Distance(*item[i].GetCollisionData()->center));
 			itemId.push_back(i);
