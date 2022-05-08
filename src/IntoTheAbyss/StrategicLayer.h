@@ -4,6 +4,7 @@
 #include"../IntoTheAbyss/TacticalLayer.h"
 #include"../IntoTheAbyss/BehavioralLayer.h"
 #include"../IntoTheAbyss/NavigationAI.h"
+#include"../Engine/DrawFunc.h"
 /// <summary>
 /// 戦術層
 /// </summary>
@@ -30,6 +31,11 @@ public:
 	virtual AiResult CurrentProgress() = 0;
 
 	/// <summary>
+	/// デバック用
+	/// </summary>
+	virtual void Draw() = 0;
+
+	/// <summary>
 	/// 評価値の算出
 	/// </summary>
 	/// <returns>評価値</returns>
@@ -51,6 +57,8 @@ protected:
 	};
 	SearchData SearchItem(const SphereCollision &DATA);
 	static const float SEARCH_RADIUS;
+	//場所によってアイテム探索範囲を変える用の変数
+	SphereCollision searchCollision;
 };
 
 
@@ -68,6 +76,8 @@ public:
 	/// 実行
 	/// </summary>
 	void Update()override;
+
+	void Draw()override;
 
 	/// <summary>
 	/// 現在実行している処理の進捗
@@ -121,6 +131,8 @@ public:
 	/// </summary>
 	void Update()override;
 
+	void Draw()override {};
+
 	/// <summary>
 	/// 現在実行している処理の進捗
 	/// </summary>
@@ -153,6 +165,8 @@ public:
 	/// 実行
 	/// </summary>
 	void Update()override;
+
+	void Draw()override {};
 
 	/// <summary>
 	/// 現在実行している処理の進捗

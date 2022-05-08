@@ -4,6 +4,8 @@
 #include"BulletCollision.h"
 #include"../IntoTheAbyss/CharacterManager.h"
 #include"Stamina.h"
+#include"ScrollMgr.h"
+#include"StageMgr.h"
 
 const float IStrategicLayer::SEARCH_RADIUS = 500.0f;
 const float RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 0.4f;
@@ -21,10 +23,19 @@ IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &D
 		rate = CharacterAIData::Instance()->position / 0.5f;
 	}
 
-	SphereCollision collision;
-	Vec2<float> adjPos = *DATA.center + Vec2<float>((SEARCH_RADIUS / 2.0f) * rate, 0.0f);
-	collision.center = &adjPos;
-	collision.radius = SEARCH_RADIUS;
+	float mapX = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum())[0].size() * 50.0f;
+
+	float position = CharacterManager::Instance()->Right()->pos.x / mapX;
+	float rate = 1.0f;
+	//ポジションゲージが0.5以下の場合、敵陣に近づいている事のなので座標を動かす準備をする
+	if (position <= 0.5f)
+	{
+		float adjPosition = position - 0.3f;
+		rate = adjPosition / 0.2f;
+	}
+	Vec2<float> adjPos = Vec2<float>((SEARCH_RADIUS / 2.0f) * (1.0 - rate), 0.0f);
+	searchCollision.center = &adjPos;
+	searchCollision.radius = SEARCH_RADIUS;
 
 
 
@@ -36,7 +47,7 @@ IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &D
 		//アイテムを一つ以上見つけたら探索準備をする
 		//そして距離を測る
 		bool canGetFlag = item[i].GetIsActive() && !item[i].GetIsAcquired();
-		if (canGetFlag && BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), collision))
+		if (canGetFlag && BulletCollision::Instance()->CheckSphereAndSphere(*item[i].GetCollisionData(), searchCollision))
 		{
 			distance.push_back(DATA.center->Distance(*item[i].GetCollisionData()->center));
 			itemId.push_back(i);
@@ -167,6 +178,22 @@ void RestoreStamina::Update()
 
 	//戦略実行からの経過時間
 	++timer;
+}
+
+void RestoreStamina::Draw()
+{
+	float mapX = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum())[0].size() * 50.0f;
+
+	float position = CharacterManager::Instance()->Right()->pos.x / mapX;
+	float rate = 1.0f;
+	//ポジションゲージが0.5以下の場合、敵陣に近づいている事のなので座標を動かす準備をする
+	if (position <= 0.5f)
+	{
+		float adjPosition = position - 0.3f;
+		rate = adjPosition / 0.2f;
+	}
+	Vec2<float> adjPos = Vec2<float>((SEARCH_RADIUS / 2.0f) * (1.0 - rate), 0.0f);
+	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos + adjPos), ScrollMgr::Instance()->zoom * searchCollision.radius, Color(255, 255, 255, 255));
 }
 
 AiResult RestoreStamina::CurrentProgress()

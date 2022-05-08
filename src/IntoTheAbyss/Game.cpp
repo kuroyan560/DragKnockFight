@@ -333,7 +333,6 @@ void Game::Init()
 
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 
-	chara.Init();
 }
 
 void Game::Update()
@@ -545,6 +544,7 @@ void Game::Update()
 	chara.shortestData = navi.GetShortestRoute();
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
+		chara.Init();
 	}
 
 	navi.startPoint = chara.startPoint;
@@ -918,7 +918,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	}
 
 	navi.Draw();
-	//chara.Draw();
+	chara.Draw();
 }
 
 void Game::Scramble()
