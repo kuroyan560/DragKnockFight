@@ -168,7 +168,7 @@ private:
 	//クラッシュさせる--------------------------
 	bool crashEnemyFlag;
 	int swingCoolTime;
-	const int SWING_MAX_COOL_TIME = 10;//振り回しのクールタイム
+	const int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
 
 
 	MoveToOwnGround moveToOnwGround;

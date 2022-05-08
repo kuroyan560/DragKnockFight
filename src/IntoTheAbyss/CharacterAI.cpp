@@ -75,8 +75,8 @@ void CharacterAI::Update()
 					max = strategyEvaluationValue;
 				}
 			}
-			//strategyOfChoice = selecting;
-			//strategyArray[strategyOfChoice]->Init();
+			strategyOfChoice = selecting;
+			strategyArray[strategyOfChoice]->Init();
 		}
 		//ˆÓŽvŒˆ’è--------------------------
 
