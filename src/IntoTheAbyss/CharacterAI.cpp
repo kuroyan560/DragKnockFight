@@ -15,11 +15,11 @@ void CharacterAI::Init()
 	//êÌó™ëwÇÃê∂ê¨--------------------------
 	strategyArray[STRATEGY_RESTORE_STAMINA] = std::make_unique<RestoreStamina>();
 	strategyArray[STRATEGY_GO_TO_THE_FIELD] = std::make_unique<GoToTheField>();
-	//strategyArray[STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE] = std::make_unique<AcquireASuperiorityGauge>();
+	strategyArray[STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE] = std::make_unique<AcquireASuperiorityGauge>();
 	//êÌó™ëwÇÃê∂ê¨--------------------------
 
 	startFlag = false;
-	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
+	strategyOfChoice = 1;
 	strategyArray[strategyOfChoice]->Init();
 	initFlag = true;
 }
@@ -75,7 +75,7 @@ void CharacterAI::Update()
 					max = strategyEvaluationValue;
 				}
 			}
-			strategyOfChoice = static_cast<AiStrategy>(selecting);
+			strategyOfChoice = selecting;
 			strategyArray[strategyOfChoice]->Init();
 		}
 		//à”évåàíË--------------------------

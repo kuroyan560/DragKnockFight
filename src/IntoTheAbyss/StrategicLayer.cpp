@@ -487,20 +487,20 @@ void AcquireASuperiorityGauge::Update()
 	bool canSwingCClockWiseFlag = CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
 
 	//一定距離を保っているか
-	const float CERTAIN_DISTANCE = 200.0f;
-	bool keepACertainDistanceFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->distance;
+	//const float CERTAIN_DISTANCE = 200.0f;
+	//bool keepACertainDistanceFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->distance;
 
 	const float STAMINA_VALUE = 0.5f;
 	//スタミナが多い
 	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge && SWING_MAX_COOL_TIME <= swingCoolTime;
 	//敵を振り回しで移動させる
-	if (canSwingClockWiseFlag && useSwingFlag && keepACertainDistanceFlag)
+	if (canSwingClockWiseFlag && useSwingFlag)
 	{
 		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
 		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
 		swingCoolTime = 0;
 	}
-	else if (canSwingCClockWiseFlag && useSwingFlag && keepACertainDistanceFlag)
+	else if (canSwingCClockWiseFlag && useSwingFlag)
 	{
 		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
 		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterManager::Instance()->Right()->SWING_STAMINA);
@@ -534,5 +534,99 @@ AiResult AcquireASuperiorityGauge::CurrentProgress()
 
 float AcquireASuperiorityGauge::EvaluationFunction()
 {
-	return 2.0f;
+	CharacterAIData *data = CharacterAIData::Instance();
+	//評価値
+	int evaluationValue = 0;
+
+	//優勢ゲージ n6~7
+	float sub = data->bossData.gaugeValue - data->bossData.gaugeValue;
+	const float BIG_DIFFERENCE_IN_GAUGE = 0.3f;
+	if (BIG_DIFFERENCE_IN_GAUGE <= fabs(sub))
+	{
+		evaluationValue += 3;
+	}
+
+	const float MANY_OF_MY_OWN_STAMINA = 0.5f;
+	//スタミナが多い
+	if (MANY_OF_MY_OWN_STAMINA <= data->bossData.stamineGauge)
+	{
+		evaluationValue += 2;
+	}
+
+	//ウェイポイント探索
+	SearchWayPoint search;
+
+	//ボスから近場のウェイポイント探索
+	search.Init(CharacterManager::Instance()->Right()->pos);
+	WayPointData playerNearWayPoint = search.Update();
+
+	const float nearDistance = 200.0f;
+	//敵と壁との距離が近い
+	if (!playerNearWayPoint.isWall)
+	{
+		bool nearTopFlag = playerNearWayPoint.wallDistanceTop < nearDistance;
+		bool nearBottomFlag = playerNearWayPoint.wallDistanceBottom < nearDistance;
+		bool nearLeftFlag = playerNearWayPoint.wallDistanceLeft < nearDistance;
+		bool nearRightFlag = playerNearWayPoint.wallDistanceRight < nearDistance;
+
+		if (nearTopFlag || nearBottomFlag || nearLeftFlag || nearRightFlag)
+		{
+			evaluationValue += 2;
+		}
+	}
+
+
+	SphereCollision searchArea;
+	searchArea.center = &CharacterManager::Instance()->Right()->pos;
+	searchArea.radius = SEARCH_RADIUS;
+
+	//敵より自分の方がアイテムが近い
+	//自分側
+	SearchData bossResult = SearchItem(searchArea);
+	//敵側
+	SphereCollision hitBox;
+	hitBox.center = &CharacterManager::Instance()->Left()->pos;
+	hitBox.radius = SEARCH_RADIUS;
+	SearchData playerResult = SearchItem(hitBox);
+	const float distance = 200.0f;
+	//敵が一定以上アイテムから離れていたら、敵を移動させることを優勢できるように値を入れる
+	if (distance < playerResult.distance)
+	{
+		evaluationValue += 2;
+	}
+
+
+
+
+	{
+		//自分と自陣との距離が近い&&優勢ゲージが優勢
+		const float NEAR_LINE_RATE = 0.7f;
+		bool nearFlag = NEAR_LINE_RATE < CharacterAIData::Instance()->position;
+		const float ADVANTAGE_VALUE = 0.7f;
+		bool advantageFlag = ADVANTAGE_VALUE <= data->bossData.gaugeValue;
+		if (nearFlag)
+		{
+			evaluationValue += 3;
+		}
+	}
+
+	{
+		//自分と敵陣との距離が近い&&優勢ゲージが劣勢
+		const float NEAR_LINE_RATE = 0.3f;
+		bool nearFlag = CharacterAIData::Instance()->position < NEAR_LINE_RATE;
+		const float ADVANTAGE_VALUE = 0.3f;
+		bool advantageFlag = data->bossData.gaugeValue <= ADVANTAGE_VALUE;
+		if (nearFlag)
+		{
+			evaluationValue += 3;
+		}
+	}
+
+	//敵の振り回し入力があった
+	if (data->swingFlag)
+	{
+		evaluationValue += 2;
+	}
+
+	return static_cast<float>(evaluationValue) / static_cast<float>(data->EVALUATION_MAX_VALUE);
 }
