@@ -496,7 +496,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && isDashStamina) {
 
 		// inputVec = ひだりスティックの入力方向
-		const float DASH_SPEED = 30.0f;
+		const float DASH_SPEED = 60.0f;
 		vel += inputLeftVec * DASH_SPEED;
 
 		// 移動量が限界を超えないようにする。
