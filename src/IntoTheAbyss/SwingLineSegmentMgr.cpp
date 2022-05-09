@@ -295,6 +295,8 @@ void SwingLineSegmentMgr::UpdateSwing(const Vec2<float>& CharaPos)
 
 	}
 
+	reticlePos += moveVel;
+
 	// 保存してある座標を更新。
 	swingCharaPos = CharaPos;
 
