@@ -28,21 +28,14 @@ RoundChangeEffect::RoundChangeEffect()
 	playerReticleData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/reticle_player.png");
 	enemyReticleData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/reticle_enemy.png");
 
-	fightSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_fight.wav");
-	readySE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_ready.wav");
-	round1SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round1.wav");
-	round2SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round2.wav");
-	round3SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round3.wav");
-	round4SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round4.wav");
-	round5SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round5.wav");
-
-	AudioApp::Instance()->ChangeVolume(round1SE, 0.13f);
-	AudioApp::Instance()->ChangeVolume(round2SE, 0.13f);
-	AudioApp::Instance()->ChangeVolume(round3SE, 0.13f);
-	AudioApp::Instance()->ChangeVolume(round4SE, 0.13f);
-	AudioApp::Instance()->ChangeVolume(round5SE, 0.13f);
-	AudioApp::Instance()->ChangeVolume(readySE, 0.13f);
-	AudioApp::Instance()->ChangeVolume(fightSE, 0.13f);
+	static const float VOL = 0.13f;
+	fightSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_fight.wav", VOL);
+	readySE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_ready.wav", VOL);
+	round1SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round1.wav", VOL);
+	round2SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round2.wav", VOL);
+	round3SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round3.wav", VOL);
+	round4SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round4.wav", VOL);
+	round5SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round5.wav", VOL);
 
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, numberHandle.data());
 

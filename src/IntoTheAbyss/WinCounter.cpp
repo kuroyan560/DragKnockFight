@@ -102,12 +102,7 @@ void WinCounter::Draw()
 #include"AudioApp.h"
 void WinCounter::RoundFinish(const Vec2<float>& FinishPos, const bool& WinnerIsLeft, const Vec2<float>& WinnerPos)
 {
-	static int SE = -1;
-	if (SE == -1)
-	{
-		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/knockout.wav");
-		AudioApp::Instance()->ChangeVolume(SE, 0.25f);
-	}
+	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/knockout.wav", 0.25f);
 	AudioApp::Instance()->PlayWave(SE);
 
 	countRound++;

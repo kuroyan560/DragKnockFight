@@ -117,12 +117,7 @@ void StunEffect::Update()
 			status = StunEffect::STATUS_STOP;
 			breakUITimer = 0;
 
-			static int BREAK_SE = -1;
-			if (BREAK_SE == -1)
-			{
-				BREAK_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/break.wav");
-				AudioApp::Instance()->ChangeVolume(BREAK_SE, 0.45f);
-			}
+			static const int BREAK_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/break.wav", 0.45f);
 			AudioApp::Instance()->PlayWave(BREAK_SE);
 		}
 

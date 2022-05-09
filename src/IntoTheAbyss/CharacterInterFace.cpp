@@ -128,34 +128,29 @@ void CharacterInterFace::Crash(const Vec2<float>& MyVec)
 
 void CharacterInterFace::CrashUpdate()
 {
-	//êUÇËâÒÇ≥ÇÍÇƒÇ¢ÇÈ
-	if (partner.lock()->nowSwing)
-	{
-		//àÍíËó êUÇËâÒÇµÇΩå„
-		static const float CRASH_SWING_RATE = 0.15f;
-		if (ADD_SWING_ANGLE * 2.0f < partner.lock()->addSwingAngle)
-		{
-			Vec2<float>vec = { 0,0 };
-			if (mapChipHit[LEFT])vec.x = -1.0f;
-			else if (mapChipHit[RIGHT])vec.x = 1.0f;
-			if (mapChipHit[TOP])vec.y = -1.0f;
-			else if (mapChipHit[BOTTOM])vec.y = 1.0f;
+	////êUÇËâÒÇ≥ÇÍÇƒÇ¢ÇÈ
+	//if (partner.lock()->nowSwing)
+	//{
+	//	//àÍíËó êUÇËâÒÇµÇΩå„
+	//	static const float CRASH_SWING_RATE = 0.15f;
+	//	if (ADD_SWING_ANGLE * 2.0f < partner.lock()->addSwingAngle)
+	//	{
+	//		Vec2<float>vec = { 0,0 };
+	//		if (mapChipHit[LEFT])vec.x = -1.0f;
+	//		else if (mapChipHit[RIGHT])vec.x = 1.0f;
+	//		if (mapChipHit[TOP])vec.y = -1.0f;
+	//		else if (mapChipHit[BOTTOM])vec.y = 1.0f;
 
-			Crash(vec);
-		}
+	//		Crash(vec);
+	//	}
 
-		partner.lock()->FinishSwing();
-	}
+	//	partner.lock()->FinishSwing();
+	//}
 }
 
 void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const bool& IsClockWise)
 {
-	static int SE = -1;
-	if (SE == -1)
-	{
-		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/swing.wav");
-		AudioApp::Instance()->ChangeVolume(SE, 0.13f);
-	}
+	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/swing.wav", 0.13f);
 
 	//êUÇËâÒÇµèàóùÇ™ä˘Ç…ëñÇ¡ÇƒÇ¢ÇÈèÍçáÇÕÅAèdÇÀÇƒêUÇËâÒÇπÇ»Ç¢
 	if (partner.lock()->nowSwing || nowSwing)return;
@@ -310,7 +305,10 @@ void CharacterInterFace::Appear()
 
 void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear)
 {
-	pilotSize = TexHandleMgr::GetTexBuffer(pilotGraph)->GetGraphSize().Float();
+	if (pilotGraph != -1)
+	{
+		pilotSize = TexHandleMgr::GetTexBuffer(pilotGraph)->GetGraphSize().Float();
+	}
 	if (Appear)appearExtRate = { INIT_SIZE,INIT_SIZE };
 	else appearExtRate = { 1.0f,1.0f };
 	initPaticleFlag = false;

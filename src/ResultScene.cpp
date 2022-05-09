@@ -55,13 +55,7 @@ void ResultScene::OnInitialize()
 
 void ResultScene::OnUpdate()
 {
-	static int SE = -1;
-	if (SE == -1)
-	{
-		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/resultScore.wav");
-		AudioApp::Instance()->ChangeVolume(SE, 0.13f);
-	}
-
+	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/resultScore.wav", 0.13f);
 
 	Vec2<float> windowSize = WinApp::Instance()->GetWinSize().Float();
 

@@ -1,6 +1,7 @@
 #include "Stamina.h"
 #include "ScrollMgr.h"
 #include "DrawFunc.h"
+#include"AudioApp.h"
 
 Stamina::Stamina()
 {
@@ -152,12 +153,20 @@ void Stamina::SetColor(const Color& InnerColor, const Color& OuterColor)
 
 }
 
+int StaminaMgr::STAMINA_HEAL_SE[STAMINA_NUM] = { -1 };
+
 StaminaMgr::StaminaMgr()
 {
+	if (STAMINA_HEAL_SE[0] == -1)
+	{
+		for (int i = 0; i < STAMINA_NUM; ++i)
+		{
+			STAMINA_HEAL_SE[i] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/staminaBarHeal_" + std::to_string(i) + ".wav");
+		}
+	}
 
 	// 初期化 仮でスタミナゲージを5個設定しています。
-	const int KARI = 5;
-	for (int index = 0; index < KARI; ++index) {
+	for (int index = 0; index < STAMINA_NUM; ++index) {
 		stamina.push_back(Stamina());
 	}
 
@@ -193,6 +202,7 @@ void StaminaMgr::Update(const bool& Heal, const Vec2<float>& CharacterPos)
 			if (stamina[index].GetIsActivate()) continue;
 
 			stamina[index].AddNowGauge(HEAL_AMOUNT * SlowMgr::Instance()->slowAmount);
+			if (100.0f <= stamina[index].GetNowGauge())AudioApp::Instance()->PlayWave(STAMINA_HEAL_SE[index]);
 
 			// 手前側から一つずつ順々に回復していくため、リターン。
 			break;
@@ -312,6 +322,8 @@ void StaminaMgr::AddStamina(const int& AddStamina)
 
 	if (AddStamina <= 0) return;
 
+	std::vector<int>seHandles;
+
 	//元々最大か
 	const bool oldFullFlg = 100.0f <= stamina.back().GetNowGauge();
 
@@ -328,6 +340,7 @@ void StaminaMgr::AddStamina(const int& AddStamina)
 
 			stamina[index].AddNowGauge(addStamina);
 			stamina[index].SetExp();
+			if (100.0f <= stamina[index].GetNowGauge())seHandles.emplace_back(STAMINA_HEAL_SE[index]);
 
 			break;
 
@@ -341,10 +354,11 @@ void StaminaMgr::AddStamina(const int& AddStamina)
 			// 回復する。
 			stamina[index].AddNowGauge(100.0f - stamina[index].GetNowGauge());
 			stamina[index].SetExp(true);
-
+			if (100.0f <= stamina[index].GetNowGauge())seHandles.emplace_back(STAMINA_HEAL_SE[index]);
 		}
 	}
 
+	AudioApp::Instance()->PlayWaveArray(seHandles);
 	//最大になった
 	if (!oldFullFlg && 100.0f <= stamina.back().GetNowGauge())outOfStaminaEffect.Full();
 }

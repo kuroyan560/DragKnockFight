@@ -148,14 +148,27 @@ void StaminaItemMgr::Draw()
 
 }
 
+#include"AudioApp.h"
 int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, const float& PilotRadius, StaminaItem::CHARA_ID CharaID, const Vec2<float>* PilotPos)
 {
+	static bool SE_INIT = false;
+	static int SE[2];
+	static const float SE_VOL = 0.8f;
+
+	if (!SE_INIT)
+	{
+		SE[0] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/itemGet_0.wav",SE_VOL);
+		SE[1] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/itemGet_1.wav",SE_VOL);
+
+		SE_INIT = true;
+	}
 
 	/*===== 当たり判定を行い、スタミナの回復量を取得する =====*/
 
 	if (CharaPos == nullptr) return 0;
 
 	int healAmount = 0;
+	int getNum = 0;
 
 	for (int index = 0; index < ITEM_COUNT; ++index) {
 
@@ -169,6 +182,7 @@ int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, co
 		if (isHit && item[index].GetIsAcquired()) {
 
 			healAmount += item[index].GetHealAmount();
+			getNum++;
 
 			// アイテムを消す。
 			item[index].Init();
@@ -182,6 +196,13 @@ int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, co
 		}
 
 	}
+
+	std::vector<int>seHandles;
+	for (int i = 0; i < getNum; ++i)
+	{
+		seHandles.emplace_back(SE[KuroFunc::GetRand(1)]);
+	}
+	AudioApp::Instance()->PlayWaveArray(seHandles);
 
 	return healAmount;
 

@@ -49,6 +49,8 @@ public:
 class StaminaMgr {
 
 public:
+	static const int STAMINA_NUM = 5;
+	static int STAMINA_HEAL_SE[STAMINA_NUM];
 
 	/*===== ƒƒ“ƒo•Ï” =====*/
 

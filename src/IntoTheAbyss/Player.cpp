@@ -49,8 +49,7 @@ Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& T
 	// 画像をロード
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
 
-	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav");
-	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
+	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav", 0.2f);
 
 	bulletGraph = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/bullet.png");
 
@@ -494,6 +493,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 		CharacterAIData::Instance()->swingFlag = false;
 	}
 
+	static const int DASH_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/dash.wav", 0.4f);
+
 	// スタミナが残っているか？
 	bool isDashStamina = staminaGauge->CheckCanAction(DASH_STAMINA);
 
@@ -502,6 +503,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 	inputLeftVec /= {32768.0f, 32768.0f};
 	inputRate = inputLeftVec.Length();
 	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && isDashStamina) {
+		
+		AudioApp::Instance()->PlayWave(DASH_SE);
 
 		// inputVec = ひだりスティックの入力方向
 		const float DASH_SPEED = 30.0f;

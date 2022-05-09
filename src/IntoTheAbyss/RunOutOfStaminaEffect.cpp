@@ -144,8 +144,12 @@ void RunOutOfStaminaEffect::Draw()
 	}
 }
 
+#include"AudioApp.h"
 void RunOutOfStaminaEffect::Empty()
 {
+	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/staminaEmpty.wav");
+	AudioApp::Instance()->PlayWave(SE);
+
 	//ã‚Ì•ûŒü‚É”ò‚Î‚·
 	float rad = Angle::ConvertToRadian(90);
 	ParticleMgr::Instance()->Generate(baseEmptyStringPos, Vec2<float>(cosf(rad), sinf(rad)), BULLET);
