@@ -165,7 +165,7 @@ bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, cons
 		if (charaID == CharaID) {
 
 			// 2点間の距離を求める。
-			float distance = (pos - *CharaPos).Length();
+			float distance = (pos - *charaPos).Length();
 
 			// 2点間の距離が半径よりも小さかったら。
 			if (distance <= CharaRadius) {

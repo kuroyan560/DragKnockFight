@@ -693,7 +693,7 @@ void Game::Update()
 	// スタミナアイテムの当たり判定処理
 	int healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Left()->pos, 30, 70, StaminaItem::CHARA_ID::LEFT, CharacterManager::Instance()->Left()->GetPilotPosPtr());
 	CharacterManager::Instance()->Left()->staminaGauge->AddStamina(healAmount);
-	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 30, 70, StaminaItem::CHARA_ID::RIGHT, CharacterManager::Instance()->Right()->GetPilotPosPtr());
+	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 90, 70, StaminaItem::CHARA_ID::RIGHT, CharacterManager::Instance()->Right()->GetPilotPosPtr());
 	CharacterManager::Instance()->Right()->staminaGauge->AddStamina(healAmount);
 
 	if (!Camera::Instance()->Active()) {

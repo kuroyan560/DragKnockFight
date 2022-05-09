@@ -75,7 +75,7 @@ void StaminaItemMgr::GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STAT
 			randomVec.Normalize();
 
 			// 生成する。
-			item[index].Generate(GeneratePos, randomVec, HEAL_AMOUNT, CRASH_VEL, StaminaItem::STAMINA_ITEM_ID::CRASH_ITEM, true, CharaPos);
+			item[index].Generate(GeneratePos, randomVec, HEAL_AMOUNT, CRASH_VEL, StaminaItem::STAMINA_ITEM_ID::CRASH_ITEM, true, CharaPos, CharaID);
 
 			break;
 
@@ -115,7 +115,7 @@ void StaminaItemMgr::Update()
 
 		Vec2<float> randomSponePos = { KuroFunc::GetRand(0.0f, 2000.0f), KuroFunc::GetRand(0.0f,1000.0f) };
 
-		//GenerateSpone(randomSponePos);
+		GenerateSpone(randomSponePos);
 
 		sponeTimer = 0;
 
@@ -164,6 +164,10 @@ int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, co
 
 		// 当たり判定を行う。
 		bool isHit = item[index].CheckHit(CharaPos, CharaRadius, PilotRadius, CharaID, PilotPos);
+
+		if(isHit){
+		int a = 0;
+		}
 
 		// 当たっていて、アイテムが取得されている状態だったら回復量を加算する。
 		if (isHit && item[index].GetIsAcquired()) {
