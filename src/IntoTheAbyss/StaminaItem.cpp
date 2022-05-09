@@ -2,6 +2,7 @@
 #include "ScrollMgr.h"
 #include "DrawFunc.h"
 #include"TexHandleMgr.h"
+#include "BulletCollision.h"
 
 int StaminaItem::GRAPH_HANDLE[STAR_COLOR::GRAPH_NUM] = { -1 };
 
@@ -15,6 +16,10 @@ StaminaItem::StaminaItem()
 	/*===== èâä˙âª =====*/
 
 	isActive = false;
+
+	collisionData = std::make_shared<SphereCollision>();
+	collisionData->center = &pos;
+	collisionData->radius = HIT_RADIUS;
 
 }
 

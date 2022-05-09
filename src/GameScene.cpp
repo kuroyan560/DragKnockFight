@@ -127,6 +127,7 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("MaxTimer%d", game.player.CHANGE_GRAVITY_TIMER);
 	ImGui::Text("NowTimer%d", game.player.changeGravityTimer);
 	ImGui::End();*/
+	game.navi.ImGuiDraw();
 
 	DebugImGuiManager::Instance()->DrawImGui();
 

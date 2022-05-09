@@ -4,6 +4,7 @@
 #include "ScrollMgr.h"
 #include "TexHandleMgr.h"
 #include "MapChipCollider.h"
+#include"StageMgr.h"
 
 void SwingLineSegment::Init()
 {
@@ -133,22 +134,6 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 	// 全ての線分を生成する。
 	for (int index = 0; index < LINE_COUNT; ++index) {
 
-		//// 動かさないフラグが立っていたらfor分を抜ける。
-		//if (IsSwing) {
-
-		//	lineSegments[index].SetAlpha(250);
-		//	lineSegments[index].ResetDistance(Pos, Distance);
-		//	continue;
-
-		//}
-		//else if (NoMove) {
-
-		//	lineSegments[index].SetAlpha(0);
-		//	lineSegments[index].ResetDistance(Pos, Distance);
-		//	continue;
-
-		//}
-
 		// 開始時角度と終了時角度を求める。
 		float startAngle = nowAngle;
 		float endAngle = nowAngle + (isClockWise ? ANGLE_DIFFERENCE : -ANGLE_DIFFERENCE);
@@ -174,11 +159,6 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 		// 使用する画像を決める。
 		int handle = 0;
 		SwingLineSegment::SEGMENT_ID id;
-		// 最初は操作ボタンが書いてあるUIを描画する。
-		//if (index == 0) {
-		//	handle = UIHandle;
-		//	id = SwingLineSegment::SEGMENT_ID::SEGMENT_ID_UI;
-		//}
 		// 最後の線分は矢印を描画する。
 		if (index == LINE_COUNT - 1) {
 			handle = arrowHandle;
@@ -241,14 +221,24 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 
 	}
 
-	// マップチップと当たっていたら、全ての線分の色をちょっとだけ濃くする。
-	if (isHitMapChip) {
+	// 照準の位置がふっとばされていたら、線分の終端に置く。
+	if (reticlePos.x < -100) {
 
+		reticlePos = lineSegments[LINE_COUNT - 1].GetEnd();
+
+	}
+
+	// マップチップと当たっていたら、全ての線分の色をちょっとだけ濃くする。
+	isHitWallFlag = false;
+	if (isHitMapChip) {
 		for (int index = 0; index < LINE_COUNT; ++index) {
 
 			// 線分は濃くしない。	橋本さんから貰う画像を入れる際はこの処理はいらなくなる。
-			if (lineSegments[index].GetID() == SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW) continue;
-
+			if (lineSegments[index].GetID() == SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW)
+			{
+				isHitWallFlag = true;
+				continue;
+			}
 			lineSegments[index].SetAlpha(200);
 
 		}
@@ -280,6 +270,30 @@ void SwingLineSegmentMgr::Draw(const WHICH_TEAM& Team)
 #include <IntoTheAbyss/StageMgr.h>
 #include "SelectStage.h"
 #include "Collider.h"
+bool SwingLineSegmentMgr::IsHitWall()
+{
+	return isHitWallFlag;
+}
+float SwingLineSegmentMgr::CalSwingEndDistance(const Vec2<float>& CharaPos, const Vec2<float>& SwingTargetVec, const float& Distance)
+{
+
+	// レティクルの位置がふっとばされていたら。
+	if (reticlePos.x < -100 || reticlePos.y < -100) {
+
+		// 開始地点から終了地点までの距離を求めて、それを返す。
+		Vec2<float> endPos = CharaPos + SwingTargetVec * Distance;
+		float buff = (swingStartPos - endPos).Length();
+		return buff;
+
+	}
+	else {
+
+		float buff = (reticlePos - swingStartPos).Length();
+		return buff;
+
+	}
+
+}
 const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos)
 {
 	//どうやって使うか
@@ -298,6 +312,8 @@ const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& Start
 	bool isTop = handSegmentDir.y < 0;
 	bool isLeft = handSegmentDir.x < 0;
 
+	SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
+
 	// 次にマップチップとの最短距離を求める。
 	const int MAP_Y = mapData.size();
 	for (int height = 0; height < MAP_Y; ++height) {
@@ -306,7 +322,11 @@ const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& Start
 		for (int width = 0; width < MAP_X; ++width) {
 
 			// このマップチップが1~9以外だったら判定を飛ばす。
-			if (mapData[height][width] < 1 || mapData[height][width] > 9) continue;
+			if (mapData[height][width] < mapChipSizeData.min ||
+				mapChipSizeData.max < mapData[height][width])
+			{
+				continue;
+			}
 
 			// このインデックスのブロックの座標を取得。
 			const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);

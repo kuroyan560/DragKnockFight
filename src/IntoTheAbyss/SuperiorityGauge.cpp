@@ -5,6 +5,7 @@
 #include"../Engine/DrawFunc.h"
 #include"TexHandleMgr.h"
 #include"DebugImGuiManager.h"
+#include"CharacterAIData.h"
 
 float SuperiorityGauge::GAUGE_MAX_VALUE = 100.0f;
 int SuperiorityGauge::STACK_MAX_TIMER = 120;
@@ -18,13 +19,13 @@ SuperiorityGauge::SuperiorityGauge()
 	//imguiHandle = DebugImGuiManager::Instance()->Add("Gauge");
 }
 
-void SuperiorityGauge::AddGauge(const WHICH_TEAM& Team, const float& Value)
+void SuperiorityGauge::AddGauge(const WHICH_TEAM &Team, const float &Value)
 {
 	gaugeData[Team].gaugeValue += Value;
 	gaugeData[TEAM_NUM - Team - 1].gaugeValue -= Value;
 }
 
-const SuperiorityGauge::GaugeData& SuperiorityGauge::GetGaugeData(const WHICH_TEAM& Team)
+const SuperiorityGauge::GaugeData &SuperiorityGauge::GetGaugeData(const WHICH_TEAM &Team)
 {
 	return gaugeData[Team];
 }
@@ -74,6 +75,11 @@ void SuperiorityGauge::Update()
 	{
 		isStackingFlag = false;
 	}
+
+
+	//キャラクターAI用のデータ集め
+	CharacterAIData::Instance()->playerData.gaugeValue = gaugeData[LEFT_TEAM].gaugeDivValue;
+	CharacterAIData::Instance()->bossData.gaugeValue = gaugeData[RIGHT_TEAM].gaugeDivValue;
 }
 
 #include"D3D12App.h"

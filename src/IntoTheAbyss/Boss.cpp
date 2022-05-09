@@ -23,6 +23,9 @@
 #include"DebugParameter.h"
 #include"AfterImage.h"
 
+#include"CharacterAIData.h"
+#include"CharacterManager.h"
+#include"Stamina.h"
 
 static const Vec2<float> SCALE = { 80.0f,80.0f };
 Boss::Boss() :CharacterInterFace(SCALE)
@@ -54,7 +57,7 @@ void Boss::OnInit()
 }
 
 #include"Camera.h"
-void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
+void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 {
 	/*===== 更新処理 =====*/
 
@@ -145,7 +148,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 			patternTimer = 0;
 		}
 		//ボスのAI-----------------------
-		//bossPatternNow = BOSS_PATTERN_NORMALMOVE;
+		bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 
 		/*if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_P, "Boss Swing", "DIK_P")) {
 
@@ -175,21 +178,29 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	DebugParameter::Instance()->bossDebugData.bossNowStatus = static_cast<E_BossPattern>(bossPatternNow);
 
 
-	//振り回しの開始ベクトルを取得。
-	//if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_O, "SwingBoss", TO_STRING(DIK_O)))
-	if (patternData.swingFlag)
+	//振り回し命令
+	if (CharacterAIOrder::Instance()->swingClockWiseFlag)
 	{
-		Vec2<float> dir = GetPartnerPos() - pos;
-		dir.Normalize();
-
 		// 振り回しのトリガー判定
-		if (0.3f < fabs(dir.y))
-		{
-			SwingPartner({ 0,1 }, false);
-			patternData.swingFlag = false;
-		}
+		SwingPartner(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), true);
+		CharacterAIOrder::Instance()->swingClockWiseFlag = false;
+	}
+	else if (CharacterAIOrder::Instance()->swingCounterClockWiseFlag)
+	{
+		// 振り回しのトリガー判定
+		SwingPartner(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), false);
+		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
 	}
 
+	CWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
+	CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+	CharacterAIData::Instance()->cDistance = CWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
+	//CWSwingSegmentMgr.Init();
+
+	CCWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
+	CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+	CharacterAIData::Instance()->cCDistance = CCWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
+	//CCWSwingSegmentMgr.Init();
 
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
 
@@ -252,292 +263,13 @@ void Boss::OnDraw()
 			}
 		}
 	}
+
+
+	CWSwingSegmentMgr.Draw(RIGHT_TEAM);
+	CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
 }
 
-//void Boss::CheckHit(const vector<vector<int>>& mapData, bool& isHitMapChip, const Vec2<float>& playerPos, const Vec2<float>& lineCenterPos)
-//{
-//
-//	/*===== 当たり判定 =====*/
-//
-//	// ボスがマップチップと当たっているかのフラグ
-//	INTERSECTED_LINE intersectedBuff = {};
-//
-//	// マップチップ目線でどこに当たったか
-//	bool isHitTop = false;
-//	bool isHitRight = false;
-//	bool isHitLeft = false;
-//	bool isHitBottom = false;
-//
-//	bool onGround = false;
-//	// 移動量を元にしたマップチップとの当たり判定を行う。
-//	Vec2<float> moveDir = pos - prevPos;
-//	moveDir.Normalize();
-//	INTERSECTED_LINE intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(pos, prevPos, moveDir * scale, scale, onGround, mapData, false);
-//	isHitTop = intersectedLine == INTERSECTED_TOP;
-//	isHitRight = intersectedLine == INTERSECTED_RIGHT;
-//	isHitLeft = intersectedLine == INTERSECTED_LEFT;
-//	isHitBottom = intersectedLine == INTERSECTED_BOTTOM;
-//
-//	// 左上
-//	Vec2<float> velPosBuff = pos - scale;
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos - scale, {}, {}, onGround, mapData, false);
-//	pos = velPosBuff + scale;
-//	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
-//	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
-//	if (intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
-//	if (intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
-//
-//	// 右上
-//	velPosBuff = pos + Vec2<float>(scale.x, -scale.y);
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(scale.x, -scale.y), {}, {}, onGround, mapData, false);
-//	pos = velPosBuff - Vec2<float>(scale.x, -scale.y);
-//	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
-//	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
-//	if (intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
-//	if (intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
-//
-//	// 右下
-//	velPosBuff = pos + scale;
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + scale, {}, {}, onGround, mapData, false);
-//	pos = velPosBuff - scale;
-//	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
-//	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
-//	if (intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
-//	if (intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
-//
-//	// 左下
-//	velPosBuff = pos + Vec2<float>(-scale.x, scale.y);
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(-scale.x, scale.y), {}, {}, onGround, mapData, false);
-//	pos = velPosBuff - Vec2<float>(-scale.x, scale.y);
-//	if (intersectedLine == INTERSECTED_TOP) isHitTop = true;
-//	if (intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
-//	if (intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
-//	if (intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
-//
-//	// スケールを元にしたマップチップとの当たり判定を行う。
-//
-//	// 上方向
-//	float offset = 5.0f;
-//	Vec2<float> posBuff = pos + Vec2<float>(scale.x - offset, 0);
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, scale, mapData, INTERSECTED_TOP);
-//	pos.y = posBuff.y;
-//	if (!isHitTop && intersectedLine == INTERSECTED_TOP) isHitTop = true;
-//	posBuff = pos - Vec2<float>(scale.x - offset, 0);
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, scale, mapData, INTERSECTED_TOP);
-//	pos.y = posBuff.y;
-//	if (!isHitTop && intersectedLine == INTERSECTED_TOP) isHitTop = true;
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_TOP);
-//	if (!isHitTop && intersectedLine == INTERSECTED_TOP) isHitTop = true;
-//
-//	// 下方向
-//	posBuff = pos + Vec2<float>(scale.x - offset, 0);
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, scale, mapData, INTERSECTED_BOTTOM);
-//	pos.y = posBuff.y;
-//	if (!isHitBottom && intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
-//	posBuff = pos - Vec2<float>(scale.x - offset, 0);
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, scale, mapData, INTERSECTED_BOTTOM);
-//	pos.y = posBuff.y;
-//	if (!isHitBottom && intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_BOTTOM);
-//	if (!isHitBottom && intersectedLine == INTERSECTED_BOTTOM) isHitBottom = true;
-//
-//	// 右方向
-//	posBuff = pos + Vec2<float>(0, scale.y - offset);
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, scale, mapData, INTERSECTED_RIGHT);
-//	pos.x = posBuff.x;
-//	if (!isHitRight && intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
-//	posBuff = pos - Vec2<float>(0, scale.y - offset);
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, scale, mapData, INTERSECTED_RIGHT);
-//	pos.x = posBuff.x;
-//	if (!isHitRight && intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_RIGHT);
-//	if (!isHitRight && intersectedLine == INTERSECTED_RIGHT) isHitRight = true;
-//
-//	// 下方向
-//	posBuff = pos + Vec2<float>(0, scale.y - offset);
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, scale, mapData, INTERSECTED_LEFT);
-//	pos.x = posBuff.x;
-//	if (!isHitLeft && intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
-//	posBuff = pos - Vec2<float>(0, scale.y - offset);
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(posBuff, scale, mapData, INTERSECTED_LEFT);
-//	pos.x = posBuff.x;
-//	if (!isHitLeft && intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
-//	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(pos, scale, mapData, INTERSECTED_LEFT);
-//	if (!isHitLeft && intersectedLine == INTERSECTED_LEFT) isHitLeft = true;
-//
-//
-//	// マップチップと当たっていたら
-//	if (isHitTop || isHitRight || isHitLeft || isHitBottom) {
-//
-//		// マップチップと当たっている場所によって、引っかかっているかどうかを調べる。
-//
-//		// プレイヤーとの角度
-//		float playerAngle = atan2(playerPos.y - pos.y, playerPos.x - pos.x);
-//		playerAngle = fabs(playerAngle);
-//
-//		if (isHitTop) {
-//
-//			// マップチップの上にあたっていたということは、プレイヤーが下方向にいればOK！
-//			// 下方向の具体的な値は
-//			const float MIN_ANGLE = 0.785398f;
-//			const float MAX_ANGLE = 2.35619f;
-//
-//			// 角度がこの値の間だったら
-//			if (MIN_ANGLE <= playerAngle && playerAngle <= MAX_ANGLE) {
-//
-//				// 引っかかっている。
-//				isHitMapChip = true;
-//				intersectedBuff = INTERSECTED_BOTTOM;
-//
-//			}
-//
-//		}
-//
-//		if (isHitBottom) {
-//
-//			// マップチップの下にあたっていたということは、プレイヤーが上方向にいればOK！
-//			// 上方向の具体的な値は
-//			const float MIN_ANGLE = 3.92699f;
-//			const float MAX_ANGLE = 5.49779f;
-//
-//			// 角度がこの値の間だったら
-//			if (MIN_ANGLE <= playerAngle && playerAngle <= MAX_ANGLE) {
-//
-//				// 引っかかっている。
-//				isHitMapChip = true;
-//				intersectedBuff = INTERSECTED_TOP;
-//
-//			}
-//
-//		}
-//
-//		if (isHitRight) {
-//
-//			// マップチップの右にあたっていたということは、プレイヤーが左方向にいればOK！
-//			// 左方向の具体的な値は
-//			const float MIN_ANGLE = 2.35619f;
-//			const float MAX_ANGLE = 3.92699f;
-//
-//			// 角度がこの値の間だったら
-//			if (MIN_ANGLE <= playerAngle && playerAngle <= MAX_ANGLE) {
-//
-//				// 引っかかっている。
-//				isHitMapChip = true;
-//				intersectedBuff = INTERSECTED_RIGHT;
-//
-//			}
-//
-//		}
-//
-//		if (isHitLeft) {
-//
-//			// マップチップの左にあたっていたということは、プレイヤーが右方向にいればOK！
-//			// 右方向の具体的な値は
-//			const float MIN_ANGLE = 0.785398f;
-//			const float MAX_ANGLE = 5.49779f;
-//
-//			// 角度がこの値の間だったら
-//			if (MAX_ANGLE <= playerAngle || playerAngle <= MIN_ANGLE) {
-//
-//				// 引っかかっている。
-//				isHitMapChip = true;
-//				intersectedBuff = INTERSECTED_LEFT;
-//
-//			}
-//
-//		}
-//
-//		// Swingのフレームが全く経過していなかったら処理を飛ばす。
-//		if (SwingMgr::Instance()->easingTimer <= 0.05f) {
-//
-//		}
-//		// 一定以下だったらダメージを与えない。
-//		if (SwingMgr::Instance()->easingTimer <= 0.15f) {
-//
-//			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
-//			Vec2<float>vec = { 0,0 };
-//			if (SwingMgr::Instance()->isSwingPlayer || OFFSET_INERTIA / 2.0f < afterSwingDelay) {
-//
-//				if (isHitLeft)vec.x = -1.0f;
-//				else if (isHitRight)vec.x = 1.0f;
-//				if (isHitTop)vec.y = -1.0f;
-//				else if (isHitBottom)vec.y = 1.0f;
-//
-//				/*Crash(vec);
-//
-//				SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);*/
-//				SwingMgr::Instance()->isSwingPlayer = false;
-//
-//			}
-//
-//		}
-//		else {
-//
-//			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
-//			Vec2<float>vec = { 0,0 };
-//			if (SwingMgr::Instance()->isSwingPlayer || OFFSET_INERTIA / 2.0f < afterSwingDelay) {
-//
-//				if (isHitLeft)vec.x = -1.0f;
-//				else if (isHitRight)vec.x = 1.0f;
-//				if (isHitTop)vec.y = -1.0f;
-//				else if (isHitBottom)vec.y = 1.0f;
-//
-//				Crash(vec);
-//
-//				SuperiorityGauge::Instance()->AddPlayerGauge(10.0f);
-//				SwingMgr::Instance()->isSwingPlayer = false;
-//
-//			}
-//
-//		}
-//
-//	}
-//
-//	// マップチップにあたっている状態で画面外に出たら
-//	if (isHitMapChip && stuckWindowTimer <= 0) {
-//
-//		Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
-//		windowSize *= Vec2<int>(2, 2);
-//
-//		// ボスとプレイヤーの距離
-//		float distanceX = fabs(lineCenterPos.x - pos.x);
-//		float disntaceY = fabs(lineCenterPos.y - pos.y);
-//
-//		// ウィンドウ左右
-//		bool winLeft = pos.x - scale.x - ScrollMgr::Instance()->scrollAmount.x <= 0;
-//		bool winRight = windowSize.x <= pos.x + scale.x - ScrollMgr::Instance()->scrollAmount.x;
-//		if (winRight || winLeft) {
-//
-//			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-//			Crash({ winRight ? 1.0f : -1.0f , 0.0f });
-//			SuperiorityGauge::Instance()->AddPlayerGauge(10);
-//
-//		}
-//		// ウィンドウ上下
-//		bool winTop = pos.y - scale.y - ScrollMgr::Instance()->scrollAmount.y <= 0;
-//		bool winBottom = windowSize.y <= pos.y + scale.y - ScrollMgr::Instance()->scrollAmount.y;
-//		if (winBottom || winTop) {
-//
-//			stuckWindowTimer = STRUCK_WINDOW_TIMER;
-//			Crash({ 0.0f,winBottom ? 1.0f : -1.0f });
-//			SuperiorityGauge::Instance()->AddPlayerGauge(10);
-//
-//		}
-//
-//	}
-//
-//	prevIntersectedLine = intersectedBuff;
-//
-//	if (0 < stuckWindowTimer) {
-//
-//		isHitMapChip = false;
-//		--stuckWindowTimer;
-//
-//	}
-//
-//}
-
-void Boss::Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed)
+void Boss::Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed)
 {
 	static const int BULLET_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
 	bulletMgr.Generate(BULLET_GRAPH, generatePos, forwardAngle, speed);

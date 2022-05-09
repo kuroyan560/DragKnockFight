@@ -77,7 +77,7 @@ void TutorialScene::OnInitialize()
 {
 	CharacterManager::Instance()->PracticeMode();
 	pictureStory.InitScene();
-	game.Init();
+	game.Init(true);
 	Tutorial::SetStaticActiveAll(false);
 }
 

@@ -22,6 +22,9 @@ class RenderTarget;
 #include"RoundChangeEffect.h"
 #include"ScreenEdgeEffect.h"
 
+#include"NavigationAI.h"
+#include"CharacterAI.h"
+
 class CharacterInterFace;
 
 struct MassChipData
@@ -114,8 +117,11 @@ class Game
 	Vec2<float>responeScrollPos;
 
 	//登場演出を行うかのフラグ
-	bool roundStartEffect = true;
+	bool practiceMode = true;
 public:
+	//テスト用
+	NavigationAI navi;
+	CharacterAI chara;
 
 	HomeBase playerHomeBase, enemyHomeBase;
 
@@ -123,7 +129,7 @@ public:
 	int nowSelectNum = 0;
 
 	Game();
-	void Init(const bool& RoundStartEffect = true);
+	void Init(const bool& PractiveMode = false);
 	void Update(const bool& Loop = false);
 	void Draw();
 	void Scramble();

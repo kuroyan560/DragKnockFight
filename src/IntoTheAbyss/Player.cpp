@@ -24,6 +24,8 @@
 #include "DrawFunc.h"
 #include "Stamina.h"
 
+#include"CharacterAIData.h"
+
 Vec2<float> Player::GetGeneratePos()
 {
 	return WinApp::Instance()->GetExpandWinCenter() * Vec2<float>(1.0f, 0.25f);
@@ -118,6 +120,12 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	RECOIL_AMOUNT = data->RECOIL_AMOUNT;
 	FIRST_RECOIL_AMOUNT = data->FIRST_RECOIL_AMOUNT;
 	MAX_RECOIL_AMOUNT = data->MAX_RECOIL_AMOUNT;
+
+
+	CharacterAIData::Instance()->playerData.dashStamina = DASH_STAMINA;
+	CharacterAIData::Instance()->playerData.swingStamina = SWING_STAMINA;
+
+
 
 
 	/*===== 入力処理 =====*/
@@ -243,6 +251,7 @@ void Player::OnUpdateNoRelatedSwing()
 		tiredTimer = 0;
 		anim.ChangeAnim(TIRED);
 	}
+
 }
 
 void Player::OnDraw()
@@ -457,9 +466,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		isInputSwingRB = isInputRB;
 
-		// スタミナを消費 振り回しが終わった際にスタミナを消費するようにしました。
-		//staminaGauge->ConsumesStamina(SWING_STAMINA);
-
+		//キャラクターAI用のデータ集め
+		CharacterAIData::Instance()->swingFlag = true;
 	}
 	//else if (isSwingPartner && canSwing && !isGripPowerEmpty && isInputRightStick) {
 	else if (isSwingPartner && canSwing && isInputRightStick) {
@@ -467,6 +475,11 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// 先行入力を保存。
 		isAdvancedEntrySwing = true;
 		advancedEntrySwingTimer = ADVANCED_ENTRY_SWING_TIMER;
+	}
+	else
+	{
+		//キャラクターAI用のデータ集め
+		CharacterAIData::Instance()->swingFlag = false;
 	}
 
 	// スタミナが残っているか？
@@ -490,9 +503,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		}
 
-		// スタミナを消費
-		const int DASH_GRIP_POWER = 20;
-
 		//煙
 		ParticleMgr::Instance()->Generate(pos, -inputLeftVec, BULLET);
 		//残像
@@ -501,6 +511,11 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// スタミナを消費
 		staminaGauge->ConsumesStamina(DASH_STAMINA);
 
+		CharacterAIData::Instance()->dashFlag = true;
+	}
+	else
+	{
+		CharacterAIData::Instance()->dashFlag = false;
 	}
 
 	// スタミナが残っているか？
@@ -518,12 +533,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 		if (isClockWise) {
 
 			CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+			CWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 			CCWSwingSegmentMgr.Init();
 
 		}
 		else {
 
 			CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+			CCWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 			CWSwingSegmentMgr.Init();
 
 		}
