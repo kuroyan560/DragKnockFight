@@ -31,7 +31,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	engineOption.backBuffClearColor = Color(56, 22, 74, 255);
 	engineOption.useHDR = false;
 	engineOption.frameRate = 43;
-	engineOption.imguiActive = true;
+	engineOption.imguiActive = false;
 
 	//===============================
 
