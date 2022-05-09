@@ -216,7 +216,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			if (miniIntersectedPoint.second == INTERSECTED_TOP) {
 
 				// âüÇµñﬂÇ∑ÅB
-				pos.y = miniIntersectedPoint.first.y - size.y;
+				pos.y = miniIntersectedPoint.first.y - size.y - offset;
 
 			}
 			else if (miniIntersectedPoint.second == INTERSECTED_RIGHT) {
