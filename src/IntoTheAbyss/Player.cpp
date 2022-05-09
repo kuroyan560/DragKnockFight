@@ -53,7 +53,10 @@ Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& T
 	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
 
 	bulletGraph = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/bullet.png");
-	pilotGraph = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot.png");
+
+	playerPilotGraph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot.png");
+	playerPilotGraph[1] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot_back.png");
+	pilotGraph = playerPilotGraph[0];
 }
 
 Player::~Player()
@@ -112,6 +115,7 @@ void Player::OnInit()
 	prevInputRightStick = {};
 
 	autoPilotMove = { 0,0 };
+	pilotGraph = playerPilotGraph[0];
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -367,6 +371,12 @@ void Player::OnPilotControl()
 
 	//ãÛãCíÔçRÇ≈å∏ë¨
 	pilotVel = KuroMath::Lerp(pilotVel, { 0,0 }, 0.1f);
+
+	if (rightStickVec.x < 0)pilotDrawMiror = false;
+	if (0 < rightStickVec.x)pilotDrawMiror = true;
+
+	if (rightStickVec.y < 0)pilotGraph = playerPilotGraph[1];	//å„ÇÎå¸Ç´
+	if (0 < rightStickVec.y)pilotGraph = playerPilotGraph[0];	//ëOå¸Ç´
 }
 
 void Player::Input(const vector<vector<int>>& MapData)

@@ -293,6 +293,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		CharacterManager::Instance()->Right()->SetHitCheck(true);
 		GameTimer::Instance()->SetInterruput(false);
 		roundChangeEffect.initGameFlag = true;
+		roundChangeEffect.drawFightFlag = true;
 	}
 
 }

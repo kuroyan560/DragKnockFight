@@ -310,6 +310,7 @@ void CharacterInterFace::Appear()
 
 void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear)
 {
+	pilotSize = TexHandleMgr::GetTexBuffer(pilotGraph)->GetGraphSize().Float();
 	if (Appear)appearExtRate = { INIT_SIZE,INIT_SIZE };
 	else appearExtRate = { 1.0f,1.0f };
 	initPaticleFlag = false;
@@ -573,7 +574,7 @@ void CharacterInterFace::Draw()
 			TexHandleMgr::GetTexBuffer(LINE_GRAPH[team]), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 
 		const auto sizeHalf = pilotSize * ScrollMgr::Instance()->zoom / 2.0f;
-		DrawFunc::DrawExtendGraph2D(pilotDrawPos - sizeHalf, pilotDrawPos + sizeHalf, TexHandleMgr::GetTexBuffer(pilotGraph));
+		DrawFunc::DrawExtendGraph2D(pilotDrawPos - sizeHalf, pilotDrawPos + sizeHalf, TexHandleMgr::GetTexBuffer(pilotGraph), Color(), { pilotDrawMiror,false });
 	}
 
 	bulletMgr.Draw();
