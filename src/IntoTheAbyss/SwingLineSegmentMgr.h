@@ -51,6 +51,9 @@ public:
 	// 距離修正 スイング中は線分の更新を止めるが、スイング中に紐の長さが変わってしまう場合があるのでそれに対応させるために追加。
 	void ResetDistance(const Vec2<float>& Pos, const float& Distance);
 
+	// 頂点を移動させる。
+	void MoveVertex(const Vec2<float>& Move);
+
 	inline void SetAlpha(const int& Alpha) { alpha = Alpha; }
 	inline void Deactivate() { isActive = false; }
 	inline const Vec2<float>& GetStart() { return start; }
@@ -75,6 +78,7 @@ private:
 	std::array<SwingLineSegment, LINE_COUNT> lineSegments;	// 線分
 	Vec2<float> reticlePos;	// 照準座標
 	Vec2<float> swingStartPos;	// 振り回し時の振り回されているキャラの開始座標
+	Vec2<float> swingCharaPos;	// スイングしている時の予測線を動かすための前フレーム座標
 
 	int UIHandle;		// ボタンのUIの画像
 	int arrowHandle;	// 矢印画像
@@ -105,6 +109,9 @@ public:
 	/// <param name="IsSwing"> 振り回しをしているか </param>
 	/// <param name="NoMove"> 線分の更新をしないか </param>
 	void Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const std::vector<std::vector<int>>& MapData);
+
+	void SetCharaStartPos(const Vec2<float>& CharaPos);	// 振り回し開始時に振り回すキャラの座標を保存する関数を呼ぶ。
+	void UpdateSwing(const Vec2<float>& CharaPos);		// 振り回し中に呼ぶ更新処理
 
 	// 描画処理
 	void Draw(const WHICH_TEAM& Team);

@@ -190,7 +190,7 @@ void StaminaMgr::Update(const bool& Heal, const Vec2<float>& CharacterPos)
 {
 	const bool oldFullFlg = 100.0f <= stamina.back().GetNowGauge();
 
-	static const float HEAL_AMOUNT = 1.0f;
+	static const float HEAL_AMOUNT = 1.5f;
 	// スタミナゲージは何もしてなくても少しずつ回復する。
 	const int STAMINA_COUNT = stamina.size();
 

@@ -91,7 +91,7 @@ void StaminaItem::Update()
 
 		// 移動量を0に近づける。
 		vel -= vel / 10.0f;
-		if (vel < 1.0f) vel = 0;
+		if (vel < 3.0f) vel = 0;
 
 		// 移動量を足す。
 		pos += forwardVec * vel;
@@ -165,7 +165,7 @@ bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, cons
 		if (charaID == CharaID) {
 
 			// 2点間の距離を求める。
-			float distance = (pos - *CharaPos).Length();
+			float distance = (pos - *charaPos).Length();
 
 			// 2点間の距離が半径よりも小さかったら。
 			if (distance <= CharaRadius) {

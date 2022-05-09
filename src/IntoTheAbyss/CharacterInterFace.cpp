@@ -128,7 +128,7 @@ void CharacterInterFace::Crash(const Vec2<float>& MyVec)
 
 void CharacterInterFace::CrashUpdate()
 {
-	////振り回されている
+	//振り回されている
 	//if (partner.lock()->nowSwing)
 	//{
 	//	//一定量振り回した後
@@ -150,7 +150,13 @@ void CharacterInterFace::CrashUpdate()
 
 void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const bool& IsClockWise)
 {
+
+	// 振り回しの予測線を更新する際に使用する変数をセット。
+	CWSwingSegmentMgr.SetCharaStartPos(pos);
+	CCWSwingSegmentMgr.SetCharaStartPos(pos);
+
 	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/swing.wav", 0.13f);
+
 
 	//振り回し処理が既に走っている場合は、重ねて振り回せない
 	if (partner.lock()->nowSwing || nowSwing)return;
@@ -390,6 +396,17 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
+
+
+	// 振り回し中だったら線分を更新する。
+	if (nowSwing) {
+
+		CWSwingSegmentMgr.UpdateSwing(pos);
+		CCWSwingSegmentMgr.UpdateSwing(pos);
+
+	}
+
+
 	//スタン状態更新
 	if (stanTimer)
 	{
@@ -899,9 +916,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				// アイテムを生成する。
 				StaminaItem::CHARA_ID charaID;
-				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::LEFT;
-				if (team != WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::RIGHT;
+				if (team != WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::LEFT;
+				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::RIGHT;
 				StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
+
+				// クラッシュさせる。
+				Crash(vec);
 
 			}
 
@@ -1087,5 +1107,8 @@ void CharacterInterFace::FinishSwing()
 	nowSwing = false;
 	partner.lock()->stagingDevice.StopSpin();
 	partner.lock()->OnSwingedFinish();
+	CWSwingSegmentMgr.Init();
+	CCWSwingSegmentMgr.Init();
+
 }
 
