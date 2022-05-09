@@ -46,7 +46,7 @@
 #include"CharacterManager.h"
 #include "StaminaItemMgr.h"
 
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -72,7 +72,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -102,7 +102,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData *>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				if (height < 0 || mapChipDrawData.size() <= height) continue;
 				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
@@ -161,7 +161,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
+const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -179,7 +179,7 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
+void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -595,10 +595,10 @@ void Game::Update()
 #pragma region 当たり判定
 
 	//左弾と右プレイヤーの判定
-	auto &leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
+	auto& leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
 	for (int index = 0; index < leftBulMgr.bullets.size(); ++index)
 	{
-		auto &bul = leftBulMgr.bullets[index];
+		auto& bul = leftBulMgr.bullets[index];
 		if (!bul.isActive)continue;
 
 		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
@@ -617,7 +617,7 @@ void Game::Update()
 	auto rightBulMgr = CharacterManager::Instance()->Right()->GetBulletMgr();
 	for (int index = 0; index < rightBulMgr.bullets.size(); ++index)
 	{
-		auto &bul = rightBulMgr.bullets[index];
+		auto& bul = rightBulMgr.bullets[index];
 		if (!bul.isActive)continue;
 
 		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
@@ -771,7 +771,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 	if (roundChangeEffect.initGameFlag)
 	{
 		//左プレイヤー～中央のチェイン
-		auto &left = CharacterManager::Instance()->Left();
+		auto& left = CharacterManager::Instance()->Left();
 		Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
 		Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
 		if (0.0f < left->addLineLength)
@@ -781,7 +781,7 @@ void Game::Draw(std::weak_ptr<RenderTarget>EmissiveMap)
 		}
 
 		//右プレイヤー～中央のチェイン
-		auto &right = CharacterManager::Instance()->Right();
+		auto& right = CharacterManager::Instance()->Right();
 		Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
 		Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
 		if (0.0f < right->addLineLength)
@@ -953,7 +953,7 @@ void Game::Scramble()
 
 
 	// 線分の長さ
-	float line = 0;
+	float charaLength = 0;
 	float LINE = CharacterInterFace::LINE_LENGTH * 2 + (CharacterManager::Instance()->Left()->addLineLength + CharacterManager::Instance()->Right()->addLineLength);
 
 	// どちらかが踏ん張っているか。
@@ -962,85 +962,21 @@ void Game::Scramble()
 	// どちらかが振り回しているか。
 	bool isSwingNow = CharacterManager::Instance()->Left()->GetNowSwing() || CharacterManager::Instance()->Right()->GetNowSwing();
 
-	// どちらかが踏ん張っていたら。
-	if (isHoldNow) {
-
-		// 右側のキャラが踏ん張っていたら。
-		if (CharacterManager::Instance()->Left()->isHold) {
-
-			// 距離を求める。
-			line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
-
-			// ボスをプレイヤーの方に移動させる。
-			if (LINE < line) {
-
-				// 押し戻し量
-				float moveLength = line - LINE;
-
-				// 押し戻し方向
-				Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos);
-				moveDir.Normalize();
-
-				// 押し戻す。
-				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
-
-				// 引っかかり判定だったら
-				if (CharacterManager::Instance()->Right()->GetStackFlag()) {
-
-					CharacterManager::Instance()->Right()->addLineLength += moveLength;
-
-				}
-
-			}
-
-		}
-		// 左側のキャラが踏ん張っていたら。
-		else {
-
-			// 距離を求める。
-			line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
-
-			// プレイヤーをボスの方に移動させる。
-			if (LINE < line) {
-
-				// 押し戻し量
-				float moveLength = line - LINE;
-
-				// 押し戻し方向
-				Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos);
-				moveDir.Normalize();
-
-				// 押し戻す。
-				CharacterManager::Instance()->Left()->pos += moveDir * Vec2<float>(moveLength, moveLength);
-
-				// 引っかかり判定だったら
-				if (CharacterManager::Instance()->Left()->GetStackFlag()) {
-
-					CharacterManager::Instance()->Left()->addLineLength += moveLength;
-
-				}
-
-			}
-
-		}
-
-
-	}
 
 	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
-	else if (leftVelGauge.Length() < rightVelGauge.Length()) {
+	if (leftVelGauge.Length() < rightVelGauge.Length()) {
 
 		// 右側のほうが移動量が大きかったら。
 		// 右側のキャラを中心とした位置に左側のキャラを持ってくる。
 
 		// 距離を求める。
-		line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
+		charaLength = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
 
 		// プレイヤーをボスの方に移動させる。
-		if (LINE < line) {
+		if (LINE < charaLength) {
 
 			// 押し戻し量
-			float moveLength = line - LINE;
+			float moveLength = charaLength - LINE;
 
 			// 押し戻し方向
 			Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos);
@@ -1065,13 +1001,13 @@ void Game::Scramble()
 		// 左側のキャラを中心とした位置に右側のキャラを持ってくる。
 
 		// 距離を求める。
-		line = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
+		charaLength = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
 
 		// ボスをプレイヤーの方に移動させる。
-		if (LINE < line) {
+		if (LINE < charaLength) {
 
 			// 押し戻し量
-			float moveLength = line - LINE;
+			float moveLength = charaLength - LINE;
 
 			// 押し戻し方向
 			Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos);
@@ -1102,27 +1038,44 @@ void Game::Scramble()
 
 	}
 
+	const float ADD_LINE_LENGTH_SUB_AMOUNT = 5.0f;
+
 	// どちらのキャラも引っかかっているか
 	bool isBothStuck = CharacterManager::Instance()->Right()->GetStackFlag() && CharacterManager::Instance()->Left()->GetStackFlag();
 	// 引っかかり判定じゃなかったらだんだん短くする。
 	Vec2<float> movedVel = (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Right()->prevPos);
+	movedVel += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos);
 	// 右側の紐の処理
-	if (!isBothStuck && 0 < CharacterManager::Instance()->Right()->addLineLength && movedVel.Length() <= 0.5f && !isSwingNow) {
+	if (!isBothStuck && 0 < CharacterManager::Instance()->Right()->addLineLength && !isSwingNow) {
 
-		CharacterManager::Instance()->Right()->addLineLength -= 5.0f;
+		// 引く量 0未満にならないようにするため。
+		float subAmount = ADD_LINE_LENGTH_SUB_AMOUNT;
+		if (CharacterManager::Instance()->Right()->addLineLength < ADD_LINE_LENGTH_SUB_AMOUNT) {
+			subAmount = CharacterManager::Instance()->Right()->addLineLength;
+		}
+
+		// 移動中は引かない。
+		if (ADD_LINE_LENGTH_SUB_AMOUNT < CharacterManager::Instance()->Right()->vel.Length()) {
+			subAmount = 0;
+		}
+
+		CharacterManager::Instance()->Right()->addLineLength -= subAmount;
 
 		// 引いた分移動させる。
 		float charaLength = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
 		// [今の長さ] が [初期長さ * 2] + [左の紐の長さ] 以上だったら処理を行う。
 		if (CharacterInterFace::LINE_LENGTH * 2.0f + CharacterManager::Instance()->Left()->addLineLength < charaLength) {
 
+			// 動いていたら
+			if (1.0f < movedVel.Length()) {
+			}
 			// 右側が引っかかっていたら。
-			if (CharacterManager::Instance()->Right()->GetStackFlag()) {
+			else if (CharacterManager::Instance()->Right()->GetStackFlag()) {
 				// 右側が引っかかっているときは代わりに左側を動かす。
-				CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * 5.0f;
+				CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * subAmount;
 			}
 			else {
-				CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * 5.0f;
+				CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * subAmount;
 			}
 		}
 
@@ -1131,30 +1084,45 @@ void Game::Scramble()
 	if (CharacterManager::Instance()->Right()->addLineLength < 0) CharacterManager::Instance()->Right()->addLineLength = 0;
 
 
-	movedVel = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos);
+	//movedVel = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos);
 	// 左側の紐の処理
-	if (!isBothStuck && 0 < CharacterManager::Instance()->Left()->addLineLength && movedVel.Length() <= 0.5f && !isSwingNow) {
+	if (!isBothStuck && 0 < CharacterManager::Instance()->Left()->addLineLength && !isSwingNow) {
 
-		CharacterManager::Instance()->Left()->addLineLength -= 5.0f;
+		// 引く量 0未満にならないようにするため。
+		float subAmount = ADD_LINE_LENGTH_SUB_AMOUNT;
+		if (CharacterManager::Instance()->Left()->addLineLength < ADD_LINE_LENGTH_SUB_AMOUNT) {
+			subAmount = CharacterManager::Instance()->Left()->addLineLength;
+		}
+
+		// 移動中は引かない。
+		if (ADD_LINE_LENGTH_SUB_AMOUNT < CharacterManager::Instance()->Left()->vel.Length()) {
+			subAmount = 0;
+		}
+
+		CharacterManager::Instance()->Left()->addLineLength -= subAmount;
 
 		// 引いた分移動させる。
 		float charaLength = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
 		// [今の長さ] が [初期長さ * 2] + [左の紐の長さ] 以上だったら処理を行う。
 		if (CharacterInterFace::LINE_LENGTH * 2.0f + CharacterManager::Instance()->Right()->addLineLength < charaLength) {
 
+			// 動いていたら
+			if (1.0f < movedVel.Length()) {
+			}
 			// 左側が引っかかっていたら。
-			if (CharacterManager::Instance()->Left()->GetStackFlag()) {
+			else if (CharacterManager::Instance()->Left()->GetStackFlag()) {
 				// 左側が引っかかっているときは代わりに右側を動かす。
-				CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * 5.0f;
+				CharacterManager::Instance()->Right()->pos += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal() * subAmount;
 			}
 			else {
-				CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * 5.0f;
+				CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * subAmount;
 			}
 		}
 
 	}
 
 	if (CharacterManager::Instance()->Right()->addLineLength < 0) CharacterManager::Instance()->Right()->addLineLength = 0;
+	if (CharacterManager::Instance()->Left()->addLineLength < 0) CharacterManager::Instance()->Left()->addLineLength = 0;
 
 	isCatchMapChipBoss = false;
 	isCatchMapChipPlayer = false;
@@ -1168,8 +1136,8 @@ void Game::CalCenterPos()
 
 	// 本当はScrambleの一番うしろに入れていた処理なんですが、押し戻しをした後に呼ぶ必要が出てきたので関数で分けました。
 
-	auto &left = CharacterManager::Instance()->Left();
-	auto &right = CharacterManager::Instance()->Right();
+	auto& left = CharacterManager::Instance()->Left();
+	auto& right = CharacterManager::Instance()->Right();
 
 	// 移動量に応じて本来あるべき長さにする。
 	Vec2<float> prevSubPos = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos;
@@ -1237,8 +1205,8 @@ void Game::CalCenterPos()
 		//else {
 			// 規定値以上だったら普通に場所を求める。
 
-		auto &right = CharacterManager::Instance()->Right();
-		auto &left = CharacterManager::Instance()->Left();
+		auto& right = CharacterManager::Instance()->Right();
+		auto& left = CharacterManager::Instance()->Left();
 
 		Vec2<float> rightPos = right->pos;
 		rightPos += (left->pos - right->pos).GetNormal() * right->addLineLength;
