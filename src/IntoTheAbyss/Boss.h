@@ -25,6 +25,7 @@ public:
 	//画像
 	static const enum DIR { FRONT, BACK, DIR_NUM };
 	int graphHandle[DIR_NUM];
+	int afterImgageTimer;
 
 	//ボスのパターン制御-----------------------
 	enum E_BossPattern
