@@ -112,6 +112,10 @@ void Player::OnInit()
 	prevInputRightStick = {};
 
 	autoPilotMove = { 0,0 };
+
+	CWSwingSegmentMgr.Init();
+	CCWSwingSegmentMgr.Init();
+
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
