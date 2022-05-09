@@ -150,6 +150,11 @@ void CharacterInterFace::CrashUpdate()
 
 void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const bool& IsClockWise)
 {
+
+	// 振り回しの予測線を更新する際に使用する変数をセット。
+	CWSwingSegmentMgr.SetCharaStartPos(pos);
+	CCWSwingSegmentMgr.SetCharaStartPos(pos);
+
 	static int SE = -1;
 	if (SE == -1)
 	{
@@ -349,6 +354,17 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos)
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
+
+
+	// 振り回し中だったら線分を更新する。
+	if (nowSwing) {
+
+		CWSwingSegmentMgr.UpdateSwing(pos);
+		CCWSwingSegmentMgr.UpdateSwing(pos);
+
+	}
+
+
 	//スタン状態更新
 	if (stanTimer)
 	{

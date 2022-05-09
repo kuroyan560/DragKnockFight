@@ -87,6 +87,14 @@ void SwingLineSegment::ResetDistance(const Vec2<float>& Pos, const float& Distan
 
 }
 
+void SwingLineSegment::MoveVertex(const Vec2<float>& Move)
+{
+
+	start += Move;
+	end += Move;
+
+}
+
 void SwingLineSegmentMgr::Setting(const bool& IsClockWise, const int& HandleUI, const int& HandleArrow, const int& HandleLine, const int& ReticleHandle)
 {
 
@@ -270,6 +278,27 @@ void SwingLineSegmentMgr::Draw(const WHICH_TEAM& Team)
 #include <IntoTheAbyss/StageMgr.h>
 #include "SelectStage.h"
 #include "Collider.h"
+void SwingLineSegmentMgr::SetCharaStartPos(const Vec2<float>& CharaPos)
+{
+	swingCharaPos = CharaPos;
+}
+void SwingLineSegmentMgr::UpdateSwing(const Vec2<float>& CharaPos)
+{
+
+	// 前フレームの座標からの差分を求める。
+	Vec2<float> moveVel = CharaPos - swingCharaPos;
+
+	// 全ての線分を動かす。
+	for (int index = 0; index < LINE_COUNT; ++index) {
+
+		lineSegments[index].MoveVertex(moveVel);
+
+	}
+
+	// 保存してある座標を更新。
+	swingCharaPos = CharaPos;
+
+}
 bool SwingLineSegmentMgr::IsHitWall()
 {
 	return isHitWallFlag;
