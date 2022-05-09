@@ -558,14 +558,22 @@ void CharacterInterFace::Draw()
 	CCWSwingSegmentMgr.Draw(team);
 	OnDraw();
 
-	//デバッグパイロット描画
-	if (IsPilotOutSide())
+	static const int LINE_GRAPH[TEAM_NUM] =
+	{
+		TexHandleMgr::LoadGraph("resource/ChainCombat/chain_player.png"),
+		TexHandleMgr::LoadGraph("resource/ChainCombat/chain_enemy.png")
+	};
+	static const int CHAIN_THICKNESS = 4;
+
+	//パイロット描画
+	if (IsPilotOutSide() && pilotGraph != -1)
 	{
 		const auto pilotDrawPos = ScrollMgr::Instance()->Affect(pilotPos);
-		const auto teamColor = GetTeamColor();
-		DrawFunc::DrawLine2D(pilotDrawPos, ScrollMgr::Instance()->Affect(pos), teamColor);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(pilotPos),
+			TexHandleMgr::GetTexBuffer(LINE_GRAPH[team]), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+
 		const auto sizeHalf = pilotSize * ScrollMgr::Instance()->zoom / 2.0f;
-		DrawFunc::DrawBox2D(pilotDrawPos - sizeHalf, pilotDrawPos + sizeHalf, teamColor, true);
+		DrawFunc::DrawExtendGraph2D(pilotDrawPos - sizeHalf, pilotDrawPos + sizeHalf, TexHandleMgr::GetTexBuffer(pilotGraph));
 	}
 
 	bulletMgr.Draw();
