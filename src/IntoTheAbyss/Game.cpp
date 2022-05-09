@@ -713,7 +713,9 @@ void Game::Update(const bool& Loop)
 	CrashEffectMgr::Instance()->Update();
 
 	// スタミナアイテムの更新処理
-	StaminaItemMgr::Instance()->Update(playerHomeBase.GetRightUpPos(), enemyHomeBase.GetLeftDownPos());
+	if (!readyToStartRoundFlag) {
+		StaminaItemMgr::Instance()->Update(playerHomeBase.GetRightUpPos(), enemyHomeBase.GetLeftDownPos());
+	}
 
 	// スタミナアイテムの当たり判定処理
 	int healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Left()->pos, 30, 70, StaminaItem::CHARA_ID::LEFT, CharacterManager::Instance()->Left()->GetPilotPosPtr());
