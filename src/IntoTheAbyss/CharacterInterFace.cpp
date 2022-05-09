@@ -129,27 +129,32 @@ void CharacterInterFace::Crash(const Vec2<float>& MyVec)
 void CharacterInterFace::CrashUpdate()
 {
 	//振り回されている
-	if (partner.lock()->nowSwing)
-	{
-		//一定量振り回した後
-		static const float CRASH_SWING_RATE = 0.15f;
-		if (ADD_SWING_ANGLE * 2.0f < partner.lock()->addSwingAngle)
-		{
-			Vec2<float>vec = { 0,0 };
-			if (mapChipHit[LEFT])vec.x = -1.0f;
-			else if (mapChipHit[RIGHT])vec.x = 1.0f;
-			if (mapChipHit[TOP])vec.y = -1.0f;
-			else if (mapChipHit[BOTTOM])vec.y = 1.0f;
+	//if (partner.lock()->nowSwing)
+	//{
+	//	//一定量振り回した後
+	//	static const float CRASH_SWING_RATE = 0.15f;
+	//	if (ADD_SWING_ANGLE * 2.0f < partner.lock()->addSwingAngle)
+	//	{
+	//		Vec2<float>vec = { 0,0 };
+	//		if (mapChipHit[LEFT])vec.x = -1.0f;
+	//		else if (mapChipHit[RIGHT])vec.x = 1.0f;
+	//		if (mapChipHit[TOP])vec.y = -1.0f;
+	//		else if (mapChipHit[BOTTOM])vec.y = 1.0f;
 
-			Crash(vec);
-		}
+	//		Crash(vec);
+	//	}
 
-		partner.lock()->FinishSwing();
-	}
+	//	partner.lock()->FinishSwing();
+	//}
 }
 
 void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const bool& IsClockWise)
 {
+
+	// 振り回しの予測線を更新する際に使用する変数をセット。
+	CWSwingSegmentMgr.SetCharaStartPos(pos);
+	CCWSwingSegmentMgr.SetCharaStartPos(pos);
+
 	static int SE = -1;
 	if (SE == -1)
 	{
@@ -391,6 +396,17 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
+
+
+	// 振り回し中だったら線分を更新する。
+	if (nowSwing) {
+
+		CWSwingSegmentMgr.UpdateSwing(pos);
+		CCWSwingSegmentMgr.UpdateSwing(pos);
+
+	}
+
+
 	//スタン状態更新
 	if (stanTimer)
 	{
@@ -900,9 +916,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				// アイテムを生成する。
 				StaminaItem::CHARA_ID charaID;
-				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::LEFT;
-				if (team != WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::RIGHT;
+				if (team != WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::LEFT;
+				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::RIGHT;
 				StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
+
+				// クラッシュさせる。
+				Crash(vec);
 
 			}
 
@@ -1088,5 +1107,8 @@ void CharacterInterFace::FinishSwing()
 	nowSwing = false;
 	partner.lock()->stagingDevice.StopSpin();
 	partner.lock()->OnSwingedFinish();
+	CWSwingSegmentMgr.Init();
+	CCWSwingSegmentMgr.Init();
+
 }
 
