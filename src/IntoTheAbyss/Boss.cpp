@@ -54,6 +54,7 @@ void Boss::OnInit()
 
 	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 	patternTimer = 0;
+	afterImgageTimer = 0;
 }
 
 #include"Camera.h"
@@ -204,6 +205,17 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
 
+	if (CharacterAIOrder::Instance()->dashFlag)
+	{
+		afterImgageTimer = 15.0f;
+		CharacterAIOrder::Instance()->dashFlag = false;
+	}
+	//ダッシュの残像
+	if (afterImgageTimer)
+	{
+		AfterImageMgr::Instance()->Generate(pos, Vec2<float>(1.0f, 1.0f) *ScrollMgr::Instance()->zoom, 0.0f, graphHandle[FRONT], GetTeamColor());
+		afterImgageTimer--;
+	}
 
 	// 移動量に関する変数をここで全てvelに代入する。
 	vel = moveVel;

@@ -36,10 +36,10 @@ void MovingBetweenTwoPoints::Update()
 	++timer;
 
 	//プレイヤーがダッシュしたらその後に遅れてダッシュする
-	if (CharacterAIData::Instance()->dashFlag)
+	const float USE_DASH_STAMINA_GAUGE = 0.3f;
+	if (CharacterAIData::Instance()->dashFlag && USE_DASH_STAMINA_GAUGE <= CharacterAIData::Instance()->bossData.stamineGauge)
 	{
 		dashFlag = true;
-		operateDash.Init(vel / 2.0f);
 	}
 	if (dashFlag)
 	{
@@ -48,6 +48,8 @@ void MovingBetweenTwoPoints::Update()
 	//スタミナの減算は若干遅れて行う
 	if (15 <= dashTimer)
 	{
+		operateDash.Init(vel / 2.0f);
+		CharacterAIOrder::Instance()->dashFlag = true;
 		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterAIData::Instance()->playerData.dashStamina);
 		dashTimer = 0;
 		dashFlag = false;
