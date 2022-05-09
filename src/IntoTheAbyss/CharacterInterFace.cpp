@@ -570,8 +570,10 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 void CharacterInterFace::Draw()
 {
 	// Žc‘œ‚ð•`‰æ
-	CWSwingSegmentMgr.Draw(team);
-	CCWSwingSegmentMgr.Draw(team);
+	if (!GetNowBreak()) {
+		CWSwingSegmentMgr.Draw(team);
+		CCWSwingSegmentMgr.Draw(team);
+	}
 	OnDraw();
 
 	static const int LINE_GRAPH[TEAM_NUM] =
