@@ -36,7 +36,8 @@ void MovingBetweenTwoPoints::Update()
 	++timer;
 
 	//プレイヤーがダッシュしたらその後に遅れてダッシュする
-	if (CharacterAIData::Instance()->dashFlag)
+	const float USE_DASH_STAMINA_GAUGE = 0.3f;
+	if (CharacterAIData::Instance()->dashFlag && USE_DASH_STAMINA_GAUGE <= CharacterAIData::Instance()->bossData.stamineGauge)
 	{
 		dashFlag = true;
 	}
