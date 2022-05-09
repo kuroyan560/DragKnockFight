@@ -42,7 +42,7 @@ public:
 	void Init();
 	void GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STATUS Status, Vec2<float>* CharaPos, StaminaItem::CHARA_ID CharaID, const Vec2<float>& SwingCharaPos);
 	void GenerateSpone(const Vec2<float>& GeneratePos);
-	void Update();
+	void Update(const Vec2<float>& LeftUp, const Vec2<float>& RightDown);
 	void Draw();
 
 	// 当たり判定を行い、スタミナの回復量を取得する。
