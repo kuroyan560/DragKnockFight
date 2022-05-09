@@ -972,7 +972,7 @@ void Game::Scramble()
 		// 距離を求める。
 		charaLength = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
 
-		// プレイヤーをボスの方に移動させる。
+		// 左側のキャラを右側のキャラの方に移動させる。
 		if (LINE < charaLength) {
 
 			// 押し戻し量
@@ -989,6 +989,9 @@ void Game::Scramble()
 			if (CharacterManager::Instance()->Left()->GetStackFlag()) {
 
 				CharacterManager::Instance()->Left()->addLineLength += moveLength;
+
+				// 引っかかっている場合は更に押し戻す。(壁ズリを表現するため)
+				CharacterManager::Instance()->Left()->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
 			}
 
@@ -1016,21 +1019,13 @@ void Game::Scramble()
 			// 押し戻す。
 			CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
-			//if (CharacterManager::Instance()->Right()->GetPos().x < CharacterManager::Instance()->Right()->GetPrevPos().x) {
-			//	CharacterManager::Instance()->Right()->AddVel({ -(CharacterManager::Instance()->Right()->GetPrevPos().x - CharacterManager::Instance()->Right()->GetPos().x),0.0f });
-			//}
-
-			// ボスの移動量が0を下回らないようにする。
-			//if (CharacterManager::Instance()->Right()->GetVel().x < 0) {
-
-			//	boss.vel.x = 0;
-
-			//}
-
 			// 引っかかり判定だったら
 			if (CharacterManager::Instance()->Right()->GetStackFlag()) {
 
 				CharacterManager::Instance()->Right()->addLineLength += moveLength;
+
+				// 引っかかっている場合は更に押し戻す。(壁ズリを表現するため)
+				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
 			}
 
@@ -1059,7 +1054,12 @@ void Game::Scramble()
 			subAmount = 0;
 		}
 
+		// 紐加算量をへらす。
 		CharacterManager::Instance()->Right()->addLineLength -= subAmount;
+
+		// キャラクターを紐加算量が減った方向に移動させる。
+		Vec2<float> charaDir = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).GetNormal();
+		CharacterManager::Instance()->Right()->vel += charaDir * subAmount / 10.0f;
 
 		// 引いた分移動させる。
 		float charaLength = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
@@ -1084,7 +1084,6 @@ void Game::Scramble()
 	if (CharacterManager::Instance()->Right()->addLineLength < 0) CharacterManager::Instance()->Right()->addLineLength = 0;
 
 
-	//movedVel = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos);
 	// 左側の紐の処理
 	if (!isBothStuck && 0 < CharacterManager::Instance()->Left()->addLineLength && !isSwingNow) {
 
@@ -1099,7 +1098,13 @@ void Game::Scramble()
 			subAmount = 0;
 		}
 
+
+		// 紐加算量をへらす。
 		CharacterManager::Instance()->Left()->addLineLength -= subAmount;
+
+		// キャラクターを紐加算量が減った方向に移動させる。
+		Vec2<float> charaDir = (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal();
+		CharacterManager::Instance()->Left()->vel += charaDir * subAmount / 10.0f;
 
 		// 引いた分移動させる。
 		float charaLength = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
