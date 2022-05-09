@@ -6,8 +6,7 @@
 
 CrashMgr::CrashMgr()
 {
-	se = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/crash.wav");
-	AudioApp::Instance()->ChangeVolume(se, 0.27f);
+	se = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/crash.wav", 0.27f);
 
 	crashGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/crash.png");
 }

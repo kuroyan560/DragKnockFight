@@ -113,6 +113,7 @@ public:
 	//パイロットの移動速度
 	Vec2<float>pilotVel;
 	Vec2<float>pilotAccel;
+	int playerPilotGraph[2];	//FRONT,BACK
 
 public:
 

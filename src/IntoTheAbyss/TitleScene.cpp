@@ -39,12 +39,7 @@ void TitleScene::OnInitialize()
 
 void TitleScene::OnUpdate()
 {
-	static int SE = -1;
-	if (SE == -1)
-	{
-		SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/select.wav");
-		AudioApp::Instance()->ChangeVolume(SE, 0.13f);
-	}
+	static int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/select.wav", 0.13f);
 
 	//チュートリアル選択画面
 	if (tutorialQuestion)

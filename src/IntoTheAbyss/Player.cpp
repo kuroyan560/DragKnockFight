@@ -49,11 +49,13 @@ Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& T
 	// 画像をロード
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
 
-	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav");
-	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
+	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav", 0.2f);
 
 	bulletGraph = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/bullet.png");
-	pilotGraph = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot.png");
+
+	playerPilotGraph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot.png");
+	playerPilotGraph[1] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot_back.png");
+	pilotGraph = playerPilotGraph[0];
 }
 
 Player::~Player()
@@ -112,6 +114,11 @@ void Player::OnInit()
 	prevInputRightStick = {};
 
 	autoPilotMove = { 0,0 };
+
+	CWSwingSegmentMgr.Init();
+	CCWSwingSegmentMgr.Init();
+
+	pilotGraph = playerPilotGraph[0];
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -367,6 +374,12 @@ void Player::OnPilotControl()
 
 	//空気抵抗で減速
 	pilotVel = KuroMath::Lerp(pilotVel, { 0,0 }, 0.1f);
+
+	if (rightStickVec.x < 0)pilotDrawMiror = false;
+	if (0 < rightStickVec.x)pilotDrawMiror = true;
+
+	if (rightStickVec.y < 0)pilotGraph = playerPilotGraph[1];	//後ろ向き
+	if (0 < rightStickVec.y)pilotGraph = playerPilotGraph[0];	//前向き
 }
 
 void Player::Input(const vector<vector<int>>& MapData)
@@ -484,6 +497,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 		CharacterAIData::Instance()->swingFlag = false;
 	}
 
+	static const int DASH_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/dash.wav", 0.4f);
+
 	// スタミナが残っているか？
 	bool isDashStamina = staminaGauge->CheckCanAction(DASH_STAMINA);
 
@@ -492,9 +507,11 @@ void Player::Input(const vector<vector<int>>& MapData)
 	inputLeftVec /= {32768.0f, 32768.0f};
 	inputRate = inputLeftVec.Length();
 	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && isDashStamina) {
+		
+		AudioApp::Instance()->PlayWave(DASH_SE);
 
 		// inputVec = ひだりスティックの入力方向
-		const float DASH_SPEED = 60.0f;
+		const float DASH_SPEED = 30.0f;
 		vel += inputLeftVec * DASH_SPEED;
 
 		// 移動量が限界を超えないようにする。

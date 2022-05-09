@@ -294,14 +294,14 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		CharacterManager::Instance()->Right()->SetHitCheck(true);
 		GameTimer::Instance()->SetInterruput(false);
 		roundChangeEffect.initGameFlag = true;
+		roundChangeEffect.drawFightFlag = true;
 	}
 
 }
 
 Game::Game()
 {
-	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
-	AudioApp::Instance()->ChangeVolume(bgm, 0.00f);
+	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav", 0.0f);
 
 	playerHomeBase.Init({ 0.0f,0.0f }, { 0.0f,0.0f }, true);
 	enemyHomeBase.Init({ 0.0f,0.0f }, { 800.0f,1000.0f }, false);

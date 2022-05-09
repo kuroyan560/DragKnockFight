@@ -211,7 +211,6 @@ bool StaminaItem::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, cons
 
 void StaminaItem::Acquire(Vec2<float>* CharaPos, CHARA_ID CharaID)
 {
-
 	/*===== æ“¾‚³‚ê‚½ó‘Ô‚É‚·‚é =====*/
 
 	isAcquired = true;
