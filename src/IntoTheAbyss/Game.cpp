@@ -301,7 +301,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 Game::Game()
 {
-	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav", 0.0f);
+	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav", 0.1f);
 
 	playerHomeBase.Init({ 0.0f,0.0f }, { 0.0f,0.0f }, true);
 	enemyHomeBase.Init({ 0.0f,0.0f }, { 800.0f,1000.0f }, false);

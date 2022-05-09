@@ -153,7 +153,7 @@ int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, co
 {
 	static bool SE_INIT = false;
 	static int SE[2];
-	static const float SE_VOL = 0.8f;
+	static const float SE_VOL = 0.15f;
 
 	if (!SE_INIT)
 	{
