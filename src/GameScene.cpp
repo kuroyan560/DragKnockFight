@@ -28,11 +28,13 @@ GameScene::GameScene()
 
 }
 
+#include"IntoTheAbyss/Tutorial.h"
 void GameScene::OnInitialize()
 {
 	ResultTransfer::Instance()->Init();
 	isSS = false;
 	game.Init();
+	Tutorial::SetStaticActiveAll(true);
 }
 
 void GameScene::OnUpdate()
