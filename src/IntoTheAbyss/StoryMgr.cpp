@@ -2,12 +2,11 @@
 #include"../Engine/UsersInput.h"
 #include"TexHandleMgr.h"
 #include"WinApp.h"
+#include"Tutorial.h"
 
 StoryMgr::StoryMgr()
 {
 	aButtonHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/star.png");
-	pos.x = static_cast<float>(WinApp::Instance()->GetWinSize().x - 70 - 15);
-	pos.y = static_cast<float>(WinApp::Instance()->GetWinSize().y - 70);
 	drawButtonFlag = true;
 	flashTimer = 0;
 }
@@ -31,6 +30,7 @@ void StoryMgr::InitScene()
 		story[i]->InitScene();
 	}
 	story[0]->Start();
+	Tutorial::SetStaticActiveAll(false);
 }
 
 #include"AudioApp.h"
@@ -48,9 +48,50 @@ void StoryMgr::Update()
 		{
 			story[storyHandle]->Start();
 		}
+
+		//チュートリアルアイコン表示
+		{
+			if (storyHandle == 1)
+			{
+				Tutorial::SetStaticActive(Tutorial::MOVE, true);
+				Tutorial::SetStaticActive(Tutorial::DASH, true);
+				Tutorial::SetStaticActive(Tutorial::SWING, true);
+			}
+			if (storyHandle == 3)
+			{
+				Tutorial::SetStaticActive(Tutorial::PILOT, true);
+			}
+		}
+
+		if (storyHandle == story.size() - 1)
+		{
+			Tutorial::SetStaticActiveAll(true);
+		}
 	}
 
-	story[storyHandle]->Update();
+	const bool startButtonTrigger = UsersInput::Instance()->ControllerOnTrigger(0, START);
+	//最後のストーリーじゃないとき
+	if (storyHandle < story.size() - 1)
+	{
+		//説明スキップ
+		if (startButtonTrigger)
+		{
+			storyHandle = story.size() - 1;
+			story[storyHandle]->Start();
+			Tutorial::SetStaticActiveAll(true);
+		}
+	}
+	//Aボタンでもう一度見る
+	else
+	{
+		if (UsersInput::Instance()->ControllerOnTrigger(0, A))
+		{
+			InitScene();
+		}
+	}
+
+	bool finishButtonTrigger = storyHandle == story.size() - 1 ? startButtonTrigger : UsersInput::Instance()->ControllerOnTrigger(0, A);
+	story[storyHandle]->Update(finishButtonTrigger);
 
 	++flashTimer;
 	if (30 <= flashTimer)
@@ -65,8 +106,13 @@ void StoryMgr::Draw()
 {
 	story[storyHandle]->Draw();
 
-	if (story[storyHandle]->OneLooped() && drawButtonFlag)
+	static const Vec2<float>A_BUTTON_POS =
 	{
-		DrawFunc::DrawRotaGraph2D(pos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(aButtonHandle));
+		static_cast<float>(WinApp::Instance()->GetWinSize().x - 70 - 15),
+		static_cast<float>(WinApp::Instance()->GetWinSize().y - 30)
+	};
+	if (story[storyHandle]->OneLooped() && drawButtonFlag && storyHandle != story.size() - 1)
+	{
+		DrawFunc::DrawRotaGraph2D(A_BUTTON_POS, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(aButtonHandle));
 	}
 }

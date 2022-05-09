@@ -38,12 +38,13 @@ Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& T
 {
 	/*====== コンストラクタ =====*/
 	if (PLAYER_CHARACTER_NUM <= CharacterName)assert(0);
+	static const std::string PLAYER_DIR = "resource/ChainCombat/player/";
 	static const std::string NAME_DIR[PLAYER_CHARACTER_NUM] =
 	{
 		"luna",
 		"lacy"
 	};
-	const int AIM_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/aim.png");
+	const int AIM_GRAPH = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/aim.png");
 
 	// 画像をロード
 	//playerGraph = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Player.png");
@@ -51,7 +52,8 @@ Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& T
 	shotSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/shot.wav");
 	AudioApp::Instance()->ChangeVolume(shotSE, 0.2f);
 
-	bulletGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/player/" + NAME_DIR[CharacterName] + "/bullet.png");
+	bulletGraph = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/bullet.png");
+	pilotGraph = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot.png");
 }
 
 Player::~Player()

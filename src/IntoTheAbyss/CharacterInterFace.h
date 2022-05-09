@@ -92,6 +92,7 @@ protected:
 	const float PILOT_RANGE = 300.0f;
 	Vec2<float>pilotPos;	// パイロットの座標
 	Vec2<float>pilotSize = { 64.0f,64.0f };	//パイロットのサイズ
+	int pilotGraph = -1;
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };

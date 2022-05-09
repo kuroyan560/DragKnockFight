@@ -78,7 +78,6 @@ void TutorialScene::OnInitialize()
 	CharacterManager::Instance()->PracticeMode();
 	pictureStory.InitScene();
 	game.Init(true);
-	Tutorial::SetStaticActiveAll(false);
 }
 
 void TutorialScene::OnUpdate()
@@ -89,7 +88,7 @@ void TutorialScene::OnUpdate()
 
 	if (pictureStory.goToTitleSceneFlag)
 	{
-		KuroEngine::Instance().ChangeScene(1, changeScene);
+		KuroEngine::Instance().ChangeScene(0, changeScene);
 	}
 }
 
