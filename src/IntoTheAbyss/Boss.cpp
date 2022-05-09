@@ -196,12 +196,12 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	CWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 	CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
 	CharacterAIData::Instance()->cDistance = CWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
-	//CWSwingSegmentMgr.Init();
+	CWSwingSegmentMgr.Init();
 
 	CCWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 	CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
 	CharacterAIData::Instance()->cCDistance = CCWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
-	//CCWSwingSegmentMgr.Init();
+	CCWSwingSegmentMgr.Init();
 
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
 
@@ -276,9 +276,8 @@ void Boss::OnDraw()
 		}
 	}
 
-
-	CWSwingSegmentMgr.Draw(RIGHT_TEAM);
-	CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
+	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
+	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
 }
 
 void Boss::Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed)

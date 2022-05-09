@@ -80,9 +80,16 @@ void CharacterAI::Update()
 		}
 		//ˆÓŽvŒˆ’è--------------------------
 
-		strategyArray[strategyOfChoice]->route = shortestData;
-		strategyArray[strategyOfChoice]->Update();
 
+		strategyArray[strategyOfChoice]->route = shortestData;
+		if (!CharacterManager::Instance()->Right()->GetNowBreak())
+		{
+			strategyArray[strategyOfChoice]->Update();
+		}
+		else
+		{
+			CharacterAIOrder::Instance()->vel = { 0.0f,0.0f };
+		}
 
 		//Žó‚¯“n‚µ-----------------------------------------------------
 		startPoint = strategyArray[strategyOfChoice]->startPoint;

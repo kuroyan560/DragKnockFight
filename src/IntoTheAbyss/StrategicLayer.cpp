@@ -334,7 +334,6 @@ void GoToTheField::Update()
 		swingCoolTime = 0;
 	}
 
-
 	//êUÇËâÒÇµÇΩç€Ç…àÍíËãóó£à»è„ó£ÇÍÇÍÇÈÇ©
 	const float CERTAIN_DISTANCE = 100.0f;
 	bool haveAdvantageToSwingClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->cDistance;
@@ -518,6 +517,12 @@ void AcquireASuperiorityGauge::Update()
 	endPoint = moveToOnwGround.endPoint;
 	startFlag = true;
 
+
+	if (CharacterManager::Instance()->Right()->GetNowSwing() || CharacterManager::Instance()->Right()->GetNowBreak())
+	{
+		swingCoolTime = 0;
+	}
+
 	//êUÇËâÒÇµâ¬î\Ç©
 	bool canSwingClockWiseFlag = CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
 	bool canSwingCClockWiseFlag = CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
@@ -527,12 +532,12 @@ void AcquireASuperiorityGauge::Update()
 	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge && SWING_MAX_COOL_TIME <= swingCoolTime;
 
 	//ìGÇêUÇËâÒÇµÇ≈à⁄ìÆÇ≥ÇπÇÈ
-	if (canSwingClockWiseFlag && useSwingFlag)
+	if (canSwingClockWiseFlag && useSwingFlag && !CharacterManager::Instance()->Right()->GetNowBreak())
 	{
 		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
 		swingCoolTime = 0;
 	}
-	else if (canSwingCClockWiseFlag && useSwingFlag)
+	else if (canSwingCClockWiseFlag && useSwingFlag && !CharacterManager::Instance()->Right()->GetNowBreak())
 	{
 		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
 		swingCoolTime = 0;

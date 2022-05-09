@@ -10,7 +10,6 @@ void OperateMove::Update(const Vec2<float> &VELOCITY)
 {
 	//ˆÚ“®
 	CharacterAIOrder::Instance()->vel = VELOCITY;
-
 }
 
 AiResult OperateMove::CurrentProgress()
