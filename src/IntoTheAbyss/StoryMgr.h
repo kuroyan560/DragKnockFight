@@ -28,7 +28,6 @@ private:
 	std::vector<std::shared_ptr<PictureStory>> story;
 	int storyHandle;
 
-	Vec2<float>pos;
 	int aButtonHandle;
 	int flashTimer;
 	bool drawButtonFlag;

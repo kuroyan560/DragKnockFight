@@ -10,7 +10,7 @@ public:
 
 	void Init(const std::vector<int> &PICTURE_HANDLE, const std::vector<int> &STRING_HANDLE);
 	void InitScene();
-	void Update();
+	void Update(const bool& FinishButtonTrigger);
 	void Draw();
 
 	void Start();
@@ -22,10 +22,7 @@ public:
 private:
 	bool startFlag;
 
-	//std::vector<Vec2<float>>picturePos;
-	//std::vector<int>pictureHandle;
-	//int pictureArrayHandle;
-	
+	std::vector<int>pictureHandle;
 
 	Vec2<float>basePos;
 	std::vector<Vec2<float>>stringPos;

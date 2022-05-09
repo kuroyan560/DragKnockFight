@@ -115,15 +115,23 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 
 	//DrawIcon(rightStickInput, RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBase_R);
 	//DrawIcon(rightStickInput, RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
-	if (pilotLeave && ACTIVE[PILOT])
+	if (ACTIVE[PILOT])
 	{
 		DrawIcon(RtriggerPos + OFFSET[team], RButton ? iconGraphs.buttonOn_R : iconGraphs.buttonOff_R);
-		DrawIcon(RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBasePilot_R);
-		DrawIcon(RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
+		if (pilotLeave)
+		{
+			DrawIcon(RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBasePilot_R);
+		}
 	}
-	else if (ACTIVE[SWING])
+	if (ACTIVE[SWING] && !pilotLeave)
 	{
 		//スウィング
 		DrawIcon(RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBaseSwing_R);
 	}
+
+	if (ACTIVE[PILOT] || ACTIVE[SWING])
+	{
+		DrawIcon(RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
+	}
+
 }
