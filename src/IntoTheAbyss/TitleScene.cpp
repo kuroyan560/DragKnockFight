@@ -83,7 +83,7 @@ void TitleScene::OnUpdate()
 	else
 	{
 		//ステージセレクトに移動する
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::START))
 		{
 			tutorialQuestion = true;
 			tutorialSelect = false;
