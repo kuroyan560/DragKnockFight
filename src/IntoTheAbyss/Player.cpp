@@ -602,7 +602,7 @@ void Player::Move()
 	/*===== ˆÚ“®‚ÉŠÖ‚·‚éˆ— =====*/
 
 	// ˆÚ“®—Ê‚ð0‚É‹ß•t‚¯‚éB
-	vel = KuroMath::Lerp(vel, { 0.0f,0.0f }, 0.03f);
+	vel = KuroMath::Lerp(vel, { 0.0f,0.0f }, 0.05f);
 
 	// ˆÚ“®—Ê‚ªŒÀŠE‚ð’´‚¦‚È‚¢‚æ‚¤‚É‚·‚éB
 	//if (fabs(vel.x) > MAX_RECOIL_AMOUNT) {
