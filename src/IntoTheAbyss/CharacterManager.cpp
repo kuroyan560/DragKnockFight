@@ -27,7 +27,7 @@ void CharacterManager::CharactersSelectInit()
 
 	//ビッサミ提出用
 	characterName[LEFT_TEAM] = PLAYABLE_LUNA;
-	characterName[RIGHT_TEAM] = PLAYABLE_LACY;
+	characterName[RIGHT_TEAM] = PLAYABLE_BOSS_0;
 }
 
 void CharacterManager::CharactersSelectUpdate()

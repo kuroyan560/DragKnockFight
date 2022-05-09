@@ -183,8 +183,6 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
-	AudioApp::Instance()->StopWave(bgm);
-
 	int stageNum = STAGE_NUM;
 	int roomNum = ROOM_NUM;
 
@@ -301,7 +299,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 Game::Game()
 {
-	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav", 0.1f);
+	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 
 	playerHomeBase.Init({ 0.0f,0.0f }, { 0.0f,0.0f }, true);
 	enemyHomeBase.Init({ 0.0f,0.0f }, { 800.0f,1000.0f }, false);
@@ -473,7 +471,6 @@ void Game::Update(const bool& Loop)
 		//勝利数カウント演出
 		if (!WinCounter::Instance()->GetNowAnimation())
 		{
-
 			//どちらかが３勝とったらゲーム終了
 			if (WinCounter::Instance()->GetGameFinish() && !Loop)
 			{
@@ -516,7 +513,11 @@ void Game::Update(const bool& Loop)
 		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initGameFlag)
 		{
 			roundChangeEffect.initGameFlag = true;
-			AudioApp::Instance()->PlayWave(bgm, true);
+			if (!AudioApp::Instance()->NowPlay(bgm))
+			{
+				AudioApp::Instance()->ChangeVolume(bgm, 0.1f);
+				AudioApp::Instance()->PlayWave(bgm, true);
+			}
 		}
 
 		//登場演出
