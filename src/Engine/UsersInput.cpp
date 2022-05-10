@@ -95,7 +95,7 @@ void UsersInput::Update(const HWND& Hwnd, const Vec2<float>& WinSize)
 			XINPUT_VIBRATION vibration;
 			ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
 
-			if (shakeTimer == 0)
+			if (shakeTimer[i] <= 0)
 			{
 				vibration.wLeftMotorSpeed = 0.0f; // use any value between 0-65535 here
 				vibration.wRightMotorSpeed = 0.0f; // use any value between 0-65535 here

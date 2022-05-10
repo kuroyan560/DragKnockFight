@@ -159,6 +159,10 @@ private:
 		inputInvalidTimerByCrash = INPUT_INVALID_TIMER;
 		anim.ChangeAnim(SWINGED);
 	}
+	void OnPartnerCrash()override
+	{
+		UsersInput::Instance()->ShakeController(controllerIdx, 0.9f, 15);
+	}
 	void OnPilotLeave()override	//パイロットがロボから離れた瞬間
 	{
 		pilotVel = { 0,0 };

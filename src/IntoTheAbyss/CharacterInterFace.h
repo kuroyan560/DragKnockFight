@@ -129,7 +129,8 @@ protected:
 	virtual void OnBreakFinish() = 0;
 	virtual void OnSwinged() = 0;
 	virtual void OnSwingedFinish() = 0;
-	virtual void OnCrash() = 0;
+	virtual void OnCrash() = 0;	//”自分”がクラッシュした瞬間
+	virtual void OnPartnerCrash() = 0;	//”相手”がクラッシュした瞬間
 	virtual void OnPilotLeave() = 0;	//パイロットがロボから離れた瞬間
 	virtual void OnPilotControl() = 0;		//パイロットを動かす処理
 	virtual void OnPilotReturn() = 0;	//パイロットがロボに戻った瞬間

@@ -118,6 +118,7 @@ void CharacterInterFace::Crash(const Vec2<float>& MyVec)
 	stagingDevice.StopSpin();
 
 	OnCrash();
+	partner.lock()->OnPartnerCrash();
 
 	if (stanTimer)return;	//スタン中ならダメージによる顔変更なし
 	static const int DAMAGE_TOTAL_TIME = 90;
@@ -238,6 +239,9 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 
 void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 {
+	//パイロットでなくする
+	return;
+
 	if (isPilotDetached == Flg)return;
 	//パイロット切り離しには最低でもスタミナバー１個分必要
 	if (Flg && !staminaGauge->CheckCanAction(1))return;

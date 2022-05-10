@@ -91,6 +91,7 @@ private:
 	void OnSwinged()override {}
 	void OnSwingedFinish()override {}
 	void OnCrash()override {}
+	void OnPartnerCrash()override {}
 	virtual void OnPilotLeave()override {}	//パイロットがロボから離れた瞬間
 	virtual void OnPilotControl()override {}		//パイロットを動かす処理
 	virtual void OnPilotReturn()override {}	//パイロットがロボに戻った瞬間
