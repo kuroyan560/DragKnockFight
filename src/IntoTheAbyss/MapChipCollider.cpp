@@ -83,7 +83,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			const float centerY = height * MAP_CHIP_SIZE;
 
 			// プレイヤーとの距離が一定以上離れていたら処理を行わない。
-			if (MAP_CHIP_SIZE * 2.0f <= Vec2<float>(centerX - pos.x, centerY - pos.y).Length()) {
+			if (MAP_CHIP_SIZE * 10.0f <= Vec2<float>(centerX - pos.x, centerY - pos.y).Length()) {
 				continue;
 			}
 
@@ -313,10 +313,10 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			const float centerY = height * MAP_CHIP_SIZE;
 
 			// プレイヤーとの距離が一定以上離れていたら処理を行わない。
-			if (size.x * 2.0f <= fabs(centerX - pos.x)) {
+			if (size.x * 10.0f <= fabs(centerX - pos.x)) {
 				continue;
 			}
-			if (size.y * 2.0f <= fabs(centerY - pos.y)) {
+			if (size.y * 10.0f <= fabs(centerY - pos.y)) {
 				continue;
 			}
 
