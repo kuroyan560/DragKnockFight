@@ -518,7 +518,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	}*/
 
 	// 体幹ゲージをデフォルトに戻すタイマーが0だったら
-	if (gaugeReturnTimer <= 0) {
+	if (gaugeReturnTimer <= 0 && !GetNowBreak()) {
 
 		static const int DEF_GAUGE = 50;
 		static const float RETURN_AMOUNT = 0.1f;
@@ -570,8 +570,10 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 void CharacterInterFace::Draw()
 {
 	// 残像を描画
-	CWSwingSegmentMgr.Draw(team);
-	CCWSwingSegmentMgr.Draw(team);
+	if (!GetNowBreak()) {
+		CWSwingSegmentMgr.Draw(team);
+		CCWSwingSegmentMgr.Draw(team);
+	}
 	OnDraw();
 
 	static const int LINE_GRAPH[TEAM_NUM] =

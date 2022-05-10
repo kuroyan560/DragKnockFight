@@ -27,6 +27,10 @@ FaceIcon::FaceIcon()
 	animasions[PLAYABLE_BOSS_0][DAMAGE].graph.emplace_back(TexHandleMgr::LoadGraph(boss_0Dir + "damage.png"));
 	animasions[PLAYABLE_BOSS_0][BREAK].graph.emplace_back(TexHandleMgr::LoadGraph(boss_0Dir + "break.png"));
 	animasions[PLAYABLE_BOSS_0][DEAD].graph.emplace_back(TexHandleMgr::LoadGraph(boss_0Dir + "dead.png"));
+	for (auto& anim : animasions[PLAYABLE_BOSS_0])
+	{
+		anim.mirrorX = true;
+	}
 }
 
 void FaceIcon::Init(const PLAYABLE_CHARACTER_NAME& Left, const PLAYABLE_CHARACTER_NAME& Right)

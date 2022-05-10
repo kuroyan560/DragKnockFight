@@ -28,6 +28,9 @@ ResultScene::ResultScene()
 
 void ResultScene::OnInitialize()
 {
+	static const int BGM = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
+	AudioApp::Instance()->ChangeVolume(BGM, 0.05f);
+
 	resultUITimer = 0;
 	breakEnemyUITimer = 0;
 	breakPlayerUITimer = 0;
@@ -208,6 +211,8 @@ void ResultScene::OnImguiDebug()
 
 void ResultScene::OnFinalize()
 {
+	static const int BGM = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
+	AudioApp::Instance()->StopWave(BGM);
 }
 
 void ResultScene::DrawBREAK(const Vec2<float>& targetPosm, const float& easingTimer, const int& graphHandle, const int& breakCount)

@@ -37,9 +37,16 @@ void TitleScene::OnInitialize()
 	tutorialQuestion = false;
 }
 
+#include"CharacterManager.h"
 void TitleScene::OnUpdate()
 {
 	static int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/select.wav", 0.13f);
+
+	//PVEとPVP切り替え（β版プレイ会向け）
+	if (UsersInput::Instance()->KeyInput(DIK_LSHIFT) && UsersInput::Instance()->KeyOnTrigger(DIK_T))
+	{
+		CharacterManager::Instance()->vsMode = !CharacterManager::Instance()->vsMode;
+	}
 
 	//チュートリアル選択画面
 	if (tutorialQuestion)
@@ -83,7 +90,7 @@ void TitleScene::OnUpdate()
 	else
 	{
 		//ステージセレクトに移動する
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::START))
 		{
 			tutorialQuestion = true;
 			tutorialSelect = false;
