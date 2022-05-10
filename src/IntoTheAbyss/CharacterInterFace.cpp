@@ -930,6 +930,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				// クラッシュさせる。
 				Crash(vec);
 
+				CWSwingSegmentMgr.Init();
+				CCWSwingSegmentMgr.Init();
+
 			}
 
 			// ゲージがデフォルトに戻るまでのタイマーを更新。
