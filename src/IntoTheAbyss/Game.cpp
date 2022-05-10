@@ -295,6 +295,12 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
+	
+	chara.Finalize();
+	if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
+	{
+		chara.Init();
+	}
 }
 
 Game::Game()
@@ -348,11 +354,6 @@ void Game::Init(const bool& PracticeMode)
 	CrashEffectMgr::Instance()->Init();
 
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
-
-	if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
-	{
-		chara.Init();
-	}
 }
 
 void Game::Update(const bool& Loop)

@@ -16,7 +16,6 @@ class StaminaMgr;
 
 class CharacterInterFace
 {
-
 private:
 	void SwingUpdate();
 	void Crash(const Vec2<float>& MyVec);
