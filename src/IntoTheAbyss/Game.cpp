@@ -705,12 +705,14 @@ void Game::Update(const bool& Loop)
 		StunEffect::Instance()->Activate(CharacterManager::Instance()->Left()->pos, Vec2<float>(0, 0), LEFT_TEAM);
 		ResultTransfer::Instance()->leftBreakCount++;
 		CharacterManager::Instance()->Left()->Break();
+		CharacterManager::Instance()->Left()->InitVel();
 	}
 	if (SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).overGaugeFlag && !SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).prevOverGaugeFlag) {
 		// ƒvƒŒƒCƒ„[‚Ì—D¨ƒQ[ƒW‚ªU‚èØ‚Á‚½‚Æ‚¢‚¤‚±‚Æ‚ÍA“G‚Ì—D¨ƒQ[ƒW‚ª0‚¾‚Æ‚¢‚¤‚±‚ÆB
 		StunEffect::Instance()->Activate(CharacterManager::Instance()->Right()->pos, Vec2<float>(1200, 0), RIGHT_TEAM);
 		ResultTransfer::Instance()->rightBreakCount++;
 		CharacterManager::Instance()->Right()->Break();
+		CharacterManager::Instance()->Right()->InitVel();
 	}
 
 	CrashMgr::Instance()->Update();
