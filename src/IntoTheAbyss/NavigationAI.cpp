@@ -214,7 +214,7 @@ void NavigationAI::Update(const Vec2<float>& POS)
 void NavigationAI::Draw()
 {
 	//デバックの時のみ表示
-#ifdef DEBUG
+#ifdef _DEBUG
 
 	//ウェイポイントの描画
 	for (int y = 0; y < wayPointYCount; ++y)

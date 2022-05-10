@@ -49,4 +49,5 @@ public:
 	bool dashFlag;
 	bool swingClockWiseFlag;
 	bool swingCounterClockWiseFlag;
+	bool startAiFlag;
 };
