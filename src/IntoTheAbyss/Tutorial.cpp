@@ -73,7 +73,7 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 
 
 	//右プレイヤーか左プレイヤーかでの位置オフセット
-	static const Vec2<float> OFFSET[TEAM_NUM] = { {65,500},{1135,500} };
+	static const Vec2<float> OFFSET[TEAM_NUM] = { {65,530},{1135,530} };
 	//スティックのヘッドの半径オフセット
 	static const float STICK_HEAD_RADIUS_OFFSET = 25.0f * SCALE;
 	//アイコンごとのオフセット
@@ -115,14 +115,14 @@ void Tutorial::Draw(const Vec2<float>& LStickVec, Vec2<float> RStickVec, const b
 
 	//DrawIcon(rightStickInput, RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBase_R);
 	//DrawIcon(rightStickInput, RstickHeadPos + OFFSET[team], iconGraphs.stickHead);
-	if (ACTIVE[PILOT])
-	{
-		DrawIcon(RtriggerPos + OFFSET[team], RButton ? iconGraphs.buttonOn_R : iconGraphs.buttonOff_R);
-		if (pilotLeave)
-		{
-			DrawIcon(RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBasePilot_R);
-		}
-	}
+	//if (ACTIVE[PILOT])
+	//{
+	//	DrawIcon(RtriggerPos + OFFSET[team], RButton ? iconGraphs.buttonOn_R : iconGraphs.buttonOff_R);
+	//	if (pilotLeave)
+	//	{
+	//		DrawIcon(RstickPos + RstickOffset + OFFSET[team], iconGraphs.stickBasePilot_R);
+	//	}
+	//}
 	if (ACTIVE[SWING] && !pilotLeave)
 	{
 		//スウィング

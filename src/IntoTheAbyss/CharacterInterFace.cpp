@@ -238,6 +238,9 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 
 void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 {
+	//パイロットでなくする
+	return;
+
 	if (isPilotDetached == Flg)return;
 	//パイロット切り離しには最低でもスタミナバー１個分必要
 	if (Flg && !staminaGauge->CheckCanAction(1))return;

@@ -20,7 +20,7 @@ class CharacterManager : public Singleton<CharacterManager>
 
 public:
 	//マルチ対戦モード
-	bool vsMode = false;
+	bool vsMode = true;
 	//選択
 	void CharactersSelectInit();
 	void CharactersSelectUpdate();
