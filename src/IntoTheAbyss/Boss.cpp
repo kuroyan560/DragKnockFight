@@ -33,13 +33,7 @@ Boss::Boss() :CharacterInterFace(SCALE)
 	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
 	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
 
-	bossPattern[0] = std::make_unique<BossPatternNormalMove>();
-	bossPattern[1] = std::make_unique<BossPatternAttack>();
-	bossPattern[2] = std::make_unique<BossPatternSwing>();
-
-
 	//パターンに渡すデータの初期化
-	patternData.moveVel = &moveVel;
 	navigationAi.Init(StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()));
 }
 
@@ -53,8 +47,6 @@ void Boss::OnInit()
 	afterSwingDelay = 0;
 	prevIntersectedLine = INTERSECTED_NONE;
 
-	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
-	patternTimer = 0;
 	afterImgageTimer = 0;
 
 	characterAi.Init();
@@ -82,41 +74,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 	// パートナーが振り回し状態だったら更新処理を行わない。
 	if (!(!partner.lock()->GetNowSwing() && !nowSwing)) return;
-
-	for (int i = 0; i < patternData.nearLimmitLine.size(); ++i)
-	{
-		patternData.nearLimmitLine[i].startPos = pos;
-
-		float angle = i * (360.0f / patternData.nearLimmitLine.size());
-		float dir = Angle::ConvertToRadian(angle);
-		float distance = 150.0f;
-		patternData.nearLimmitLine[i].endPos = pos + Vec2<float>(cosf(dir), sinf(dir)) * distance;
-	}
-
-	for (int i = 0; i < patternData.farLimmitLine.size(); ++i)
-	{
-		patternData.farLimmitLine[i].startPos = pos;
-
-		float angle = i * (360.0f / patternData.farLimmitLine.size());
-		float dir = Angle::ConvertToRadian(angle);
-		float distance = 350.0f;
-		patternData.farLimmitLine[i].endPos = pos + Vec2<float>(cosf(dir), sinf(dir)) * distance;
-	}
-
-	if (bossPatternNow != BOSS_PATTERN_NORMALMOVE)
-	{
-		moveVel = { 10.0f,0.0f };
-	}
-
-
-
-	for (int i = 0; i < patternData.bulltData.size(); ++i)
-	{
-		if (patternData.bulltData[i].initFlag)
-		{
-			patternData.bulltData[i].Reset();
-		}
-	}
 
 	// [振り回し中か振り回され中だったら] 更新処理を行わない。　　臨の実装です。
 	bool isSwingNow = this->GetNowSwing() || partner.lock()->GetNowSwing();
@@ -167,11 +124,11 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 	CWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 	CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
-	CharacterAIData::Instance()->cDistance = CWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
+	CharacterAIData::Instance()->swingClockwiseDistance = CWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
 
 	CCWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 	CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
-	CharacterAIData::Instance()->cCDistance = CCWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
+	CharacterAIData::Instance()->swingCounterClockwiseDistance = CCWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
 
 
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
@@ -211,42 +168,6 @@ void Boss::OnDraw()
 		DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
 			TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
 	}
-
-	//レイとの判定確認
-	if (DebugParameter::Instance()->bossDebugData.drawNearRayFlag)
-	{
-		for (int i = 0; i < patternData.nearLimmitLine.size(); ++i)
-		{
-			Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.nearLimmitLine[i].startPos);
-			Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.nearLimmitLine[i].endPos);
-			if (patternData.nearLimmitLine[i].hitFlag)
-			{
-				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 0, 0, 255));
-			}
-			else
-			{
-				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(255, 255, 255, 255));
-			}
-		}
-	}
-
-	if (DebugParameter::Instance()->bossDebugData.drawFarRayFlag)
-	{
-		for (int i = 0; i < patternData.farLimmitLine.size(); ++i)
-		{
-			Vec2<float>drawStartPos = ScrollMgr::Instance()->Affect(patternData.farLimmitLine[i].startPos);
-			Vec2<float>drawEndPos = ScrollMgr::Instance()->Affect(patternData.farLimmitLine[i].endPos);
-			if (patternData.farLimmitLine[i].hitFlag)
-			{
-				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(0, 255, 0, 255));
-			}
-			else
-			{
-				DrawFunc::DrawLine2D(drawStartPos, drawEndPos, Color(0, 0, 255, 255));
-			}
-		}
-	}
-
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
 

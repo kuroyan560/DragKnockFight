@@ -34,8 +34,8 @@ public:
 	bool swingFlag;//U‚è‰ñ‚µ“ü—Í
 	bool dashFlag;//ƒ_ƒbƒVƒ…“ü—Í
 
-	float cDistance;
-	float cCDistance;
+	float swingClockwiseDistance;
+	float swingCounterClockwiseDistance;
 
 	const int EVALUATION_MAX_VALUE = 10;
 
