@@ -19,6 +19,8 @@ class CharacterManager : public Singleton<CharacterManager>
 	std::array<std::shared_ptr<CharacterInterFace>, TEAM_NUM>characters;
 
 public:
+	//マルチ対戦モード
+	bool vsMode = false;
 	//選択
 	void CharactersSelectInit();
 	void CharactersSelectUpdate();
