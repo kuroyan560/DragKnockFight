@@ -21,8 +21,9 @@ NavigationAI::NavigationAI()
 
 static const float BOSS_SIZE = 160.0f;
 
-void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
+void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 {
+
 	SizeData wallMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
 	//座標の設定--------------------------
@@ -104,7 +105,7 @@ void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 	startFlag = false;
 }
 
-void NavigationAI::Update(const Vec2<float>& POS)
+void NavigationAI::Update(const Vec2<float> &POS)
 {
 
 	// ウェイポイントのアイテム保持数を計算する。
@@ -426,7 +427,7 @@ std::vector<WayPointData> NavigationAI::GetShortestRoute()
 
 }
 
-inline const Vec2<int>& NavigationAI::GetMapChipNum(const Vec2<float>& WORLD_POS)
+inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS)
 {
 	//浮動小数点を切り下げる処理
 	Vec2<float> num =
@@ -459,12 +460,12 @@ inline const Vec2<int>& NavigationAI::GetMapChipNum(const Vec2<float>& WORLD_POS
 	return result;
 }
 
-inline bool NavigationAI::DontUse(const Vec2<int>& HANDLE)
+inline bool NavigationAI::DontUse(const Vec2<int> &HANDLE)
 {
 	return HANDLE != Vec2<int>(-1, -1);
 }
 
-void NavigationAI::AStart(const WayPointData& START_POINT, const WayPointData& END_POINT)
+void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &END_POINT)
 {
 	std::vector<std::shared_ptr<WayPointData>>startPoint;//ウェイポイントの探索開始位置
 	std::vector<std::shared_ptr<WayPointData>>nextPoint; //次のウェイポイントの探索開始位置
@@ -667,11 +668,11 @@ void NavigationAI::AStart(const WayPointData& START_POINT, const WayPointData& E
 	shortestRoute = ConvertToShortestRoute2(branchQueue);
 }
 
-void NavigationAI::RegistBranch(const WayPointData& DATA)
+void NavigationAI::RegistBranch(const WayPointData &DATA)
 {
 }
 
-inline bool NavigationAI::CheckQueue(const Vec2<int>& HANDLE)
+inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
 {
 	for (int i = 0; i < queue.size(); ++i)
 	{
@@ -683,7 +684,7 @@ inline bool NavigationAI::CheckQueue(const Vec2<int>& HANDLE)
 	return false;
 }
 
-std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>>& QUEUE)
+std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>> &QUEUE)
 {
 	std::vector<float>sumArray;
 	for (int i = 0; i < QUEUE.size(); ++i)
@@ -824,7 +825,7 @@ std::vector<std::shared_ptr<NavigationAI::QueueData>> NavigationAI::ConvertToSho
 	return result;
 }
 
-Vec2<float> NavigationAI::CaluLine(const Vec2<float>& CENTRAL_POS, int angle)
+Vec2<float> NavigationAI::CaluLine(const Vec2<float> &CENTRAL_POS, int angle)
 {
 	float distance = 0.0f;
 
@@ -880,7 +881,7 @@ Vec2<float> NavigationAI::CaluLine(const Vec2<float>& CENTRAL_POS, int angle)
 	return CENTRAL_POS + lineEndPos * distance;
 }
 
-bool NavigationAI::ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA)
+bool NavigationAI::ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<float> &SEARCH_DIR, const SizeData &CHIP_DATA)
 {
 
 	// 指定された方向に線分を伸ばす。
@@ -908,7 +909,7 @@ bool NavigationAI::ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec
 
 }
 
-float NavigationAI::SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA)
+float NavigationAI::SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float> &SEARCH_DIR, const SizeData &CHIP_DATA)
 {
 	int searchCounter = 0;
 	Vec2<float> searchIndex = { ((float)DATA->handle.x * BOSS_SIZE) / MAP_CHIP_SIZE, ((float)DATA->handle.y * BOSS_SIZE) / MAP_CHIP_SIZE };
@@ -997,7 +998,7 @@ void NavigationAI::CheckNumberOfItemHeldCount()
 
 }
 
-std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>>& QUEUE)
+std::vector<std::shared_ptr<WayPointData>> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>> &QUEUE)
 {
 	std::vector<std::vector<std::shared_ptr<WayPointData>>> route;
 

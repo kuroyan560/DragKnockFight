@@ -331,11 +331,6 @@ void GoToTheField::Update()
 	}
 
 
-	if (CharacterManager::Instance()->Right()->GetNowSwing())
-	{
-		swingCoolTime = 0;
-	}
-
 	//U‚è‰ñ‚µ‚½Û‚Éˆê’è‹——£ˆÈã—£‚ê‚ê‚é‚©
 	const float CERTAIN_DISTANCE = 100.0f;
 	bool haveAdvantageToSwingClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->cDistance;
@@ -355,10 +350,12 @@ void GoToTheField::Update()
 		if (CharacterAIData::Instance()->cCDistance < CharacterAIData::Instance()->cDistance)
 		{
 			CharacterAIOrder::Instance()->swingClockWiseFlag = true;
+			swingCoolTime = 0;
 		}
 		else
 		{
 			CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
+			swingCoolTime = 0;
 		}
 	}
 

@@ -20,13 +20,12 @@ void CharacterAI::Init()
 		strategyArray[STRATEGY_GO_TO_THE_FIELD] = std::make_unique<GoToTheField>();
 		strategyArray[STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE] = std::make_unique<AcquireASuperiorityGauge>();
 		//í—ª‘w‚Ì¶¬--------------------------
-
-		startFlag = false;
 	}
 	initFlag = true;
 	useAiFlag = true;
 	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
 	strategyArray[strategyOfChoice]->Init();
+	startFlag = false;
 }
 
 void CharacterAI::Finalize()

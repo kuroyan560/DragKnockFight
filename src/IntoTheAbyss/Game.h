@@ -119,10 +119,6 @@ class Game
 	//登場演出を行うかのフラグ
 	bool practiceMode = true;
 public:
-	//テスト用
-	NavigationAI navi;
-	CharacterAI chara;
-
 	HomeBase playerHomeBase, enemyHomeBase;
 
 	array<int, 2> debugStageData = { 0,0 };//デバック用のステージと部屋番号

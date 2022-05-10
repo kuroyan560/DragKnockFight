@@ -294,13 +294,6 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.initGameFlag = true;
 		roundChangeEffect.drawFightFlag = true;
 	}
-
-	
-	chara.Finalize();
-	if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
-	{
-		chara.Init();
-	}
 }
 
 Game::Game()
@@ -334,8 +327,6 @@ Game::Game()
 
 	GameTimer::Instance()->Init(120);
 	ScoreManager::Instance()->Init();
-
-	navi.Init(mapData);
 }
 
 void Game::Init(const bool& PracticeMode)
@@ -576,18 +567,10 @@ void Game::Update(const bool& Loop)
 	}
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
-		chara.Init();
 	}
-	chara.shortestData = navi.GetShortestRoute();
-
-	navi.startPoint = chara.startPoint;
-	navi.endPoint = chara.endPoint;
-	navi.startFlag = chara.startFlag;
-	navi.Update({});
 
 	if (gameStartFlag)
 	{
-		chara.Update();
 	}
 
 	CharacterAIData::Instance()->nowPos = CharacterManager::Instance()->Right()->pos;
@@ -953,9 +936,6 @@ void Game::Draw()
 		Vec2<float>rightDownPos = *enemyHomeBase.hitBox.center + enemyHomeBase.hitBox.size / 2.0f;
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
-
-	navi.Draw();
-	chara.Draw();
 }
 
 void Game::Scramble()

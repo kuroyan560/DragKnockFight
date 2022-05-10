@@ -337,6 +337,5 @@ private:
 	float SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
 
 	void CheckNumberOfItemHeldCount();
-
 };
 
