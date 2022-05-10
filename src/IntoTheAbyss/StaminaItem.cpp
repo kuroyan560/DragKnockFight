@@ -142,12 +142,19 @@ void StaminaItem::Draw()
 
 	/*===== •`‰æˆ— =====*/
 
+	Vec2<float> drawPos = ScrollMgr::Instance()->Affect(pos);
+
+	// ‰æ–ÊŠO‚¾‚Á‚½‚ç•`‰æ‚µ‚È‚¢B
+	Vec2<int> windowSize = WinApp::Instance()->GetWinSize();
+	if (drawPos.x < -50 || windowSize.x + 50 < drawPos.x) return;
+	if (drawPos.y < -50 || windowSize.y + 50 < drawPos.y) return;
+
 	//DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(pos), DRAW_RADIUS * Camera::Instance()->zoom, itemColor, isAcquired);
 	const float extDiffer = isAcquired ? 1.0f : 0.75f;
 	const Vec2<float>extRate = { Camera::Instance()->zoom * extDiffer,Camera::Instance()->zoom * extDiffer };
 	static const float ALPHA_MIN = 0.6f;
 	const float alpha = isAcquired ? 1.0f : (sin(flashRad) * (1.0f - ALPHA_MIN) + ALPHA_MIN);
-	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), extRate, 0.0f, TexHandleMgr::GetTexBuffer(graph), Color(1.0f, 1.0f, 1.0f, alpha));
+	DrawFunc::DrawRotaGraph2D(drawPos, extRate, 0.0f, TexHandleMgr::GetTexBuffer(graph), Color(1.0f, 1.0f, 1.0f, alpha));
 
 }
 
