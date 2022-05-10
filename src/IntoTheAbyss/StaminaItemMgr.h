@@ -18,6 +18,7 @@ private:
 
 	int sponeTimer = 0;
 	const int SPONE_TIMER = 60;	// アイテムが自動スポーンするタイマー
+	const int SPONE_COUNT = 3;	// 一回のスポーンでアイテムがすぽーんする数
 
 	const int GENERATE_CRASH = 5;		// クラッシュ時に生成するアイテム
 	const int ADD_GENERATE_CRASH = 10;	// クラッシュ時に生成するアイテム

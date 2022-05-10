@@ -406,6 +406,11 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	}
 
+	// 相手が振り回していたら、こちらの照準を消す。
+	if (partner.lock()->GetNowSwing() || 0 < stanTimer || 0 < damageTimer) {
+		CWSwingSegmentMgr.Init();
+		CCWSwingSegmentMgr.Init();
+	}
 
 	//スタン状態更新
 	if (stanTimer)

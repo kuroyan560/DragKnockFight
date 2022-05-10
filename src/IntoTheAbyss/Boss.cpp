@@ -196,12 +196,10 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	CWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 	CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
 	CharacterAIData::Instance()->cDistance = CWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
-	CWSwingSegmentMgr.Init();
 
 	CCWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 	CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
 	CharacterAIData::Instance()->cCDistance = CCWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
-	CCWSwingSegmentMgr.Init();
 
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
 
