@@ -22,11 +22,11 @@ void CharacterAI::Init()
 		//í—ª‘w‚Ì¶¬--------------------------
 
 		startFlag = false;
-		strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
-		strategyArray[strategyOfChoice]->Init();
 	}
 	initFlag = true;
 	useAiFlag = true;
+	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
+	strategyArray[strategyOfChoice]->Init();
 }
 
 void CharacterAI::Finalize()
