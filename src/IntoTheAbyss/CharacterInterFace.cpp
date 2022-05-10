@@ -118,6 +118,7 @@ void CharacterInterFace::Crash(const Vec2<float>& MyVec)
 	stagingDevice.StopSpin();
 
 	OnCrash();
+	partner.lock()->OnPartnerCrash();
 
 	if (stanTimer)return;	//スタン中ならダメージによる顔変更なし
 	static const int DAMAGE_TOTAL_TIME = 90;
