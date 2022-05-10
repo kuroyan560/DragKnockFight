@@ -25,6 +25,7 @@ public:
 	CharacterAI();
 
 	void Init();
+	void Finalize();
 	void Update();
 	void Draw();
 
@@ -40,4 +41,5 @@ public:
 
 	int startTimer;
 	bool initFlag;
+	bool useAiFlag;
 };

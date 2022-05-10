@@ -118,6 +118,14 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	// [振り回し中か振り回され中だったら] 更新処理を行わない。　　臨の実装です。
 	bool isSwingNow = this->GetNowSwing() || partner.lock()->GetNowSwing();
 
+
+	if (CharacterManager::Instance()->Right()->GetNowBreak())
+	{
+		CWSwingSegmentMgr.Init();
+		CCWSwingSegmentMgr.Init();
+	}
+
+
 	// [硬直中] [スタン演出中] は動かさない
 	if (0 < afterSwingDelay || StunEffect::Instance()->isActive) {
 		// 何もしない。
@@ -196,12 +204,11 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	CWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 	CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
 	CharacterAIData::Instance()->cDistance = CWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
-	CWSwingSegmentMgr.Init();
 
 	CCWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 	CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
 	CharacterAIData::Instance()->cCDistance = CCWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
-	CCWSwingSegmentMgr.Init();
+
 
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
 

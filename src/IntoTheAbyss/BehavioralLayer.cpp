@@ -110,7 +110,6 @@ const WayPointData &SearchWayPoint::Update()
 			}
 		}
 	}
-
 	return *wayPoints[handle.y][handle.x];
 }
 

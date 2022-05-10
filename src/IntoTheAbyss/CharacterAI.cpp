@@ -8,20 +8,30 @@ CharacterAI::CharacterAI()
 {
 	startTimer = 0;
 	initFlag = false;
+	useAiFlag = false;
 }
 
 void CharacterAI::Init()
 {
-	//戦略層の生成--------------------------
-	strategyArray[STRATEGY_RESTORE_STAMINA] = std::make_unique<RestoreStamina>();
-	strategyArray[STRATEGY_GO_TO_THE_FIELD] = std::make_unique<GoToTheField>();
-	strategyArray[STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE] = std::make_unique<AcquireASuperiorityGauge>();
-	//戦略層の生成--------------------------
+	if (!initFlag)
+	{
+		//戦略層の生成--------------------------
+		strategyArray[STRATEGY_RESTORE_STAMINA] = std::make_unique<RestoreStamina>();
+		strategyArray[STRATEGY_GO_TO_THE_FIELD] = std::make_unique<GoToTheField>();
+		strategyArray[STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE] = std::make_unique<AcquireASuperiorityGauge>();
+		//戦略層の生成--------------------------
 
-	startFlag = false;
+		startFlag = false;
+	}
+	initFlag = true;
+	useAiFlag = true;
 	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
 	strategyArray[strategyOfChoice]->Init();
-	initFlag = true;
+}
+
+void CharacterAI::Finalize()
+{
+	useAiFlag = false;
 }
 
 void CharacterAI::Update()
@@ -56,7 +66,7 @@ void CharacterAI::Update()
 	CharacterAIData::Instance()->distance = CharacterManager::Instance()->Left()->pos.Distance(CharacterManager::Instance()->Right()->pos);
 	//キャラクターAIに必要なデータ集め--------------------------
 
-	if (initFlag)
+	if (useAiFlag)
 	{
 		//意思決定--------------------------
 		//戦略が成功又は失敗した際

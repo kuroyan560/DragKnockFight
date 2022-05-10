@@ -16,7 +16,6 @@ class StaminaMgr;
 
 class CharacterInterFace
 {
-
 private:
 	void SwingUpdate();
 	void Crash(const Vec2<float>& MyVec);
@@ -161,6 +160,9 @@ public:
 
 	// 前フレームの座標を保存。
 	inline void SavePrevFramePos() { prevPos = pos; }
+
+	// 振り回しの予測線を消す。
+	void InitSwingLineSegmetn();
 
 public:
 	static const int LINE_LENGTH = 150;

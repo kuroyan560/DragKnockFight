@@ -295,6 +295,12 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
+	
+	chara.Finalize();
+	if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
+	{
+		chara.Init();
+	}
 }
 
 Game::Game()
@@ -348,11 +354,6 @@ void Game::Init(const bool& PracticeMode)
 	CrashEffectMgr::Instance()->Init();
 
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
-
-	if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
-	{
-		chara.Init();
-	}
 }
 
 void Game::Update(const bool& Loop)
@@ -437,6 +438,11 @@ void Game::Update(const bool& Loop)
 		gameStartFlag = false;
 
 		screenEdgeEffect.LeftPlayerWin(120);
+
+		// 両キャラの予測線を消す。
+		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
+		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
+
 	}
 
 	//敵陣地とプレイヤーの判定
@@ -453,6 +459,10 @@ void Game::Update(const bool& Loop)
 		playerHitColor = Color(255, 0, 0, 255);
 
 		screenEdgeEffect.RightPlayerWin(120);
+
+		// 両キャラの予測線を消す。
+		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
+		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
 	}
 
 	//ラウンド終了演出開始
