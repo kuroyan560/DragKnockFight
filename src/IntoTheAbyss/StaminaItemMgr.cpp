@@ -113,9 +113,14 @@ void StaminaItemMgr::Update(const Vec2<float>& LeftUp, const Vec2<float>& RightD
 	++sponeTimer;
 	if (SPONE_TIMER <= sponeTimer) {
 
-		Vec2<float> randomSponePos = { KuroFunc::GetRand(LeftUp.x, RightDown.x), KuroFunc::GetRand(LeftUp.y,RightDown.y) };
+		// 規定の数アイテムをすぽーんさせる。
+		for (int generateCount = 0; generateCount < SPONE_COUNT; ++generateCount) {
 
-		GenerateSpone(randomSponePos);
+			Vec2<float> randomSponePos = { KuroFunc::GetRand(LeftUp.x, RightDown.x), KuroFunc::GetRand(LeftUp.y,RightDown.y) };
+
+			GenerateSpone(randomSponePos);
+
+		}
 
 		sponeTimer = 0;
 
@@ -157,8 +162,8 @@ int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, co
 
 	if (!SE_INIT)
 	{
-		SE[0] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/itemGet_0.wav",SE_VOL);
-		SE[1] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/itemGet_1.wav",SE_VOL);
+		SE[0] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/itemGet_0.wav", SE_VOL);
+		SE[1] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/itemGet_1.wav", SE_VOL);
 
 		SE_INIT = true;
 	}
