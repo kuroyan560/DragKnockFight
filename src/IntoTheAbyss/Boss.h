@@ -11,6 +11,9 @@ using namespace std;
 
 #include"CharacterInterFace.h"
 
+#include"NavigationAI.h"
+#include"CharacterAI.h"
+
 // プレイヤーと引っ張り合うボスクラス
 class Boss : public CharacterInterFace
 {

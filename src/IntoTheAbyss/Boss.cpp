@@ -136,55 +136,12 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	else if (GetCanMove()) {
 
 		//ボスのAI-----------------------
-		++patternTimer;
-		//次の状態選択
-		if (120 <= patternTimer)
-		{
-			Vec2<float> dir = GetPartnerPos() - pos;
-			dir.Normalize();
 
-			while (1)
-			{
-				int random = KuroFunc::GetRand(BOSS_PATTERN_MAX - 1);
-				//振り回しの条件がそろっていない時は振り回しをさせない
-				if (fabs(dir.y) <= 0.3f && random == BOSS_PATTERN_SWING)
-				{
-					continue;
-				}
-				bossPatternNow = static_cast<E_BossPattern>(random);
-				break;
-			}
-			patternTimer = 0;
-		}
+
+
+
 		//ボスのAI-----------------------
-		bossPatternNow = BOSS_PATTERN_NORMALMOVE;
-
-		/*if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_P, "Boss Swing", "DIK_P")) {
-
-			bossPatternNow = static_cast<E_BossPattern>(BOSS_PATTERN_SWING);
-			patternTimer = 0;
-			bossPattern[bossPatternNow]->Init();
-
-		}*/
-
-		//ボスの挙動
-		if (bossPatternNow != oldBossPattern)
-		{
-			bossPattern[bossPatternNow]->Init();
-		}
-		bossPattern[bossPatternNow]->Update(&patternData);
-		oldBossPattern = bossPatternNow;
-
-		//ボスの弾
-		for (int i = 0; i < patternData.bulltData.size(); ++i)
-		{
-			if (patternData.bulltData[i].initFlag)
-			{
-				Shot(pos, patternData.bulltData[i].dir, patternData.bulltData[i].speed);
-			}
-		}
 	}
-	DebugParameter::Instance()->bossDebugData.bossNowStatus = static_cast<E_BossPattern>(bossPatternNow);
 
 
 	//振り回し命令
