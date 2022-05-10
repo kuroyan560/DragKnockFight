@@ -161,6 +161,9 @@ public:
 	// 前フレームの座標を保存。
 	inline void SavePrevFramePos() { prevPos = pos; }
 
+	// 振り回しの予測線を消す。
+	void InitSwingLineSegmetn();
+
 public:
 	static const int LINE_LENGTH = 150;
 	static const int ADD_LINE_LENGTH_VEL = 100;	// 移動量に応じて伸びるaddLineLengthの最大量

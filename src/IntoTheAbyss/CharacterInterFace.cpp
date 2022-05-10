@@ -309,6 +309,12 @@ void CharacterInterFace::Appear()
 	}
 }
 
+void CharacterInterFace::InitSwingLineSegmetn()
+{
+	CWSwingSegmentMgr.Init();
+	CCWSwingSegmentMgr.Init();
+}
+
 void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear)
 {
 	if (pilotGraph != -1)

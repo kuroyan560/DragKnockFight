@@ -439,6 +439,11 @@ void Game::Update(const bool& Loop)
 		gameStartFlag = false;
 
 		screenEdgeEffect.LeftPlayerWin(120);
+
+		// 両キャラの予測線を消す。
+		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
+		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
+
 	}
 
 	//敵陣地とプレイヤーの判定
@@ -455,6 +460,10 @@ void Game::Update(const bool& Loop)
 		playerHitColor = Color(255, 0, 0, 255);
 
 		screenEdgeEffect.RightPlayerWin(120);
+
+		// 両キャラの予測線を消す。
+		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
+		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
 	}
 
 	//ラウンド終了演出開始
