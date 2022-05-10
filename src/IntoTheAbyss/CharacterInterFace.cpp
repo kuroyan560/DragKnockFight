@@ -1125,6 +1125,7 @@ void CharacterInterFace::FinishSwing()
 	partner.lock()->OnSwingedFinish();
 	CWSwingSegmentMgr.Init();
 	CCWSwingSegmentMgr.Init();
+	addSwingAngle = 0;
 
 }
 
