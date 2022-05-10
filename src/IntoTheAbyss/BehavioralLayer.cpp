@@ -99,9 +99,9 @@ const WayPointData &SearchWayPoint::Update()
 	{
 		for (int x = 0; x < wayPoints[y].size(); ++x)
 		{
-			if (wayPoints[y][x]->handle != Vec2<int>(-1, -1))
+			if (wayPoints[y][x].handle != Vec2<int>(-1, -1))
 			{
-				float distance = startPos.Distance(wayPoints[y][x]->pos);
+				float distance = startPos.Distance(wayPoints[y][x].pos);
 				if (distance < minDistance)
 				{
 					minDistance = distance;
@@ -110,7 +110,7 @@ const WayPointData &SearchWayPoint::Update()
 			}
 		}
 	}
-	return *wayPoints[handle.y][handle.x];
+	return wayPoints[handle.y][handle.x];
 }
 
 AiResult SearchWayPoint::CurrentProgress()
@@ -135,7 +135,7 @@ const WayPointData &SearchingToNotGetStuck::Update(const Vec2<float> START_POS)
 	//‰º•ûŒü‚Ì’Tõ
 	while (true)
 	{
-		WayPointData check = *wayPoints[handle.y + downIndex][handle.x];
+		WayPointData check = wayPoints[handle.y + downIndex][handle.x];
 		//•Ç‚È‚ç’Tõ‚µ‚È‚¢
 		if (check.isWall)
 		{
@@ -158,7 +158,7 @@ const WayPointData &SearchingToNotGetStuck::Update(const Vec2<float> START_POS)
 	//ã•ûŒü‚Ì’Tõ
 	while (true)
 	{
-		WayPointData check = *wayPoints[handle.y + topIndex][handle.x];
+		WayPointData check = wayPoints[handle.y + topIndex][handle.x];
 		//•Ç‚È‚ç’Tõ‚µ‚È‚¢
 		if (check.isWall)
 		{

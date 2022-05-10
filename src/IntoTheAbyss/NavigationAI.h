@@ -93,7 +93,7 @@ public:
 	bool resetSearchFlag;
 
 
-	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;//ウェイポイントの配列
+	std::vector<std::vector<WayPointData>> wayPoints;//ウェイポイントの配列
 	int wayPointXCount;
 	int wayPointYCount;
 
@@ -127,7 +127,7 @@ private:
 	/// </summary>
 	/// <param name="HANDLE">ウェイポイントを繋げる為の判定</param>
 	/// <param name="DATA">リンク付けする対象</param>
-	inline void RegistHandle(std::shared_ptr<WayPointData> DATA);
+	inline void RegistHandle(WayPointData DATA);
 
 	/// <summary>
 	/// 使用しているウェイポイントかどうか
@@ -142,7 +142,7 @@ private:
 	/// <param name="START_POS">始点</param>
 	/// <param name="END_POS">終点</param>
 	/// <returns>true...当たった、false...当たっていない</returns>
-	bool CheckMapChipWallAndRay(const Vec2<float>& START_POS, const Vec2<float>& END_POS)
+	bool CheckMapChipWallAndRay(const Vec2<float> &START_POS, const Vec2<float> &END_POS)
 	{
 
 		// マップチップの情報。
@@ -218,11 +218,11 @@ private:
 
 		return false;
 
-	}
+	};
 
 
 	//A*-------------------------------
-	std::vector<std::shared_ptr<QueueData>>queue;	//最短ルートの候補を纏めた配列
+	std::vector<QueueData>queue;	//最短ルートの候補を纏めた配列
 
 	float routeRate;	//ランダムでルートを取った際の数字
 	bool initRouteFlag;	//ゴール地点が変わった際にルート候補からランダムで選択する
@@ -246,9 +246,7 @@ private:
 	/// </summary>
 	/// <param name="QUEUE">最短ルート候補</param>
 	/// <returns>スタートからゴールまでの最短ルート</returns>
-	std::vector<std::shared_ptr<QueueData>> ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>>& QUEUE);
-
-	std::vector<std::shared_ptr<WayPointData>> ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>>& QUEUE);
+	std::vector<WayPointData> ConvertToShortestRoute2(const std::vector<std::vector<WayPointData>>& QUEUE);
 
 
 	void RegistBranch(const WayPointData& DATA);
@@ -257,8 +255,8 @@ private:
 	WayPointData prevStartPoint;//探索する際の前フレームのスタート地点
 	WayPointData prevEndPoint;	//探索する際の前フレームのゴール地点
 
-	std::vector<std::vector<std::shared_ptr<WayPointData>>> branchQueue;//探索中のルートを保存する
-	std::vector<std::shared_ptr<WayPointData>> shortestRoute;
+	std::vector<std::vector<WayPointData>> branchQueue;//探索中のルートを保存する
+	std::vector<WayPointData> shortestRoute;
 	std::vector<bool> reachToGoalFlag;
 
 	//デバック--------------------------
@@ -325,7 +323,7 @@ private:
 	/// <param name="SEARCH_OFFSET"> 検索するマップチップの位置 (DATAを基準としてどこを検索するかの値) </param>
 	/// <param name="CHIP_DATA"> マップチップのブロックのIDを取得して壁判定するためのデータ </param>
 	/// <returns> 繋げられたかが返される。 繋げる処理はこの関数の内部にある。 </returns>
-	bool ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
+	bool ConnectWayPoint(WayPointData DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
 
 	/// <summary>
 	/// ウェイポイントから壁までの距離を計算する処理
@@ -334,7 +332,7 @@ private:
 	/// <param name="SEARCH_DIR"> 検索する方向 </param>
 	/// <param name="CHIP_DATA"> マップチップのブロックのIDを取得して壁判定するためのデータ </param>
 	/// <returns> 検索した方向での壁までの距離を返す。 </returns>
-	float SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
+	float SearchWall(WayPointData DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
 
 	void CheckNumberOfItemHeldCount();
 };

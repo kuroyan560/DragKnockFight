@@ -67,7 +67,7 @@ public:
 	/// <returns>FAIL...é∏îs,INPROCESS...é¿çsíÜ,SUCCESS...ê¨å˜</returns>
 	AiResult CurrentProgress();
 private:
-	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
+	std::vector<std::vector<WayPointData>> wayPoints;
 	Vec2<float>startPos;
 	
 };
@@ -89,7 +89,7 @@ public:
 	AiResult CurrentProgress();
 private:
 	SearchWayPoint search;
-	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
+	std::vector<std::vector<WayPointData>> wayPoints;
 };
 
 /// <summary>

@@ -115,11 +115,11 @@ void MoveToOwnGround::Update()
 
 		//w’n‘¤‚ÌYÀ•Wƒ‰ƒ“ƒ_ƒ€‚ÅŽæ‚é
 		int goalYPoint = KuroFunc::GetRand(0, CharacterAIData::Instance()->wayPoints.size() - 1);
-		while (CharacterAIData::Instance()->wayPoints[goalYPoint][goalXPoint]->isWall)
+		while (CharacterAIData::Instance()->wayPoints[goalYPoint][goalXPoint].isWall)
 		{
 			goalYPoint = KuroFunc::GetRand(0, CharacterAIData::Instance()->wayPoints.size() - 1);
 		}
-		endPoint = *CharacterAIData::Instance()->wayPoints[goalYPoint][goalXPoint];
+		endPoint = CharacterAIData::Instance()->wayPoints[goalYPoint][goalXPoint];
 		timer = 1;
 	}
 	++timer;

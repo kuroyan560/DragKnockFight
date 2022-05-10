@@ -27,7 +27,7 @@ class CharacterAIData :public Singleton<CharacterAIData>
 {
 public:
 	CommonParameter playerData, bossData;
-	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
+	std::vector<std::vector<WayPointData>> wayPoints;
 	float distance;	//プレイヤーと敵との距離
 	float position;	//現在地
 
