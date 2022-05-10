@@ -464,10 +464,6 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 	Vec2<int>sHandle(START_POINT.handle);
 
 	nextPoint.push_back(WayPointData());
-	nextPoint[0] = wayPoints[sHandle.y][sHandle.x];
-	searchMap.clear();
-	queue.clear();
-	branchQueue.clear();
 	bool failFlag = false;
 
 	//最初のブランチを作る
@@ -476,6 +472,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 	branchQueue[0][0] = wayPoints[sHandle.y][sHandle.x];
 	branchQueue[0][0].branchHandle = 0;
 	wayPoints[sHandle.y][sHandle.x].branchHandle = 0;
+	nextPoint[0] = wayPoints[sHandle.y][sHandle.x];
 
 	if (START_POINT.handle == END_POINT.handle || START_POINT.isWall || END_POINT.isWall)
 	{
@@ -493,8 +490,8 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 			nextPoint.pop_back();
 		}
 
-
-		searchMap.push_back({});
+		std::vector<SearchMapData>tmp;
+		//searchMap.push_back(tmp);
 		//現在追跡中のルート分探索
 		for (int startPointIndex = 0; startPointIndex < startPoint.size(); ++startPointIndex)
 		{
@@ -513,12 +510,23 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 					continue;
 				}
 
-				int layerArrayNum = searchMap.size() - 1;
-				int nowHandleArrayNum = searchMap[layerArrayNum].size();
+				//int layerArrayNum = searchMap.size() - 1;
+				//int nowHandleArrayNum = searchMap[layerArrayNum].size() - 1;
 				//探索していなかったらデバック情報を追加する
 				if (!CheckQueue(handle))
 				{
-					searchMap[layerArrayNum].push_back(SearchMapData(handle, Color(0, 255, 0, 255)));
+					//if (nowHandleArrayNum != -1)
+					{
+						//searchMap[layerArrayNum].push_back(SearchMapData());
+						//searchMap[layerArrayNum][nowHandleArrayNum].handle = handle;
+						//searchMap[layerArrayNum][nowHandleArrayNum].color = Color(0, 255, 0, 255);
+					}
+					//else
+					{
+						//searchMap[layerArrayNum].push_back(SearchMapData());
+						//searchMap[layerArrayNum][0].handle = handle;
+						//searchMap[layerArrayNum][0].color = Color(0, 255, 0, 255);
+					}
 
 					//現在地よりヒューリスティック推定値が小さいしてないならスタックする
 					if (nextHeuristicValue < nowHeuristicValue)
@@ -530,7 +538,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 							queue.push_back(QueueData(startPoint[startPointIndex].handle, nowHeuristicValue));
 						}
 
-						searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
+						//searchMap[layerArrayNum][nowHandleArrayNum].color = Color(223, 144, 53, 255);
 						//パス数の記録
 						wayPoints[handle.y][handle.x].passNum = startPoint[startPointIndex].passNum + 1;
 						//キューにはハンドルと現在地からゴールまでの距離(ヒューリスティック推定値)をスタックする
@@ -557,6 +565,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 								++wayPoints[startHandle.y][startHandle.x].branchReferenceCount;
 
 								branchQueue[branchHandle].push_back(WayPointData());
+								//疑惑
 								branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 							}
 							//二回以上探索されたら別のブランチを作成し、今までのルートを渡し追加する
@@ -570,6 +579,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 								int branchHandle = wayPoints[startHandle.y][startHandle.x].branchHandle;
 								//既に別のウェイポイントが追加されているので最後の場所に上書きする
 								branchQueue[newbranchHandle] = branchQueue[branchHandle];
+								//疑惑
 								branchQueue[newbranchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 							}
 						}
@@ -578,6 +588,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 						{
 							int branchHandle = wayPoints[startHandle.y][startHandle.x].branchHandle;
 							branchQueue[branchHandle].push_back(WayPointData());
+							//疑惑
 							branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 						}
 					}
@@ -598,6 +609,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 							++wayPoints[startHandle.y][startHandle.x].branchReferenceCount;
 
 							branchQueue[branchHandle].push_back(WayPointData());
+							//疑惑
 							branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 						}
 						//二回以上探索されたら別のブランチを作成し、今までのルートを渡し追加する
@@ -611,6 +623,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 							int branchHandle = wayPoints[startHandle.y][startHandle.x].branchHandle;
 							//既に別のウェイポイントが追加されているので最後の場所に上書きする
 							branchQueue[newbranchHandle] = branchQueue[branchHandle];
+							//疑惑
 							branchQueue[newbranchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 						}
 					}
@@ -657,6 +670,12 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 	//今までの候補から最短ルートを作る
 	//queue = ConvertToShortestRoute(queue);
 	shortestRoute = ConvertToShortestRoute2(branchQueue);
+	//searchMap.clear();
+	//searchMap.shrink_to_fit();
+	queue.clear();
+	queue.shrink_to_fit();
+	branchQueue.clear();
+	branchQueue.shrink_to_fit();
 }
 
 void NavigationAI::RegistBranch(const WayPointData &DATA)
@@ -860,7 +879,8 @@ std::vector<WayPointData> NavigationAI::ConvertToShortestRoute2(const std::vecto
 	//スタート地点からゴール地点まで繋がっているルートを探す
 	for (int branch = 0; branch < QUEUE.size(); ++branch)
 	{
-		if (QUEUE[branch][0].handle == startPoint.handle &&
+		if (QUEUE[branch].size() != 0 &&
+			QUEUE[branch][0].handle == startPoint.handle &&
 			QUEUE[branch][QUEUE[branch].size() - 1].handle == endPoint.handle)
 		{
 			route.push_back(QUEUE[branch]);
