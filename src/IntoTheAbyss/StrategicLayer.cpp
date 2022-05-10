@@ -310,6 +310,8 @@ void GoToTheField::Init()
 	startFlag = false;
 	goToTheFieldFlag = true;
 	swingCoolTime = 0;
+	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
+	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
 }
 
 void GoToTheField::Update()
@@ -490,6 +492,8 @@ void AcquireASuperiorityGauge::Init()
 	dontCrashFlag = false;
 
 	swingCoolTime = 0;
+	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
+	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
 }
 
 void AcquireASuperiorityGauge::Update()
