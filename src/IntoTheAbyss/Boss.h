@@ -47,6 +47,10 @@ public:
 	//ボスのパターン制御-----------------------
 
 
+	NavigationAI navigationAi;
+	CharacterAI characterAi;
+
+
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
 public:

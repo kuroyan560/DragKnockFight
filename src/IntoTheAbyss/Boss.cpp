@@ -40,6 +40,7 @@ Boss::Boss() :CharacterInterFace(SCALE)
 
 	//パターンに渡すデータの初期化
 	patternData.moveVel = &moveVel;
+	navigationAi.Init(StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()));
 }
 
 void Boss::OnInit()
@@ -55,6 +56,8 @@ void Boss::OnInit()
 	bossPatternNow = BOSS_PATTERN_NORMALMOVE;
 	patternTimer = 0;
 	afterImgageTimer = 0;
+
+	characterAi.Init();
 }
 
 #include"Camera.h"
@@ -136,13 +139,17 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	else if (GetCanMove()) {
 
 		//ボスのAI-----------------------
+		characterAi.shortestData = navigationAi.GetShortestRoute();
 
+		navigationAi.startPoint = characterAi.startPoint;
+		navigationAi.endPoint = characterAi.endPoint;
+		navigationAi.startFlag = characterAi.startFlag;
 
-
+		navigationAi.Update({});
+		characterAi.Update();
 
 		//ボスのAI-----------------------
 	}
-
 
 	//振り回し命令
 	if (CharacterAIOrder::Instance()->swingClockWiseFlag)
@@ -177,12 +184,12 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	//ダッシュの残像
 	if (afterImgageTimer)
 	{
-		AfterImageMgr::Instance()->Generate(pos, Vec2<float>(1.0f, 1.0f) *ScrollMgr::Instance()->zoom, 0.0f, graphHandle[FRONT], GetTeamColor());
+		AfterImageMgr::Instance()->Generate(pos, Vec2<float>(1.0f, 1.0f) * ScrollMgr::Instance()->zoom, 0.0f, graphHandle[FRONT], GetTeamColor());
 		afterImgageTimer--;
 	}
 
 	// 移動量に関する変数をここで全てvelに代入する。
-	vel = moveVel;
+	vel = CharacterAIOrder::Instance()->vel;
 
 }
 
@@ -242,6 +249,10 @@ void Boss::OnDraw()
 
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
+
+	//navigationAi.Draw();
+	//characterAi.Draw();
+
 }
 
 void Boss::Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed)
