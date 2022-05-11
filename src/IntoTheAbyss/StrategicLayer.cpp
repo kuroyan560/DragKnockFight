@@ -333,8 +333,8 @@ void GoToTheField::Update()
 
 	//êUÇËâÒÇµÇΩç€Ç…àÍíËãóó£à»è„ó£ÇÍÇÍÇÈÇ©
 	const float CERTAIN_DISTANCE = 100.0f;
-	bool haveAdvantageToSwingClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->cDistance;
-	bool haveAdvantageToSwingCClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->cCDistance;
+	bool haveAdvantageToSwingClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->swingClockwiseDistance;
+	bool haveAdvantageToSwingCClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->swingCounterClockwiseDistance;
 
 	//ÉXÉ^É~ÉiÇ™ëΩÇ¢
 	const float STAMINA_VALUE = 0.5f;
@@ -347,7 +347,7 @@ void GoToTheField::Update()
 	if (useSwingFlag && timeToSiwngFlag && (haveAdvantageToSwingClockWiseFlag || haveAdvantageToSwingCClockWiseFlag))
 	{
 		//ìGÇêUÇËâÒÇµÇ≈à⁄ìÆÇ≥ÇπÇÈãóó£Ç™ëÂÇ´Ç¢ï˚Ç…êUÇËâÒÇ∑
-		if (CharacterAIData::Instance()->cCDistance < CharacterAIData::Instance()->cDistance)
+		if (CharacterAIData::Instance()->swingCounterClockwiseDistance < CharacterAIData::Instance()->swingClockwiseDistance)
 		{
 			CharacterAIOrder::Instance()->swingClockWiseFlag = true;
 			swingCoolTime = 0;

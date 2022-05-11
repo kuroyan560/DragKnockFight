@@ -27,15 +27,15 @@ class CharacterAIData :public Singleton<CharacterAIData>
 {
 public:
 	CommonParameter playerData, bossData;
-	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;
+	std::vector<std::vector<WayPointData>> wayPoints;
 	float distance;	//プレイヤーと敵との距離
 	float position;	//現在地
 
 	bool swingFlag;//振り回し入力
 	bool dashFlag;//ダッシュ入力
 
-	float cDistance;
-	float cCDistance;
+	float swingClockwiseDistance;
+	float swingCounterClockwiseDistance;
 
 	const int EVALUATION_MAX_VALUE = 10;
 

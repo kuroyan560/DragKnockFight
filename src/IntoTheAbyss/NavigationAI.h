@@ -34,7 +34,7 @@ struct WayPointData
 	{
 	}
 
-	void RegistHandle(const Vec2<int>& HANDLE)
+	void RegistHandle(const Vec2<int> &HANDLE)
 	{
 		for (int i = 0; i < wayPointHandles.size(); ++i)
 		{
@@ -50,9 +50,46 @@ struct WayPointData
 		{
 			return;
 		}
-
 		wayPointHandles.push_back(HANDLE);
 	}
+
+	WayPointData(const WayPointData &DATA)
+	{
+		handle = DATA.handle;
+		pos = DATA.pos;						//座標
+		radius = DATA.radius;							//大きさ
+		wayPointHandles = DATA.wayPointHandles;	//どの方向に行けるかハンドル取ったもの
+		passNum = DATA.passNum;							//目標地点までのパス数
+		branchHandle = DATA.branchHandle;						//探索中の分岐のハンドル
+		branchReferenceCount = DATA.branchReferenceCount;				//何回その分岐を参照したか
+		isWall = DATA.isWall;							//壁かどうか 今までは壁にはウェイポイントを配置しないという処理になっていたが、接続の探索のしやすさから壁にもウェイポイントを設置するようにしました。
+
+		numberOfItemHeld = DATA.numberOfItemHeld;					// 保持アイテム数
+
+		wallDistanceTop = DATA.wallDistanceTop;					//上方向の壁までの距離
+		wallDistanceBottom = DATA.wallDistanceBottom;				//下方向の壁までの距離
+		wallDistanceLeft = DATA.wallDistanceLeft;					//左方向の壁までの距離
+		wallDistanceRight = DATA.wallDistanceRight;				//右方向の壁までの距離
+	}
+
+	void operator=(const WayPointData &DATA)
+	{
+		handle = DATA.handle;
+		pos = DATA.pos;						//座標
+		radius = DATA.radius;							//大きさ
+		wayPointHandles = DATA.wayPointHandles;	//どの方向に行けるかハンドル取ったもの
+		passNum = DATA.passNum;							//目標地点までのパス数
+		branchHandle = DATA.branchHandle;						//探索中の分岐のハンドル
+		branchReferenceCount = DATA.branchReferenceCount;				//何回その分岐を参照したか
+		isWall = DATA.isWall;							//壁かどうか 今までは壁にはウェイポイントを配置しないという処理になっていたが、接続の探索のしやすさから壁にもウェイポイントを設置するようにしました。
+
+		numberOfItemHeld = DATA.numberOfItemHeld;					// 保持アイテム数
+
+		wallDistanceTop = DATA.wallDistanceTop;					//上方向の壁までの距離
+		wallDistanceBottom = DATA.wallDistanceBottom;				//下方向の壁までの距離
+		wallDistanceLeft = DATA.wallDistanceLeft;					//左方向の壁までの距離
+		wallDistanceRight = DATA.wallDistanceRight;				//右方向の壁までの距離
+	};
 };
 
 class NavigationAI
@@ -64,9 +101,9 @@ public:
 	/// ポイントの生成
 	/// </summary>
 	/// <param name="MAP_DATA">ステージのCSV</param>
-	void Init(const RoomMapChipArray& MAP_DATA);
+	void Init(const RoomMapChipArray &MAP_DATA);
 
-	void Update(const Vec2<float>& POS);
+	void Update(const Vec2<float> &POS);
 
 	void Draw();
 
@@ -85,7 +122,7 @@ public:
 	{
 		Vec2<int>handle;
 		float sum;
-		QueueData(const Vec2<int>& HANDLE, float SUM) :handle(HANDLE), sum(SUM)
+		QueueData(const Vec2<int> &HANDLE, float SUM) :handle(HANDLE), sum(SUM)
 		{
 		};
 	};
@@ -93,7 +130,7 @@ public:
 	bool resetSearchFlag;
 
 
-	std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints;//ウェイポイントの配列
+	std::vector<std::vector<WayPointData>> wayPoints;//ウェイポイントの配列
 	int wayPointXCount;
 	int wayPointYCount;
 
@@ -120,21 +157,21 @@ private:
 	/// </summary>
 	/// <param name="WORLD_POS">ワールド座標</param>
 	/// <returns>マップチップ座標</returns>
-	inline const Vec2<int>& GetMapChipNum(const Vec2<float>& WORLD_POS);
+	inline const Vec2<int> &GetMapChipNum(const Vec2<float> &WORLD_POS);
 
 	/// <summary>
 	/// 引数に渡したウェイポイントを周りのウェイポイントと繋げる
 	/// </summary>
 	/// <param name="HANDLE">ウェイポイントを繋げる為の判定</param>
 	/// <param name="DATA">リンク付けする対象</param>
-	inline void RegistHandle(std::shared_ptr<WayPointData> DATA);
+	inline void RegistHandle(WayPointData DATA);
 
 	/// <summary>
 	/// 使用しているウェイポイントかどうか
 	/// </summary>
 	/// <param name="DATA">ウェイポイントのデータ</param>
 	/// <returns>true...使われている,false...使われていない</returns>
-	inline bool DontUse(const Vec2<int>& HANDLE);
+	inline bool DontUse(const Vec2<int> &HANDLE);
 
 	/// <summary>
 	/// マップチップとレイの判定
@@ -142,7 +179,7 @@ private:
 	/// <param name="START_POS">始点</param>
 	/// <param name="END_POS">終点</param>
 	/// <returns>true...当たった、false...当たっていない</returns>
-	bool CheckMapChipWallAndRay(const Vec2<float>& START_POS, const Vec2<float>& END_POS)
+	bool CheckMapChipWallAndRay(const Vec2<float> &START_POS, const Vec2<float> &END_POS)
 	{
 
 		// マップチップの情報。
@@ -218,11 +255,11 @@ private:
 
 		return false;
 
-	}
+	};
 
 
 	//A*-------------------------------
-	std::vector<std::shared_ptr<QueueData>>queue;	//最短ルートの候補を纏めた配列
+	std::vector<QueueData>queue;	//最短ルートの候補を纏めた配列
 
 	float routeRate;	//ランダムでルートを取った際の数字
 	bool initRouteFlag;	//ゴール地点が変わった際にルート候補からランダムで選択する
@@ -232,33 +269,31 @@ private:
 	/// </summary>
 	/// <param name="START_POINT">スタート地点</param>
 	/// <param name="END_POINT">ゴール地点</param>
-	void AStart(const WayPointData& START_POINT, const WayPointData& END_POINT);
+	void AStart(const WayPointData &START_POINT, const WayPointData &END_POINT);
 
 	/// <summary>
 	/// キューに同じハンドルがスタックされているかどうか
 	/// ゴール地点は複数スタックしても良い
 	/// </summary>
 	/// <param name="HANDLE">ウェイポイントのハンドル</param>
-	inline bool CheckQueue(const Vec2<int>& HANDLE);
+	inline bool CheckQueue(const Vec2<int> &HANDLE);
 
 	/// <summary>
 	/// 探索した際の最短ルート候補から最短ルートに絞る
 	/// </summary>
 	/// <param name="QUEUE">最短ルート候補</param>
 	/// <returns>スタートからゴールまでの最短ルート</returns>
-	std::vector<std::shared_ptr<QueueData>> ConvertToShortestRoute(const std::vector<std::shared_ptr<QueueData>>& QUEUE);
-
-	std::vector<std::shared_ptr<WayPointData>> ConvertToShortestRoute2(const std::vector<std::vector<std::shared_ptr<WayPointData>>>& QUEUE);
+	std::vector<WayPointData> ConvertToShortestRoute2(const std::vector<std::vector<WayPointData>> &QUEUE);
 
 
-	void RegistBranch(const WayPointData& DATA);
+	void RegistBranch(const WayPointData &DATA);
 
 
 	WayPointData prevStartPoint;//探索する際の前フレームのスタート地点
 	WayPointData prevEndPoint;	//探索する際の前フレームのゴール地点
 
-	std::vector<std::vector<std::shared_ptr<WayPointData>>> branchQueue;//探索中のルートを保存する
-	std::vector<std::shared_ptr<WayPointData>> shortestRoute;
+	std::vector<std::vector<WayPointData>> branchQueue;//探索中のルートを保存する
+	std::vector<WayPointData> shortestRoute;
 	std::vector<bool> reachToGoalFlag;
 
 	//デバック--------------------------
@@ -275,7 +310,7 @@ private:
 	{
 		Vec2<int>handle;
 		Color color;
-		SearchMapData(const Vec2<int>& HANDLE, const Color& COLOR) :handle(HANDLE), color(COLOR)
+		SearchMapData() :handle(Vec2<int>(-1, -1)), color(Color(255, 255, 255, 255))
 		{
 		}
 	};
@@ -283,10 +318,10 @@ private:
 	int layerNum;
 
 
-	bool CheckHitLineCircle(const Vec2<float>& LineStartPos, const Vec2<float>& LineEndPos, const Vec2<float>& CircleCenterPos, const float& CircleRadius) {
+	bool CheckHitLineCircle(const Vec2<float> &LineStartPos, const Vec2<float> &LineEndPos, const Vec2<float> &CircleCenterPos, const float &CircleRadius) {
 
 		// 始点から終点までのベクトルを正規化する。
-		Vec2<float>& startEndPos = LineEndPos - LineStartPos;
+		Vec2<float> &startEndPos = LineEndPos - LineStartPos;
 		startEndPos.Normalize();
 
 		// [始点から終点までのベクトル]と、[始点から円の中心までのベクトル]の結果の外積が円の半径よりも小さかったら判定の第一段階クリア！
@@ -316,7 +351,7 @@ private:
 	}
 
 
-	Vec2<float>CaluLine(const Vec2<float>& CENTRAL_POS, int angle);
+	Vec2<float>CaluLine(const Vec2<float> &CENTRAL_POS, int angle);
 
 	/// <summary>
 	/// ウェイポイントを繋げる処理
@@ -325,7 +360,7 @@ private:
 	/// <param name="SEARCH_OFFSET"> 検索するマップチップの位置 (DATAを基準としてどこを検索するかの値) </param>
 	/// <param name="CHIP_DATA"> マップチップのブロックのIDを取得して壁判定するためのデータ </param>
 	/// <returns> 繋げられたかが返される。 繋げる処理はこの関数の内部にある。 </returns>
-	bool ConnectWayPoint(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
+	bool ConnectWayPoint(WayPointData DATA, const Vec2<float> &SEARCH_DIR, const SizeData &CHIP_DATA);
 
 	/// <summary>
 	/// ウェイポイントから壁までの距離を計算する処理
@@ -334,7 +369,7 @@ private:
 	/// <param name="SEARCH_DIR"> 検索する方向 </param>
 	/// <param name="CHIP_DATA"> マップチップのブロックのIDを取得して壁判定するためのデータ </param>
 	/// <returns> 検索した方向での壁までの距離を返す。 </returns>
-	float SearchWall(std::shared_ptr<WayPointData> DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA);
+	float SearchWall(WayPointData DATA, const Vec2<float> &SEARCH_DIR, const SizeData &CHIP_DATA);
 
 	void CheckNumberOfItemHeldCount();
 };

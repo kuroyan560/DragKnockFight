@@ -31,25 +31,9 @@ public:
 	int afterImgageTimer;
 
 	//ボスのパターン制御-----------------------
-	enum E_BossPattern
-	{
-		BOSS_PATTERN_NONE = -1,
-		BOSS_PATTERN_NORMALMOVE,
-		BOSS_PATTERN_ATTACK,
-		BOSS_PATTERN_SWING,
-		BOSS_PATTERN_MAX
-	};
-	E_BossPattern bossPatternNow, oldBossPattern;
-	BossPatternData patternData;
-	std::array<std::unique_ptr<IBossPattern>, BOSS_PATTERN_MAX>bossPattern;
-	int patternTimer;
-	bool atackModeFlag;
-	//ボスのパターン制御-----------------------
-
-
 	NavigationAI navigationAi;
 	CharacterAI characterAi;
-
+	//ボスのパターン制御-----------------------
 
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
