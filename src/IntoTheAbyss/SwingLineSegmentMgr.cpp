@@ -325,7 +325,7 @@ float SwingLineSegmentMgr::CalSwingEndDistance(const Vec2<float>& CharaPos, cons
 	}
 
 }
-const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos)
+Vec2<float> SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos)
 {
 	//‚Ç‚¤‚â‚Á‚Äg‚¤‚©
 	Vec2<float>handSegmentStart(StartPos), handSegmentEnd(EndPos);//ü•ª

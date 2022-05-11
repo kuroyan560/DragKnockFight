@@ -133,6 +133,6 @@ public:
 private:
 
 	// 線分とマップチップの交差
-	const Vec2<float>& SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos);
+	Vec2<float> SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos);
 
 };
