@@ -53,6 +53,25 @@ struct WayPointData
 		wayPointHandles.push_back(HANDLE);
 	}
 
+	WayPointData(const WayPointData &DATA)
+	{
+		handle = DATA.handle;
+		pos = DATA.pos;						//座標
+		radius = DATA.radius;							//大きさ
+		wayPointHandles = DATA.wayPointHandles;	//どの方向に行けるかハンドル取ったもの
+		passNum = DATA.passNum;							//目標地点までのパス数
+		branchHandle = DATA.branchHandle;						//探索中の分岐のハンドル
+		branchReferenceCount = DATA.branchReferenceCount;				//何回その分岐を参照したか
+		isWall = DATA.isWall;							//壁かどうか 今までは壁にはウェイポイントを配置しないという処理になっていたが、接続の探索のしやすさから壁にもウェイポイントを設置するようにしました。
+
+		numberOfItemHeld = DATA.numberOfItemHeld;					// 保持アイテム数
+
+		wallDistanceTop = DATA.wallDistanceTop;					//上方向の壁までの距離
+		wallDistanceBottom = DATA.wallDistanceBottom;				//下方向の壁までの距離
+		wallDistanceLeft = DATA.wallDistanceLeft;					//左方向の壁までの距離
+		wallDistanceRight = DATA.wallDistanceRight;				//右方向の壁までの距離
+	}
+
 	void operator=(const WayPointData &DATA)
 	{
 		handle = DATA.handle;
