@@ -16,7 +16,7 @@ void CharacterAI::Init()
 	if (!initFlag)
 	{
 		//í—ª‘w‚Ì¶¬--------------------------
-		strategyArray[STRATEGY_RESTORE_STAMINA] = std::make_unique<RestoreStamina>();
+		//strategyArray[STRATEGY_RESTORE_STAMINA] = std::make_unique<RestoreStamina>();
 		strategyArray[STRATEGY_GO_TO_THE_FIELD] = std::make_unique<GoToTheField>();
 		strategyArray[STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE] = std::make_unique<AcquireASuperiorityGauge>();
 		//í—ª‘w‚Ì¶¬--------------------------
