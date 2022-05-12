@@ -1009,7 +1009,9 @@ void Game::Scramble()
 				CharacterManager::Instance()->Left()->addLineLength += moveLength;
 
 				// 引っかかっている場合は更に押し戻す。(壁ズリを表現するため)
-				CharacterManager::Instance()->Left()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+				if (0 < CharacterManager::Instance()->Left()->addLineLength) {
+					CharacterManager::Instance()->Left()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+				}
 
 			}
 
@@ -1043,7 +1045,9 @@ void Game::Scramble()
 				CharacterManager::Instance()->Right()->addLineLength += moveLength;
 
 				// 引っかかっている場合は更に押し戻す。(壁ズリを表現するため)
-				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+				if (0 < CharacterManager::Instance()->Right()->addLineLength) {
+					CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+				}
 
 			}
 
