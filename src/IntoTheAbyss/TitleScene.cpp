@@ -172,7 +172,7 @@ void TitleScene::OnDraw()
 
 		// PRESSENTER‚Ì‰æ‘œ‚ð•`‰æ
 		if (isPressStartDraw) {
-			DrawFunc::DrawRotaGraph2D({660,550}, { 1,1 }, 0, TexHandleMgr::GetTexBuffer(pressStartHandle));
+			DrawFunc::DrawRotaGraph2D(PRESS_START_POS, { 1,1 }, 0, TexHandleMgr::GetTexBuffer(pressStartHandle));
 		}
 	}
 }
