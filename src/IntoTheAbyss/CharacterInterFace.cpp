@@ -1130,6 +1130,7 @@ void CharacterInterFace::FinishSwing()
 	CWSwingSegmentMgr.Init();
 	CCWSwingSegmentMgr.Init();
 	addSwingAngle = 0;
+	swingTimer = 0;
 
 }
 

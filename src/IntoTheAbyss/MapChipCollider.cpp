@@ -313,10 +313,10 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			const float centerY = height * MAP_CHIP_SIZE;
 
 			// プレイヤーとの距離が一定以上離れていたら処理を行わない。
-			if (size.x * 10.0f <= fabs(centerX - pos.x)) {
+			if (size.x * 3.0f <= fabs(centerX - pos.x)) {
 				continue;
 			}
-			if (size.y * 10.0f <= fabs(centerY - pos.y)) {
+			if (size.y * 3.0f <= fabs(centerY - pos.y)) {
 				continue;
 			}
 
