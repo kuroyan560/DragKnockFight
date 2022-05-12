@@ -33,7 +33,7 @@ private:
 	const Vec2<float> LUNA_ROBOT_POS = { 125.0f, 350.0f };
 	const Vec2<float> LACY_ROBOT_POS = { WINDOW_SIZE.x / 2.0f - 50.0f, 340.0f };
 	const Vec2<float> TITLE_POS = { 170,80 };
-	const Vec2<float> PRESS_START_POS = { 270,500 };
+	const Vec2<float> PRESS_START_POS = { 660,550 };
 
 	// イージングに使用するタイマー
 	const float ADD_EASING_TIMER = 0.01f;
