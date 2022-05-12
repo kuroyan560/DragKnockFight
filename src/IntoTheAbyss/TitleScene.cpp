@@ -90,7 +90,7 @@ void TitleScene::OnUpdate()
 	else
 	{
 		//ステージセレクトに移動する
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::START))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
 		{
 			tutorialQuestion = true;
 			tutorialSelect = false;
@@ -172,7 +172,7 @@ void TitleScene::OnDraw()
 
 		// PRESSENTERの画像を描画
 		if (isPressStartDraw) {
-			DrawFunc::DrawGraph(PRESS_START_POS, TexHandleMgr::GetTexBuffer(pressStartHandle));
+			DrawFunc::DrawRotaGraph2D({660,550}, { 1,1 }, 0, TexHandleMgr::GetTexBuffer(pressStartHandle));
 		}
 	}
 }
