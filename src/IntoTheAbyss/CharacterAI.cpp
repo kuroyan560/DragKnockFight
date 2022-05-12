@@ -26,6 +26,8 @@ void CharacterAI::Init()
 	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
 	strategyArray[strategyOfChoice]->Init();
 	startFlag = false;
+	CharacterAIData::Instance()->dashTimer = 0;
+	startDashFlag = false;
 }
 
 void CharacterAI::Finalize()
@@ -63,6 +65,31 @@ void CharacterAI::Update()
 	}
 	//敵とプレイヤーとの距離
 	CharacterAIData::Instance()->distance = CharacterManager::Instance()->Left()->pos.Distance(CharacterManager::Instance()->Right()->pos);
+
+
+
+	if (CharacterAIData::Instance()->dashFlag)
+	{
+		startDashFlag = true;
+	}
+	if (startDashFlag)
+	{
+		++CharacterAIData::Instance()->dashTimer;
+		if (CharacterAIData::Instance()->dashFlag)
+		{
+			++CharacterAIData::Instance()->dashCount;
+		}
+	}
+	//20Flame以上入力が無かったらリセットする
+	if (20 <= CharacterAIData::Instance()->dashTimer)
+	{
+		CharacterAIData::Instance()->dashCount = 0;
+		CharacterAIData::Instance()->dashTimer = 0;
+		startDashFlag = false;
+	}
+
+
+
 	//キャラクターAIに必要なデータ集め--------------------------
 
 	if (useAiFlag)

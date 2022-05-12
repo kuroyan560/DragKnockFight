@@ -33,6 +33,8 @@ public:
 
 	bool swingFlag;//U‚è‰ñ‚µ“ü—Í
 	bool dashFlag;//ƒ_ƒbƒVƒ…“ü—Í
+	int dashCount;
+	int dashTimer;
 
 	float swingClockwiseDistance;
 	float swingCounterClockwiseDistance;

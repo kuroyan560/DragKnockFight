@@ -42,4 +42,7 @@ public:
 	int startTimer;
 	bool initFlag;
 	bool useAiFlag;
+
+
+	bool startDashFlag;
 };

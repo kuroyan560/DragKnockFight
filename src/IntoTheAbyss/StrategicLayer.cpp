@@ -341,11 +341,21 @@ void GoToTheField::Update()
 	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge;
 	//振り回しのクールタイムが終わった
 	bool timeToSiwngFlag = SWING_MAX_COOL_TIME <= swingCoolTime;
+	//プレイヤーが一定フレーム内に連続でダッシュしている
+	bool playerDashAlotFlag = 3 <= CharacterAIData::Instance()->dashCount;
 
+	if (playerDashAlotFlag)
+	{
+		bool debug = false;
+	}
 
 	//スタミナが多く振り回しのクールタイムが終わった際、一定距離離れていたら実行
-	if (useSwingFlag && timeToSiwngFlag && (haveAdvantageToSwingClockWiseFlag || haveAdvantageToSwingCClockWiseFlag))
+	if ((useSwingFlag && timeToSiwngFlag && (haveAdvantageToSwingClockWiseFlag || haveAdvantageToSwingCClockWiseFlag)) || playerDashAlotFlag)
 	{
+		//連続で振り回すのを防止する為ダッシュカウントをリセットする
+		CharacterAIData::Instance()->dashCount = 0;
+		CharacterAIData::Instance()->dashTimer = 0;
+
 		//敵を振り回しで移動させる距離が大きい方に振り回す
 		if (CharacterAIData::Instance()->swingCounterClockwiseDistance < CharacterAIData::Instance()->swingClockwiseDistance)
 		{
@@ -531,15 +541,30 @@ void AcquireASuperiorityGauge::Update()
 	const float STAMINA_VALUE = 0.5f;
 	//スタミナが多い
 	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge && SWING_MAX_COOL_TIME <= swingCoolTime;
+	//プレイヤーが一定フレーム内に連続でダッシュしている
+	bool playerDashAlotFlag = 3 <= CharacterAIData::Instance()->dashCount;
+
+	if (playerDashAlotFlag)
+	{
+		bool debug = false;
+	}
 
 	//敵を振り回しで移動させる
-	if (canSwingClockWiseFlag && useSwingFlag && !CharacterManager::Instance()->Right()->GetNowBreak())
+	if ((canSwingClockWiseFlag && useSwingFlag || playerDashAlotFlag) && !CharacterManager::Instance()->Right()->GetNowBreak())
 	{
+		//連続で振り回すのを防止する為ダッシュカウントをリセットする
+		CharacterAIData::Instance()->dashCount = 0;
+		CharacterAIData::Instance()->dashTimer = 0;
+
 		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
 		swingCoolTime = 0;
 	}
-	else if (canSwingCClockWiseFlag && useSwingFlag && !CharacterManager::Instance()->Right()->GetNowBreak())
+	else if ((canSwingCClockWiseFlag && useSwingFlag || playerDashAlotFlag) && !CharacterManager::Instance()->Right()->GetNowBreak())
 	{
+		//連続で振り回すのを防止する為ダッシュカウントをリセットする
+		CharacterAIData::Instance()->dashCount = 0;
+		CharacterAIData::Instance()->dashTimer = 0;
+
 		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
 		swingCoolTime = 0;
 	}
