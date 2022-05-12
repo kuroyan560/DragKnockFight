@@ -109,12 +109,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 				if (height - 1 >= 0) {
 
 					// 交点の上のマップチップが壁だったら無効化する。
-					if (!(mapChipSizeData.min <= mapChipData[height - 1][width] && mapChipSizeData.max <= mapChipData[height - 1][width])) {
+					//if (!(mapChipSizeData.min <= mapChipData[height - 1][width] && mapChipSizeData.max <= mapChipData[height - 1][width])) {
 
 						buff.second = INTERSECTED_TOP;
 						intersectPos.push_back(buff);
 
-					}
+					//}
 
 				}
 
@@ -133,12 +133,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 				if (width + 1 < mapChipData[height].size()) {
 
 					// 交点の右のマップチップが壁だったら無効化する。
-					if (!(mapChipSizeData.min <= mapChipData[height][width + 1] && mapChipSizeData.max <= mapChipData[height][width + 1])) {
+					//if (!(mapChipSizeData.min <= mapChipData[height][width + 1] && mapChipSizeData.max <= mapChipData[height][width + 1])) {
 
 						buff.second = INTERSECTED_RIGHT;
 						intersectPos.push_back(buff);
 
-					}
+					//}
 
 				}
 
@@ -155,12 +155,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 				if (height + 1 < mapChipData.size()) {
 
 					// 交点の上のマップチップが壁だったら無効化する。
-					if (!(mapChipSizeData.min <= mapChipData[height + 1][width] && mapChipSizeData.max <= mapChipData[height + 1][width])) {
+					//if (!(mapChipSizeData.min <= mapChipData[height + 1][width] && mapChipSizeData.max <= mapChipData[height + 1][width])) {
 
 						buff.second = INTERSECTED_BOTTOM;
 						intersectPos.push_back(buff);
 
-					}
+					//}
 
 				}
 
@@ -179,12 +179,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 				if (width - 1 >= 0) {
 
 					// 交点の左のマップチップが壁だったら無効化する。
-					if (!(mapChipSizeData.min <= mapChipData[height][width - 1] && mapChipSizeData.max <= mapChipData[height][width - 1])) {
+					//if (!(mapChipSizeData.min <= mapChipData[height][width - 1] && mapChipSizeData.max <= mapChipData[height][width - 1])) {
 
 						buff.second = INTERSECTED_LEFT;
 						intersectPos.push_back(buff);
 
-					}
+					//}
 
 				}
 
@@ -343,12 +343,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 				if (height - 1 >= 0) {
 
 					// 交点の上のマップチップが壁だったら無効化する。
-					if (!(mapChipSizeData.min <= mapChipData[height - 1][width] && mapChipSizeData.max <= mapChipData[height - 1][width])) {
+					//if (!(mapChipSizeData.min <= mapChipData[height - 1][width] && mapChipSizeData.max <= mapChipData[height - 1][width])) {
 
 						buff.second = INTERSECTED_TOP;
 						intersectPos.push_back(buff);
 
-					}
+					//}
 
 				}
 
@@ -365,12 +365,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 				if (width + 1 < mapChipData[height].size()) {
 
 					// 交点の右のマップチップが壁だったら無効化する。
-					if (!(mapChipSizeData.min <= mapChipData[height][width + 1] && mapChipSizeData.max <= mapChipData[height][width + 1])) {
+					//if (!(mapChipSizeData.min <= mapChipData[height][width + 1] && mapChipSizeData.max <= mapChipData[height][width + 1])) {
 
 						buff.second = INTERSECTED_RIGHT;
 						intersectPos.push_back(buff);
 
-					}
+					//}
 
 				}
 
@@ -387,12 +387,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 				if (height + 1 < mapChipData.size()) {
 
 					// 交点の上のマップチップが壁だったら無効化する。
-					if (!(mapChipSizeData.min <= mapChipData[height + 1][width] && mapChipSizeData.max <= mapChipData[height + 1][width])) {
+					//if (!(mapChipSizeData.min <= mapChipData[height + 1][width] && mapChipSizeData.max <= mapChipData[height + 1][width])) {
 
 						buff.second = INTERSECTED_BOTTOM;
 						intersectPos.push_back(buff);
 
-					}
+					//}
 
 				}
 
@@ -409,12 +409,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 				if (width - 1 >= 0) {
 
 					// 交点の左のマップチップが壁だったら無効化する。
-					if (!(mapChipSizeData.min <= mapChipData[height][width - 1] && mapChipSizeData.max <= mapChipData[height][width - 1])) {
+					//if (!(mapChipSizeData.min <= mapChipData[height][width - 1] && mapChipSizeData.max <= mapChipData[height][width - 1])) {
 
 						buff.second = INTERSECTED_LEFT;
 						intersectPos.push_back(buff);
 
-					}
+					//}
 
 				}
 
