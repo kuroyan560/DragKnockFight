@@ -507,18 +507,37 @@ void Player::Input(const vector<vector<int>>& MapData)
 	inputLeftVec /= {32768.0f, 32768.0f};
 	inputRate = inputLeftVec.Length();
 	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && isDashStamina) {
-		
+
 		AudioApp::Instance()->PlayWave(DASH_SE);
 
 		// inputVec = ひだりスティックの入力方向
 		const float DASH_SPEED = 30.0f;
-		vel += inputLeftVec * DASH_SPEED;
+		const float CANCEL_DASH_SPEED = 40.0f;
+		const float JUST_CANCEL_DASH_SPEED = 50;
+		float speed = 0;
+
+		// 相方が振り回し中だったら。
+		if (partner.lock()->GetNowSwing()) {
+
+			speed = CANCEL_DASH_SPEED;
+
+			// 相方の振り回しを終わらせる。
+			partner.lock()->FinishSwing();
+
+		}
+		else {
+
+			speed = DASH_SPEED;
+
+		}
+
+		vel += inputLeftVec * speed;
 
 		// 移動量が限界を超えないようにする。
-		if (DASH_SPEED < vel.Length()) {
+		if (speed < vel.Length()) {
 
 			vel.Normalize();
-			vel *= DASH_SPEED;
+			vel *= speed;
 
 		}
 
