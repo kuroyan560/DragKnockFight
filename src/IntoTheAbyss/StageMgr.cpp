@@ -263,6 +263,28 @@ void StageMgr::WriteMapChipData(const int &STAGE_NUM, const int &ROOM_NUM, const
 		return;
 	}
 	allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] = CHIPNUM;
+
+	//ï`âÊÇÃèëÇ´ä∑Ç¶
+	if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_TYPE_STATIC_COLOR_ON)
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle;
+	}
+	else if(GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_TYPE_STATIC_COLOR_OFF)
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle;
+	}
+	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_TYPE_STATIC_ELEC_ON)
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle;
+	}
+	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_TYPE_STATIC_ELEC_OFF)
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle;
+	}
+	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle;
+	}
 }
 
 MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM)
