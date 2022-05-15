@@ -102,7 +102,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
-				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
+				vector<std::shared_ptr<MapChipAnimationData>>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				if (height < 0 || mapChipDrawData.size() <= height) continue;
 				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
@@ -778,8 +778,12 @@ void Game::Draw()
 	/*===== •`‰æˆ— =====*/
 	//BackGround::Instance()->Draw();
 
-
-	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+	if (stageNum != prevDrawChipStageNum || roomNum != prevDrawChipRoomNum)
+	{
+		mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+	}
+	prevDrawChipStageNum = stageNum;
+	prevDrawChipRoomNum = roomNum;
 	DrawMapChip(mapData, mapChipDrawData, stageNum, roomNum);
 
 

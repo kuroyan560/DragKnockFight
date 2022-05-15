@@ -33,7 +33,7 @@ struct MassChipData
 	Vec2<float>rightDownPos;
 	bool sideOrUpDownFlag;
 
-	MassChipData(const Vec2<float>& LEFT_UP_POS, const Vec2<float>& RIGHT_DOWN_POS, const bool& SIDE_OR_UPDOWN_FLAG) :
+	MassChipData(const Vec2<float> &LEFT_UP_POS, const Vec2<float> &RIGHT_DOWN_POS, const bool &SIDE_OR_UPDOWN_FLAG) :
 		leftUpPos(LEFT_UP_POS), rightDownPos(RIGHT_DOWN_POS), sideOrUpDownFlag(SIDE_OR_UPDOWN_FLAG)
 	{
 	}
@@ -43,9 +43,9 @@ struct MassChipData
 //元ソリューションのmain処理をまとめたもの
 class Game
 {
-	std::vector<std::unique_ptr<MassChipData>> AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM);
-	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum);
-	const int& GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS);
+	std::vector<std::unique_ptr<MassChipData>> AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM);
+	void DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum);
+	const int &GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS);
 
 	// ボスorプレイヤーが引っかかっているかのフラグ
 	bool isCatchMapChipBoss;
@@ -62,6 +62,8 @@ class Game
 	int oldRoomNum = -1;
 
 	vector<vector<MapChipDrawData>> mapChipDrawData;
+	int prevDrawChipStageNum;
+	int prevDrawChipRoomNum;
 
 	int countStopNum = 0;
 	int countHitNum = 0;
@@ -98,7 +100,7 @@ class Game
 	int bgm;
 
 	bool firstLoadFlag;
-	void InitGame(const int& STAGE_NUM, const int& ROOM_NUM);
+	void InitGame(const int &STAGE_NUM, const int &ROOM_NUM);
 
 	MiniMap miniMap;
 	Vec2<float>cameraBasePos;
@@ -125,13 +127,13 @@ public:
 	int nowSelectNum = 0;
 
 	Game();
-	void Init(const bool& PractiveMode = false);
-	void Update(const bool& Loop = false);
+	void Init(const bool &PractiveMode = false);
+	void Update(const bool &Loop = false);
 	void Draw();
 	void Scramble();
 	void CalCenterPos();
 
 	Vec2<float>GetStageSize();
-	const bool& TurnResultScene() { return turnResultScene; }
+	const bool &TurnResultScene() { return turnResultScene; }
 };
 

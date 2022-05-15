@@ -76,6 +76,17 @@ struct MapChipDrawData
 	Vec2<float> offset;	//32*32の画像じゃない場合の画像位置調整
 	Vec2<float> offsetInterval;//上下左右の画像の間隔を空ける
 
+	void Reset()
+	{
+		handle = -1;	//画像ハンドル
+		radian = 0.0f;//画像の角度
+		animationFlag = false;//アニメーションを有効にするフラグ
+		interval = 0;		//アニメーションの間隔
+		animationNum = 0;//現在参照しているアニメーションの画像
+		offset = {};	//32*32の画像じゃない場合の画像位置調整
+		offsetInterval = {};//上下左右の画像の間隔を空ける
+	};
+
 	//MapChipDrawData() : handle(-1), radian(0.0f), animationFlag(false), interval(0), animationNum(0), offset(Vec2<float>(0.0f, 0.0f))
 	MapChipDrawData() : radian(0.0f), animationFlag(false), interval(0), animationNum(0), offset(Vec2<float>(0.0f, 0.0f))
 	{
@@ -199,7 +210,7 @@ public:
 		return allMapChipData.size();
 	}
 
-	std::vector<MapChipAnimationData *> animationData;//マップチップのアニメーション情報の一覧
+	std::vector<std::shared_ptr<MapChipAnimationData>> animationData;//マップチップのアニメーション情報の一覧
 
 
 	void WriteMapChipData(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM);
@@ -228,6 +239,8 @@ private:
 	std::array<int, 12> eventChipHandle;
 
 	array<int, 30> mapChipGraphHandle;
+	array<int, 2> gimmcikGraphHandle;
+	array<int, 12> lightGraphHandle;
 	enum MapChipDrawEnum
 	{
 		MAPCHIP_DRAW_WALL_LEFT_UP,
@@ -338,5 +351,7 @@ private:
 		}
 		return sum;
 	}
+
+	void SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM);
 };
 
