@@ -100,7 +100,7 @@ protected:
 	bool stackMapChip;
 
 	//試合開始時に呼び出される
-	CharacterInterFace(const Vec2<float> &HonraiSize);
+	CharacterInterFace(const Vec2<float>& HonraiSize);
 
 
 	std::weak_ptr<CharacterInterFace>partner;
@@ -151,7 +151,10 @@ public:
 	bool CompleteAppear() { return 20 <= moveTimer; }
 
 	// 前フレームの座標を保存。
-	inline void SavePrevFramePos() { prevPos = pos; }
+	inline void SavePrevFramePos() {
+		prevPrevPos = prevPos;
+		prevPos = pos;
+	}
 
 	// 振り回しの予測線を消す。
 	void InitSwingLineSegmetn();
@@ -167,6 +170,7 @@ public:
 	Vec2<float> pos;			// 座標
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
+	Vec2<float> prevPrevPos;		// 前のフレームの前フレームの座標 名前安直すぎて申し訳ない…
 	bool isHold;				// つかんでいるかフラグ
 	std::shared_ptr<StaminaMgr> staminaGauge;	// スタミナゲージクラス
 	const int SWING_STAMINA = 2;	// 振り回し時の消費スタミナ
