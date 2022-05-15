@@ -306,7 +306,7 @@ GoToTheField::GoToTheField()
 void GoToTheField::Init()
 {
 	timer = 0;
-	timeOver = 60 * 3;
+	timeOver = 60 * 5;
 	startFlag = false;
 	goToTheFieldFlag = true;
 	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
@@ -476,7 +476,7 @@ void AcquireASuperiorityGauge::Init()
 {
 	nowGauge = CharacterAIData::Instance()->bossData.gaugeValue;
 	timer = 0;
-	timeOver = 60 * 3;
+	timeOver = 60 * 10;
 
 	crashEnemyFlag = false;
 	dontCrashFlag = false;

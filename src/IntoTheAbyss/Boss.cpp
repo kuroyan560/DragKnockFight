@@ -72,6 +72,10 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 	}
 
+	//プレイヤーを振り回し終えた後にダッシュする
+	CharacterAIData::Instance()->releaseSwingFlag = !GetNowSwing() && CharacterAIData::Instance()->prevSwingFlag;
+	CharacterAIData::Instance()->prevSwingFlag = GetNowSwing();
+
 	// パートナーが振り回し状態だったら更新処理を行わない。
 	if (!(!partner.lock()->GetNowSwing() && !nowSwing)) return;
 
@@ -91,7 +95,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		// 何もしない。
 	}
 	else if (isSwingNow) {
-
+		bool deb = false;
 	}
 	else if (GetCanMove()) {
 
