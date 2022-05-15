@@ -306,7 +306,7 @@ GoToTheField::GoToTheField()
 void GoToTheField::Init()
 {
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = 60 * 3;
 	startFlag = false;
 	goToTheFieldFlag = true;
 	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
@@ -328,8 +328,8 @@ void GoToTheField::Update()
 	//Ž©•ª‚ª“Gw‚É‹ß‚Ã‚©‚È‚¢
 	else
 	{
-	}
 
+	}
 
 	//U‚è‰ñ‚µ‚½Û‚Éˆê’è‹——£ˆÈã—£‚ê‚ê‚é‚©
 	const float CERTAIN_DISTANCE = 100.0f;
@@ -476,7 +476,7 @@ void AcquireASuperiorityGauge::Init()
 {
 	nowGauge = CharacterAIData::Instance()->bossData.gaugeValue;
 	timer = 0;
-	timeOver = 60 * 10;
+	timeOver = 60 * 3;
 
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
