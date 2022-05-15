@@ -18,8 +18,9 @@ StageMgr::StageMgr()
 	allMapChipData.resize(allStageNum);
 	relationRoomData.resize(allStageNum);
 	allMapChipDrawData.resize(allStageNum);
+	//1~21
+	mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK] = { 1,MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS };
 
-	mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK] = { 1,16 };
 
 	//LoadDivGraph("Resource/chip_sheet.png", 18, 6, 3, 32, 32, mapChipGraphHandle.data());
 
@@ -252,6 +253,55 @@ const bool &StageMgr::CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMB
 	}
 
 	return false;
+}
+
+void StageMgr::WriteMapChipData(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM)
+{
+	if (allMapChipData[STAGE_NUM][ROOM_NUM].size() <= MAPCHIP_NUM.y && allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
+	{
+		//”z—ñŠOŽQÆ
+		return;
+	}
+	allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] = CHIPNUM;
+}
+
+MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM)
+{
+	if (allMapChipData[STAGE_NUM][ROOM_NUM].size() <= MAPCHIP_NUM.y && allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
+	{
+		return MAPCHIP_BLOCK_NONE;
+	}
+
+	int otherBlockNum = 5;
+	if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] &&
+		allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - otherBlockNum)
+	{
+		return MAPCHIP_BLOCK_WALL;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON)
+	{
+		return MAPCHIP_BLOCK_ELEC_ON;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_OFF)
+	{
+		return MAPCHIP_BLOCK_ELEC_OFF;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_ON)
+	{
+		return MAPCHIP_BLOCK_COLOR_ON;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_OFF)
+	{
+		return MAPCHIP_BLOCK_COLOR_OFF;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+	{
+		return MAPCHIP_BLOCK_ELEC_ON_ALLWAYS;
+	}
+	else
+	{
+		return MAPCHIP_BLOCK_NONE;
+	}
 }
 
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)

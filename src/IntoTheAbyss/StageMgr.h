@@ -39,13 +39,28 @@ struct SizeData
 enum MapChipData
 {
 	MAPCHIP_TYPE_STATIC_BLOCK,
-	MAPCHIP_TYPE_TOCH,
+	MAPCHIP_TYPE_STATIC_COLOR_ON = 17,
+	MAPCHIP_TYPE_STATIC_COLOR_OFF,
+	MAPCHIP_TYPE_STATIC_ELEC_ON,
+	MAPCHIP_TYPE_STATIC_ELEC_OFF,
+	MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS,
 	MAPCHIP_TYPE_MAX
 };
 enum MapChipBlockData
 {
 	MAPCHIP_BLOCK_START = 30,
 	MAPCHIP_BLOCK_GOAL = 31
+};
+
+enum MapChipType
+{
+	MAPCHIP_BLOCK_NONE,
+	MAPCHIP_BLOCK_WALL,
+	MAPCHIP_BLOCK_COLOR_ON,
+	MAPCHIP_BLOCK_COLOR_OFF,
+	MAPCHIP_BLOCK_ELEC_ON,
+	MAPCHIP_BLOCK_ELEC_OFF,
+	MAPCHIP_BLOCK_ELEC_ON_ALLWAYS,
 };
 
 struct MapChipDrawData
@@ -162,7 +177,6 @@ public:
 		}
 	};
 
-
 	/// <summary>
 	/// 指定したステージ番号の小部屋の数を返します
 	/// </summary>
@@ -183,6 +197,12 @@ public:
 	}
 
 	std::vector<MapChipAnimationData *> animationData;//マップチップのアニメーション情報の一覧
+
+
+	void WriteMapChipData(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM);
+
+	MapChipType GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM);
+
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
