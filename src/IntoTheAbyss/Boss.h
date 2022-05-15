@@ -36,6 +36,8 @@ public:
 
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
+	int prevStaminaMax;
+
 public:
 	/*===== 定数 =====*/
 

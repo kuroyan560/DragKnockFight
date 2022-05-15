@@ -86,6 +86,13 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		CCWSwingSegmentMgr.Init();
 	}
 
+	int staminaMax = DebugParameter::Instance()->GetBossData().staminaMax;
+	if (staminaMax != prevStaminaMax)
+	{
+		staminaGauge->Resize(staminaMax);
+	}
+	prevStaminaMax = staminaMax;
+
 
 	// [d’¼’†] [ƒXƒ^ƒ“‰‰o’†] ‚Í“®‚©‚³‚È‚¢
 	if (0 < afterSwingDelay || StunEffect::Instance()->isActive) {
@@ -165,6 +172,7 @@ void Boss::OnDraw()
 
 	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
 		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
+
 
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
