@@ -309,7 +309,6 @@ void GoToTheField::Init()
 	timeOver = 60 * 5;
 	startFlag = false;
 	goToTheFieldFlag = true;
-	swingCoolTime = 0;
 	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
 	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
 	operateSwing.Init(SWING_MAX_COOL_TIME);
@@ -354,30 +353,6 @@ void GoToTheField::Update()
 		}
 	}
 
-
-	////スタミナが多く振り回しのクールタイムが終わった際、一定距離離れていたら実行
-	//if (((useSwingFlag && timeToSiwngFlag && (haveAdvantageToSwingClockWiseFlag || haveAdvantageToSwingCClockWiseFlag)) || playerDashAlotFlag) && !CharacterManager::Instance()->Right()->GetNowBreak())
-	//{
-	//	//連続で振り回すのを防止する為ダッシュカウントをリセットする
-	//	CharacterAIData::Instance()->dashCount = 0;
-	//	CharacterAIData::Instance()->dashTimer = 0;
-
-	//	//敵を振り回しで移動させる距離が大きい方に振り回す
-	//	if (CharacterAIData::Instance()->swingCounterClockwiseDistance < CharacterAIData::Instance()->swingClockwiseDistance && !CharacterManager::Instance()->Right()->GetNowBreak())
-	//	{
-	//		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
-	//		swingCoolTime = 0;
-	//	}
-	//	else
-	//	{
-	//		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
-	//		swingCoolTime = 0;
-	//	}
-	//}
-
-
-
-	++swingCoolTime;
 	++timer;
 }
 
@@ -506,7 +481,6 @@ void AcquireASuperiorityGauge::Init()
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
 
-	swingCoolTime = 0;
 	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
 	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
 
@@ -539,11 +513,6 @@ void AcquireASuperiorityGauge::Update()
 	startFlag = true;
 
 
-	if (CharacterManager::Instance()->Right()->GetNowSwing() || CharacterManager::Instance()->Right()->GetNowBreak())
-	{
-		swingCoolTime = 0;
-	}
-
 	//振り回し可能か
 	bool canSwingClockWiseFlag = CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
 	bool canSwingCClockWiseFlag = CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
@@ -573,31 +542,6 @@ void AcquireASuperiorityGauge::Update()
 			CharacterAIData::Instance()->dashTimer = 0;
 		}
 	}
-
-
-
-
-	//敵を振り回しで移動させる
-	//if ((canSwingClockWiseFlag && useSwingFlag || playerDashAlotFlag) && !CharacterManager::Instance()->Right()->GetNowBreak())
-	//{
-	//	//連続で振り回すのを防止する為ダッシュカウントをリセットする
-	//	CharacterAIData::Instance()->dashCount = 0;
-	//	CharacterAIData::Instance()->dashTimer = 0;
-
-	//	CharacterAIOrder::Instance()->swingClockWiseFlag = true;
-	//	swingCoolTime = 0;
-	//}
-	//else if ((canSwingCClockWiseFlag && useSwingFlag || playerDashAlotFlag) && !CharacterManager::Instance()->Right()->GetNowBreak())
-	//{
-	//	//連続で振り回すのを防止する為ダッシュカウントをリセットする
-	//	CharacterAIData::Instance()->dashCount = 0;
-	//	CharacterAIData::Instance()->dashTimer = 0;
-
-	//	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
-	//	swingCoolTime = 0;
-	//}
-
-	//++swingCoolTime;
 
 
 	//戦略実行中
