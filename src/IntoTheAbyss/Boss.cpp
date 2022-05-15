@@ -95,13 +95,23 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	//	return;
 	//}
 
+	if (signbit(moveVel.x))
+	{
+		anim->ChangeAnim(GO_FRONT);
+	}
+	else
+	{
+		anim->ChangeAnim(GO_FRONT);
+	}
+
+
 	// パートナーが振り回していたら残像を出す。
 	if (partner.lock()->GetNowSwing()) {
 
 		DIR dir = FRONT;
 		if (vel.y < 0)dir = BACK;
 		AfterImageMgr::Instance()->Generate(pos, {}, 0, graphHandle[dir], Color(239, 1, 144, 255), true, size);
-
+		anim->ChangeAnim(DAMAGE);
 	}
 
 	// パートナーが振り回し状態だったら更新処理を行わない。
@@ -164,14 +174,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 	anim->Update();
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
-	if (signbit(moveVel.x))
-	{
-		anim->ChangeAnim(GO_FRONT);
-	}
-	else
-	{
-		anim->ChangeAnim(GO_FRONT);
-	}
 
 	if (CharacterAIOrder::Instance()->dashFlag)
 	{
