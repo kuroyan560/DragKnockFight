@@ -272,7 +272,8 @@ MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, 
 		return MAPCHIP_BLOCK_NONE;
 	}
 
-	int otherBlockNum = 5;
+	int otherBlockNum = 6;
+	int spaceNum = 0;
 	if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] &&
 		allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - otherBlockNum)
 	{
@@ -297,6 +298,14 @@ MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, 
 	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
 	{
 		return MAPCHIP_BLOCK_ELEC_ON_ALLWAYS;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == spaceNum)
+	{
+		return MAPCHIP_BLOCK_SPACE;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_CHANGE_AREA)
+	{
+		return MAPCHIP_BLOCK_CHANGE_AREA;
 	}
 	else
 	{

@@ -327,6 +327,11 @@ Game::Game()
 
 	GameTimer::Instance()->Init(120);
 	ScoreManager::Instance()->Init();
+
+
+	StageMgr::Instance()->GetMapChipType(0, 0, Vec2<int>(20, 20));
+	StageMgr::Instance()->WriteMapChipData(0, 0, Vec2<int>(20, 20), 0);
+
 }
 
 void Game::Init(const bool& PracticeMode)
