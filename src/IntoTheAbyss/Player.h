@@ -19,6 +19,20 @@ class LightManager;
 
 #include"RunOutOfStaminaEffect.h"
 
+static const enum PLAYER_ANIM
+{
+	DEFAULT_FRONT,
+	DEFAULT_BACK,
+	PULL_FRONT,
+	PULL_BACK,
+	HOLD,
+	SWINGED,
+	TIRED,
+	KNOCK_OUT,
+	NON_PILOT,
+	PLAYER_ANIM_NUM
+};
+
 // プレイヤークラス
 class Player :public CharacterInterFace
 {
@@ -48,7 +62,7 @@ public:
 	//プレイヤーの向き
 	//enum DRAW_DIR { FRONT, BACK, DIR_NUM, DEFAULT = FRONT }playerDir = DEFAULT;
 	//アニメーション統括
-	PlayerAnimation anim;
+	std::shared_ptr<PlayerAnimation> anim;
 	static const int TIRED_DRAW_TIME = 90;
 	int tiredTimer = TIRED_DRAW_TIME;
 
@@ -115,6 +129,11 @@ public:
 	Vec2<float>pilotAccel;
 	int playerPilotGraph[2];	//FRONT,BACK
 
+	// ジャスト振り回しキャンセルダッシュ用の当たり判定線分。
+	Vec2<float> justCancelDashStartPos;
+	Vec2<float> justCancelDashEndPos;
+
+
 public:
 
 	/*-- メンバ関数 --*/
@@ -141,23 +160,23 @@ private:
 	void OnHitMapChip(const HIT_DIR& Dir)override;
 
 	void OnBreak()override { isHold = false; }
-	void OnBreakFinish()override { anim.ChangeAnim(DEFAULT_FRONT); }
+	void OnBreakFinish()override { anim->ChangeAnim(DEFAULT_FRONT); }
 	void OnSwinged()override
 	{
-		anim.ChangeAnim(SWINGED);
+		anim->ChangeAnim(SWINGED);
 	}
 	void OnSwingedFinish()override
 	{
 		if (!GetNowBreak() && !inputInvalidTimerByCrash)
 		{
-			anim.ChangeAnim(DEFAULT_FRONT);
+			anim->ChangeAnim(DEFAULT_FRONT);
 		}
 	}
 	void OnCrash()override
 	{
 		// 入力受付無効化タイマーをセッティングする。
 		inputInvalidTimerByCrash = INPUT_INVALID_TIMER;
-		anim.ChangeAnim(SWINGED);
+		anim->ChangeAnim(SWINGED);
 		UsersInput::Instance()->ShakeController(controllerIdx, 0.8f, 13);
 	}
 	void OnPartnerCrash()override
@@ -167,13 +186,13 @@ private:
 	void OnPilotLeave()override	//パイロットがロボから離れた瞬間
 	{
 		pilotVel = { 0,0 };
-		anim.ChangeAnim(NON_PILOT);
+		anim->ChangeAnim(NON_PILOT);
 		tutorial.SetPilotLeave(true);
 	}
 	void OnPilotControl()override;		//パイロットを動かす処理
 	void OnPilotReturn()override	//パイロットがロボに戻った瞬間
 	{
-		if (anim.GetNowAnim() != TIRED)anim.ChangeAnim(DEFAULT_FRONT);
+		if (anim->GetNowAnim() != TIRED)anim->ChangeAnim(DEFAULT_FRONT);
 		tutorial.SetPilotLeave(false);
 	}
 
@@ -208,5 +227,8 @@ private:
 	void CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& mapData);
 
 public:
-	void OnKnockOut()override { anim.ChangeAnim(KNOCK_OUT); }
+	void OnKnockOut()override { anim->ChangeAnim(KNOCK_OUT); }
+
+	bool CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos);
+
 };

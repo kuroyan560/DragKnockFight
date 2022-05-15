@@ -941,6 +941,7 @@ void Game::Draw()
 		Vec2<float>rightDownPos = *enemyHomeBase.hitBox.center + enemyHomeBase.hitBox.size / 2.0f;
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
+
 }
 
 void Game::Scramble()
@@ -973,7 +974,6 @@ void Game::Scramble()
 			CharacterManager::Instance()->Right()->pos += rightVelGauge;
 		}
 	}
-
 
 	// ü•ª‚Ì’·‚³
 	float charaLength = 0;

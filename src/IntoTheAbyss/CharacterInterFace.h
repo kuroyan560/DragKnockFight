@@ -160,7 +160,10 @@ public:
 	bool CompleteAppear() { return 20 <= moveTimer; }
 
 	// 前フレームの座標を保存。
-	inline void SavePrevFramePos() { prevPos = pos; }
+	inline void SavePrevFramePos() {
+		prevPrevPos = prevPos;
+		prevPos = pos;
+	}
 
 	// 振り回しの予測線を消す。
 	void InitSwingLineSegmetn();
@@ -176,10 +179,12 @@ public:
 	Vec2<float> pos;			// 座標
 	Vec2<float>vel;
 	Vec2<float> prevPos;		// 前フレームの座標
+	Vec2<float> prevPrevPos;		// 前のフレームの前フレームの座標 名前安直すぎて申し訳ない…
 	bool isHold;				// つかんでいるかフラグ
 	std::shared_ptr<StaminaMgr> staminaGauge;	// スタミナゲージクラス
 	const int SWING_STAMINA = 2;	// 振り回し時の消費スタミナ
 	const int DASH_STAMINA = 1;		// ダッシュ時の消費スタミナ
+	bool goAreaFlag;
 
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team, const PLAYABLE_CHARACTER_NAME& Name)
 	{
@@ -209,6 +214,7 @@ public:
 	const bool& GetCanMove() { return canMove && !stanTimer; }
 	const bool& GetStackFlag() { return stackMapChip; }
 	const bool& GetNowBreak() { return stanTimer; }
+	const bool& GetSwingClockWise() { return isSwingClockWise; }	// true…時計回り false…反時計回り
 	BulletMgrBase& GetBulletMgr() { return bulletMgr; }
 
 	//パイロットの座標（切り離ししてないときはnullptrを返す）

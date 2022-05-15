@@ -14,6 +14,8 @@ class OperateMove
 public:
 	OperateMove();
 
+	void Init();
+
 	/// <summary>
 	/// Às
 	/// </summary>
@@ -29,7 +31,7 @@ private:
 	Vec2<float>oldPos;
 
 	int stanTimer;
-}; 
+};
 
 
 //ƒ_ƒbƒVƒ…
@@ -47,4 +49,38 @@ private:
 	float rate;
 	Vec2<float> dashSpeed;
 	float timer;
+};
+
+
+/// <summary>
+/// U‚è‰ñ‚µ‚Ì–½—ß
+/// </summary>
+class OperateSwing
+{
+public:
+	OperateSwing();
+
+	void Init(int SWING_COOL_TIME);
+
+	/// <summary>
+	/// Œv‰ñ‚è‚ÉU‚è‰ñ‚·
+	/// </summary>
+	AiResult SwingClockWise();
+
+	/// <summary>
+	/// ”½Œv‰ñ‚è‚ÉU‚è‰ñ‚·
+	/// </summary>
+	AiResult SwingCounterClockWise();
+
+	/// <summary>
+	/// “G‚ğ‚æ‚èˆÚ“®‚Å‚«‚é’·‚³‚ÅU‚è‰ñ‚·
+	/// </summary>
+	AiResult SwingLongDisntnce();
+
+	void Update();
+
+private:
+	int swingTimer;
+	int swingCoolTime;
+	bool enableToSwingFlag;
 };

@@ -1,40 +1,26 @@
 #pragma once
 #include<vector>
 #include"Vec.h"
-#include"CharacterInterFace.h"
 
-static const enum PLAYER_ANIM
+struct Anim
 {
-	DEFAULT_FRONT,
-	DEFAULT_BACK,
-	PULL_FRONT,
-	PULL_BACK,
-	HOLD,
-	SWINGED,
-	TIRED,
-	KNOCK_OUT,
-	NON_PILOT,
-	PLAYER_ANIM_NUM
+	std::vector<int> graph;
+	int interval;
+	bool loop;
 };
 
 class PlayerAnimation
 {
-	PLAYER_ANIM status = DEFAULT_FRONT;
-	struct Anim
-	{
-		std::vector<int> graph;
-		int interval;
-		bool loop;
-		Vec2<float>handCenterOffset = { 0,0 };
-	};
-	Anim animations[PLAYER_ANIM_NUM];
+	int status;
+
+	std::vector<Anim>animations;
 
 	int idx;	//画像インデックス
 	float timer;	//時間計測
 
 public:
-	PlayerAnimation(const PLAYABLE_CHARACTER_NAME& CharacterName);
-	void Init(const PLAYER_ANIM& AnimStatus = DEFAULT_FRONT)
+	PlayerAnimation(const std::vector<Anim>& Anims);
+	void Init(const int& AnimStatus)
 	{
 		status = AnimStatus;
 		timer = 0;
@@ -43,10 +29,9 @@ public:
 
 	void Update();
 
-	void ChangeAnim(const PLAYER_ANIM& AnimStatus)
+	void ChangeAnim(const int& AnimStatus)
 	{
 		if (status == AnimStatus)return;
-		if (status == KNOCK_OUT)return;
 		status = AnimStatus;
 		timer = 0;
 		idx = 0;
@@ -59,14 +44,9 @@ public:
 
 	Vec2<int>GetGraphSize();
 	
-	const Vec2<float>GetHandCenterOffset()&
-	{
-		return animations[status].handCenterOffset;
-	}
-
-	const PLAYER_ANIM& GetNowAnim() { return status; }
+	const int& GetNowAnim() { return status; }
 
 	//どれかひとつでも当てはまったらtrueを返す
-	bool Compare(const std::vector<PLAYER_ANIM>& Status);
+	bool Compare(const std::vector<int>& Status);
 };
 
