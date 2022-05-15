@@ -312,6 +312,7 @@ void GoToTheField::Init()
 	swingCoolTime = 0;
 	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
 	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
+	operateSwing.Init(SWING_MAX_COOL_TIME);
 }
 
 void GoToTheField::Update()
@@ -333,41 +334,48 @@ void GoToTheField::Update()
 
 	//振り回した際に一定距離以上離れれるか
 	const float CERTAIN_DISTANCE = 100.0f;
-	bool haveAdvantageToSwingClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->swingClockwiseDistance;
-	bool haveAdvantageToSwingCClockWiseFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->swingCounterClockwiseDistance;
+	bool haveAdvantageToSwingFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->swingClockwiseDistance || CERTAIN_DISTANCE <= CharacterAIData::Instance()->swingCounterClockwiseDistance;
 
 	//スタミナが多い
 	const float STAMINA_VALUE = 0.5f;
 	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge;
-	//振り回しのクールタイムが終わった
-	bool timeToSiwngFlag = SWING_MAX_COOL_TIME <= swingCoolTime;
 	//プレイヤーが一定フレーム内に連続でダッシュしている
 	bool playerDashAlotFlag = 3 <= CharacterAIData::Instance()->dashCount;
 
-	if (playerDashAlotFlag)
-	{
-		bool debug = false;
-	}
 
-	//スタミナが多く振り回しのクールタイムが終わった際、一定距離離れていたら実行
-	if ((useSwingFlag && timeToSiwngFlag && (haveAdvantageToSwingClockWiseFlag || haveAdvantageToSwingCClockWiseFlag)) || playerDashAlotFlag)
+	operateSwing.Update();
+	if ((useSwingFlag && haveAdvantageToSwingFlag) || playerDashAlotFlag)
 	{
-		//連続で振り回すのを防止する為ダッシュカウントをリセットする
-		CharacterAIData::Instance()->dashCount = 0;
-		CharacterAIData::Instance()->dashTimer = 0;
-
-		//敵を振り回しで移動させる距離が大きい方に振り回す
-		if (CharacterAIData::Instance()->swingCounterClockwiseDistance < CharacterAIData::Instance()->swingClockwiseDistance)
+		if (operateSwing.SwingLongDisntnce() == AiResult::OPERATE_SUCCESS)
 		{
-			CharacterAIOrder::Instance()->swingClockWiseFlag = true;
-			swingCoolTime = 0;
-		}
-		else
-		{
-			CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
-			swingCoolTime = 0;
+			//連続で振り回すのを防止する為ダッシュカウントをリセットする
+			CharacterAIData::Instance()->dashCount = 0;
+			CharacterAIData::Instance()->dashTimer = 0;
 		}
 	}
+
+
+	////スタミナが多く振り回しのクールタイムが終わった際、一定距離離れていたら実行
+	//if (((useSwingFlag && timeToSiwngFlag && (haveAdvantageToSwingClockWiseFlag || haveAdvantageToSwingCClockWiseFlag)) || playerDashAlotFlag) && !CharacterManager::Instance()->Right()->GetNowBreak())
+	//{
+	//	//連続で振り回すのを防止する為ダッシュカウントをリセットする
+	//	CharacterAIData::Instance()->dashCount = 0;
+	//	CharacterAIData::Instance()->dashTimer = 0;
+
+	//	//敵を振り回しで移動させる距離が大きい方に振り回す
+	//	if (CharacterAIData::Instance()->swingCounterClockwiseDistance < CharacterAIData::Instance()->swingClockwiseDistance && !CharacterManager::Instance()->Right()->GetNowBreak())
+	//	{
+	//		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
+	//		swingCoolTime = 0;
+	//	}
+	//	else
+	//	{
+	//		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
+	//		swingCoolTime = 0;
+	//	}
+	//}
+
+
 
 	++swingCoolTime;
 	++timer;
@@ -501,6 +509,8 @@ void AcquireASuperiorityGauge::Init()
 	swingCoolTime = 0;
 	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
 	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
+
+	operateSwing.Init(SWING_MAX_COOL_TIME);
 }
 
 void AcquireASuperiorityGauge::Update()
@@ -540,36 +550,54 @@ void AcquireASuperiorityGauge::Update()
 
 	const float STAMINA_VALUE = 0.5f;
 	//スタミナが多い
-	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge && SWING_MAX_COOL_TIME <= swingCoolTime;
+	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge;
 	//プレイヤーが一定フレーム内に連続でダッシュしている
 	bool playerDashAlotFlag = 3 <= CharacterAIData::Instance()->dashCount;
 
-	if (playerDashAlotFlag)
+
+
+	operateSwing.Update();
+	if (useSwingFlag || playerDashAlotFlag)
 	{
-		bool debug = false;
+		if (canSwingClockWiseFlag && operateSwing.SwingClockWise() == AiResult::OPERATE_SUCCESS)
+		{
+			//連続で振り回すのを防止する為ダッシュカウントをリセットする
+			CharacterAIData::Instance()->dashCount = 0;
+			CharacterAIData::Instance()->dashTimer = 0;
+
+		}
+		else if (canSwingCClockWiseFlag && operateSwing.SwingCounterClockWise() == AiResult::OPERATE_SUCCESS)
+		{
+			//連続で振り回すのを防止する為ダッシュカウントをリセットする
+			CharacterAIData::Instance()->dashCount = 0;
+			CharacterAIData::Instance()->dashTimer = 0;
+		}
 	}
+
+
+
 
 	//敵を振り回しで移動させる
-	if ((canSwingClockWiseFlag && useSwingFlag || playerDashAlotFlag) && !CharacterManager::Instance()->Right()->GetNowBreak())
-	{
-		//連続で振り回すのを防止する為ダッシュカウントをリセットする
-		CharacterAIData::Instance()->dashCount = 0;
-		CharacterAIData::Instance()->dashTimer = 0;
+	//if ((canSwingClockWiseFlag && useSwingFlag || playerDashAlotFlag) && !CharacterManager::Instance()->Right()->GetNowBreak())
+	//{
+	//	//連続で振り回すのを防止する為ダッシュカウントをリセットする
+	//	CharacterAIData::Instance()->dashCount = 0;
+	//	CharacterAIData::Instance()->dashTimer = 0;
 
-		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
-		swingCoolTime = 0;
-	}
-	else if ((canSwingCClockWiseFlag && useSwingFlag || playerDashAlotFlag) && !CharacterManager::Instance()->Right()->GetNowBreak())
-	{
-		//連続で振り回すのを防止する為ダッシュカウントをリセットする
-		CharacterAIData::Instance()->dashCount = 0;
-		CharacterAIData::Instance()->dashTimer = 0;
+	//	CharacterAIOrder::Instance()->swingClockWiseFlag = true;
+	//	swingCoolTime = 0;
+	//}
+	//else if ((canSwingCClockWiseFlag && useSwingFlag || playerDashAlotFlag) && !CharacterManager::Instance()->Right()->GetNowBreak())
+	//{
+	//	//連続で振り回すのを防止する為ダッシュカウントをリセットする
+	//	CharacterAIData::Instance()->dashCount = 0;
+	//	CharacterAIData::Instance()->dashTimer = 0;
 
-		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
-		swingCoolTime = 0;
-	}
+	//	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
+	//	swingCoolTime = 0;
+	//}
 
-	++swingCoolTime;
+	//++swingCoolTime;
 
 
 	//戦略実行中

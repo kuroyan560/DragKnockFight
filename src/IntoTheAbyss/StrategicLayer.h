@@ -4,6 +4,7 @@
 #include"../IntoTheAbyss/TacticalLayer.h"
 #include"../IntoTheAbyss/BehavioralLayer.h"
 #include"../IntoTheAbyss/NavigationAI.h"
+#include"../IntoTheAbyss/OperatingLayer.h"
 #include"../Engine/DrawFunc.h"
 /// <summary>
 /// 戦術層
@@ -144,9 +145,11 @@ public:
 	MoveToOwnGround moveToOnwGround;
 private:
 	bool goToTheFieldFlag;
+	OperateSwing operateSwing;
+
 
 	int swingCoolTime;
-	const int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
+	const int SWING_MAX_COOL_TIME = 60;//振り回しのクールタイム
 };
 
 
@@ -182,9 +185,9 @@ private:
 	//クラッシュさせる--------------------------
 	bool crashEnemyFlag;
 	int swingCoolTime;
-	const int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
+	const int SWING_MAX_COOL_TIME = 60;//振り回しのクールタイム
 
-
+	OperateSwing operateSwing;
 	MoveToOwnGround moveToOnwGround;
 
 	//クラッシュされないようにする--------------------------
