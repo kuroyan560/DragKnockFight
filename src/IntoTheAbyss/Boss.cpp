@@ -51,11 +51,11 @@ Boss::Boss() :CharacterInterFace(SCALE)
 	animations[FRONT].interval = 5;
 	animations[FRONT].loop = true;
 
-	/*static const int DEFAULT_BACK_NUM = 12;
+	static const int DEFAULT_BACK_NUM = 12;
 	animations[GO_BACK].graph.resize(DEFAULT_BACK_NUM);
-	TexHandleMgr::LoadDivGraph(BossRelative + "default.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[GO_BACK].graph.data());
+	TexHandleMgr::LoadDivGraph(BossRelative + "default_back.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[GO_BACK].graph.data());
 	animations[GO_BACK].interval = 5;
-	animations[GO_BACK].loop = true;*/
+	animations[GO_BACK].loop = true;
 
 	static const int DEFAULT_DAMAGE_NUM = 1;
 	animations[DAMAGE].graph.resize(DEFAULT_DAMAGE_NUM);
