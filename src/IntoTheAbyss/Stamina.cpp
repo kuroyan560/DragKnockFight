@@ -174,7 +174,6 @@ StaminaMgr::StaminaMgr()
 
 void StaminaMgr::Init()
 {
-
 	// ‰Šú‰» ‘S‚Ä‚ğ–„‚ß‚éB
 	const int SIZE = stamina.size();
 	for (int index = 0; index < SIZE; ++index) {

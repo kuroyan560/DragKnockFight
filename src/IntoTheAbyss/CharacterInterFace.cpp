@@ -10,6 +10,7 @@
 #include "AfterImage.h"
 #include "CrashEffectMgr.h"
 #include "Stamina.h"
+#include"CharacterManager.h"
 
 void CharacterInterFace::SwingUpdate()
 {
@@ -24,10 +25,17 @@ void CharacterInterFace::SwingUpdate()
 
 	// このタイミングでスタミナを消費する。
 	if (swingTimer == 5) {
-
-		// スタミナを消費
-		staminaGauge->ConsumesStamina(SWING_STAMINA);
-
+		//現状はこれで間に合わせる。
+		if (CharacterManager::Instance()->Right()->GetCharacterName()== PLAYABLE_BOSS_0)
+		{
+			// スタミナを消費
+			staminaGauge->ConsumesStamina(DebugParameter::Instance()->bossDebugData.staminaSwing);
+		}
+		else
+		{
+			// スタミナを消費
+			staminaGauge->ConsumesStamina(SWING_STAMINA);
+		}
 	}
 
 	// 限界を超えていたら修正。

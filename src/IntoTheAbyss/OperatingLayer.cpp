@@ -1,5 +1,6 @@
 #include "OperatingLayer.h"
 #include"CharacterManager.h"
+#include"DebugParameter.h"
 
 OperateMove::OperateMove()
 {
@@ -119,6 +120,7 @@ AiResult OperateSwing::SwingLongDisntnce()
 
 void OperateSwing::Update()
 {
+	swingCoolTime = DebugParameter::Instance()->bossDebugData.coolTime;
 	if (swingCoolTime <= swingTimer && !CharacterManager::Instance()->Right()->GetNowBreak() && !CharacterManager::Instance()->Right()->GetNowSwing())
 	{
 		enableToSwingFlag = true;

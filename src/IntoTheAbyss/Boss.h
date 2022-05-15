@@ -2,7 +2,6 @@
 #include <vector>
 #include "Intersected.h"
 #include"AreaCollider.h"
-#include"IBossPattern.h"
 #include<array>
 #include<memory>
 

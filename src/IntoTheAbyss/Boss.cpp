@@ -11,9 +11,6 @@
 #include "StunEffect.h"
 
 #include"TexHandleMgr.h"
-#include"BossPatternNormalMove.h"
-#include"BossPatternAttack.h"
-#include"BossPatternSwing.h"
 #include"CrashMgr.h"
 #include"CharacterInterFace.h"
 
@@ -135,8 +132,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	CharacterAIData::Instance()->swingCounterClockwiseDistance = CCWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
 
 
-	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
-
 	if (CharacterAIOrder::Instance()->dashFlag)
 	{
 		afterImgageTimer = 15.0f;
@@ -167,11 +162,10 @@ void Boss::OnDraw()
 	auto drawScale = stagingDevice.GetExtRate() * SCALE * appearExtRate;
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
-	if (DebugParameter::Instance()->bossDebugData.drawBossFlag)
-	{
-		DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-			TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
-	}
+
+	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
+		TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
+
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
 

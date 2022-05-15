@@ -88,21 +88,15 @@ void DebugParameter::DrawImGui()
 	if (DebugImGuiManager::Instance()->DrawFlag(bossParamImguiHandle))
 	{
 		ImGui::Begin("BossParameter");
-		std::string statusString = GetStatus(bossDebugData.bossNowStatus);
+		/*std::string statusString = GetStatus(bossDebugData.bossNowStatus);
 		std::string drawStatusStirng = "BOSS_NOW_STATUS:" + statusString;
-		ImGui::Text(drawStatusStirng.c_str());
-		ImGui::Text("moveVelX:%f", bossDebugData.moveVel.x);
-		ImGui::Text("moveVelY:%f", bossDebugData.moveVel.y);
-		ImGui::InputFloat("PULL_POWER_MIN", &bossDebugData.PULL_POWER_MIN);
-		ImGui::InputFloat("PULL_POWER_MAX", &bossDebugData.PULL_POWER_MAX);
-		ImGui::InputFloat("PULL_ADD_X_POWER", &bossDebugData.PULL_ADD_X_POWER);
-		ImGui::InputFloat("moveX", &bossDebugData.moveX);
-		ImGui::InputInt("PULL_SPAN_MIN", &bossDebugData.PULL_SPAN_MIN);
-		ImGui::InputInt("PULL_SPAN_MAX", &bossDebugData.PULL_SPAN_MAX);
-		ImGui::Text("DrawDebug");
-		ImGui::Checkbox("NearRay", &bossDebugData.drawNearRayFlag);
-		ImGui::Checkbox("FarRay", &bossDebugData.drawFarRayFlag);
-		ImGui::Checkbox("Boss", &bossDebugData.drawBossFlag);
+		ImGui::Text(drawStatusStirng.c_str());*/
+		ImGui::InputFloat("Velocity", &bossDebugData.vel);
+		ImGui::InputInt("SWING_COOL_TIME", &bossDebugData.coolTime);
+		ImGui::InputInt("STAMINA_MAX", &bossDebugData.staminaMax);
+		ImGui::InputInt("STAMINA_DASH", &bossDebugData.staminaDash);
+		ImGui::InputInt("STAMINA_SWING", &bossDebugData.staminaSwing);
+		ImGui::Checkbox("enableToDashAfterSwingFlag", &bossDebugData.enableToDashAfterSwingFlag);
 		ImGui::End();
 	}
 }

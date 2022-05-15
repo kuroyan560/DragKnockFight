@@ -6,6 +6,7 @@
 #include"Stamina.h"
 #include"ScrollMgr.h"
 #include"StageMgr.h"
+#include"DebugParameter.h"
 
 const float IStrategicLayer::SEARCH_RADIUS = 500.0f;
 const float RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 0.4f;
@@ -311,6 +312,7 @@ void GoToTheField::Init()
 	goToTheFieldFlag = true;
 	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
 	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
+
 	operateSwing.Init(SWING_MAX_COOL_TIME);
 }
 
@@ -340,7 +342,6 @@ void GoToTheField::Update()
 	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge;
 	//プレイヤーが一定フレーム内に連続でダッシュしている
 	bool playerDashAlotFlag = 3 <= CharacterAIData::Instance()->dashCount;
-
 
 	operateSwing.Update();
 	if ((useSwingFlag && haveAdvantageToSwingFlag) || playerDashAlotFlag)

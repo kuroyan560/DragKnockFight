@@ -1,6 +1,7 @@
 #include "BehavioralLayer.h"
 #include"CharacterManager.h"
 #include"Stamina.h"
+#include"DebugParameter.h"
 
 MovingBetweenTwoPoints::MovingBetweenTwoPoints()
 {
@@ -17,7 +18,9 @@ void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float
 	endPos = END_POS;
 	Vec2<float>normal((END_POS - START_POS));
 	normal.Normalize();
-	vel = normal * Vec2<float>(14.0f, 14.0f);
+
+	float localVel = DebugParameter::Instance()->bossDebugData.vel;
+	vel = normal * Vec2<float>(localVel, localVel);
 	if (STACK_FLAG)
 	{
 		vel.x = 0.0f;
@@ -39,10 +42,23 @@ void MovingBetweenTwoPoints::Update()
 	const float USE_DASH_STAMINA_GAUGE = 0.3f;
 	//プレイヤーがダッシュした時に遅れてダッシュする
 	const bool dashCounterFlag = CharacterAIData::Instance()->dashFlag && USE_DASH_STAMINA_GAUGE <= CharacterAIData::Instance()->bossData.stamineGauge;
-	if (dashCounterFlag || CharacterAIData::Instance()->releaseSwingFlag)
+
+	//デバックで振り回し後にダッシュするかを指定したもの
+	if (DebugParameter::Instance()->bossDebugData.enableToDashAfterSwingFlag)
 	{
-		dashFlag = true;
+		if (dashCounterFlag || CharacterAIData::Instance()->releaseSwingFlag)
+		{
+			dashFlag = true;
+		}
 	}
+	else
+	{
+		if (dashCounterFlag)
+		{
+			dashFlag = true;
+		}
+	}
+
 	if (dashFlag)
 	{
 		++dashTimer;
@@ -52,7 +68,7 @@ void MovingBetweenTwoPoints::Update()
 	{
 		operateDash.Init(vel / 2.0f);
 		CharacterAIOrder::Instance()->dashFlag = true;
-		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(CharacterAIData::Instance()->playerData.dashStamina);
+		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(DebugParameter::Instance()->bossDebugData.staminaDash);
 		dashTimer = 0;
 		dashFlag = false;
 	}

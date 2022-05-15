@@ -147,7 +147,7 @@ private:
 	bool goToTheFieldFlag;
 	OperateSwing operateSwing;
 
-	const int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
+	int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
 };
 
 
@@ -182,7 +182,7 @@ private:
 	float nowGauge;							//戦略開始時の優勢ゲージ
 	//クラッシュさせる--------------------------
 	bool crashEnemyFlag;
-	const int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
+	int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
 
 	OperateSwing operateSwing;
 	MoveToOwnGround moveToOnwGround;
