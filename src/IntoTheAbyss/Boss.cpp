@@ -47,7 +47,6 @@ Boss::Boss() :CharacterInterFace(SCALE)
 
 	static const int DEFAULT_FRONT_NUM = 12;
 	animations[GO_FRONT].graph.resize(DEFAULT_FRONT_NUM);
-	animations[GO_FRONT].graph[0] = TexHandleMgr::LoadGraph(BossRelative + "default.png");
 	TexHandleMgr::LoadDivGraph(BossRelative + "default.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[GO_FRONT].graph.data());
 	animations[GO_FRONT].interval = 5;
 	animations[GO_FRONT].loop = true;
