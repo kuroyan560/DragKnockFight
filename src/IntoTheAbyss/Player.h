@@ -115,6 +115,11 @@ public:
 	Vec2<float>pilotAccel;
 	int playerPilotGraph[2];	//FRONT,BACK
 
+	// ジャスト振り回しキャンセルダッシュ用の当たり判定線分。
+	Vec2<float> justCancelDashStartPos;
+	Vec2<float> justCancelDashEndPos;
+
+
 public:
 
 	/*-- メンバ関数 --*/
@@ -209,4 +214,7 @@ private:
 
 public:
 	void OnKnockOut()override { anim.ChangeAnim(KNOCK_OUT); }
+
+	bool CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos);
+
 };
