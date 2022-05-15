@@ -120,7 +120,7 @@ AiResult OperateSwing::SwingLongDisntnce()
 
 void OperateSwing::Update()
 {
-	swingCoolTime = DebugParameter::Instance()->bossDebugData.coolTime;
+	swingCoolTime = DebugParameter::Instance()->GetBossData().coolTime;
 	if (swingCoolTime <= swingTimer && !CharacterManager::Instance()->Right()->GetNowBreak() && !CharacterManager::Instance()->Right()->GetNowSwing())
 	{
 		enableToSwingFlag = true;

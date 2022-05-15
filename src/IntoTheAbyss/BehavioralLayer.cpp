@@ -19,7 +19,7 @@ void MovingBetweenTwoPoints::Init(const Vec2<float> &START_POS, const Vec2<float
 	Vec2<float>normal((END_POS - START_POS));
 	normal.Normalize();
 
-	float localVel = DebugParameter::Instance()->bossDebugData.vel;
+	float localVel = DebugParameter::Instance()->GetBossData().vel;
 	vel = normal * Vec2<float>(localVel, localVel);
 	if (STACK_FLAG)
 	{
@@ -44,7 +44,7 @@ void MovingBetweenTwoPoints::Update()
 	const bool dashCounterFlag = CharacterAIData::Instance()->dashFlag && USE_DASH_STAMINA_GAUGE <= CharacterAIData::Instance()->bossData.stamineGauge;
 
 	//デバックで振り回し後にダッシュするかを指定したもの
-	if (DebugParameter::Instance()->bossDebugData.enableToDashAfterSwingFlag)
+	if (DebugParameter::Instance()->GetBossData().enableToDashAfterSwingFlag)
 	{
 		if (dashCounterFlag || CharacterAIData::Instance()->releaseSwingFlag)
 		{
@@ -68,7 +68,7 @@ void MovingBetweenTwoPoints::Update()
 	{
 		operateDash.Init(vel / 2.0f);
 		CharacterAIOrder::Instance()->dashFlag = true;
-		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(DebugParameter::Instance()->bossDebugData.staminaDash);
+		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(DebugParameter::Instance()->GetBossData().staminaDash);
 		dashTimer = 0;
 		dashFlag = false;
 	}

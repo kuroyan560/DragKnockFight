@@ -29,7 +29,7 @@ void CharacterInterFace::SwingUpdate()
 		if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
 		{
 			// スタミナを消費
-			staminaGauge->ConsumesStamina(DebugParameter::Instance()->bossDebugData.staminaSwing);
+			staminaGauge->ConsumesStamina(DebugParameter::Instance()->GetBossData().staminaSwing);
 		}
 		else
 		{

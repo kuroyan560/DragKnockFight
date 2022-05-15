@@ -101,7 +101,9 @@ public:
 
 	MaskData maskData;
 
-	BossDebugParameterData bossDebugData;
+	int bossStageNum;
+	std::vector<BossDebugParameterData> bossDebugData;
+	const BossDebugParameterData &GetBossData();
 
 	std::string GetStatus(int NUM)
 	{
@@ -124,5 +126,6 @@ public:
 			break;
 		}
 	}
+
 };
 

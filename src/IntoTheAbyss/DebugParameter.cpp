@@ -1,4 +1,5 @@
 #include "DebugParameter.h"
+#include"SelectStage.h"
 
 DebugParameter::DebugParameter()
 {
@@ -26,6 +27,17 @@ DebugParameter::DebugParameter()
 
 	roundParamImguiHandle = DebugImGuiManager::Instance()->Add("RoundParameter");
 	bossParamImguiHandle = DebugImGuiManager::Instance()->Add("BossParameter");
+
+	bossStageNum = 0;
+
+
+	bossDebugData.push_back(BossDebugParameterData());
+	bossDebugData.push_back(BossDebugParameterData());
+	bossDebugData.push_back(BossDebugParameterData());
+
+	//BossDebugParameterData data;
+	//bossDebugData.push_back(data);
+
 }
 
 void DebugParameter::Update()
@@ -88,15 +100,31 @@ void DebugParameter::DrawImGui()
 	if (DebugImGuiManager::Instance()->DrawFlag(bossParamImguiHandle))
 	{
 		ImGui::Begin("BossParameter");
-		/*std::string statusString = GetStatus(bossDebugData.bossNowStatus);
-		std::string drawStatusStirng = "BOSS_NOW_STATUS:" + statusString;
-		ImGui::Text(drawStatusStirng.c_str());*/
-		ImGui::InputFloat("Velocity", &bossDebugData.vel);
-		ImGui::InputInt("SWING_COOL_TIME", &bossDebugData.coolTime);
-		ImGui::InputInt("STAMINA_MAX", &bossDebugData.staminaMax);
-		ImGui::InputInt("STAMINA_DASH", &bossDebugData.staminaDash);
-		ImGui::InputInt("STAMINA_SWING", &bossDebugData.staminaSwing);
-		ImGui::Checkbox("enableToDashAfterSwingFlag", &bossDebugData.enableToDashAfterSwingFlag);
+		ImGui::InputInt("BossParamData", &bossStageNum);
+
+		if (bossStageNum < 0)
+		{
+			bossStageNum = 0;
+		}
+		else if (bossDebugData.size() <= bossStageNum)
+		{
+			bossStageNum = bossDebugData.size() - 1;
+		}
+		ImGui::InputFloat("Velocity", &bossDebugData[bossStageNum].vel);
+		ImGui::InputInt("SWING_COOL_TIME", &bossDebugData[bossStageNum].coolTime);
+		ImGui::InputInt("STAMINA_MAX", &bossDebugData[bossStageNum].staminaMax);
+		ImGui::InputInt("STAMINA_DASH", &bossDebugData[bossStageNum].staminaDash);
+		ImGui::InputInt("STAMINA_SWING", &bossDebugData[bossStageNum].staminaSwing);
+		ImGui::Checkbox("enableToDashAfterSwingFlag", &bossDebugData[bossStageNum].enableToDashAfterSwingFlag);
 		ImGui::End();
 	}
+}
+
+const BossDebugParameterData &DebugParameter::GetBossData()
+{
+#ifdef DEBUG
+	bossStageNum = SelectStage::Instance()->GetStageNum();
+#endif // _DEBUG
+
+	return bossDebugData[bossStageNum];
 }
