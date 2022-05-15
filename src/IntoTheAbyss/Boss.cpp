@@ -30,8 +30,8 @@
 static const Vec2<float> SCALE = { 80.0f,80.0f };
 Boss::Boss() :CharacterInterFace(SCALE)
 {
-	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
-	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
+	//graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
+	//graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
 
 	//パターンに渡すデータの初期化
 	navigationAi.Init(StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()));
@@ -43,19 +43,19 @@ Boss::Boss() :CharacterInterFace(SCALE)
 	const std::string BossRelative = "resource/ChainCombat/boss/0/";
 
 	std::vector<Anim>animations;
-	animations.resize(3);
+	animations.resize(ANIMAHANDLE_MAX);
 
 	static const int DEFAULT_FRONT_NUM = 12;
-	animations[GO_FRONT].graph.resize(DEFAULT_FRONT_NUM);
-	TexHandleMgr::LoadDivGraph(BossRelative + "default.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[GO_FRONT].graph.data());
-	animations[GO_FRONT].interval = 5;
-	animations[GO_FRONT].loop = true;
+	animations[FRONT].graph.resize(DEFAULT_FRONT_NUM);
+	TexHandleMgr::LoadDivGraph(BossRelative + "default.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[FRONT].graph.data());
+	animations[FRONT].interval = 5;
+	animations[FRONT].loop = true;
 
-	static const int DEFAULT_BACK_NUM = 12;
+	/*static const int DEFAULT_BACK_NUM = 12;
 	animations[GO_BACK].graph.resize(DEFAULT_BACK_NUM);
 	TexHandleMgr::LoadDivGraph(BossRelative + "default.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[GO_BACK].graph.data());
 	animations[GO_BACK].interval = 5;
-	animations[GO_BACK].loop = true;
+	animations[GO_BACK].loop = true;*/
 
 	static const int DEFAULT_DAMAGE_NUM = 1;
 	animations[DAMAGE].graph.resize(DEFAULT_DAMAGE_NUM);
@@ -80,7 +80,7 @@ void Boss::OnInit()
 	afterImgageTimer = 0;
 
 	characterAi.Init();
-	anim->Init(GO_FRONT);
+	anim->Init(FRONT);
 }
 
 #include"Camera.h"
@@ -94,22 +94,19 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	//	return;
 	//}
 
-	if (signbit(moveVel.x))
+	if (signbit(CharacterAIData::Instance()->prevPos.x - CharacterAIData::Instance()->nowPos.x))
 	{
-		anim->ChangeAnim(GO_FRONT);
+		anim->ChangeAnim(FRONT);
 	}
 	else
 	{
-		anim->ChangeAnim(GO_FRONT);
+		anim->ChangeAnim(FRONT);
 	}
 
 
 	// パートナーが振り回していたら残像を出す。
 	if (partner.lock()->GetNowSwing()) {
-
-		DIR dir = FRONT;
-		if (vel.y < 0)dir = BACK;
-		AfterImageMgr::Instance()->Generate(pos, {}, 0, graphHandle[dir], Color(239, 1, 144, 255), true, size);
+		AfterImageMgr::Instance()->Generate(pos, {}, 0, anim->GetGraphHandle(), Color(239, 1, 144, 255), true, size);
 		anim->ChangeAnim(DAMAGE);
 	}
 
@@ -182,12 +179,13 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	//ダッシュの残像
 	if (afterImgageTimer)
 	{
-		AfterImageMgr::Instance()->Generate(pos, Vec2<float>(1.0f, 1.0f) * ScrollMgr::Instance()->zoom, 0.0f, graphHandle[FRONT], GetTeamColor());
+		AfterImageMgr::Instance()->Generate(pos, Vec2<float>(1.0f, 1.0f) * ScrollMgr::Instance()->zoom, 0.0f, anim->GetGraphHandle(), GetTeamColor());
 		afterImgageTimer--;
 	}
 
 	// 移動量に関する変数をここで全てvelに代入する。
 	vel = CharacterAIOrder::Instance()->vel;
+
 
 }
 
@@ -197,9 +195,6 @@ void Boss::OnDraw()
 {
 	/*===== 描画処理 =====*/
 	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
-	DIR dir = FRONT;
-	if (vel.y < 0)dir = BACK;
-
 	auto drawPos = pos + stagingDevice.GetShake();
 	auto drawScale = stagingDevice.GetExtRate() * SCALE * appearExtRate;
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));

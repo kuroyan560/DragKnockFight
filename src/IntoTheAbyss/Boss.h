@@ -27,9 +27,13 @@ public:
 	INTERSECTED_LINE prevIntersectedLine;
 
 	//‰æ‘œ
-	static const enum DIR { FRONT, BACK, DIR_NUM };
-	static const enum AnimHandle { GO_FRONT, GO_BACK, DAMAGE };
-	int graphHandle[DIR_NUM];
+	static const enum AnimHandle 
+	{
+		FRONT,
+		//GO_BACK,
+		DAMAGE,
+		ANIMAHANDLE_MAX
+	};
 	int afterImgageTimer;
 	std::shared_ptr<PlayerAnimation> anim;
 
