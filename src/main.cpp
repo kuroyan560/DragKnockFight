@@ -30,8 +30,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	engineOption.iconPath = nullptr;
 	engineOption.backBuffClearColor = Color(56, 22, 74, 255);
 	engineOption.useHDR = false;
+#ifdef _DEBUG
 	engineOption.frameRate = 43;
-	engineOption.imguiActive = false;
+#else
+	engineOption.frameRate = 200;
+#endif
+
+	engineOption.imguiActive = true;
 
 	//===============================
 
