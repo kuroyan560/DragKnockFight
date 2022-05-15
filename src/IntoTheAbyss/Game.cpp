@@ -102,6 +102,49 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 				if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 
 
+				/*----- デバッグ用 -----*/
+
+
+
+				// ブロックが左(緑)ブロックだったら
+				if (mapChipData[height][width] == MAPCHIP_TYPE_STATIC_COLOR_LEFT) {
+
+					DrawFunc::DrawBox2D(drawPos + Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), drawPos - Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), Color(50, 200, 50, 255), TRUE);
+					continue;
+
+				}
+				// ブロックが右(赤)ブロックだったら
+				else if (mapChipData[height][width] == MAPCHIP_TYPE_STATIC_COLOR_RIGHT) {
+
+					DrawFunc::DrawBox2D(drawPos + Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), drawPos - Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), Color(200, 50, 50, 255), TRUE);
+					continue;
+
+				}
+				// ブロックがトゲブロック(棘無し)だったら
+				else if (mapChipData[height][width] == MAPCHIP_TYPE_STATIC_ELEC_OFF) {
+
+					DrawFunc::DrawBox2D(drawPos + Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), drawPos - Vec2<float>(MAP_CHIP_HALF_SIZE, MAP_CHIP_HALF_SIZE), Color(200, 50, 50, 255), TRUE);
+					continue;
+
+				}
+				// ブロックがトゲブロック(棘有り)だったら
+				else if (mapChipData[height][width] == MAPCHIP_TYPE_STATIC_ELEC_ON) {
+
+
+
+				}
+				// ブロックがトゲブロック(常時)だったら
+				else if (mapChipData[height][width] == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS) {
+
+
+
+				}
+
+
+
+				/*----- デバッグ用 -----*/
+
+
 				vector<MapChipAnimationData*>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
 				if (height < 0 || mapChipDrawData.size() <= height) continue;
