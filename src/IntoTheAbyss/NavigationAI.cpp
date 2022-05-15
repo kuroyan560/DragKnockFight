@@ -21,7 +21,7 @@ NavigationAI::NavigationAI()
 
 static const float BOSS_SIZE = 160.0f;
 
-void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
+void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 {
 
 	SizeData wallMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
@@ -65,10 +65,11 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 			bool wallFlag = false;
 
 			// 壁とウェイポイントの当たり判定を行う。
-			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_LEFT);
-			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_RIGHT);
-			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_TOP);
-			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_BOTTOM);
+			Vec2<int> buff;	// 新しく当たり判定関数に機能を追加したためそれに合わせるための変数です。この場において用途はありません。
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_LEFT, buff);
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_RIGHT, buff);
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_TOP, buff);
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_BOTTOM, buff);
 
 			//等間隔で開ける
 			wayPoints[y][x].pos = worldPos;
@@ -104,7 +105,7 @@ void NavigationAI::Init(const RoomMapChipArray &MAP_DATA)
 	startFlag = false;
 }
 
-void NavigationAI::Update(const Vec2<float> &POS)
+void NavigationAI::Update(const Vec2<float>& POS)
 {
 
 	// ウェイポイントのアイテム保持数を計算する。
@@ -419,7 +420,7 @@ std::vector<WayPointData> NavigationAI::GetShortestRoute()
 	return shortestRoute;
 }
 
-inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS)
+inline const Vec2<int>& NavigationAI::GetMapChipNum(const Vec2<float>& WORLD_POS)
 {
 	//浮動小数点を切り下げる処理
 	Vec2<float> num =
@@ -452,12 +453,12 @@ inline const Vec2<int> &NavigationAI::GetMapChipNum(const Vec2<float> &WORLD_POS
 	return result;
 }
 
-inline bool NavigationAI::DontUse(const Vec2<int> &HANDLE)
+inline bool NavigationAI::DontUse(const Vec2<int>& HANDLE)
 {
 	return HANDLE != Vec2<int>(-1, -1);
 }
 
-void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &END_POINT)
+void NavigationAI::AStart(const WayPointData& START_POINT, const WayPointData& END_POINT)
 {
 	std::vector<WayPointData>startPoint;//ウェイポイントの探索開始位置
 	std::vector<WayPointData>nextPoint; //次のウェイポイントの探索開始位置
@@ -575,7 +576,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 								branchQueue[branchHandle].push_back(WayPointData());
 								//疑惑
 								branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
-								
+
 							}
 							//二回以上探索されたら別のブランチを作成し、今までのルートを渡し追加する
 							else
@@ -591,7 +592,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 								//疑惑
 								branchQueue[newbranchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 
-								
+
 							}
 						}
 						//現在地がゴールでそのゴールが他のブランチにも追加済みの場合、他のブランチにも追加できるようにする
@@ -602,7 +603,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 							//疑惑
 							branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 
-							
+
 						}
 					}
 					//探索に失敗したウェイポイントを記録する
@@ -625,7 +626,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 							//疑惑
 							branchQueue[branchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 
-							
+
 						}
 						//二回以上探索されたら別のブランチを作成し、今までのルートを渡し追加する
 						else
@@ -641,7 +642,7 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 							//疑惑
 							branchQueue[newbranchHandle][branchQueue[branchHandle].size() - 1] = wayPoints[handle.y][handle.x];
 
-							
+
 						}
 					}
 				}
@@ -695,11 +696,11 @@ void NavigationAI::AStart(const WayPointData &START_POINT, const WayPointData &E
 	branchQueue.shrink_to_fit();
 }
 
-void NavigationAI::RegistBranch(const WayPointData &DATA)
+void NavigationAI::RegistBranch(const WayPointData& DATA)
 {
 }
 
-inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
+inline bool NavigationAI::CheckQueue(const Vec2<int>& HANDLE)
 {
 	for (int i = 0; i < queue.size(); ++i)
 	{
@@ -711,7 +712,7 @@ inline bool NavigationAI::CheckQueue(const Vec2<int> &HANDLE)
 	return false;
 }
 
-Vec2<float> NavigationAI::CaluLine(const Vec2<float> &CENTRAL_POS, int angle)
+Vec2<float> NavigationAI::CaluLine(const Vec2<float>& CENTRAL_POS, int angle)
 {
 	float distance = 0.0f;
 
@@ -767,7 +768,7 @@ Vec2<float> NavigationAI::CaluLine(const Vec2<float> &CENTRAL_POS, int angle)
 	return CENTRAL_POS + lineEndPos * distance;
 }
 
-bool NavigationAI::ConnectWayPoint(WayPointData DATA, const Vec2<float> &SEARCH_DIR, const SizeData &CHIP_DATA)
+bool NavigationAI::ConnectWayPoint(WayPointData DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA)
 {
 
 	// 指定された方向に線分を伸ばす。
@@ -795,7 +796,7 @@ bool NavigationAI::ConnectWayPoint(WayPointData DATA, const Vec2<float> &SEARCH_
 
 }
 
-float NavigationAI::SearchWall(WayPointData DATA, const Vec2<float> &SEARCH_DIR, const SizeData &CHIP_DATA)
+float NavigationAI::SearchWall(WayPointData DATA, const Vec2<float>& SEARCH_DIR, const SizeData& CHIP_DATA)
 {
 	int searchCounter = 0;
 	Vec2<float> searchIndex = { ((float)DATA.handle.x * BOSS_SIZE) / MAP_CHIP_SIZE, ((float)DATA.handle.y * BOSS_SIZE) / MAP_CHIP_SIZE };
@@ -884,7 +885,7 @@ void NavigationAI::CheckNumberOfItemHeldCount()
 
 }
 
-std::vector<WayPointData> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<WayPointData>> &QUEUE)
+std::vector<WayPointData> NavigationAI::ConvertToShortestRoute2(const std::vector<std::vector<WayPointData>>& QUEUE)
 {
 	std::vector<std::vector<WayPointData>> route;
 
