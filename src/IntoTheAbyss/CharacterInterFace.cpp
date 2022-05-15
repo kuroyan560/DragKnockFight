@@ -387,7 +387,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	gaugeReturnTimer = 0;
 
 	// 各キャラによってスタミナゲージのデフォルト量を決定する予定。
-	staminaGauge = std::make_shared<StaminaMgr>();
+	//staminaGauge = std::make_shared<StaminaMgr>();
 	staminaGauge->Init();
 
 	// キャラに寄ってスタミナゲージの色を設定する。
@@ -1139,5 +1139,18 @@ void CharacterInterFace::FinishSwing()
 	addSwingAngle = 0;
 	swingTimer = 0;
 
+}
+
+CharacterInterFace::CharacterInterFace(const Vec2<float> &HonraiSize) : size(HonraiSize)
+{
+	areaHitBox.center = &pos;
+	areaHitBox.size = size;
+	bulletHitSphere.center = &pos;
+	bulletHitSphere.radius = size.x;
+	rbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_RB.png");
+	lbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_LB.png");
+	lineHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_line.png");
+	arrowHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_arrow.png");
+	staminaGauge = std::make_shared<StaminaMgr>();
 }
 
