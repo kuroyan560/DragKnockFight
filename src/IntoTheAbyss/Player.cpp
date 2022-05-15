@@ -34,7 +34,7 @@ Vec2<float> Player::GetGeneratePos()
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& Team)
-	:CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx((int)Team), tutorial(Team)
+	:CharacterInterFace(PLAYER_HIT_SIZE), controllerIdx((int)Team), tutorial(Team)
 {
 	/*====== コンストラクタ =====*/
 	if (PLAYER_CHARACTER_NUM <= CharacterName)assert(0);
@@ -56,6 +56,65 @@ Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& T
 	playerPilotGraph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot.png");
 	playerPilotGraph[1] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot_back.png");
 	pilotGraph = playerPilotGraph[0];
+
+	std::vector<Anim>animations;
+	animations.resize(PLAYER_ANIM_NUM);
+	static const int DEFAULT_FRONT_NUM = 1;
+	animations[DEFAULT_FRONT].graph.resize(DEFAULT_FRONT_NUM);
+	//TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/Player/on_ground_wait.png", ON_GROUND_WAIT_NUM, { ON_GROUND_WAIT_NUM,1 }, animations[ON_GROUND_WAIT].graph.data());
+	animations[DEFAULT_FRONT].graph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/player.png");
+	animations[DEFAULT_FRONT].interval = 10;
+	animations[DEFAULT_FRONT].loop = true;
+
+	static const int DEFAULT_BACK_NUM = 1;
+	animations[DEFAULT_BACK].graph.resize(DEFAULT_BACK_NUM);
+	animations[DEFAULT_BACK].graph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/player_back.png");
+	animations[DEFAULT_BACK].interval = 10;
+	animations[DEFAULT_BACK].loop = true;
+
+	static const int PULL_FRONT_NUM = 3;
+	animations[PULL_FRONT].graph.resize(PULL_FRONT_NUM);
+	TexHandleMgr::LoadDivGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pull_front.png", PULL_FRONT_NUM, { PULL_FRONT_NUM,1 }, animations[PULL_FRONT].graph.data());
+	animations[PULL_FRONT].interval = 6;
+	animations[PULL_FRONT].loop = true;
+
+	static const int PULL_BACK_NUM = 3;
+	animations[PULL_BACK].graph.resize(PULL_FRONT_NUM);
+	TexHandleMgr::LoadDivGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pull_back.png", PULL_BACK_NUM, { PULL_BACK_NUM,1 }, animations[PULL_BACK].graph.data());
+	animations[PULL_BACK].interval = 6;
+	animations[PULL_BACK].loop = true;
+
+	static const int HOLD_NUM = 5;
+	animations[HOLD].graph.resize(HOLD_NUM);
+	TexHandleMgr::LoadDivGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/hold.png", HOLD_NUM, { HOLD_NUM,1 }, animations[HOLD].graph.data());
+	animations[HOLD].interval = 3;
+	animations[HOLD].loop = false;
+
+	static const int SWINGED_NUM = 1;
+	animations[SWINGED].graph.resize(SWINGED_NUM);
+	animations[SWINGED].graph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/swinged.png");
+	animations[SWINGED].interval = 10;
+	animations[SWINGED].loop = true;
+
+	static const int TIRED_NUM = 3;
+	animations[TIRED].graph.resize(TIRED_NUM);
+	TexHandleMgr::LoadDivGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/tired.png", TIRED_NUM, { TIRED_NUM,1 }, animations[TIRED].graph.data());
+	animations[TIRED].interval = 6;
+	animations[TIRED].loop = true;
+
+	static const int KNOCK_OUT_NUM = 1;
+	animations[KNOCK_OUT].graph.resize(KNOCK_OUT_NUM);
+	animations[KNOCK_OUT].graph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/swinged.png");
+	animations[KNOCK_OUT].interval = 10;
+	animations[KNOCK_OUT].loop = true;
+
+	static const int NON_PILOT_NUM = 1;
+	animations[NON_PILOT].graph.resize(NON_PILOT_NUM);
+	animations[NON_PILOT].graph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/nonPilot.png");
+	animations[NON_PILOT].interval = 10;
+	animations[NON_PILOT].loop = true;
+
+	anim = std::make_shared<PlayerAnimation>(animations);
 }
 
 Player::~Player()
@@ -71,7 +130,7 @@ void Player::OnInit()
 	//playerDir = DEFAULT;
 
 	//アニメーション初期化
-	anim.Init();
+	anim->Init(DEFAULT_FRONT);
 	tiredTimer = TIRED_DRAW_TIME;
 
 	// 腕をセット
@@ -174,7 +233,7 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 		// 残像を保存。
 		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate();
-		AfterImageMgr::Instance()->Generate(pos, extRate, stagingDevice.GetSpinRadian(), anim.GetGraphHandle(), charaColor);
+		AfterImageMgr::Instance()->Generate(pos, extRate, stagingDevice.GetSpinRadian(), anim->GetGraphHandle(), charaColor);
 
 	}
 
@@ -213,7 +272,7 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 		--inputInvalidTimerByCrash;
 		if (inputInvalidTimerByCrash <= 0 && !GetNowBreak())
 		{
-			anim.ChangeAnim(DEFAULT_FRONT);
+			anim->ChangeAnim(DEFAULT_FRONT);
 		}
 	}
 
@@ -221,21 +280,21 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	/*if (gripPowerTimer <= 0) {
 
 		isGripPowerEmpty = true;
-		anim.ChangeAnim(TIRED);
+		anim->ChangeAnim(TIRED);
 	}*/
 
 	//ダッシュの残像
 	if (dashAftImgTimer)
 	{
 		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate();
-		AfterImageMgr::Instance()->Generate(pos, extRate, 0.0f, anim.GetGraphHandle(), GetTeamColor());
+		AfterImageMgr::Instance()->Generate(pos, extRate, 0.0f, anim->GetGraphHandle(), GetTeamColor());
 		dashAftImgTimer--;
 	}
 
 	// 振り回していなかったら
 	if (!nowSwing) {
 
-		if (anim.GetNowAnim() == HOLD)anim.ChangeAnim(DEFAULT_FRONT);
+		if (anim->GetNowAnim() == HOLD)anim->ChangeAnim(DEFAULT_FRONT);
 
 		// 紐つかみ状態(踏ん張り状態)を解除する。
 		isHold = false;
@@ -257,7 +316,7 @@ void Player::OnUpdateNoRelatedSwing()
 
 	//		gripPowerTimer = MAX_GRIP_POWER_TIMER;
 	//		isGripPowerEmpty = false;
-	//		anim.ChangeAnim(DEFAULT_FRONT);
+	//		anim->ChangeAnim(DEFAULT_FRONT);
 	//	}
 	//}
 
@@ -265,18 +324,18 @@ void Player::OnUpdateNoRelatedSwing()
 	UpdateStretch();
 
 	//アニメーション更新
-	anim.Update();
+	anim->Update();
 
 	if (tiredTimer < TIRED_DRAW_TIME)
 	{
 		tiredTimer++;
-		if (TIRED_DRAW_TIME <= tiredTimer)anim.ChangeAnim(DEFAULT_FRONT);
+		if (TIRED_DRAW_TIME <= tiredTimer)anim->ChangeAnim(DEFAULT_FRONT);
 	}
 
 	if (staminaGauge->emptyTrigger)
 	{
 		tiredTimer = 0;
-		anim.ChangeAnim(TIRED);
+		anim->ChangeAnim(TIRED);
 	}
 
 }
@@ -286,17 +345,17 @@ void Player::OnDraw()
 	//if (vel.y < 0)playerDir = BACK;
 	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
 
-	if (!isHold && !anim.Compare({ SWINGED,TIRED,NON_PILOT }) && CompleteAppear())
+	if (!isHold && !anim->Compare({ SWINGED,TIRED,NON_PILOT,KNOCK_OUT }) && CompleteAppear())
 	{
 		if (moveInput.x)
 		{
-			if (playerDirY == PLAYER_BACK)anim.ChangeAnim(PULL_BACK);
-			else anim.ChangeAnim(PULL_FRONT);
+			if (playerDirY == PLAYER_BACK)anim->ChangeAnim(PULL_BACK);
+			else anim->ChangeAnim(PULL_FRONT);
 		}
 		else
 		{
-			if (playerDirY == PLAYER_BACK)anim.ChangeAnim(DEFAULT_BACK);
-			else anim.ChangeAnim(DEFAULT_FRONT);
+			if (playerDirY == PLAYER_BACK)anim->ChangeAnim(DEFAULT_BACK);
+			else anim->ChangeAnim(DEFAULT_FRONT);
 		}
 	}
 
@@ -324,7 +383,7 @@ void Player::OnDraw()
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(pos + stagingDevice.GetShake());
 	//胴体
-	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
+	auto bodyTex = TexHandleMgr::GetTexBuffer(anim->GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	bool mirorX = playerDirX == PLAYER_RIGHT || (isHold && (partner.lock()->pos - pos).x < 0);
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * staminaGauge->outOfStaminaEffect.GetSize() * appearExtRate,
@@ -850,7 +909,7 @@ void Player::UpdateStretch()
 Vec2<float> Player::GetPlayerGraphSize()
 {
 	//return { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+	return { (anim->GetGraphSize().x * EXT_RATE) / 2.0f,(anim->GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 }
 
 void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& MapData)

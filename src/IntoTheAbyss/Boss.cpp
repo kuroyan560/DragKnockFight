@@ -30,11 +30,41 @@
 static const Vec2<float> SCALE = { 80.0f,80.0f };
 Boss::Boss() :CharacterInterFace(SCALE)
 {
-	graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
-	graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
+	//graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
+	//graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
 
 	//パターンに渡すデータの初期化
 	navigationAi.Init(StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()));
+
+
+
+
+
+	const std::string BossRelative = "resource/ChainCombat/boss/0/";
+
+	std::vector<Anim>animations;
+	animations.resize(ANIMAHANDLE_MAX);
+
+	static const int DEFAULT_FRONT_NUM = 12;
+	animations[FRONT].graph.resize(DEFAULT_FRONT_NUM);
+	TexHandleMgr::LoadDivGraph(BossRelative + "default.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[FRONT].graph.data());
+	animations[FRONT].interval = 5;
+	animations[FRONT].loop = true;
+
+	static const int DEFAULT_BACK_NUM = 12;
+	animations[BACK].graph.resize(DEFAULT_BACK_NUM);
+	TexHandleMgr::LoadDivGraph(BossRelative + "default_back.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[BACK].graph.data());
+	animations[BACK].interval = 5;
+	animations[BACK].loop = true;
+
+	static const int DEFAULT_DAMAGE_NUM = 1;
+	animations[DAMAGE].graph.resize(DEFAULT_DAMAGE_NUM);
+	animations[DAMAGE].graph[0] = TexHandleMgr::LoadGraph(BossRelative + "damage.png");
+	animations[DAMAGE].interval = 0;
+	animations[DAMAGE].loop = false;
+
+
+	anim = std::make_shared<PlayerAnimation>(animations);
 }
 
 void Boss::OnInit()
@@ -50,6 +80,7 @@ void Boss::OnInit()
 	afterImgageTimer = 0;
 
 	characterAi.Init();
+	anim->Init(FRONT);
 }
 
 #include"Camera.h"
@@ -63,13 +94,20 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	//	return;
 	//}
 
+	if (signbit(CharacterAIData::Instance()->prevPos.x - CharacterAIData::Instance()->nowPos.x))
+	{
+		anim->ChangeAnim(BACK);
+	}
+	else
+	{
+		anim->ChangeAnim(FRONT);
+	}
+
+
 	// パートナーが振り回していたら残像を出す。
 	if (partner.lock()->GetNowSwing()) {
-
-		DIR dir = FRONT;
-		if (vel.y < 0)dir = BACK;
-		AfterImageMgr::Instance()->Generate(pos, {}, 0, graphHandle[dir], Color(239, 1, 144, 255), true, size);
-
+		AfterImageMgr::Instance()->Generate(pos, {}, 0, anim->GetGraphHandle(), Color(239, 1, 144, 255), true, size);
+		anim->ChangeAnim(DAMAGE);
 	}
 
 	// パートナーが振り回し状態だったら更新処理を行わない。
@@ -89,12 +127,12 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	// [硬直中] [スタン演出中] は動かさない
 	if (0 < afterSwingDelay || StunEffect::Instance()->isActive) {
 		// 何もしない。
+		anim->ChangeAnim(DAMAGE);
 	}
 	else if (isSwingNow) {
-
+		anim->ChangeAnim(DAMAGE);
 	}
 	else if (GetCanMove()) {
-
 		//ボスのAI-----------------------
 		characterAi.shortestData = navigationAi.GetShortestRoute();
 
@@ -130,7 +168,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
 	CharacterAIData::Instance()->swingCounterClockwiseDistance = CCWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
 
-
+	anim->Update();
 	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
 
 	if (CharacterAIOrder::Instance()->dashFlag)
@@ -141,12 +179,13 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	//ダッシュの残像
 	if (afterImgageTimer)
 	{
-		AfterImageMgr::Instance()->Generate(pos, Vec2<float>(1.0f, 1.0f) * ScrollMgr::Instance()->zoom, 0.0f, graphHandle[FRONT], GetTeamColor());
+		AfterImageMgr::Instance()->Generate(pos, Vec2<float>(1.0f, 1.0f) * ScrollMgr::Instance()->zoom, 0.0f, anim->GetGraphHandle(), GetTeamColor());
 		afterImgageTimer--;
 	}
 
 	// 移動量に関する変数をここで全てvelに代入する。
 	vel = CharacterAIOrder::Instance()->vel;
+
 
 }
 
@@ -156,9 +195,6 @@ void Boss::OnDraw()
 {
 	/*===== 描画処理 =====*/
 	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
-	DIR dir = FRONT;
-	if (vel.y < 0)dir = BACK;
-
 	auto drawPos = pos + stagingDevice.GetShake();
 	auto drawScale = stagingDevice.GetExtRate() * SCALE * appearExtRate;
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
@@ -166,7 +202,7 @@ void Boss::OnDraw()
 	if (DebugParameter::Instance()->bossDebugData.drawBossFlag)
 	{
 		DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-			TexHandleMgr::GetTexBuffer(graphHandle[dir]), CRASH_TEX, stagingDevice.GetFlashAlpha());
+		TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
 	}
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
