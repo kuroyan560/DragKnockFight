@@ -134,7 +134,25 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	CharacterAIData::Instance()->playerData.dashStamina = DASH_STAMINA;
 	CharacterAIData::Instance()->playerData.swingStamina = SWING_STAMINA;
 
+	// 相手が振り回していたら、ジャストキャンセルダッシュ用の線分の位置を更新する。
+	if (partner.lock()->GetNowSwing()) {
 
+		const float LINE_LENGTH = 200.0f;
+
+		// 前フレームとの位置関係から、線分を伸ばすべき方向を決める。
+		Vec2<float> dir = prevPos - prevPrevPos;
+		dir.Normalize();
+
+		justCancelDashStartPos = pos;
+		justCancelDashEndPos = pos + dir * LINE_LENGTH;
+
+	}
+	else {
+
+		justCancelDashEndPos = { -10000,-100000 };
+		justCancelDashStartPos = { -20000,-20000 };
+
+	}
 
 
 	/*===== 入力処理 =====*/
@@ -294,6 +312,8 @@ void Player::OnDraw()
 
 	//muffler.Draw(LigManager);
 
+	// デバッグ用で振り回しキャンセルラインの描画を行う。
+	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(justCancelDashStartPos), ScrollMgr::Instance()->Affect(justCancelDashEndPos), Color());
 
 	//rHand->Draw(EXT_RATE, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	//lHand->Draw(EXT_RATE, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
