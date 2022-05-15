@@ -214,4 +214,7 @@ private:
 
 public:
 	void OnKnockOut()override { anim.ChangeAnim(KNOCK_OUT); }
+
+	bool CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos);
+
 };
