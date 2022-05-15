@@ -52,10 +52,10 @@ Boss::Boss() :CharacterInterFace(SCALE)
 	animations[FRONT].loop = true;
 
 	static const int DEFAULT_BACK_NUM = 12;
-	animations[GO_BACK].graph.resize(DEFAULT_BACK_NUM);
-	TexHandleMgr::LoadDivGraph(BossRelative + "default_back.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[GO_BACK].graph.data());
-	animations[GO_BACK].interval = 5;
-	animations[GO_BACK].loop = true;
+	animations[BACK].graph.resize(DEFAULT_BACK_NUM);
+	TexHandleMgr::LoadDivGraph(BossRelative + "default_back.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[BACK].graph.data());
+	animations[BACK].interval = 5;
+	animations[BACK].loop = true;
 
 	static const int DEFAULT_DAMAGE_NUM = 1;
 	animations[DAMAGE].graph.resize(DEFAULT_DAMAGE_NUM);
@@ -96,7 +96,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 	if (signbit(CharacterAIData::Instance()->prevPos.x - CharacterAIData::Instance()->nowPos.x))
 	{
-		anim->ChangeAnim(FRONT);
+		anim->ChangeAnim(BACK);
 	}
 	else
 	{

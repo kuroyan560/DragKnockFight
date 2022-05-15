@@ -30,7 +30,7 @@ public:
 	static const enum AnimHandle 
 	{
 		FRONT,
-		GO_BACK,
+		BACK,
 		DAMAGE,
 		ANIMAHANDLE_MAX
 	};
