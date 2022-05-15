@@ -194,7 +194,7 @@ StageMgr::StageMgr()
 						MapChipDrawEnum now = static_cast<MapChipDrawEnum>(allMapChipData[stageNum][roomNum][y][x] - 1);
 						allMapChipDrawData[stageNum][roomNum][y][x].handle = mapChipGraphHandle[now];
 					}
-					else if (MAPCHIP_TYPE_STATIC_COLOR_RIGHT <= allMapChipData[stageNum][roomNum][y][x] && allMapChipData[stageNum][roomNum][y][x] <= MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+					else if (MAPCHIP_TYPE_STATIC_COLOR_LEFT <= allMapChipData[stageNum][roomNum][y][x] && allMapChipData[stageNum][roomNum][y][x] <= MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
 					{
 						SetGimmickGraphHandle(stageNum, roomNum, Vec2<int>(x, y));
 					}
