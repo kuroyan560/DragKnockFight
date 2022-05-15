@@ -34,7 +34,7 @@ Vec2<float> Player::GetGeneratePos()
 static const float EXT_RATE = 0.6f;	//Player's expand rate used in Draw().
 static const Vec2<float> PLAYER_HIT_SIZE = { (80 * EXT_RATE) / 2.0f,(80 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& Team)
-	:CharacterInterFace(PLAYER_HIT_SIZE), anim(CharacterName), controllerIdx((int)Team), tutorial(Team)
+	:CharacterInterFace(PLAYER_HIT_SIZE), controllerIdx((int)Team), tutorial(Team)
 {
 	/*====== コンストラクタ =====*/
 	if (PLAYER_CHARACTER_NUM <= CharacterName)assert(0);
@@ -56,6 +56,65 @@ Player::Player(const PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& T
 	playerPilotGraph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot.png");
 	playerPilotGraph[1] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pilot_back.png");
 	pilotGraph = playerPilotGraph[0];
+
+	std::vector<Anim>animations;
+	animations.resize(PLAYER_ANIM_NUM);
+	static const int DEFAULT_FRONT_NUM = 1;
+	animations[DEFAULT_FRONT].graph.resize(DEFAULT_FRONT_NUM);
+	//TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/Player/on_ground_wait.png", ON_GROUND_WAIT_NUM, { ON_GROUND_WAIT_NUM,1 }, animations[ON_GROUND_WAIT].graph.data());
+	animations[DEFAULT_FRONT].graph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/player.png");
+	animations[DEFAULT_FRONT].interval = 10;
+	animations[DEFAULT_FRONT].loop = true;
+
+	static const int DEFAULT_BACK_NUM = 1;
+	animations[DEFAULT_BACK].graph.resize(DEFAULT_BACK_NUM);
+	animations[DEFAULT_BACK].graph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/player_back.png");
+	animations[DEFAULT_BACK].interval = 10;
+	animations[DEFAULT_BACK].loop = true;
+
+	static const int PULL_FRONT_NUM = 3;
+	animations[PULL_FRONT].graph.resize(PULL_FRONT_NUM);
+	TexHandleMgr::LoadDivGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pull_front.png", PULL_FRONT_NUM, { PULL_FRONT_NUM,1 }, animations[PULL_FRONT].graph.data());
+	animations[PULL_FRONT].interval = 6;
+	animations[PULL_FRONT].loop = true;
+
+	static const int PULL_BACK_NUM = 3;
+	animations[PULL_BACK].graph.resize(PULL_FRONT_NUM);
+	TexHandleMgr::LoadDivGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/pull_back.png", PULL_BACK_NUM, { PULL_BACK_NUM,1 }, animations[PULL_BACK].graph.data());
+	animations[PULL_BACK].interval = 6;
+	animations[PULL_BACK].loop = true;
+
+	static const int HOLD_NUM = 5;
+	animations[HOLD].graph.resize(HOLD_NUM);
+	TexHandleMgr::LoadDivGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/hold.png", HOLD_NUM, { HOLD_NUM,1 }, animations[HOLD].graph.data());
+	animations[HOLD].interval = 3;
+	animations[HOLD].loop = false;
+
+	static const int SWINGED_NUM = 1;
+	animations[SWINGED].graph.resize(SWINGED_NUM);
+	animations[SWINGED].graph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/swinged.png");
+	animations[SWINGED].interval = 10;
+	animations[SWINGED].loop = true;
+
+	static const int TIRED_NUM = 3;
+	animations[TIRED].graph.resize(TIRED_NUM);
+	TexHandleMgr::LoadDivGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/tired.png", TIRED_NUM, { TIRED_NUM,1 }, animations[TIRED].graph.data());
+	animations[TIRED].interval = 6;
+	animations[TIRED].loop = true;
+
+	static const int KNOCK_OUT_NUM = 1;
+	animations[KNOCK_OUT].graph.resize(KNOCK_OUT_NUM);
+	animations[KNOCK_OUT].graph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/swinged.png");
+	animations[KNOCK_OUT].interval = 10;
+	animations[KNOCK_OUT].loop = true;
+
+	static const int NON_PILOT_NUM = 1;
+	animations[NON_PILOT].graph.resize(NON_PILOT_NUM);
+	animations[NON_PILOT].graph[0] = TexHandleMgr::LoadGraph(PLAYER_DIR + NAME_DIR[CharacterName] + "/nonPilot.png");
+	animations[NON_PILOT].interval = 10;
+	animations[NON_PILOT].loop = true;
+
+	anim = std::make_shared<PlayerAnimation>(animations);
 }
 
 Player::~Player()
@@ -71,7 +130,7 @@ void Player::OnInit()
 	//playerDir = DEFAULT;
 
 	//アニメーション初期化
-	anim.Init();
+	anim->Init(DEFAULT_FRONT);
 	tiredTimer = TIRED_DRAW_TIME;
 
 	// 腕をセット
@@ -134,7 +193,25 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	CharacterAIData::Instance()->playerData.dashStamina = DASH_STAMINA;
 	CharacterAIData::Instance()->playerData.swingStamina = SWING_STAMINA;
 
+	// 相手が振り回していたら、ジャストキャンセルダッシュ用の線分の位置を更新する。
+	if (partner.lock()->GetNowSwing()) {
 
+		const float LINE_LENGTH = 400.0f;
+
+		// 前フレームとの位置関係から、線分を伸ばすべき方向を決める。
+		Vec2<float> dir = prevPos - prevPrevPos;
+		dir.Normalize();
+
+		justCancelDashStartPos = pos;
+		justCancelDashEndPos = pos + dir * LINE_LENGTH;
+
+	}
+	else {
+
+		justCancelDashEndPos = { -10000,-100000 };
+		justCancelDashStartPos = { -20000,-20000 };
+
+	}
 
 
 	/*===== 入力処理 =====*/
@@ -156,7 +233,7 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 
 		// 残像を保存。
 		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate();
-		AfterImageMgr::Instance()->Generate(pos, extRate, stagingDevice.GetSpinRadian(), anim.GetGraphHandle(), charaColor);
+		AfterImageMgr::Instance()->Generate(pos, extRate, stagingDevice.GetSpinRadian(), anim->GetGraphHandle(), charaColor);
 
 	}
 
@@ -195,7 +272,7 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 		--inputInvalidTimerByCrash;
 		if (inputInvalidTimerByCrash <= 0 && !GetNowBreak())
 		{
-			anim.ChangeAnim(DEFAULT_FRONT);
+			anim->ChangeAnim(DEFAULT_FRONT);
 		}
 	}
 
@@ -203,21 +280,21 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	/*if (gripPowerTimer <= 0) {
 
 		isGripPowerEmpty = true;
-		anim.ChangeAnim(TIRED);
+		anim->ChangeAnim(TIRED);
 	}*/
 
 	//ダッシュの残像
 	if (dashAftImgTimer)
 	{
 		Vec2<float> extRate = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize()) * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate();
-		AfterImageMgr::Instance()->Generate(pos, extRate, 0.0f, anim.GetGraphHandle(), GetTeamColor());
+		AfterImageMgr::Instance()->Generate(pos, extRate, 0.0f, anim->GetGraphHandle(), GetTeamColor());
 		dashAftImgTimer--;
 	}
 
 	// 振り回していなかったら
 	if (!nowSwing) {
 
-		if (anim.GetNowAnim() == HOLD)anim.ChangeAnim(DEFAULT_FRONT);
+		if (anim->GetNowAnim() == HOLD)anim->ChangeAnim(DEFAULT_FRONT);
 
 		// 紐つかみ状態(踏ん張り状態)を解除する。
 		isHold = false;
@@ -239,7 +316,7 @@ void Player::OnUpdateNoRelatedSwing()
 
 	//		gripPowerTimer = MAX_GRIP_POWER_TIMER;
 	//		isGripPowerEmpty = false;
-	//		anim.ChangeAnim(DEFAULT_FRONT);
+	//		anim->ChangeAnim(DEFAULT_FRONT);
 	//	}
 	//}
 
@@ -247,18 +324,18 @@ void Player::OnUpdateNoRelatedSwing()
 	UpdateStretch();
 
 	//アニメーション更新
-	anim.Update();
+	anim->Update();
 
 	if (tiredTimer < TIRED_DRAW_TIME)
 	{
 		tiredTimer++;
-		if (TIRED_DRAW_TIME <= tiredTimer)anim.ChangeAnim(DEFAULT_FRONT);
+		if (TIRED_DRAW_TIME <= tiredTimer)anim->ChangeAnim(DEFAULT_FRONT);
 	}
 
 	if (staminaGauge->emptyTrigger)
 	{
 		tiredTimer = 0;
-		anim.ChangeAnim(TIRED);
+		anim->ChangeAnim(TIRED);
 	}
 
 }
@@ -268,17 +345,17 @@ void Player::OnDraw()
 	//if (vel.y < 0)playerDir = BACK;
 	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });
 
-	if (!isHold && !anim.Compare({ SWINGED,TIRED,NON_PILOT }) && CompleteAppear())
+	if (!isHold && !anim->Compare({ SWINGED,TIRED,NON_PILOT,KNOCK_OUT }) && CompleteAppear())
 	{
 		if (moveInput.x)
 		{
-			if (playerDirY == PLAYER_BACK)anim.ChangeAnim(PULL_BACK);
-			else anim.ChangeAnim(PULL_FRONT);
+			if (playerDirY == PLAYER_BACK)anim->ChangeAnim(PULL_BACK);
+			else anim->ChangeAnim(PULL_FRONT);
 		}
 		else
 		{
-			if (playerDirY == PLAYER_BACK)anim.ChangeAnim(DEFAULT_BACK);
-			else anim.ChangeAnim(DEFAULT_FRONT);
+			if (playerDirY == PLAYER_BACK)anim->ChangeAnim(DEFAULT_BACK);
+			else anim->ChangeAnim(DEFAULT_FRONT);
 		}
 	}
 
@@ -294,6 +371,8 @@ void Player::OnDraw()
 
 	//muffler.Draw(LigManager);
 
+	// デバッグ用で振り回しキャンセルラインの描画を行う。
+	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(justCancelDashStartPos), ScrollMgr::Instance()->Affect(justCancelDashEndPos), Color());
 
 	//rHand->Draw(EXT_RATE, DEF_RIGHT_HAND_ANGLE, { 0.0f,0.0f }, drawCursorFlag);
 	//lHand->Draw(EXT_RATE, DEF_LEFT_HAND_ANGLE, { 1.0f,0.0f }, drawCursorFlag);
@@ -304,7 +383,7 @@ void Player::OnDraw()
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 	const Vec2<float>drawPos = ScrollMgr::Instance()->Affect(pos + stagingDevice.GetShake());
 	//胴体
-	auto bodyTex = TexHandleMgr::GetTexBuffer(anim.GetGraphHandle());
+	auto bodyTex = TexHandleMgr::GetTexBuffer(anim->GetGraphHandle());
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	bool mirorX = playerDirX == PLAYER_RIGHT || (isHold && (partner.lock()->pos - pos).x < 0);
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * staminaGauge->outOfStaminaEffect.GetSize() * appearExtRate,
@@ -507,18 +586,44 @@ void Player::Input(const vector<vector<int>>& MapData)
 	inputLeftVec /= {32768.0f, 32768.0f};
 	inputRate = inputLeftVec.Length();
 	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && isDashStamina) {
-		
+
 		AudioApp::Instance()->PlayWave(DASH_SE);
 
 		// inputVec = ひだりスティックの入力方向
 		const float DASH_SPEED = 30.0f;
-		vel += inputLeftVec * DASH_SPEED;
+		const float CANCEL_DASH_SPEED = 35.0f;
+		const float JUST_CANCEL_DASH_SPEED = 40.0f;
+		float speed = 0;
+
+		// 相方が振り回し中だったら。
+		if (partner.lock()->GetNowSwing()) {
+
+			speed = CANCEL_DASH_SPEED;
+
+			// ジャスト回避の予測線との当たり判定を行い、マップチップとあたっていたらダッシュ速度を上げる。
+			if(CheckHitMapChip(justCancelDashStartPos, justCancelDashEndPos)){
+			
+				speed = JUST_CANCEL_DASH_SPEED;
+			
+			}
+
+			// 相方の振り回しを終わらせる。
+			partner.lock()->FinishSwing();
+
+		}
+		else {
+
+			speed = DASH_SPEED;
+
+		}
+
+		vel += inputLeftVec * speed;
 
 		// 移動量が限界を超えないようにする。
-		if (DASH_SPEED < vel.Length()) {
+		if (speed < vel.Length()) {
 
 			vel.Normalize();
-			vel *= DASH_SPEED;
+			vel *= speed;
 
 		}
 
@@ -804,7 +909,7 @@ void Player::UpdateStretch()
 Vec2<float> Player::GetPlayerGraphSize()
 {
 	//return { (56 * EXT_RATE) / 2.0f,(144 * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
-	return { (anim.GetGraphSize().x * EXT_RATE) / 2.0f,(anim.GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
+	return { (anim->GetGraphSize().x * EXT_RATE) / 2.0f,(anim->GetGraphSize().y * EXT_RATE) / 2.0f };			// プレイヤーのサイズ
 }
 
 void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector<int>>& MapData)
@@ -908,5 +1013,167 @@ void Player::CheckHitMapChipVel(const Vec2<float>& checkPos, const vector<vector
 		// のし上がりの場所に当たった場合
 		vel.y *= 0.5f;
 	}
+
+}
+
+bool Player::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& EndPos)
+{
+	//どうやって使うか
+	Vec2<float>handSegmentStart(StartPos), handSegmentEnd(EndPos);//線分
+	Vec2<float>handSegmentDir(EndPos - StartPos);					//線分の方向
+	Vec2<float>handPos(StartPos);									//線分の始点
+	Vec2<float>sightPos;						//求められた交点の中の最短距離
+	RoomMapChipArray mapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());					//マップ
+	//どうやって使うか
+
+
+	// 最短距離を保存するようの配列。
+	std::vector<std::pair<Vec2<float>, float>> shortestPoints;
+
+	// 照準のレイの方向によって当たり判定を無効化する為のフラグをセットする。
+	bool isTop = handSegmentDir.y < 0;
+	bool isLeft = handSegmentDir.x < 0;
+
+	SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
+
+	// 次にマップチップとの最短距離を求める。
+	const int MAP_Y = mapData.size();
+	for (int height = 0; height < MAP_Y; ++height) {
+
+		const int MAP_X = mapData[height].size();
+		for (int width = 0; width < MAP_X; ++width) {
+
+			// このマップチップが1~9以外だったら判定を飛ばす。
+			if (mapData[height][width] < mapChipSizeData.min ||
+				mapChipSizeData.max < mapData[height][width])
+			{
+				continue;
+			}
+
+			// このインデックスのブロックの座標を取得。
+			const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);
+
+			Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
+
+			// 一定範囲以外だったら処理を飛ばす。
+			bool checkInsideTop = BLOCK_POS.y < handPos.y - windowSize.y;
+			bool checkInsideBottom = handPos.y + windowSize.y > BLOCK_POS.y;
+			bool checkInsideLeft = BLOCK_POS.x < handPos.x + windowSize.x;
+			bool checkInsideRight = handPos.x + windowSize.x > BLOCK_POS.x;
+			if (checkInsideTop && checkInsideBottom && checkInsideLeft && checkInsideRight) {
+				//player.onGround = false;
+				continue;
+			}
+
+			// そのブロックが内包されているブロックだったら処理を飛ばす。
+			Vec2<int> mapChipIndex = { width, height };
+			if (StageMgr::Instance()->IsItWallIn(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), mapChipIndex)) {
+
+				continue;
+
+			}
+
+			// レイの方向とブロックの位置関係で処理を飛ばす。ウィンドウを4分割するやつ
+			float offsetHandPos = MAP_CHIP_SIZE;
+			if (isLeft && handPos.x + offsetHandPos < BLOCK_POS.x) continue;
+			if (!isLeft && BLOCK_POS.x < handPos.x - offsetHandPos) continue;
+			if (isTop && handPos.y + offsetHandPos < BLOCK_POS.y) continue;
+			if (!isTop && BLOCK_POS.y < handPos.y - offsetHandPos) continue;
+
+			// 線分の始点とのマップチップの距離が、視点と終点の距離より大きかったら処理を行わない。
+			float startEndDistance = (StartPos - EndPos).Length();
+			float blockDistance = (StartPos - BLOCK_POS).Length();
+			if (startEndDistance < blockDistance) continue;
+
+			// 四辺分交点を求める。
+
+			// 交点保存用
+			vector<Vec2<float>> intersectedPos;
+
+			// 上方向
+			if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE))) {
+
+				// 交点を求めて保存する。
+				intersectedPos.push_back(Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE)));
+
+			}
+			// 右方向
+			if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+
+				// 交点を求めて保存する。
+				intersectedPos.push_back(Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE)));
+
+			}
+			// 下方向
+			if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+
+				// 交点を求めて保存する。
+				intersectedPos.push_back(Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE)));
+
+			}
+			// 左方向
+			if (Collider::Instance()->IsIntersected(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+
+				// 交点を求めて保存する。
+				intersectedPos.push_back(Collider::Instance()->CalIntersectPoint(handSegmentStart, handSegmentEnd, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE)));
+
+			}
+
+			// 最短距離を求める。
+			Vec2<float> shortestPos = {};
+			float shoterstLength = 1000000.0f;
+
+			// サイズが0だったら処理を飛ばす。
+			const int INTERSECTED_COUNT = intersectedPos.size();
+			if (INTERSECTED_COUNT <= 0) continue;
+
+			// 最短距離を求める。
+			for (int index = 0; index < INTERSECTED_COUNT; ++index) {
+
+				// 保存されているデータより大きかったら処理を飛ばす。
+				float lengthBuff = Vec2<float>(intersectedPos[index] - handPos).Length();
+				if (lengthBuff >= shoterstLength) continue;
+
+				// データを保存する。
+				shoterstLength = lengthBuff;
+				shortestPos = intersectedPos[index];
+
+			}
+
+			// 最短の距離を保存する。
+			pair<Vec2<float>, float> buff = { shortestPos, shoterstLength };
+			shortestPoints.push_back(buff);
+		}
+	}
+
+
+	/*-- ここまでの過程で様々な最短を求めることができた。 --*/
+
+	// 最短の座標を保存する用変数。
+	float shortestLength = 100000.0f;
+
+	// 全ての最短の中から最も短いものを求める。
+	const int SHORTEST_COUNT = shortestPoints.size();
+
+	// サイズが0だったら照準をどっかに飛ばしてリターン。
+	if (SHORTEST_COUNT <= 0) {
+
+		sightPos = { -100,-100 };
+		return false;
+	}
+
+	for (int index = 0; index < SHORTEST_COUNT; ++index) {
+
+		// 保存されているデータより大きかったら処理を飛ばす。
+		if (shortestPoints[index].second >= shortestLength) continue;
+
+		// データを保存する。
+		shortestLength = shortestPoints[index].second;
+		sightPos = shortestPoints[index].first;
+	}
+
+
+	//最短距離が一つでも算出されたら当たり判定を出す
+	return true;
 
 }

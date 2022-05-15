@@ -13,6 +13,7 @@ using namespace std;
 
 #include"NavigationAI.h"
 #include"CharacterAI.h"
+#include"PlayerAnimation.h"
 
 // プレイヤーと引っ張り合うボスクラス
 class Boss : public CharacterInterFace
@@ -26,9 +27,15 @@ public:
 	INTERSECTED_LINE prevIntersectedLine;
 
 	//画像
-	static const enum DIR { FRONT, BACK, DIR_NUM };
-	int graphHandle[DIR_NUM];
+	static const enum AnimHandle 
+	{
+		FRONT,
+		BACK,
+		DAMAGE,
+		ANIMAHANDLE_MAX
+	};
 	int afterImgageTimer;
+	std::shared_ptr<PlayerAnimation> anim;
 
 	//ボスのパターン制御-----------------------
 	NavigationAI navigationAi;
@@ -37,6 +44,7 @@ public:
 
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
+
 public:
 	/*===== 定数 =====*/
 
