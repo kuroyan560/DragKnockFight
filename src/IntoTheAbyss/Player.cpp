@@ -514,6 +514,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		const float DASH_SPEED = 30.0f;
 		vel += inputLeftVec * DASH_SPEED;
 
+
 		// ˆÚ“®—Ê‚ªŒÀŠE‚ğ’´‚¦‚È‚¢‚æ‚¤‚É‚·‚éB
 		if (DASH_SPEED < vel.Length()) {
 

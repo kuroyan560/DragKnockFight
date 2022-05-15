@@ -26,7 +26,7 @@ void CharacterInterFace::SwingUpdate()
 	// このタイミングでスタミナを消費する。
 	if (swingTimer == 5) {
 		//現状はこれで間に合わせる。
-		if (CharacterManager::Instance()->Right()->GetCharacterName()== PLAYABLE_BOSS_0)
+		if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
 		{
 			// スタミナを消費
 			staminaGauge->ConsumesStamina(DebugParameter::Instance()->bossDebugData.staminaSwing);
@@ -414,7 +414,6 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
-
 
 	// 振り回し中だったら線分を更新する。
 	if (nowSwing) {

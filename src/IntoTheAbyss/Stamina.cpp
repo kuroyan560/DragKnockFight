@@ -410,3 +410,19 @@ void StaminaMgr::ConsumesStaminaByGauge(const float& CounsumeStaminaGauge)
 	}
 
 }
+
+void StaminaMgr::Resize(const int& Size)
+{
+
+	stamina.resize(Size);
+	const int SIZE = stamina.size();
+
+	// ‰Šú‰» ‘S‚Ä‚ğ–„‚ß‚éB
+	for (int index = 0; index < SIZE; ++index) {
+		stamina[index].Init();
+	}
+
+	outOfStaminaEffect.Init();
+	emptyTrigger = false;
+
+}

@@ -110,6 +110,7 @@ protected:
 		lbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_LB.png");
 		lineHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_line.png");
 		arrowHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_arrow.png");
+
 	}
 
 	std::weak_ptr<CharacterInterFace>partner;
