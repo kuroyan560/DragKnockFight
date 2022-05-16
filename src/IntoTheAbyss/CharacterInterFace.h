@@ -47,6 +47,8 @@ private:
 	int stanTimer;
 	//ダメージ用タイマー
 	int damageTimer;
+	// トゲブロックにあたったとき用タイマー これに値が入っているときは動けない。
+	int elecTimer;
 
 	//パイロット切り離し
 	bool isPilotDetached = false;	// パイロット切り離し中かのフラグ
