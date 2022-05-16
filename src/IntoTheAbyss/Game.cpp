@@ -46,7 +46,7 @@
 #include"CharacterManager.h"
 #include "StaminaItemMgr.h"
 
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -72,7 +72,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -161,7 +161,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -179,7 +179,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -190,8 +190,13 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	FaceIcon::Instance()->Init(CharacterManager::Instance()->Left()->GetCharacterName(), CharacterManager::Instance()->Right()->GetCharacterName());
 
-	mapData = StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
-	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+
+	StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
+	StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+	mapData = StageMgr::Instance()->GetLocalMap();
+	mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
+
+	RoomMapChipArray tmp = *mapData;
 
 	// シェイク量を設定。
 	ShakeMgr::Instance()->Init();
@@ -215,23 +220,25 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		Vec2<float>playerRightDownPos;
 		Vec2<float>enemyLeftUpPos;
 		Vec2<float>enemyRightDownPos;
-		for (int y = 0; y < mapData.size(); ++y)
+
+		
+		for (int y = 0; y < tmp.size(); ++y)
 		{
-			for (int x = 0; x < mapData[y].size(); ++x)
+			for (int x = 0; x < tmp[y].size(); ++x)
 			{
-				if (mapData[y][x] == 33)
+				if (tmp[y][x] == 33)
 				{
 					playerLeftUpPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 				}
-				if (mapData[y][x] == 34)
+				if (tmp[y][x] == 34)
 				{
 					playerRightDownPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 				}
-				if (mapData[y][x] == 35)
+				if (tmp[y][x] == 35)
 				{
 					enemyLeftUpPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 				}
-				if (mapData[y][x] == 36)
+				if (tmp[y][x] == 36)
 				{
 					enemyRightDownPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 				}
@@ -243,7 +250,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		enemyHomeBase.Init(enemyLeftUpPos - chipPos, enemyRightDownPos + chipPos, false);
 
 		{
-			float size = (mapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
+			float size = (tmp[0].size() * MAP_CHIP_SIZE) - 400.0f;
 			miniMap.Init(size);
 		}
 
@@ -257,7 +264,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	StaminaItemMgr::Instance()->Init();
 
-	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) * 0.5f, (mapData.size() * MAP_CHIP_SIZE) * 0.5f);
+	Vec2<float> responePos((tmp[0].size() * MAP_CHIP_SIZE) * 0.5f, (tmp.size() * MAP_CHIP_SIZE) * 0.5f);
 
 	//スクロールを上にずらす用
 	//responePos.x -= 100;
@@ -307,16 +314,19 @@ Game::Game()
 	cameraBasePos = { 0.0f,-40.0f };
 
 	roundChangeEffect.Init();
+	StageMgr::Instance()->GetMapChipData(0, 0);
+	StageMgr::Instance()->GetMapChipDrawBlock(0, 0);
+	mapData = StageMgr::Instance()->GetLocalMap();
+	RoomMapChipArray tmp = *mapData;
 
-	mapData = StageMgr::Instance()->GetMapChipData(0, 0);
-	mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(0, 0);
+	mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 
-	Vec2<float> responePos((mapData[0].size() * MAP_CHIP_SIZE) * 0.5f, (mapData.size() * MAP_CHIP_SIZE) * 0.5f);
+	Vec2<float> responePos((tmp[0].size() * MAP_CHIP_SIZE) * 0.5f, (tmp.size() * MAP_CHIP_SIZE) * 0.5f);
 	//スクロールを上にずらす用
 	responePos.x -= 25;
 	responePos.y += 50;
 	responeScrollPos = responePos;
-	ScrollMgr::Instance()->Init(responeScrollPos, Vec2<float>(mapData[0].size() * MAP_CHIP_SIZE, mapData.size() * MAP_CHIP_SIZE), cameraBasePos);
+	ScrollMgr::Instance()->Init(responeScrollPos, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
 
 	Camera::Instance()->Init();
 	SuperiorityGauge::Instance()->Init();
@@ -334,7 +344,7 @@ Game::Game()
 
 }
 
-void Game::Init(const bool& PracticeMode)
+void Game::Init(const bool &PracticeMode)
 {
 	practiceMode = PracticeMode;
 
@@ -352,7 +362,7 @@ void Game::Init(const bool& PracticeMode)
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 }
 
-void Game::Update(const bool& Loop)
+void Game::Update(const bool &Loop)
 {
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 
@@ -412,6 +422,13 @@ void Game::Update(const bool& Loop)
 		//mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
 	}
 #pragma endregion
+
+
+	if (UsersInput::Instance()->KeyOnTrigger(DIK_H))
+	{
+		StageMgr::Instance()->WriteMapChipData(0, 0, Vec2<int>(23, 15), MAPCHIP_TYPE_STATIC_COLOR_LEFT);
+	}
+
 
 
 	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0, BACK);
@@ -565,10 +582,10 @@ void Game::Update(const bool& Loop)
 		CharacterManager::Instance()->Left()->SavePrevFramePos();
 		CharacterManager::Instance()->Right()->SavePrevFramePos();
 
-		CharacterManager::Instance()->Left()->Update(mapData, lineCenterPos);
+		CharacterManager::Instance()->Left()->Update(*mapData, lineCenterPos);
 
 		// ボスの更新処理
-		CharacterManager::Instance()->Right()->Update(mapData, lineCenterPos);
+		CharacterManager::Instance()->Right()->Update(*mapData, lineCenterPos);
 	}
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
@@ -583,8 +600,8 @@ void Game::Update(const bool& Loop)
 	Scramble();
 
 	// プレイヤーとボスの当たり判定処理
-	CharacterManager::Instance()->Left()->CheckHit(mapData, lineCenterPos);
-	CharacterManager::Instance()->Right()->CheckHit(mapData, lineCenterPos);
+	CharacterManager::Instance()->Left()->CheckHit(*mapData, lineCenterPos);
+	CharacterManager::Instance()->Right()->CheckHit(*mapData, lineCenterPos);
 	CharacterAIData::Instance()->prevPos = CharacterManager::Instance()->Right()->pos;
 
 	miniMap.Update();
@@ -617,10 +634,10 @@ void Game::Update(const bool& Loop)
 #pragma region 当たり判定
 
 	//左弾と右プレイヤーの判定
-	auto& leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
+	auto &leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
 	for (int index = 0; index < leftBulMgr.bullets.size(); ++index)
 	{
-		auto& bul = leftBulMgr.bullets[index];
+		auto &bul = leftBulMgr.bullets[index];
 		if (!bul.isActive)continue;
 
 		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
@@ -639,7 +656,7 @@ void Game::Update(const bool& Loop)
 	auto rightBulMgr = CharacterManager::Instance()->Right()->GetBulletMgr();
 	for (int index = 0; index < rightBulMgr.bullets.size(); ++index)
 	{
-		auto& bul = rightBulMgr.bullets[index];
+		auto &bul = rightBulMgr.bullets[index];
 		if (!bul.isActive)continue;
 
 		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
@@ -780,11 +797,11 @@ void Game::Draw()
 
 	if (stageNum != prevDrawChipStageNum || roomNum != prevDrawChipRoomNum)
 	{
-		mapChipDrawData = StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
 	}
+	mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 	prevDrawChipStageNum = stageNum;
 	prevDrawChipRoomNum = roomNum;
-	DrawMapChip(mapData, mapChipDrawData, stageNum, roomNum);
+	DrawMapChip(*mapData, *mapChipDrawData, stageNum, roomNum);
 
 
 	playerHomeBase.Draw();
@@ -801,7 +818,7 @@ void Game::Draw()
 	if (roundChangeEffect.initGameFlag)
 	{
 		//左プレイヤー～中央のチェイン
-		auto& left = CharacterManager::Instance()->Left();
+		auto &left = CharacterManager::Instance()->Left();
 		Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
 		Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
 		if (0.0f < left->addLineLength)
@@ -811,7 +828,7 @@ void Game::Draw()
 		}
 
 		//右プレイヤー～中央のチェイン
-		auto& right = CharacterManager::Instance()->Right();
+		auto &right = CharacterManager::Instance()->Right();
 		Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
 		Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
 		if (0.0f < right->addLineLength)
@@ -1172,8 +1189,8 @@ void Game::CalCenterPos()
 
 	// 本当はScrambleの一番うしろに入れていた処理なんですが、押し戻しをした後に呼ぶ必要が出てきたので関数で分けました。
 
-	auto& left = CharacterManager::Instance()->Left();
-	auto& right = CharacterManager::Instance()->Right();
+	auto &left = CharacterManager::Instance()->Left();
+	auto &right = CharacterManager::Instance()->Right();
 
 	// 移動量に応じて本来あるべき長さにする。
 	Vec2<float> prevSubPos = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos;
@@ -1241,8 +1258,8 @@ void Game::CalCenterPos()
 		//else {
 			// 規定値以上だったら普通に場所を求める。
 
-		auto& right = CharacterManager::Instance()->Right();
-		auto& left = CharacterManager::Instance()->Left();
+		auto &right = CharacterManager::Instance()->Right();
+		auto &left = CharacterManager::Instance()->Left();
 
 		Vec2<float> rightPos = right->pos;
 		rightPos += (left->pos - right->pos).GetNormal() * right->addLineLength;
@@ -1267,6 +1284,6 @@ Vec2<float> Game::GetStageSize()
 {
 	static const float CHIP_SIZE = 64;
 	int sizeX = mapData[0].size();
-	int sizeY = mapData.size();
+	int sizeY = mapData->size();
 	return Vec2<float>(CHIP_SIZE * sizeX, CHIP_SIZE * sizeY);
 }

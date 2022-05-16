@@ -56,12 +56,12 @@ class Game
 	Vec2<float> prevLineCenterPos;		// 前フレームの紐の中心点
 
 	// マップチップのデータ
-	vector<vector<int>> mapData;
+	vector<vector<int>> *mapData;
 
 	int oldStageNum = -1;
 	int oldRoomNum = -1;
 
-	vector<vector<MapChipDrawData>> mapChipDrawData;
+	vector<vector<MapChipDrawData>> *mapChipDrawData;
 	int prevDrawChipStageNum;
 	int prevDrawChipRoomNum;
 

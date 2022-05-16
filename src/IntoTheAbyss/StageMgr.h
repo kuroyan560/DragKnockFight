@@ -47,6 +47,7 @@ enum MapChipData
 	MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS,
 	MAPCHIP_TYPE_MAX
 };
+
 enum MapChipBlockData
 {
 	MAPCHIP_BLOCK_START = 30,
@@ -218,6 +219,10 @@ public:
 	MapChipType GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM);
 
 
+	RoomMapChipArray *GetLocalMap();
+	RoomMapChipDrawArray *GetLocalDrawMap();
+
+
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
 
@@ -234,6 +239,9 @@ private:
 
 	std::vector<StageMapChipDrawData> allMapChipDrawData;//マップチップの描画情報
 	static const int SECRET_DOOR_NUMBER = 5;
+
+	RoomMapChipArray localRoomMapChipArray;
+	RoomMapChipDrawArray localRoomMapChipDrawArray;
 
 	int thowGraphHandle;
 	std::array<int, 12> eventChipHandle;
@@ -353,5 +361,43 @@ private:
 	}
 
 	void SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM);
+
+	void SetLocalGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM, const int &CHIP_NUM)
+	{
+		//描画の書き換え
+		if (CHIP_NUM == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[0];
+		}
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[1];
+		}
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_ON)
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
+		}
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_OFF)
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle;
+		}
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
+		}
+		else
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+		}
+	}
 };
 
