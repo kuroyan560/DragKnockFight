@@ -119,7 +119,11 @@ AiResult OperateSwing::SwingLongDisntnce()
 
 void OperateSwing::Update()
 {
-	if (swingCoolTime <= swingTimer && !CharacterManager::Instance()->Right()->GetNowBreak() && !CharacterManager::Instance()->Right()->GetNowSwing())
+	bool coolTimeFlag = swingCoolTime <= swingTimer;
+	bool localEnableToSwingFlag = !CharacterManager::Instance()->Right()->GetNowBreak() && !CharacterManager::Instance()->Right()->GetNowSwing();
+	bool goToFiledFlag = CharacterManager::Instance()->Left()->GetNowBreak();
+
+	if (coolTimeFlag && localEnableToSwingFlag && !goToFiledFlag)
 	{
 		enableToSwingFlag = true;
 	}

@@ -365,6 +365,7 @@ void Game::Init(const bool &PracticeMode)
 void Game::Update(const bool &Loop)
 {
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
+	RoomMapChipArray tmpMapData = *mapData;
 
 #pragma region ステージの切り替え
 	const bool enableToSelectStageFlag = 0 < debugStageData[0];
@@ -563,8 +564,7 @@ void Game::Update(const bool &Loop)
 		//gameStartFlag = true;
 		//SelectStage::Instance()->resetStageFlag = true;
 		//readyToStartRoundFlag = false;
-
-		float size = (mapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
+		float size = (tmpMapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
 		miniMap.Init(size);
 	}
 
@@ -582,10 +582,10 @@ void Game::Update(const bool &Loop)
 		CharacterManager::Instance()->Left()->SavePrevFramePos();
 		CharacterManager::Instance()->Right()->SavePrevFramePos();
 
-		CharacterManager::Instance()->Left()->Update(*mapData, lineCenterPos);
+		CharacterManager::Instance()->Left()->Update(tmpMapData, lineCenterPos);
 
 		// ボスの更新処理
-		CharacterManager::Instance()->Right()->Update(*mapData, lineCenterPos);
+		CharacterManager::Instance()->Right()->Update(tmpMapData, lineCenterPos);
 	}
 	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_D, "StartCharaAI", TO_STRING(DIK_D)))
 	{
@@ -600,8 +600,8 @@ void Game::Update(const bool &Loop)
 	Scramble();
 
 	// プレイヤーとボスの当たり判定処理
-	CharacterManager::Instance()->Left()->CheckHit(*mapData, lineCenterPos);
-	CharacterManager::Instance()->Right()->CheckHit(*mapData, lineCenterPos);
+	CharacterManager::Instance()->Left()->CheckHit(tmpMapData, lineCenterPos);
+	CharacterManager::Instance()->Right()->CheckHit(tmpMapData, lineCenterPos);
 	CharacterAIData::Instance()->prevPos = CharacterManager::Instance()->Right()->pos;
 
 	miniMap.Update();
