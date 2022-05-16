@@ -248,7 +248,7 @@ private:
 
 	array<int, 30> mapChipGraphHandle;
 	array<int, 2> gimmcikGraphHandle;
-	array<int, 12> lightGraphHandle;
+	array<int, 12> sparkGraphHandle;
 	enum MapChipDrawEnum
 	{
 		MAPCHIP_DRAW_WALL_LEFT_UP,

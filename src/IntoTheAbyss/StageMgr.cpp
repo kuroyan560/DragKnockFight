@@ -47,7 +47,7 @@ StageMgr::StageMgr()
 
 	gimmcikGraphHandle[0] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/chip_item_red.png");
 	gimmcikGraphHandle[1] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/chip_item_green.png");
-	TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/chip_spark.png", 12, { 12,1 }, lightGraphHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/chip_spark.png", 12, { 12,1 }, sparkGraphHandle.data());
 
 
 
