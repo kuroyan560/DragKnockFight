@@ -354,4 +354,3 @@ private:
 
 	void SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM);
 };
-

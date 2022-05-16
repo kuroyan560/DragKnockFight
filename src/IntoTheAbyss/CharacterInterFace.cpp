@@ -353,6 +353,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	bulletMgr.Init();
 
 	stanTimer = 0;
+	elecTimer = 0;
 
 	stagingDevice.Init();
 
@@ -444,6 +445,12 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		{
 			FaceIcon::Instance()->Change(team, FACE_STATUS::DEFAULT);
 		}
+	}
+
+	// 棘にあたって一定時間動かないフラグが立っていたらリターン
+	if (0 < elecTimer) {
+		--elecTimer;
+		return;
 	}
 
 	//自身が振り回し中
@@ -965,6 +972,38 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, StaminaItem::CHARA_ID::RIGHT, partner.lock()->pos);
 
 					}
+
+				}
+				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
+
+					// トゲブロック(針有り)だったら
+
+					// このキャラを一定時間スタンさせる。
+					static const int ELEC_TIMER = 30;
+					elecTimer = ELEC_TIMER;
+
+					// トゲブロックを棘無し状態にさせる。
+					StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_ELEC_OFF);
+
+
+				}
+				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_ELEC_OFF) {
+
+					// トゲブロック(針無し)だったら
+
+					// トゲブロックを棘有り状態にさせる。
+					StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_ELEC_ON);
+
+
+				}
+				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_ELEC_ON_ALLWAYS) {
+
+					// トゲブロック(常時)だったら
+
+					// このキャラを一定時間スタンさせる。
+					static const int ELEC_TIMER = 30;
+					elecTimer = ELEC_TIMER;
+
 
 				}
 				else {
