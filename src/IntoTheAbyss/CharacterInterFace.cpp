@@ -954,6 +954,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 					}
 
+					// トゲブロックを棘無し状態にさせる。
+					StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
+
 
 				}
 				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
@@ -972,6 +975,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, StaminaItem::CHARA_ID::RIGHT, partner.lock()->pos);
 
 					}
+
+					// トゲブロックを棘無し状態にさせる。
+					StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
 
 				}
 				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
