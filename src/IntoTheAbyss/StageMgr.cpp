@@ -47,6 +47,7 @@ StageMgr::StageMgr()
 
 	gimmcikGraphHandle[0] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/chip_item_red.png");
 	gimmcikGraphHandle[1] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/chip_item_green.png");
+	gimmcikGraphHandle[2] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/chip_spark_off.png");
 	TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/chip_spark.png", 12, { 12,1 }, sparkGraphHandle.data());
 
 
@@ -417,7 +418,7 @@ void StageMgr::SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, 
 	}
 	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_ELEC_OFF)
 	{
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle;
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[2];
 	}
 	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_ELEC_ON_ALLWAYS)
 	{

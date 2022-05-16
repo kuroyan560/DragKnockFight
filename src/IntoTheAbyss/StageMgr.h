@@ -247,7 +247,7 @@ private:
 	std::array<int, 12> eventChipHandle;
 
 	array<int, 30> mapChipGraphHandle;
-	array<int, 2> gimmcikGraphHandle;
+	array<int, 3> gimmcikGraphHandle;
 	array<int, 12> sparkGraphHandle;
 	enum MapChipDrawEnum
 	{
@@ -385,7 +385,7 @@ private:
 		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_OFF)
 		{
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle;
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[2];
 		}
 		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
 		{
