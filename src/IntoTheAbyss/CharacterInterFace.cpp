@@ -993,6 +993,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 					// トゲブロックを棘有り状態にさせる。
 					StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_ELEC_ON);
+					
+					// アイテムを生成する。
+					StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
 
 
 				}
