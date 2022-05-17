@@ -12,6 +12,6 @@ public:
 	void Draw();
 
 	std::unique_ptr<BossHand> leftHand, rightHande;
-
+	int k = 0;
 };
 
