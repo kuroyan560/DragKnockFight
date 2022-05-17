@@ -2,6 +2,8 @@
 #include"Singleton.h"
 #include"Vec.h"
 #include"CharacterInterFace.h"
+#include<array>
+
 class WinCounter : public Singleton<WinCounter>
 {
 	friend class Singleton<WinCounter>;
@@ -13,6 +15,11 @@ class WinCounter : public Singleton<WinCounter>
 	//KnockOut 画像
 	int knockOutGraph_Left;
 	int knockOutGraph_Right;
+	std::array<int, 3> lunaHandle;			// ノックアウト時のLuna(左側のキャラ)の画像ハンドル アニメーション
+	std::array<int, 5> maskHandle;			// ノックアウト時にマスクとして使用する画像のハンドル アニメーション
+	std::array<int, 5> maskFrameHandle;	// ノックアウト時に使用するマスクのフレーム アニメーション
+	int maskAnimHandle;
+	int lunaAnimHandle;
 
 	//試合関連
 	int countRound;						//ラウンド数
@@ -20,11 +27,9 @@ class WinCounter : public Singleton<WinCounter>
 	int drawCountLeft, drawCountRight;	//勝利数描画数
 
 	// KnockOut 文字のアニメーション
-	Vec2<float>knockOutPos;
-	Vec2<float>knockOutAppearPos;
-	Vec2<float>knockOutDisappearPos;
-	float kncokOutScale;
-	float knockOutRadian;
+	Vec2<float>knockOutPos;				// [KnockOut!!!!]の画像の座標
+	Vec2<float>maskPos;					// [KnockOut!!!!]にかけるマスクの座標
+	Vec2<float>charaPos;				// マスクの内側にいるキャラの座標
 	int knockOutSpinVec;
 	int knockOutGraph;
 	int knockOutTimer;
@@ -35,6 +40,18 @@ class WinCounter : public Singleton<WinCounter>
 	bool gameFinish = false;
 
 	Vec2<float>GetWinCountPos(const bool& Left, const int& Num);
+
+	// ノックアウト時のステータス
+	enum class KNOCK_OUT_PHASE {
+
+		START_PHASE,		// 開始フェーズ
+		CHARA_APPEAR_PHASE,	// キャラカットイン開始フェーズ
+		STOP_PHASE,			// キャラカットイン中の一時停止フェーズ
+		CHARA_EXIT_PHASE,	// キャラカットイン終了フェーズ
+		END_PHASE,			// 終了フェーズ
+
+	};
+	KNOCK_OUT_PHASE knockOutPhase;
 
 public:
 	void Reset()
