@@ -38,14 +38,14 @@ void WinCounter::Update()
 	if (!animation)return;
 
 	//ノックアウトの文字アニメーション
-	static const int START_PHASE_TIME = 60;
-	static const int CHARA_APPEAR_PHASE_TIME = 40;
-	static const int STOP_PHASE_TIMER = 30;
-	static const int CHARA_EXIT_PHASE_TIME = 40;
-	static const int WAIT_TIME = 30;
-	static const int DISAPPEAR_TIME = 60;
-	static const Vec2<float> KNOCK_OUT_APPEAR_POS = { static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y + 100.0f) };
-	static const Vec2<float> MASK_POS = { static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y) };
+	const int START_PHASE_TIME = 60;
+	const int CHARA_APPEAR_PHASE_TIME = 40;
+	const int STOP_PHASE_TIMER = 30;
+	const int CHARA_EXIT_PHASE_TIME = 40;
+	const int WAIT_TIME = 30;
+	const int DISAPPEAR_TIME = 60;
+	const Vec2<float> KNOCK_OUT_APPEAR_POS = { static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y + 200.0f) };
+	const Vec2<float> MASK_POS = { static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y) };
 	const float toRad = Angle::ROUND() * 2.0f * knockOutSpinVec;
 
 	// 現在のフェーズによってノックアウトの演出の更新処理を行う。
@@ -78,7 +78,7 @@ void WinCounter::Update()
 		if (knockOutTimer != 0 && knockOutTimer % 10 == 0)++maskAnimHandle;
 
 		// マスクの内側のキャラクターを動かす。
-		charaPos = KuroMath::Ease(Out, Exp, knockOutTimer, CHARA_APPEAR_PHASE_TIME, { static_cast<float>(WinApp::Instance()->GetWinSize().x) + 100.0f, MASK_POS.y }, MASK_POS);
+		charaPos = KuroMath::Ease(Out, Exp, knockOutTimer, CHARA_APPEAR_PHASE_TIME, { static_cast<float>(WinApp::Instance()->GetWinSize().x) + 500.0f, MASK_POS.y }, MASK_POS);
 
 		// キャラクターをアニメーションさせる。
 		if (knockOutTimer % 5 == 0) {
@@ -132,7 +132,7 @@ void WinCounter::Update()
 		if (knockOutTimer != 0 && knockOutTimer % 10 == 0)--maskAnimHandle;
 
 		// マスクの内側のキャラクターを動かす。
-		charaPos = KuroMath::Ease(Out, Exp, knockOutTimer, CHARA_EXIT_PHASE_TIME, MASK_POS, { -100.0f, MASK_POS.y });
+		charaPos = KuroMath::Ease(In, Exp, knockOutTimer, CHARA_EXIT_PHASE_TIME, MASK_POS, { -500.0f, MASK_POS.y });
 
 		// キャラクターをアニメーションさせる。
 		if (knockOutTimer % 5 == 0) {
@@ -159,7 +159,7 @@ void WinCounter::Update()
 		// 最終フェーズ
 
 		// [KnockOut!!!!]の画像を動かす。
-		knockOutPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, KNOCK_OUT_APPEAR_POS, { KNOCK_OUT_APPEAR_POS.x, static_cast<float>(WinApp::Instance()->GetWinSize().y) + 100.0f });
+		knockOutPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, KNOCK_OUT_APPEAR_POS, { KNOCK_OUT_APPEAR_POS.x, static_cast<float>(WinApp::Instance()->GetWinSize().y) + 300.0f });
 
 		// [KnockOut!!!!]にかけるマスクの座標を動かす。
 		maskPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, MASK_POS, { static_cast<float>(WinApp::Instance()->GetWinSize().x + 1000.0f),MASK_POS.y });
@@ -242,13 +242,16 @@ void WinCounter::Draw()
 	static const float KNOCK_OUT_SCALE = 0.8f;
 
 	// マスクを描画。
-	//DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(5.0f, 5.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
+	//DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
+	
+	// マスクの枠を描画。
+	DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskFrameHandle[maskAnimHandle]));
 
 	// マスクの内側のキャラクターを描画。
-	DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
+	//DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
 	//DrawFunc_Mask::DrawGraphByMaskGraph(charaPos, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]), maskPos, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
 	//DrawFunc_Mask::DrawRotaGraph2D(maskPos, Vec2<float>(5.0f, 5.0f), 0, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]), maskPos, Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y)));
-	//DrawFunc_Mask::DrawRotaGraph2D(charaPos, Vec2<float>(5.0f, 5.0f), 0.0f, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]));
+	DrawFunc::DrawRotaGraph2D(charaPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]));
 
 	// [KnockOut!!!!]の画像を描画。
 	DrawFunc::DrawRotaGraph2D(knockOutPos, { 1.0f * KNOCK_OUT_SCALE,1.0f * KNOCK_OUT_SCALE }, 0.0f, TexHandleMgr::GetTexBuffer(knockOutGraph));
