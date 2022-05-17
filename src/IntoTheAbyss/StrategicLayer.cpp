@@ -15,7 +15,9 @@ IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &D
 {
 	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
 
-	float mapX = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum())[0].size() * 50.0f;
+	RoomMapChipArray *mapData = StageMgr::Instance()->GetLocalMap();
+
+	float mapX = mapData[0].size() * 50.0f;
 	float position = CharacterManager::Instance()->Right()->pos.x / mapX;
 	float rate = 1.0f;
 	//ポジションゲージが0.5以下の場合、敵陣に近づいている事のなので座標を動かす準備をする
@@ -173,9 +175,10 @@ void RestoreStamina::Update()
 
 void RestoreStamina::Draw()
 {
-	float mapX = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum())[0].size() * 50.0f;
+	RoomMapChipArray mapData = *StageMgr::Instance()->GetLocalMap();
+	float mapX = mapData[0].size() * 50.0f;
 
-	float position = CharacterManager::Instance()->Right()->pos.x / mapX;
+		float position = CharacterManager::Instance()->Right()->pos.x / mapX;
 	float rate = 1.0f;
 	//ポジションゲージが0.5以下の場合、敵陣に近づいている事のなので座標を動かす準備をする
 	if (position <= 0.5f)

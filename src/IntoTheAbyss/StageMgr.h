@@ -127,12 +127,11 @@ public:
 	StageMgr();
 
 	/// <summary>
-	/// 小部屋のマップチップデータを受け取ります
+	/// そのステージで使うマップチップを設定します
 	/// </summary>
 	/// <param name="STAGE_NUMBER">ステージ番号</param>
 	/// <param name="ROOM_NUMBER">小部屋番号</param>
-	/// <returns>vector<vector<int>>のマップチップ配列</returns>
-	const RoomMapChipArray &GetMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
+	void SetLocalMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
 
 	/// <summary>
 	/// 扉からどこの部屋に向かうかを返します
@@ -180,7 +179,7 @@ public:
 		return result;
 	};
 
-	RoomMapChipDrawArray GetMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
+	void SetLocalMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
 
 
 	const bool &CheckStageNum(const int &STAGE_NUMBER);

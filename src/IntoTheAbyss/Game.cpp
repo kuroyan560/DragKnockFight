@@ -191,8 +191,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	FaceIcon::Instance()->Init(CharacterManager::Instance()->Left()->GetCharacterName(), CharacterManager::Instance()->Right()->GetCharacterName());
 
 
-	StageMgr::Instance()->GetMapChipData(stageNum, roomNum);
-	StageMgr::Instance()->GetMapChipDrawBlock(stageNum, roomNum);
+	StageMgr::Instance()->SetLocalMapChipData(stageNum, roomNum);
+	StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNum, roomNum);
 	mapData = StageMgr::Instance()->GetLocalMap();
 	mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 
@@ -314,8 +314,8 @@ Game::Game()
 	cameraBasePos = { 0.0f,-40.0f };
 
 	roundChangeEffect.Init();
-	StageMgr::Instance()->GetMapChipData(0, 0);
-	StageMgr::Instance()->GetMapChipDrawBlock(0, 0);
+	StageMgr::Instance()->SetLocalMapChipData(0, 0);
+	StageMgr::Instance()->SetLocalMapChipDrawBlock(0, 0);
 	mapData = StageMgr::Instance()->GetLocalMap();
 	RoomMapChipArray tmp = *mapData;
 

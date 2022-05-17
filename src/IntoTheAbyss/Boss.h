@@ -40,6 +40,7 @@ public:
 	//ボスのパターン制御-----------------------
 	NavigationAI navigationAi;
 	CharacterAI characterAi;
+	bool initNaviAiFlag;
 	//ボスのパターン制御-----------------------
 
 	//ボスのパラメーター変更

@@ -32,14 +32,7 @@ Boss::Boss() :CharacterInterFace(SCALE)
 {
 	//graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
 	//graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
-
-	//パターンに渡すデータの初期化
-	navigationAi.Init(StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()));
-
-
-
-
-
+	
 	const std::string BossRelative = "resource/ChainCombat/boss/0/";
 
 	std::vector<Anim>animations;
@@ -65,6 +58,8 @@ Boss::Boss() :CharacterInterFace(SCALE)
 
 
 	anim = std::make_shared<PlayerAnimation>(animations);
+
+	initNaviAiFlag = false;
 }
 
 void Boss::OnInit()
@@ -81,6 +76,15 @@ void Boss::OnInit()
 
 	characterAi.Init();
 	anim->Init(FRONT);
+
+	//他の処理との都合上Initに一回のみ初期化
+	if (!initNaviAiFlag)
+	{
+		//パターンに渡すデータの初期化
+		navigationAi.Init(*StageMgr::Instance()->GetLocalMap());
+		initNaviAiFlag = true;
+	}
+
 }
 
 #include"Camera.h"

@@ -208,10 +208,9 @@ StageMgr::StageMgr()
 	//GimmickLoader::Instance()->ErrorCheck();
 }
 
-const RoomMapChipArray &StageMgr::GetMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
+void StageMgr::SetLocalMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	localRoomMapChipArray = allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
-	return localRoomMapChipArray;
 }
 
 const int &StageMgr::GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER)
@@ -232,10 +231,9 @@ const SizeData StageMgr::GetMapChipSizeData(MapChipData TYPE)
 }
 
 
-RoomMapChipDrawArray StageMgr::GetMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
+void StageMgr::SetLocalMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	localRoomMapChipDrawArray = allMapChipDrawData[STAGE_NUMBER][ROOM_NUMBER];
-	return localRoomMapChipDrawArray;
 }
 
 const bool &StageMgr::CheckStageNum(const int &STAGE_NUMBER)
@@ -350,11 +348,11 @@ MapChipType StageMgr::GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM)
 	}
 	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
 	{
-		return MAPCHIP_BLOCK_COLOR_RIGHT;
+		return MAPCHIP_BLOCK_COLOR_LEFT;
 	}
 	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
 	{
-		return MAPCHIP_BLOCK_COLOR_LEFT;
+		return MAPCHIP_BLOCK_COLOR_RIGHT;
 	}
 	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
 	{
@@ -449,7 +447,7 @@ bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM,
 void StageMgr::SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM)
 {
 	//ï`âÊÇÃèëÇ´ä∑Ç¶
-	if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_COLOR_LEFT)
+	if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_COLOR_RIGHT)
 	{
 		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_RED];
 	}

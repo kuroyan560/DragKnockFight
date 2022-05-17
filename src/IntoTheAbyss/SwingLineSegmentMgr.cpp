@@ -332,7 +332,7 @@ Vec2<float> SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, co
 	Vec2<float>handSegmentDir(EndPos - StartPos);					//線分の方向
 	Vec2<float>handPos(StartPos);									//線分の始点
 	Vec2<float>sightPos;						//求められた交点の中の最短距離
-	RoomMapChipArray mapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());					//マップ
+	RoomMapChipArray mapData = *StageMgr::Instance()->GetLocalMap();					//マップ
 	//どうやって使うか
 
 

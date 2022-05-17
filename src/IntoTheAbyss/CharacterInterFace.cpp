@@ -936,8 +936,8 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::RIGHT;
 
 				// あたったチップが色ブロックだったら。
-				MapChipType hitChipData = StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex);
-				if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
+				MapChipType hitChipData = StageMgr::Instance()->GetLocalMapChipType(hitChipIndex);
+				if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
 
 					// 自分が右側のキャラだったら。
 					if (team == WHICH_TEAM::RIGHT_TEAM) {
@@ -954,36 +954,36 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 					}
 
-					// 色ブロックを反転させる。
-					StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
+					// トゲブロックを棘無し状態にさせる。
+					StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(-1, 0)) == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(-1, 0)) == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
 						// トゲブロックを棘無し状態にさせる。
-						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(-1, 0), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
+						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(-1, 0), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(1, 0)) == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(1, 0)) == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
 						// トゲブロックを棘無し状態にさせる。
-						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(1, 0), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
+						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(1, 0), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(0, -1)) == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(0, -1)) == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
 						// トゲブロックを棘無し状態にさせる。
-						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, -1), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
+						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, -1), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(0, 1)) == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(0, 1)) == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
 						// トゲブロックを棘無し状態にさせる。
-						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, 1), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
+						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, 1), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
 					}
 
 
 				}
-				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
+				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
 
 					// 自分が右側のキャラだったら。
 					if (team == WHICH_TEAM::RIGHT_TEAM) {
@@ -1000,31 +1000,31 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 					}
 
-					// 色ブロックを反転させる。
-					StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
+					// トゲブロックを棘無し状態にさせる。
+					StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(-1, 0)) == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(-1, 0)) == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
 						// トゲブロックを棘無し状態にさせる。
-						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(-1, 0), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
+						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(-1, 0), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(1, 0)) == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(1, 0)) == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
 						// トゲブロックを棘無し状態にさせる。
-						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(1, 0), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
+						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(1, 0), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(0, -1)) == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(0, -1)) == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
 						// トゲブロックを棘無し状態にさせる。
-						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, -1), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
+						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, -1), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(0, 1)) == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(0, 1)) == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
 						// トゲブロックを棘無し状態にさせる。
-						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, 1), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
+						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, 1), MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
 					}
 
 				}
@@ -1040,25 +1040,25 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_ELEC_OFF);
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(-1, 0)) == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(-1, 0)) == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
 						// トゲブロックを棘無し状態にさせる。
 						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(-1, 0), MapChipData::MAPCHIP_TYPE_STATIC_ELEC_OFF);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(1, 0)) == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(1, 0)) == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
 						// トゲブロックを棘無し状態にさせる。
 						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(1, 0), MapChipData::MAPCHIP_TYPE_STATIC_ELEC_OFF);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(0, -1)) == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(0, -1)) == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
 						// トゲブロックを棘無し状態にさせる。
 						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, -1), MapChipData::MAPCHIP_TYPE_STATIC_ELEC_OFF);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(0, 1)) == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(0, 1)) == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
 						// トゲブロックを棘無し状態にさせる。
 						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, 1), MapChipData::MAPCHIP_TYPE_STATIC_ELEC_OFF);
 					}
@@ -1076,25 +1076,25 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(-1, 0)) == MapChipType::MAPCHIP_BLOCK_ELEC_OFF) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(-1, 0)) == MapChipType::MAPCHIP_BLOCK_ELEC_OFF) {
 						// トゲブロックを棘無し状態にさせる。
 						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(-1, 0), MapChipData::MAPCHIP_TYPE_STATIC_ELEC_ON);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(1, 0)) == MapChipType::MAPCHIP_BLOCK_ELEC_OFF) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(1, 0)) == MapChipType::MAPCHIP_BLOCK_ELEC_OFF) {
 						// トゲブロックを棘無し状態にさせる。
 						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(1, 0), MapChipData::MAPCHIP_TYPE_STATIC_ELEC_ON);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(0, -1)) == MapChipType::MAPCHIP_BLOCK_ELEC_OFF) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(0, -1)) == MapChipType::MAPCHIP_BLOCK_ELEC_OFF) {
 						// トゲブロックを棘無し状態にさせる。
 						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, -1), MapChipData::MAPCHIP_TYPE_STATIC_ELEC_ON);
 					}
 
 					// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-					if (StageMgr::Instance()->GetMapChipType(0, 0, hitChipIndex + Vec2<int>(0, 1)) == MapChipType::MAPCHIP_BLOCK_ELEC_OFF) {
+					if (StageMgr::Instance()->GetLocalMapChipType(hitChipIndex + Vec2<int>(0, 1)) == MapChipType::MAPCHIP_BLOCK_ELEC_OFF) {
 						// トゲブロックを棘無し状態にさせる。
 						StageMgr::Instance()->WriteMapChipData(0, 0, hitChipIndex + Vec2<int>(0, 1), MapChipData::MAPCHIP_TYPE_STATIC_ELEC_ON);
 					}
