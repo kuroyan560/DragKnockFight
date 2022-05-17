@@ -170,3 +170,67 @@ void DrawFunc_Mask::DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float
 
 	DrawRotaGraph2D(centerPos, expRate, KuroFunc::GetAngle(vec), Tex, maskCenterPos,maskSize, { 0.5f,0.5f }, Mirror);
 }
+
+void DrawFunc_Mask::DrawGraphByMaskGraph(const Vec2<float>& Center, const std::shared_ptr<TextureBuffer>& Tex, const Vec2<float>& MaskCenter, const std::shared_ptr<TextureBuffer>& MaskTex)
+{
+	//DrawGraphByMaskGraph専用頂点
+	class Vertex
+	{
+	public:
+		Vec2<float>center;
+		Vec2<float>maskCenterPos;
+		Vertex(const Vec2<float>& Center, const Vec2<float>& MaskCenterPos)
+			:center(Center), maskCenterPos(MaskCenterPos) {}
+	};
+
+	static std::shared_ptr<GraphicsPipeline>ROTA_GRAPH_PIPELINE;
+	static std::vector<std::shared_ptr<VertexBuffer>>ROTA_GRAPH_VERTEX_BUFF;
+	static std::vector<RootParam>ROOT_PARAMETER =
+	{
+		RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, "平行投影行列定数バッファ"),
+		RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, "テクスチャリソース"),
+		RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, "マスクテクスチャリソース"),
+	};
+
+
+	//パイプライン未生成
+	if (!ROTA_GRAPH_PIPELINE)
+	{
+		//パイプライン設定
+		static PipelineInitializeOption PIPELINE_OPTION(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT, D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
+		PIPELINE_OPTION.depthTest = false;
+
+		//シェーダー情報
+		static Shaders SHADERS;
+		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawGraphByMaskGraph.hlsl", "VSmain", "vs_5_0");
+		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawGraphByMaskGraph.hlsl", "GSmain", "gs_5_0");
+		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawGraphByMaskGraph.hlsl", "PSmain", "ps_5_0");
+
+		//インプットレイアウト
+		static std::vector<InputLayoutParam>INPUT_LAYOUT =
+		{
+			InputLayoutParam("CENTER",DXGI_FORMAT_R32G32_FLOAT),
+			InputLayoutParam("MASK_CENTER",DXGI_FORMAT_R32G32_FLOAT),
+		};
+
+		//レンダーターゲット描画先情報
+		std::vector<RenderTargetInfo>RENDER_TARGET_INFO = { RenderTargetInfo(D3D12App::Instance()->GetBackBuffFormat(), AlphaBlendMode_Trans) };
+		//パイプライン生成
+		ROTA_GRAPH_PIPELINE = D3D12App::Instance()->GenerateGraphicsPipeline(PIPELINE_OPTION, SHADERS, INPUT_LAYOUT, ROOT_PARAMETER, RENDER_TARGET_INFO, WrappedSampler(true, false));
+	}
+
+	KuroEngine::Instance().Graphics().SetPipeline(ROTA_GRAPH_PIPELINE);
+
+	if (ROTA_GRAPH_VERTEX_BUFF.size() < (DRAW_BY_MASK_GRAPH_COUNT + 1))
+	{
+		ROTA_GRAPH_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(Vertex), 1, nullptr, ("DrawGraphByMaskGraph -" + std::to_string(DRAW_BY_MASK_GRAPH_COUNT)).c_str()));
+	}
+
+	Vertex vertex(Center, MaskCenter);
+	ROTA_GRAPH_VERTEX_BUFF[DRAW_BY_MASK_GRAPH_COUNT]->Mapping(&vertex);
+
+	KuroEngine::Instance().Graphics().ObjectRender(ROTA_GRAPH_VERTEX_BUFF[DRAW_BY_MASK_GRAPH_COUNT],
+		{ KuroEngine::Instance().GetParallelMatProjBuff(),Tex,MaskTex }, { CBV,SRV,SRV }, 0.0f, true);
+
+	DRAW_BY_MASK_GRAPH_COUNT++;
+}
