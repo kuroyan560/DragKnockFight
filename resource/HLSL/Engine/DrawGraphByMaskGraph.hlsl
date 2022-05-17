@@ -7,6 +7,7 @@ struct VSOutput
 {
     float4 center : CENTER;
     float4 maskCenter : MASK_CENTER;
+    int2 mirror : MIRROR;
 };
 
 VSOutput VSmain(VSOutput input)
@@ -17,8 +18,8 @@ VSOutput VSmain(VSOutput input)
 struct GSOutput
 {
     float4 pos : SV_POSITION;
-    float2 maskUv : TEXCOORD;
-    float2 uvOffset : TEXCOORD_OFFSET;
+    float2 maskUv : MASK_TEXCOORD;
+    float2 texUv : TEXCOORD;
 };
 
 Texture2D<float4> tex : register(t0);
@@ -44,16 +45,18 @@ void GSmain(
     
     float width_h = maskTexSize.x / 2.0f;
     float height_h = maskTexSize.y / 2.0f;
+    float2 uvOffset = -maskTexSize / (input[0].center.xy - input[0].maskCenter.xy);
     
     GSOutput element;
-    element.uvOffset = -maskTexSize / (input[0].center.xy - input[0].maskCenter.xy);
     
     //ç∂â∫
     element.pos = input[0].center;
     element.pos.x -= width_h;
     element.pos.y += height_h;
     element.pos = mul(parallelProjMat, element.pos);
-    element.maskUv = float2(0.0f, 1.0f);
+    float2 leftBottomUV = float2(0.0f + input[0].mirror.x, 1.0f - input[0].mirror.y);
+    element.maskUv = leftBottomUV - uvOffset;
+    element.texUv = leftBottomUV + uvOffset;
     output.Append(element);
     
     //ç∂è„
@@ -61,7 +64,9 @@ void GSmain(
     element.pos.x -= width_h;
     element.pos.y -= height_h;
     element.pos = mul(parallelProjMat, element.pos);
-    element.maskUv = float2(0.0f, 0.0f);
+    float2 leftUpUV = float2(0.0f + input[0].mirror.x, 0.0f + input[0].mirror.y);
+    element.maskUv = leftUpUV - uvOffset;
+    element.texUv = leftUpUV + uvOffset;
     output.Append(element);
     
      //âEâ∫
@@ -69,7 +74,9 @@ void GSmain(
     element.pos.x += width_h;
     element.pos.y += height_h;
     element.pos = mul(parallelProjMat, element.pos);
-    element.maskUv = float2(1.0f, 1.0f);
+    float2 rightBottomUV = float2(1.0f - input[0].mirror.x, 1.0f - input[0].mirror.y);
+    element.maskUv = rightBottomUV - uvOffset;
+    element.texUv = rightBottomUV + uvOffset;
     output.Append(element);
     
     //âEè„
@@ -77,21 +84,21 @@ void GSmain(
     element.pos.x += width_h;
     element.pos.y -= height_h;
     element.pos = mul(parallelProjMat, element.pos);
-    element.maskUv = float2(1.0f, 0.0f);
+    float2 rightUpUV = float2(1.0f - input[0].mirror.x, 0.0f + input[0].mirror.y);
+    element.maskUv = rightUpUV - uvOffset;
+    element.texUv = rightUpUV + uvOffset;
     output.Append(element);
 }
 
 float4 PSmain(GSOutput input) : SV_TARGET
 {
-    float2 texUv = input.maskUv + input.uvOffset;
-    
     clip(step(0.0f, input.pos.x));
     clip(step(input.pos.x, 1.0f));
     clip(step(0.0f, input.pos.y));
     clip(step(input.pos.y, 1.0f));
     
     float4 maskCol = maskTex.Sample(smp, input.maskUv);
-    float4 texCol = tex.Sample(smp, texUv);
+    float4 texCol = tex.Sample(smp, input.texUv);
 
     return maskCol * texCol;
 }
