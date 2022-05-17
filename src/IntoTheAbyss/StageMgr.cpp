@@ -326,6 +326,54 @@ MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, 
 	}
 }
 
+MapChipType StageMgr::GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM)
+{
+	if (localRoomMapChipArray.size() <= MAPCHIP_NUM.y && localRoomMapChipArray[MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
+	{
+		return MAPCHIP_BLOCK_NONE;
+	}
+
+	int otherBlockNum = 6;
+	int spaceNum = 0;
+	if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] &&
+		localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - otherBlockNum)
+	{
+		return MAPCHIP_BLOCK_WALL;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON)
+	{
+		return MAPCHIP_BLOCK_ELEC_ON;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_OFF)
+	{
+		return MAPCHIP_BLOCK_ELEC_OFF;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
+	{
+		return MAPCHIP_BLOCK_COLOR_RIGHT;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
+	{
+		return MAPCHIP_BLOCK_COLOR_LEFT;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+	{
+		return MAPCHIP_BLOCK_ELEC_ON_ALLWAYS;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == spaceNum)
+	{
+		return MAPCHIP_BLOCK_SPACE;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_CHANGE_AREA)
+	{
+		return MAPCHIP_BLOCK_CHANGE_AREA;
+	}
+	else
+	{
+		return MAPCHIP_BLOCK_NONE;
+	}
+}
+
 RoomMapChipArray *StageMgr::GetLocalMap()
 {
 	return &localRoomMapChipArray;

@@ -224,6 +224,7 @@ public:
 	void WriteMapChipData(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM);
 
 	MapChipType GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM);
+	MapChipType GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM);
 
 
 	RoomMapChipArray *GetLocalMap();
