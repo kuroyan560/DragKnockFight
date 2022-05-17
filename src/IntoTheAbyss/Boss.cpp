@@ -57,6 +57,9 @@ Boss::Boss() :CharacterInterFace(SCALE)
 	anim = std::make_shared<PlayerAnimation>(animations);
 
 	initNaviAiFlag = false;
+
+	leftHand = std::make_unique<PlayerHand>(TexHandleMgr::LoadGraph("resource/luna/arm_L.png"), -1);
+	rightHand = std::make_unique<PlayerHand>(TexHandleMgr::LoadGraph("resource/luna/arm_R.png"), -1);
 }
 
 void Boss::OnInit()
@@ -81,7 +84,8 @@ void Boss::OnInit()
 		navigationAi.Init(*StageMgr::Instance()->GetLocalMap());
 		initNaviAiFlag = true;
 	}
-
+	leftHand->Init(10.0f);
+	rightHand->Init(-10.0f);
 }
 
 #include"Camera.h"
@@ -104,6 +108,8 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		anim->ChangeAnim(FRONT);
 	}
 
+	leftHand->Update(pos);
+	rightHand->Update(pos);
 
 	// パートナーが振り回していたら残像を出す。
 	if (partner.lock()->GetNowSwing()) {
@@ -213,6 +219,9 @@ void Boss::OnDraw()
 
 	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
 		TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
+
+	leftHand->Draw(ScrollMgr::Instance()->zoom, 10.0f, Vec2<float>(0.0f, 0.0f), true);
+	rightHand->Draw(ScrollMgr::Instance()->zoom, 10.0f, Vec2<float>(0.0f, 0.0f), true);
 
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);

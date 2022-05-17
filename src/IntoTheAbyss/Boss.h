@@ -14,6 +14,8 @@ using namespace std;
 #include"CharacterAI.h"
 #include"PlayerAnimation.h"
 
+#include"PlayerHand.h"
+
 // プレイヤーと引っ張り合うボスクラス
 class Boss : public CharacterInterFace
 {
@@ -45,6 +47,8 @@ public:
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
 	int prevStaminaMax;
+
+	std::unique_ptr<PlayerHand> leftHand, rightHand;
 
 public:
 	/*===== 定数 =====*/
