@@ -58,8 +58,8 @@ Boss::Boss() :CharacterInterFace(SCALE)
 
 	initNaviAiFlag = false;
 
-	leftHand = std::make_unique<PlayerHand>(TexHandleMgr::LoadGraph("resource/luna/arm_L.png"), -1);
-	rightHand = std::make_unique<PlayerHand>(TexHandleMgr::LoadGraph("resource/luna/arm_R.png"), -1);
+	leftHand = std::make_unique<PlayerHand>(TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/arm_L.png"), -1);
+	rightHand = std::make_unique<PlayerHand>(TexHandleMgr::LoadGraph("resource/ChainCombat/player/luna/arm_R.png"), -1);
 }
 
 void Boss::OnInit()
@@ -84,8 +84,8 @@ void Boss::OnInit()
 		navigationAi.Init(*StageMgr::Instance()->GetLocalMap());
 		initNaviAiFlag = true;
 	}
-	leftHand->Init(10.0f);
-	rightHand->Init(-10.0f);
+	leftHand->Init(50.0f);
+	rightHand->Init(50.0f);
 }
 
 #include"Camera.h"
@@ -217,11 +217,11 @@ void Boss::OnDraw()
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
 
-	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-		TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
+//	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
+//		TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
 
-	leftHand->Draw(ScrollMgr::Instance()->zoom, 10.0f, Vec2<float>(0.0f, 0.0f), true);
-	rightHand->Draw(ScrollMgr::Instance()->zoom, 10.0f, Vec2<float>(0.0f, 0.0f), true);
+	leftHand->Draw(1.0f, 10.0f, Vec2<float>(0.0f, 0.0f), true);
+	rightHand->Draw(1.0f, 10.0f, Vec2<float>(0.0f, 0.0f), true);
 
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
