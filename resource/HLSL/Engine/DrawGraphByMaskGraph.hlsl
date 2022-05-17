@@ -22,7 +22,7 @@ struct GSOutput
 };
 
 Texture2D<float4> tex : register(t0);
-Texture2D<float4> maskTex : register(t0);
+Texture2D<float4> maskTex : register(t1);
 SamplerState smp : register(s0);
 
 float2 RotateFloat2(float2 Pos, float Radian)
