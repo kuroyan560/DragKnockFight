@@ -1,8 +1,9 @@
 #pragma once
 #include"../KuroEngine.h"
+#include"StageSelectScreenShot.h"
 
 /// <summary>
-/// ステージ選択画面の背景
+/// ステージ選択画面の画像
 /// </summary>
 class StageSelectImage
 {
@@ -21,5 +22,7 @@ private:
 	Vec2<float>size;
 
 	bool zoomOutlag;
+
+	StageSelectScreenShot screenShot;
 };
 

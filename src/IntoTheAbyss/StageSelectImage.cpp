@@ -16,6 +16,7 @@ StageSelectImage::StageSelectImage()
 
 void StageSelectImage::Init()
 {
+	screenShot.Init();
 }
 
 void StageSelectImage::Update()
@@ -31,24 +32,24 @@ void StageSelectImage::Update()
 		lerpSize = { 2.8f,2.5f };
 	}
 
-	Vec2<float>distance = lerpPos - pos;
-	pos += distance * 0.1f;
-	Vec2<float>distance2 = lerpSize - size;
-	size += distance2 * 0.1f;
+	screenShot.Update();
+
 }
 
 void StageSelectImage::Draw()
 {
 	DrawFunc::DrawRotaGraph2D(pos, size, 0.0f, TexHandleMgr::GetTexBuffer(backGroundHandle));
+	screenShot.Draw();
 }
 
 void StageSelectImage::ImGuiDraw()
 {
-	ImGui::Begin("StageSelectImage");
+	ImGui::Begin("StageSelectImage2");
 	ImGui::InputFloat("PosX", &pos.x);
 	ImGui::InputFloat("PosY", &pos.y);
 	ImGui::InputFloat("SizeX", &size.x);
 	ImGui::InputFloat("SizeY", &size.y);
 	ImGui::Checkbox("ZoomOut", &zoomOutlag);
 	ImGui::End();
+	screenShot.ImGuiDraw();
 }
