@@ -340,7 +340,7 @@ Game::Game()
 
 
 	StageMgr::Instance()->GetMapChipType(0, 0, Vec2<int>(20, 20));
-	StageMgr::Instance()->WriteMapChipData(0, 0, Vec2<int>(20, 20), 0);
+	StageMgr::Instance()->WriteMapChipData(Vec2<int>(20, 20), 0);
 
 }
 
@@ -427,7 +427,7 @@ void Game::Update(const bool &Loop)
 
 	if (UsersInput::Instance()->KeyOnTrigger(DIK_H))
 	{
-		StageMgr::Instance()->WriteMapChipData(0, 0, Vec2<int>(23, 15), MAPCHIP_TYPE_STATIC_COLOR_LEFT);
+		StageMgr::Instance()->WriteMapChipData(Vec2<int>(23, 15), MAPCHIP_TYPE_STATIC_COLOR_LEFT);
 	}
 
 

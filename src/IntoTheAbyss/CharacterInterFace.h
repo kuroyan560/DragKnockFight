@@ -11,6 +11,7 @@
 #include"SwingLineSegmentMgr.h"
 #include"TexHandleMgr.h"
 #include"CharacterInfo.h"
+#include"StageMgr.h"
 
 class StaminaMgr;
 
@@ -261,5 +262,10 @@ public:
 	{
 		return CCWSwingSegmentMgr.IsHitWall();
 	}
+
+	// マップチップが指定のインデックスだったら指定の値に塗り替える。 上下左右も。
+	void OverWriteMapChipValueAround(const Vec2<int>& MapChipIndex, const MapChipType& DstType, const MapChipData& SrcData);
+
+
 };
 

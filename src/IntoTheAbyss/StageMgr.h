@@ -220,7 +220,7 @@ public:
 	std::vector<std::shared_ptr<MapChipAnimationData>> animationData;//マップチップのアニメーション情報の一覧
 
 
-	void WriteMapChipData(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM);
+	void WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM);
 
 	MapChipType GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM);
 	MapChipType GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM);
@@ -369,7 +369,7 @@ private:
 
 	void SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM);
 
-	void SetLocalGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM, const int &CHIP_NUM)
+	void SetLocalGimmickGraphHandle(const Vec2<int> &MAPCHIP_NUM, const int &CHIP_NUM)
 	{
 		//描画の書き換え
 		if (CHIP_NUM == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
