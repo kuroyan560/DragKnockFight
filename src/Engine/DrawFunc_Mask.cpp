@@ -7,6 +7,8 @@ int DrawFunc_Mask::DRAW_EXTEND_GRAPH_COUNT = 0;
 //DrawRotaGraph
 int DrawFunc_Mask::DRAW_ROTA_GRAPH_COUNT = 0;
 
+int DrawFunc_Mask::DRAW_BY_MASK_GRAPH_COUNT = 0;
+
 static std::vector<RootParam>ROOT_PARAMETER =
 {
 	RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, "平行投影行列定数バッファ"),
