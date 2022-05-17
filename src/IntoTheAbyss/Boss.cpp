@@ -11,9 +11,6 @@
 #include "StunEffect.h"
 
 #include"TexHandleMgr.h"
-#include"BossPatternNormalMove.h"
-#include"BossPatternAttack.h"
-#include"BossPatternSwing.h"
 #include"CrashMgr.h"
 #include"CharacterInterFace.h"
 
@@ -114,6 +111,10 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		anim->ChangeAnim(DAMAGE);
 	}
 
+	//プレイヤーを振り回し終えた後にダッシュする
+	CharacterAIData::Instance()->releaseSwingFlag = !GetNowSwing() && CharacterAIData::Instance()->prevSwingFlag;
+	CharacterAIData::Instance()->prevSwingFlag = GetNowSwing();
+
 	// パートナーが振り回し状態だったら更新処理を行わない。
 	if (!(!partner.lock()->GetNowSwing() && !nowSwing)) return;
 
@@ -126,6 +127,13 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		CWSwingSegmentMgr.Init();
 		CCWSwingSegmentMgr.Init();
 	}
+
+	int staminaMax = DebugParameter::Instance()->GetBossData().staminaMax;
+	if (staminaMax != prevStaminaMax)
+	{
+		staminaGauge->Resize(staminaMax);
+	}
+	prevStaminaMax = staminaMax;
 
 
 	// [硬直中] [スタン演出中] は動かさない
@@ -173,7 +181,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	CharacterAIData::Instance()->swingCounterClockwiseDistance = CCWSwingSegmentMgr.CalSwingEndDistance(pos, swingTargetVec, (pos - partner.lock()->pos).Length());
 
 	anim->Update();
-	DebugParameter::Instance()->bossDebugData.moveVel = moveVel;
 
 	if (CharacterAIOrder::Instance()->dashFlag)
 	{
@@ -203,11 +210,10 @@ void Boss::OnDraw()
 	auto drawScale = stagingDevice.GetExtRate() * SCALE * appearExtRate;
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
-	if (DebugParameter::Instance()->bossDebugData.drawBossFlag)
-	{
-		DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
+
+	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
 		TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
-	}
+
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
 

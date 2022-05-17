@@ -103,17 +103,8 @@ protected:
 	bool stackMapChip;
 
 	//ééçáäJénéûÇ…åƒÇ—èoÇ≥ÇÍÇÈ
-	CharacterInterFace(const Vec2<float>& HonraiSize) : size(HonraiSize)
-	{
-		areaHitBox.center = &pos;
-		areaHitBox.size = size;
-		bulletHitSphere.center = &pos;
-		bulletHitSphere.radius = size.x;
-		rbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_RB.png");
-		lbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_LB.png");
-		lineHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_line.png");
-		arrowHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_arrow.png");
-	}
+	CharacterInterFace(const Vec2<float>& HonraiSize);
+
 
 	std::weak_ptr<CharacterInterFace>partner;
 	StagingInterFace stagingDevice;

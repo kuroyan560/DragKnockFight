@@ -43,6 +43,8 @@ private:
 
 	SphereCollision startColision,endColision;
 	bool initFlag;
+
+	bool prevDashFlag;
 };
 
 

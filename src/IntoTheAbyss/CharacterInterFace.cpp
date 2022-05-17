@@ -10,6 +10,7 @@
 #include "AfterImage.h"
 #include "CrashEffectMgr.h"
 #include "Stamina.h"
+#include"CharacterManager.h"
 
 void CharacterInterFace::SwingUpdate()
 {
@@ -24,10 +25,17 @@ void CharacterInterFace::SwingUpdate()
 
 	// このタイミングでスタミナを消費する。
 	if (swingTimer == 5) {
-
-		// スタミナを消費
-		staminaGauge->ConsumesStamina(SWING_STAMINA);
-
+		//現状はこれで間に合わせる。
+		if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
+		{
+			// スタミナを消費
+			staminaGauge->ConsumesStamina(DebugParameter::Instance()->GetBossData().staminaSwing);
+		}
+		else
+		{
+			// スタミナを消費
+			staminaGauge->ConsumesStamina(SWING_STAMINA);
+		}
 	}
 
 	// 限界を超えていたら修正。
@@ -381,7 +389,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	gaugeReturnTimer = 0;
 
 	// 各キャラによってスタミナゲージのデフォルト量を決定する予定。
-	staminaGauge = std::make_shared<StaminaMgr>();
+	//staminaGauge = std::make_shared<StaminaMgr>();
 	staminaGauge->Init();
 
 	// キャラに寄ってスタミナゲージの色を設定する。
@@ -408,7 +416,6 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
-
 
 	// 振り回し中だったら線分を更新する。
 	if (nowSwing) {
@@ -1257,5 +1264,18 @@ void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int>& MapChipInd
 		StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(0, 1), SrcData);
 	}
 
+}
+
+CharacterInterFace::CharacterInterFace(const Vec2<float> &HonraiSize) : size(HonraiSize)
+{
+	areaHitBox.center = &pos;
+	areaHitBox.size = size;
+	bulletHitSphere.center = &pos;
+	bulletHitSphere.radius = size.x;
+	rbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_RB.png");
+	lbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_LB.png");
+	lineHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_line.png");
+	arrowHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_arrow.png");
+	staminaGauge = std::make_shared<StaminaMgr>();
 }
 

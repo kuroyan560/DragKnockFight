@@ -1,5 +1,6 @@
 #include "OperatingLayer.h"
 #include"CharacterManager.h"
+#include"DebugParameter.h"
 
 OperateMove::OperateMove()
 {

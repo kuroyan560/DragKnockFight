@@ -174,7 +174,6 @@ StaminaMgr::StaminaMgr()
 
 void StaminaMgr::Init()
 {
-
 	// 初期化 全てを埋める。
 	const int SIZE = stamina.size();
 	for (int index = 0; index < SIZE; ++index) {
@@ -202,7 +201,10 @@ void StaminaMgr::Update(const bool& Heal, const Vec2<float>& CharacterPos)
 			if (stamina[index].GetIsActivate()) continue;
 
 			stamina[index].AddNowGauge(HEAL_AMOUNT * SlowMgr::Instance()->slowAmount);
-			if (100.0f <= stamina[index].GetNowGauge())AudioApp::Instance()->PlayWave(STAMINA_HEAL_SE[index]);
+
+			int indexBuff = index;
+			if(5 <= indexBuff) indexBuff = 4;
+			if (100.0f <= stamina[index].GetNowGauge())AudioApp::Instance()->PlayWave(STAMINA_HEAL_SE[indexBuff]);
 
 			// 手前側から一つずつ順々に回復していくため、リターン。
 			break;
@@ -340,7 +342,10 @@ void StaminaMgr::AddStamina(const int& AddStamina)
 
 			stamina[index].AddNowGauge(addStamina);
 			stamina[index].SetExp();
-			if (100.0f <= stamina[index].GetNowGauge())seHandles.emplace_back(STAMINA_HEAL_SE[index]);
+
+			int indexBuff = index;
+			if (5 <= indexBuff) indexBuff = 4;
+			if (100.0f <= stamina[index].GetNowGauge())seHandles.emplace_back(STAMINA_HEAL_SE[indexBuff]);
 
 			break;
 
@@ -354,7 +359,10 @@ void StaminaMgr::AddStamina(const int& AddStamina)
 			// 回復する。
 			stamina[index].AddNowGauge(100.0f - stamina[index].GetNowGauge());
 			stamina[index].SetExp(true);
-			if (100.0f <= stamina[index].GetNowGauge())seHandles.emplace_back(STAMINA_HEAL_SE[index]);
+
+			int indexBuff = index;
+			if (5 <= indexBuff) indexBuff = 4;
+			if (100.0f <= stamina[index].GetNowGauge())seHandles.emplace_back(STAMINA_HEAL_SE[indexBuff]);
 		}
 	}
 
@@ -409,5 +417,21 @@ void StaminaMgr::ConsumesStaminaByGauge(const float& CounsumeStaminaGauge)
 		emptyTrigger = true;
 		outOfStaminaEffect.Empty();
 	}
+
+}
+
+void StaminaMgr::Resize(const int& Size)
+{
+
+	stamina.resize(Size);
+	const int SIZE = stamina.size();
+
+	// 初期化 全てを埋める。
+	for (int index = 0; index < SIZE; ++index) {
+		stamina[index].Init();
+	}
+
+	outOfStaminaEffect.Init();
+	emptyTrigger = false;
 
 }
