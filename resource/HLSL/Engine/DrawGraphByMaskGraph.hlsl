@@ -46,7 +46,7 @@ void GSmain(
     float height_h = maskTexSize.y / 2.0f;
     
     GSOutput element;
-    element.uvOffset = -maskTexSize / (input[0].center.xy - input[0].maskCenter.xy);
+    element.uvOffset = -(input[0].center.xy - input[0].maskCenter.xy) / maskTexSize;
     
     //ç∂â∫
     element.pos = input[0].center;
@@ -85,10 +85,10 @@ float4 PSmain(GSOutput input) : SV_TARGET
 {
     float2 texUv = input.maskUv + input.uvOffset;
     
-    clip(step(0.0f, input.pos.x));
-    clip(step(input.pos.x, 1.0f));
-    clip(step(0.0f, input.pos.y));
-    clip(step(input.pos.y, 1.0f));
+    clip(step(0.0f, texUv.x));
+    clip(step(texUv.x, 1.0f));
+    clip(step(0.0f, texUv.y));
+    clip(step(texUv.y, 1.0f));
     
     float4 maskCol = maskTex.Sample(smp, input.maskUv);
     float4 texCol = tex.Sample(smp, texUv);
