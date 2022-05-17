@@ -35,6 +35,8 @@ void TitleScene::OnInitialize()
 	tutorialYes = FIRST;
 	FIRST = false;
 	tutorialQuestion = false;
+
+	handMgr.Init();
 }
 
 #include"CharacterManager.h"
@@ -119,24 +121,26 @@ void TitleScene::OnUpdate()
 		}
 	}
 
-	//hand.Update();
+	handMgr.Update();
+
 }
+
 
 void TitleScene::OnDraw()
 {
 	//デバックの為にコメントアウト----------------------------------------------
 
-	//static const std::string DIR = "resource/ChainCombat/title_scene/";
-	//static const int QUESTION = TexHandleMgr::LoadGraph(DIR + "question.png");
-	//static const int YES_ON = TexHandleMgr::LoadGraph(DIR + "yes_on.png");
-	//static const int YES_OFF = TexHandleMgr::LoadGraph(DIR + "yes_off.png");
-	//static const int NO_ON = TexHandleMgr::LoadGraph(DIR + "no_on.png");
-	//static const int NO_OFF = TexHandleMgr::LoadGraph(DIR + "no_off.png");
+	static const std::string DIR = "resource/ChainCombat/title_scene/";
+	static const int QUESTION = TexHandleMgr::LoadGraph(DIR + "question.png");
+	static const int YES_ON = TexHandleMgr::LoadGraph(DIR + "yes_on.png");
+	static const int YES_OFF = TexHandleMgr::LoadGraph(DIR + "yes_off.png");
+	static const int NO_ON = TexHandleMgr::LoadGraph(DIR + "no_on.png");
+	static const int NO_OFF = TexHandleMgr::LoadGraph(DIR + "no_off.png");
 
-	//static const float QUES_OFFSET_Y = 100.0f;
-	//static const float YES_NO_OFFSET_X = 300.0f;
+	static const float QUES_OFFSET_Y = 100.0f;
+	static const float YES_NO_OFFSET_X = 300.0f;
 
-	//KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
+	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 
 	//if (tutorialQuestion)
 	//{
@@ -182,8 +186,7 @@ void TitleScene::OnDraw()
 	//デバックの為にコメントアウト----------------------------------------------
 
 
-	//hand.Draw();
-
+	handMgr.Draw();
 }
 
 void TitleScene::OnImguiDebug()
@@ -192,7 +195,7 @@ void TitleScene::OnImguiDebug()
 	ImGui::Text("Abutton:StageSelect");
 	ImGui::End();
 
-	//hand.ImGuiDraw();
+	//handMgr.ImGuiDraw();
 }
 
 void TitleScene::OnFinalize()

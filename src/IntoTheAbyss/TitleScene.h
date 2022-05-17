@@ -48,8 +48,7 @@ private:
 	bool tutorialSelect = false;
 	bool tutorialYes = true;
 
-
-	BossHandMgr hand;
+	BossHandMgr handMgr;
 public:
 	TitleScene();
 	void OnInitialize()override;
