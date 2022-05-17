@@ -16,6 +16,7 @@ class WinCounter : public Singleton<WinCounter>
 	int knockOutGraph_Left;
 	int knockOutGraph_Right;
 	std::array<int, 3> lunaHandle;			// ノックアウト時のLuna(左側のキャラ)の画像ハンドル アニメーション
+	std::array<int, 3> lacyHandle;			// ノックアウト時のLuna(左側のキャラ)の画像ハンドル アニメーション
 	std::array<int, 5> maskHandle;			// ノックアウト時にマスクとして使用する画像のハンドル アニメーション
 	std::array<int, 5> maskFrameHandle;	// ノックアウト時に使用するマスクのフレーム アニメーション
 	int maskAnimHandle;
@@ -34,6 +35,9 @@ class WinCounter : public Singleton<WinCounter>
 	int knockOutGraph;
 	int knockOutTimer;
 
+	// 左側のKnockOutかどうか
+	bool isLeftKnockOut;
+
 	//勝利数カウント演出
 	bool animation;
 
@@ -45,9 +49,7 @@ class WinCounter : public Singleton<WinCounter>
 	enum class KNOCK_OUT_PHASE {
 
 		START_PHASE,		// 開始フェーズ
-		CHARA_APPEAR_PHASE,	// キャラカットイン開始フェーズ
 		STOP_PHASE,			// キャラカットイン中の一時停止フェーズ
-		CHARA_EXIT_PHASE,	// キャラカットイン終了フェーズ
 		END_PHASE,			// 終了フェーズ
 
 	};
