@@ -242,9 +242,10 @@ void WinCounter::Draw()
 	static const float KNOCK_OUT_SCALE = 0.8f;
 
 	// マスクを描画。
-	DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(5.0f, 5.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
+	//DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(5.0f, 5.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
 
 	// マスクの内側のキャラクターを描画。
+	//DrawFunc::DrawRotaGraph2D(charaPos, Vec2<float>(5.0f, 5.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
 	DrawFunc_Mask::DrawGraphByMaskGraph(charaPos, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]), maskPos, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
 	//DrawFunc_Mask::DrawRotaGraph2D(maskPos, Vec2<float>(5.0f, 5.0f), 0, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]), maskPos, Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y)));
 	//DrawFunc_Mask::DrawRotaGraph2D(charaPos, Vec2<float>(5.0f, 5.0f), 0.0f, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]));
