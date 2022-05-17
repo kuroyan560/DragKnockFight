@@ -214,7 +214,7 @@ void DrawFunc_Mask::DrawGraphByMaskGraph(const Vec2<float>& Center, const std::s
 		{
 			InputLayoutParam("CENTER",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("MASK_CENTER",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("MIROR",DXGI_FORMAT_R32G32_SINT),
+			InputLayoutParam("MIRROR",DXGI_FORMAT_R32G32_SINT),
 		};
 
 		//レンダーターゲット描画先情報
