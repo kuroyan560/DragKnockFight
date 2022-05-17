@@ -303,11 +303,11 @@ MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, 
 	}
 	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
 	{
-		return MAPCHIP_BLOCK_COLOR_RIGHT;
+		return MAPCHIP_BLOCK_COLOR_LEFT;
 	}
 	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
 	{
-		return MAPCHIP_BLOCK_COLOR_LEFT;
+		return MAPCHIP_BLOCK_COLOR_RIGHT;
 	}
 	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
 	{
@@ -402,7 +402,7 @@ bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM,
 void StageMgr::SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM)
 {
 	//ï`âÊÇÃèëÇ´ä∑Ç¶
-	if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_COLOR_RIGHT)
+	if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_COLOR_LEFT)
 	{
 		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[0];
 	}
