@@ -90,7 +90,7 @@ float4 PSmain(GSOutput input) : SV_TARGET
     clip(step(0.0f, texUv.y));
     clip(step(texUv.y, 1.0f));
     
-    float4 maskCol = maskTex.Sample(smp, input.maskUv);
+    float4 maskCol = maskTex.Sample(smp, input.maskUv - input.uvOffset);
     float4 texCol = tex.Sample(smp, texUv);
 
     return maskCol * texCol;

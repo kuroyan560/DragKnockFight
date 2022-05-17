@@ -38,12 +38,12 @@ void WinCounter::Update()
 	if (!animation)return;
 
 	//ノックアウトの文字アニメーション
-	const int START_PHASE_TIME = 60;
-	const int CHARA_APPEAR_PHASE_TIME = 40;
-	const int STOP_PHASE_TIMER = 30;
-	const int CHARA_EXIT_PHASE_TIME = 40;
-	const int WAIT_TIME = 30;
-	const int DISAPPEAR_TIME = 60;
+	const int START_PHASE_TIME = 60;			// 開始フェーズの時間
+	const int CHARA_APPEAR_PHASE_TIME = 5;		// キャラ出現フェーズの時間 このフェーズはなくなりそう
+	const int STOP_PHASE_TIMER = 50;			// 一時停止フェーズの時間
+	const int CHARA_EXIT_PHASE_TIME = 5;		// キャラ退出フェーズの時間 このフェーズも無くなりそう。
+	const int END_PHASE_TIME = 60;				// 終了フェーズの時間
+	const int CHARA_ANIM_FRAME = 5;				// キャラの1アニメーションにかかる時間
 	const Vec2<float> KNOCK_OUT_APPEAR_POS = { static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y + 200.0f) };
 	const Vec2<float> MASK_POS = { static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y) };
 	const float toRad = Angle::ROUND() * 2.0f * knockOutSpinVec;
@@ -59,7 +59,24 @@ void WinCounter::Update()
 		knockOutPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, { KNOCK_OUT_APPEAR_POS.x, -100.0f }, KNOCK_OUT_APPEAR_POS);
 
 		// [KnockOut!!!!]にかけるマスクの座標を動かす。
-		maskPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, { -100.0f, MASK_POS.y }, MASK_POS);
+		maskPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, { -static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(-WinApp::Instance()->GetWinSize().y) }, MASK_POS);
+
+		// マスクの内側のキャラクターを動かす。
+		charaPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, { static_cast<float>(WinApp::Instance()->GetWinSize().x + WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinSize().y + WinApp::Instance()->GetWinCenter().y) }, MASK_POS);
+
+		// タイマーが10の倍数になったらアニメーションハンドルを加算する。
+		if (knockOutTimer != 0 && knockOutTimer % 10 == 0 && maskAnimHandle < maskHandle.size() - 1)++maskAnimHandle;
+
+		// キャラクターをアニメーションさせる。
+		if (knockOutTimer % CHARA_ANIM_FRAME == 0) {
+
+			++lunaAnimHandle;
+
+			if (lunaHandle.size() <= lunaAnimHandle) {
+				lunaAnimHandle = 0;
+			}
+
+		}
 
 		// タイマーが規定値に達したら、次のフェーズへ移行する。
 		if (START_PHASE_TIME <= knockOutTimer) {
@@ -74,14 +91,8 @@ void WinCounter::Update()
 
 		// キャラ出現フェーズ
 
-		// タイマーが10の倍数になったらアニメーションハンドルを加算する。
-		if (knockOutTimer != 0 && knockOutTimer % 10 == 0)++maskAnimHandle;
-
-		// マスクの内側のキャラクターを動かす。
-		charaPos = KuroMath::Ease(Out, Exp, knockOutTimer, CHARA_APPEAR_PHASE_TIME, { static_cast<float>(WinApp::Instance()->GetWinSize().x) + 500.0f, MASK_POS.y }, MASK_POS);
-
 		// キャラクターをアニメーションさせる。
-		if (knockOutTimer % 5 == 0) {
+		if (knockOutTimer % CHARA_ANIM_FRAME == 0) {
 
 			++lunaAnimHandle;
 
@@ -105,7 +116,7 @@ void WinCounter::Update()
 		// 一時停止フェーズ
 
 		// キャラクターをアニメーションさせる。
-		if (knockOutTimer % 5 == 0) {
+		if (knockOutTimer % CHARA_ANIM_FRAME == 0) {
 
 			++lunaAnimHandle;
 
@@ -128,14 +139,8 @@ void WinCounter::Update()
 
 		// キャラ退出フェーズ
 
-		// タイマーが10の倍数になったらアニメーションハンドルを減算する。
-		if (knockOutTimer != 0 && knockOutTimer % 10 == 0)--maskAnimHandle;
-
-		// マスクの内側のキャラクターを動かす。
-		charaPos = KuroMath::Ease(In, Exp, knockOutTimer, CHARA_EXIT_PHASE_TIME, MASK_POS, { -500.0f, MASK_POS.y });
-
 		// キャラクターをアニメーションさせる。
-		if (knockOutTimer % 5 == 0) {
+		if (knockOutTimer % CHARA_ANIM_FRAME == 0) {
 
 			++lunaAnimHandle;
 
@@ -158,18 +163,47 @@ void WinCounter::Update()
 
 		// 最終フェーズ
 
+		// キャラクターをアニメーションさせる。
+		if (knockOutTimer % CHARA_ANIM_FRAME == 0) {
+
+			++lunaAnimHandle;
+
+			if (lunaHandle.size() <= lunaAnimHandle) {
+				lunaAnimHandle = 0;
+			}
+
+		}
+
+		// タイマーが10の倍数になったらアニメーションハンドルを減算する。
+		if (knockOutTimer != 0 && knockOutTimer % 10 == 0 && 0 < maskAnimHandle)--maskAnimHandle;
+
 		// [KnockOut!!!!]の画像を動かす。
-		knockOutPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, KNOCK_OUT_APPEAR_POS, { KNOCK_OUT_APPEAR_POS.x, static_cast<float>(WinApp::Instance()->GetWinSize().y) + 300.0f });
+		knockOutPos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME / 2.0f, KNOCK_OUT_APPEAR_POS, { KNOCK_OUT_APPEAR_POS.x, static_cast<float>(WinApp::Instance()->GetWinSize().y) + 300.0f });
 
 		// [KnockOut!!!!]にかけるマスクの座標を動かす。
-		maskPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, MASK_POS, { static_cast<float>(WinApp::Instance()->GetWinSize().x + 1000.0f),MASK_POS.y });
+		maskPos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME, MASK_POS, { static_cast<float>(WinApp::Instance()->GetWinSize().x + WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinSize().y + WinApp::Instance()->GetWinCenter().y) });
+
+		// マスクの内側のキャラクターを動かす。
+		charaPos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME, MASK_POS, { -static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(-WinApp::Instance()->GetWinSize().y) });
+
 
 		// タイマーが規定値に達したら、次のフェーズへ移行する。
 		if (START_PHASE_TIME <= knockOutTimer) {
 
 			knockOutTimer = 0;
-			// 終わり
 			knockOutPhase = KNOCK_OUT_PHASE::START_PHASE;
+			// 終わり
+			animation = false;
+
+			if (knockOutGraph == knockOutGraph_Left)drawCountLeft++;
+			else drawCountRight++;
+
+			//試合終了かの判定はここでとる
+			static const int WIN_MAX = 3;
+			if (WIN_MAX <= drawCountLeft || WIN_MAX <= drawCountRight)
+			{
+				gameFinish = true;
+			}
 
 		}
 
@@ -243,15 +277,15 @@ void WinCounter::Draw()
 
 	// マスクを描画。
 	//DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
-	
+
 	// マスクの枠を描画。
 	DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskFrameHandle[maskAnimHandle]));
 
 	// マスクの内側のキャラクターを描画。
 	//DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
-	//DrawFunc_Mask::DrawGraphByMaskGraph(charaPos, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]), maskPos, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
+	DrawFunc_Mask::DrawGraphByMaskGraph(charaPos, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]), maskPos, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]));
 	//DrawFunc_Mask::DrawRotaGraph2D(maskPos, Vec2<float>(5.0f, 5.0f), 0, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]), maskPos, Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y)));
-	DrawFunc::DrawRotaGraph2D(charaPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]));
+	//DrawFunc::DrawRotaGraph2D(charaPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]));
 
 	// [KnockOut!!!!]の画像を描画。
 	DrawFunc::DrawRotaGraph2D(knockOutPos, { 1.0f * KNOCK_OUT_SCALE,1.0f * KNOCK_OUT_SCALE }, 0.0f, TexHandleMgr::GetTexBuffer(knockOutGraph));
