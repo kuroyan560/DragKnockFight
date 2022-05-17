@@ -45,7 +45,7 @@ void GSmain(
     
     float width_h = maskTexSize.x / 2.0f;
     float height_h = maskTexSize.y / 2.0f;
-    float2 uvOffset = -maskTexSize / (input[0].center.xy - input[0].maskCenter.xy);
+    float2 uvOffset = -(input[0].center.xy - input[0].maskCenter.xy) / maskTexSize;
     
     GSOutput element;
     
