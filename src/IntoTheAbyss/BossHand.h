@@ -1,10 +1,10 @@
 #pragma once
-#include"../KuroEngine.h"
+#include"../Common/Vec.h"
 
 class BossHand
 {
 public:
-	BossHand();
+	BossHand(int HANDLE);
 
 	void Init();
 	void Update(const Vec2<float> &POS, float RADIUS, float RADIAN);

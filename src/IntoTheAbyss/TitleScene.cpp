@@ -118,63 +118,72 @@ void TitleScene::OnUpdate()
 			isPressStartDraw = isPressStartDraw ? false : true;
 		}
 	}
+
+	//hand.Update();
 }
 
 void TitleScene::OnDraw()
 {
-	static const std::string DIR = "resource/ChainCombat/title_scene/";
-	static const int QUESTION = TexHandleMgr::LoadGraph(DIR + "question.png");
-	static const int YES_ON = TexHandleMgr::LoadGraph(DIR + "yes_on.png");
-	static const int YES_OFF = TexHandleMgr::LoadGraph(DIR + "yes_off.png");
-	static const int NO_ON = TexHandleMgr::LoadGraph(DIR + "no_on.png");
-	static const int NO_OFF = TexHandleMgr::LoadGraph(DIR + "no_off.png");
+	//デバックの為にコメントアウト----------------------------------------------
 
-	static const float QUES_OFFSET_Y = 100.0f;
-	static const float YES_NO_OFFSET_X = 300.0f;
+	//static const std::string DIR = "resource/ChainCombat/title_scene/";
+	//static const int QUESTION = TexHandleMgr::LoadGraph(DIR + "question.png");
+	//static const int YES_ON = TexHandleMgr::LoadGraph(DIR + "yes_on.png");
+	//static const int YES_OFF = TexHandleMgr::LoadGraph(DIR + "yes_off.png");
+	//static const int NO_ON = TexHandleMgr::LoadGraph(DIR + "no_on.png");
+	//static const int NO_OFF = TexHandleMgr::LoadGraph(DIR + "no_off.png");
 
-	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
+	//static const float QUES_OFFSET_Y = 100.0f;
+	//static const float YES_NO_OFFSET_X = 300.0f;
 
-	if (tutorialQuestion)
-	{
-		const auto winCenter = WinApp::Instance()->GetExpandWinCenter();
-		int yes = tutorialYes ? YES_ON : YES_OFF;
-		int no = tutorialYes ? NO_OFF : NO_ON;
-		if (!tutorialSelect)
-		{
-			yes = YES_OFF;
-			no = NO_OFF;
-		}
+	//KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 
-		DrawFunc::DrawRotaGraph2D({ winCenter.x,winCenter.y - QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(QUESTION));
-		DrawFunc::DrawRotaGraph2D({ winCenter.x - YES_NO_OFFSET_X,winCenter.y + QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(yes));
-		DrawFunc::DrawRotaGraph2D({ winCenter.x + YES_NO_OFFSET_X,winCenter.y + QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(no));
-	}
-	else
-	{
-		// 枠を描画
-		DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(frameHandle));
+	//if (tutorialQuestion)
+	//{
+	//	const auto winCenter = WinApp::Instance()->GetExpandWinCenter();
+	//	int yes = tutorialYes ? YES_ON : YES_OFF;
+	//	int no = tutorialYes ? NO_OFF : NO_ON;
+	//	if (!tutorialSelect)
+	//	{
+	//		yes = YES_OFF;
+	//		no = NO_OFF;
+	//	}
 
-		float easingAmount = KuroMath::Ease(InOut, Sine, easingTimer, 0.0f, 1.0f);
+	//	DrawFunc::DrawRotaGraph2D({ winCenter.x,winCenter.y - QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(QUESTION));
+	//	DrawFunc::DrawRotaGraph2D({ winCenter.x - YES_NO_OFFSET_X,winCenter.y + QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(yes));
+	//	DrawFunc::DrawRotaGraph2D({ winCenter.x + YES_NO_OFFSET_X,winCenter.y + QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(no));
+	//}
+	//else
+	//{
+	//	// 枠を描画
+	//	DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(frameHandle));
 
-		// 星を描画
-		DrawFunc::DrawGraph(Vec2<float>(0, 30) + Vec2<float>(0, easingAmount * -EASING_MOVE_STAR), TexHandleMgr::GetTexBuffer(starHandle));
+	//	float easingAmount = KuroMath::Ease(InOut, Sine, easingTimer, 0.0f, 1.0f);
 
-		// 背景キャラ二人を描画
-		DrawFunc::DrawGraph(LACY_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lacyHandle));
-		DrawFunc::DrawGraph(LUNA_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lunaHandle));
+	//	// 星を描画
+	//	DrawFunc::DrawGraph(Vec2<float>(0, 30) + Vec2<float>(0, easingAmount * -EASING_MOVE_STAR), TexHandleMgr::GetTexBuffer(starHandle));
 
-		// 背景キャラロボット二体を描画
-		DrawFunc::DrawGraph(LACY_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lacyRobotHandle));
-		DrawFunc::DrawGraph(LUNA_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lunaRobotHandle));
+	//	// 背景キャラ二人を描画
+	//	DrawFunc::DrawGraph(LACY_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lacyHandle));
+	//	DrawFunc::DrawGraph(LUNA_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lunaHandle));
 
-		// タイトルアイコン画像を描画
-		DrawFunc::DrawGraph(TITLE_POS + Vec2<float>(0, easingAmount * -EASING_MOVE_TITLE), TexHandleMgr::GetTexBuffer(titleHandle));
+	//	// 背景キャラロボット二体を描画
+	//	DrawFunc::DrawGraph(LACY_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lacyRobotHandle));
+	//	DrawFunc::DrawGraph(LUNA_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lunaRobotHandle));
 
-		// PRESSENTERの画像を描画
-		if (isPressStartDraw) {
-			DrawFunc::DrawRotaGraph2D(PRESS_START_POS, { 1,1 }, 0, TexHandleMgr::GetTexBuffer(pressStartHandle));
-		}
-	}
+	//	// タイトルアイコン画像を描画
+	//	DrawFunc::DrawGraph(TITLE_POS + Vec2<float>(0, easingAmount * -EASING_MOVE_TITLE), TexHandleMgr::GetTexBuffer(titleHandle));
+
+	//	// PRESSENTERの画像を描画
+	//	if (isPressStartDraw) {
+	//		DrawFunc::DrawRotaGraph2D(PRESS_START_POS, { 1,1 }, 0, TexHandleMgr::GetTexBuffer(pressStartHandle));
+	//	}
+	//}
+	//デバックの為にコメントアウト----------------------------------------------
+
+
+	//hand.Draw();
+
 }
 
 void TitleScene::OnImguiDebug()
@@ -182,6 +191,8 @@ void TitleScene::OnImguiDebug()
 	ImGui::Begin("TitleScene");
 	ImGui::Text("Abutton:StageSelect");
 	ImGui::End();
+
+	//hand.ImGuiDraw();
 }
 
 void TitleScene::OnFinalize()

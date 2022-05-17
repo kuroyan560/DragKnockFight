@@ -3,6 +3,7 @@
 #include"SceneCange.h"
 #include"ScreenEdgeEffect.h"
 #include"PictureStory.h"
+#include"BossHandMgr.h"
 
 class TitleScene : public BaseScene
 {
@@ -47,6 +48,8 @@ private:
 	bool tutorialSelect = false;
 	bool tutorialYes = true;
 
+
+	BossHandMgr hand;
 public:
 	TitleScene();
 	void OnInitialize()override;
