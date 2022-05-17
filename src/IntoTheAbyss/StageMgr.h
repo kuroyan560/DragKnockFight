@@ -104,6 +104,13 @@ struct MapChipAnimationData
 	};
 };
 
+enum GimickHandle
+{
+	GMMICK_RED,
+	GMMICK_GREEN,
+	GMMICK_ELEC_OFF
+};
+
 typedef std::vector<std::vector<int>> RoomMapChipArray;
 typedef std::vector<RoomMapChipArray> StageMapChipData;
 
@@ -368,12 +375,12 @@ private:
 		if (CHIP_NUM == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
 		{
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[0];
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_GREEN];
 		}
 		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
 		{
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[1];
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_RED];
 		}
 		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_ON)
 		{
@@ -385,7 +392,7 @@ private:
 		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_OFF)
 		{
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[2];
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_ELEC_OFF];
 		}
 		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
 		{
