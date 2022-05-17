@@ -1,0 +1,25 @@
+#pragma once
+#include"../KuroEngine.h"
+
+/// <summary>
+/// ÉXÉeÅ[ÉWëIëâÊñ ÇÃîwåi
+/// </summary>
+class StageSelectImage
+{
+public:
+	StageSelectImage();
+	void Init();
+	void Update();
+	void Draw();
+
+	void ImGuiDraw();
+private:
+	int backGroundHandle;//îwåi
+	Vec2<float>lerpPos;
+	Vec2<float>pos;
+	Vec2<float>lerpSize;
+	Vec2<float>size;
+
+	bool zoomOutlag;
+};
+
