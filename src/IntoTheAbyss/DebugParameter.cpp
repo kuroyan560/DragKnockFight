@@ -115,6 +115,8 @@ void DebugParameter::DrawImGui()
 		ImGui::InputInt("STAMINA_MAX", &bossDebugData[bossStageNum].staminaMax);
 		ImGui::InputInt("STAMINA_DASH", &bossDebugData[bossStageNum].staminaDash);
 		ImGui::InputInt("STAMINA_SWING", &bossDebugData[bossStageNum].staminaSwing);
+		ImGui::InputFloat("SWING_ANGLE", &bossDebugData[bossStageNum].swingAngle);
+		ImGui::InputFloat("SWING_MAX", &bossDebugData[bossStageNum].swingMax);
 		ImGui::Checkbox("enableToDashAfterSwingFlag", &bossDebugData[bossStageNum].enableToDashAfterSwingFlag);
 		ImGui::End();
 	}

@@ -65,9 +65,12 @@ struct BossDebugParameterData
 	int staminaMax;
 	int staminaDash;
 	int staminaSwing;
+	float swingAngle;
+	float swingMax;
 	bool enableToDashAfterSwingFlag;
 	BossDebugParameterData() :
-		vel(14.0f), coolTime(30), staminaMax(6), staminaDash(1), staminaSwing(2), enableToDashAfterSwingFlag(true)
+		vel(14.0f), coolTime(30), staminaMax(6), staminaDash(1), staminaSwing(2), enableToDashAfterSwingFlag(true),
+		swingAngle(0.02f), swingMax(0.13f)
 	{
 	}
 };

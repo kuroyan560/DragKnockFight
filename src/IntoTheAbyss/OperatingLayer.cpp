@@ -14,8 +14,15 @@ void OperateMove::Init()
 
 void OperateMove::Update(const Vec2<float> &VELOCITY)
 {
-	//ˆÚ“®
-	CharacterAIOrder::Instance()->vel = VELOCITY;
+	if (!CharacterManager::Instance()->Right()->GetNowSwing())
+	{
+		//ˆÚ“®
+		CharacterAIOrder::Instance()->vel = VELOCITY;
+	}
+	else
+	{
+		CharacterAIOrder::Instance()->vel = { 0.0f,0.0f };
+	}
 }
 
 AiResult OperateMove::CurrentProgress()
@@ -120,6 +127,7 @@ AiResult OperateSwing::SwingLongDisntnce()
 
 void OperateSwing::Update()
 {
+	swingCoolTime = DebugParameter::Instance()->GetBossData().coolTime;
 	bool coolTimeFlag = swingCoolTime <= swingTimer;
 	bool localEnableToSwingFlag = !CharacterManager::Instance()->Right()->GetNowBreak() && !CharacterManager::Instance()->Right()->GetNowSwing();
 	bool goToFiledFlag = CharacterManager::Instance()->Left()->GetNowBreak();

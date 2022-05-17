@@ -14,6 +14,8 @@
 
 void CharacterInterFace::SwingUpdate()
 {
+	ADD_SWING_ANGLE = DebugParameter::Instance()->GetBossData().swingAngle;
+	MAX_SWING_ANGLE = DebugParameter::Instance()->GetBossData().swingMax;
 
 	/*===== U‚è‰ñ‚µ’†‚ÉŒÄ‚Î‚ê‚éˆ— =====*/
 
