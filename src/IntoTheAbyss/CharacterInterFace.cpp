@@ -958,10 +958,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
 
 					// 指定したブロックの上下左右を書き換える。
-					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
+					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_COLOR_LEFT, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
 
 				}
-				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
+				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
 
 					// 自分が右側のキャラだったら。
 					if (team == WHICH_TEAM::RIGHT_TEAM) {
@@ -982,7 +982,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
 
 					// 指定したブロックの上下左右を書き換える。
-					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_COLOR_LEFT, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
+					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
 
 				}
 				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
@@ -1234,7 +1234,7 @@ void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int>& MapChipInd
 {
 
 	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-	if (StageMgr::Instance()->GetLocalMapChipType( MapChipIndex + Vec2<int>(-1, 0)) == DstType) {
+	if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(-1, 0)) == DstType) {
 		// トゲブロックを棘無し状態にさせる。
 		StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(-1, 0), SrcData);
 	}
