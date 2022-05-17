@@ -6,50 +6,41 @@ StageSelectImage::StageSelectImage()
 {
 	backGroundHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/frame.png");
 
-	pos = { 1280.0f / 2.0f,720.0f / 2.0f };
-	lerpPos = { 640,900 };
-	pos = { 640,900 };
-	lerpSize = { 2.8f,2.5f };
-	size = { 2.8f,2.5f };
+	backGroundLerpData.Init(Vec2<float>(640.0f, 900.0f), Vec2<float>(2.8f, 2.5f));
 	zoomOutlag = false;
 }
 
 void StageSelectImage::Init()
 {
-	screenShot.Init();
 }
 
 void StageSelectImage::Update()
 {
 	if (zoomOutlag)
 	{
-		lerpPos = { 1280.0f / 2.0f,720.0f / 2.0f };
-		lerpSize = { 1.0f,1.0f };
+		backGroundLerpData.lerpPos = { 1280.0f / 2.0f,720.0f / 2.0f };
+		backGroundLerpData.lerpSize = { 1.0f,1.0f };
 	}
 	else
 	{
-		lerpPos = { 640,900 };
-		lerpSize = { 2.8f,2.5f };
+		backGroundLerpData.lerpPos = { 640,900 };
+		backGroundLerpData.lerpSize = { 2.8f,2.5f };
 	}
-
-	screenShot.Update();
-
+	backGroundLerpData.Lerp();
 }
 
 void StageSelectImage::Draw()
 {
-	DrawFunc::DrawRotaGraph2D(pos, size, 0.0f, TexHandleMgr::GetTexBuffer(backGroundHandle));
-	screenShot.Draw();
+	DrawFunc::DrawRotaGraph2D(backGroundLerpData.pos, backGroundLerpData.size, 0.0f, TexHandleMgr::GetTexBuffer(backGroundHandle));
 }
 
 void StageSelectImage::ImGuiDraw()
 {
 	ImGui::Begin("StageSelectImage2");
-	ImGui::InputFloat("PosX", &pos.x);
-	ImGui::InputFloat("PosY", &pos.y);
-	ImGui::InputFloat("SizeX", &size.x);
-	ImGui::InputFloat("SizeY", &size.y);
+	ImGui::InputFloat("PosX", &backGroundLerpData.lerpPos.x);
+	ImGui::InputFloat("PosY", &backGroundLerpData.lerpPos.y);
+	ImGui::InputFloat("SizeX", &backGroundLerpData.size.x);
+	ImGui::InputFloat("SizeY", &backGroundLerpData.size.y);
 	ImGui::Checkbox("ZoomOut", &zoomOutlag);
 	ImGui::End();
-	screenShot.ImGuiDraw();
 }

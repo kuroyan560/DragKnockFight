@@ -1,21 +1,24 @@
 #pragma once
 #include"../KuroEngine.h"
+#include"../Common/KuroMath.h"
 
-class IStageSelectImage
+struct LerpData
 {
-protected:
-	Vec2<float>pos, size;
 	Vec2<float>lerpPos, lerpSize;
+	Vec2<float>pos, size;
 
-	void Lerp(const Vec2<float> &POS, const Vec2<float> &SIZE)
+	void Init(const Vec2<float> &POS, const Vec2<float> &SIZE)
 	{
 		lerpPos = POS;
 		lerpSize = SIZE;
 
-		Vec2<float>distance = lerpPos - pos;
-		pos += distance * 0.1f;
-		Vec2<float>distance2 = lerpSize - size;
-		size += distance2 * 0.1f;
+		pos = POS;
+		size = SIZE;
+	}
+
+	void Lerp()
+	{
+		pos = KuroMath::Lerp(pos, lerpPos, 0.1f);
+		size = KuroMath::Lerp(size, lerpSize, 0.1f);
 	};
 };
-

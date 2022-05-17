@@ -1,5 +1,5 @@
 #pragma once
-#include"../KuroEngine.h"
+#include"IStageSelectImage.h"
 #include<array>
 
 class StageSelectScreenShot
@@ -17,7 +17,7 @@ public:
 private:
 	int selectNum;
 	std::array<int, 3> screenShotHandle;
-	Vec2<float>pos, size;
+	LerpData screenShotLerpData;
 	bool zoomOutFlag;
 };
 

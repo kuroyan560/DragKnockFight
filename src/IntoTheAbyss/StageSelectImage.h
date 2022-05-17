@@ -1,5 +1,6 @@
 #pragma once
 #include"../KuroEngine.h"
+#include"IStageSelectImage.h"
 #include"StageSelectScreenShot.h"
 
 /// <summary>
@@ -16,13 +17,10 @@ public:
 	void ImGuiDraw();
 private:
 	int backGroundHandle;//îwåi
-	Vec2<float>lerpPos;
-	Vec2<float>pos;
-	Vec2<float>lerpSize;
-	Vec2<float>size;
+	LerpData backGroundLerpData;
 
 	bool zoomOutlag;
 
-	StageSelectScreenShot screenShot;
+	//StageSelectScreenShot screenShot;
 };
 

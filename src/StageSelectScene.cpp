@@ -14,6 +14,7 @@ void StageSelectScene::OnInitialize()
 	charactersSelect = false;
 	CharacterManager::Instance()->CharactersSelectInit();
 	stageSelect.Init();
+	//screenShot.Init();
 }
 
 void StageSelectScene::OnUpdate()
@@ -77,6 +78,7 @@ void StageSelectScene::OnUpdate()
 		SelectStage::Instance()->SelectStageNum(stageNum);
 	}
 
+	//screenShot.Update();
 	stageSelect.Update();
 }
 
@@ -85,6 +87,7 @@ void StageSelectScene::OnDraw()
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	stageSelect.Draw();
+	//screenShot.Draw();
 }
 
 void StageSelectScene::OnImguiDebug()
@@ -106,6 +109,7 @@ void StageSelectScene::OnImguiDebug()
 	}
 
 	stageSelect.ImGuiDraw();
+	//screenShot.ImGuiDraw();
 }
 
 void StageSelectScene::OnFinalize()
