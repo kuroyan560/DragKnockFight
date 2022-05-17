@@ -14,15 +14,8 @@ void OperateMove::Init()
 
 void OperateMove::Update(const Vec2<float> &VELOCITY)
 {
-	if (!CharacterManager::Instance()->Right()->GetNowSwing())
-	{
-		//ˆÚ“®
-		CharacterAIOrder::Instance()->vel = VELOCITY;
-	}
-	else
-	{
-		CharacterAIOrder::Instance()->vel = { 0.0f,0.0f };
-	}
+	//ˆÚ“®
+	CharacterAIOrder::Instance()->vel = VELOCITY;
 }
 
 AiResult OperateMove::CurrentProgress()
