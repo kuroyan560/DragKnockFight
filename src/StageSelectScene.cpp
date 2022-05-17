@@ -13,6 +13,7 @@ void StageSelectScene::OnInitialize()
 {
 	charactersSelect = false;
 	CharacterManager::Instance()->CharactersSelectInit();
+	stageSelect.Init();
 }
 
 void StageSelectScene::OnUpdate()
@@ -75,12 +76,15 @@ void StageSelectScene::OnUpdate()
 		}
 		SelectStage::Instance()->SelectStageNum(stageNum);
 	}
+
+	stageSelect.Update();
 }
 
 void StageSelectScene::OnDraw()
 {
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
+	stageSelect.Draw();
 }
 
 void StageSelectScene::OnImguiDebug()
@@ -100,6 +104,8 @@ void StageSelectScene::OnImguiDebug()
 		ImGui::Text("Abutton:Done");
 		ImGui::End();
 	}
+
+	stageSelect.ImGuiDraw();
 }
 
 void StageSelectScene::OnFinalize()

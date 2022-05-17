@@ -1,14 +1,17 @@
 #pragma once
 #include"KuroEngine.h"
 #include"IntoTheAbyss/SceneCange.h"
+#include"IntoTheAbyss/StageSelectImage.h"
 
 class StageSelectScene : public BaseScene
 {
 	//ビッサミ提出用
-	bool isSkip = true;
+	bool isSkip = false;
 
 	//キャラクター選択中フラグ
 	bool charactersSelect;
+
+	StageSelectImage stageSelect;
 
 public:
 	StageSelectScene();
