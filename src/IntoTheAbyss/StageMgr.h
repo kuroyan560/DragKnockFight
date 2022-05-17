@@ -39,13 +39,32 @@ struct SizeData
 enum MapChipData
 {
 	MAPCHIP_TYPE_STATIC_BLOCK,
-	MAPCHIP_TYPE_TOCH,
+	MAPCHIP_TYPE_STATIC_CHANGE_AREA = 17,
+	MAPCHIP_TYPE_STATIC_COLOR_LEFT,
+	MAPCHIP_TYPE_STATIC_COLOR_RIGHT,
+	MAPCHIP_TYPE_STATIC_ELEC_ON,
+	MAPCHIP_TYPE_STATIC_ELEC_OFF,
+	MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS,
 	MAPCHIP_TYPE_MAX
 };
+
 enum MapChipBlockData
 {
 	MAPCHIP_BLOCK_START = 30,
 	MAPCHIP_BLOCK_GOAL = 31
+};
+
+enum MapChipType
+{
+	MAPCHIP_BLOCK_NONE,
+	MAPCHIP_BLOCK_SPACE,
+	MAPCHIP_BLOCK_WALL,
+	MAPCHIP_BLOCK_CHANGE_AREA,
+	MAPCHIP_BLOCK_COLOR_LEFT,
+	MAPCHIP_BLOCK_COLOR_RIGHT,
+	MAPCHIP_BLOCK_ELEC_ON,
+	MAPCHIP_BLOCK_ELEC_OFF,
+	MAPCHIP_BLOCK_ELEC_ON_ALLWAYS,
 };
 
 struct MapChipDrawData
@@ -57,6 +76,17 @@ struct MapChipDrawData
 	int animationNum;//現在参照しているアニメーションの画像
 	Vec2<float> offset;	//32*32の画像じゃない場合の画像位置調整
 	Vec2<float> offsetInterval;//上下左右の画像の間隔を空ける
+
+	void Reset()
+	{
+		handle = -1;	//画像ハンドル
+		radian = 0.0f;//画像の角度
+		animationFlag = false;//アニメーションを有効にするフラグ
+		interval = 0;		//アニメーションの間隔
+		animationNum = 0;//現在参照しているアニメーションの画像
+		offset = {};	//32*32の画像じゃない場合の画像位置調整
+		offsetInterval = {};//上下左右の画像の間隔を空ける
+	};
 
 	//MapChipDrawData() : handle(-1), radian(0.0f), animationFlag(false), interval(0), animationNum(0), offset(Vec2<float>(0.0f, 0.0f))
 	MapChipDrawData() : radian(0.0f), animationFlag(false), interval(0), animationNum(0), offset(Vec2<float>(0.0f, 0.0f))
@@ -72,6 +102,13 @@ struct MapChipAnimationData
 	MapChipAnimationData(const vector<int> &HANDLE, int INTERVAL = -1) :handle(HANDLE), maxInterval(INTERVAL)
 	{
 	};
+};
+
+enum GimickHandle
+{
+	GMMICK_RED,
+	GMMICK_GREEN,
+	GMMICK_ELEC_OFF
 };
 
 typedef std::vector<std::vector<int>> RoomMapChipArray;
@@ -90,12 +127,11 @@ public:
 	StageMgr();
 
 	/// <summary>
-	/// 小部屋のマップチップデータを受け取ります
+	/// そのステージで使うマップチップを設定します
 	/// </summary>
 	/// <param name="STAGE_NUMBER">ステージ番号</param>
 	/// <param name="ROOM_NUMBER">小部屋番号</param>
-	/// <returns>vector<vector<int>>のマップチップ配列</returns>
-	const RoomMapChipArray &GetMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
+	void SetLocalMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
 
 	/// <summary>
 	/// 扉からどこの部屋に向かうかを返します
@@ -143,7 +179,7 @@ public:
 		return result;
 	};
 
-	RoomMapChipDrawArray GetMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
+	void SetLocalMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
 
 
 	const bool &CheckStageNum(const int &STAGE_NUMBER);
@@ -161,7 +197,6 @@ public:
 			return false;
 		}
 	};
-
 
 	/// <summary>
 	/// 指定したステージ番号の小部屋の数を返します
@@ -182,7 +217,18 @@ public:
 		return allMapChipData.size();
 	}
 
-	std::vector<MapChipAnimationData *> animationData;//マップチップのアニメーション情報の一覧
+	std::vector<std::shared_ptr<MapChipAnimationData>> animationData;//マップチップのアニメーション情報の一覧
+
+
+	void WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM);
+
+	MapChipType GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM);
+	MapChipType GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM);
+
+
+	RoomMapChipArray *GetLocalMap();
+	RoomMapChipDrawArray *GetLocalDrawMap();
+
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
@@ -201,10 +247,15 @@ private:
 	std::vector<StageMapChipDrawData> allMapChipDrawData;//マップチップの描画情報
 	static const int SECRET_DOOR_NUMBER = 5;
 
+	RoomMapChipArray localRoomMapChipArray;
+	RoomMapChipDrawArray localRoomMapChipDrawArray;
+
 	int thowGraphHandle;
 	std::array<int, 12> eventChipHandle;
 
 	array<int, 30> mapChipGraphHandle;
+	array<int, 3> gimmcikGraphHandle;
+	array<int, 12> sparkGraphHandle;
 	enum MapChipDrawEnum
 	{
 		MAPCHIP_DRAW_WALL_LEFT_UP,
@@ -314,6 +365,46 @@ private:
 			++sum;
 		}
 		return sum;
+	}
+
+	void SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM);
+
+	void SetLocalGimmickGraphHandle(const Vec2<int> &MAPCHIP_NUM, const int &CHIP_NUM)
+	{
+		//描画の書き換え
+		if (CHIP_NUM == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_GREEN];
+		}
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_RED];
+		}
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_ON)
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
+		}
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_OFF)
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_ELEC_OFF];
+		}
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
+		}
+		else
+		{
+			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+		}
 	}
 };
 

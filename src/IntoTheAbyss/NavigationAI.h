@@ -183,7 +183,7 @@ private:
 	{
 
 		// マップチップの情報。
-		RoomMapChipArray mapData = StageMgr::Instance()->GetMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());					//マップ
+		RoomMapChipArray mapData = *StageMgr::Instance()->GetLocalMap();					//マップ
 
 		// マップチップの識別用データ
 		SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);

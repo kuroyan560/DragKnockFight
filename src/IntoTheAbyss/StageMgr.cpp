@@ -18,8 +18,9 @@ StageMgr::StageMgr()
 	allMapChipData.resize(allStageNum);
 	relationRoomData.resize(allStageNum);
 	allMapChipDrawData.resize(allStageNum);
+	//1~21
+	mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK] = { 1,MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS };
 
-	mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK] = { 1,16 };
 
 	//LoadDivGraph("Resource/chip_sheet.png", 18, 6, 3, 32, 32, mapChipGraphHandle.data());
 
@@ -44,6 +45,10 @@ StageMgr::StageMgr()
 	thowGraphHandle = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/Thown.png");
 
 
+	gimmcikGraphHandle[GMMICK_RED] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/chip_item_red.png");
+	gimmcikGraphHandle[GMMICK_GREEN] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/chip_item_green.png");
+	gimmcikGraphHandle[GMMICK_ELEC_OFF] = TexHandleMgr::LoadGraph("resource/IntoTheAbyss/chip_spark_off.png");
+	TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/chip_spark.png", 12, { 12,1 }, sparkGraphHandle.data());
 
 
 	//問題の箇所-----------------------
@@ -56,11 +61,14 @@ StageMgr::StageMgr()
 
 
 
-	vector<int>tmp(6);
-	TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/gate.png", 6, { 6,1 }, &tmp[0]);
-	//アニメーション情報を読み込み
-	animationData.push_back(new MapChipAnimationData(tmp, 10));
+	//vector<int>tmp(6);
+	//TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/gate.png", 6, { 6,1 }, tmp.data());
+	////アニメーション情報を読み込み
+	//animationData.push_back(std::make_shared<MapChipAnimationData>(tmp, 10));
 
+	vector<int>tmp2(12);
+	TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/chip_spark.png", 12, { 12,1 }, tmp2.data());
+	animationData.push_back(std::make_shared<MapChipAnimationData>(tmp2, 10));
 
 	//std::string rootFilePass = "Resource/MapChipData/";
 	std::string rootFilePass = "resource/IntoTheAbyss/MapChipData/";
@@ -181,10 +189,14 @@ StageMgr::StageMgr()
 			{
 				for (int x = 0; x < allMapChipDrawData[stageNum][roomNum][y].size(); ++x)
 				{
-					if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[stageNum][roomNum][y][x] && allMapChipData[stageNum][roomNum][y][x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max)
+					if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[stageNum][roomNum][y][x] && allMapChipData[stageNum][roomNum][y][x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - 5)
 					{
 						MapChipDrawEnum now = static_cast<MapChipDrawEnum>(allMapChipData[stageNum][roomNum][y][x] - 1);
 						allMapChipDrawData[stageNum][roomNum][y][x].handle = mapChipGraphHandle[now];
+					}
+					else if (MAPCHIP_TYPE_STATIC_CHANGE_AREA <= allMapChipData[stageNum][roomNum][y][x] && allMapChipData[stageNum][roomNum][y][x] <= MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+					{
+						SetGimmickGraphHandle(stageNum, roomNum, Vec2<int>(x, y));
 					}
 				}
 			}
@@ -196,9 +208,9 @@ StageMgr::StageMgr()
 	//GimmickLoader::Instance()->ErrorCheck();
 }
 
-const RoomMapChipArray &StageMgr::GetMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
+void StageMgr::SetLocalMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
-	return allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
+	localRoomMapChipArray = allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
 }
 
 const int &StageMgr::GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER)
@@ -219,10 +231,9 @@ const SizeData StageMgr::GetMapChipSizeData(MapChipData TYPE)
 }
 
 
-RoomMapChipDrawArray StageMgr::GetMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
+void StageMgr::SetLocalMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
-	RoomMapChipDrawArray tmp = allMapChipDrawData[STAGE_NUMBER][ROOM_NUMBER];
-	return tmp;
+	localRoomMapChipDrawArray = allMapChipDrawData[STAGE_NUMBER][ROOM_NUMBER];
 }
 
 const bool &StageMgr::CheckStageNum(const int &STAGE_NUMBER)
@@ -252,6 +263,123 @@ const bool &StageMgr::CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMB
 	}
 
 	return false;
+}
+
+void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM)
+{
+	if (localRoomMapChipArray.size() <= MAPCHIP_NUM.y && localRoomMapChipArray[MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
+	{
+		//配列外参照
+		return;
+	}
+	localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] = CHIPNUM;
+	SetLocalGimmickGraphHandle(MAPCHIP_NUM, CHIPNUM);
+}
+
+MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM)
+{
+	if (allMapChipData[STAGE_NUM][ROOM_NUM].size() <= MAPCHIP_NUM.y && allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
+	{
+		return MAPCHIP_BLOCK_NONE;
+	}
+
+	int otherBlockNum = 6;
+	int spaceNum = 0;
+	if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] &&
+		allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - otherBlockNum)
+	{
+		return MAPCHIP_BLOCK_WALL;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON)
+	{
+		return MAPCHIP_BLOCK_ELEC_ON;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_OFF)
+	{
+		return MAPCHIP_BLOCK_ELEC_OFF;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
+	{
+		return MAPCHIP_BLOCK_COLOR_LEFT;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
+	{
+		return MAPCHIP_BLOCK_COLOR_RIGHT;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+	{
+		return MAPCHIP_BLOCK_ELEC_ON_ALLWAYS;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == spaceNum)
+	{
+		return MAPCHIP_BLOCK_SPACE;
+	}
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_CHANGE_AREA)
+	{
+		return MAPCHIP_BLOCK_CHANGE_AREA;
+	}
+	else
+	{
+		return MAPCHIP_BLOCK_NONE;
+	}
+}
+
+MapChipType StageMgr::GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM)
+{
+	if (localRoomMapChipArray.size() <= MAPCHIP_NUM.y && localRoomMapChipArray[MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
+	{
+		return MAPCHIP_BLOCK_NONE;
+	}
+
+	int otherBlockNum = 6;
+	int spaceNum = 0;
+	if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] &&
+		localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - otherBlockNum)
+	{
+		return MAPCHIP_BLOCK_WALL;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON)
+	{
+		return MAPCHIP_BLOCK_ELEC_ON;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_OFF)
+	{
+		return MAPCHIP_BLOCK_ELEC_OFF;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
+	{
+		return MAPCHIP_BLOCK_COLOR_LEFT;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
+	{
+		return MAPCHIP_BLOCK_COLOR_RIGHT;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+	{
+		return MAPCHIP_BLOCK_ELEC_ON_ALLWAYS;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == spaceNum)
+	{
+		return MAPCHIP_BLOCK_SPACE;
+	}
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_CHANGE_AREA)
+	{
+		return MAPCHIP_BLOCK_CHANGE_AREA;
+	}
+	else
+	{
+		return MAPCHIP_BLOCK_NONE;
+	}
+}
+
+RoomMapChipArray *StageMgr::GetLocalMap()
+{
+	return &localRoomMapChipArray;
+}
+
+RoomMapChipDrawArray *StageMgr::GetLocalDrawMap()
+{
+	return &localRoomMapChipDrawArray;
 }
 
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
@@ -314,4 +442,37 @@ bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM,
 	}
 
 	return sideFlag;
+}
+
+void StageMgr::SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM)
+{
+	//描画の書き換え
+	if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_COLOR_RIGHT)
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_RED];
+	}
+	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_COLOR_LEFT)
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_GREEN];
+	}
+	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_ELEC_ON)
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
+	}
+	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_ELEC_OFF)
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_ELEC_OFF];
+	}
+	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_ELEC_ON_ALLWAYS)
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
+	}
+	else
+	{
+		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+	}
 }

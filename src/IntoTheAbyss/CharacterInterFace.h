@@ -11,6 +11,7 @@
 #include"SwingLineSegmentMgr.h"
 #include"TexHandleMgr.h"
 #include"CharacterInfo.h"
+#include"StageMgr.h"
 
 class StaminaMgr;
 
@@ -47,6 +48,8 @@ private:
 	int stanTimer;
 	//ダメージ用タイマー
 	int damageTimer;
+	// トゲブロックにあたったとき用タイマー これに値が入っているときは動けない。
+	int elecTimer;
 
 	//パイロット切り離し
 	bool isPilotDetached = false;	// パイロット切り離し中かのフラグ
@@ -152,7 +155,7 @@ protected:
 	bool IsPilotOutSide() { return isPilotDetached || pilotReturnTimer < pilotReturnTotalTime; }
 
 	// 当たり判定情報保存。
-	void SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine);
+	void SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, Vec2<int>& hitChipIndex, const Vec2<int>& hitChipIndexBuff);
 
 public:
 	//登場演出が完了したか
@@ -259,5 +262,10 @@ public:
 	{
 		return CCWSwingSegmentMgr.IsHitWall();
 	}
+
+	// マップチップが指定のインデックスだったら指定の値に塗り替える。 上下左右も。
+	void OverWriteMapChipValueAround(const Vec2<int>& MapChipIndex, const MapChipType& DstType, const MapChipData& SrcData);
+
+
 };
 
