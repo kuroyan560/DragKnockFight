@@ -2,7 +2,6 @@
 #include <vector>
 #include "Intersected.h"
 #include"AreaCollider.h"
-#include"IBossPattern.h"
 #include<array>
 #include<memory>
 
@@ -45,6 +44,7 @@ public:
 
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
+	int prevStaminaMax;
 
 public:
 	/*===== 定数 =====*/

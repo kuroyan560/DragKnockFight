@@ -619,6 +619,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		vel += inputLeftVec * speed;
 
+
 		// ˆÚ“®—Ê‚ªŒÀŠE‚ğ’´‚¦‚È‚¢‚æ‚¤‚É‚·‚éB
 		if (speed < vel.Length()) {
 

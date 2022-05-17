@@ -13,12 +13,15 @@ class DrawFunc_Mask
 	//DrawRotaGraph
 	static int DRAW_ROTA_GRAPH_COUNT;
 
+	static int DRAW_BY_MASK_GRAPH_COUNT;
+
 public:
 	//呼び出しカウントリセット
 	static void CountReset()
 	{
 		DRAW_EXTEND_GRAPH_COUNT = 0;
 		DRAW_ROTA_GRAPH_COUNT = 0;
+		DRAW_BY_MASK_GRAPH_COUNT = 0;
 	}
 
 	/// <summary>
@@ -77,6 +80,15 @@ public:
 	/// <param name="Miror">反転フラグ</param>
 	static void DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const std::shared_ptr<TextureBuffer>& Tex, const int& Thickness,
 		const Vec2<float>& MaskLeftUpPos, const Vec2<float>& MaskRightBottomPos, const Vec2<bool>& Mirror = { false,false });
+
+	/// <summary>
+	/// マスク画像を基に描画（マスク画像の範囲だけテクスチャ描画）
+	/// </summary>
+	/// <param name="Center">中心座標</param>
+	/// <param name="Tex">テクスチャ</param>
+	/// <param name="MaskCenter">マスク画像の中心座標</param>
+	/// <param name="MaskTex">マスク画像</param>
+	static void DrawGraphByMaskGraph(const Vec2<float>& Center, const std::shared_ptr<TextureBuffer>& Tex, const Vec2<float>& MaskCenter, const std::shared_ptr<TextureBuffer>& MaskTex);
 
 };
 

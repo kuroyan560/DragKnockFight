@@ -79,7 +79,10 @@ public:
 	// 指定したアクションができるか。
 	bool CheckCanAction(const int& ConsumesStamina);
 
-	//バー単位ではなくゲージ消費(パイロット引き離し用)、足りなかったらfalseを返す
+	// バー単位ではなくゲージ消費(パイロット引き離し用)、足りなかったらfalseを返す
 	void ConsumesStaminaByGauge(const float& CounsumeStaminaGauge);
+
+	// スタミナゲージのサイズを設定する。
+	void Resize(const int& Size);
 
 };

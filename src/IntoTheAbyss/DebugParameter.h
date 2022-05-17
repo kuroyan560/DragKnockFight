@@ -60,21 +60,17 @@ struct RoundParameterData
 
 struct BossDebugParameterData
 {
-	int bossNowStatus;
-	int PULL_SPAN_MIN;
-	int PULL_SPAN_MAX;
-	float PULL_POWER_MIN;
-	float PULL_POWER_MAX;
-	float PULL_ADD_X_POWER;
-	float moveX;
-	Vec2<float> moveVel;
-
-	bool drawNearRayFlag;
-	bool drawFarRayFlag;
-	bool drawBossFlag;
+	float vel;
+	int coolTime;
+	int staminaMax;
+	int staminaDash;
+	int staminaSwing;
+	float swingAngle;
+	float swingMax;
+	bool enableToDashAfterSwingFlag;
 	BossDebugParameterData() :
-		PULL_POWER_MIN(0.0f), PULL_POWER_MAX(0.0f), PULL_SPAN_MIN(0), PULL_SPAN_MAX(0), moveX(0.0f), PULL_ADD_X_POWER(0.0f),
-		drawNearRayFlag(false), drawFarRayFlag(false), drawBossFlag(true)
+		vel(14.0f), coolTime(30), staminaMax(6), staminaDash(1), staminaSwing(2), enableToDashAfterSwingFlag(true),
+		swingAngle(0.02f), swingMax(0.13f)
 	{
 	}
 };
@@ -108,7 +104,9 @@ public:
 
 	MaskData maskData;
 
-	BossDebugParameterData bossDebugData;
+	int bossStageNum;
+	std::vector<BossDebugParameterData> bossDebugData;
+	const BossDebugParameterData &GetBossData();
 
 	std::string GetStatus(int NUM)
 	{
@@ -131,5 +129,6 @@ public:
 			break;
 		}
 	}
+
 };
 

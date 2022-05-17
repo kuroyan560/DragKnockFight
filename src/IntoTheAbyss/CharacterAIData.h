@@ -42,6 +42,9 @@ public:
 	const int EVALUATION_MAX_VALUE = 10;
 
 	Vec2<float>nowPos,prevPos;
+
+	bool releaseSwingFlag;
+	bool prevSwingFlag;
 };
 
 class CharacterAIOrder :public Singleton<CharacterAIOrder>
