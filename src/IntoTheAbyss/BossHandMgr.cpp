@@ -71,7 +71,7 @@ void BossHandMgr::Update(const Vec2<float> &POS)
 	}
 
 	//ï‚ä‘
-	float mul = 0.5f;
+	float mul = 0.3f;
 	{
 		float distance = leftAngleLerp - leftHandData.angle;
 		leftHandData.angle += distance * mul;
