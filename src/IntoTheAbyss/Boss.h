@@ -13,6 +13,7 @@ using namespace std;
 #include"NavigationAI.h"
 #include"CharacterAI.h"
 #include"PlayerAnimation.h"
+#include"BossHandMgr.h"
 
 // プレイヤーと引っ張り合うボスクラス
 class Boss : public CharacterInterFace
@@ -41,6 +42,8 @@ public:
 	CharacterAI characterAi;
 	bool initNaviAiFlag;
 	//ボスのパターン制御-----------------------
+
+	BossHandMgr handMgr;
 
 	//ボスのパラメーター変更
 	int bossImGuiHandle;

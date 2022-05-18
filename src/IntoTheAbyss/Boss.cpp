@@ -29,7 +29,7 @@ Boss::Boss() :CharacterInterFace(SCALE)
 {
 	//graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
 	//graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
-	
+
 	const std::string BossRelative = "resource/ChainCombat/boss/0/";
 
 	std::vector<Anim>animations;
@@ -82,6 +82,8 @@ void Boss::OnInit()
 		initNaviAiFlag = true;
 	}
 
+	handMgr.Init(false);
+
 }
 
 #include"Camera.h"
@@ -103,6 +105,13 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	{
 		anim->ChangeAnim(FRONT);
 	}
+
+
+
+	handMgr.Hold(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), GetNowSwing());
+
+	handMgr.Update(pos);
+
 
 
 	// パートナーが振り回していたら残像を出す。
@@ -196,8 +205,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 	// 移動量に関する変数をここで全てvelに代入する。
 	vel = CharacterAIOrder::Instance()->vel;
-
-
 }
 
 #include"DrawFunc_FillTex.h"
@@ -219,6 +226,8 @@ void Boss::OnDraw()
 
 	//navigationAi.Draw();
 	//characterAi.Draw();
+
+	handMgr.Draw();
 
 }
 

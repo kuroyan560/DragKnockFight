@@ -8,7 +8,7 @@ public:
 	
 	void Init();
 	void Update(const Vec2<float> &POS, float RADIUS, float ANGLE, bool HOLD);
-	void Draw();
+	void Draw(bool SCROL_ON = true);
 
 private:
 	int nowHnadle,graphHandle, holdGraphHandle;
