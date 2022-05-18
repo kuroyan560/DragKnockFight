@@ -41,26 +41,27 @@ void WinCounter::Update()
 	//ノックアウトの文字アニメーション
 	const int START_PHASE_TIME = 60;			// 開始フェーズの時間
 	const int STOP_PHASE_TIMER = 50;			// 一時停止フェーズの時間
-	const int END_PHASE_TIME = 60;				// 終了フェーズの時間
+	const int END_PHASE_TIME = 50;				// 終了フェーズの時間
 	const int CHARA_ANIM_FRAME = 5;				// キャラの1アニメーションにかかる時間
 	const Vec2<float> KNOCK_OUT_APPEAR_POS = { static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y + 200.0f) };
 	const Vec2<float> MASK_POS = { static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y) };
 
+	const Vec2<float> WindowSize = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y));
+	const Vec2<float> WindowHalfSize = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
+
 	// 勝者によってマスクやキャラアイコンの移動を変えるための変数。
-	Vec2<float> maskStartPos = { -static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(-WinApp::Instance()->GetWinSize().y) };
-	Vec2<float> maskEndPos = { static_cast<float>(WinApp::Instance()->GetWinSize().x + WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinSize().y + WinApp::Instance()->GetWinCenter().y) };
-	Vec2<float> charaStartPos = { static_cast<float>(WinApp::Instance()->GetWinSize().x + WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinSize().y + WinApp::Instance()->GetWinCenter().y) };
-	Vec2<float> charaEndPos = { -static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(-WinApp::Instance()->GetWinSize().y) };
+	Vec2<float> maskStartPos = { -WindowSize.x,-WindowSize.y };
+	Vec2<float> maskEndPos = { WindowSize.x + WindowHalfSize.x, WindowSize.y + WindowHalfSize.y };
+	Vec2<float> charaStartPos = maskEndPos;
+	Vec2<float> charaEndPos = maskStartPos;
 
 	// 右のキャラだったら値を反転させる。
 	if (!isLeftKnockOut) {
 
-		Vec2<float> buff = maskStartPos;
-		maskStartPos = { -static_cast<float>(WinApp::Instance()->GetWinSize().x), -static_cast<float>(WinApp::Instance()->GetWinSize().y) };
-		maskEndPos = { -static_cast<float>(WinApp::Instance()->GetWinSize().x), -static_cast<float>(WinApp::Instance()->GetWinSize().y) };;
-		buff = charaStartPos;
-		charaStartPos = { -static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y + WinApp::Instance()->GetWinSize().y) };;
-		charaEndPos = { static_cast<float>(WinApp::Instance()->GetWinSize().x + WinApp::Instance()->GetWinCenter().x), -static_cast<float>(WinApp::Instance()->GetWinSize().y + WinApp::Instance()->GetWinCenter().y) };;
+		maskStartPos = { WindowSize.x + WindowSize.x, -WindowSize.y };
+		maskEndPos = { -WindowHalfSize.x, WindowSize.y + WindowHalfSize.y };
+		charaStartPos = maskEndPos;
+		charaEndPos = maskStartPos;
 
 	}
 
