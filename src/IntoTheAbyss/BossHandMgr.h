@@ -21,5 +21,11 @@ public:
 	std::unique_ptr<BossHand>leftHand, rightHand;
 
 	HandData leftHandData, rightHandData;
+	bool holdFlag;
+	bool lockOnFlag;
+
+	Vec2<float>centralPos, targetPos, nowSwingVec;
+
+	float leftAngle, rightAngle;
 };
 

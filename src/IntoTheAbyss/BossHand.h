@@ -4,14 +4,14 @@
 class BossHand
 {
 public:
-	BossHand(int HANDLE);
+	BossHand(int HANDLE, int HOLD_HANDLE);
 	
 	void Init();
-	void Update(const Vec2<float> &POS, float RADIUS, float ANGLE);
+	void Update(const Vec2<float> &POS, float RADIUS, float ANGLE, bool HOLD);
 	void Draw();
 
 private:
-	int graphHandle;
+	int nowHnadle,graphHandle, holdGraphHandle;
 	float radian;
 	Vec2<float> pos, size, centralPos;
 };
