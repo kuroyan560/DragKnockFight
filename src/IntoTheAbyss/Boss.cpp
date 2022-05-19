@@ -53,6 +53,12 @@ Boss::Boss() :CharacterInterFace(SCALE)
 	animations[DAMAGE].interval = 0;
 	animations[DAMAGE].loop = false;
 
+	static const int SWING_NUM = 1;
+	animations[SWING].graph.resize(SWING_NUM);
+	animations[SWING].graph[0] = TexHandleMgr::LoadGraph(BossRelative + "swing.png");
+	animations[SWING].interval = 0;
+	animations[SWING].loop = false;
+
 
 	anim = std::make_shared<PlayerAnimation>(animations);
 
@@ -91,12 +97,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 {
 	/*===== XVˆ— =====*/
 
-	//if (Camera::Instance()->Active())
-	//{
-	//	moveVel = { 0,0 };
-	//	return;
-	//}
-
+	//ˆÚ“®Žž‚Ì‰æ‘œØ‚è‘Ö‚¦
 	if (signbit(CharacterAIData::Instance()->prevPos.x - CharacterAIData::Instance()->nowPos.x))
 	{
 		anim->ChangeAnim(BACK);
@@ -105,12 +106,28 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	{
 		anim->ChangeAnim(FRONT);
 	}
+	//U‚è‰ñ‚µ’†‚Ì‰æ‘œØ‚è‘Ö‚¦
+	if (GetNowSwing())
+	{
+		anim->ChangeAnim(SWING);
+	}
 
 
 
 	handMgr.Hold(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), GetNowSwing());
 
 	handMgr.Update(pos + Vec2<float>(0.0f, 20.0f));
+
+	if (GetNowSwing())
+	{
+		Vec2<float>dir = -Vec2<float>(partner.lock()->pos - pos).GetNormal();
+		float adjRadian = Angle::ConvertToRadian(180.0f);
+		bossGraphRadian = atan2f(dir.y + adjRadian, dir.x + adjRadian);
+	}
+	else
+	{
+		bossGraphRadian = 0.0f;
+	}
 
 
 
@@ -218,8 +235,11 @@ void Boss::OnDraw()
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
 
-	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-		TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
+	//	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
+	//		TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
+
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos),
+		Vec2<float>(0.7f, 0.7f), bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()));
 
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);

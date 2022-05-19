@@ -32,6 +32,7 @@ public:
 		FRONT,
 		BACK,
 		DAMAGE,
+		SWING,
 		ANIMAHANDLE_MAX
 	};
 	int afterImgageTimer;
@@ -44,6 +45,7 @@ public:
 	//ボスのパターン制御-----------------------
 
 	BossHandMgr handMgr;
+	float bossGraphRadian;
 
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
