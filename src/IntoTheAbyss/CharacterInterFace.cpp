@@ -606,7 +606,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	else {
 
 		// ‚Ý‚¬‚Ìƒ`[ƒ€(“G)‚¾‚Á‚½‚ç
-		staminaAutoHealAmount = 1.5f;
+		staminaAutoHealAmount = DebugParameter::Instance()->GetBossData().staminaHealAmount;
 
 	}
 
