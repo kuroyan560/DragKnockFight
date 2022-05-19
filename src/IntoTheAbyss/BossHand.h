@@ -16,4 +16,9 @@ private:
 	Vec2<float> pos, size, centralPos;
 
 	int count;
+
+	Vec2<float>pointPos;
+	float angle;
+	float bossCount;
+	float countDown;
 };

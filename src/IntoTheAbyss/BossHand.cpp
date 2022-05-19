@@ -4,6 +4,7 @@
 #include"../Common/KuroMath.h"
 #include"../IntoTheAbyss/ScrollMgr.h"
 #include"../IntoTheAbyss/CharacterAIData.h"
+#include"../IntoTheAbyss/CharacterManager.h"
 
 BossHand::BossHand(int HANDLE, int HOLD_HANDLE) :graphHandle(HANDLE), holdGraphHandle(HOLD_HANDLE),
 radian(0.0f), centralPos({ 0.0f,0.0f }), pos({ 0.0f,0.0f }), size({ 1.0f,1.0f })
@@ -24,21 +25,17 @@ void BossHand::Update(const Vec2<float> &POS, float RADIUS, float ANGLE, bool HO
 	else
 	{
 		nowHnadle = graphHandle;
+		angle = 0.0f;
+		bossCount = 0.0f;
 	}
 
 	centralPos = POS;
 	//radian = Angle::ConvertToRadian(ANGLE);
 	radian = ANGLE;
 
-	const float PI2 = 3.14f;
-	count += 1 + 50 * CharacterAIOrder::Instance()->prevRate;
-	float countDown = sinf(PI2 / 120.0f * count) * 0.0f;
-
-	Vec2<float>shakeVec = DIR;
-	shakeVec.x = 1.0f - fabs(shakeVec.x);
-	shakeVec.y = 1.0f - fabs(shakeVec.y);
-
-	pos = centralPos + Vec2<float>((cosf(radian) * RADIUS) + countDown * (shakeVec.x), (sinf(radian) * RADIUS) + countDown * (shakeVec.y));
+	
+	Vec2<float> shakeAmount = CharacterManager::Instance()->Right()->shakeValue;
+	pos = centralPos + Vec2<float>((cosf(radian) * RADIUS) + shakeAmount.x, (sinf(radian) * RADIUS) + shakeAmount.y);
 }
 
 void BossHand::Draw(bool SCROL_ON)

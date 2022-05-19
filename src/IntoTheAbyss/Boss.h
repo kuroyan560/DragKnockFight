@@ -105,20 +105,6 @@ private:
 
 	void Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed);
 
-	void Shake()
-	{
-		if (maxShakeAmount <= 25.0f)
-		{
-			maxShakeAmount += 0.5f;
-		}
-		// シェイク量を更新する。
-		//shakeAmount.x = GetRand(maxShakeAmount * 2.0f) - maxShakeAmount;
-		//shakeAmount.y = GetRand(maxShakeAmount * 2.0f) - maxShakeAmount;
-		shakeAmount.x = KuroFunc::GetRand(maxShakeAmount * 2.0f) - maxShakeAmount;
-		shakeAmount.y = KuroFunc::GetRand(maxShakeAmount * 2.0f) - maxShakeAmount;
-	};
-	float maxShakeAmount;
-	Vec2<float>shakeAmount;
 public:
 	void OnKnockOut()override {};
 };

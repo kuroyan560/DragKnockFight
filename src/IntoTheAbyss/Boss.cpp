@@ -88,7 +88,6 @@ void Boss::OnInit()
 		initNaviAiFlag = true;
 	}
 
-	maxShakeAmount = 0.0f;
 	initShakeFalg = false;
 	bossScale = { 0.7f,0.7f };
 }
@@ -145,7 +144,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	Vec2<float>nomal = pos - pointPos;
 	nomal.Normalize();
 
-	shakeAmount = { (nomal.x * countDown) * 10.0f,(nomal.y * countDown) * 10.0f };
+	shakeValue = { (nomal.x * countDown) * 10.0f,(nomal.y * countDown) * 10.0f };
 
 
 
@@ -266,7 +265,7 @@ void Boss::OnDraw()
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
 
-	DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeAmount), bossScale * ScrollMgr::Instance()->zoom,
+	DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeValue), bossScale * ScrollMgr::Instance()->zoom,
 		bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
 
 
