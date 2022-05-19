@@ -166,13 +166,12 @@ void D3D12App::Initialize(const HWND& Hwnd, const Vec2<int>& ScreenSize, const b
 			assert(0);
 		}
 
-		auto val = ClearValue.GetColor();
 		float clearValue[4] =
 		{
-			val.x,
-			val.y,
-			val.z,
-			val.w,
+			ClearValue.r,
+			ClearValue.g,
+			ClearValue.b,
+			ClearValue.a
 		};
 		swapchain = std::make_unique<Swapchain>(device, swapchain1, *descHeapCBV_SRV_UAV, *descHeapRTV, useHDR, clearValue);
 	}
@@ -461,13 +460,12 @@ std::shared_ptr<TextureBuffer> D3D12App::GenerateTextureBuffer(const Color& Colo
 	XMFLOAT4* texturedata = new XMFLOAT4[texDataCount];
 
 	//全ピクセルの色を初期化
-	auto colorval = Color.GetColor();
 	for (int i = 0; i < texDataCount; ++i)
 	{
-		texturedata[i].x = colorval.x;	//R
-		texturedata[i].y = colorval.y;	//G
-		texturedata[i].z = colorval.z;	//B
-		texturedata[i].w = colorval.w;	//A
+		texturedata[i].x = Color.r;	//R
+		texturedata[i].y = Color.g;	//G
+		texturedata[i].z = Color.b;	//B
+		texturedata[i].w = Color.a;	//A
 	}
 
 	//テクスチャヒープ設定
@@ -503,10 +501,10 @@ std::shared_ptr<TextureBuffer> D3D12App::GenerateTextureBuffer(const Color& Colo
 
 	//バッファに名前セット
 	std::wstring name = L"ColorTexture - ";
-	name += std::to_wstring(colorval.x) + L" , ";
-	name += std::to_wstring(colorval.y) + L" , ";
-	name += std::to_wstring(colorval.z) + L" , ";
-	name += std::to_wstring(colorval.w);
+	name += std::to_wstring(Color.r) + L" , ";
+	name += std::to_wstring(Color.g) + L" , ";
+	name += std::to_wstring(Color.b) + L" , ";
+	name += std::to_wstring(Color.a);
 	buff->SetName(name.c_str());
 
 	//テクスチャバッファにデータ転送
@@ -709,13 +707,12 @@ std::shared_ptr<RenderTarget> D3D12App::GenerateRenderTarget(const DXGI_FORMAT& 
 	);
 
 	//レンダーターゲットのクリア値
-	auto colorval = ClearValue.GetColor();
 	float clearColor[4] =
 	{
-		colorval.x,
-		colorval.y,
-		colorval.z,
-		colorval.w
+		ClearValue.r,
+		ClearValue.g,
+		ClearValue.b,
+		ClearValue.a
 	};
 
 	D3D12_CLEAR_VALUE clearValue;

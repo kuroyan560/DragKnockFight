@@ -97,7 +97,7 @@ void AfterImageMgr::Draw()
 
 		// 描画。
 		Color texColor = afterImages[index].srcColor;
-		texColor.Alpha() = afterImages[index].alpha;
+		texColor.a = afterImages[index].alpha;
 
 		// ExtendGraphフラグが立っていたら。
 		if (afterImages[index].isExtendGraph) {

@@ -76,6 +76,7 @@ struct MapChipDrawData
 	int animationNum;//現在参照しているアニメーションの画像
 	Vec2<float> offset;	//32*32の画像じゃない場合の画像位置調整
 	Vec2<float> offsetInterval;//上下左右の画像の間隔を空ける
+	float shocked;	//衝撃率
 
 	void Reset()
 	{
@@ -86,6 +87,7 @@ struct MapChipDrawData
 		animationNum = 0;//現在参照しているアニメーションの画像
 		offset = {};	//32*32の画像じゃない場合の画像位置調整
 		offsetInterval = {};//上下左右の画像の間隔を空ける
+		shocked = 0.0f;
 	};
 
 	//MapChipDrawData() : handle(-1), radian(0.0f), animationFlag(false), interval(0), animationNum(0), offset(Vec2<float>(0.0f, 0.0f))

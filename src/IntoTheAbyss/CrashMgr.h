@@ -1,6 +1,7 @@
 #pragma once
 #include"Singleton.h"
 #include"Vec.h"
+#include<array>
 class StagingInterFace;
 class CrashMgr : public Singleton<CrashMgr>
 {
@@ -12,7 +13,7 @@ class CrashMgr : public Singleton<CrashMgr>
 	static const int CRASH_DISAPPEAR_TIME = 30;
 	static const int CRASH_LIFE_SPAN = CRASH_APPEAR_TIME + CRASH_WAIT_TIME + CRASH_DISAPPEAR_TIME;
 	int se;
-	int crashGraph;
+	std::array<int, 3>crashGraph;
 
 	struct CrashDrawInfo
 	{
@@ -21,6 +22,7 @@ class CrashMgr : public Singleton<CrashMgr>
 		float scale;
 		float alpha;
 		int life;
+		float scaleOffsetRadian;
 	};
 	static const int CRASH_MAX_NUM = 10;
 	CrashDrawInfo crashInfo[CRASH_MAX_NUM];

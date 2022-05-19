@@ -280,6 +280,9 @@ void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 
 void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, Vec2<int>& hitChipIndex, const Vec2<int>& hitChipIndexBuff)
 {
+	auto mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
+	(*mapChipDrawData)[hitChipIndexBuff.y][hitChipIndexBuff.x].shocked = 1.0f;
+
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_TOP)isHitTop = true;
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_BOTTOM) isHitBottom = true;
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_LEFT) isHitLeft = true;
@@ -594,7 +597,20 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	}
 
-	staminaGauge->Update(!isPilotDetached, pos);
+	if (team == WHICH_TEAM::LEFT_TEAM) {
+
+		// ひだりのチーム(プレイヤー)だったら
+		staminaAutoHealAmount = 1.5f;
+
+	}
+	else {
+
+		// みぎのチーム(敵)だったら
+		staminaAutoHealAmount = DebugParameter::Instance()->GetBossData().staminaHealAmount;
+
+	}
+
+	staminaGauge->Update(!isPilotDetached, pos, staminaAutoHealAmount);
 }
 
 #include "DrawFunc.h"
@@ -937,7 +953,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				}
 
 				// クラッシュ演出を追加。
-				CrashEffectMgr::Instance()->Generate(pos);
+				CrashEffectMgr::Instance()->Generate(pos, GetTeamColor());
 
 				// 今自分がどっちのチームかを取得。
 				StaminaItem::CHARA_ID charaID;
@@ -1255,20 +1271,20 @@ void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int>& MapChipInd
 	}
 
 	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-	if (StageMgr::Instance()->GetLocalMapChipType( MapChipIndex + Vec2<int>(0, -1)) == DstType) {
+	if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(0, -1)) == DstType) {
 		// トゲブロックを棘無し状態にさせる。
 		StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(0, -1), SrcData);
 	}
 
 	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-	if (StageMgr::Instance()->GetLocalMapChipType( MapChipIndex + Vec2<int>(0, 1)) == DstType) {
+	if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(0, 1)) == DstType) {
 		// トゲブロックを棘無し状態にさせる。
 		StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(0, 1), SrcData);
 	}
 
 }
 
-CharacterInterFace::CharacterInterFace(const Vec2<float> &HonraiSize) : size(HonraiSize)
+CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(HonraiSize)
 {
 	areaHitBox.center = &pos;
 	areaHitBox.size = size;

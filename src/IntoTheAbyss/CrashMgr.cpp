@@ -8,7 +8,7 @@ CrashMgr::CrashMgr()
 {
 	se = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/crash.wav", 0.27f);
 
-	crashGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/crash.png");
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/crash.png", 3, { 3,1 }, crashGraph.data());
 }
 
 void CrashMgr::Init()
@@ -51,6 +51,8 @@ void CrashMgr::Update()
 			info.scale = KuroMath::Ease(In, Back, timer, totalTime, 1.0f, 0.0f);
 		}
 
+		info.scaleOffsetRadian += Angle::ConvertToRadian(20.0f);
+
 		info.life++;
 	}
 }
@@ -65,8 +67,8 @@ void CrashMgr::Draw()
 		if (CRASH_LIFE_SPAN < info.life)continue;
 
 		auto drawPos = ScrollMgr::Instance()->Affect(info.pos);
-		float drawScale = info.scale * ScrollMgr::Instance()->zoom;
-		DrawFunc::DrawRotaGraph2D(drawPos, { drawScale,drawScale }, info.radian, TexHandleMgr::GetTexBuffer(crashGraph));
+		float drawScale = info.scale * ScrollMgr::Instance()->zoom + cos(info.scaleOffsetRadian) * 0.05f;
+		DrawFunc::DrawRotaGraph2D(drawPos, { drawScale,drawScale }, info.radian, TexHandleMgr::GetTexBuffer(crashGraph[KuroFunc::GetRand(2)]));
 	}
 }
 
@@ -99,6 +101,7 @@ void CrashMgr::Crash(const Vec2<float>& Pos, StagingInterFace& CrashDevice, cons
 			info.radian = 0.0f;
 			info.scale = 0.0f;
 			info.alpha = 1.0f;
+			info.scaleOffsetRadian = 0.0f;
 			break;
 		}
 	}

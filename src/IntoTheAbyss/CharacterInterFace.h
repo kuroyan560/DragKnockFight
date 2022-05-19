@@ -180,6 +180,8 @@ public:
 	const int DASH_STAMINA = 1;		// ダッシュ時の消費スタミナ
 	bool goAreaFlag;
 
+	float staminaAutoHealAmount;
+
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team, const PLAYABLE_CHARACTER_NAME& Name)
 	{
 		partner = Partner;
