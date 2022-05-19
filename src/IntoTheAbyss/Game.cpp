@@ -89,9 +89,10 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 		const int WIDTH = mapChipData[height].size();
 		for (int width = 0; width < WIDTH; ++width) {
 
+			if (mapChipDrawData[height][width].shocked)mapChipDrawData[height][width].shocked -= 0.02f;
+
 			// ブロック以外だったら処理を飛ばす。
 			bool blockFlag = (mapChipData[height][width] >= wallChipMemorySize.min && mapChipData[height][width] <= wallChipMemorySize.max);
-
 			if (blockFlag)
 			{
 				// スクロール量から描画する位置を求める。
@@ -130,7 +131,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 					handle = mapChipDrawData[height][width].handle;
 				}
 
-				mapChipDrawData[height][width].shocked = KuroMath::Lerp(mapChipDrawData[height][width].shocked, 0.0f, 0.8f);
+				//mapChipDrawData[height][width].shocked = KuroMath::Lerp(mapChipDrawData[height][width].shocked, 0.0f, 0.8f);
 
 				Vec2<float> pos = drawPos;
 				pos += mapChipDrawData[height][width].offset;
@@ -159,7 +160,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 		{
 			drawMap[i].AddChip(itr->second[chipIdx]);
 		}
-		drawMap[i].Draw(TexHandleMgr::GetTexBuffer(itr->first), nullptr, nullptr);
+		drawMap[i].Draw(TexHandleMgr::GetTexBuffer(itr->first));
 		i++;
 	}
 }
