@@ -185,11 +185,10 @@ void StaminaMgr::Init()
 }
 
 #include"SlowMgr.h"
-void StaminaMgr::Update(const bool& Heal, const Vec2<float>& CharacterPos)
+void StaminaMgr::Update(const bool& Heal, const Vec2<float>& CharacterPos, const int& AutoHeapAmount)
 {
 	const bool oldFullFlg = 100.0f <= stamina.back().GetNowGauge();
 
-	static const float HEAL_AMOUNT = 1.5f;
 	// スタミナゲージは何もしてなくても少しずつ回復する。
 	const int STAMINA_COUNT = stamina.size();
 
@@ -200,7 +199,7 @@ void StaminaMgr::Update(const bool& Heal, const Vec2<float>& CharacterPos)
 			// 既にマックスだったら処理を飛ばす。
 			if (stamina[index].GetIsActivate()) continue;
 
-			stamina[index].AddNowGauge(HEAL_AMOUNT * SlowMgr::Instance()->slowAmount);
+			stamina[index].AddNowGauge(AutoHeapAmount * SlowMgr::Instance()->slowAmount);
 
 			int indexBuff = index;
 			if(5 <= indexBuff) indexBuff = 4;

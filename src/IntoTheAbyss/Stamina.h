@@ -64,7 +64,7 @@ public:
 
 	StaminaMgr();
 	void Init();
-	void Update(const bool& Heal, const Vec2<float>& CharacterPos);
+	void Update(const bool& Heal, const Vec2<float>& CharacterPos, const int& AutoHeapAmount);
 	void Draw(const Vec2<float>& CharaPos);
 	
 	// F‚ğİ’èB
