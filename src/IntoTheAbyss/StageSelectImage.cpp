@@ -1,6 +1,7 @@
 #include "StageSelectImage.h"
 #include"../Engine/DrawFunc.h"
 #include"../IntoTheAbyss/TexHandleMgr.h"
+#include"IntoTheAbyss/StageSelectOffsetPosDebug.h"
 
 StageSelectImage::StageSelectImage()
 {
@@ -42,7 +43,8 @@ void StageSelectImage::Update()
 
 void StageSelectImage::Draw()
 {
-	DrawFunc::DrawRotaGraph2D(backGroundLerpData.pos + expData.pos, backGroundLerpData.size + expData.size, 0.0f, TexHandleMgr::GetTexBuffer(backGroundHandle));
+	Vec2<float> debugPos = StageSelectOffsetPosDebug::Instance()->pos;
+	DrawFunc::DrawRotaGraph2D(backGroundLerpData.pos + expData.pos + debugPos, backGroundLerpData.size + expData.size, 0.0f, TexHandleMgr::GetTexBuffer(backGroundHandle));
 }
 
 void StageSelectImage::ImGuiDraw()

@@ -23,10 +23,13 @@ public:
 private:
 	int selectNum;
 	std::array<int, 3> screenShotHandle;
+	std::array<int, 3> stageNumberHandle;
 	LerpData screenShotLerpData;
+	LerpData stageNumberData;
 
 	// ‘I‘ğ‚³‚ê‚½‚ÉŠgk‚·‚é‚½‚ß‚Ì•Ï”
 	LerpData expData;
+	LerpData stageNumberExpData;
 
 	bool zoomOutFlag;
 };

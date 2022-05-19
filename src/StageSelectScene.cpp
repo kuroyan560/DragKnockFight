@@ -2,6 +2,7 @@
 #include"IntoTheAbyss/SelectStage.h"
 #include"IntoTheAbyss/StageMgr.h"
 #include"IntoTheAbyss/CharacterManager.h"
+#include"IntoTheAbyss/StageSelectOffsetPosDebug.h"
 
 StageSelectScene::StageSelectScene()
 {
@@ -13,15 +14,23 @@ void StageSelectScene::OnInitialize()
 {
 	charactersSelect = false;
 	CharacterManager::Instance()->CharactersSelectInit();
+	// ステージセレクト画面の更新処理用クラスを初期化。
 	stageSelect.Init();
+	// マップのスクショを初期化。
 	screenShot.Init();
+	// 各矢印を初期化
 	rightArrow.Init(Vec2<float>(1180.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), 0);
 	leftArrow.Init(Vec2<float>(100.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), DirectX::XM_PI);
+	// 各キャラの画像を初期化。
+	Vec2<float> leftCharaPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x * 0.25f + 55.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y - 7.0f));
+	leftChara.Init(Vec2<float>(-550.0f, 881.0f), leftCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/luna.png"));
+	Vec2<float> rightCharaPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x * 1.75f - 55.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y - 7.0f));
+	rightChara.Init(Vec2<float>(1830.0f, 881.0f), rightCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/lacy.png"));
 }
 
 void StageSelectScene::OnUpdate()
 {
-
+	
 	// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
 	screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
 
@@ -48,8 +57,19 @@ void StageSelectScene::OnUpdate()
 			charactersSelect = false;
 			screenShot.SetZoomFlag(false);
 			stageSelect.SetZoomFlag(false);
-			rightArrow.SetZoom(false);
-			leftArrow.SetZoom(false);
+
+			// 矢印をズームインさせる。
+			rightArrow.SetZoomOut(false);
+			leftArrow.SetZoomOut(false);
+
+			// 矢印をデフォルトの場所に移動させる。
+			rightArrow.SetDefPos();
+			leftArrow.SetDefPos();
+
+			// キャラのカードをズームインさせる。
+			leftChara.SetIsZoomOut(false);
+			rightChara.SetIsZoomOut(false);
+
 		}
 	}
 	else
@@ -60,8 +80,19 @@ void StageSelectScene::OnUpdate()
 			charactersSelect = true;
 			screenShot.SetZoomFlag(true);		// ズームアウトさせる
 			stageSelect.SetZoomFlag(true);		// ズームアウトさせる
-			rightArrow.SetZoom(true);
-			leftArrow.SetZoom(true);
+
+			// 矢印をズームアウトさせる。
+			rightArrow.SetZoomOut(true);
+			leftArrow.SetZoomOut(true);
+
+			// 矢印をデフォルトの場所に移動させる。
+			rightArrow.SetExitPos(Vec2<float>(2000, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), Vec2<float>(0.0f, 0.0f));
+			leftArrow.SetExitPos(Vec2<float>(-1000, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), Vec2<float>(0.0f, 0.0f));
+
+			// キャラのカードをズームアウトさせる。
+			leftChara.SetIsZoomOut(true);
+			rightChara.SetIsZoomOut(true);
+
 		}
 		//タイトルシーンに移動する
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
@@ -76,6 +107,8 @@ void StageSelectScene::OnUpdate()
 			screenShot.Next();
 			stageSelect.SetExp(Vec2<float>(0, 40), Vec2<float>(0.2f, 0.2f));
 			screenShot.SetExp(Vec2<float>(0, 0), Vec2<float>(0.1f, 0.1f));
+			rightArrow.SetExpSize(Vec2<float>(0.5f, 0.5f));
+			leftArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
 		}
 		//ステージ番号を減らす
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::LB))
@@ -84,6 +117,8 @@ void StageSelectScene::OnUpdate()
 			screenShot.Prev();
 			stageSelect.SetExp(Vec2<float>(0, 40), Vec2<float>(0.2f, 0.2f));
 			screenShot.SetExp(Vec2<float>(0, 0), Vec2<float>(0.1f, 0.12f));
+			leftArrow.SetExpSize(Vec2<float>(0.5f, 0.5f));
+			rightArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
 		}
 
 
@@ -102,6 +137,34 @@ void StageSelectScene::OnUpdate()
 	stageSelect.Update();
 	rightArrow.Update();
 	leftArrow.Update();
+
+	// 背景のキャラカードの更新処理
+	leftChara.Update();
+	rightChara.Update();
+
+	float moveOffset = 15.0f;
+	// キー入力に応じて、描画座標のオフセットを切り替える。 いつの日か必要になる気がするので残しておきます。
+	/*if (UsersInput::Instance()->KeyInput(DIK_UP)) {
+
+		StageSelectOffsetPosDebug::Instance()->pos.y += moveOffset;
+
+	}
+	if (UsersInput::Instance()->KeyInput(DIK_DOWN)) {
+
+		StageSelectOffsetPosDebug::Instance()->pos.y -= moveOffset;
+
+	}
+	if (UsersInput::Instance()->KeyInput(DIK_LEFT)) {
+
+		StageSelectOffsetPosDebug::Instance()->pos.x += moveOffset;
+
+	}
+	if (UsersInput::Instance()->KeyInput(DIK_RIGHT)) {
+
+		StageSelectOffsetPosDebug::Instance()->pos.x -= moveOffset;
+
+	}*/
+
 }
 
 void StageSelectScene::OnDraw()
@@ -112,6 +175,9 @@ void StageSelectScene::OnDraw()
 	screenShot.Draw();
 	rightArrow.Draw();
 	leftArrow.Draw();
+	// ひだりのキャラの描画処理
+	leftChara.Draw();
+	rightChara.Draw();
 }
 
 void StageSelectScene::OnImguiDebug()

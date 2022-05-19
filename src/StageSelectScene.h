@@ -4,6 +4,7 @@
 #include"IntoTheAbyss/StageSelectImage.h"
 #include"IntoTheAbyss/StageSelectScreenShot.h"
 #include"IntoTheAbyss/StageSelectArrow.h"
+#include"IntoTheAbyss/StageSelectCharacterImage.h"
 
 class StageSelectScene : public BaseScene
 {
@@ -13,10 +14,12 @@ class StageSelectScene : public BaseScene
 	//キャラクター選択中フラグ
 	bool charactersSelect;
 
-	StageSelectImage stageSelect;		// ステージ選択画面の背景(フレーム)
-	StageSelectScreenShot screenShot;	// そのマップのスクショ
-	StageSelectArrow rightArrow;		// 右矢印
-	StageSelectArrow leftArrow;			// 左矢印
+	StageSelectImage stageSelect;			// ステージ選択画面の背景(フレーム)
+	StageSelectScreenShot screenShot;		// そのマップのスクショ
+	StageSelectArrow rightArrow;			// 右矢印
+	StageSelectArrow leftArrow;				// 左矢印
+	StageSelectCharacterImage leftChara;	// 左側のキャラ
+	StageSelectCharacterImage rightChara;	// 右側のキャラ
 
 
 public:

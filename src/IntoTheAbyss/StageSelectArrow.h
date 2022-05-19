@@ -10,9 +10,10 @@ private:
 
 	LerpData pos;		// 座標など
 	LerpData expData;	// 演出用
+	Vec2<float> defPos;	// デフォルトの座標
 	float angle;		// 回転させる角度
 	int arrowHandle;	// 矢の画像ハンドル
-	bool isZoom;		// ズームしているかのフラグ
+	bool isZoomOut;		// ズームしているかのフラグ
 
 
 public:
@@ -24,6 +25,9 @@ public:
 	void Update();
 	void Draw();
 
-	inline void SetZoom(const bool& Zoom) { isZoom = Zoom; }
+	inline void SetZoomOut(const bool& Zoom) { isZoomOut = Zoom; }
+	void SetDefPos();
+	void SetExitPos(const Vec2<float>& ExitPos,const Vec2<float>& ExitSize);
+	void SetExpSize(const Vec2<float>& Size);
 
 };
