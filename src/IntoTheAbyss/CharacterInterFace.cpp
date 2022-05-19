@@ -280,6 +280,9 @@ void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 
 void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, Vec2<int>& hitChipIndex, const Vec2<int>& hitChipIndexBuff)
 {
+	auto mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
+	(*mapChipDrawData)[hitChipIndexBuff.x][hitChipIndexBuff.y].shocked = 1.0f;
+
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_TOP)isHitTop = true;
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_BOTTOM) isHitBottom = true;
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_LEFT) isHitLeft = true;

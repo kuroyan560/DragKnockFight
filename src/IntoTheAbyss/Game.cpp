@@ -130,6 +130,8 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 					handle = mapChipDrawData[height][width].handle;
 				}
 
+				mapChipDrawData[height][width].shocked = KuroMath::Lerp(mapChipDrawData[height][width].shocked, 0.0f, 0.8f);
+
 				Vec2<float> pos = drawPos;
 				pos += mapChipDrawData[height][width].offset;
 				if (0 <= handle)
@@ -137,6 +139,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 					ChipData chipData;
 					chipData.pos = pos;
 					chipData.radian = mapChipDrawData[height][width].radian;
+					chipData.shocked = mapChipDrawData[height][width].shocked;
 					datas[handle].emplace_back(chipData);
 					//DrawFunc::DrawRotaGraph2D({ pos.x, pos.y }, 1.6f * ScrollMgr::Instance()->zoom, mapChipDrawData[height][width].radian, TexHandleMgr::GetTexBuffer(handle));
 				}
@@ -154,7 +157,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	{
 		for (int chipIdx = 0; chipIdx < itr->second.size(); ++chipIdx)
 		{
-			drawMap[i].AddChip(itr->second[chipIdx].pos, itr->second[chipIdx].radian);
+			drawMap[i].AddChip(itr->second[chipIdx]);
 		}
 		drawMap[i].Draw(TexHandleMgr::GetTexBuffer(itr->first), nullptr, nullptr);
 		i++;

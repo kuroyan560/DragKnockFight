@@ -20,9 +20,10 @@ struct VSOutput
 {
     float2 pos : POSITION;
     float radian : RADIAN;
+    float shocked : SHOCKED;
 };
 
-VSOutput VSmain(VSOutput input)
+VSOutput VSmain_Base(VSOutput input)
 {
     return input;
 }
@@ -43,7 +44,7 @@ float2 RotateFloat2(float2 Pos, float Radian)
 }
 
 [maxvertexcount(4)]
-void GSmain(
+void GSmain_Base(
 	point VSOutput input[1],
 	inout TriangleStream<GSOutput> output
 )
@@ -111,7 +112,7 @@ static const float DIFFUSE = 1.0f;
 static const float SPECULAR = 1.0f;
 static const float LIM = 1.0f;
 
-PSOutput PSmain(GSOutput input)
+PSOutput PSmain_Base(GSOutput input)
 {
  //ƒ|ƒWƒVƒ‡ƒ“
     float3 pos = float3(input.worldPos.xy, DEPTH);

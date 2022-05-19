@@ -17,15 +17,16 @@ DrawMap::DrawMap()
 
 		//シェーダー情報
 		static Shaders SHADERS;
-		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/DrawMap.hlsl", "VSmain", "vs_5_0");
-		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/HLSL/DrawMap.hlsl", "GSmain", "gs_5_0");
-		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/DrawMap.hlsl", "PSmain", "ps_5_0");
+		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/DrawMap.hlsl", "VSmain_Base", "vs_5_0");
+		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/HLSL/DrawMap.hlsl", "GSmain_Base", "gs_5_0");
+		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/DrawMap.hlsl", "PSmain_Base", "ps_5_0");
 
 		//インプットレイアウト
 		static std::vector<InputLayoutParam>INPUT_LAYOUT =
 		{
 			InputLayoutParam("POSITION",DXGI_FORMAT_R32G32_FLOAT),
-			InputLayoutParam("RADIAN",DXGI_FORMAT_R32_FLOAT)
+			InputLayoutParam("RADIAN",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("SHOCKED",DXGI_FORMAT_R32_FLOAT),
 		};
 
 		//ルートパラメータ
@@ -61,14 +62,13 @@ DrawMap::DrawMap()
 	vertexBuff = D3D12App::Instance()->GenerateVertexBuffer(sizeof(ChipData), MAX_CHIP_NUM, nullptr, "DrawMap - ChipNum");
 }
 
-void DrawMap::AddChip(const Vec2<float>& Pos, const float& Radian)
+void DrawMap::AddChip(const ChipData& Data)
 {
 	if (MAX_CHIP_NUM <= chipNum + 1)
 	{
 		assert(0);
 	}
-	chipDatas[chipNum].pos = Pos;
-	chipDatas[chipNum].radian = Radian;
+	chipDatas[chipNum] = Data;
 	chipNum++;
 }
 
