@@ -48,7 +48,10 @@ private:
 	bool tutorialSelect = false;
 	bool tutorialYes = true;
 
-	BossHandMgr hand;
+	Vec2<float>centralPos;
+	float count;
+	float radius;
+	float addCount;
 
 public:
 	TitleScene();

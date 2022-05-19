@@ -579,6 +579,9 @@ void Game::Update(const bool &Loop)
 	screenEdgeEffect.CheckPos(miniMap.nowValue);
 
 
+	Vec2<float> sub = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
+	bossHand.Hold(-sub.GetNormal(), CharacterAIOrder::Instance()->prevSwingFlag);
+	bossHand.Update(CharacterManager::Instance()->Right()->pos);
 
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
@@ -623,10 +626,7 @@ void Game::Update(const bool &Loop)
 
 
 
-	Vec2<float> sub = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
-	bossHand.Hold(-sub.GetNormal(), CharacterAIOrder::Instance()->prevSwingFlag);
-	bossHand.Update(CharacterManager::Instance()->Right()->pos);
-
+	
 
 	// 振り回し管理クラスの更新処理
 	//SwingMgr::Instance()->Update(player.centerPos, boss.pos, lineLengthBoss + lineLengthPlayer + addLineLengthBoss + addLineLengthPlayer);

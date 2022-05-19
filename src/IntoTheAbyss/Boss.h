@@ -50,11 +50,15 @@ public:
 	int bossImGuiHandle;
 	int prevStaminaMax;
 
-	int bossCount;
+	float bossCount;
 	float countDown;
 	Vec2<float>shakeDir;
 	Sprite bossGraph;
 	bool initShakeFalg;
+	Vec2<float>bossScale;
+
+	Vec2<float>pointPos;
+	float angle;
 
 public:
 	/*===== ’è” =====*/

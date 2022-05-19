@@ -36,7 +36,8 @@ void TitleScene::OnInitialize()
 	FIRST = false;
 	tutorialQuestion = false;
 
-	hand.Init();
+	count = 0.0f;
+	addCount = 1.0f;
 }
 
 #include"CharacterManager.h"
@@ -120,8 +121,6 @@ void TitleScene::OnUpdate()
 			isPressStartDraw = isPressStartDraw ? false : true;
 		}
 	}
-
-	hand.Update();
 }
 
 void TitleScene::OnDraw()
@@ -179,8 +178,12 @@ void TitleScene::OnDraw()
 	//		DrawFunc::DrawRotaGraph2D(PRESS_START_POS, { 1,1 }, 0, TexHandleMgr::GetTexBuffer(pressStartHandle));
 	//	}
 	//}
+	float PI2 = 3.14f;
+	count += addCount;
+	float value = sinf(PI2 / 120.0f + count) * radius;
+	centralPos = { 300.0f + value ,300.0f + value };
+	DrawFunc::DrawCircle2D(centralPos, 20.0f, Color(255, 255, 255, 255));
 
-	hand.Draw();
 }
 
 void TitleScene::OnImguiDebug()
@@ -189,7 +192,10 @@ void TitleScene::OnImguiDebug()
 	ImGui::Text("Abutton:StageSelect");
 	ImGui::End();
 
-	hand.ImGuiDraw();
+	ImGui::Begin("t");
+	ImGui::InputFloat("R", &radius);
+	ImGui::InputFloat("AddCount", &addCount);
+	ImGui::End();
 }
 
 void TitleScene::OnFinalize()

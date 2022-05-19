@@ -90,6 +90,7 @@ void Boss::OnInit()
 
 	maxShakeAmount = 0.0f;
 	initShakeFalg = false;
+	bossScale = { 0.7f,0.7f };
 }
 
 #include"Camera.h"
@@ -112,6 +113,39 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		anim->ChangeAnim(SWING);
 	}
 
+
+
+	//—h‚êŠJŽn
+	if (CharacterAIOrder::Instance()->prevSwingFlag && !initShakeFalg)
+	{
+		initShakeFalg = true;
+	}
+	//—h‚êI—¹
+	if (!CharacterAIOrder::Instance()->prevSwingFlag || GetNowSwing())
+	{
+		countDown = 0;
+		bossCount = 0;
+		angle = 0;
+		initShakeFalg = false;
+	}
+
+
+	//—h‚ê’†
+	if (initShakeFalg)
+	{
+		float shakeValue = CharacterAIOrder::Instance()->prevRate;
+		bossCount += (0.8f * shakeValue);
+		const float PI2 = 3.14f;
+		countDown = sinf(PI2 / 120.0f + bossCount);
+	}
+
+	pointPos.x = pos.x + cosf(Angle::ConvertToRadian(angle)) * 1.0f;
+	pointPos.y = pos.y + sinf(Angle::ConvertToRadian(angle)) * 1.0f;
+	angle += 10.0f;
+	Vec2<float>nomal = pos - pointPos;
+	nomal.Normalize();
+
+	shakeAmount = { (nomal.x * countDown) * 10.0f,(nomal.y * countDown) * 10.0f };
 
 
 
@@ -219,35 +253,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	// ˆÚ“®—Ê‚ÉŠÖ‚·‚é•Ï”‚ð‚±‚±‚Å‘S‚Ävel‚É‘ã“ü‚·‚éB
 	vel = CharacterAIOrder::Instance()->vel;
 
-	//—h‚êŠJŽn
-	if (CharacterAIOrder::Instance()->prevSwingFlag && !initShakeFalg)
-	{
-		initShakeFalg = true;
-	}
-	//—h‚êI—¹
-	else if (!CharacterAIOrder::Instance()->prevSwingFlag)
-	{
-		countDown = 0;
-		initShakeFalg = false;
-	}
-
-	//—h‚ê’†
-	if (initShakeFalg)
-	{
-		float shakeValue = CharacterAIOrder::Instance()->prevRate;
-		bossCount += 0 + 60 * CharacterAIOrder::Instance()->prevRate;
-		const float PI2 = 3.14f;
-		countDown = sinf(PI2 / 120.0f * bossCount) * 10.0f;
-	}
-
-	if (bossCount % 5 == 0)
-	{
-		shakeAmount = { countDown,-countDown };
-	}
-	else
-	{
-		shakeAmount = { countDown,countDown };
-	}
 }
 
 #include"DrawFunc_FillTex.h"
@@ -261,7 +266,7 @@ void Boss::OnDraw()
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
 
-	DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeAmount), Vec2<float>(0.7f, 0.7f),
+	DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeAmount), bossScale * ScrollMgr::Instance()->zoom,
 		bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
 
 

@@ -75,7 +75,7 @@ void OperateSwing::Init(int SWING_COOL_TIME)
 {
 	swingCoolTime = SWING_COOL_TIME;
 	swingTimer = 0;
-	prevSwingCoolTimer = 60;
+	prevSwingCoolTimer = 120;
 	prevSwingTimer = 0;
 	enableToSwingFlag = false;
 }
@@ -148,10 +148,18 @@ void OperateSwing::Update()
 		CharacterAIOrder::Instance()->prevRate = rate;
 	}
 
+
+
 	swingCoolTime = DebugParameter::Instance()->GetBossData().coolTime;
 	bool localEnableToSwingFlag = !CharacterManager::Instance()->Right()->GetNowBreak() && !CharacterManager::Instance()->Right()->GetNowSwing();
 	bool goToFiledFlag = CharacterManager::Instance()->Left()->GetNowBreak();
 	bool prevTimeFlag = prevSwingCoolTimer <= prevSwingTimer;
+
+	if (prevTimeFlag)
+	{
+		bool debug = false;
+	}
+
 	if (prevTimeFlag && localEnableToSwingFlag && !goToFiledFlag)
 	{
 		enableToSwingFlag = true;
