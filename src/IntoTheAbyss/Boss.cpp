@@ -219,19 +219,34 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	// ˆÚ“®—Ê‚ÉŠÖ‚·‚é•Ï”‚ð‚±‚±‚Å‘S‚Ävel‚É‘ã“ü‚·‚éB
 	vel = CharacterAIOrder::Instance()->vel;
 
+	//—h‚êŠJŽn
 	if (CharacterAIOrder::Instance()->prevSwingFlag && !initShakeFalg)
 	{
 		initShakeFalg = true;
 	}
+	//—h‚êI—¹
 	else if (!CharacterAIOrder::Instance()->prevSwingFlag)
 	{
+		countDown = 0;
 		initShakeFalg = false;
-		maxShakeAmount = 0;
 	}
 
+	//—h‚ê’†
 	if (initShakeFalg)
 	{
-		Shake();
+		float shakeValue = CharacterAIOrder::Instance()->prevRate;
+		bossCount += 0 + 60 * CharacterAIOrder::Instance()->prevRate;
+		const float PI2 = 3.14f;
+		countDown = sinf(PI2 / 120.0f * bossCount) * 10.0f;
+	}
+
+	if (bossCount % 5 == 0)
+	{
+		shakeAmount = { countDown,-countDown };
+	}
+	else
+	{
+		shakeAmount = { countDown,countDown };
 	}
 }
 

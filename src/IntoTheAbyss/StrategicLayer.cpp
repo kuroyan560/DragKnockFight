@@ -347,7 +347,8 @@ void GoToTheField::Update()
 	bool playerDashAlotFlag = 3 <= CharacterAIData::Instance()->dashCount;
 
 	operateSwing.Update();
-	if ((useSwingFlag && haveAdvantageToSwingFlag) || playerDashAlotFlag)
+	//if ((useSwingFlag && haveAdvantageToSwingFlag) || playerDashAlotFlag)
+	if (useSwingFlag)
 	{
 		if (operateSwing.SwingLongDisntnce() == AiResult::OPERATE_SUCCESS)
 		{
@@ -518,8 +519,10 @@ void AcquireASuperiorityGauge::Update()
 
 
 	//振り回し可能か
-	bool canSwingClockWiseFlag = CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
-	bool canSwingCClockWiseFlag = CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
+	//bool canSwingClockWiseFlag = CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
+	bool canSwingClockWiseFlag = true;
+	//bool canSwingCClockWiseFlag = CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
+	bool canSwingCClockWiseFlag = true;
 
 	const float STAMINA_VALUE = 0.5f;
 	//スタミナが多い
@@ -530,7 +533,7 @@ void AcquireASuperiorityGauge::Update()
 
 
 	operateSwing.Update();
-	if (useSwingFlag || playerDashAlotFlag)
+	//if (useSwingFlag || playerDashAlotFlag)
 	{
 		if (canSwingClockWiseFlag && operateSwing.SwingClockWise() == AiResult::OPERATE_SUCCESS)
 		{

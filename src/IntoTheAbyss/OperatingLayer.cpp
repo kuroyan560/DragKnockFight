@@ -75,7 +75,7 @@ void OperateSwing::Init(int SWING_COOL_TIME)
 {
 	swingCoolTime = SWING_COOL_TIME;
 	swingTimer = 0;
-	prevSwingCoolTimer = 30;
+	prevSwingCoolTimer = 60;
 	prevSwingTimer = 0;
 	enableToSwingFlag = false;
 }
