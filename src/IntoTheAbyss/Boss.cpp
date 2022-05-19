@@ -76,7 +76,7 @@ void Boss::OnInit()
 	prevIntersectedLine = INTERSECTED_NONE;
 
 	afterImgageTimer = 0;
-
+	bossCount = 0;
 	characterAi.Init();
 	anim->Init(FRONT);
 
@@ -215,6 +215,20 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 	// ˆÚ“®—Ê‚ÉŠÖ‚·‚é•Ï”‚ð‚±‚±‚Å‘S‚Ävel‚É‘ã“ü‚·‚éB
 	vel = CharacterAIOrder::Instance()->vel;
+
+	if (CharacterAIOrder::Instance()->prevSwingFlag && !initShakeFalg)
+	{
+		initShakeFalg = true;
+	}
+	else if(maxShakeAmount)
+	{
+		bossCount = 0;
+	}
+
+	if (initShakeFalg)
+	{
+		Shake();
+	}
 }
 
 #include"DrawFunc_FillTex.h"
@@ -228,7 +242,7 @@ void Boss::OnDraw()
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
 
-	DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos), Vec2<float>(0.7f, 0.7f),
+	DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeAmount), Vec2<float>(0.7f, 0.7f),
 		bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
 
 

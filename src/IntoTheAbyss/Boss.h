@@ -27,7 +27,7 @@ public:
 	INTERSECTED_LINE prevIntersectedLine;
 
 	//画像
-	static const enum AnimHandle 
+	static const enum AnimHandle
 	{
 		FRONT,
 		BACK,
@@ -50,8 +50,11 @@ public:
 	int bossImGuiHandle;
 	int prevStaminaMax;
 
-
+	int bossCount;
+	float countDown;
+	Vec2<float>shakeDir;
 	Sprite bossGraph;
+	bool initShakeFalg;
 
 public:
 	/*===== 定数 =====*/
@@ -75,7 +78,7 @@ private:
 	void OnInit()override;
 
 	// 更新処理
-	void OnUpdate(const std::vector<std::vector<int>>& MapData)override;
+	void OnUpdate(const std::vector<std::vector<int>> &MapData)override;
 
 	//スウィング中も呼び出される更新処理
 	void OnUpdateNoRelatedSwing()override {}
@@ -84,7 +87,7 @@ private:
 	void OnDraw()override;
 	void OnDrawUI()override {}
 
-	void OnHitMapChip(const HIT_DIR& Dir)override {}
+	void OnHitMapChip(const HIT_DIR &Dir)override {}
 
 	void OnBreak()override {}
 	void OnBreakFinish()override {}
@@ -96,7 +99,22 @@ private:
 	virtual void OnPilotControl()override {}		//パイロットを動かす処理
 	virtual void OnPilotReturn()override {}	//パイロットがロボに戻った瞬間
 
-	void Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed);
+	void Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed);
+
+	void Shake()
+	{
+		if (25.0f <= maxShakeAmount)
+		{
+			maxShakeAmount += 0.5f;
+		}
+		// シェイク量を更新する。
+		//shakeAmount.x = GetRand(maxShakeAmount * 2.0f) - maxShakeAmount;
+		//shakeAmount.y = GetRand(maxShakeAmount * 2.0f) - maxShakeAmount;
+		shakeAmount.x = KuroFunc::GetRand(maxShakeAmount * 2.0f) - maxShakeAmount;
+		shakeAmount.y = KuroFunc::GetRand(maxShakeAmount * 2.0f) - maxShakeAmount;
+	};
+	float maxShakeAmount;
+	Vec2<float>shakeAmount;
 public:
 	void OnKnockOut()override {};
 };

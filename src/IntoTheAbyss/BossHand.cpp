@@ -32,8 +32,13 @@ void BossHand::Update(const Vec2<float> &POS, float RADIUS, float ANGLE, bool HO
 
 	const float PI2 = 3.14f;
 	count += 1 + 50 * CharacterAIOrder::Instance()->prevRate;
-	float countDown = sinf(PI2 / 120.0f * count) * 10.0f;
-	pos = centralPos + Vec2<float>((cosf(radian) * RADIUS) + countDown * DIR.x, (sinf(radian) * RADIUS));
+	float countDown = sinf(PI2 / 120.0f * count) * 0.0f;
+
+	Vec2<float>shakeVec = DIR;
+	shakeVec.x = 1.0f - fabs(shakeVec.x);
+	shakeVec.y = 1.0f - fabs(shakeVec.y);
+
+	pos = centralPos + Vec2<float>((cosf(radian) * RADIUS) + countDown * (shakeVec.x), (sinf(radian) * RADIUS) + countDown * (shakeVec.y));
 }
 
 void BossHand::Draw(bool SCROL_ON)
