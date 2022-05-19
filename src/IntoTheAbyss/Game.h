@@ -25,6 +25,8 @@ class RenderTarget;
 #include"NavigationAI.h"
 #include"CharacterAI.h"
 
+#include"BossHandMgr.h"
+
 class CharacterInterFace;
 
 struct MassChipData
@@ -120,6 +122,9 @@ class Game
 
 	//登場演出を行うかのフラグ
 	bool practiceMode = true;
+
+	
+	BossHandMgr bossHand;
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
 

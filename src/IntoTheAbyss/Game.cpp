@@ -181,6 +181,8 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 #include"PlayerHand.h"
 void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
+	bossHand.Init(false);
+
 	CrashMgr::Instance()->Init();
 
 	int stageNum = STAGE_NUM;
@@ -221,7 +223,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		Vec2<float>enemyLeftUpPos;
 		Vec2<float>enemyRightDownPos;
 
-		
+
 		for (int y = 0; y < tmp.size(); ++y)
 		{
 			for (int x = 0; x < tmp[y].size(); ++x)
@@ -616,6 +618,12 @@ void Game::Update(const bool &Loop)
 	ShakeMgr::Instance()->Update();
 
 
+
+	Vec2<float> sub = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
+	bossHand.Hold(-sub.GetNormal(), CharacterAIOrder::Instance()->prevSwingFlag);
+	bossHand.Update(CharacterManager::Instance()->Right()->pos);
+
+
 	// 振り回し管理クラスの更新処理
 	//SwingMgr::Instance()->Update(player.centerPos, boss.pos, lineLengthBoss + lineLengthPlayer + addLineLengthBoss + addLineLengthPlayer);
 
@@ -963,6 +971,10 @@ void Game::Draw()
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
+	if (gameStartFlag)
+	{
+		bossHand.Draw();
+	}
 }
 
 void Game::Scramble()

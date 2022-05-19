@@ -7,6 +7,7 @@ struct HandData
 	Vec2<float>pos;
 	float radius;
 	float angle;
+	float startAngle;
 };
 
 class BossHandMgr
@@ -33,6 +34,11 @@ public:
 	float holdRadian;
 
 	bool initFlag;
-
 	bool debugFlag;
+
+	int timer;
+
+
+	Vec2<float>adjPos;
+
 };

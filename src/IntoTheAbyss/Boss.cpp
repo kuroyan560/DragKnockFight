@@ -246,7 +246,7 @@ void Boss::OnDraw()
 	//navigationAi.Draw();
 	//characterAi.Draw();
 
-	handMgr.Draw();
+	//handMgr.Draw();
 
 }
 
