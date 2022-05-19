@@ -594,7 +594,20 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	}
 
-	staminaGauge->Update(!isPilotDetached, pos);
+	if (team == WHICH_TEAM::LEFT_TEAM) {
+
+		// ひだりのチーム(プレイヤー)だったら
+		staminaAutoHealAmount = 1.5f;
+
+	}
+	else {
+
+		// みぎのチーム(敵)だったら
+		staminaAutoHealAmount = 1.5f;
+
+	}
+
+	staminaGauge->Update(!isPilotDetached, pos, staminaAutoHealAmount);
 }
 
 #include "DrawFunc.h"
@@ -1255,20 +1268,20 @@ void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int>& MapChipInd
 	}
 
 	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-	if (StageMgr::Instance()->GetLocalMapChipType( MapChipIndex + Vec2<int>(0, -1)) == DstType) {
+	if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(0, -1)) == DstType) {
 		// トゲブロックを棘無し状態にさせる。
 		StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(0, -1), SrcData);
 	}
 
 	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-	if (StageMgr::Instance()->GetLocalMapChipType( MapChipIndex + Vec2<int>(0, 1)) == DstType) {
+	if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(0, 1)) == DstType) {
 		// トゲブロックを棘無し状態にさせる。
 		StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(0, 1), SrcData);
 	}
 
 }
 
-CharacterInterFace::CharacterInterFace(const Vec2<float> &HonraiSize) : size(HonraiSize)
+CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(HonraiSize)
 {
 	areaHitBox.center = &pos;
 	areaHitBox.size = size;
