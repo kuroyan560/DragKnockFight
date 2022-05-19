@@ -37,8 +37,8 @@ public:
 	bool debugFlag;
 
 	int timer;
+	float normalLeftRadian, normalRightRadian;
 
-
-	Vec2<float>adjPos;
+	Vec2<float>adjPos,holdDir;
 
 };

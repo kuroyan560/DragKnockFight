@@ -44,12 +44,14 @@ public:
 	bool initNaviAiFlag;
 	//ボスのパターン制御-----------------------
 
-	BossHandMgr handMgr;
 	float bossGraphRadian;
 
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
 	int prevStaminaMax;
+
+
+	Sprite bossGraph;
 
 public:
 	/*===== 定数 =====*/

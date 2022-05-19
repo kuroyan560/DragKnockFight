@@ -137,6 +137,16 @@ void OperateSwing::Update()
 		CharacterAIOrder::Instance()->prevSwingFlag = false;
 	}
 
+	float rate = static_cast<float>(prevSwingTimer) / static_cast<float>(prevSwingCoolTimer);
+	if (rate <= 1.0f)
+	{
+		CharacterAIOrder::Instance()->prevRate = rate;
+	}
+	else
+	{
+		rate = 1.0f;
+		CharacterAIOrder::Instance()->prevRate = rate;
+	}
 
 	swingCoolTime = DebugParameter::Instance()->GetBossData().coolTime;
 	bool localEnableToSwingFlag = !CharacterManager::Instance()->Right()->GetNowBreak() && !CharacterManager::Instance()->Right()->GetNowSwing();

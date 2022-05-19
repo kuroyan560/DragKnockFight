@@ -87,9 +87,6 @@ void Boss::OnInit()
 		navigationAi.Init(*StageMgr::Instance()->GetLocalMap());
 		initNaviAiFlag = true;
 	}
-
-	handMgr.Init(false);
-
 }
 
 #include"Camera.h"
@@ -107,21 +104,18 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 		anim->ChangeAnim(FRONT);
 	}
 	//U‚è‰ñ‚µ’†‚Ì‰æ‘œØ‚è‘Ö‚¦
-	if (GetNowSwing())
+	if (GetNowSwing() || CharacterAIOrder::Instance()->prevSwingFlag)
 	{
 		anim->ChangeAnim(SWING);
 	}
 
 
 
-	handMgr.Hold(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), CharacterAIOrder::Instance()->prevSwingFlag);
-	handMgr.Update(pos + Vec2<float>(0.0f, 20.0f));
 
 	if (GetNowSwing())
 	{
 		Vec2<float>dir = -Vec2<float>(partner.lock()->pos - pos).GetNormal();
-		float adjRadian = Angle::ConvertToRadian(180.0f);
-		bossGraphRadian = atan2f(dir.y + adjRadian, dir.x + adjRadian);
+		bossGraphRadian = atan2f(dir.y, dir.x);
 	}
 	else
 	{
@@ -234,11 +228,9 @@ void Boss::OnDraw()
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
 
-	//	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-	//		TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
+	DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos), Vec2<float>(0.7f, 0.7f),
+		bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
 
-	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos),
-		Vec2<float>(0.7f, 0.7f), bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()));
 
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
@@ -246,8 +238,13 @@ void Boss::OnDraw()
 	//navigationAi.Draw();
 	//characterAi.Draw();
 
-	//handMgr.Draw();
-
+	/*bossGraph.SetTexture(TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()));
+	bossGraph.SetColor(Color(255, 0, 0, static_cast<int>(255 * stagingDevice.GetFlashAlpha())));
+	bossGraph.transform.SetPos(ScrollMgr::Instance()->Affect(drawPos));
+	bossGraph.transform.SetScale(Vec2<float>(2.5f, 2.5f));
+	Vec3<Angle>lAngle = { 0.0f,0.0f,Angle::ConvertToDegree(bossGraphRadian) };
+	bossGraph.transform.SetRotate(lAngle);
+	bossGraph.Draw();*/
 }
 
 void Boss::Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed)

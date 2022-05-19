@@ -15,12 +15,15 @@ void BossHandMgr::Init(bool DEBUG)
 	leftHand->Init();
 	rightHand->Init();
 
+	normalLeftRadian = Angle::ConvertToRadian(-40.0f);
+	normalRightRadian = Angle::ConvertToRadian(40.0f);
+
 	centralPos = { 400.0f,400.0f };
 	leftHandData.radius = -100.0f;
-	leftHandData.angle = 0.0f;
+	leftHandData.angle = normalLeftRadian;
 	rightHandData.pos = { 400.0f,400.0f };
 	rightHandData.radius = 100.0f;
-	rightHandData.angle = 0.0f;
+	rightHandData.angle = normalRightRadian;
 
 	debugFlag = DEBUG;
 	initFlag = false;
@@ -29,13 +32,14 @@ void BossHandMgr::Init(bool DEBUG)
 
 void BossHandMgr::Update(const Vec2<float> &POS)
 {
+	Vec2<float> vec;
 	if (lockOnFlag)
 	{
 		//デバック用
 		if (debugFlag)
 		{
 			//目標地点のベクトルの保存----------------------------------------------
-			Vec2<float> vec = (targetPos - (centralPos + adjPos)) * -1.0f;
+			vec = (targetPos - (centralPos + adjPos)) * -1.0f;
 			vec.Normalize();
 			float radian = atan2f(vec.y, vec.x);
 			//目標地点のベクトルの保存----------------------------------------------
@@ -71,16 +75,16 @@ void BossHandMgr::Update(const Vec2<float> &POS)
 		//デバック用
 		if (debugFlag)
 		{
-			leftHandData.angle = Angle::ConvertToRadian(leftAngle);
-			rightHandData.angle = Angle::ConvertToRadian(rightAngle);
+			leftHandData.angle = normalLeftRadian;
+			rightHandData.angle = normalRightRadian;
 			endLeftAngleLerp = leftAngle;
 			endRightAngleLerp = rightAngle;
 		}
 		//ゲーム用
 		else
 		{
-			endLeftAngleLerp = Angle::ConvertToRadian(0.0f);
-			endRightAngleLerp = Angle::ConvertToRadian(0.0f);
+			endLeftAngleLerp = normalLeftRadian;
+			endRightAngleLerp = normalRightRadian;
 			leftAngle = endLeftAngleLerp;
 			rightAngle = endRightAngleLerp;
 			leftHandData.angle = leftAngle;
@@ -138,9 +142,16 @@ void BossHandMgr::Update(const Vec2<float> &POS)
 		rightHandData.pos = centralPos + adjPos;
 	}
 
-	leftHand->Update(leftHandData.pos, leftHandData.radius, leftHandData.angle, holdFlag);
-	rightHand->Update(rightHandData.pos, rightHandData.radius, rightHandData.angle, holdFlag);
-
+	if (debugFlag)
+	{
+		leftHand->Update(leftHandData.pos, leftHandData.radius, leftHandData.angle, holdFlag, vec);
+		rightHand->Update(rightHandData.pos, rightHandData.radius, rightHandData.angle, holdFlag, vec);
+	}
+	else
+	{
+		leftHand->Update(leftHandData.pos, leftHandData.radius, leftHandData.angle, holdFlag, holdDir);
+		rightHand->Update(rightHandData.pos, rightHandData.radius, rightHandData.angle, holdFlag, holdDir);
+	}
 }
 
 void BossHandMgr::Draw()
@@ -165,6 +176,7 @@ void BossHandMgr::Draw()
 
 void BossHandMgr::Hold(const Vec2<float> &DIR, bool HOLD)
 {
+	holdDir = DIR;
 	if (HOLD)
 	{
 		holdRadian = atan2f(DIR.y, DIR.x);
