@@ -50,7 +50,7 @@ void GSmain(
     GSOutput element;
     
     //ç∂â∫
-    element.pos = input[0].center;
+    element.pos = input[0].maskCenter;
     element.pos.x -= width_h;
     element.pos.y += height_h;
     element.pos = mul(parallelProjMat, element.pos);
@@ -60,7 +60,7 @@ void GSmain(
     output.Append(element);
     
     //ç∂è„
-    element.pos = input[0].center;
+    element.pos = input[0].maskCenter;
     element.pos.x -= width_h;
     element.pos.y -= height_h;
     element.pos = mul(parallelProjMat, element.pos);
@@ -70,7 +70,7 @@ void GSmain(
     output.Append(element);
     
      //âEâ∫
-    element.pos = input[0].center;
+    element.pos = input[0].maskCenter;
     element.pos.x += width_h;
     element.pos.y += height_h;
     element.pos = mul(parallelProjMat, element.pos);
@@ -80,7 +80,7 @@ void GSmain(
     output.Append(element);
     
     //âEè„
-    element.pos = input[0].center;
+    element.pos = input[0].maskCenter;
     element.pos.x += width_h;
     element.pos.y -= height_h;
     element.pos = mul(parallelProjMat, element.pos);
