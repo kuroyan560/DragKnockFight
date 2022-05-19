@@ -17,10 +17,16 @@ public:
 	void ImGuiDraw();
 
 	inline const bool& GetZoomOutFlag() { return zoomOutFlag; }
-	inline void SetZoomFlag(const bool& Zoom) { zoomOutFlag = Zoom; }
+	void SetZoomFlag(const bool& Zoom);
 
 	// 演出用の拡縮をセット。
-	inline void SetExp(const Vec2<float>& expPos, const Vec2<float>& expRate) { expData.Init(expPos, expRate); };
+	inline void SetExp(const Vec2<float>& expPos, const Vec2<float>& expRate) {
+		expData.pos = expPos;
+		expData.size = expRate;
+		expData.timer = 0.0f;
+	};
+
+	inline LerpData& GetLerpData() { return backGroundLerpData; }
 
 private:
 

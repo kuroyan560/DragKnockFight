@@ -7,17 +7,16 @@ StageSelectImage::StageSelectImage()
 {
 	backGroundHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/frame.png");
 
-	backGroundLerpData.Init(Vec2<float>(640.0f, 900.0f), Vec2<float>(2.8f, 2.5f));
+	backGroundLerpData.Init(Vec2<float>(640, 900), Vec2<float>(2.8f, 2.5f), Vec2<float>(1280.0f / 2.0f, 720.0f / 2.0f), Vec2<float>(1.0f, 1.0f));
 	zoomOutFlag = false;
 }
 
 void StageSelectImage::Init()
 {
-	backGroundLerpData.Init(Vec2<float>(640, 900), Vec2<float>(2.8f, 2.5f));
-	backGroundLerpData.lerpPos = { 640,900 };
-	backGroundLerpData.lerpSize = { 2.8f,2.5f };
-	expData.Init(Vec2<float>(0, 0), Vec2<float>(0, 0));
+	backGroundLerpData.Init(Vec2<float>(640, 900), Vec2<float>(2.8f, 2.5f), Vec2<float>(1280.0f / 2.0f, 720.0f / 2.0f), Vec2<float>(1.0f, 1.0f));
+	expData.Init(Vec2<float>(0, 0), Vec2<float>(0, 0), Vec2<float>(0, 0), Vec2<float>(0, 0));
 	zoomOutFlag = false;
+	backGroundLerpData.timer = 1.0f;
 }
 
 void StageSelectImage::Update()
@@ -27,13 +26,17 @@ void StageSelectImage::Update()
 	{
 		backGroundLerpData.lerpPos = { 1280.0f / 2.0f,720.0f / 2.0f };
 		backGroundLerpData.lerpSize = { 1.0f,1.0f };
+		backGroundLerpData.startPos = { 640,900 };
+		backGroundLerpData.startSize = { 2.8f,2.5f };
 	}
 	else
 	{
+		backGroundLerpData.startPos = { 1280.0f / 2.0f,720.0f / 2.0f };
+		backGroundLerpData.startSize = { 1.0f,1.0f };
 		backGroundLerpData.lerpPos = { 640,900 };
-		backGroundLerpData.lerpSize = { 2.8f,2.5f };		// メモ：座標はY+40 スケールは+0.2f
+		backGroundLerpData.lerpSize = { 2.8f,2.5f };
 	}
-	backGroundLerpData.Lerp();
+	backGroundLerpData.EaseInOut();
 
 	// 拡縮のための大きさを0に戻す。
 	expData.lerpPos = Vec2<float>(0, 0);
@@ -56,4 +59,10 @@ void StageSelectImage::ImGuiDraw()
 	ImGui::InputFloat("SizeY", &backGroundLerpData.size.y);
 	ImGui::Checkbox("ZoomOut", &zoomOutFlag);
 	ImGui::End();
+}
+
+void StageSelectImage::SetZoomFlag(const bool& Zoom)
+{
+	zoomOutFlag = Zoom;
+	backGroundLerpData.timer = 0.0f;
 }

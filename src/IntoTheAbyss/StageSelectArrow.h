@@ -15,6 +15,8 @@ private:
 	int arrowHandle;	// 矢の画像ハンドル
 	bool isZoomOut;		// ズームしているかのフラグ
 
+	float timer;		// リサージュ曲線に使用するタイマー
+
 
 public:
 
@@ -22,12 +24,12 @@ public:
 
 	StageSelectArrow();
 	void Init(const Vec2<float>& Pos, const float& Angle);
-	void Update();
+	void Update(const bool& isLeft);
 	void Draw();
 
-	inline void SetZoomOut(const bool& Zoom) { isZoomOut = Zoom; }
+	void SetZoomOut(const bool& Zoom);
 	void SetDefPos();
-	void SetExitPos(const Vec2<float>& ExitPos,const Vec2<float>& ExitSize);
+	void SetExitPos(const Vec2<float>& ExitPos, const Vec2<float>& ExitSize);
 	void SetExpSize(const Vec2<float>& Size);
 
 };

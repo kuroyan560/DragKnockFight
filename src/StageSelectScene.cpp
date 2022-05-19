@@ -19,8 +19,8 @@ void StageSelectScene::OnInitialize()
 	// マップのスクショを初期化。
 	screenShot.Init();
 	// 各矢印を初期化
-	rightArrow.Init(Vec2<float>(1180.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), 0);
-	leftArrow.Init(Vec2<float>(100.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), DirectX::XM_PI);
+	rightArrow.Init(Vec2<float>(1180.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), 0);
+	leftArrow.Init(Vec2<float>(100.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), DirectX::XM_PI);
 	// 各キャラの画像を初期化。
 	Vec2<float> leftCharaPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x * 0.25f + 55.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y - 7.0f));
 	leftChara.Init(Vec2<float>(-550.0f, 881.0f), leftCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/luna.png"));
@@ -30,9 +30,6 @@ void StageSelectScene::OnInitialize()
 
 void StageSelectScene::OnUpdate()
 {
-	
-	// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
-	screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
 
 	if (isSkip)
 	{
@@ -48,11 +45,11 @@ void StageSelectScene::OnUpdate()
 		//ゲームシーンに移動する
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
 		{
-			//KuroEngine::Instance().ChangeScene(2, changeScene);
-			//SelectStage::Instance()->resetStageFlag = true;
+			KuroEngine::Instance().ChangeScene(2, changeScene);
+			SelectStage::Instance()->resetStageFlag = true;
 		}
 		//ステージ選択へ戻る
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B) && 1.0f <= stageSelect.GetLerpData().timer)
 		{
 			charactersSelect = false;
 			screenShot.SetZoomFlag(false);
@@ -70,12 +67,15 @@ void StageSelectScene::OnUpdate()
 			leftChara.SetIsZoomOut(false);
 			rightChara.SetIsZoomOut(false);
 
+			// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
+			screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
+
 		}
 	}
 	else
 	{
 		//キャラクター選択へ
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A) && 1.0f <= stageSelect.GetLerpData().timer)
 		{
 			charactersSelect = true;
 			screenShot.SetZoomFlag(true);		// ズームアウトさせる
@@ -92,6 +92,9 @@ void StageSelectScene::OnUpdate()
 			// キャラのカードをズームアウトさせる。
 			leftChara.SetIsZoomOut(true);
 			rightChara.SetIsZoomOut(true);
+
+			// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
+			screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
 
 		}
 		//タイトルシーンに移動する
@@ -135,8 +138,8 @@ void StageSelectScene::OnUpdate()
 
 	screenShot.Update();
 	stageSelect.Update();
-	rightArrow.Update();
-	leftArrow.Update();
+	rightArrow.Update(false);
+	leftArrow.Update(true);
 
 	// 背景のキャラカードの更新処理
 	leftChara.Update();

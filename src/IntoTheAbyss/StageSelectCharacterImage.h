@@ -11,7 +11,10 @@ public:
 	void Update();
 	void Draw();
 
-	inline void SetIsZoomOut(const bool& Zoom) { isZoomOut = Zoom; }
+	inline void SetIsZoomOut(const bool& Zoom) {
+		isZoomOut = Zoom;
+		pos.timer = 0.0f;
+	}
 
 private:
 
