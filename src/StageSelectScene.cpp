@@ -14,11 +14,17 @@ void StageSelectScene::OnInitialize()
 	charactersSelect = false;
 	CharacterManager::Instance()->CharactersSelectInit();
 	stageSelect.Init();
-	//screenShot.Init();
+	screenShot.Init();
+	rightArrow.Init(Vec2<float>(1180.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), 0);
+	leftArrow.Init(Vec2<float>(100.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), DirectX::XM_PI);
 }
 
 void StageSelectScene::OnUpdate()
 {
+
+	// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
+	screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
+
 	if (isSkip)
 	{
 		KuroEngine::Instance().ChangeScene(2, changeScene);
@@ -33,13 +39,17 @@ void StageSelectScene::OnUpdate()
 		//ゲームシーンに移動する
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
 		{
-			KuroEngine::Instance().ChangeScene(2, changeScene);
-			SelectStage::Instance()->resetStageFlag = true;
+			//KuroEngine::Instance().ChangeScene(2, changeScene);
+			//SelectStage::Instance()->resetStageFlag = true;
 		}
 		//ステージ選択へ戻る
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
 		{
 			charactersSelect = false;
+			screenShot.SetZoomFlag(false);
+			stageSelect.SetZoomFlag(false);
+			rightArrow.SetZoom(false);
+			leftArrow.SetZoom(false);
 		}
 	}
 	else
@@ -48,6 +58,10 @@ void StageSelectScene::OnUpdate()
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
 		{
 			charactersSelect = true;
+			screenShot.SetZoomFlag(true);		// ズームアウトさせる
+			stageSelect.SetZoomFlag(true);		// ズームアウトさせる
+			rightArrow.SetZoom(true);
+			leftArrow.SetZoom(true);
 		}
 		//タイトルシーンに移動する
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
@@ -56,14 +70,20 @@ void StageSelectScene::OnUpdate()
 		}
 
 		//ステージ番号を増やす
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_UP))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::RB))
 		{
 			++stageNum;
+			screenShot.Next();
+			stageSelect.SetExp(Vec2<float>(0, 40), Vec2<float>(0.2f, 0.2f));
+			screenShot.SetExp(Vec2<float>(0, 0), Vec2<float>(0.1f, 0.1f));
 		}
 		//ステージ番号を減らす
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_DOWN))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::LB))
 		{
 			--stageNum;
+			screenShot.Prev();
+			stageSelect.SetExp(Vec2<float>(0, 40), Vec2<float>(0.2f, 0.2f));
+			screenShot.SetExp(Vec2<float>(0, 0), Vec2<float>(0.1f, 0.12f));
 		}
 
 
@@ -78,8 +98,10 @@ void StageSelectScene::OnUpdate()
 		SelectStage::Instance()->SelectStageNum(stageNum);
 	}
 
-	//screenShot.Update();
+	screenShot.Update();
 	stageSelect.Update();
+	rightArrow.Update();
+	leftArrow.Update();
 }
 
 void StageSelectScene::OnDraw()
@@ -87,7 +109,9 @@ void StageSelectScene::OnDraw()
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	stageSelect.Draw();
-	//screenShot.Draw();
+	screenShot.Draw();
+	rightArrow.Draw();
+	leftArrow.Draw();
 }
 
 void StageSelectScene::OnImguiDebug()
