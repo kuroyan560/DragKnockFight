@@ -89,7 +89,7 @@ void Stamina::Draw(const Vec2<float>& DrawPos, const float& Width, const float& 
 		// スタミナが溜まっていない部分を描画
 		Color outerColorBuff = outerColor;
 		outerColorBuff /= 3.0f;
-		outerColorBuff.Alpha() = 50;
+		outerColorBuff.a = 50;
 		DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(nowGaugePos - expAmount), ScrollMgr::Instance()->Affect(DrawPos + Vec2<float>(Width, Height) + expAmount), outerColorBuff, true, AlphaBlendMode_Trans);
 
 	}

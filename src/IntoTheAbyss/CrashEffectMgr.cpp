@@ -12,16 +12,18 @@ void ClassEffect::Init()
 
 }
 
-void ClassEffect::Generate(const Vec2<float>& Pos)
+void ClassEffect::Generate(const Vec2<float>& Pos, const Color& Col)
 {
 
 	/*===== 生成処理 =====*/
 
 	pos = Pos;
-	size = { 1.0f, 0.0f };
-	isExpY = true;
+	size = { 30.0f, 0.0f };
+	isExpY = false;
 	isActive = true;
+	timer = 0;
 
+	col = Col;
 }
 
 void ClassEffect::Update()
@@ -84,17 +86,24 @@ void ClassEffect::Draw()
 
 	/*===== 描画処理 =====*/
 
-	Color col = Color();
-	int rand = KuroFunc::GetRand(0, 2);
-	if (rand == 0) {
-		col = { 239, 1, 144,255 };
-	}
-	else if (rand == 1) {
-		col = { 47, 255, 139,255 };
-	}
+	Color drawCol = col;
+	//int rand = KuroFunc::GetRand(0, 1);
+	//if (rand == 0) {
+	//	drawCol = Color(239, 1, 144, 255);
+	//}
+	//else if (rand == 1) {
+	//	drawCol = Color(47, 255, 139, 255);
+	//}
+	drawCol.r *=  KuroFunc::GetRand(0.5f, 1.5f);
+	drawCol.g *=  KuroFunc::GetRand(0.5f, 1.5f);
+	drawCol.b *=  KuroFunc::GetRand(0.5f, 1.5f);
+	static const float MAX_OFFSET = 0.0f;
+	Vec2<float>offset = { KuroFunc::GetRand(-MAX_OFFSET,MAX_OFFSET),KuroFunc::GetRand(-MAX_OFFSET,MAX_OFFSET) };
 
-	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(pos - size), ScrollMgr::Instance()->Affect(pos + size), col, true);
-
+	Vec2<float>drawSize = size;
+	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(pos - drawSize + offset), ScrollMgr::Instance()->Affect(pos + drawSize + offset), drawCol, true, AlphaBlendMode_Add);
+	drawSize = { size.y,size.x };
+	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(pos - drawSize + offset), ScrollMgr::Instance()->Affect(pos + drawSize + offset), drawCol, true, AlphaBlendMode_Add);
 }
 
 void CrashEffectMgr::Init()
@@ -110,12 +119,13 @@ void CrashEffectMgr::Init()
 
 }
 
-void CrashEffectMgr::Generate(const Vec2<float>& Pos)
+void CrashEffectMgr::Generate(const Vec2<float>& Pos, const Color& Col)
 {
 
 	/*===== 生成処理 =====*/
+	Vec2<float>randomPos = { 0,0 };
 
-	static const int GENERATE_COUNT = 3;
+	static const int GENERATE_COUNT = 1;
 	for (int generateCount = 0; generateCount < GENERATE_COUNT; ++generateCount) {
 
 		for (int index = 0; index < CRASH_EFFECT_AMOUNT; ++index) {
@@ -124,9 +134,9 @@ void CrashEffectMgr::Generate(const Vec2<float>& Pos)
 			if (crashEffects[index].GetIsActive()) continue;
 
 			// 生成地点からランダムで位置をずらす。
-			const float RANDOM = 200.0f;
-			Vec2<float> randomPos = { KuroFunc::GetRand(-RANDOM,RANDOM),KuroFunc::GetRand(-RANDOM,RANDOM) };
-			crashEffects[index].Generate(Pos + randomPos);
+			const float RANDOM = 5.0f;
+			crashEffects[index].Generate(Pos + randomPos, Col);
+			randomPos = { KuroFunc::GetRand(-RANDOM,RANDOM),KuroFunc::GetRand(-RANDOM,RANDOM) };
 
 			break;
 

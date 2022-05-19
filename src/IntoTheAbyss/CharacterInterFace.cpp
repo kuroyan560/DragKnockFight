@@ -953,7 +953,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				}
 
 				// クラッシュ演出を追加。
-				CrashEffectMgr::Instance()->Generate(pos);
+				CrashEffectMgr::Instance()->Generate(pos, GetTeamColor());
 
 				// 今自分がどっちのチームかを取得。
 				StaminaItem::CHARA_ID charaID;

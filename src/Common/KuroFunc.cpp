@@ -254,10 +254,13 @@ float KuroFunc::GetBezierFromControlPoint(float t, int ControlPointNum, float* C
 	return result;
 }
 
+#include<random>
 int KuroFunc::GetRand(int Min, int Max)
 {
-	int result = (Max - Min + 1) * rand() / RAND_MAX + Min;
-	return result;
+	static std::random_device rd;
+	static std::mt19937 mt(rd());
+	std::uniform_int_distribution<int>dist(Min, Max);
+	return dist(mt);
 }
 
 int KuroFunc::GetRand(int Max)
@@ -267,8 +270,10 @@ int KuroFunc::GetRand(int Max)
 
 float KuroFunc::GetRand(float Min, float Max)
 {
-	float result = (Max - Min) * ((double)rand() / RAND_MAX) + Min;
-	return result;
+	static std::random_device rd;
+	static std::mt19937 mt(rd());
+	std::uniform_real_distribution<float>dist(Min, Max);
+	return dist(mt);
 }
 
 float KuroFunc::GetRand(float Max)
