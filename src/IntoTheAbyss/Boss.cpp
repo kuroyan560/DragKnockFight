@@ -87,6 +87,9 @@ void Boss::OnInit()
 		navigationAi.Init(*StageMgr::Instance()->GetLocalMap());
 		initNaviAiFlag = true;
 	}
+
+	maxShakeAmount = 0.0f;
+	initShakeFalg = false;
 }
 
 #include"Camera.h"
@@ -220,9 +223,10 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	{
 		initShakeFalg = true;
 	}
-	else if(maxShakeAmount)
+	else if (!CharacterAIOrder::Instance()->prevSwingFlag)
 	{
-		bossCount = 0;
+		initShakeFalg = false;
+		maxShakeAmount = 0;
 	}
 
 	if (initShakeFalg)

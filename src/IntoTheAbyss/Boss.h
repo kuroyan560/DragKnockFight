@@ -103,7 +103,7 @@ private:
 
 	void Shake()
 	{
-		if (25.0f <= maxShakeAmount)
+		if (maxShakeAmount <= 25.0f)
 		{
 			maxShakeAmount += 0.5f;
 		}
