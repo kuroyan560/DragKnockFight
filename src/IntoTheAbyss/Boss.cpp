@@ -114,8 +114,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 
 
-	handMgr.Hold(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), GetNowSwing());
-
+	handMgr.Hold(-Vec2<float>(partner.lock()->pos - pos).GetNormal(), CharacterAIOrder::Instance()->prevSwingFlag);
 	handMgr.Update(pos + Vec2<float>(0.0f, 20.0f));
 
 	if (GetNowSwing())

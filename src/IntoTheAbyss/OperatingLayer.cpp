@@ -75,6 +75,8 @@ void OperateSwing::Init(int SWING_COOL_TIME)
 {
 	swingCoolTime = SWING_COOL_TIME;
 	swingTimer = 0;
+	prevSwingCoolTimer = 30;
+	prevSwingTimer = 0;
 	enableToSwingFlag = false;
 }
 
@@ -84,6 +86,7 @@ AiResult OperateSwing::SwingClockWise()
 	{
 		CharacterAIOrder::Instance()->swingClockWiseFlag = true;
 		swingTimer = 0;
+		prevSwingTimer = 0;
 		return AiResult::OPERATE_SUCCESS;
 	}
 	return AiResult::OPERATE_FAIL;
@@ -95,6 +98,7 @@ AiResult OperateSwing::SwingCounterClockWise()
 	{
 		CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
 		swingTimer = 0;
+		prevSwingTimer = 0;
 		return AiResult::OPERATE_SUCCESS;
 	}
 	return AiResult::OPERATE_FAIL;
@@ -113,6 +117,7 @@ AiResult OperateSwing::SwingLongDisntnce()
 			CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
 		}
 		swingTimer = 0;
+		prevSwingTimer = 0;
 		return AiResult::OPERATE_SUCCESS;
 	}
 	return AiResult::OPERATE_FAIL;
@@ -120,12 +125,24 @@ AiResult OperateSwing::SwingLongDisntnce()
 
 void OperateSwing::Update()
 {
-	swingCoolTime = DebugParameter::Instance()->GetBossData().coolTime;
 	bool coolTimeFlag = swingCoolTime <= swingTimer;
+	if (coolTimeFlag)
+	{
+		++prevSwingTimer;
+		CharacterAIOrder::Instance()->prevSwingFlag = true;
+	}
+	else
+	{
+		++swingTimer;
+		CharacterAIOrder::Instance()->prevSwingFlag = false;
+	}
+
+
+	swingCoolTime = DebugParameter::Instance()->GetBossData().coolTime;
 	bool localEnableToSwingFlag = !CharacterManager::Instance()->Right()->GetNowBreak() && !CharacterManager::Instance()->Right()->GetNowSwing();
 	bool goToFiledFlag = CharacterManager::Instance()->Left()->GetNowBreak();
-
-	if (coolTimeFlag && localEnableToSwingFlag && !goToFiledFlag)
+	bool prevTimeFlag = prevSwingCoolTimer <= prevSwingTimer;
+	if (prevTimeFlag && localEnableToSwingFlag && !goToFiledFlag)
 	{
 		enableToSwingFlag = true;
 	}
@@ -133,5 +150,4 @@ void OperateSwing::Update()
 	{
 		enableToSwingFlag = false;
 	}
-	++swingTimer;
 }

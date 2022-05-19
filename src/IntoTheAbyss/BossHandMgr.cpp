@@ -21,6 +21,7 @@ void BossHandMgr::Init(bool DEBUG)
 	rightHandData.radius = 100.0f;
 
 	debugFlag = DEBUG;
+	initFlag = false;
 }
 
 void BossHandMgr::Update(const Vec2<float> &POS)
@@ -36,15 +37,15 @@ void BossHandMgr::Update(const Vec2<float> &POS)
 			float radian = atan2f(vec.y, vec.x);
 			//目標地点のベクトルの保存----------------------------------------------
 			float space = 10.0f;
-			leftAngleLerp = radian - Angle::ConvertToRadian(-space);
-			rightAngleLerp = radian + Angle::ConvertToRadian(180.0f - space);
+			endLeftAngleLerp = (radian - Angle::ConvertToRadian(-space));
+			endRightAngleLerp = (radian + Angle::ConvertToRadian(180.0f - space));
 		}
 		//ゲーム用
 		else
 		{
 			float space = 10.0f;
-			leftAngleLerp = holdRadian - Angle::ConvertToRadian(-space);
-			rightAngleLerp = holdRadian + Angle::ConvertToRadian(180.0f - space);
+			endLeftAngleLerp = holdRadian - Angle::ConvertToRadian(-space);
+			endRightAngleLerp = holdRadian + Angle::ConvertToRadian(180.0f - space);
 		}
 
 		holdFlag = true;
@@ -57,15 +58,15 @@ void BossHandMgr::Update(const Vec2<float> &POS)
 		{
 			leftHandData.angle = Angle::ConvertToRadian(leftAngle);
 			rightHandData.angle = Angle::ConvertToRadian(rightAngle);
-			leftAngleLerp = leftAngle;
-			rightAngleLerp = rightAngle;
+			endLeftAngleLerp = leftAngle;
+			endRightAngleLerp = rightAngle;
 		}
 		//ゲーム
 		else
 		{
 			float space = 10.0f;
-			leftAngleLerp = Angle::ConvertToRadian(0.0f);
-			rightAngleLerp = Angle::ConvertToRadian(0.0f);
+			endLeftAngleLerp = Angle::ConvertToRadian(0.0f);
+			endRightAngleLerp = Angle::ConvertToRadian(0.0f);
 		}
 		holdFlag = false;
 	}
@@ -73,11 +74,11 @@ void BossHandMgr::Update(const Vec2<float> &POS)
 	//補間
 	float mul = 0.3f;
 	{
-		float distance = leftAngleLerp - leftHandData.angle;
+		float distance = endLeftAngleLerp - leftHandData.angle;
 		leftHandData.angle += distance * mul;
 	}
 	{
-		float distance = rightAngleLerp - rightHandData.angle;
+		float distance = endRightAngleLerp - rightHandData.angle;
 		rightHandData.angle += distance * mul;
 	}
 
@@ -111,9 +112,12 @@ void BossHandMgr::Draw()
 		leftHand->Draw();
 		rightHand->Draw();
 	}
-	DrawFunc::DrawCircle2D(centralPos, 1.0f, Color(255, 255, 255, 255));
-	DrawFunc::DrawCircle2D(targetPos, 5.0f, Color(255, 0, 0, 255));
-	DrawFunc::DrawLine2D(centralPos, targetPos, Color(0, 255, 0, 255));
+	if (debugFlag)
+	{
+		DrawFunc::DrawCircle2D(centralPos, 1.0f, Color(255, 255, 255, 255));
+		DrawFunc::DrawCircle2D(targetPos, 5.0f, Color(255, 0, 0, 255));
+		DrawFunc::DrawLine2D(centralPos, targetPos, Color(0, 255, 0, 255));
+	}
 }
 
 void BossHandMgr::Hold(const Vec2<float> &DIR, bool HOLD)
@@ -126,8 +130,8 @@ void BossHandMgr::Hold(const Vec2<float> &DIR, bool HOLD)
 	else
 	{
 		lockOnFlag = false;
-		leftAngleLerp = 0.0f;
-		rightAngleLerp = 0.0f;
+		endLeftAngleLerp = 0.0f;
+		endRightAngleLerp = 0.0f;
 	}
 }
 

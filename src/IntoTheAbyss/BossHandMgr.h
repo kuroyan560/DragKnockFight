@@ -29,9 +29,10 @@ public:
 	Vec2<float>centralPos, targetPos, nowSwingVec;
 
 	float leftAngle, rightAngle;
-	float leftAngleLerp, rightAngleLerp;
+	float endLeftAngleLerp, endRightAngleLerp;
 	float holdRadian;
 
+	bool initFlag;
 
 	bool debugFlag;
 };
