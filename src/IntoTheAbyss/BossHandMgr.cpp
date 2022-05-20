@@ -32,114 +32,113 @@ void BossHandMgr::Init(bool DEBUG)
 
 void BossHandMgr::Update(const Vec2<float> &POS)
 {
-	Vec2<float> vec;
-	if (lockOnFlag)
-	{
-		//デバック用
-		if (debugFlag)
-		{
-			//目標地点のベクトルの保存----------------------------------------------
-			vec = (targetPos - (centralPos + adjPos)) * -1.0f;
-			vec.Normalize();
-			float radian = atan2f(vec.y, vec.x);
-			//目標地点のベクトルの保存----------------------------------------------
-			float space = 10.0f;
-			endLeftAngleLerp = radian - Angle::ConvertToRadian(-space);
-			endRightAngleLerp = radian + Angle::ConvertToRadian(180.0f - space);
 
-			if (!initFlag)
+	Vec2<float> vec = { 0.0f,0.0f };
+
+	if (StartEffect())
+	{
+		//掴み時
+		if (lockOnFlag)
+		{
+			//デバック用
+			if (debugFlag)
 			{
-				leftHandData.startAngle = leftHandData.angle;
-				rightHandData.startAngle = rightHandData.angle;
-				initFlag = true;
+				//目標地点のベクトルの保存----------------------------------------------
+				vec = (targetPos - centralPos) * -1.0f;
+				vec.Normalize();
+				float radian = atan2f(vec.y, vec.x);
+				//目標地点のベクトルの保存----------------------------------------------
+				float space = 10.0f;
+				endLeftAngleLerp = radian - Angle::ConvertToRadian(-space);
+				endRightAngleLerp = radian + Angle::ConvertToRadian(180.0f - space);
+
+				if (!initFlag)
+				{
+					leftHandData.startAngle = leftHandData.angle;
+					rightHandData.startAngle = rightHandData.angle;
+					initFlag = true;
+				}
+			}
+			//ゲーム用
+			else
+			{
+				float space = 10.0f;
+				endLeftAngleLerp = holdRadian - Angle::ConvertToRadian(-space);
+				endRightAngleLerp = holdRadian + Angle::ConvertToRadian(180.0f - space);
+
+				if (!initFlag)
+				{
+					leftHandData.startAngle = leftHandData.angle;
+					rightHandData.startAngle = rightHandData.angle;
+					initFlag = true;
+				}
 			}
 		}
-		//ゲーム用
+		//通常時
 		else
 		{
-			float space = 10.0f;
-			endLeftAngleLerp = holdRadian - Angle::ConvertToRadian(-space);
-			endRightAngleLerp = holdRadian + Angle::ConvertToRadian(180.0f - space);
-
-			if (!initFlag)
+			//デバック用
+			if (debugFlag)
 			{
-				leftHandData.startAngle = leftHandData.angle;
-				rightHandData.startAngle = rightHandData.angle;
-				initFlag = true;
+				leftHandData.angle = normalLeftRadian;
+				rightHandData.angle = normalRightRadian;
+				endLeftAngleLerp = leftAngle;
+				endRightAngleLerp = rightAngle;
+			}
+			//ゲーム用
+			else
+			{
+				endLeftAngleLerp = normalLeftRadian;
+				endRightAngleLerp = normalRightRadian;
+				leftAngle = endLeftAngleLerp;
+				rightAngle = endRightAngleLerp;
+				leftHandData.angle = leftAngle;
+				rightHandData.angle = rightAngle;
+			}
+			initFlag = false;
+		}
+
+
+		float timeOver = 10.0f;
+		if (lockOnFlag && timeOver <= timer)
+		{
+			rightHandData.angle = endRightAngleLerp;
+			leftHandData.angle = endLeftAngleLerp;
+			holdFlag = true;
+		}
+		else if (!lockOnFlag)
+		{
+			float space = 10.0f;
+			timer = 0;
+			holdFlag = false;
+		}
+		else
+		{
+			++timer;
+
+			//補間
+			float mul = 0.3f;
+			{
+				float distance = endLeftAngleLerp - leftHandData.angle;
+				leftHandData.angle += distance * mul;
+			}
+			{
+				float distance = endRightAngleLerp - rightHandData.angle;
+				rightHandData.angle += distance * mul;
 			}
 		}
 	}
-	//通常時
-	else
-	{
-		//デバック用
-		if (debugFlag)
-		{
-			leftHandData.angle = normalLeftRadian;
-			rightHandData.angle = normalRightRadian;
-			endLeftAngleLerp = leftAngle;
-			endRightAngleLerp = rightAngle;
-		}
-		//ゲーム用
-		else
-		{
-			endLeftAngleLerp = normalLeftRadian;
-			endRightAngleLerp = normalRightRadian;
-			leftAngle = endLeftAngleLerp;
-			rightAngle = endRightAngleLerp;
-			leftHandData.angle = leftAngle;
-			rightHandData.angle = rightAngle;
-		}
-		initFlag = false;
-	}
-
-
-	float timeOver = 10.0f;
-	if (lockOnFlag && timeOver <= timer)
-	{
-		rightHandData.angle = endRightAngleLerp;
-		leftHandData.angle = endLeftAngleLerp;
-		holdFlag = true;
-	}
-	else if (!lockOnFlag)
-	{
-		float space = 10.0f;
-		timer = 0;
-		//leftHandData.angle = 0.0f - Angle::ConvertToRadian(-space);
-		//rightHandData.angle = 0.0f + Angle::ConvertToRadian(180.0f - space);
-		holdFlag = false;
-	}
-	else
-	{
-		++timer;
-		//float sub = endLeftAngleLerp - leftHandData.startAngle;
-		//leftHandData.angle += sub / timeOver;
-		//float sub2 = endRightAngleLerp - rightHandData.startAngle;
-		//rightHandData.angle += sub2 / timeOver;
-
-		//補間
-		float mul = 0.3f;
-		{
-			float distance = endLeftAngleLerp - leftHandData.angle;
-			leftHandData.angle += distance * mul;
-		}
-		{
-			float distance = endRightAngleLerp - rightHandData.angle;
-			rightHandData.angle += distance * mul;
-		}
-	}
-
 
 	if (debugFlag)
 	{
-		leftHandData.pos = centralPos + adjPos;
-		rightHandData.pos = centralPos + adjPos;
+		leftHandData.pos = centralPos;
+		rightHandData.pos = centralPos;
 	}
 	else
 	{
 		centralPos = POS;
-		leftHandData.pos = centralPos + adjPos;
-		rightHandData.pos = centralPos + adjPos;
+		leftHandData.pos = centralPos;
+		rightHandData.pos = centralPos;
 	}
 
 	if (debugFlag)
@@ -203,7 +202,21 @@ void BossHandMgr::ImGuiDraw()
 	ImGui::SliderFloat("LeftAngle", &leftAngle, -360.0f, 360.0f);
 	ImGui::InputFloat("RightRadius", &rightHandData.radius);
 	ImGui::SliderFloat("RgihtAngle", &rightAngle, -360.0f, 360.0f);
-	ImGui::InputFloat("AdjPosX", &adjPos.x, -360.0f, 360.0f);
-	ImGui::InputFloat("AdhPosY", &adjPos.y, -360.0f, 360.0f);
 	ImGui::End();
+}
+
+bool BossHandMgr::StartEffect()
+{
+	//補間
+	float mul = 0.3f;
+	{
+		float distance = endLeftAngleLerp - leftHandData.angle;
+		leftHandData.angle += distance * mul;
+	}
+	{
+		float distance = endRightAngleLerp - rightHandData.angle;
+		rightHandData.angle += distance * mul;
+	}
+
+	return false;
 }

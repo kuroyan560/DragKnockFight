@@ -39,6 +39,11 @@ public:
 	int timer;
 	float normalLeftRadian, normalRightRadian;
 
-	Vec2<float>adjPos,holdDir;
+	Vec2<float>holdDir;
+
+
+private:
+
+	bool StartEffect();
 
 };
