@@ -122,6 +122,7 @@ public:
 	bool drawFightFlag;
 	bool readyToInitFlag;
 	bool initGameFlag;
+	bool readyFlag;
 	std::unique_ptr<DrawData> playerReticleData, enemyReticleData;
 };
 

@@ -28,6 +28,15 @@ void BossHandMgr::Init(bool DEBUG)
 	debugFlag = DEBUG;
 	initFlag = false;
 	initStartFlag = false;
+	startEffectFlag = false;
+	initStartEffectFlag = false;
+	holdFlag = false;
+}
+
+void BossHandMgr::InitRadius()
+{
+	leftHandData.radius = -500.0f;
+	rightHandData.radius = 500.0f;
 }
 
 void BossHandMgr::Update(const Vec2<float> &POS)
@@ -35,7 +44,16 @@ void BossHandMgr::Update(const Vec2<float> &POS)
 
 	Vec2<float> vec = { 0.0f,0.0f };
 
-	if (StartEffect())
+	bool startFlag = StartEffect();
+	if (startFlag && !initStartEffectFlag)
+	{
+		startEffectFlag = true;
+		initStartEffectFlag = true;
+	}
+
+
+
+	if (startEffectFlag)
 	{
 		//íÕÇ›éû
 		if (lockOnFlag)
@@ -181,6 +199,10 @@ void BossHandMgr::Hold(const Vec2<float> &DIR, bool HOLD)
 		holdRadian = atan2f(DIR.y, DIR.x);
 		lockOnFlag = true;
 	}
+	else if (!startEffectFlag)
+	{
+		lockOnFlag = false;
+	}
 	else
 	{
 		lockOnFlag = false;
@@ -210,8 +232,9 @@ bool BossHandMgr::StartEffect()
 
 
 	//âÒÇ∑----------------------------------------------
-	endLeftAngleLerp += 0.1f;
-	endRightAngleLerp += 0.1f;
+	float speed = 0.3f;
+	endLeftAngleLerp += speed;
+	endRightAngleLerp += speed;
 
 	float minRadius = 10.0f;
 	//àÍíËÇÃëÂÇ´Ç≥&&ì¡íËÇÃÉAÉìÉOÉãÇ…Ç»Ç¡ÇΩÇÁèIóπ
@@ -227,13 +250,14 @@ bool BossHandMgr::StartEffect()
 		endLeftAngleLerp = normalLeftRadian;
 		endRightAngleLerp = normalRightRadian;
 
+		float radiusSpeed = 3.0f;
 		if (leftHandData.radius <= -100)
 		{
 			leftHandData.radius = -100;
 		}
 		else
 		{
-			leftHandData.radius -= 1.0f;
+			leftHandData.radius -= radiusSpeed;
 		}
 		if (100 <= rightHandData.radius)
 		{
@@ -241,13 +265,13 @@ bool BossHandMgr::StartEffect()
 		}
 		else
 		{
-			rightHandData.radius += 1.0f;
+			rightHandData.radius += radiusSpeed;
 		}
 
 
 		bool startRadiusFlag = leftHandData.radius == -100 && rightHandData.radius == 100;
-		bool sameRadianFlag = static_cast<int>(endLeftAngleLerp) == normalLeftRadian &&
-			static_cast<int>(endRightAngleLerp) == normalRightRadian;
+		bool sameRadianFlag = endLeftAngleLerp == normalLeftRadian &&
+			endRightAngleLerp == normalRightRadian;
 		if (startRadiusFlag && sameRadianFlag)
 		{
 			return true;
@@ -256,13 +280,14 @@ bool BossHandMgr::StartEffect()
 	else
 	{
 		//îºåaÇè¨Ç≥Ç≠Ç∑ÇÈ----------------------------------------------
+		float smallSpeed = 8.0f;
 		if (-minRadius <= leftHandData.radius)
 		{
 			leftHandData.radius = -minRadius;
 		}
 		else
 		{
-			leftHandData.radius += 5.0f;
+			leftHandData.radius += smallSpeed;
 		}
 		if (rightHandData.radius <= minRadius)
 		{
@@ -270,7 +295,7 @@ bool BossHandMgr::StartEffect()
 		}
 		else
 		{
-			rightHandData.radius -= 5.0f;
+			rightHandData.radius -= smallSpeed;
 		}
 	}
 

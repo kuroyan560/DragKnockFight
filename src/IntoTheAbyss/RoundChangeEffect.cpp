@@ -41,6 +41,7 @@ RoundChangeEffect::RoundChangeEffect()
 
 
 	numberData->handle = numberHandle[0];
+	readyFlag = false;
 }
 
 void RoundChangeEffect::Init()
@@ -122,6 +123,8 @@ void RoundChangeEffect::Start(const int& ROUND_NUMBER, const bool& LEFT_OR_RIGHT
 		enemyReticleAlpha = 255;
 
 		initMaskFlag = false;
+
+		readyFlag = false;
 
 		firstRoundFlag = ROUND_NUMBER == 1;
 		if (firstRoundFlag)
@@ -300,6 +303,7 @@ void RoundChangeEffect::Update()
 		//Æ€‚ğ‰æ–Êã‚©‚çReady‚Ì‰¡‚É“oê‚·‚é‚æ‚¤‚É“®‚©‚·
 		if (drawReadyFlag)
 		{
+			readyFlag = true;
 			Rate(&playerReticleData->rate, playerReticleData->maxTimer);
 			Rate(&enemyReticleData->rate, enemyReticleData->maxTimer);
 			playerReticleData->pos.y = playerReticleData->basePos.y + KuroMath::Ease(Out, Cubic, playerReticleData->rate, 0.0f, 1.0f) * (720.0f / 2.0f + 150.0f);

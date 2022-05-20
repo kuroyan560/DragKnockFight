@@ -15,6 +15,7 @@ class BossHandMgr
 public:
 	BossHandMgr();
 	void Init(bool DEBUG = true);
+	void InitRadius();
 	void Update(const Vec2<float> &POS = {});
 	void Draw();
 
@@ -42,8 +43,8 @@ public:
 	float normalLeftRadian, normalRightRadian;
 
 	Vec2<float>holdDir;
-
-
+	bool startEffectFlag;
+	bool initStartEffectFlag;
 private:
 
 	bool StartEffect();

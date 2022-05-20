@@ -10,6 +10,7 @@ BossHand::BossHand(int HANDLE, int HOLD_HANDLE) :graphHandle(HANDLE), holdGraphH
 radian(0.0f), centralPos({ 0.0f,0.0f }), pos({ 0.0f,0.0f }), size({ 1.0f,1.0f })
 {
 	count = 0;
+	nowHnadle = graphHandle;
 }
 
 void BossHand::Init()

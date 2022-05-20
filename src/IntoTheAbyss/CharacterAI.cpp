@@ -32,6 +32,8 @@ void CharacterAI::Init()
 	{
 		strategyArray[i]->Init();
 	}
+
+	CharacterAIOrder::Instance()->Init();
 }
 
 void CharacterAI::Finalize()

@@ -58,4 +58,14 @@ public:
 	bool prevSwingFlag;//—\”õ“®ì
 
 	float prevRate;
+
+	void Init()
+	{
+		dashFlag = false;
+		swingClockWiseFlag = false;
+		swingCounterClockWiseFlag = false;
+		startAiFlag = false;
+		prevSwingFlag = false;
+		prevRate = 0.0f;
+	};
 };
