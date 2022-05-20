@@ -34,7 +34,8 @@ void BossHand::Update(const Vec2<float> &POS, float RADIUS, float ANGLE, bool HO
 	radian = ANGLE;
 
 	
-	Vec2<float> shakeAmount = CharacterManager::Instance()->Right()->shakeValue;
+	//Vec2<float> shakeAmount = CharacterManager::Instance()->Right()->shakeValue;
+	Vec2<float> shakeAmount = { 0.0f,0.0f };
 	pos = centralPos + Vec2<float>((cosf(radian) * RADIUS) + shakeAmount.x, (sinf(radian) * RADIUS) + shakeAmount.y);
 }
 

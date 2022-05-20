@@ -31,9 +31,11 @@ public:
 
 	float leftAngle, rightAngle;
 	float endLeftAngleLerp, endRightAngleLerp;
+	float endLeftAngleRadius, endRightAngleRadius;
 	float holdRadian;
 
 	bool initFlag;
+	bool initStartFlag;
 	bool debugFlag;
 
 	int timer;

@@ -19,15 +19,15 @@ void BossHandMgr::Init(bool DEBUG)
 	normalRightRadian = Angle::ConvertToRadian(40.0f);
 
 	centralPos = { 400.0f,400.0f };
-	leftHandData.radius = -100.0f;
+	leftHandData.radius = -500.0f;
 	leftHandData.angle = normalLeftRadian;
 	rightHandData.pos = { 400.0f,400.0f };
-	rightHandData.radius = 100.0f;
+	rightHandData.radius = 500.0f;
 	rightHandData.angle = normalRightRadian;
 
 	debugFlag = DEBUG;
 	initFlag = false;
-	//adjPos.y = 35.0f;
+	initStartFlag = false;
 }
 
 void BossHandMgr::Update(const Vec2<float> &POS)
@@ -207,6 +207,74 @@ void BossHandMgr::ImGuiDraw()
 
 bool BossHandMgr::StartEffect()
 {
+
+
+	//‰ñ‚·----------------------------------------------
+	endLeftAngleLerp += 0.1f;
+	endRightAngleLerp += 0.1f;
+
+	float minRadius = 10.0f;
+	//ˆê’è‚Ì‘å‚«‚³&&“Á’è‚ÌƒAƒ“ƒOƒ‹‚É‚È‚Á‚½‚çI—¹
+	bool sameRadiusFlag = leftHandData.radius == -minRadius && rightHandData.radius == minRadius;
+
+	if (!initStartFlag && sameRadiusFlag)
+	{
+		initStartFlag = true;
+	}
+
+	if (initStartFlag)
+	{
+		endLeftAngleLerp = normalLeftRadian;
+		endRightAngleLerp = normalRightRadian;
+
+		if (leftHandData.radius <= -100)
+		{
+			leftHandData.radius = -100;
+		}
+		else
+		{
+			leftHandData.radius -= 1.0f;
+		}
+		if (100 <= rightHandData.radius)
+		{
+			rightHandData.radius = 100.0f;
+		}
+		else
+		{
+			rightHandData.radius += 1.0f;
+		}
+
+
+		bool startRadiusFlag = leftHandData.radius == -100 && rightHandData.radius == 100;
+		bool sameRadianFlag = static_cast<int>(endLeftAngleLerp) == normalLeftRadian &&
+			static_cast<int>(endRightAngleLerp) == normalRightRadian;
+		if (startRadiusFlag && sameRadianFlag)
+		{
+			return true;
+		}
+	}
+	else
+	{
+		//”¼Œa‚ğ¬‚³‚­‚·‚é----------------------------------------------
+		if (-minRadius <= leftHandData.radius)
+		{
+			leftHandData.radius = -minRadius;
+		}
+		else
+		{
+			leftHandData.radius += 5.0f;
+		}
+		if (rightHandData.radius <= minRadius)
+		{
+			rightHandData.radius = minRadius;
+		}
+		else
+		{
+			rightHandData.radius -= 5.0f;
+		}
+	}
+
+
 	//•âŠÔ
 	float mul = 0.3f;
 	{
