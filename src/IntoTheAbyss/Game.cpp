@@ -685,8 +685,8 @@ void Game::Draw()
 	{
 		// 残像を描画
 		AfterImageMgr::Instance()->Draw();
-		CharacterManager::Instance()->Left()->Draw();
-		CharacterManager::Instance()->Right()->Draw();
+		CharacterManager::Instance()->Left()->Draw(readyToStartRoundFlag);
+		CharacterManager::Instance()->Right()->Draw(readyToStartRoundFlag);
 	}
 
 	// クラッシュ時の演出の描画処理。

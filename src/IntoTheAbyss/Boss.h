@@ -74,7 +74,7 @@ private:
 	void OnUpdateNoRelatedSwing()override {}
 
 	// •`‰æˆ—
-	void OnDraw()override;
+	void OnDraw(const bool& isRoundStartEffect)override;
 	void OnDrawUI()override {}
 
 	void OnHitMapChip(const HIT_DIR& Dir)override {}

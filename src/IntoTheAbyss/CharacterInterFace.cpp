@@ -615,14 +615,14 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 #include "DrawFunc.h"
 #include"TexHandleMgr.h"
-void CharacterInterFace::Draw()
+void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 {
 	// Žc‘œ‚ð•`‰æ
 	if (!GetNowBreak()) {
 		CWSwingSegmentMgr.Draw(team);
 		CCWSwingSegmentMgr.Draw(team);
 	}
-	OnDraw();
+	OnDraw(isRoundStartEffect);
 
 	static const int LINE_GRAPH[TEAM_NUM] =
 	{

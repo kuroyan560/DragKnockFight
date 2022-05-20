@@ -153,7 +153,7 @@ private:
 	void OnUpdateNoRelatedSwing()override;
 
 	// 描画処理
-	void OnDraw()override;
+	void OnDraw(const bool& isRoundStartEffect)override;
 	void OnDrawUI()override;
 
 	//マップチップとヒットしたとき

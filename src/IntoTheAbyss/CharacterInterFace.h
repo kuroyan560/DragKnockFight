@@ -116,7 +116,7 @@ protected:
 	virtual void OnInit() = 0;
 	virtual void OnUpdate(const std::vector<std::vector<int>>& MapData) = 0;
 	virtual void OnUpdateNoRelatedSwing() = 0;	//スウィング中でも通る処理
-	virtual void OnDraw() = 0;
+	virtual void OnDraw(const bool& isRoundStartEffect) = 0;
 	virtual void OnDrawUI() = 0;
 	virtual void OnHitMapChip(const HIT_DIR& Dir) = 0;
 	virtual void OnBreak() = 0;
@@ -190,7 +190,7 @@ public:
 	}
 	void Init(const Vec2<float>& GeneratePos, const bool& Appear);	//ラウンド開始時に呼び出される
 	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
-	void Draw();
+	void Draw(const bool& isRoundStartEffect);
 	void DrawUI();
 	//当たり判定
 	void CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
