@@ -13,6 +13,7 @@ using namespace std;
 #include"NavigationAI.h"
 #include"CharacterAI.h"
 #include"PlayerAnimation.h"
+#include"BossHandMgr.h"
 
 // プレイヤーと引っ張り合うボスクラス
 class Boss : public CharacterInterFace
@@ -26,11 +27,12 @@ public:
 	INTERSECTED_LINE prevIntersectedLine;
 
 	//画像
-	static const enum AnimHandle 
+	static const enum AnimHandle
 	{
 		FRONT,
 		BACK,
 		DAMAGE,
+		SWING,
 		ANIMAHANDLE_MAX
 	};
 	int afterImgageTimer;
@@ -42,9 +44,21 @@ public:
 	bool initNaviAiFlag;
 	//ボスのパターン制御-----------------------
 
+	float bossGraphRadian;
+
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
 	int prevStaminaMax;
+
+	float bossCount;
+	float countDown;
+	Vec2<float>shakeDir;
+	Sprite bossGraph;
+	bool initShakeFalg;
+	Vec2<float>bossScale;
+
+	Vec2<float>pointPos;
+	float angle;
 
 public:
 	/*===== 定数 =====*/
@@ -68,7 +82,7 @@ private:
 	void OnInit()override;
 
 	// 更新処理
-	void OnUpdate(const std::vector<std::vector<int>>& MapData)override;
+	void OnUpdate(const std::vector<std::vector<int>> &MapData)override;
 
 	//スウィング中も呼び出される更新処理
 	void OnUpdateNoRelatedSwing()override {}
@@ -77,7 +91,7 @@ private:
 	void OnDraw()override;
 	void OnDrawUI()override {}
 
-	void OnHitMapChip(const HIT_DIR& Dir)override {}
+	void OnHitMapChip(const HIT_DIR &Dir)override {}
 
 	void OnBreak()override {}
 	void OnBreakFinish()override {}
@@ -89,7 +103,8 @@ private:
 	virtual void OnPilotControl()override {}		//パイロットを動かす処理
 	virtual void OnPilotReturn()override {}	//パイロットがロボに戻った瞬間
 
-	void Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed);
+	void Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed);
+
 public:
 	void OnKnockOut()override {};
 };

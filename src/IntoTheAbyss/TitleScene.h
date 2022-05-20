@@ -3,6 +3,7 @@
 #include"SceneCange.h"
 #include"ScreenEdgeEffect.h"
 #include"PictureStory.h"
+#include"BossHandMgr.h"
 
 class TitleScene : public BaseScene
 {

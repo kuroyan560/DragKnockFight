@@ -24,10 +24,14 @@ void CharacterAI::Init()
 	initFlag = true;
 	useAiFlag = true;
 	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
-	strategyArray[strategyOfChoice]->Init();
 	startFlag = false;
 	CharacterAIData::Instance()->dashTimer = 0;
 	startDashFlag = false;
+
+	for (int i = 0; i < strategyArray.size(); ++i)
+	{
+		strategyArray[i]->Init();
+	}
 }
 
 void CharacterAI::Finalize()

@@ -29,7 +29,7 @@ Boss::Boss() :CharacterInterFace(SCALE)
 {
 	//graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
 	//graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
-	
+
 	const std::string BossRelative = "resource/ChainCombat/boss/0/";
 
 	std::vector<Anim>animations;
@@ -53,6 +53,12 @@ Boss::Boss() :CharacterInterFace(SCALE)
 	animations[DAMAGE].interval = 0;
 	animations[DAMAGE].loop = false;
 
+	static const int SWING_NUM = 1;
+	animations[SWING].graph.resize(SWING_NUM);
+	animations[SWING].graph[0] = TexHandleMgr::LoadGraph(BossRelative + "swing.png");
+	animations[SWING].interval = 0;
+	animations[SWING].loop = false;
+
 
 	anim = std::make_shared<PlayerAnimation>(animations);
 
@@ -70,7 +76,7 @@ void Boss::OnInit()
 	prevIntersectedLine = INTERSECTED_NONE;
 
 	afterImgageTimer = 0;
-
+	bossCount = 0;
 	characterAi.Init();
 	anim->Init(FRONT);
 
@@ -82,6 +88,8 @@ void Boss::OnInit()
 		initNaviAiFlag = true;
 	}
 
+	initShakeFalg = false;
+	bossScale = { 0.7f,0.7f };
 }
 
 #include"Camera.h"
@@ -89,12 +97,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 {
 	/*===== 更新処理 =====*/
 
-	//if (Camera::Instance()->Active())
-	//{
-	//	moveVel = { 0,0 };
-	//	return;
-	//}
-
+	//移動時の画像切り替え
 	if (signbit(CharacterAIData::Instance()->prevPos.x - CharacterAIData::Instance()->nowPos.x))
 	{
 		anim->ChangeAnim(BACK);
@@ -103,6 +106,58 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	{
 		anim->ChangeAnim(FRONT);
 	}
+	//振り回し中の画像切り替え
+	if (GetNowSwing() || CharacterAIOrder::Instance()->prevSwingFlag)
+	{
+		anim->ChangeAnim(SWING);
+	}
+
+
+
+	//揺れ開始
+	if (CharacterAIOrder::Instance()->prevSwingFlag && !initShakeFalg)
+	{
+		initShakeFalg = true;
+	}
+	//揺れ終了
+	if (!CharacterAIOrder::Instance()->prevSwingFlag || GetNowSwing())
+	{
+		countDown = 0;
+		bossCount = 0;
+		angle = 0;
+		initShakeFalg = false;
+	}
+
+
+	//揺れ中
+	if (initShakeFalg)
+	{
+		float shakeValue = CharacterAIOrder::Instance()->prevRate;
+		bossCount += (0.8f * shakeValue);
+		const float PI2 = 3.14f;
+		countDown = sinf(PI2 / 120.0f + bossCount);
+	}
+
+	pointPos.x = pos.x + cosf(Angle::ConvertToRadian(angle)) * 1.0f;
+	pointPos.y = pos.y + sinf(Angle::ConvertToRadian(angle)) * 1.0f;
+	angle += 10.0f;
+	Vec2<float>nomal = pos - pointPos;
+	nomal.Normalize();
+
+	shakeValue = { (nomal.x * countDown) * 10.0f,(nomal.y * countDown) * 10.0f };
+
+
+
+	if (GetNowSwing())
+	{
+		Vec2<float>dir = -Vec2<float>(partner.lock()->pos - pos).GetNormal();
+		bossGraphRadian = atan2f(dir.y, dir.x);
+	}
+	else
+	{
+		bossGraphRadian = 0.0f;
+	}
+
 
 
 	// パートナーが振り回していたら残像を出す。
@@ -197,7 +252,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	// 移動量に関する変数をここで全てvelに代入する。
 	vel = CharacterAIOrder::Instance()->vel;
 
-
 }
 
 #include"DrawFunc_FillTex.h"
@@ -211,8 +265,9 @@ void Boss::OnDraw()
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
 
-	DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
-		TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
+	DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeValue), bossScale * ScrollMgr::Instance()->zoom,
+		bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
+
 
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
@@ -220,6 +275,13 @@ void Boss::OnDraw()
 	//navigationAi.Draw();
 	//characterAi.Draw();
 
+	/*bossGraph.SetTexture(TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()));
+	bossGraph.SetColor(Color(255, 0, 0, static_cast<int>(255 * stagingDevice.GetFlashAlpha())));
+	bossGraph.transform.SetPos(ScrollMgr::Instance()->Affect(drawPos));
+	bossGraph.transform.SetScale(Vec2<float>(2.5f, 2.5f));
+	Vec3<Angle>lAngle = { 0.0f,0.0f,Angle::ConvertToDegree(bossGraphRadian) };
+	bossGraph.transform.SetRotate(lAngle);
+	bossGraph.Draw();*/
 }
 
 void Boss::Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed)

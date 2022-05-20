@@ -175,6 +175,7 @@ void TitleScene::OnDraw()
 			DrawFunc::DrawRotaGraph2D(PRESS_START_POS, { 1,1 }, 0, TexHandleMgr::GetTexBuffer(pressStartHandle));
 		}
 	}
+
 }
 
 void TitleScene::OnImguiDebug()
@@ -182,6 +183,7 @@ void TitleScene::OnImguiDebug()
 	ImGui::Begin("TitleScene");
 	ImGui::Text("Abutton:StageSelect");
 	ImGui::End();
+
 }
 
 void TitleScene::OnFinalize()

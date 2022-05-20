@@ -82,5 +82,7 @@ public:
 private:
 	int swingTimer;
 	int swingCoolTime;
+	int prevSwingTimer;
+	int prevSwingCoolTimer;
 	bool enableToSwingFlag;
 };

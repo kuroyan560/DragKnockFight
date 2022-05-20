@@ -55,4 +55,7 @@ public:
 	bool swingClockWiseFlag;
 	bool swingCounterClockWiseFlag;
 	bool startAiFlag;
+	bool prevSwingFlag;//—\”õ“®ì
+
+	float prevRate;
 };
