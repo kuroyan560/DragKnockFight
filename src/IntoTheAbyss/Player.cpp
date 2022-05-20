@@ -340,7 +340,7 @@ void Player::OnUpdateNoRelatedSwing()
 
 }
 
-void Player::OnDraw()
+void Player::OnDraw(const bool& isRoundStartEffect)
 {
 	//if (vel.y < 0)playerDir = BACK;
 	auto moveInput = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });

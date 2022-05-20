@@ -256,7 +256,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 
 #include"DrawFunc_FillTex.h"
 #include"D3D12App.h"
-void Boss::OnDraw()
+void Boss::OnDraw(const bool& isRoundStartEffect)
 {
 	/*===== ï`âÊèàóù =====*/
 	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);

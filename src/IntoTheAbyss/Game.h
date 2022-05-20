@@ -140,5 +140,19 @@ public:
 
 	Vec2<float>GetStageSize();
 	const bool &TurnResultScene() { return turnResultScene; }
+
+
+	// ステージ切り替え関数
+	void SwitchingStage();
+
+	// 陣地の判定
+	void DeterminationOfThePosition();
+
+	// ラウンド開始時演出
+	void RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData);
+
+	// ラウンド終了時演出
+	void RoundFinishEffect(const bool& Loop);
+
 };
 
