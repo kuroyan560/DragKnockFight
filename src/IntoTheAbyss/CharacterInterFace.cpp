@@ -615,14 +615,14 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 #include "DrawFunc.h"
 #include"TexHandleMgr.h"
-void CharacterInterFace::Draw()
+void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 {
 	// 残像を描画
 	if (!GetNowBreak()) {
 		CWSwingSegmentMgr.Draw(team);
 		CCWSwingSegmentMgr.Draw(team);
 	}
-	OnDraw();
+	OnDraw(isRoundStartEffect);
 
 	static const int LINE_GRAPH[TEAM_NUM] =
 	{
@@ -904,6 +904,32 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 		// 一定以下だったらダメージを与えない。
 		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 2.0f) {
 
+			// 触れただけでその色になるようにする。
+			MapChipType hitChipData = StageMgr::Instance()->GetLocalMapChipType(hitChipIndex);
+			if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
+
+				// 自分が右側のキャラだったら。
+				if (team == WHICH_TEAM::RIGHT_TEAM) {
+
+					// ブロックを右の色にする。
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
+
+				}
+
+			}
+			else if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
+
+				// 自分が左側のキャラだったら。
+				if (team == WHICH_TEAM::LEFT_TEAM) {
+
+					// ブロックを右の色にする。
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
+
+				}
+
+			}
+
+
 		}
 		else if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 4.0f) {
 
@@ -979,9 +1005,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 					}
 
-					// トゲブロックを棘無し状態にさせる。
-					StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
-
 					// 指定したブロックの上下左右を書き換える。
 					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_COLOR_LEFT, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
 
@@ -1002,9 +1025,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, StaminaItem::CHARA_ID::RIGHT, partner.lock()->pos);
 
 					}
-
-					// トゲブロックを棘無し状態にさせる。
-					StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
 
 					// 指定したブロックの上下左右を書き換える。
 					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
@@ -1034,7 +1054,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_ELEC_ON);
 
 					// アイテムを生成する。
-					StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
+					//StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
 
 					// 指定したブロックの上下左右を書き換える。
 					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_ELEC_OFF, MapChipData::MAPCHIP_TYPE_STATIC_ELEC_ON);
@@ -1054,7 +1074,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				else {
 
 					// アイテムを生成する。
-					StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
+					//StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
 
 				}
 
