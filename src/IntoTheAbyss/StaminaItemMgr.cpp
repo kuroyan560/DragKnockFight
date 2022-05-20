@@ -110,21 +110,21 @@ void StaminaItemMgr::Update(const Vec2<float>& LeftUp, const Vec2<float>& RightD
 	/*===== 更新処理 =====*/
 
 	// 自動スポーンに関する更新を行う。
-	++sponeTimer;
-	if (SPONE_TIMER <= sponeTimer) {
+	//++sponeTimer;
+	//if (SPONE_TIMER <= sponeTimer) {
 
-		// 規定の数アイテムをすぽーんさせる。
-		for (int generateCount = 0; generateCount < SPONE_COUNT; ++generateCount) {
+	//	// 規定の数アイテムをすぽーんさせる。
+	//	for (int generateCount = 0; generateCount < SPONE_COUNT; ++generateCount) {
 
-			Vec2<float> randomSponePos = { KuroFunc::GetRand(LeftUp.x, RightDown.x), KuroFunc::GetRand(LeftUp.y,RightDown.y) };
+	//		Vec2<float> randomSponePos = { KuroFunc::GetRand(LeftUp.x, RightDown.x), KuroFunc::GetRand(LeftUp.y,RightDown.y) };
 
-			GenerateSpone(randomSponePos);
+	//		GenerateSpone(randomSponePos);
 
-		}
+	//	}
 
-		sponeTimer = 0;
+	//	sponeTimer = 0;
 
-	}
+	//}
 
 	for (int index = 0; index < ITEM_COUNT; ++index) {
 
