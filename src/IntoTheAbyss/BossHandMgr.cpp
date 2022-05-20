@@ -4,10 +4,10 @@
 #include"../Engine/DrawFunc.h"
 #include"../Common/KuroMath.h"
 
-BossHandMgr::BossHandMgr()
+BossHandMgr::BossHandMgr(int L_DEFAULT_HANDLE, int R_DEFAULT_HANDLE, int L_HOLD_HANDLE, int R_HOLD_HANDLE)
 {
-	leftHand = std::make_unique<BossHand>(TexHandleMgr::LoadGraph("resource/ChainCombat/boss/0/arm/default/L.png"), TexHandleMgr::LoadGraph("resource/ChainCombat/boss/0/arm/hold/L.png"));
-	rightHand = std::make_unique<BossHand>(TexHandleMgr::LoadGraph("resource/ChainCombat/boss/0/arm/default/R.png"), TexHandleMgr::LoadGraph("resource/ChainCombat/boss/0/arm/hold/R.png"));
+	leftHand = std::make_unique<BossHand>(L_DEFAULT_HANDLE, L_HOLD_HANDLE);
+	rightHand = std::make_unique<BossHand>(R_DEFAULT_HANDLE, R_HOLD_HANDLE);
 }
 
 void BossHandMgr::Init(bool DEBUG)

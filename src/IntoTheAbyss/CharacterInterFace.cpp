@@ -417,6 +417,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	}
 	staminaGauge->SetColor(innerColor, outerColor);
 
+	prevSwingFlag = false;
 }
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)

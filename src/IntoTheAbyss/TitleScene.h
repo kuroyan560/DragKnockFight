@@ -48,7 +48,7 @@ private:
 	bool tutorialSelect = false;
 	bool tutorialYes = true;
 
-	BossHandMgr handMgr;
+	//std::unique_ptr<BossHandMgr> handMgr;
 
 public:
 	TitleScene();

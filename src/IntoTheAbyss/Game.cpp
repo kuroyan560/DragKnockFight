@@ -192,7 +192,8 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 
 	SuperiorityGauge::Instance()->Init();
 
-	bossHand.Init(false);
+	bossHandMgr->Init(false);
+	playerHandMgr->Init(false);
 
 	FaceIcon::Instance()->Init(CharacterManager::Instance()->Left()->GetCharacterName(), CharacterManager::Instance()->Right()->GetCharacterName());
 
@@ -348,6 +349,23 @@ Game::Game()
 	StageMgr::Instance()->GetMapChipType(0, 0, Vec2<int>(20, 20));
 	StageMgr::Instance()->WriteMapChipData(Vec2<int>(20, 20), 0);
 
+	{
+		std::string bossFilePass = "resource/ChainCombat/boss/0/arm/";
+		int dL = TexHandleMgr::LoadGraph(bossFilePass + "default/L.png");
+		int dR = TexHandleMgr::LoadGraph(bossFilePass + "default/R.png");
+		int hL = TexHandleMgr::LoadGraph(bossFilePass + "hold/L.png");
+		int hR = TexHandleMgr::LoadGraph(bossFilePass + "hold/R.png");
+		bossHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR);
+	}
+
+	{
+		std::string bossFilePass = "resource/ChainCombat/player/luna/arm/";
+		int dL = TexHandleMgr::LoadGraph(bossFilePass + "default/L.png");
+		int dR = TexHandleMgr::LoadGraph(bossFilePass + "default/R.png");
+		int hL = TexHandleMgr::LoadGraph(bossFilePass + "hold/L.png");
+		int hR = TexHandleMgr::LoadGraph(bossFilePass + "hold/R.png");
+		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR);
+	}
 }
 
 void Game::Init(const bool &PracticeMode)
@@ -402,9 +420,16 @@ void Game::Update(const bool &Loop)
 
 	if (roundChangeEffect.readyFlag)
 	{
-		Vec2<float> sub = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
-		bossHand.Hold(-sub.GetNormal(), CharacterAIOrder::Instance()->prevSwingFlag);
-		bossHand.Update(CharacterManager::Instance()->Right()->pos);
+		{
+			Vec2<float> sub = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
+			bossHandMgr->Hold(-sub.GetNormal(), CharacterAIOrder::Instance()->prevSwingFlag);
+			bossHandMgr->Update(CharacterManager::Instance()->Right()->pos);
+		}
+		{
+			Vec2<float> sub = CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos;
+			playerHandMgr->Hold(-sub.GetNormal(), CharacterManager::Instance()->Left()->prevSwingFlag || CharacterManager::Instance()->Left()->GetNowSwing());
+			playerHandMgr->Update(CharacterManager::Instance()->Left()->pos);
+		}
 	}
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
@@ -621,7 +646,8 @@ void Game::Draw()
 
 	if (roundChangeEffect.readyFlag)
 	{
-		bossHand.Draw();
+		bossHandMgr->Draw();
+		playerHandMgr->Draw();
 	}
 
 	playerHomeBase.Draw();

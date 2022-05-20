@@ -183,7 +183,7 @@ public:
 	float staminaAutoHealAmount;
 
 	Vec2<float>shakeValue;
-
+	bool prevSwingFlag;
 
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team, const PLAYABLE_CHARACTER_NAME& Name)
 	{

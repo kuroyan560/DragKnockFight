@@ -13,7 +13,7 @@ struct HandData
 class BossHandMgr
 {
 public:
-	BossHandMgr();
+	BossHandMgr(int L_DEFAULT_HANDLE, int R_DEFAULT_HANDLE, int L_HOLD_HANDLE, int R_HOLD_HANDLE);
 	void Init(bool DEBUG = true);
 	void InitRadius();
 	void Update(const Vec2<float> &POS = {});

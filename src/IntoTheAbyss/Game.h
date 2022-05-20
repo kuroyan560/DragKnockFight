@@ -124,7 +124,8 @@ class Game
 	bool practiceMode = true;
 
 	
-	BossHandMgr bossHand;
+	std::unique_ptr<BossHandMgr> bossHandMgr;
+	std::unique_ptr<BossHandMgr> playerHandMgr;
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
 

@@ -655,6 +655,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 		posBuff.Normalize();
 		bool isClockWise = 0 < posBuff.Cross(inputRightVec);
 
+		prevSwingFlag = true;
+
 		if (isClockWise) {
 
 			CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
@@ -678,6 +680,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 			//パイロット切り離し
 			if (UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::RB))SetPilotDetachedFlg(true);
 		}
+
+		prevSwingFlag = false;
 	}
 	if (UsersInput::Instance()->ControllerOffTrigger(controllerIdx, XBOX_BUTTON::RB))SetPilotDetachedFlg(false);
 
