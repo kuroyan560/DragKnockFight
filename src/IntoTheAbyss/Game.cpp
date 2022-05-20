@@ -46,7 +46,7 @@
 #include"CharacterManager.h"
 #include "StaminaItemMgr.h"
 
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -72,7 +72,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
+void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -165,7 +165,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 	}
 }
 
-const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
+const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -183,7 +183,7 @@ const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
+void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -225,7 +225,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		Vec2<float>enemyLeftUpPos;
 		Vec2<float>enemyRightDownPos;
 
-		
+
 		for (int y = 0; y < tmp.size(); ++y)
 		{
 			for (int x = 0; x < tmp[y].size(); ++x)
@@ -348,7 +348,7 @@ Game::Game()
 
 }
 
-void Game::Init(const bool &PracticeMode)
+void Game::Init(const bool& PracticeMode)
 {
 	practiceMode = PracticeMode;
 
@@ -366,74 +366,13 @@ void Game::Init(const bool &PracticeMode)
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 }
 
-void Game::Update(const bool &Loop)
+void Game::Update(const bool& Loop)
 {
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 	RoomMapChipArray tmpMapData = *mapData;
 
-#pragma region ステージの切り替え
-	const bool enableToSelectStageFlag = 0 < debugStageData[0];
-	const bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
-	//マップの切り替え
-	const bool up = UsersInput::Instance()->KeyOnTrigger(DIK_UP) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_UP);
-	const bool down = UsersInput::Instance()->KeyOnTrigger(DIK_DOWN) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_DOWN);
-	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_LEFT);
-	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_RIGHT);
-
-	if (up && enableToSelectStageFlag2 && nowSelectNum == 0)
-	{
-		++debugStageData[0];
-	}
-	//if (Input::isKeyTrigger(KEY_INPUT_DOWN) && enableToSelectStageFlag && nowSelectNum == 0)
-	if (down && enableToSelectStageFlag && nowSelectNum == 0)
-	{
-		--debugStageData[0];
-	}
-
-
-	const bool enableToSelectRoomFlag = 0 < debugStageData[1];
-	const bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
-	//部屋の切り替え
-	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectRoomFlag2 && nowSelectNum == 1)
-	if (up && enableToSelectRoomFlag2 && nowSelectNum == 1)
-	{
-		++debugStageData[1];
-	}
-	//if (Input::isKeyTrigger(KEY_INPUT_DOWN) && enableToSelectRoomFlag && nowSelectNum == 1)
-	if (down && enableToSelectRoomFlag && nowSelectNum == 1)
-	{
-		--debugStageData[1];
-	}
-
-	//部屋か番号に切り替え
-	//if (Input::isKeyTrigger(KEY_INPUT_LEFT) && 0 < nowSelectNum)
-	if (left && 0 < nowSelectNum)
-	{
-		--nowSelectNum;
-		debugStageData[1] = 0;
-	}
-	if (right && nowSelectNum < 1)
-	{
-		++nowSelectNum;
-		debugStageData[1] = 0;
-	}
-
-	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0, A);
-	if (done && false)
-	{
-		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
-		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
-		SelectStage::Instance()->resetStageFlag = true;
-		//mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
-	}
-#pragma endregion
-
-
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_H))
-	{
-		StageMgr::Instance()->WriteMapChipData(Vec2<int>(23, 15), MAPCHIP_TYPE_STATIC_COLOR_LEFT);
-	}
-
+	// ステージの切り替え
+	SwitchingStage();
 
 
 	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0, BACK);
@@ -445,132 +384,14 @@ void Game::Update(const bool &Loop)
 		//sceneChangeDeadFlag = player.isDead;
 	}
 
-	//プレイヤー陣地と敵の判定
-	if (playerHomeBase.Collision(CharacterManager::Instance()->Right()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
-	{
-		//プレイヤー勝利
-		WinCounter::Instance()->RoundFinish(lineCenterPos, true, CharacterManager::Instance()->Right()->pos);
-		CharacterManager::Instance()->Right()->OnKnockOut();
-		roundFinishFlag = true;
-		playerOrEnemeyWinFlag = true;
-		gameStartFlag = false;
-
-		screenEdgeEffect.LeftPlayerWin(120);
-
-		// 両キャラの予測線を消す。
-		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
-		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
-
-	}
-
-	//敵陣地とプレイヤーの判定
-	if (enemyHomeBase.Collision(CharacterManager::Instance()->Left()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
-	{
-		//敵勝利
-		WinCounter::Instance()->RoundFinish(lineCenterPos, false, CharacterManager::Instance()->Left()->pos);
-		CharacterManager::Instance()->Left()->OnKnockOut();
-		roundFinishFlag = true;
-		playerOrEnemeyWinFlag = false;
-		gameStartFlag = false;
-
-		areaHitColor = Color(255, 0, 0, 255);
-		playerHitColor = Color(255, 0, 0, 255);
-
-		screenEdgeEffect.RightPlayerWin(120);
-
-		// 両キャラの予測線を消す。
-		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
-		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
-	}
+	// 陣地の判定
+	DeterminationOfThePosition();
 
 	//ラウンド終了演出開始
-	if (roundFinishFlag)
-	{
-		//動けなくする
-		CharacterManager::Instance()->Left()->SetCanMove(false);
-		CharacterManager::Instance()->Right()->SetCanMove(false);
-		CharacterManager::Instance()->Left()->SetHitCheck(false);
-		CharacterManager::Instance()->Right()->SetHitCheck(false);
-
-		//時間計測ストップ
-		GameTimer::Instance()->SetInterruput(true);
-
-		//勝利数カウント演出
-		if (!WinCounter::Instance()->GetNowAnimation())
-		{
-			//どちらかが３勝とったらゲーム終了
-			if (WinCounter::Instance()->GetGameFinish() && !Loop)
-			{
-				ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
-				if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
-				else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
-				turnResultScene = true;
-			}
-			//次のラウンドへ
-			else
-			{
-				//練習モード
-				if (Loop)WinCounter::Instance()->Reset();
-
-				++roundTimer;
-
-				if (60 <= roundTimer)
-				{
-					readyToStartRoundFlag = true;
-					roundFinishFlag = false;
-					InitGame(0, 0);
-				}
-			}
-		}
-	}
+	RoundFinishEffect(Loop);
 
 	//ラウンド開始時の演出開始
-	if (readyToStartRoundFlag)
-	{
-		roundChangeEffect.Start(WinCounter::Instance()->GetNowRound(), playerOrEnemeyWinFlag);
-		Vec2<float>winSize;
-		winSize.x = static_cast<float>(WinApp::Instance()->GetWinSize().x);
-		winSize.y = static_cast<float>(WinApp::Instance()->GetWinSize().y);
-
-		//Vec2<float> responePos = Vec2<float>(((mapData[0].size() * MAP_CHIP_SIZE) / 2.0f) - 100.0f, (mapData.size() * MAP_CHIP_SIZE) / 2.0f);
-		//responePos.y -= -cameraBasePos.y * 2.0f;
-		ScrollMgr::Instance()->Warp(responeScrollPos);
-
-		//プレイヤーと敵の座標初期化
-		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initGameFlag)
-		{
-			roundChangeEffect.initGameFlag = true;
-			if (!AudioApp::Instance()->NowPlay(bgm))
-			{
-				AudioApp::Instance()->ChangeVolume(bgm, 0.1f);
-				AudioApp::Instance()->PlayWave(bgm, true);
-			}
-		}
-
-		//登場演出
-		if (roundChangeEffect.initGameFlag)
-		{
-			CharacterManager::Instance()->Left()->Appear();
-			CharacterManager::Instance()->Right()->Appear();
-			if (CharacterManager::Instance()->Left()->CompleteAppear() && CharacterManager::Instance()->Right()->CompleteAppear())	//どちらのキャラも登場演出完了
-			{
-				//ゲームスタート
-				readyToStartRoundFlag = false;
-				gameStartFlag = true;
-				roundTimer = 0;
-				CharacterManager::Instance()->Left()->SetCanMove(true);
-				CharacterManager::Instance()->Right()->SetCanMove(true);
-				CharacterManager::Instance()->Left()->SetHitCheck(true);
-				CharacterManager::Instance()->Right()->SetHitCheck(true);
-				GameTimer::Instance()->SetInterruput(false);
-			}
-		}
-		//gameStartFlag = true;
-		//SelectStage::Instance()->resetStageFlag = true;
-		//readyToStartRoundFlag = false;
-		float size = (tmpMapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
-		miniMap.Init(size);
-	}
+	RoundStartEffect(Loop, tmpMapData);
 
 	miniMap.CalucurateCurrentPos(lineCenterPos);
 
@@ -619,18 +440,10 @@ void Game::Update(const bool &Loop)
 	// シェイク量の更新処理
 	ShakeMgr::Instance()->Update();
 
-
-	// 振り回し管理クラスの更新処理
-	//SwingMgr::Instance()->Update(player.centerPos, boss.pos, lineLengthBoss + lineLengthPlayer + addLineLengthBoss + addLineLengthPlayer);
-
-#pragma region 各ギミックの更新処理
-
 	SuperiorityGauge::Instance()->Update();
 
 	// スタン演出クラスの更新処理
 	StunEffect::Instance()->Update();
-
-#pragma endregion
 
 
 	/*===== 当たり判定 =====*/
@@ -638,10 +451,10 @@ void Game::Update(const bool &Loop)
 #pragma region 当たり判定
 
 	//左弾と右プレイヤーの判定
-	auto &leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
+	auto& leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
 	for (int index = 0; index < leftBulMgr.bullets.size(); ++index)
 	{
-		auto &bul = leftBulMgr.bullets[index];
+		auto& bul = leftBulMgr.bullets[index];
 		if (!bul.isActive)continue;
 
 		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
@@ -660,7 +473,7 @@ void Game::Update(const bool &Loop)
 	auto rightBulMgr = CharacterManager::Instance()->Right()->GetBulletMgr();
 	for (int index = 0; index < rightBulMgr.bullets.size(); ++index)
 	{
-		auto &bul = rightBulMgr.bullets[index];
+		auto& bul = rightBulMgr.bullets[index];
 		if (!bul.isActive)continue;
 
 		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
@@ -822,7 +635,7 @@ void Game::Draw()
 	if (roundChangeEffect.initGameFlag)
 	{
 		//左プレイヤー～中央のチェイン
-		auto &left = CharacterManager::Instance()->Left();
+		auto& left = CharacterManager::Instance()->Left();
 		Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
 		Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
 		if (0.0f < left->addLineLength)
@@ -832,7 +645,7 @@ void Game::Draw()
 		}
 
 		//右プレイヤー～中央のチェイン
-		auto &right = CharacterManager::Instance()->Right();
+		auto& right = CharacterManager::Instance()->Right();
 		Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
 		Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
 		if (0.0f < right->addLineLength)
@@ -856,48 +669,6 @@ void Game::Draw()
 				TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 
 		}
-
-
-		/*auto& left = CharacterManager::Instance()->Left();
-		auto& right = CharacterManager::Instance()->Right();
-
-		Vec2<float> dir = (left->pos - right->pos).GetNormal();
-		Vec2<float> buff = right->pos + dir * right->addLineLength;
-
-		if ((CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() < CharacterInterFace::LINE_LENGTH * 2.0f) {
-
-			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(left->pos), ScrollMgr::Instance()->Affect(right->pos), Color());
-
-		}
-		else {
-
-			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(right->pos), ScrollMgr::Instance()->Affect(buff), Color(255, 0, 0, 255));
-
-			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(buff), ScrollMgr::Instance()->Affect(buff + dir * (CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f)), Color(255, 255, 255, 255));
-			buff = buff + dir * (CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f);
-
-			DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(buff), ScrollMgr::Instance()->Affect(buff + dir * left->addLineLength), Color(0, 0, 255, 255));
-
-
-			Vec2<float> bossPlayerDir = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
-			bossPlayerDir.Normalize();
-			Vec2<float> bossDefLength = CharacterManager::Instance()->Right()->pos + bossPlayerDir * CharacterManager::Instance()->Right()->addLineLength;
-		}
-
-		float time = 30.0f;
-		if (1.0f < lineExtendScale)
-		{
-			lineExtendScale -= lineExtendMaxScale / time;
-		}
-		else
-		{
-			lineExtendScale = 1.0f;
-		}*/
-
-		//DrawFunc::DrawLine2D(boss.pos - scrollShakeAmount, bossDefLength - scrollShakeAmount, Color(255, 0, 0, 255));
-		//DrawFunc::DrawLine2D(bossDefLength - scrollShakeAmount, bossDefLength + bossPlayerDir * lineLengthBoss - scrollShakeAmount, Color(255, 255, 255, 255));
-		//DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), ScrollMgr::Instance()->Affect(lineCenterPos),
-		//	TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom * lineExtendScale);
 
 		// 線分の中心に円を描画
 		if (roundChangeEffect.drawFightFlag)
@@ -1193,8 +964,8 @@ void Game::CalCenterPos()
 
 	// 本当はScrambleの一番うしろに入れていた処理なんですが、押し戻しをした後に呼ぶ必要が出てきたので関数で分けました。
 
-	auto &left = CharacterManager::Instance()->Left();
-	auto &right = CharacterManager::Instance()->Right();
+	auto& left = CharacterManager::Instance()->Left();
+	auto& right = CharacterManager::Instance()->Right();
 
 	// 移動量に応じて本来あるべき長さにする。
 	Vec2<float> prevSubPos = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos;
@@ -1262,8 +1033,8 @@ void Game::CalCenterPos()
 		//else {
 			// 規定値以上だったら普通に場所を求める。
 
-		auto &right = CharacterManager::Instance()->Right();
-		auto &left = CharacterManager::Instance()->Left();
+		auto& right = CharacterManager::Instance()->Right();
+		auto& left = CharacterManager::Instance()->Left();
 
 		Vec2<float> rightPos = right->pos;
 		rightPos += (left->pos - right->pos).GetNormal() * right->addLineLength;
@@ -1290,4 +1061,206 @@ Vec2<float> Game::GetStageSize()
 	int sizeX = mapData[0].size();
 	int sizeY = mapData->size();
 	return Vec2<float>(CHIP_SIZE * sizeX, CHIP_SIZE * sizeY);
+}
+
+void Game::SwitchingStage()
+{
+
+	const bool enableToSelectStageFlag = 0 < debugStageData[0];
+	const bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
+	//マップの切り替え
+	const bool up = UsersInput::Instance()->KeyOnTrigger(DIK_UP) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_UP);
+	const bool down = UsersInput::Instance()->KeyOnTrigger(DIK_DOWN) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_DOWN);
+	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_LEFT);
+	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_RIGHT);
+
+	if (up && enableToSelectStageFlag2 && nowSelectNum == 0)
+	{
+		++debugStageData[0];
+	}
+	//if (Input::isKeyTrigger(KEY_INPUT_DOWN) && enableToSelectStageFlag && nowSelectNum == 0)
+	if (down && enableToSelectStageFlag && nowSelectNum == 0)
+	{
+		--debugStageData[0];
+	}
+
+
+	const bool enableToSelectRoomFlag = 0 < debugStageData[1];
+	const bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
+	//部屋の切り替え
+	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectRoomFlag2 && nowSelectNum == 1)
+	if (up && enableToSelectRoomFlag2 && nowSelectNum == 1)
+	{
+		++debugStageData[1];
+	}
+	//if (Input::isKeyTrigger(KEY_INPUT_DOWN) && enableToSelectRoomFlag && nowSelectNum == 1)
+	if (down && enableToSelectRoomFlag && nowSelectNum == 1)
+	{
+		--debugStageData[1];
+	}
+
+	//部屋か番号に切り替え
+	//if (Input::isKeyTrigger(KEY_INPUT_LEFT) && 0 < nowSelectNum)
+	if (left && 0 < nowSelectNum)
+	{
+		--nowSelectNum;
+		debugStageData[1] = 0;
+	}
+	if (right && nowSelectNum < 1)
+	{
+		++nowSelectNum;
+		debugStageData[1] = 0;
+	}
+
+	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0, A);
+	if (done && false)
+	{
+		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
+		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
+		SelectStage::Instance()->resetStageFlag = true;
+		//mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
+	}
+
+}
+
+void Game::DeterminationOfThePosition()
+{
+
+	//プレイヤー陣地と敵の判定
+	if (playerHomeBase.Collision(CharacterManager::Instance()->Right()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
+	{
+		//プレイヤー勝利
+		WinCounter::Instance()->RoundFinish(lineCenterPos, true, CharacterManager::Instance()->Right()->pos);
+		CharacterManager::Instance()->Right()->OnKnockOut();
+		roundFinishFlag = true;
+		playerOrEnemeyWinFlag = true;
+		gameStartFlag = false;
+
+		screenEdgeEffect.LeftPlayerWin(120);
+
+		// 両キャラの予測線を消す。
+		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
+		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
+
+	}
+
+	//敵陣地とプレイヤーの判定
+	if (enemyHomeBase.Collision(CharacterManager::Instance()->Left()->GetAreaHitBox()) && !roundFinishFlag && !readyToStartRoundFlag)
+	{
+		//敵勝利
+		WinCounter::Instance()->RoundFinish(lineCenterPos, false, CharacterManager::Instance()->Left()->pos);
+		CharacterManager::Instance()->Left()->OnKnockOut();
+		roundFinishFlag = true;
+		playerOrEnemeyWinFlag = false;
+		gameStartFlag = false;
+
+		areaHitColor = Color(255, 0, 0, 255);
+		playerHitColor = Color(255, 0, 0, 255);
+
+		screenEdgeEffect.RightPlayerWin(120);
+
+		// 両キャラの予測線を消す。
+		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
+		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
+	}
+
+}
+
+void Game::RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData)
+{
+
+	//ラウンド開始時の演出開始
+	if (readyToStartRoundFlag)
+	{
+		roundChangeEffect.Start(WinCounter::Instance()->GetNowRound(), playerOrEnemeyWinFlag);
+		Vec2<float>winSize;
+		winSize.x = static_cast<float>(WinApp::Instance()->GetWinSize().x);
+		winSize.y = static_cast<float>(WinApp::Instance()->GetWinSize().y);
+
+		//Vec2<float> responePos = Vec2<float>(((mapData[0].size() * MAP_CHIP_SIZE) / 2.0f) - 100.0f, (mapData.size() * MAP_CHIP_SIZE) / 2.0f);
+		//responePos.y -= -cameraBasePos.y * 2.0f;
+		ScrollMgr::Instance()->Warp(responeScrollPos);
+
+		//プレイヤーと敵の座標初期化
+		if (roundChangeEffect.readyToInitFlag && !roundChangeEffect.initGameFlag)
+		{
+			roundChangeEffect.initGameFlag = true;
+			if (!AudioApp::Instance()->NowPlay(bgm))
+			{
+				AudioApp::Instance()->ChangeVolume(bgm, 0.1f);
+				AudioApp::Instance()->PlayWave(bgm, true);
+			}
+		}
+
+		//登場演出
+		if (roundChangeEffect.initGameFlag)
+		{
+			CharacterManager::Instance()->Left()->Appear();
+			CharacterManager::Instance()->Right()->Appear();
+			if (CharacterManager::Instance()->Left()->CompleteAppear() && CharacterManager::Instance()->Right()->CompleteAppear())	//どちらのキャラも登場演出完了
+			{
+				//ゲームスタート
+				readyToStartRoundFlag = false;
+				gameStartFlag = true;
+				roundTimer = 0;
+				CharacterManager::Instance()->Left()->SetCanMove(true);
+				CharacterManager::Instance()->Right()->SetCanMove(true);
+				CharacterManager::Instance()->Left()->SetHitCheck(true);
+				CharacterManager::Instance()->Right()->SetHitCheck(true);
+				GameTimer::Instance()->SetInterruput(false);
+			}
+		}
+		//gameStartFlag = true;
+		//SelectStage::Instance()->resetStageFlag = true;
+		//readyToStartRoundFlag = false;
+		float size = (tmpMapData[0].size() * MAP_CHIP_SIZE) - 400.0f;
+		miniMap.Init(size);
+	}
+
+}
+
+void Game::RoundFinishEffect(const bool& Loop)
+{
+
+	//ラウンド終了演出開始
+	if (roundFinishFlag)
+	{
+		//動けなくする
+		CharacterManager::Instance()->Left()->SetCanMove(false);
+		CharacterManager::Instance()->Right()->SetCanMove(false);
+		CharacterManager::Instance()->Left()->SetHitCheck(false);
+		CharacterManager::Instance()->Right()->SetHitCheck(false);
+
+		//時間計測ストップ
+		GameTimer::Instance()->SetInterruput(true);
+
+		//勝利数カウント演出
+		if (!WinCounter::Instance()->GetNowAnimation())
+		{
+			//どちらかが３勝とったらゲーム終了
+			if (WinCounter::Instance()->GetGameFinish() && !Loop)
+			{
+				ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
+				if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
+				else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
+				turnResultScene = true;
+			}
+			//次のラウンドへ
+			else
+			{
+				//練習モード
+				if (Loop)WinCounter::Instance()->Reset();
+
+				++roundTimer;
+
+				if (60 <= roundTimer)
+				{
+					readyToStartRoundFlag = true;
+					roundFinishFlag = false;
+					InitGame(0, 0);
+				}
+			}
+		}
+	}
+
 }
