@@ -43,7 +43,7 @@ void StageSelectScene::OnUpdate()
 		CharacterManager::Instance()->CharactersSelectUpdate();
 
 		//ƒQ[ƒ€ƒV[ƒ“‚ÉˆÚ“®‚·‚é
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A) && 1.0f <= stageSelect.GetLerpData().timer)
 		{
 			KuroEngine::Instance().ChangeScene(2, changeScene);
 			SelectStage::Instance()->resetStageFlag = true;
