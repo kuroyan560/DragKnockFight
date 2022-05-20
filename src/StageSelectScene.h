@@ -5,6 +5,7 @@
 #include"IntoTheAbyss/StageSelectScreenShot.h"
 #include"IntoTheAbyss/StageSelectArrow.h"
 #include"IntoTheAbyss/StageSelectCharacterImage.h"
+#include"IntoTheAbyss/MaskSceneTransition.h"
 
 class StageSelectScene : public BaseScene
 {
@@ -31,7 +32,7 @@ public:
 	void OnFinalize()override;
 
 	// シーンチェンジに使用する。
-	std::shared_ptr<SceneCange>changeScene;
+	std::shared_ptr<MaskSceneTransition>changeScene;
 
 	// ステージ番号
 	int stageNum;

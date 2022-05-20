@@ -6,7 +6,7 @@
 
 StageSelectScene::StageSelectScene()
 {
-	changeScene = std::make_shared<SceneCange>();
+	changeScene = std::make_shared<MaskSceneTransition>();
 	stageNum = 0;
 }
 
