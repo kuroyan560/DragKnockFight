@@ -10,7 +10,7 @@
 
 const float IStrategicLayer::SEARCH_RADIUS = 500.0f;
 const float RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 0.4f;
-const float AcquireASuperiorityGauge::SUCCEED_GAUGE_VALUE = 0.3f;
+const float SwingThreeTimesCounterClockWise::SUCCEED_GAUGE_VALUE = 0.3f;
 
 float IStrategicLayer::GetGaugeStatus()
 {
@@ -313,11 +313,11 @@ float RestoreStamina::EvaluationFunction()
 }
 
 
-GoToTheField::GoToTheField()
+SwingClockWise::SwingClockWise()
 {
 }
 
-void GoToTheField::Init()
+void SwingClockWise::Init()
 {
 	timer = 0;
 	timeOver = 60 * 5;
@@ -330,7 +330,7 @@ void GoToTheField::Init()
 	operateSwing.Init(SWING_MAX_COOL_TIME);
 }
 
-void GoToTheField::Update()
+void SwingClockWise::Update()
 {
 	//自分が自陣に近づく
 	if (goToTheFieldFlag)
@@ -371,7 +371,7 @@ void GoToTheField::Update()
 	++timer;
 }
 
-AiResult GoToTheField::CurrentProgress()
+AiResult SwingClockWise::CurrentProgress()
 {
 	if (finishFlag)
 	{
@@ -383,7 +383,7 @@ AiResult GoToTheField::CurrentProgress()
 	}
 }
 
-float GoToTheField::EvaluationFunction()
+float SwingClockWise::EvaluationFunction()
 {
 	CharacterAIData *data = CharacterAIData::Instance();
 	//評価値
@@ -483,11 +483,11 @@ float GoToTheField::EvaluationFunction()
 }
 
 
-AcquireASuperiorityGauge::AcquireASuperiorityGauge()
+SwingThreeTimesCounterClockWise::SwingThreeTimesCounterClockWise()
 {
 }
 
-void AcquireASuperiorityGauge::Init()
+void SwingThreeTimesCounterClockWise::Init()
 {
 	nowGauge = CharacterAIData::Instance()->bossData.gaugeValue;
 	timer = 0;
@@ -507,9 +507,8 @@ void AcquireASuperiorityGauge::Init()
 	countSwingNum = 0;
 }
 
-void AcquireASuperiorityGauge::Update()
+void SwingThreeTimesCounterClockWise::Update()
 {
-
 	moveToOnwGround.route = route;
 	moveToOnwGround.Update();
 	startPoint = moveToOnwGround.startPoint;
@@ -548,7 +547,7 @@ void AcquireASuperiorityGauge::Update()
 	++timer;
 }
 
-AiResult AcquireASuperiorityGauge::CurrentProgress()
+AiResult SwingThreeTimesCounterClockWise::CurrentProgress()
 {
 	if (finishFlag)
 	{
@@ -560,7 +559,7 @@ AiResult AcquireASuperiorityGauge::CurrentProgress()
 	}
 }
 
-float AcquireASuperiorityGauge::EvaluationFunction()
+float SwingThreeTimesCounterClockWise::EvaluationFunction()
 {
 	CharacterAIData *data = CharacterAIData::Instance();
 	//評価値
@@ -655,4 +654,205 @@ float AcquireASuperiorityGauge::EvaluationFunction()
 	}
 
 	return static_cast<float>(evaluationValue) / static_cast<float>(data->EVALUATION_MAX_VALUE);
+}
+
+Dash::Dash()
+{
+}
+
+void Dash::Init()
+{
+	finishFlag = false;
+	timer = 0;
+	timeOver = 60 * 5;
+}
+
+void Dash::Update()
+{
+	bool activeFlag = timeOver <= timer;
+	if (activeFlag)
+	{
+		finishFlag = true;
+		CharacterAIData::Instance()->dashFlag = true;
+	}
+
+	moveToOnwGround.route = route;
+	moveToOnwGround.Update();
+	startPoint = moveToOnwGround.startPoint;
+	endPoint = moveToOnwGround.endPoint;
+	startFlag = true;
+
+
+	++timer;
+}
+
+AiResult Dash::CurrentProgress()
+{
+	if (finishFlag)
+	{
+		return AiResult::OPERATE_SUCCESS;
+	}
+	else
+	{
+		return AiResult::OPERATE_INPROCESS;
+	}
+}
+
+float Dash::EvaluationFunction()
+{
+	return KuroFunc::GetRand(1.0f);
+}
+
+
+SwingClockWiseThreeTimes::SwingClockWiseThreeTimes()
+{
+
+}
+
+void SwingClockWiseThreeTimes::Init()
+{
+	timer = 0;
+	timeOver = 60 * 5;
+
+	crashEnemyFlag = false;
+	dontCrashFlag = false;
+
+	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
+	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
+	CharacterAIOrder::Instance()->stopFlag = false;
+	operateSwing.Init(SWING_MAX_COOL_TIME);
+
+	finishFlag = false;
+	swingingFlag = false;
+
+	countSwingNum = 0;
+}
+
+void SwingClockWiseThreeTimes::Update()
+{
+	moveToOnwGround.route = route;
+	moveToOnwGround.Update();
+	startPoint = moveToOnwGround.startPoint;
+	endPoint = moveToOnwGround.endPoint;
+	startFlag = true;
+
+
+	bool useSwingFlag = timeOver <= timer;
+
+	operateSwing.Update();
+	if (useSwingFlag)
+	{
+		if (3 <= countSwingNum && !CharacterManager::Instance()->Right()->GetNowSwing())
+		{
+			finishFlag = true;
+		}
+		else if (countSwingNum % 2 == 0 && !CharacterManager::Instance()->Right()->GetNowSwing())
+		{
+			operateSwing.SwingQuickCounterClockWise();
+			CharacterAIData::Instance()->dashCount = 0;
+			CharacterAIData::Instance()->dashTimer = 0;
+			++countSwingNum;
+		}
+		else if (countSwingNum % 2 != 0 && !CharacterManager::Instance()->Right()->GetNowSwing())
+		{
+			operateSwing.SwingQuickClockWise();
+			CharacterAIData::Instance()->dashCount = 0;
+			CharacterAIData::Instance()->dashTimer = 0;
+			++countSwingNum;
+		}
+		swingingFlag = true;
+		CharacterAIOrder::Instance()->stopFlag = true;
+	}
+
+	//戦略実行中
+	++timer;
+}
+
+AiResult SwingClockWiseThreeTimes::CurrentProgress()
+{
+	if (finishFlag)
+	{
+		return AiResult::OPERATE_SUCCESS;
+	}
+	else
+	{
+		return AiResult::OPERATE_INPROCESS;
+	}
+}
+
+float SwingClockWiseThreeTimes::EvaluationFunction()
+{
+	return KuroFunc::GetRand(1.0f);
+}
+
+
+SwingCounterClockWise::SwingCounterClockWise()
+{
+
+}
+
+void SwingCounterClockWise::Init()
+{
+	timer = 0;
+	timeOver = 60 * 5;
+
+	crashEnemyFlag = false;
+	dontCrashFlag = false;
+
+	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
+	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
+	CharacterAIOrder::Instance()->stopFlag = false;
+	operateSwing.Init(SWING_MAX_COOL_TIME);
+
+	finishFlag = false;
+	swingingFlag = false;
+
+	countSwingNum = 0;
+}
+
+void SwingCounterClockWise::Update()
+{
+	moveToOnwGround.route = route;
+	moveToOnwGround.Update();
+	startPoint = moveToOnwGround.startPoint;
+	endPoint = moveToOnwGround.endPoint;
+	startFlag = true;
+
+
+	bool useSwingFlag = timeOver <= timer;
+	operateSwing.Update();
+	if (useSwingFlag)
+	{
+		if (operateSwing.SwingCounterClockWise() == AiResult::OPERATE_SUCCESS)
+		{
+			//連続で振り回すのを防止する為ダッシュカウントをリセットする
+			CharacterAIData::Instance()->dashCount = 0;
+			CharacterAIData::Instance()->dashTimer = 0;
+		}
+		//振り回し終わったら次の戦略に移動する
+		else if (!CharacterManager::Instance()->Right()->GetNowSwing())
+		{
+			finishFlag = true;
+			CharacterAIOrder::Instance()->prevSwingFlag = false;
+		}
+	}
+	//戦略実行中
+	++timer;
+}
+
+AiResult SwingCounterClockWise::CurrentProgress()
+{
+	if (finishFlag)
+	{
+		return AiResult::OPERATE_SUCCESS;
+	}
+	else
+	{
+		return AiResult::OPERATE_INPROCESS;
+	}
+}
+
+float SwingCounterClockWise::EvaluationFunction()
+{
+	return KuroFunc::GetRand(1.0f);
 }

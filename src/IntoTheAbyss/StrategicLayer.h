@@ -123,10 +123,10 @@ private:
 /// <summary>
 /// 自陣に向かう
 /// </summary>
-class GoToTheField :public IStrategicLayer
+class SwingClockWise :public IStrategicLayer
 {
 public:
-	GoToTheField();
+	SwingClockWise();
 
 	void Init()override;
 
@@ -159,10 +159,10 @@ private:
 /// <summary>
 /// 優勢ゲージを獲得する
 /// </summary>
-class AcquireASuperiorityGauge :public IStrategicLayer
+class SwingThreeTimesCounterClockWise :public IStrategicLayer
 {
 public:
-	AcquireASuperiorityGauge();
+	SwingThreeTimesCounterClockWise();
 
 	void Init()override;
 
@@ -197,5 +197,100 @@ private:
 	int countSwingNum;
 	bool swingingFlag;
 	bool finishFlag;
+};
 
+class Dash :public IStrategicLayer
+{
+public:
+	Dash();
+
+	void Init()override;
+
+	/// <summary>
+	/// 実行
+	/// </summary>
+	void Update()override;
+
+	void Draw()override {};
+
+	/// <summary>
+	/// 現在実行している処理の進捗
+	/// </summary>
+	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
+	AiResult CurrentProgress()override;
+
+	float EvaluationFunction()override;
+	MoveToOwnGround moveToOnwGround;
+private:
+	OperateDash dash;
+	bool finishFlag;
+
+};
+
+class SwingClockWiseThreeTimes :public IStrategicLayer
+{
+public:
+	SwingClockWiseThreeTimes();
+
+	void Init()override;
+	
+	void Update()override;
+	
+	void Draw()override {};
+
+	/// <summary>
+	/// 現在実行している処理の進捗
+	/// </summary>
+	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
+	AiResult CurrentProgress()override;
+
+	float EvaluationFunction()override;
+private:
+	//クラッシュさせる--------------------------
+	bool crashEnemyFlag;
+	int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
+
+	OperateSwing operateSwing;
+	MoveToOwnGround moveToOnwGround;
+
+	//クラッシュされないようにする--------------------------
+	bool dontCrashFlag;
+
+	int countSwingNum;
+	bool swingingFlag;
+	bool finishFlag;
+};
+
+class SwingCounterClockWise :public IStrategicLayer
+{
+public:
+	SwingCounterClockWise();
+
+	void Init()override;
+
+	void Update()override;
+
+	void Draw()override {};
+
+	/// <summary>
+	/// 現在実行している処理の進捗
+	/// </summary>
+	/// <returns>FAIL...失敗,INPROCESS...実行中,SUCCESS...成功</returns>
+	AiResult CurrentProgress()override;
+
+	float EvaluationFunction()override;
+private:
+	//クラッシュさせる--------------------------
+	bool crashEnemyFlag;
+	int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
+
+	OperateSwing operateSwing;
+	MoveToOwnGround moveToOnwGround;
+
+	//クラッシュされないようにする--------------------------
+	bool dontCrashFlag;
+
+	int countSwingNum;
+	bool swingingFlag;
+	bool finishFlag;
 };

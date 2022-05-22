@@ -10,47 +10,66 @@ CharacterAI::CharacterAI()
 	initFlag = false;
 	useAiFlag = false;
 
-
-
-
-
 	std::vector<BehaviorGraphData>data;
-	data.resize(3);
+	data.resize(5);
 
 	std::string pass = "resource/ChainCombat/boss/behaviorPrediction/";
 	std::string pass2 = "resource/ChainCombat/boss/0/icon/";
 	int dataArrayNum = 0;
 	int roopNum = 10;
+	//ダッシュ
+	{
+		const int GRAPH_NUM = 3;
+		data[STRATEGY_SWING_DASH].handle.graph.resize(GRAPH_NUM);
+		data[STRATEGY_SWING_DASH].handle.interval = roopNum;
+		data[STRATEGY_SWING_DASH].handle.loop = true;
+		data[STRATEGY_SWING_DASH].cautionFlag = false;
+		TexHandleMgr::LoadDivGraph(pass + "dash.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+	}
+
+	++dataArrayNum;
 	//時計回り振り回し
 	{
 		const int GRAPH_NUM = 3;
-		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
-		data[dataArrayNum].handle.interval = roopNum;
-		data[dataArrayNum].handle.loop = true;
-		data[dataArrayNum].cautionFlag = false;
+		data[STRATEGY_SWING_CLOCKWISE].handle.graph.resize(GRAPH_NUM);
+		data[STRATEGY_SWING_CLOCKWISE].handle.interval = roopNum;
+		data[STRATEGY_SWING_CLOCKWISE].handle.loop = true;
+		data[STRATEGY_SWING_CLOCKWISE].cautionFlag = false;
 		TexHandleMgr::LoadDivGraph(pass + "clock_swing.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
 	}
+
+	++dataArrayNum;
+	//反時計周り振り回し
+	{
+		const int GRAPH_NUM = 3;
+		data[STRATEGY_SWING_COUNTERCLOCKWISE].handle.graph.resize(GRAPH_NUM);
+		data[STRATEGY_SWING_COUNTERCLOCKWISE].handle.interval = roopNum;
+		data[STRATEGY_SWING_COUNTERCLOCKWISE].handle.loop = true;
+		data[STRATEGY_SWING_COUNTERCLOCKWISE].cautionFlag = false;
+		TexHandleMgr::LoadDivGraph(pass + "un_clock_swing.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+	}
+
 
 	++dataArrayNum;
 	//三連撃時計振り回し
 	{
 		const int GRAPH_NUM = 6;
-		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
-		data[dataArrayNum].handle.interval = roopNum;
-		data[dataArrayNum].handle.loop = true;
-		data[dataArrayNum].cautionFlag = true;
-		TexHandleMgr::LoadDivGraph(pass2 + "un_clock_swing_triple.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+		data[STRATEGY_SWING_3TIMES_CLOCKWISE].handle.graph.resize(GRAPH_NUM);
+		data[STRATEGY_SWING_3TIMES_CLOCKWISE].handle.interval = roopNum;
+		data[STRATEGY_SWING_3TIMES_CLOCKWISE].handle.loop = true;
+		data[STRATEGY_SWING_3TIMES_CLOCKWISE].cautionFlag = true;
+		TexHandleMgr::LoadDivGraph(pass2 + "clock_swing_triple.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
 	}
 
 	++dataArrayNum;
-	//反時計回り振り回し
+	//三連撃反時計回り振り回し
 	{
-		const int GRAPH_NUM = 3;
-		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
-		data[dataArrayNum].handle.interval = roopNum;
-		data[dataArrayNum].handle.loop = true;
-		data[dataArrayNum].cautionFlag = true;
-		TexHandleMgr::LoadDivGraph(pass + "un_clock_swing.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+		const int GRAPH_NUM = 6;
+		data[STRATEGY_SWING_3TIMES_COUNTERCLOCKWISE].handle.graph.resize(GRAPH_NUM);
+		data[STRATEGY_SWING_3TIMES_COUNTERCLOCKWISE].handle.interval = roopNum;
+		data[STRATEGY_SWING_3TIMES_COUNTERCLOCKWISE].handle.loop = true;
+		data[STRATEGY_SWING_3TIMES_COUNTERCLOCKWISE].cautionFlag = true;
+		TexHandleMgr::LoadDivGraph(pass2 + "un_clock_swing_triple.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
 	}
 	behaviorGauge = std::make_unique<BehaviorPredection>(data);
 }
@@ -61,13 +80,16 @@ void CharacterAI::Init()
 	{
 		//戦略層の生成--------------------------
 		//strategyArray[STRATEGY_RESTORE_STAMINA] = std::make_unique<RestoreStamina>();
-		strategyArray[STRATEGY_GO_TO_THE_FIELD] = std::make_unique<GoToTheField>();
-		strategyArray[STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE] = std::make_unique<AcquireASuperiorityGauge>();
+		strategyArray[STRATEGY_SWING_3TIMES_COUNTERCLOCKWISE] = std::make_unique<SwingThreeTimesCounterClockWise>();
+		strategyArray[STRATEGY_SWING_3TIMES_CLOCKWISE] = std::make_unique<SwingClockWiseThreeTimes>();
+		strategyArray[STRATEGY_SWING_COUNTERCLOCKWISE] = std::make_unique<SwingCounterClockWise>();
+		strategyArray[STRATEGY_SWING_CLOCKWISE] = std::make_unique<SwingClockWise>();
+		strategyArray[STRATEGY_SWING_DASH] = std::make_unique<Dash>();
 		//戦略層の生成--------------------------
 	}
 	initFlag = true;
 	useAiFlag = true;
-	strategyOfChoice = STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE;
+	strategyOfChoice = STRATEGY_SWING_3TIMES_COUNTERCLOCKWISE;
 	startFlag = false;
 	CharacterAIData::Instance()->dashTimer = 0;
 	startDashFlag = false;
@@ -162,10 +184,10 @@ void CharacterAI::Update()
 				}
 			}
 			strategyOfChoice = selecting;
+			strategyOfChoice = STRATEGY_SWING_DASH;
 			strategyArray[strategyOfChoice]->Init();
 		}
 		//意思決定--------------------------
-
 
 		strategyArray[strategyOfChoice]->route = shortestData;
 		if (!CharacterManager::Instance()->Right()->GetNowBreak())
