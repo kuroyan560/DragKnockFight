@@ -678,8 +678,8 @@ void Game::Draw()
 		playerHandMgr->Draw();
 	}
 
-	playerHomeBase.Draw();
-	enemyHomeBase.Draw();
+	//playerHomeBase.Draw();
+	//enemyHomeBase.Draw();
 
 	// スタミナアイテムの描画処理
 	StaminaItemMgr::Instance()->Draw();

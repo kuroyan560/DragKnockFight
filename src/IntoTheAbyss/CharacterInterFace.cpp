@@ -574,48 +574,48 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	}*/
 
 	// 体幹ゲージをデフォルトに戻すタイマーが0だったら
-	if (gaugeReturnTimer <= 0 && !GetNowBreak()) {
+	//if (gaugeReturnTimer <= 0 && !GetNowBreak()) {
 
-		static const int DEF_GAUGE = 50;
-		static const float RETURN_AMOUNT = 0.1f;
+	//	static const int DEF_GAUGE = 50;
+	//	static const float RETURN_AMOUNT = 0.1f;
 
-		// 右側のチームで、右側のゲージ量がデフォルト以下だったら右側のゲージを足す。
-		float nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeValue;
-		if (GetWhichTeam() == RIGHT_TEAM && nowGaugeValue < DEF_GAUGE) {
+	//	// 右側のチームで、右側のゲージ量がデフォルト以下だったら右側のゲージを足す。
+	//	float nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeValue;
+	//	if (GetWhichTeam() == RIGHT_TEAM && nowGaugeValue < DEF_GAUGE) {
 
-			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, RETURN_AMOUNT);
+	//		SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, RETURN_AMOUNT);
 
-			// 足す過程で限界を超えないようにする。
-			nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeValue;
-			if (DEF_GAUGE < nowGaugeValue) {
+	//		// 足す過程で限界を超えないようにする。
+	//		nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).gaugeValue;
+	//		if (DEF_GAUGE < nowGaugeValue) {
 
-				SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DEF_GAUGE - nowGaugeValue);
+	//			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DEF_GAUGE - nowGaugeValue);
 
-			}
-		}
+	//		}
+	//	}
 
-		// 左側のチームで、左側のゲージ量がデフォルト以下だったら左側のゲージを足す。
-		nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeValue;
-		if (GetWhichTeam() == LEFT_TEAM && nowGaugeValue < DEF_GAUGE) {
+	//	// 左側のチームで、左側のゲージ量がデフォルト以下だったら左側のゲージを足す。
+	//	nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeValue;
+	//	if (GetWhichTeam() == LEFT_TEAM && nowGaugeValue < DEF_GAUGE) {
 
-			SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, RETURN_AMOUNT);
+	//		SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, RETURN_AMOUNT);
 
-			// 足す過程で限界を超えないようにする。
-			nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeValue;
-			if (DEF_GAUGE < nowGaugeValue) {
+	//		// 足す過程で限界を超えないようにする。
+	//		nowGaugeValue = SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).gaugeValue;
+	//		if (DEF_GAUGE < nowGaugeValue) {
 
-				SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DEF_GAUGE - nowGaugeValue);
+	//			SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DEF_GAUGE - nowGaugeValue);
 
-			}
+	//		}
 
-		}
+	//	}
 
-	}
-	else {
+	//}
+	//else {
 
-		--gaugeReturnTimer;
+	//	--gaugeReturnTimer;
 
-	}
+	//}
 
 	if (team == WHICH_TEAM::LEFT_TEAM) {
 
