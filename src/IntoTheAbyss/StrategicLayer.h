@@ -194,7 +194,7 @@ private:
 	//ƒNƒ‰ƒbƒVƒ…‚³‚ê‚È‚¢‚æ‚¤‚É‚·‚é--------------------------
 	bool dontCrashFlag;
 
-
+	int countSwingNum;
 	bool finishFlag;
 
 };

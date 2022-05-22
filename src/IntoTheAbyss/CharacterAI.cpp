@@ -23,7 +23,7 @@ void CharacterAI::Init()
 	}
 	initFlag = true;
 	useAiFlag = true;
-	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
+	strategyOfChoice = STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE;
 	startFlag = false;
 	CharacterAIData::Instance()->dashTimer = 0;
 	startDashFlag = false;

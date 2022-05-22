@@ -189,7 +189,7 @@ void RestoreStamina::Draw()
 	RoomMapChipArray mapData = *StageMgr::Instance()->GetLocalMap();
 	float mapX = mapData[0].size() * 50.0f;
 
-		float position = CharacterManager::Instance()->Right()->pos.x / mapX;
+	float position = CharacterManager::Instance()->Right()->pos.x / mapX;
 	float rate = 1.0f;
 	//ポジションゲージが0.5以下の場合、敵陣に近づいている事のなので座標を動かす準備をする
 	if (position <= 0.5f)
@@ -518,23 +518,25 @@ void AcquireASuperiorityGauge::Update()
 	operateSwing.Update();
 	if (useSwingFlag)
 	{
-		if (operateSwing.SwingCounterClockWise() == AiResult::OPERATE_SUCCESS)
-		{
-			//連続で振り回すのを防止する為ダッシュカウントをリセットする
-			CharacterAIData::Instance()->dashCount = 0;
-			CharacterAIData::Instance()->dashTimer = 0;
-		}
-		else if (!CharacterManager::Instance()->Right()->GetNowSwing())
+		if (3 <= countSwingNum && !CharacterManager::Instance()->Right()->GetNowSwing())
 		{
 			finishFlag = true;
-			CharacterAIOrder::Instance()->prevSwingFlag = false;
+		}
+		else if (countSwingNum % 2 == 0 && !CharacterManager::Instance()->Right()->GetNowSwing())
+		{
+			operateSwing.SwingQuickClockWise();
+			CharacterAIData::Instance()->dashCount = 0;
+			CharacterAIData::Instance()->dashTimer = 0;
+			++countSwingNum;
+		}
+		else if (countSwingNum % 2 != 0 && !CharacterManager::Instance()->Right()->GetNowSwing())
+		{
+			operateSwing.SwingQuickCounterClockWise();
+			CharacterAIData::Instance()->dashCount = 0;
+			CharacterAIData::Instance()->dashTimer = 0;
+			++countSwingNum;
 		}
 	}
-	else if (!CharacterManager::Instance()->Right()->GetNowSwing())
-	{
-		CharacterAIOrder::Instance()->prevSwingFlag = false;
-	}
-
 
 	//戦略実行中
 	++timer;

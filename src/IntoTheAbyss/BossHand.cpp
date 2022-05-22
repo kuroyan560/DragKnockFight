@@ -6,8 +6,8 @@
 #include"../IntoTheAbyss/CharacterAIData.h"
 #include"../IntoTheAbyss/CharacterManager.h"
 
-BossHand::BossHand(int HANDLE, int HOLD_HANDLE) :graphHandle(HANDLE), holdGraphHandle(HOLD_HANDLE),
-radian(0.0f), centralPos({ 0.0f,0.0f }), pos({ 0.0f,0.0f }), size({ 1.0f,1.0f })
+BossHand::BossHand(int HANDLE, int HOLD_HANDLE, bool SHAKE_FLAG) :graphHandle(HANDLE), holdGraphHandle(HOLD_HANDLE),
+radian(0.0f), centralPos({ 0.0f,0.0f }), pos({ 0.0f,0.0f }), size({ 1.0f,1.0f }), shakeFlag(SHAKE_FLAG)
 {
 	count = 0;
 	nowHnadle = graphHandle;
@@ -35,8 +35,11 @@ void BossHand::Update(const Vec2<float> &POS, float RADIUS, float ANGLE, bool HO
 	radian = ANGLE;
 
 	
-	//Vec2<float> shakeAmount = CharacterManager::Instance()->Right()->shakeValue;
 	Vec2<float> shakeAmount = { 0.0f,0.0f };
+	if (shakeFlag)
+	{
+		shakeAmount = CharacterManager::Instance()->Right()->shakeValue;
+	}
 	pos = centralPos + Vec2<float>((cosf(radian) * RADIUS) + shakeAmount.x, (sinf(radian) * RADIUS) + shakeAmount.y);
 }
 
