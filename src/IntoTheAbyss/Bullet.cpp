@@ -71,6 +71,8 @@ void Bullet::Update()
 
 	/*-- XVˆ— --*/
 
+	if (!isActive) return;
+
 	// ˆÚ“®‚³‚¹‚éB
 
 	if (isFirstFrame) {
@@ -95,6 +97,8 @@ void Bullet::Draw()
 {
 
 	/*-- •`‰æˆ— --*/
+
+	if (!isActive) return;
 
 	//SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
 

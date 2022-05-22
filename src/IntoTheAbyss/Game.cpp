@@ -478,40 +478,36 @@ void Game::Update(const bool& Loop)
 #pragma region 当たり判定
 
 	//左弾と右プレイヤーの判定
-	auto& leftBulMgr = CharacterManager::Instance()->Left()->GetBulletMgr();
-	for (int index = 0; index < leftBulMgr.bullets.size(); ++index)
+	for (int index = 0; index < CharacterManager::Instance()->Left()->GetBulletMgr().bullets.size(); ++index)
 	{
-		auto& bul = leftBulMgr.bullets[index];
-		if (!bul.isActive)continue;
+		if (!CharacterManager::Instance()->Left()->GetBulletMgr().bullets[index].isActive)continue;
 
-		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
+		std::shared_ptr<SphereCollision> bulCol = CharacterManager::Instance()->Left()->GetBulletMgr().bullets[index].bulletHitBox;
 		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bulCol, CharacterManager::Instance()->Right()->GetBulletHitSphere());
 
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
 		if (hitFlag)
 		{
 			SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
-			bul.Init();
+			CharacterManager::Instance()->Left()->GetBulletMgr().bullets[index].Init();
 			CharacterManager::Instance()->Right()->Damage();
 		}
 	}
 
 	//右弾と左プレイヤーの判定
-	auto rightBulMgr = CharacterManager::Instance()->Right()->GetBulletMgr();
 	static int DAMAGED_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/damaged.wav", 0.7f);
-	for (int index = 0; index < rightBulMgr.bullets.size(); ++index)
+	for (int index = 0; index < CharacterManager::Instance()->Right()->GetBulletMgr().bullets.size(); ++index)
 	{
-		auto& bul = rightBulMgr.bullets[index];
-		if (!bul.isActive)continue;
+		if (!CharacterManager::Instance()->Right()->GetBulletMgr().bullets[index].isActive)continue;
 
-		std::shared_ptr<SphereCollision> bulCol = bul.bulletHitBox;
+		std::shared_ptr<SphereCollision> bulCol = CharacterManager::Instance()->Right()->GetBulletMgr().bullets[index].bulletHitBox;
 		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bulCol, CharacterManager::Instance()->Left()->GetBulletHitSphere());
 
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
 		if (hitFlag)
 		{
 			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
-			bul.Init();
+			CharacterManager::Instance()->Right()->GetBulletMgr().bullets[index].Init();
 			CharacterManager::Instance()->Left()->Damage();
 			AudioApp::Instance()->PlayWave(DAMAGED_SE);
 		}
