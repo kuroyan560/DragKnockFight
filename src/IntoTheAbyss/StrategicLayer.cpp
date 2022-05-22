@@ -184,6 +184,7 @@ void RestoreStamina::Update()
 
 	//戦略実行からの経過時間
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 void RestoreStamina::Draw()
@@ -370,6 +371,7 @@ void SwingClockWise::Update()
 	}
 
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 AiResult SwingClockWise::CurrentProgress()
@@ -544,6 +546,7 @@ void SwingThreeTimesCounterClockWise::Update()
 
 	//戦略実行中
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 AiResult SwingThreeTimesCounterClockWise::CurrentProgress()
@@ -689,6 +692,7 @@ void Dash::Update()
 	}
 
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 AiResult Dash::CurrentProgress()
@@ -770,6 +774,7 @@ void SwingClockWiseThreeTimes::Update()
 
 	//戦略実行中
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 AiResult SwingClockWiseThreeTimes::CurrentProgress()
@@ -841,6 +846,7 @@ void SwingCounterClockWise::Update()
 	}
 	//戦略実行中
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 AiResult SwingCounterClockWise::CurrentProgress()
