@@ -5,6 +5,7 @@
 #include"BehavioralLayer.h"
 #include"OperatingLayer.h"
 #include<memory>
+#include"BehaviorPredection.h"
 
 enum AiStrategy
 {
@@ -45,4 +46,6 @@ public:
 
 
 	bool startDashFlag;
+
+	std::unique_ptr<BehaviorPredection> behaviorGauge;
 };

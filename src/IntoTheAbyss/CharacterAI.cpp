@@ -9,6 +9,10 @@ CharacterAI::CharacterAI()
 	startTimer = 0;
 	initFlag = false;
 	useAiFlag = false;
+
+
+
+	//behaviorGauge = std::make_unique<BehaviorPredection>();
 }
 
 void CharacterAI::Init()
@@ -143,6 +147,9 @@ void CharacterAI::Update()
 
 	float rate = strategyArray[strategyOfChoice]->GetGaugeStatus();
 
+	behaviorGauge->Update(CharacterManager::Instance()->Right()->pos, strategyOfChoice);
+
+
 
 }
 
@@ -157,4 +164,6 @@ void CharacterAI::Draw()
 		}
 	}
 #endif
+
+	behaviorGauge->Draw();
 }

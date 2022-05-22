@@ -3,7 +3,7 @@
 #include"SceneCange.h"
 #include"ScreenEdgeEffect.h"
 #include"PictureStory.h"
-#include"BossHandMgr.h"
+#include"BehaviorPredection.h"
 
 class TitleScene : public BaseScene
 {
@@ -49,7 +49,8 @@ private:
 	bool tutorialYes = true;
 
 	//std::unique_ptr<BossHandMgr> handMgr;
-
+	std::unique_ptr<BehaviorPredection> behavior;
+	int behaviorNum;
 public:
 	TitleScene();
 	void OnInitialize()override;
