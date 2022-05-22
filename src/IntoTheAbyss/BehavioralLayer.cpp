@@ -68,6 +68,7 @@ void MovingBetweenTwoPoints::Update()
 	{
 		operateDash.Init(vel / 2.0f);
 		CharacterAIOrder::Instance()->dashFlag = true;
+		CharacterAIData::Instance()->finishDashFlag = true;
 		CharacterManager::Instance()->Right()->staminaGauge->ConsumesStamina(DebugParameter::Instance()->GetBossData().staminaDash);
 		dashTimer = 0;
 		dashFlag = false;

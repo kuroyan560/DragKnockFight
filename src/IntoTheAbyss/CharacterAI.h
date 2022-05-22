@@ -33,6 +33,8 @@ public:
 	void Update();
 	void Draw();
 
+	void UpdateGauge();
+
 	std::vector<WayPointData> shortestData;
 
 	std::array<std::unique_ptr<IStrategicLayer>, STRATEGY_MAX> strategyArray;

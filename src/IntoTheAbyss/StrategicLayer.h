@@ -224,6 +224,7 @@ public:
 private:
 	OperateDash dash;
 	bool finishFlag;
+	bool initDashFlag;
 
 };
 

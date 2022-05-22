@@ -97,6 +97,8 @@ void RestoreStamina::Init()
 	staminaGauge = CharacterAIData::Instance()->bossData.stamineGauge;
 	timer = 0;
 	timeOver = 60 * 10;
+
+	CharacterAIOrder::Instance()->Init();
 }
 
 void RestoreStamina::Update()
@@ -323,9 +325,8 @@ void SwingClockWise::Init()
 	timeOver = 60 * 5;
 	startFlag = false;
 	goToTheFieldFlag = true;
-	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
-	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
-	CharacterAIOrder::Instance()->stopFlag = false;
+
+	CharacterAIOrder::Instance()->Init();
 	finishFlag = false;
 	operateSwing.Init(SWING_MAX_COOL_TIME);
 }
@@ -496,9 +497,7 @@ void SwingThreeTimesCounterClockWise::Init()
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
 
-	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
-	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
-	CharacterAIOrder::Instance()->stopFlag = false;
+	CharacterAIOrder::Instance()->Init();
 	operateSwing.Init(SWING_MAX_COOL_TIME);
 
 	finishFlag = false;
@@ -665,15 +664,17 @@ void Dash::Init()
 	finishFlag = false;
 	timer = 0;
 	timeOver = 60 * 5;
+	initDashFlag = false;
+	CharacterAIOrder::Instance()->Init();
 }
 
 void Dash::Update()
 {
 	bool activeFlag = timeOver <= timer;
-	if (activeFlag)
+	if (activeFlag && !initDashFlag)
 	{
-		finishFlag = true;
 		CharacterAIData::Instance()->dashFlag = true;
+		initDashFlag = true;
 	}
 
 	moveToOnwGround.route = route;
@@ -682,6 +683,10 @@ void Dash::Update()
 	endPoint = moveToOnwGround.endPoint;
 	startFlag = true;
 
+	if (CharacterAIData::Instance()->finishDashFlag)
+	{
+		finishFlag = true;
+	}
 
 	++timer;
 }
@@ -717,9 +722,8 @@ void SwingClockWiseThreeTimes::Init()
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
 
-	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
-	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
-	CharacterAIOrder::Instance()->stopFlag = false;
+
+	CharacterAIOrder::Instance()->Init();
 	operateSwing.Init(SWING_MAX_COOL_TIME);
 
 	finishFlag = false;
@@ -799,9 +803,8 @@ void SwingCounterClockWise::Init()
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
 
-	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
-	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
-	CharacterAIOrder::Instance()->stopFlag = false;
+
+	CharacterAIOrder::Instance()->Init();
 	operateSwing.Init(SWING_MAX_COOL_TIME);
 
 	finishFlag = false;

@@ -147,6 +147,8 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	shakeValue = { (nomal.x * countDown) * 10.0f,(nomal.y * countDown) * 10.0f };
 
 
+	characterAi.UpdateGauge();
+
 
 	if (GetNowSwing())
 	{

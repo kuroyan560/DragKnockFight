@@ -36,6 +36,8 @@ public:
 	int dashCount;
 	int dashTimer;
 
+	bool finishDashFlag;
+
 	float swingClockwiseDistance;
 	float swingCounterClockwiseDistance;
 
@@ -72,6 +74,7 @@ public:
 		startAiFlag = false;
 		prevSwingFlag = false;
 		stopFlag = false;
+		swingThreeTimesFlag = false;
 		prevRate = 0.0f;
 	};
 };

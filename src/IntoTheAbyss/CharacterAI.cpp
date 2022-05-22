@@ -160,7 +160,7 @@ void CharacterAI::Update()
 		startDashFlag = false;
 	}
 
-
+	CharacterAIData::Instance()->finishDashFlag = false;
 
 	//キャラクターAIに必要なデータ集め--------------------------
 
@@ -184,7 +184,6 @@ void CharacterAI::Update()
 				}
 			}
 			strategyOfChoice = selecting;
-			//strategyOfChoice = STRATEGY_SWING_DASH;
 			strategyArray[strategyOfChoice]->Init();
 		}
 		//意思決定--------------------------
@@ -205,12 +204,6 @@ void CharacterAI::Update()
 		endPoint = strategyArray[strategyOfChoice]->endPoint;
 		startFlag = strategyArray[strategyOfChoice]->startFlag;
 		CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
-
-
-		float rate = strategyArray[strategyOfChoice]->GetGaugeStatus();
-
-		Vec2<float>adjPos = { 0.0f,-120.0f };
-		behaviorGauge->Update(CharacterManager::Instance()->Right()->pos + adjPos, strategyOfChoice, rate);
 	}
 
 
@@ -231,5 +224,15 @@ void CharacterAI::Draw()
 	if (useAiFlag)
 	{
 		behaviorGauge->Draw(false);
+	}
+}
+
+void CharacterAI::UpdateGauge()
+{
+	if (useAiFlag)
+	{
+		float rate = strategyArray[strategyOfChoice]->GetGaugeStatus();
+		Vec2<float>adjPos = { 0.0f,-120.0f };
+		behaviorGauge->Update(CharacterManager::Instance()->Right()->pos + adjPos, strategyOfChoice, rate);
 	}
 }
