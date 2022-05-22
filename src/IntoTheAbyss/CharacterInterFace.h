@@ -65,6 +65,9 @@ private:
 	bool initPaticleFlag;
 	int moveTimer;
 
+	//スタミナ回復時オーラ
+	float healAuraEaseRate = 0.0f;
+
 
 protected:
 	BulletMgrBase bulletMgr;
@@ -128,6 +131,7 @@ protected:
 	virtual void OnPilotLeave() = 0;	//パイロットがロボから離れた瞬間
 	virtual void OnPilotControl() = 0;		//パイロットを動かす処理
 	virtual void OnPilotReturn() = 0;	//パイロットがロボに戻った瞬間
+	virtual void OnStaminaHeal(const int& HealAmount) = 0;
 
 	//[共通関数]
 	//振り回し
@@ -258,6 +262,6 @@ public:
 	// マップチップが指定のインデックスだったら指定の値に塗り替える。 上下左右も。
 	void OverWriteMapChipValueAround(const Vec2<int>& MapChipIndex, const MapChipType& DstType, const MapChipData& SrcData);
 
-
+	void HealStamina(const int& HealAmount);
 };
 

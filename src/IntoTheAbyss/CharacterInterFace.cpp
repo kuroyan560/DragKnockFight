@@ -424,6 +424,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	staminaGauge->SetColor(innerColor, outerColor);
 
 	prevSwingFlag = false;
+
+	healAuraEaseRate = 1.0f;
 }
 
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
@@ -632,6 +634,21 @@ void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 	}
 	OnDraw(isRoundStartEffect);
 
+	static int HEAL_GRAPH[TEAM_NUM] = { 0 };
+	if (!HEAL_GRAPH[0])
+	{
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/healAura.png", TEAM_NUM, { TEAM_NUM,1 }, HEAL_GRAPH);
+	}
+	if (healAuraEaseRate < 1.0f)
+	{
+		healAuraEaseRate += 0.02f;
+		if (1.0f < healAuraEaseRate)healAuraEaseRate = 1.0f;
+	}
+	float auraAlpha = KuroMath::Ease(In, Cubic, healAuraEaseRate, 1.0f, 0.0f);
+	float exp = ScrollMgr::Instance()->zoom;
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(HEAL_GRAPH[team]), Color(1.0f, 1.0f, 1.0f, auraAlpha),
+		{ 0.5f,0.5f }, { false,false }, AlphaBlendMode_Add);
+
 	static const int LINE_GRAPH[TEAM_NUM] =
 	{
 		TexHandleMgr::LoadGraph("resource/ChainCombat/chain_player.png"),
@@ -659,7 +676,7 @@ void CharacterInterFace::DrawUI()
 	static Color GAUGE_COLOR[TEAM_NUM] = { Color(47,255,139,255),Color(239,1,144,255) };
 	static Color GAUGE_SHADOW_COLOR[TEAM_NUM] = { Color(41,166,150,255),Color(162,27,108,255) };
 
-	if (CharacterManager::Instance()->Right()->GetCharacterName() != PLAYABLE_BOSS_0)
+	if (GetCharacterName() != PLAYABLE_BOSS_0)
 	{
 		staminaGauge->Draw(pos);
 	}
@@ -1242,6 +1259,13 @@ void CharacterInterFace::FinishSwing()
 	addSwingAngle = 0;
 	swingTimer = 0;
 
+}
+
+void CharacterInterFace::HealStamina(const int& HealAmount)
+{
+	if (HealAmount)healAuraEaseRate = 0.0f;
+	staminaGauge->AddStamina(HealAmount);
+	OnStaminaHeal(HealAmount);
 }
 
 void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int>& MapChipIndex, const MapChipType& DstType, const MapChipData& SrcData)
