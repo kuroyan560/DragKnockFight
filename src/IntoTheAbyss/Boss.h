@@ -60,8 +60,6 @@ public:
 	Vec2<float>pointPos;
 	float angle;
 
-	int healCount;
-
 public:
 	/*===== ’è” =====*/
 
@@ -109,7 +107,6 @@ private:
 	{
 		CharacterAIData::Instance()->addTimer = HealAmount;
 	};
-
 
 	void Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed);
 
