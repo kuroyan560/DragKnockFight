@@ -1,7 +1,7 @@
-#include "CircularBarrage.h"
+#include "WhirlpoolBarrage.h"
 #include "BulletMgrBase.h"
 
-void CircularBarrage::Start()
+void WhirlpoolBarrage::Start()
 {
 
 	/*===== ‰Šú‰»ˆ— =====*/
@@ -13,7 +13,7 @@ void CircularBarrage::Start()
 
 }
 
-void CircularBarrage::Init()
+void WhirlpoolBarrage::Init()
 {
 
 	isEnd = true;
@@ -23,7 +23,7 @@ void CircularBarrage::Init()
 
 }
 
-bool CircularBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const int& GraphHandle)
+bool WhirlpoolBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const int& GraphHandle)
 {
 
 	/*===== XVˆ— =====*/

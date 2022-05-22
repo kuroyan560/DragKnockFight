@@ -2,7 +2,7 @@
 #include "BarrageBase.h"
 
 // ‰~Œ`’e–‹ƒNƒ‰ƒX
-class CircularBarrage : public BarrageBase {
+class WhirlpoolBarrage : public BarrageBase {
 
 private:
 

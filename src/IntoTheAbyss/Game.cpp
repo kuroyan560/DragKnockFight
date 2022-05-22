@@ -385,7 +385,7 @@ void Game::Init(const bool& PracticeMode)
 
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 
-	testBarrage = std::make_unique<CircularBarrage>();
+	testBarrage = std::make_unique<WhirlpoolBarrage>();
 	testBarrage->Init();
 	testBulletMgr.Init();
 
