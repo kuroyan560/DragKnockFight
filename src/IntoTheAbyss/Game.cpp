@@ -474,10 +474,16 @@ void Game::Update(const bool& Loop)
 	// スタン演出クラスの更新処理
 	StunEffect::Instance()->Update();
 
-	if(UsersInput::Instance()->KeyInput(DIK_P)){
-	
+	if (UsersInput::Instance()->KeyOnTrigger(DIK_P)) {
+
 		testBarrage->Start();
-	
+
+	}
+	if (UsersInput::Instance()->KeyOnTrigger(DIK_O)) {
+
+		testBarrage = std::make_unique<CircularBarrage>();
+		testBarrage->Init();
+
 	}
 
 	static const int BOSS_BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");

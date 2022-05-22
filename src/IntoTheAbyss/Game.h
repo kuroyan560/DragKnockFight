@@ -28,6 +28,7 @@ class RenderTarget;
 #include"BossHandMgr.h"
 
 #include "WhirlpoolBarrage.h"
+#include "CircularBarrage.h"
 
 class CharacterInterFace;
 
