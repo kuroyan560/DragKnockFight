@@ -189,7 +189,6 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	FIRST_RECOIL_AMOUNT = data->FIRST_RECOIL_AMOUNT;
 	MAX_RECOIL_AMOUNT = data->MAX_RECOIL_AMOUNT;*/
 
-
 	CharacterAIData::Instance()->playerData.dashStamina = DASH_STAMINA;
 	CharacterAIData::Instance()->playerData.swingStamina = SWING_STAMINA;
 

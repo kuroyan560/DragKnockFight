@@ -591,7 +591,6 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 				SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DEF_GAUGE - nowGaugeValue);
 
 			}
-
 		}
 
 		// 左側のチームで、左側のゲージ量がデフォルト以下だったら左側のゲージを足す。
@@ -1090,7 +1089,16 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				//CrashMgr::Instance()->Crash(pos, crashDevice, ext);
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
-				SuperiorityGauge::Instance()->AddGauge(team, -10);
+
+				if (GetCharacterName() == PLAYABLE_BOSS_0)
+				{
+					SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->GetBossData().damage);
+				}
+				else
+				{
+					SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->playerData[0].damage);
+				}
+
 				partner.lock()->FinishSwing();
 
 				// チームに応じてクラッシュ数を加算する変数を変える。
