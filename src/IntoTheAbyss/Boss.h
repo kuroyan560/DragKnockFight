@@ -15,6 +15,9 @@ using namespace std;
 #include"PlayerAnimation.h"
 #include"BossHandMgr.h"
 
+#include"BulletMgrBase.h"
+#include"Barrages.h"
+
 // プレイヤーと引っ張り合うボスクラス
 class Boss : public CharacterInterFace
 {
@@ -60,6 +63,7 @@ public:
 	Vec2<float>pointPos;
 	float angle;
 
+
 public:
 	/*===== 定数 =====*/
 
@@ -82,7 +86,7 @@ private:
 	void OnInit()override;
 
 	// 更新処理
-	void OnUpdate(const std::vector<std::vector<int>> &MapData)override;
+	void OnUpdate(const std::vector<std::vector<int>>& MapData)override;
 
 	//スウィング中も呼び出される更新処理
 	void OnUpdateNoRelatedSwing()override {}
@@ -91,7 +95,7 @@ private:
 	void OnDraw(const bool& isRoundStartEffect)override;
 	void OnDrawUI()override {}
 
-	void OnHitMapChip(const HIT_DIR &Dir)override {}
+	void OnHitMapChip(const HIT_DIR& Dir)override {}
 
 	void OnBreak()override {}
 	void OnBreakFinish()override {}
@@ -103,7 +107,7 @@ private:
 	virtual void OnPilotControl()override {}		//パイロットを動かす処理
 	virtual void OnPilotReturn()override {}	//パイロットがロボに戻った瞬間
 
-	void Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed);
+	void Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed);
 
 public:
 	void OnKnockOut()override {};

@@ -12,6 +12,7 @@
 #include"TexHandleMgr.h"
 #include"CharacterInfo.h"
 #include"StageMgr.h"
+#include"Barrages.h"
 
 class StaminaMgr;
 
@@ -65,9 +66,14 @@ private:
 	bool initPaticleFlag;
 	int moveTimer;
 
+	// 弾クラス
+	BulletMgrBase bulletMgr;				// 弾クラス
+	std::unique_ptr<BarrageBase> barrage;	// 弾幕クラス
+	int barrageDelayTimer;					// 弾幕間のタイマー
+	const int BARRAGE_DELAY_TIMER = 60;		// 弾幕間の遅延タイマー
+
 
 protected:
-	BulletMgrBase bulletMgr;
 	bool nowSwing;
 	bool isAdvancedEntrySwing;		// 振り回し先行入力
 	int advancedEntrySwingTimer;	// 振り回しの先行入力を受け付けてから、無効化されるまでのタイマー
@@ -192,7 +198,7 @@ public:
 		characterName = Name;
 	}
 	void Init(const Vec2<float>& GeneratePos, const bool& Appear);	//ラウンド開始時に呼び出される
-	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
+	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect);
 	void Draw(const bool& isRoundStartEffect);
 	void DrawUI();
 	//当たり判定

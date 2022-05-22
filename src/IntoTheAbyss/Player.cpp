@@ -744,7 +744,7 @@ void Player::Shot(const Vec2<float>& GeneratePos, const float& ForwardAngle)
 {
 	//’e‘¬
 	static const float BULLET_SPEED = 30.0f;
-	bulletMgr.Generate(bulletGraph, GeneratePos, ForwardAngle, BULLET_SPEED);
+	//bulletMgr.Generate(bulletGraph, GeneratePos, ForwardAngle, BULLET_SPEED);
 }
 
 void Player::PushBackWall()
