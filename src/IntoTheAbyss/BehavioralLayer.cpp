@@ -38,10 +38,8 @@ void MovingBetweenTwoPoints::Update()
 {
 	++timer;
 
-	//プレイヤーがダッシュしたらその後に遅れてダッシュする
-	const float USE_DASH_STAMINA_GAUGE = 0.3f;
 	//プレイヤーがダッシュした時に遅れてダッシュする
-	const bool dashCounterFlag = CharacterAIData::Instance()->dashFlag && USE_DASH_STAMINA_GAUGE <= CharacterAIData::Instance()->bossData.stamineGauge;
+	const bool dashCounterFlag = CharacterAIData::Instance()->dashFlag;
 
 	//デバックで振り回し後にダッシュするかを指定したもの
 	if (DebugParameter::Instance()->GetBossData().enableToDashAfterSwingFlag)
