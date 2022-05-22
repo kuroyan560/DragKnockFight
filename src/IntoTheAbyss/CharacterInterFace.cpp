@@ -1265,6 +1265,7 @@ void CharacterInterFace::HealStamina(const int& HealAmount)
 {
 	if (HealAmount)healAuraEaseRate = 0.0f;
 	staminaGauge->AddStamina(HealAmount);
+	OnStaminaHeal(HealAmount);
 }
 
 void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int>& MapChipIndex, const MapChipType& DstType, const MapChipData& SrcData)
