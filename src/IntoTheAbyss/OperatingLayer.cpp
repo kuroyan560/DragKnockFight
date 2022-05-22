@@ -123,6 +123,18 @@ AiResult OperateSwing::SwingLongDisntnce()
 	return AiResult::OPERATE_FAIL;
 }
 
+AiResult OperateSwing::SwingQuickClockWise()
+{
+	CharacterAIOrder::Instance()->swingClockWiseFlag = true;
+	return AiResult::OPERATE_SUCCESS;
+}
+
+AiResult OperateSwing::SwingQuickCounterClockWise()
+{
+	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = true;
+	return AiResult::OPERATE_SUCCESS;
+}
+
 void OperateSwing::Update()
 {
 	bool coolTimeFlag = swingCoolTime <= swingTimer;

@@ -23,7 +23,7 @@ void CharacterAI::Init()
 	}
 	initFlag = true;
 	useAiFlag = true;
-	strategyOfChoice = STRATEGY_GO_TO_THE_FIELD;
+	strategyOfChoice = STRATEGY_ACQUIRE_A_SUPERIORITY_GAUGE;
 	startFlag = false;
 	CharacterAIData::Instance()->dashTimer = 0;
 	startDashFlag = false;
@@ -128,10 +128,11 @@ void CharacterAI::Update()
 		{
 			strategyArray[strategyOfChoice]->Update();
 		}
-		else
+		if (CharacterManager::Instance()->Right()->GetNowBreak() || CharacterAIOrder::Instance()->stopFlag)
 		{
 			CharacterAIOrder::Instance()->vel = { 0.0f,0.0f };
 		}
+
 
 		//Žó‚¯“n‚µ-----------------------------------------------------
 		startPoint = strategyArray[strategyOfChoice]->startPoint;
@@ -139,6 +140,10 @@ void CharacterAI::Update()
 		startFlag = strategyArray[strategyOfChoice]->startFlag;
 		CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
 	}
+
+	float rate = strategyArray[strategyOfChoice]->GetGaugeStatus();
+
+
 }
 
 void CharacterAI::Draw()

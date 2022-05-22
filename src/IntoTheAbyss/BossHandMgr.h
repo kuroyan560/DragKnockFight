@@ -13,7 +13,7 @@ struct HandData
 class BossHandMgr
 {
 public:
-	BossHandMgr(int L_DEFAULT_HANDLE, int R_DEFAULT_HANDLE, int L_HOLD_HANDLE, int R_HOLD_HANDLE);
+	BossHandMgr(int L_DEFAULT_HANDLE, int R_DEFAULT_HANDLE, int L_HOLD_HANDLE, int R_HOLD_HANDLE, bool SHAKE_FLAG);
 	void Init(bool DEBUG = true);
 	void InitRadius();
 	void Update(const Vec2<float> &POS = {});
@@ -45,6 +45,7 @@ public:
 	Vec2<float>holdDir;
 	bool startEffectFlag;
 	bool initStartEffectFlag;
+
 private:
 
 	bool StartEffect();

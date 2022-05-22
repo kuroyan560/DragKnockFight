@@ -4,7 +4,7 @@
 class BossHand
 {
 public:
-	BossHand(int HANDLE, int HOLD_HANDLE);
+	BossHand(int HANDLE, int HOLD_HANDLE, bool SHAKE_FLAG);
 	
 	void Init();
 	void Update(const Vec2<float> &POS, float RADIUS, float ANGLE, bool HOLD, const Vec2<float> &DIR);
@@ -21,4 +21,6 @@ private:
 	float angle;
 	float bossCount;
 	float countDown;
+
+	bool shakeFlag;
 };

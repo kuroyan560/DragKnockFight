@@ -355,7 +355,7 @@ Game::Game()
 		int dR = TexHandleMgr::LoadGraph(bossFilePass + "default/R.png");
 		int hL = TexHandleMgr::LoadGraph(bossFilePass + "hold/L.png");
 		int hR = TexHandleMgr::LoadGraph(bossFilePass + "hold/R.png");
-		bossHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR);
+		bossHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, true);
 	}
 
 	{
@@ -364,7 +364,7 @@ Game::Game()
 		int dR = TexHandleMgr::LoadGraph(bossFilePass + "default/R.png");
 		int hL = TexHandleMgr::LoadGraph(bossFilePass + "hold/L.png");
 		int hR = TexHandleMgr::LoadGraph(bossFilePass + "hold/R.png");
-		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR);
+		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, false);
 	}
 }
 
