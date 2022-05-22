@@ -63,6 +63,7 @@ void DebugParameter::DrawImGui()
 	{
 		ImGui::Begin("PlayerParameter");
 		ImGui::InputFloat("Vel", &playerData[0].playerSpeed);
+		ImGui::InputFloat("Damage", &playerData[0].damage);
 		ImGui::End();
 	}
 
@@ -87,6 +88,7 @@ void DebugParameter::DrawImGui()
 		ImGui::InputFloat("SWING_ANGLE", &bossDebugData[bossStageNum].swingAngle);
 		ImGui::InputFloat("SWING_MAX", &bossDebugData[bossStageNum].swingMax);
 		ImGui::InputFloat("STAMINA_HEAL_AMOUNT", &bossDebugData[bossStageNum].staminaHealAmount);
+		ImGui::InputFloat("DAMAGE", &bossDebugData[bossStageNum].damage);
 		ImGui::Checkbox("enableToDashAfterSwingFlag", &bossDebugData[bossStageNum].enableToDashAfterSwingFlag);
 		ImGui::End();
 	}
