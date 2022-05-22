@@ -2,6 +2,7 @@
 #include <array>
 #include <vector>
 #include"CharacterInfo.h"
+#include"Angle.h"
 
 // 振り回し領域可視化のための線分単体
 class SwingLineSegment {
@@ -74,7 +75,7 @@ private:
 
 	/*===== メンバ変数 =====*/
 
-	static const int LINE_COUNT = 9;	// 線分の数
+	static const int LINE_COUNT = 12;	// 線分の数
 	std::array<SwingLineSegment, LINE_COUNT> lineSegments;	// 線分
 	Vec2<float> reticlePos;	// 照準座標
 	Vec2<float> swingStartPos;	// 振り回し時の振り回されているキャラの開始座標
@@ -87,7 +88,7 @@ private:
 
 	bool isClockWise;	// 時計回りか？
 
-	const float ANGLE_DIFFERENCE = 0.349066f;	// 20°
+	const float ANGLE_DIFFERENCE = Angle::PI() / LINE_COUNT;
 
 	bool isHitWallFlag;//振り回した先が壁に当たるかどうか
 public:
