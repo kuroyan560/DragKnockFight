@@ -18,27 +18,28 @@ CharacterAI::CharacterAI()
 	data.resize(3);
 
 	std::string pass = "resource/ChainCombat/boss/behaviorPrediction/";
+	std::string pass2 = "resource/ChainCombat/boss/0/icon/";
 	int dataArrayNum = 0;
 	int roopNum = 10;
-	//ダッシュ
-	{
-		const int GRAPH_NUM = 3;
-		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
-		data[dataArrayNum].handle.interval = roopNum;
-		data[dataArrayNum].handle.loop = true;
-		data[dataArrayNum].cautionFlag = false;
-		TexHandleMgr::LoadDivGraph(pass + "dash.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
-	}
-
-	++dataArrayNum;
 	//時計回り振り回し
 	{
 		const int GRAPH_NUM = 3;
 		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
 		data[dataArrayNum].handle.interval = roopNum;
 		data[dataArrayNum].handle.loop = true;
-		data[dataArrayNum].cautionFlag = true;
+		data[dataArrayNum].cautionFlag = false;
 		TexHandleMgr::LoadDivGraph(pass + "clock_swing.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+	}
+
+	++dataArrayNum;
+	//三連撃時計振り回し
+	{
+		const int GRAPH_NUM = 6;
+		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
+		data[dataArrayNum].handle.interval = roopNum;
+		data[dataArrayNum].handle.loop = true;
+		data[dataArrayNum].cautionFlag = true;
+		TexHandleMgr::LoadDivGraph(pass2 + "un_clock_swing_triple.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
 	}
 
 	++dataArrayNum;
