@@ -89,7 +89,7 @@ void CharacterAI::Init()
 	}
 	initFlag = true;
 	useAiFlag = true;
-	strategyOfChoice = STRATEGY_SWING_3TIMES_COUNTERCLOCKWISE;
+	strategyOfChoice = STRATEGY_SWING_DASH;
 	startFlag = false;
 	CharacterAIData::Instance()->dashTimer = 0;
 	startDashFlag = false;
@@ -184,7 +184,7 @@ void CharacterAI::Update()
 				}
 			}
 			strategyOfChoice = selecting;
-			strategyOfChoice = STRATEGY_SWING_DASH;
+			//strategyOfChoice = STRATEGY_SWING_DASH;
 			strategyArray[strategyOfChoice]->Init();
 		}
 		//ˆÓŽvŒˆ’è--------------------------
