@@ -487,7 +487,7 @@ void Game::Update(const bool& Loop)
 	}
 
 	static const int BOSS_BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
-	testBarrage->Update(testBulletMgr, CharacterManager::Instance()->Left()->pos, BOSS_BULLET_HANDLE);
+	testBarrage->Update(testBulletMgr, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Right()->pos, BOSS_BULLET_HANDLE);
 	testBulletMgr.Update();
 
 
