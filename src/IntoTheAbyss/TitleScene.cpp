@@ -27,12 +27,6 @@ TitleScene::TitleScene()
 	isPressStartDraw = true;
 	pressStartTimer = 0;
 
-	/*std::string bossFilePass = "resource/ChainCombat/boss/0/arm/";
-	int dL = TexHandleMgr::LoadGraph(bossFilePass + "default/L.png");
-	int dR = TexHandleMgr::LoadGraph(bossFilePass + "default/R.png");
-	int hL = TexHandleMgr::LoadGraph(bossFilePass + "hold/L.png");
-	int hR = TexHandleMgr::LoadGraph(bossFilePass + "hold/R.png");*/
-	//handMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR);
 }
 
 void TitleScene::OnInitialize()
@@ -127,16 +121,6 @@ void TitleScene::OnUpdate()
 			isPressStartDraw = isPressStartDraw ? false : true;
 		}
 	}
-
-
-
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_J))
-	{
-		//handMgr->Init(true);
-	}
-
-
-	//handMgr->Update();
 }
 
 void TitleScene::OnDraw()
@@ -195,7 +179,6 @@ void TitleScene::OnDraw()
 		}
 	}
 
-	//handMgr->Draw();
 }
 
 void TitleScene::OnImguiDebug()
@@ -203,8 +186,6 @@ void TitleScene::OnImguiDebug()
 	ImGui::Begin("TitleScene");
 	ImGui::Text("Abutton:StageSelect");
 	ImGui::End();
-
-	//handMgr->ImGuiDraw();
 }
 
 void TitleScene::OnFinalize()

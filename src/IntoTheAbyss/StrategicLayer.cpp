@@ -503,6 +503,8 @@ void AcquireASuperiorityGauge::Init()
 
 	finishFlag = false;
 	swingingFlag = false;
+
+	countSwingNum = 0;
 }
 
 void AcquireASuperiorityGauge::Update()

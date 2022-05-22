@@ -9,6 +9,50 @@ CharacterAI::CharacterAI()
 	startTimer = 0;
 	initFlag = false;
 	useAiFlag = false;
+
+
+
+
+
+	std::vector<BehaviorGraphData>data;
+	data.resize(3);
+
+	std::string pass = "resource/ChainCombat/boss/behaviorPrediction/";
+	std::string pass2 = "resource/ChainCombat/boss/0/icon/";
+	int dataArrayNum = 0;
+	int roopNum = 10;
+	//Œv‰ñ‚èU‚è‰ñ‚µ
+	{
+		const int GRAPH_NUM = 3;
+		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
+		data[dataArrayNum].handle.interval = roopNum;
+		data[dataArrayNum].handle.loop = true;
+		data[dataArrayNum].cautionFlag = false;
+		TexHandleMgr::LoadDivGraph(pass + "clock_swing.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+	}
+
+	++dataArrayNum;
+	//O˜AŒ‚ŒvU‚è‰ñ‚µ
+	{
+		const int GRAPH_NUM = 6;
+		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
+		data[dataArrayNum].handle.interval = roopNum;
+		data[dataArrayNum].handle.loop = true;
+		data[dataArrayNum].cautionFlag = true;
+		TexHandleMgr::LoadDivGraph(pass2 + "un_clock_swing_triple.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+	}
+
+	++dataArrayNum;
+	//”½Œv‰ñ‚èU‚è‰ñ‚µ
+	{
+		const int GRAPH_NUM = 3;
+		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
+		data[dataArrayNum].handle.interval = roopNum;
+		data[dataArrayNum].handle.loop = true;
+		data[dataArrayNum].cautionFlag = true;
+		TexHandleMgr::LoadDivGraph(pass + "un_clock_swing.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+	}
+	behaviorGauge = std::make_unique<BehaviorPredection>(data);
 }
 
 void CharacterAI::Init()
@@ -139,9 +183,14 @@ void CharacterAI::Update()
 		endPoint = strategyArray[strategyOfChoice]->endPoint;
 		startFlag = strategyArray[strategyOfChoice]->startFlag;
 		CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
+
+
+		float rate = strategyArray[strategyOfChoice]->GetGaugeStatus();
+
+		Vec2<float>adjPos = { 0.0f,-120.0f };
+		behaviorGauge->Update(CharacterManager::Instance()->Right()->pos + adjPos, strategyOfChoice, rate);
 	}
 
-	float rate = strategyArray[strategyOfChoice]->GetGaugeStatus();
 
 
 }
@@ -157,4 +206,8 @@ void CharacterAI::Draw()
 		}
 	}
 #endif
+	if (useAiFlag)
+	{
+		behaviorGauge->Draw(false);
+	}
 }

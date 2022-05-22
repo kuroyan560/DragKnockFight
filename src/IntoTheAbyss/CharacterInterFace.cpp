@@ -658,7 +658,11 @@ void CharacterInterFace::DrawUI()
 	static Color GAUGE_COLOR[TEAM_NUM] = { Color(47,255,139,255),Color(239,1,144,255) };
 	static Color GAUGE_SHADOW_COLOR[TEAM_NUM] = { Color(41,166,150,255),Color(162,27,108,255) };
 
-	staminaGauge->Draw(pos);
+	if (CharacterManager::Instance()->Right()->GetCharacterName() != PLAYABLE_BOSS_0)
+	{
+		staminaGauge->Draw(pos);
+	}
+
 
 	OnDrawUI();
 }

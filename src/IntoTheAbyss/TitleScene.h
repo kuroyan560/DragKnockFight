@@ -3,7 +3,7 @@
 #include"SceneCange.h"
 #include"ScreenEdgeEffect.h"
 #include"PictureStory.h"
-#include"BossHandMgr.h"
+#include"BehaviorPredection.h"
 
 class TitleScene : public BaseScene
 {
@@ -47,8 +47,6 @@ private:
 	bool tutorialQuestion = false;
 	bool tutorialSelect = false;
 	bool tutorialYes = true;
-
-	//std::unique_ptr<BossHandMgr> handMgr;
 
 public:
 	TitleScene();
