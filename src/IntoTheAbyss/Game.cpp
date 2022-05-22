@@ -385,10 +385,6 @@ void Game::Init(const bool& PracticeMode)
 
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 
-	testBarrage = std::make_unique<WhirlpoolBarrage>();
-	testBarrage->Init();
-	testBulletMgr.Init();
-
 }
 
 void Game::Update(const bool& Loop)
@@ -473,58 +469,6 @@ void Game::Update(const bool& Loop)
 
 	// スタン演出クラスの更新処理
 	StunEffect::Instance()->Update();
-
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_P)) {
-
-		testBarrage->Start();
-
-	}
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_O)) {
-
-		testBarrage = std::make_unique<CircularBarrage>();
-		testBarrage->Init();
-
-	}
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_I)) {
-
-		testBarrage = std::make_unique<WhirlpoolBarrage>();
-		testBarrage->Init();
-
-	}
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_U)) {
-
-		testBarrage = std::make_unique<TargetShotBarrage>();
-		testBarrage->Init();
-
-	}
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_Y)) {
-
-		testBarrage = std::make_unique<ShotGunBarrage>();
-		testBarrage->Init();
-
-	}
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_T)) {
-
-		testBarrage = std::make_unique<WaveBarrage>();
-		testBarrage->Init();
-
-	}
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_L)) {
-
-		testBarrage = std::make_unique<Whirlpool2WayBarrage>();
-		testBarrage->Init();
-
-	}
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_K)) {
-
-		testBarrage = std::make_unique<TargetShot3WayBarrage>();
-		testBarrage->Init();
-
-	}
-
-	static const int BOSS_BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
-	testBarrage->Update(testBulletMgr, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Left()->pos, BOSS_BULLET_HANDLE);
-	testBulletMgr.Update();
 
 
 	/*===== 当たり判定 =====*/
@@ -799,8 +743,6 @@ void Game::Draw()
 	SuperiorityGauge::Instance()->Draw();
 
 	miniMap.Draw();
-
-	testBulletMgr.Draw();
 
 	FaceIcon::Instance()->Draw();
 

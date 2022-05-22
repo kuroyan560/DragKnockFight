@@ -125,9 +125,6 @@ class Game
 	//登場演出を行うかのフラグ
 	bool practiceMode = true;
 
-	std::unique_ptr<BarrageBase> testBarrage;
-	BulletMgrBase testBulletMgr;
-
 	std::unique_ptr<BossHandMgr> bossHandMgr;
 	std::unique_ptr<BossHandMgr> playerHandMgr;
 public:
