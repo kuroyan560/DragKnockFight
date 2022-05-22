@@ -509,6 +509,18 @@ void Game::Update(const bool& Loop)
 		testBarrage->Init();
 
 	}
+	if (UsersInput::Instance()->KeyOnTrigger(DIK_L)) {
+
+		testBarrage = std::make_unique<Whirlpool2WayBarrage>();
+		testBarrage->Init();
+
+	}
+	if (UsersInput::Instance()->KeyOnTrigger(DIK_K)) {
+
+		testBarrage = std::make_unique<TargetShot3WayBarrage>();
+		testBarrage->Init();
+
+	}
 
 	static const int BOSS_BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
 	testBarrage->Update(testBulletMgr, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Left()->pos, BOSS_BULLET_HANDLE);
