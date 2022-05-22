@@ -9,7 +9,7 @@ struct PlayerDebugParameterData
 	float playerSpeed;
 	float damage;//ÉQÅ[ÉWó 
 
-	PlayerDebugParameterData(float SPEED = 15.0f) :playerSpeed(SPEED), damage(20.0f)
+	PlayerDebugParameterData(float SPEED = 15.0f) :playerSpeed(SPEED), damage(10.0f)
 	{
 	}
 };
@@ -66,7 +66,7 @@ struct BossDebugParameterData
 	float damage;
 	BossDebugParameterData() :
 		vel(14.0f), coolTime(30), staminaMax(6), staminaDash(1), staminaSwing(2), enableToDashAfterSwingFlag(true),
-		swingAngle(0.02f), swingMax(0.13f), staminaHealAmount(1.5f)
+		swingAngle(0.02f), swingMax(0.13f), staminaHealAmount(1.5f), damage(10.0f)
 	{
 	}
 };
