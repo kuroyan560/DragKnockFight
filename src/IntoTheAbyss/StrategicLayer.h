@@ -46,7 +46,7 @@ public:
 	std::vector<WayPointData> route;
 	bool startFlag;
 
-	static const int GAUGE_TIMER = 60 * 5;
+	static const int GAUGE_TIMER = 30 * 5;
 
 public:
 

@@ -9,7 +9,7 @@ struct PlayerDebugParameterData
 	float playerSpeed;
 	float damage;//ÉQÅ[ÉWó 
 
-	PlayerDebugParameterData(float SPEED = 15.0f) :playerSpeed(SPEED), damage(10.0f)
+	PlayerDebugParameterData(float SPEED = 15.0f) :playerSpeed(SPEED), damage(17.0f)
 	{
 	}
 };
@@ -23,7 +23,7 @@ struct GaugeDebugParameterData
 	float enemyClashDamageValue;
 	float swingDamageValue;
 
-	GaugeDebugParameterData() :playerBulletAddGuaugeValue(4.0f), enemyBulletAddGuaugeValue(4.0f),
+	GaugeDebugParameterData() :playerBulletAddGuaugeValue(4.0f), enemyBulletAddGuaugeValue(2.0f),
 		playerClashDamageValue(10.0f), enemyClashDamageValue(10.0f),
 		swingDamageValue(5.0f)
 	{
@@ -65,8 +65,8 @@ struct BossDebugParameterData
 
 	float damage;
 	BossDebugParameterData() :
-		vel(14.0f), coolTime(30), staminaMax(6), staminaDash(1), staminaSwing(2), enableToDashAfterSwingFlag(true),
-		swingAngle(0.02f), swingMax(0.13f), staminaHealAmount(1.5f), damage(10.0f)
+		vel(14.0f), coolTime(30), staminaMax(6), staminaDash(1), staminaSwing(2), enableToDashAfterSwingFlag(false),
+		swingAngle(0.02f), swingMax(0.11f), staminaHealAmount(1.5f), damage(10.0f)
 	{
 	}
 };
