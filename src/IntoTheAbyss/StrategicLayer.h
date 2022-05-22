@@ -46,10 +46,13 @@ public:
 	std::vector<WayPointData> route;
 	bool startFlag;
 
+public:
+
+	float GetGaugeStatus();
+
 protected:
 	int timer;
 	int timeOver;
-
 	//アイテム探索
 	struct SearchData
 	{
@@ -146,6 +149,7 @@ public:
 private:
 	bool goToTheFieldFlag;
 	OperateSwing operateSwing;
+	bool finishFlag;
 
 	int SWING_MAX_COOL_TIME = 30;//振り回しのクールタイム
 };
@@ -189,5 +193,8 @@ private:
 
 	//クラッシュされないようにする--------------------------
 	bool dontCrashFlag;
+
+
+	bool finishFlag;
 
 };

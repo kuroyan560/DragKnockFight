@@ -12,6 +12,16 @@ const float IStrategicLayer::SEARCH_RADIUS = 500.0f;
 const float RestoreStamina::SUCCEED_GAIN_STAMINA_VALUE = 0.4f;
 const float AcquireASuperiorityGauge::SUCCEED_GAUGE_VALUE = 0.3f;
 
+float IStrategicLayer::GetGaugeStatus()
+{
+	float rate = static_cast<float>(timer) / static_cast<float>(timeOver);
+	if (1.0f <= rate)
+	{
+		rate = 1.0f;
+	}
+	return rate;
+}
+
 IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &DATA)
 {
 	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
@@ -315,7 +325,7 @@ void GoToTheField::Init()
 	goToTheFieldFlag = true;
 	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
 	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
-
+	finishFlag = false;
 	operateSwing.Init(SWING_MAX_COOL_TIME);
 }
 
@@ -336,30 +346,25 @@ void GoToTheField::Update()
 
 	}
 
-	//振り回した際に一定距離以上離れれるか
-	const float CERTAIN_DISTANCE = 100.0f;
-	bool haveAdvantageToSwingFlag = CERTAIN_DISTANCE <= CharacterAIData::Instance()->swingClockwiseDistance || CERTAIN_DISTANCE <= CharacterAIData::Instance()->swingCounterClockwiseDistance;
 
-	//スタミナが多い
-	const float STAMINA_VALUE = 0.5f;
-	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge;
-	//プレイヤーが一定フレーム内に連続でダッシュしている
-	bool playerDashAlotFlag = 3 <= CharacterAIData::Instance()->dashCount;
 
-	//if ((useSwingFlag && haveAdvantageToSwingFlag) || playerDashAlotFlag)
+	bool useSwingFlag = timeOver <= timer;
+
+	operateSwing.Update();
 	if (useSwingFlag)
 	{
-		operateSwing.Update();
-		if (operateSwing.SwingLongDisntnce() == AiResult::OPERATE_SUCCESS)
+		if (operateSwing.SwingClockWise() == AiResult::OPERATE_SUCCESS)
 		{
 			//連続で振り回すのを防止する為ダッシュカウントをリセットする
 			CharacterAIData::Instance()->dashCount = 0;
 			CharacterAIData::Instance()->dashTimer = 0;
 		}
-	}
-	else if (!CharacterManager::Instance()->Right()->GetNowSwing())
-	{
-		CharacterAIOrder::Instance()->prevSwingFlag = false;
+		//振り回し終わったら次の戦略に移動する
+		else if (!CharacterManager::Instance()->Right()->GetNowSwing())
+		{
+			finishFlag = true;
+			CharacterAIOrder::Instance()->prevSwingFlag = false;
+		}
 	}
 
 	++timer;
@@ -367,9 +372,9 @@ void GoToTheField::Update()
 
 AiResult GoToTheField::CurrentProgress()
 {
-	if (timeOver <= timer)
+	if (finishFlag)
 	{
-		return AiResult::OPERATE_FAIL;
+		return AiResult::OPERATE_SUCCESS;
 	}
 	else
 	{
@@ -485,7 +490,7 @@ void AcquireASuperiorityGauge::Init()
 {
 	nowGauge = CharacterAIData::Instance()->bossData.gaugeValue;
 	timer = 0;
-	timeOver = 60 * 10;
+	timeOver = 60 * 5;
 
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
@@ -494,26 +499,12 @@ void AcquireASuperiorityGauge::Init()
 	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
 
 	operateSwing.Init(SWING_MAX_COOL_TIME);
+
+	finishFlag = false;
 }
 
 void AcquireASuperiorityGauge::Update()
 {
-	////ウェイポイント
-	//const std::vector<std::vector<std::shared_ptr<WayPointData>>> wayPoints = CharacterAIData::Instance()->wayPoints;
-
-	////自分が有利不利か判断する
-	////クラッシュされる位置かされない位置かで判断する
-
-	////自分が有利ならクラッシュしに行く
-	//if (crashEnemyFlag)
-	//{
-
-	//}
-
-	////自分が不利ならクラッシュされないように立ち回る
-	//if (dontCrashFlag)
-	//{
-	//}
 
 	moveToOnwGround.route = route;
 	moveToOnwGround.Update();
@@ -522,34 +513,21 @@ void AcquireASuperiorityGauge::Update()
 	startFlag = true;
 
 
-	//振り回し可能か
-	//bool canSwingClockWiseFlag = CharacterManager::Instance()->Right()->ClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
-	bool canSwingClockWiseFlag = true;
-	//bool canSwingCClockWiseFlag = CharacterManager::Instance()->Right()->CounterClockwiseHitsTheWall() && !CharacterManager::Instance()->Right()->GetNowSwing();
-	bool canSwingCClockWiseFlag = true;
+	bool useSwingFlag = timeOver <= timer;
 
-	const float STAMINA_VALUE = 0.5f;
-	//スタミナが多い
-	bool useSwingFlag = STAMINA_VALUE <= CharacterAIData::Instance()->bossData.stamineGauge;
-	//プレイヤーが一定フレーム内に連続でダッシュしている
-	bool playerDashAlotFlag = 3 <= CharacterAIData::Instance()->dashCount;
-
-	//if (useSwingFlag || playerDashAlotFlag)
+	operateSwing.Update();
 	if (useSwingFlag)
 	{
-		operateSwing.Update();
-		if (canSwingClockWiseFlag && operateSwing.SwingClockWise() == AiResult::OPERATE_SUCCESS)
+		if (operateSwing.SwingCounterClockWise() == AiResult::OPERATE_SUCCESS)
 		{
 			//連続で振り回すのを防止する為ダッシュカウントをリセットする
 			CharacterAIData::Instance()->dashCount = 0;
 			CharacterAIData::Instance()->dashTimer = 0;
-
 		}
-		else if (canSwingCClockWiseFlag && operateSwing.SwingCounterClockWise() == AiResult::OPERATE_SUCCESS)
+		else if (!CharacterManager::Instance()->Right()->GetNowSwing())
 		{
-			//連続で振り回すのを防止する為ダッシュカウントをリセットする
-			CharacterAIData::Instance()->dashCount = 0;
-			CharacterAIData::Instance()->dashTimer = 0;
+			finishFlag = true;
+			CharacterAIOrder::Instance()->prevSwingFlag = false;
 		}
 	}
 	else if (!CharacterManager::Instance()->Right()->GetNowSwing())
@@ -564,15 +542,9 @@ void AcquireASuperiorityGauge::Update()
 
 AiResult AcquireASuperiorityGauge::CurrentProgress()
 {
-	//一定時間内に一定量回復したら成功、出来なければ失敗
-	int sub = nowGauge - CharacterAIData::Instance()->bossData.gaugeValue;
-	if (SUCCEED_GAUGE_VALUE <= sub && timer < timeOver)
+	if (finishFlag)
 	{
 		return AiResult::OPERATE_SUCCESS;
-	}
-	else if (timeOver <= timer)
-	{
-		return AiResult::OPERATE_FAIL;
 	}
 	else
 	{

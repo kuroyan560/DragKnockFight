@@ -139,6 +139,10 @@ void CharacterAI::Update()
 		startFlag = strategyArray[strategyOfChoice]->startFlag;
 		CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
 	}
+
+	float rate = strategyArray[strategyOfChoice]->GetGaugeStatus();
+
+
 }
 
 void CharacterAI::Draw()
