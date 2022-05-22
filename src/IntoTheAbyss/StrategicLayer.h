@@ -46,6 +46,8 @@ public:
 	std::vector<WayPointData> route;
 	bool startFlag;
 
+	static const int GAUGE_TIMER = 60 * 5;
+
 public:
 
 	float GetGaugeStatus();

@@ -322,7 +322,7 @@ SwingClockWise::SwingClockWise()
 void SwingClockWise::Init()
 {
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = GAUGE_TIMER;
 	startFlag = false;
 	goToTheFieldFlag = true;
 
@@ -492,7 +492,7 @@ void SwingThreeTimesCounterClockWise::Init()
 {
 	nowGauge = CharacterAIData::Instance()->bossData.gaugeValue;
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = GAUGE_TIMER;
 
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
@@ -663,7 +663,7 @@ void Dash::Init()
 {
 	finishFlag = false;
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = GAUGE_TIMER;
 	initDashFlag = false;
 	CharacterAIOrder::Instance()->Init();
 }
@@ -717,7 +717,7 @@ SwingClockWiseThreeTimes::SwingClockWiseThreeTimes()
 void SwingClockWiseThreeTimes::Init()
 {
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = GAUGE_TIMER;
 
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
@@ -798,7 +798,7 @@ SwingCounterClockWise::SwingCounterClockWise()
 void SwingCounterClockWise::Init()
 {
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = GAUGE_TIMER;
 
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
