@@ -1006,9 +1006,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 					}
 
-					// 指定したブロックの上下左右を書き換える。
-					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_COLOR_LEFT, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
-
 				}
 				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
 
@@ -1026,56 +1023,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, StaminaItem::CHARA_ID::RIGHT, partner.lock()->pos);
 
 					}
-
-					// 指定したブロックの上下左右を書き換える。
-					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
-
-				}
-				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_ELEC_ON) {
-
-					// トゲブロック(針有り)だったら
-
-					// このキャラを一定時間スタンさせる。
-					static const int ELEC_TIMER = 30;
-					elecTimer = ELEC_TIMER;
-
-					// トゲブロックを棘無し状態にさせる。
-					StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_ELEC_OFF);
-
-					// 指定したブロックの上下左右を書き換える。
-					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_ELEC_ON, MapChipData::MAPCHIP_TYPE_STATIC_ELEC_OFF);
-
-
-				}
-				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_ELEC_OFF) {
-
-					// トゲブロック(針無し)だったら
-
-					// トゲブロックを棘有り状態にさせる。
-					StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_ELEC_ON);
-
-					// アイテムを生成する。
-					//StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
-
-					// 指定したブロックの上下左右を書き換える。
-					OverWriteMapChipValueAround(hitChipIndex, MapChipType::MAPCHIP_BLOCK_ELEC_OFF, MapChipData::MAPCHIP_TYPE_STATIC_ELEC_ON);
-
-
-				}
-				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_ELEC_ON_ALLWAYS) {
-
-					// トゲブロック(常時)だったら
-
-					// このキャラを一定時間スタンさせる。
-					static const int ELEC_TIMER = 30;
-					elecTimer = ELEC_TIMER;
-
-
-				}
-				else {
-
-					// アイテムを生成する。
-					//StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, charaID, partner.lock()->pos);
 
 				}
 
