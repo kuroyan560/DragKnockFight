@@ -184,6 +184,7 @@ void RestoreStamina::Update()
 
 	//戦略実行からの経過時間
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 void RestoreStamina::Draw()
@@ -322,7 +323,7 @@ SwingClockWise::SwingClockWise()
 void SwingClockWise::Init()
 {
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = GAUGE_TIMER;
 	startFlag = false;
 	goToTheFieldFlag = true;
 
@@ -370,6 +371,7 @@ void SwingClockWise::Update()
 	}
 
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 AiResult SwingClockWise::CurrentProgress()
@@ -492,7 +494,7 @@ void SwingThreeTimesCounterClockWise::Init()
 {
 	nowGauge = CharacterAIData::Instance()->bossData.gaugeValue;
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = GAUGE_TIMER;
 
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
@@ -544,6 +546,7 @@ void SwingThreeTimesCounterClockWise::Update()
 
 	//戦略実行中
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 AiResult SwingThreeTimesCounterClockWise::CurrentProgress()
@@ -663,7 +666,7 @@ void Dash::Init()
 {
 	finishFlag = false;
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = GAUGE_TIMER;
 	initDashFlag = false;
 	CharacterAIOrder::Instance()->Init();
 }
@@ -689,6 +692,7 @@ void Dash::Update()
 	}
 
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 AiResult Dash::CurrentProgress()
@@ -717,7 +721,7 @@ SwingClockWiseThreeTimes::SwingClockWiseThreeTimes()
 void SwingClockWiseThreeTimes::Init()
 {
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = GAUGE_TIMER;
 
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
@@ -770,6 +774,7 @@ void SwingClockWiseThreeTimes::Update()
 
 	//戦略実行中
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 AiResult SwingClockWiseThreeTimes::CurrentProgress()
@@ -798,7 +803,7 @@ SwingCounterClockWise::SwingCounterClockWise()
 void SwingCounterClockWise::Init()
 {
 	timer = 0;
-	timeOver = 60 * 5;
+	timeOver = GAUGE_TIMER;
 
 	crashEnemyFlag = false;
 	dontCrashFlag = false;
@@ -841,6 +846,7 @@ void SwingCounterClockWise::Update()
 	}
 	//戦略実行中
 	++timer;
+	timer += CharacterAIData::Instance()->addTimer;
 }
 
 AiResult SwingCounterClockWise::CurrentProgress()

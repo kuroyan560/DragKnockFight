@@ -49,6 +49,8 @@ public:
 	bool prevSwingFlag;
 
 	int crashCount;
+
+	int addTimer;
 };
 
 class CharacterAIOrder :public Singleton<CharacterAIOrder>

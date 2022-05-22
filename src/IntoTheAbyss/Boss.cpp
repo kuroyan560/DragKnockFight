@@ -115,7 +115,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	}
 
 
-
 	//—h‚êŠJŽn
 	if (CharacterAIOrder::Instance()->prevSwingFlag && !initShakeFalg)
 	{
