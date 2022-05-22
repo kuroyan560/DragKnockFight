@@ -433,10 +433,11 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	healAuraEaseRate = 1.0f;
 }
 
+#include "SlowMgr.h"
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect)
 {
 
-	if (team == WHICH_TEAM::RIGHT_TEAM) {
+	if (team == WHICH_TEAM::RIGHT_TEAM && 0.8f <= SlowMgr::Instance()->slowAmount) {
 
 		// íeÇÃçXêVèàóù
 		bulletMgr.Update();
