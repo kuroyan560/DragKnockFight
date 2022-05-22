@@ -2,6 +2,7 @@
 #include <array>
 #include <vector>
 #include"CharacterInfo.h"
+#include"Angle.h"
 
 // U‚è‰ñ‚µ—Ìˆæ‰Â‹‰»‚Ì‚½‚ß‚Ìü•ª’P‘Ì
 class SwingLineSegment {
@@ -87,7 +88,7 @@ private:
 
 	bool isClockWise;	// Œv‰ñ‚è‚©H
 
-	const float ANGLE_DIFFERENCE = 0.349066f;	// 20‹
+	const float ANGLE_DIFFERENCE = Angle::PI() / LINE_COUNT;
 
 	bool isHitWallFlag;//U‚è‰ñ‚µ‚½æ‚ª•Ç‚É“–‚½‚é‚©‚Ç‚¤‚©
 public:
