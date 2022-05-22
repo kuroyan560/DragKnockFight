@@ -3,13 +3,9 @@
 
 DebugParameter::DebugParameter()
 {
-	//プリセット1
-	playerData.push_back(PlayerDebugParameterData(0.5f, 15.0f, 7.0f, 20.0f, 30.0f, 21));
-	//プリセット2
-	playerData.push_back(PlayerDebugParameterData(1.0f, 10.0f, 7.0f, 10.0f, 0.0f, 1));
-
+	playerData.push_back(PlayerDebugParameterData(15.0f));
 	//デフォルト
-	nowData = std::make_shared<PlayerDebugParameterData>(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+	nowData = std::make_shared<PlayerDebugParameterData>(15.0f);
 
 	gaugeData = std::make_shared<GaugeDebugParameterData>();
 	loadPresetFlag = true;
@@ -27,6 +23,7 @@ DebugParameter::DebugParameter()
 
 	roundParamImguiHandle = DebugImGuiManager::Instance()->Add("RoundParameter");
 	bossParamImguiHandle = DebugImGuiManager::Instance()->Add("BossParameter");
+	playerParamImguiHandle = DebugImGuiManager::Instance()->Add("PlayerParameter");
 
 	bossStageNum = 0;
 
@@ -57,43 +54,15 @@ void DebugParameter::Update()
 	//プリセット読み込み
 	if (loadPresetFlag)
 	{
-		nowData->ADD_GRAVITY = playerData[selectNum].ADD_GRAVITY;
-		nowData->FIRST_RECOIL_AMOUNT = playerData[selectNum].FIRST_RECOIL_AMOUNT;
-		nowData->MAX_GRAVITY = playerData[selectNum].MAX_GRAVITY;
-		nowData->MAX_RECOIL_AMOUNT = playerData[selectNum].MAX_RECOIL_AMOUNT;
-		nowData->RAPID_FIRE_TIMER = playerData[selectNum].RAPID_FIRE_TIMER;
-		nowData->RECOIL_AMOUNT = playerData[selectNum].RECOIL_AMOUNT;
 	}
 }
 
 void DebugParameter::DrawImGui()
 {
-	/*ImGui::Begin("Parameter");
-	ImGui::InputFloat("ADD_GRAVITY", &nowData->ADD_GRAVITY);
-	ImGui::InputFloat("MAX_GRAVITY", &nowData->MAX_GRAVITY);
-	ImGui::InputFloat("FIRST_RECOIL_AMOUNT", &nowData->FIRST_RECOIL_AMOUNT);
-	ImGui::InputFloat("RECOIL_AMOUNT", &nowData->RECOIL_AMOUNT);
-	ImGui::InputFloat("MAX_RECOIL_AMOUNT", &nowData->MAX_RECOIL_AMOUNT);
-	ImGui::InputInt("RAPID_FIRE_TIMER", &nowData->RAPID_FIRE_TIMER);
-	ImGui::InputInt("SelectPreset", &selectNum);
-	loadPresetFlag = ImGui::Button("LoadPreset");
-	ImGui::End();*/
-	if (DebugImGuiManager::Instance()->DrawFlag(roundParamImguiHandle))
+	if (DebugImGuiManager::Instance()->DrawFlag(playerParamImguiHandle))
 	{
-		ImGui::Begin("RoundParameter");
-		ImGui::Text("RoundTextParam");
-		ImGui::InputFloat("MovePosTimer_Round", &roundData->roundData.maxTimer);
-		ImGui::InputFloat("ShrinkSizeTimer_Round", &roundData->roundData.sizeMaxTimer);
-		ImGui::Text("ReadyTextParam");
-		ImGui::InputFloat("MovePosTimer_Ready", &roundData->readyData.maxTimer);
-		ImGui::InputFloat("ShrinkSizeTimer_Ready", &roundData->readyData.sizeMaxTimer);
-		ImGui::Text("FightTextParam");
-		ImGui::InputFloat("MovePosTimer_Fight", &roundData->fightData.maxTimer);
-		ImGui::InputFloat("ShrinkSizeTimer_Fight", &roundData->fightData.sizeMaxTimer);
-		ImGui::Text("NowNumberTextParam");
-		ImGui::InputFloat("ChangeNumberTimer_NowNumber", &roundData->numberData.maskMaxTimer);
-		ImGui::Text("NextNumberTextParam");
-		ImGui::InputFloat("ChangeNumberTimer_NextNumber", &roundData->nextNumberData.maskMaxTimer);
+		ImGui::Begin("PlayerParameter");
+		ImGui::InputFloat("Vel", &playerData[0].playerSpeed);
 		ImGui::End();
 	}
 

@@ -516,6 +516,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	if (SuperiorityGauge::Instance()->GetGaugeData(team).gaugeValue)
 	{
+		MOVE_SPEED_PLAYER = DebugParameter::Instance()->playerData[0].playerSpeed;
 		OnUpdate(MapData);
 	}
 

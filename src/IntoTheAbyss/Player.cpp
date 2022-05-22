@@ -185,9 +185,9 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
 
-	RECOIL_AMOUNT = data->RECOIL_AMOUNT;
+	/*RECOIL_AMOUNT = data->RECOIL_AMOUNT;
 	FIRST_RECOIL_AMOUNT = data->FIRST_RECOIL_AMOUNT;
-	MAX_RECOIL_AMOUNT = data->MAX_RECOIL_AMOUNT;
+	MAX_RECOIL_AMOUNT = data->MAX_RECOIL_AMOUNT;*/
 
 
 	CharacterAIData::Instance()->playerData.dashStamina = DASH_STAMINA;
