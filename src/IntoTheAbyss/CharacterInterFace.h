@@ -70,7 +70,7 @@ private:
 	BulletMgrBase bulletMgr;				// 弾クラス
 	std::unique_ptr<BarrageBase> barrage;	// 弾幕クラス
 	int barrageDelayTimer;					// 弾幕間のタイマー
-	const int BARRAGE_DELAY_TIMER = 60;		// 弾幕間の遅延タイマー
+	const int BARRAGE_DELAY_TIMER = 120;	// 弾幕間の遅延タイマー
 
 	//スタミナ回復時オーラ
 	float healAuraEaseRate = 0.0f;
