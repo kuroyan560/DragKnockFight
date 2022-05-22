@@ -65,6 +65,9 @@ private:
 	bool initPaticleFlag;
 	int moveTimer;
 
+	//スタミナ回復時オーラ
+	float healAuraEaseRate = 0.0f;
+
 
 protected:
 	BulletMgrBase bulletMgr;
@@ -258,6 +261,6 @@ public:
 	// マップチップが指定のインデックスだったら指定の値に塗り替える。 上下左右も。
 	void OverWriteMapChipValueAround(const Vec2<int>& MapChipIndex, const MapChipType& DstType, const MapChipData& SrcData);
 
-
+	void HealStamina(const int& HealAmount);
 };
 
