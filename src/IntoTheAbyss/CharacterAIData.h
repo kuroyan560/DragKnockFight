@@ -45,6 +45,8 @@ public:
 
 	bool releaseSwingFlag;
 	bool prevSwingFlag;
+
+	int crashCount;
 };
 
 class CharacterAIOrder :public Singleton<CharacterAIOrder>
@@ -54,8 +56,11 @@ public:
 	bool dashFlag;
 	bool swingClockWiseFlag;
 	bool swingCounterClockWiseFlag;
+	bool swingThreeTimesFlag;
+	bool stopFlag;
+
 	bool startAiFlag;
-	bool prevSwingFlag;//ó\îıìÆçÏ
+	bool prevSwingFlag;//ó\îıìÆçÏ 
 
 	float prevRate;
 
@@ -66,6 +71,7 @@ public:
 		swingCounterClockWiseFlag = false;
 		startAiFlag = false;
 		prevSwingFlag = false;
+		stopFlag = false;
 		prevRate = 0.0f;
 	};
 };

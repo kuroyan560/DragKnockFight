@@ -10,7 +10,7 @@ struct SphereCollision;
 class StaminaItem {
 
 private:
-	static const enum STAR_COLOR { RED, GREEN, YELLOW, BLUE, GRAPH_NUM, 
+	static const enum STAR_COLOR { RED, GREEN, YELLOW, GRAPH_NUM, 
 		LEFT = GREEN, RIGHT = RED, NONE = YELLOW };
 	static int GRAPH_HANDLE[GRAPH_NUM];
 

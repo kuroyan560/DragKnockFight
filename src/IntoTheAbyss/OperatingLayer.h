@@ -77,6 +77,16 @@ public:
 	/// </summary>
 	AiResult SwingLongDisntnce();
 
+	/// <summary>
+	/// ‘¦À‚ÉŒv‰ñ‚è‚ÉU‚è‰ñ‚·
+	/// </summary>
+	AiResult SwingQuickClockWise();
+
+	/// <summary>
+	/// ‘¦À‚É”½Œv‰ñ‚è‚ÉU‚è‰ñ‚·
+	/// </summary>
+	AiResult SwingQuickCounterClockWise();
+
 	void Update();
 
 private:

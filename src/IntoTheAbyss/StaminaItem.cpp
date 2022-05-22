@@ -10,7 +10,7 @@ StaminaItem::StaminaItem()
 {
 	if (GRAPH_HANDLE[0] == -1)
 	{
-		TexHandleMgr::LoadDivGraph("resource/ChainCombat/background_star.png", 4, { 4,1 }, GRAPH_HANDLE);
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/background_star.png", STAR_COLOR::GRAPH_NUM, { STAR_COLOR::GRAPH_NUM,1 }, GRAPH_HANDLE);
 	}
 
 	/*===== èâä˙âª =====*/

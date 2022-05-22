@@ -5,7 +5,7 @@
 
 BackGround::BackGround()
 {
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/background_star.png", 4, { 4,1 }, starGraph);
+	//TexHandleMgr::LoadDivGraph("resource/ChainCombat/background_star.png", 4, { 4,1 }, starGraph);
 }
 
 void BackGround::Init(const Vec2<float>& StageSize)
