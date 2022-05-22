@@ -90,6 +90,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 		for (int width = 0; width < WIDTH; ++width) {
 
 			if (mapChipDrawData[height][width].shocked)mapChipDrawData[height][width].shocked -= 0.02f;
+			if (mapChipDrawData[height][width].expEaseRate < 1.0f)mapChipDrawData[height][width].expEaseRate += 0.005f;
 
 			// ブロック以外だったら処理を飛ばす。
 			bool blockFlag = (mapChipData[height][width] >= wallChipMemorySize.min && mapChipData[height][width] <= wallChipMemorySize.max);
@@ -141,6 +142,7 @@ void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<Map
 					chipData.pos = pos;
 					chipData.radian = mapChipDrawData[height][width].radian;
 					chipData.shocked = mapChipDrawData[height][width].shocked;
+					chipData.expEaseRate = mapChipDrawData[height][width].expEaseRate;
 					datas[handle].emplace_back(chipData);
 					//DrawFunc::DrawRotaGraph2D({ pos.x, pos.y }, 1.6f * ScrollMgr::Instance()->zoom, mapChipDrawData[height][width].radian, TexHandleMgr::GetTexBuffer(handle));
 				}

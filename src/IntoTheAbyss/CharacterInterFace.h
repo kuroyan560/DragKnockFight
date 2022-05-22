@@ -19,7 +19,7 @@ class CharacterInterFace
 {
 private:
 	void SwingUpdate();
-	void Crash(const Vec2<float>& MyVec);
+	void Crash(const Vec2<float>& MyVec, const int& SmokeCol);
 	void CrashUpdate();
 
 	//‰æ–Ê‹²‚ÝƒNƒ‰ƒbƒVƒ…”»’è
@@ -229,13 +229,9 @@ public:
 	void FinishSwing();
 
 	const PLAYABLE_CHARACTER_NAME& GetCharacterName() { return characterName; }
+	static const Color TEAM_COLOR[TEAM_NUM];
 	const Color& GetTeamColor()
 	{
-		static const Color TEAM_COLOR[TEAM_NUM] =
-		{
-			Color(47,255,139,255),
-			Color(239,1,144,255)
-		};
 		return TEAM_COLOR[team];
 	}
 

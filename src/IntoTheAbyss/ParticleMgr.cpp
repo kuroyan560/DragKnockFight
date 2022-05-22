@@ -1,8 +1,10 @@
 #include "ParticleMgr.h"
 #include"KuroEngine.h"
+#include"CharacterInterFace.h"
 
-void ParticleMgr::Particle::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx)
+void ParticleMgr::Particle::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx, const Color& MulColor)
 {
+	mulColor = MulColor;
 	pos = GeneratePos;
 	emitPos = pos;
 	// 放出方向を設定
@@ -89,6 +91,7 @@ ParticleMgr::ParticleMgr()
 		//インプットレイアウト
 		static std::vector<InputLayoutParam>INPUT_LAYOUT =
 		{
+			InputLayoutParam("MUL_COLOR",DXGI_FORMAT_R32G32B32A32_FLOAT),
 			InputLayoutParam("POSITION",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("EMIT_POSITION",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("EMIT_VEC",DXGI_FORMAT_R32G32_FLOAT),
@@ -209,9 +212,9 @@ void ParticleMgr::Draw()
 		descTypes, 1.0f, true);
 }
 
-void ParticleMgr::EmitParticle(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx)
+void ParticleMgr::EmitParticle(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx, const Color& MulColor)
 {
-	particles[idx++].Generate(EmitPos, EmitVec, Type, TexIdx);
+	particles[idx++].Generate(EmitPos, EmitVec, Type, TexIdx, MulColor);
 	if (idx == MAX_NUM)idx = 0;
 }
 
@@ -235,8 +238,12 @@ void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVe
 			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::NORMAL_SMOKE, PARTICLE_TEX::SMOKE_0 + KuroFunc::GetRand(SMOKE_NUM - 1));
 		}
 	}
-	else if (Type == CRASH)
+	else if (Type == CRASH_R || Type == CRASH_G || Type == CRASH_W)
 	{
+		Color mulCol;
+		if (Type == CRASH_R)mulCol = CharacterInterFace::TEAM_COLOR[RIGHT_TEAM];
+		else if (Type == CRASH_G)mulCol = CharacterInterFace::TEAM_COLOR[LEFT_TEAM];
+
 		static const int SMOKE_EMIT_MAX = 25;
 		static const int SMOKE_EMIT_MIN = 15;
 		const int smokeNum = KuroFunc::GetRand(SMOKE_EMIT_MIN, SMOKE_EMIT_MAX);
@@ -248,7 +255,7 @@ void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVe
 		for (int i = 0; i < smokeNum; ++i)
 		{
 			emitVec = KuroMath::RotateVec2(smokeStartEmitVec, Angle::ConvertToRadian(KuroFunc::GetRand(SMOKE_EMIT_DEGREE)));
-			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::FAST_SMOKE, PARTICLE_TEX::SMOKE_0 + KuroFunc::GetRand(SMOKE_NUM - 1));
+			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::FAST_SMOKE, PARTICLE_TEX::SMOKE_0 + KuroFunc::GetRand(SMOKE_NUM - 1), mulCol);
 		}
 
 		static const int STAR_EMIT_MAX = 5;

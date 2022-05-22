@@ -12,6 +12,12 @@
 #include "Stamina.h"
 #include"CharacterManager.h"
 
+const Color CharacterInterFace::TEAM_COLOR[TEAM_NUM] =
+{
+	Color(47,255,139,255),
+	Color(239,1,144,255)
+};
+
 void CharacterInterFace::SwingUpdate()
 {
 	ADD_SWING_ANGLE = DebugParameter::Instance()->GetBossData().swingAngle;
@@ -109,7 +115,7 @@ void CharacterInterFace::SwingUpdate()
 
 }
 
-void CharacterInterFace::Crash(const Vec2<float>& MyVec)
+void CharacterInterFace::Crash(const Vec2<float>& MyVec, const int& SmokeCol)
 {
 	Vec2<bool>ext = { true,true };
 	if (MyVec.x == 0.0f)ext.y = false;
@@ -123,7 +129,7 @@ void CharacterInterFace::Crash(const Vec2<float>& MyVec)
 	if (0.0f < MyVec.y)smokeVec.y = -1.0f;
 	else if (MyVec.y < 0.0f)smokeVec.y = 1.0f;
 
-	CrashMgr::Instance()->Crash(pos, stagingDevice, ext, smokeVec);
+	CrashMgr::Instance()->Crash(pos, stagingDevice, ext, smokeVec, SmokeCol);
 	//SuperiorityGauge::Instance()->AddGauge(team, -10.0f);
 	stagingDevice.StopSpin();
 
@@ -960,12 +966,13 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			Vec2<float>vec = { 0,0 };
 			if (partner.lock()->GetNowSwing()) {
 
+				int smokeCol = 0;
+
 				if (isHitLeft)vec.x = -1.0f;
 				else if (isHitRight)vec.x = 1.0f;
 				if (isHitTop)vec.y = -1.0f;
 				else if (isHitBottom)vec.y = 1.0f;
 
-				Crash(vec);
 				//CrashMgr::Instance()->Crash(pos, crashDevice, ext);
 				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
 				SuperiorityGauge::Instance()->AddGauge(team, -10);
@@ -989,7 +996,13 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				// あたったチップが色ブロックだったら。
 				MapChipType hitChipData = StageMgr::Instance()->GetLocalMapChipType(hitChipIndex);
+				auto mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
+
+
 				if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
+
+					smokeCol = 1;
+					(*mapChipDrawData)[hitChipIndex.y][hitChipIndex.x].expEaseRate = 0.0f;
 
 					// 自分が右側のキャラだったら。
 					if (team == WHICH_TEAM::RIGHT_TEAM) {
@@ -1009,6 +1022,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				}
 				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
 
+					smokeCol = 2;
+					(*mapChipDrawData)[hitChipIndex.y][hitChipIndex.x].expEaseRate = 0.0f;
+
 					// 自分が右側のキャラだったら。
 					if (team == WHICH_TEAM::RIGHT_TEAM) {
 
@@ -1027,7 +1043,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				}
 
 				// クラッシュさせる。
-				Crash(vec);
+				Crash(vec, smokeCol);
 
 				CWSwingSegmentMgr.Init();
 				CCWSwingSegmentMgr.Init();

@@ -26,6 +26,7 @@ DrawMap::DrawMap()
 			InputLayoutParam("POSITION",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("RADIAN",DXGI_FORMAT_R32_FLOAT),
 			InputLayoutParam("SHOCKED",DXGI_FORMAT_R32_FLOAT),
+			InputLayoutParam("EXP_EASE_RATE",DXGI_FORMAT_R32_FLOAT),
 		};
 
 		//ルートパラメータ

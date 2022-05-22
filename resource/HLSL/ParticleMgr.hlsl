@@ -1,6 +1,7 @@
 #include"Engine/Math.hlsli"
 struct Vertex
 {
+    float4 mulColor;
     float2 pos;
     float2 emitPos;
     float2 emitVec;
@@ -104,6 +105,7 @@ cbuffer cbuff0 : register(b0)
 
 struct VSInput
 {
+    float4 mulColor : MUL_COLOR;
     float4 pos : POSITION;
     float2 emitVec : EMIT_VEC;
     float speed : SPEED;
@@ -119,6 +121,7 @@ struct VSInput
 
 struct VSOutput
 {
+    float4 mulColor : MUL_COLOR;
     float4 pos : POSITION;
     float radian : RADIAN;
     float alpha : ALPHA;
@@ -130,6 +133,7 @@ struct VSOutput
 VSOutput VSmain(VSInput input)
 {
     VSOutput output;
+    output.mulColor = input.mulColor;
     output.pos = input.pos;
     output.pos.xy *= zoom;
     output.pos.xy += scroll;
@@ -143,6 +147,7 @@ VSOutput VSmain(VSInput input)
 
 struct GSOutput
 {
+    float4 mulColor : MUL_COLOR;
     float4 pos : SV_POSITION;
     float4 worldPos : WORLD_POSITION;
     float2 uv : TEXCOORD;
@@ -168,6 +173,7 @@ void GSmain(
         return;
     
     GSOutput element;
+    element.mulColor = input[0].mulColor;
     element.alpha = input[0].alpha;
     element.texIdx = input[0].texIdx;
         
@@ -263,6 +269,7 @@ PSOutput PSmain(GSOutput input) : SV_TARGET
     
     //result.xyz *= ligEffect;
     result.w *= input.alpha;
+    result *= input.mulColor;
     
     PSOutput output;
     output.color = result;

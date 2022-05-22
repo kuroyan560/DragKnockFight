@@ -14,6 +14,7 @@ struct ChipData
 	Vec2<float>pos;
 	float radian = 0.0f;
 	float shocked = 0.0f;
+	float expEaseRate = 1.0f;
 };
 
 class DrawMap

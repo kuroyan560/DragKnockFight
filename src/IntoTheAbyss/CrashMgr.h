@@ -34,6 +34,6 @@ public:
 	void Init();
 	void Update();
 	void Draw();
-	void Crash(const Vec2<float>& Pos, StagingInterFace& CrashDevice, const Vec2<bool>& Ext, const Vec2<float>& SmokeVec);
+	void Crash(const Vec2<float>& Pos, StagingInterFace& CrashDevice, const Vec2<bool>& Ext, const Vec2<float>& SmokeVec, const int& SmokeCol);
 };
 

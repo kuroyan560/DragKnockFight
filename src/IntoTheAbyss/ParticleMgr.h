@@ -12,7 +12,7 @@ class ConstantBuffer;
 class TextureBuffer;
 class LightManager;
 
-static const enum PARTICLE_TYPE { DASH, BULLET, CRASH };
+static const enum PARTICLE_TYPE { DASH, BULLET, CRASH_W, CRASH_G, CRASH_R };
 
 class ParticleMgr : public Singleton<ParticleMgr>
 {
@@ -21,6 +21,7 @@ class ParticleMgr : public Singleton<ParticleMgr>
 	static const enum PARTICLE_CUMPUTE_TYPE { NORMAL_SMOKE, FAST_SMOKE, EMIT_STAR, DEFAULT = NORMAL_SMOKE };
 	struct Particle
 	{
+		Color mulColor;
 		Vec2<float> pos;	//座標
 		Vec2<float>emitPos;
 		Vec2<float>emitVec;	//放出ベクトル
@@ -38,7 +39,7 @@ class ParticleMgr : public Singleton<ParticleMgr>
 		unsigned int type = PARTICLE_CUMPUTE_TYPE::DEFAULT;	//パーティクル動き種別
 
 		// 生成処理
-		void Generate(const Vec2<float>& GeneratePos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx);
+		void Generate(const Vec2<float>& GeneratePos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx, const Color& MulColor);
 	};
 	struct GameInfo
 	{
@@ -70,7 +71,7 @@ class ParticleMgr : public Singleton<ParticleMgr>
 	static const enum PARTICLE_TEX { WHITE, SMOKE_0, SMOKE_1, SMOKE_2, SMOKE_3, STAR, TEX_NUM = 9 };
 	std::shared_ptr<TextureBuffer>textures[TEX_NUM];
 
-	void EmitParticle(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx);
+	void EmitParticle(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx, const Color& MulColor = Color());
 
 public:
 	void Init();

@@ -73,9 +73,12 @@ void CrashMgr::Draw()
 }
 
 #include"ParticleMgr.h"
-void CrashMgr::Crash(const Vec2<float>& Pos, StagingInterFace& CrashDevice, const Vec2<bool>& Ext, const Vec2<float>& SmokeVec)
+void CrashMgr::Crash(const Vec2<float>& Pos, StagingInterFace& CrashDevice, const Vec2<bool>& Ext, const Vec2<float>& SmokeVec, const int& SmokeCol)
 {
-	ParticleMgr::Instance()->Generate(Pos, SmokeVec, CRASH);
+	PARTICLE_TYPE particleType = CRASH_W;
+	if (SmokeCol == 1)particleType = CRASH_G;
+	if (SmokeCol == 2)particleType = CRASH_R;
+	ParticleMgr::Instance()->Generate(Pos, SmokeVec, particleType);
 
 	static const int CRASH_SPAN = 30;
 

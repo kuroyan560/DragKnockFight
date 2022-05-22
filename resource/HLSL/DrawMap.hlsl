@@ -19,6 +19,7 @@ struct VSOutput
     float2 pos : POSITION;
     float radian : RADIAN;
     float shocked : SHOCKED;
+    float expEaseRate : EXP_EASE_RATE;
 };
 
 VSOutput VSmain_Base(VSOutput input)
@@ -41,6 +42,11 @@ float2 RotateFloat2(float2 Pos, float Radian)
     return result;
 }
 
+float CalcExpEaseRate(float ExpEaseRate)
+{
+    return Easing_Exp_Out(ExpEaseRate, 1.0f, 5.0f, 1.0f);
+}
+
 struct PSOutput
 {
     float4 color : SV_Target0;
@@ -56,8 +62,8 @@ void GSmain_Base(
     uint2 texSize;
     tex.GetDimensions(texSize.x, texSize.y);
     
-    float width_h = texSize.x * extRate / 2.0f;
-    float height_h = texSize.y * extRate / 2.0f;
+    float width_h = texSize.x * extRate / 2.0f * CalcExpEaseRate(input[0].expEaseRate);
+    float height_h = texSize.y * extRate / 2.0f * CalcExpEaseRate(input[0].expEaseRate);
     
     GSOutput element;
     element.shocked = input[0].shocked;
@@ -117,8 +123,8 @@ void GSmain_Shocked(
     uint2 texSize;
     tex.GetDimensions(texSize.x, texSize.y);
     
-    float width_h = texSize.x * extRate / 2.0f * Easing_Exp_Out(1.0f - input[0].shocked, 1.0f, 1.5f, 1.0f);
-    float height_h = texSize.y * extRate / 2.0f * Easing_Exp_Out(1.0f - input[0].shocked, 1.0f, 1.5f, 1.0f);
+    float width_h = texSize.x * extRate / 2.0f * Easing_Exp_Out(1.0f - input[0].shocked, 1.0f, 1.5f, 1.0f) * CalcExpEaseRate(input[0].expEaseRate);
+    float height_h = texSize.y * extRate / 2.0f * Easing_Exp_Out(1.0f - input[0].shocked, 1.0f, 1.5f, 1.0f) * CalcExpEaseRate(input[0].expEaseRate);
     
     GSOutput element;
     element.shocked = input[0].shocked;
