@@ -16,7 +16,7 @@ private:
 	float angle;		// ’e–‹‚ğ”­Ë‚·‚éŠp“xB
 
 	const int SHOOT_DELAY = 2;				// ’e‚ğ”­Ë‚·‚éŠÔŠuB
-	const int MAX_ROUND = 3;
+	const int MAX_ROUND = 1;
 	const float SHOOT_COUNT_PER_ROUND = 10;	// ˆêü‚ÅŒ‚‚Â’e‚Ì”B
 	const float ANGLE = DirectX::XM_2PI / SHOOT_COUNT_PER_ROUND;
 	const float SPEED = 8.0f;				// ’e‘¬
@@ -27,7 +27,7 @@ public:
 
 	void Start() override;
 	void Init() override;
-	bool Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const int& GraphHandle)override;
+	bool Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle)override;
 
 };
 
@@ -51,6 +51,55 @@ public:
 
 	void Start() override;
 	void Init() override;
-	bool Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const int& GraphHandle)override;
+	bool Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle)override;
+
+};
+
+// “G‚Ì•ûŒü‚É””­Œ‚‚Â’e–‹
+class TargetShotBarrage : public BarrageBase {
+
+private:
+
+	/*===== ƒƒ“ƒo•Ï” =====*/
+
+	bool isEnd;			// I‚í‚Á‚½‚©‚Ç‚¤‚©BUpdateŠÖ”‚Å•Ô‚·’lB
+	int timer;			// ’e–‹‚ÌŠÔŠu‚È‚Ç‚Ég—p‚·‚éB
+	int shotCounter;	// Œ‚‚Á‚½”
+
+	const int SHOOT_DELAY = 5;				// ’e‚ğ”­Ë‚·‚éŠÔŠuB
+	const int SHOOT_COUNT = 3;
+	const float SPEED = 10.0f;				// ’e‘¬
+
+public:
+
+	/*===== ƒƒ“ƒoŠÖ” =====*/
+
+	void Start() override;
+	void Init() override;
+	bool Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle)override;
+
+};
+
+// “G‚Ì•ûŒü‚É•¡”ŒÂ‚Ì’e‚ğU‚ç‚Î‚ç‚¹‚ÄŒ‚‚Â
+class ShotGunBarrage : public BarrageBase {
+
+private:
+
+	/*===== ƒƒ“ƒo•Ï” =====*/
+
+	bool isEnd;			// I‚í‚Á‚½‚©‚Ç‚¤‚©BUpdateŠÖ”‚Å•Ô‚·’lB
+
+	const int SHOOT_COUNT = 10;				// Œ‚‚Â”
+	const float MAX_SPEED = 15.0f;			// ’e‘¬‚ÌÅ‘å’l
+	const float AngleDispersion = 0.5f;		// Šp“x‚Ì•ªU‹ï‡ ƒ‰ƒWƒAƒ“
+	const float MIN_SPEED = 5.0f;			// ’e‘¬‚ÌÅ¬’l
+
+public:
+
+	/*===== ƒƒ“ƒoŠÖ” =====*/
+
+	void Start() override;
+	void Init() override;
+	bool Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle)override;
 
 };

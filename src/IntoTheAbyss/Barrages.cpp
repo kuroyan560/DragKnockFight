@@ -24,7 +24,7 @@ void WhirlpoolBarrage::Init()
 
 }
 
-bool WhirlpoolBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const int& GraphHandle)
+bool WhirlpoolBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle)
 {
 
 	/*===== 更新処理 =====*/
@@ -86,7 +86,7 @@ void CircularBarrage::Init()
 
 }
 
-bool CircularBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const int& GraphHandle)
+bool CircularBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle)
 {
 
 	/*===== 更新処理 =====*/
@@ -112,3 +112,102 @@ bool CircularBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, c
 }
 
 #pragma endregion
+
+
+#pragma region TargetShotBarrage
+
+void TargetShotBarrage::Start()
+{
+
+	/*===== 開始 =====*/
+
+	isEnd = false;
+	timer = 0;
+	shotCounter = 0;
+
+}
+
+void TargetShotBarrage::Init()
+{
+
+	/*===== 強制終了 =====*/
+
+	isEnd = true;
+
+}
+
+bool TargetShotBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle)
+{
+
+	/*===== 更新処理 =====*/
+
+	if (isEnd) return true;
+
+	// タイマーを更新して弾を撃つ。
+	++timer;
+	if (SHOOT_DELAY <= timer) {
+
+		timer = 0;
+
+		++shotCounter;
+
+		BulletMgr.Generate(GraphHandle, Pos, atan2f(TargetPos.y - Pos.y, TargetPos.x - Pos.x), SPEED);
+
+	}
+
+	// 一定数撃ったら終わり。
+	if (SHOOT_COUNT <= shotCounter) isEnd = true;
+
+	return isEnd;
+}
+
+#pragma endregion
+
+void ShotGunBarrage::Start()
+{
+
+	/*===== 開始 =====*/
+
+	isEnd = false;
+
+}
+
+void ShotGunBarrage::Init()
+{
+
+	/*===== 強制終了 =====*/
+
+	isEnd = true;
+
+}
+
+bool ShotGunBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle)
+{
+
+	/*===== 更新処理 =====*/
+
+	if (isEnd) return true;
+
+	// キャラ間の角度。
+	float baseAngle = atan2f(TargetPos.y - Pos.y, TargetPos.x - Pos.x);
+
+	// 指定の数分弾を撃つ。
+	for (int index = 0; index < SHOOT_COUNT; ++index) {
+
+		// 散らばらせるために角度を多少ずらす。
+		float shootAngle = baseAngle + (KuroFunc::GetRand(AngleDispersion * 2.0f) - AngleDispersion);
+
+		// 移動速度もランダムで求める。
+		float speed = KuroFunc::GetRand(MAX_SPEED - MIN_SPEED) + MIN_SPEED;
+
+		// 弾を生成する。
+		BulletMgr.Generate(GraphHandle, Pos, shootAngle, speed);
+
+	}
+
+	// 一回撃ったら終わり。
+	isEnd = true;
+
+	return isEnd;
+
+}

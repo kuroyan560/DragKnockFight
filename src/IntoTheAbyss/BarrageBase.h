@@ -11,6 +11,6 @@ public:
 
 	virtual void Start() = 0;
 	virtual void Init() = 0;
-	virtual bool Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const int& GraphHandle) = 0;	// trueが帰ってきたら終わり。
+	virtual bool Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle) = 0;	// trueが帰ってきたら終わり。
 
 };
