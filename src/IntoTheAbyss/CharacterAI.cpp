@@ -27,7 +27,6 @@ CharacterAI::CharacterAI()
 		//TexHandleMgr::LoadDivGraph(pass + "dash.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
 	}
 
-	++dataArrayNum;
 	//Œv‰ñ‚èU‚è‰ñ‚µ
 	{
 		const int GRAPH_NUM = 3;
