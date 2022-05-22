@@ -15,7 +15,7 @@ public:
 	/*-- íËêî --*/
 
 	//const float MAX_RADIUS = 5.0f;
-	const float MAX_RADIUS = 10.0f;
+	const float MAX_RADIUS = 20.0f;
 	const float MAX_SPEED = 30.0f;
 	const int DEAD_TIMER = 120;
 

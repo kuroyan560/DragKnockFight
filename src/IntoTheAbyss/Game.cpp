@@ -498,6 +498,7 @@ void Game::Update(const bool& Loop)
 
 	//右弾と左プレイヤーの判定
 	auto rightBulMgr = CharacterManager::Instance()->Right()->GetBulletMgr();
+	static int DAMAGED_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/damaged.wav", 0.7f);
 	for (int index = 0; index < rightBulMgr.bullets.size(); ++index)
 	{
 		auto& bul = rightBulMgr.bullets[index];
@@ -512,6 +513,7 @@ void Game::Update(const bool& Loop)
 			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
 			bul.Init();
 			CharacterManager::Instance()->Left()->Damage();
+			AudioApp::Instance()->PlayWave(DAMAGED_SE);
 		}
 	}
 
