@@ -48,9 +48,6 @@ private:
 	bool tutorialSelect = false;
 	bool tutorialYes = true;
 
-	//std::unique_ptr<BossHandMgr> handMgr;
-	std::unique_ptr<BehaviorPredection> behavior;
-	int behaviorNum;
 public:
 	TitleScene();
 	void OnInitialize()override;

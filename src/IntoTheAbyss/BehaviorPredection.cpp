@@ -9,8 +9,10 @@ BehaviorPredection::BehaviorPredection(const std::vector<BehaviorGraphData> &DAT
 	size = { 1.0f,1.0f };
 	gaugePos = { 0.0f,0.0f };
 	gaugeSize = { 1.0f,1.0f };
-	varPos = { 0.0f,0.0f };
-	varSize = { 1.0f,1.0f };
+	leftVarPos = { 0.0f,0.0f };
+	rightVarPos = { 0.0f,0.0f };
+	commandPos = { 0.0f,0.0f };
+	commandSize = { 1.0f,1.0f };
 
 	std::vector<Anim>data;
 	for (int i = 0; i < DATA.size(); ++i)
@@ -32,32 +34,75 @@ void BehaviorPredection::Init()
 {
 }
 
-void BehaviorPredection::Update(const Vec2<float> &POS, int NOW_HANDLE)
+void BehaviorPredection::Update(const Vec2<float> &POS, int NOW_HANDLE, float RATE)
 {
-	Vec2<float>adjPos = { 0.0f,-50.0f };
-	pos = POS + adjPos;
+	Vec2<float>adjPos = { 0.0f,0.0f };
+	{
+		adjPos = { 0.0f,-50.0f };
+		pos = POS + adjPos;
+	}
+	{
+		adjPos = { 0.0f,30.0f };
+		gaugePos = POS + adjPos;
+	}
+	{
+		adjPos = { -97.5f,25.0f };
+		//画像サイズを縮小しそこに割合を足してゲージの描画と合わせる
+		Vec2<float> size = { RATE,1.0f };
+		leftVarPos = POS + adjPos;
+		rightVarPos = (leftVarPos + Vec2<float>(0.0f, 10.0f)) + (Vec2<float>(195.0f, 0.0f) * size);
+	}
+	{
+		adjPos = { 0.0f,-60.0f };
+		commandPos = POS + adjPos;
+	}
+
 	nowHandle = NOW_HANDLE;
 
 	handleData->ChangeAnim(nowHandle);
 	handleData->Update();
 }
 
-void BehaviorPredection::Draw()
+void BehaviorPredection::Draw(bool DEBUG)
 {
-	//フレームの描画
-	if (cautionFlags[nowHandle])
+	if (DEBUG)
 	{
-		DrawFunc::DrawRotaGraph2D(pos, size, 0.0f, TexHandleMgr::GetTexBuffer(cautionFlameHandle));
+		float zoom = 1.0f;
+		//フレームの描画
+		if (cautionFlags[nowHandle])
+		{
+			DrawFunc::DrawRotaGraph2D(pos, size * zoom, 0.0f, TexHandleMgr::GetTexBuffer(cautionFlameHandle));
+		}
+		else
+		{
+			DrawFunc::DrawRotaGraph2D(pos, size * zoom, 0.0f, TexHandleMgr::GetTexBuffer(defaultFlameHandle));
+		}
+
+		//ゲージの描画
+		DrawFunc::DrawExtendGraph2D(leftVarPos, rightVarPos, TexHandleMgr::GetTexBuffer(varHandle));
+		DrawFunc::DrawRotaGraph2D(gaugePos, gaugeSize * zoom, 0.0f, TexHandleMgr::GetTexBuffer(gaugeHandle));
+
+		//コマンドの描画
+		DrawFunc::DrawRotaGraph2D(commandPos, commandSize * zoom, 0.0f, TexHandleMgr::GetTexBuffer(handleData->GetGraphHandle()));
 	}
 	else
 	{
-		DrawFunc::DrawRotaGraph2D(pos, size, 0.0f, TexHandleMgr::GetTexBuffer(defaultFlameHandle));
+		float zoom = ScrollMgr::Instance()->zoom;
+		//フレームの描画
+		if (cautionFlags[nowHandle])
+		{
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), size * zoom, 0.0f, TexHandleMgr::GetTexBuffer(cautionFlameHandle));
+		}
+		else
+		{
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), size * zoom, 0.0f, TexHandleMgr::GetTexBuffer(defaultFlameHandle));
+		}
+
+		//ゲージの描画
+		DrawFunc::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(leftVarPos), ScrollMgr::Instance()->Affect(rightVarPos), TexHandleMgr::GetTexBuffer(varHandle));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(gaugePos), gaugeSize * zoom, 0.0f, TexHandleMgr::GetTexBuffer(gaugeHandle));
+
+		//コマンドの描画
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(commandPos), commandSize * zoom, 0.0f, TexHandleMgr::GetTexBuffer(handleData->GetGraphHandle()));
 	}
-
-	//ゲージの描画
-	DrawFunc::DrawRotaGraph2D(varPos, varSize, 0.0f, TexHandleMgr::GetTexBuffer(varHandle));
-	DrawFunc::DrawRotaGraph2D(gaugePos, gaugeSize, 0.0f, TexHandleMgr::GetTexBuffer(gaugeHandle));
-
-	//コマンドの描画
-	DrawFunc::DrawRotaGraph2D(pos, size, 0.0f, TexHandleMgr::GetTexBuffer(handleData->GetGraphHandle()));
 }

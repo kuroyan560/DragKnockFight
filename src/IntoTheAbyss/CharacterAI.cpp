@@ -12,7 +12,46 @@ CharacterAI::CharacterAI()
 
 
 
-	//behaviorGauge = std::make_unique<BehaviorPredection>();
+
+
+	std::vector<BehaviorGraphData>data;
+	data.resize(3);
+
+	std::string pass = "resource/ChainCombat/boss/behaviorPrediction/";
+	int dataArrayNum = 0;
+	int roopNum = 10;
+	//ダッシュ
+	{
+		const int GRAPH_NUM = 3;
+		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
+		data[dataArrayNum].handle.interval = roopNum;
+		data[dataArrayNum].handle.loop = true;
+		data[dataArrayNum].cautionFlag = false;
+		TexHandleMgr::LoadDivGraph(pass + "dash.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+	}
+
+	++dataArrayNum;
+	//時計回り振り回し
+	{
+		const int GRAPH_NUM = 3;
+		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
+		data[dataArrayNum].handle.interval = roopNum;
+		data[dataArrayNum].handle.loop = true;
+		data[dataArrayNum].cautionFlag = true;
+		TexHandleMgr::LoadDivGraph(pass + "clock_swing.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+	}
+
+	++dataArrayNum;
+	//反時計回り振り回し
+	{
+		const int GRAPH_NUM = 3;
+		data[dataArrayNum].handle.graph.resize(GRAPH_NUM);
+		data[dataArrayNum].handle.interval = roopNum;
+		data[dataArrayNum].handle.loop = true;
+		data[dataArrayNum].cautionFlag = true;
+		TexHandleMgr::LoadDivGraph(pass + "un_clock_swing.png", GRAPH_NUM, { GRAPH_NUM,1 }, data[dataArrayNum].handle.graph.data());
+	}
+	behaviorGauge = std::make_unique<BehaviorPredection>(data);
 }
 
 void CharacterAI::Init()
@@ -143,11 +182,13 @@ void CharacterAI::Update()
 		endPoint = strategyArray[strategyOfChoice]->endPoint;
 		startFlag = strategyArray[strategyOfChoice]->startFlag;
 		CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
+
+
+		float rate = strategyArray[strategyOfChoice]->GetGaugeStatus();
+
+		Vec2<float>adjPos = { 0.0f,-120.0f };
+		behaviorGauge->Update(CharacterManager::Instance()->Right()->pos + adjPos, strategyOfChoice, rate);
 	}
-
-	float rate = strategyArray[strategyOfChoice]->GetGaugeStatus();
-
-	behaviorGauge->Update(CharacterManager::Instance()->Right()->pos, strategyOfChoice);
 
 
 
@@ -164,6 +205,8 @@ void CharacterAI::Draw()
 		}
 	}
 #endif
-
-	behaviorGauge->Draw();
+	if (useAiFlag)
+	{
+		behaviorGauge->Draw(false);
+	}
 }

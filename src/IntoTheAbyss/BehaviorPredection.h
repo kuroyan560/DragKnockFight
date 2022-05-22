@@ -14,8 +14,8 @@ public:
 	BehaviorPredection(const std::vector<BehaviorGraphData> &DATA);
 
 	void Init();
-	void Update(const Vec2<float> &POS, int NOW_HANDLE);
-	void Draw();
+	void Update(const Vec2<float> &POS, int NOW_HANDLE, float RATE);
+	void Draw(bool DEBUG = true);
 
 private:
 	std::unique_ptr<PlayerAnimation> handleData;
@@ -29,7 +29,8 @@ private:
 
 
 	Vec2<float>pos, size;
+	Vec2<float>commandPos, commandSize;
 	Vec2<float>gaugePos, gaugeSize;
-	Vec2<float>varPos, varSize;
+	Vec2<float>leftVarPos, rightVarPos;
 };
 

@@ -273,7 +273,7 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
 
 	//navigationAi.Draw();
-	//characterAi.Draw();
+	characterAi.Draw();
 
 	/*bossGraph.SetTexture(TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()));
 	bossGraph.SetColor(Color(255, 0, 0, static_cast<int>(255 * stagingDevice.GetFlashAlpha())));
