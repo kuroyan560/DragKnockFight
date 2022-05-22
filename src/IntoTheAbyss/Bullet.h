@@ -26,6 +26,7 @@ public:
 	Vec2<float> pos;			// 座標
 	Vec2<float> prevPos;
 	Vec2<float> forwardVec;	// 移動方向ベクトル
+	float radius;
 	float alpha;
 	float speed;
 	int deadTimer;		// 死ぬまでの時間

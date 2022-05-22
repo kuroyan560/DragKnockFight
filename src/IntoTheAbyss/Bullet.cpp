@@ -62,6 +62,8 @@ void Bullet::Generate(const int& graphHandle, const Vec2<float>& generatePos, co
 
 	deadTimer = DEAD_TIMER;
 
+	radius = MAX_RADIUS;
+
 	// ç≈èâÇÃ1FrameÇ™åoâﬂÇµÇΩÇ©
 	isFirstFrame = false;
 }
@@ -87,7 +89,15 @@ void Bullet::Update()
 	//if (speed < 0.3f) Init();
 
 	--deadTimer;
-	if (deadTimer <= 0) Init();
+	if (deadTimer <= 0) {
+
+		radius -= 1.0f;
+
+		if (radius <= 0) {
+			Init();
+		}
+
+	}
 
 }
 
@@ -116,9 +126,9 @@ void Bullet::Draw()
 
 	//SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
-	Vec2<float>leftUp = { pos.x - MAX_RADIUS,pos.y - MAX_RADIUS };
+	Vec2<float>leftUp = { pos.x - radius,pos.y - radius };
 	leftUp = ScrollMgr::Instance()->Affect(leftUp);
-	Vec2<float>rightBottom = { pos.x + MAX_RADIUS,pos.y + MAX_RADIUS };
+	Vec2<float>rightBottom = { pos.x + radius,pos.y + radius };
 	rightBottom = ScrollMgr::Instance()->Affect(rightBottom);
 
 	DrawFunc::DrawExtendGraph2D(leftUp, rightBottom, TexHandleMgr::GetTexBuffer(graph));
