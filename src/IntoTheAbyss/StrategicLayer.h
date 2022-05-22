@@ -195,6 +195,7 @@ private:
 	bool dontCrashFlag;
 
 	int countSwingNum;
+	bool swingingFlag;
 	bool finishFlag;
 
 };

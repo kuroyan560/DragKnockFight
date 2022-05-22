@@ -128,10 +128,11 @@ void CharacterAI::Update()
 		{
 			strategyArray[strategyOfChoice]->Update();
 		}
-		else
+		if (CharacterManager::Instance()->Right()->GetNowBreak() || CharacterAIOrder::Instance()->stopFlag)
 		{
 			CharacterAIOrder::Instance()->vel = { 0.0f,0.0f };
 		}
+
 
 		//Žó‚¯“n‚µ-----------------------------------------------------
 		startPoint = strategyArray[strategyOfChoice]->startPoint;

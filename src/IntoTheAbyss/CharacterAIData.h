@@ -57,6 +57,7 @@ public:
 	bool swingClockWiseFlag;
 	bool swingCounterClockWiseFlag;
 	bool swingThreeTimesFlag;
+	bool stopFlag;
 
 	bool startAiFlag;
 	bool prevSwingFlag;//ó\îıìÆçÏ 
@@ -70,6 +71,7 @@ public:
 		swingCounterClockWiseFlag = false;
 		startAiFlag = false;
 		prevSwingFlag = false;
+		stopFlag = false;
 		prevRate = 0.0f;
 	};
 };

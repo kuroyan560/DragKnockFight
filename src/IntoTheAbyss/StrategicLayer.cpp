@@ -325,6 +325,7 @@ void GoToTheField::Init()
 	goToTheFieldFlag = true;
 	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
 	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
+	CharacterAIOrder::Instance()->stopFlag = false;
 	finishFlag = false;
 	operateSwing.Init(SWING_MAX_COOL_TIME);
 }
@@ -497,10 +498,11 @@ void AcquireASuperiorityGauge::Init()
 
 	CharacterAIOrder::Instance()->swingClockWiseFlag = false;
 	CharacterAIOrder::Instance()->swingCounterClockWiseFlag = false;
-
+	CharacterAIOrder::Instance()->stopFlag = false;
 	operateSwing.Init(SWING_MAX_COOL_TIME);
 
 	finishFlag = false;
+	swingingFlag = false;
 }
 
 void AcquireASuperiorityGauge::Update()
@@ -536,6 +538,8 @@ void AcquireASuperiorityGauge::Update()
 			CharacterAIData::Instance()->dashTimer = 0;
 			++countSwingNum;
 		}
+		swingingFlag = true;
+		CharacterAIOrder::Instance()->stopFlag = true;
 	}
 
 	//í—ªÀs’†
