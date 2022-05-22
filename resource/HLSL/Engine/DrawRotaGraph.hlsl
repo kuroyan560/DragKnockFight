@@ -96,6 +96,15 @@ float4 PSmain(GSOutput input) : SV_TARGET
     return tex.Sample(smp, input.uv) * input.emitColor;
 }
 
+float4 PSmain_Add(GSOutput input) : SV_TARGET
+{
+    float4 col = tex.Sample(smp, input.uv);
+    col *= input.emitColor;
+    col.xyz *= col.w;
+    return col;
+}
+
+
 float4 main(float4 pos : POSITION) : SV_POSITION
 {
     return pos;

@@ -351,7 +351,14 @@ void DrawFunc::DrawRotaGraph2D(const Vec2<float>& Center, const Vec2<float>& Ext
 		static Shaders SHADERS;
 		SHADERS.vs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph.hlsl", "VSmain", "vs_5_0");
 		SHADERS.gs = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph.hlsl", "GSmain", "gs_5_0");
-		SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph.hlsl", "PSmain", "ps_5_0");
+		if(BlendMode == AlphaBlendMode_Add)
+		{
+			SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph.hlsl", "PSmain_Add", "ps_5_0");
+		}
+		else
+		{
+			SHADERS.ps = D3D12App::Instance()->CompileShader("resource/HLSL/Engine/DrawRotaGraph.hlsl", "PSmain", "ps_5_0");
+		}
 
 		//インプットレイアウト
 		static std::vector<InputLayoutParam>INPUT_LAYOUT =

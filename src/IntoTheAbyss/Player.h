@@ -195,6 +195,7 @@ private:
 		if (anim->GetNowAnim() != TIRED)anim->ChangeAnim(DEFAULT_FRONT);
 		tutorial.SetPilotLeave(false);
 	}
+	void OnStaminaHeal(const int& HealAmount)override {};
 
 	bool drawCursorFlag;
 

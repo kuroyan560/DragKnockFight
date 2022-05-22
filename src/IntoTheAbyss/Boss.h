@@ -106,6 +106,8 @@ private:
 	virtual void OnPilotLeave()override {}	//パイロットがロボから離れた瞬間
 	virtual void OnPilotControl()override {}		//パイロットを動かす処理
 	virtual void OnPilotReturn()override {}	//パイロットがロボに戻った瞬間
+	void OnStaminaHeal(const int& HealAmount)override {};
+
 
 	void Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed);
 
