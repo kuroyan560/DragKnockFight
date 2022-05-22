@@ -74,7 +74,7 @@ private:
 
 	/*===== メンバ変数 =====*/
 
-	static const int LINE_COUNT = 9;	// 線分の数
+	static const int LINE_COUNT = 12;	// 線分の数
 	std::array<SwingLineSegment, LINE_COUNT> lineSegments;	// 線分
 	Vec2<float> reticlePos;	// 照準座標
 	Vec2<float> swingStartPos;	// 振り回し時の振り回されているキャラの開始座標

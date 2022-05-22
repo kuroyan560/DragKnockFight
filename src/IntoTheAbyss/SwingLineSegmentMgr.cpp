@@ -47,8 +47,7 @@ void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_LINE:
 
 		// 仮でアルファで画像を変える。
-		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle),
-			Color(TEAM_COLOR_X[Team], TEAM_COLOR_Y[Team], TEAM_COLOR_Z[Team], alpha), 32);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 32);
 
 		break;
 
@@ -56,16 +55,14 @@ void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 
 		drawPos = Vec2<float>(start - end) / 2.0f;
 		size = { 64.0f,64.0f };
-		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle),
-			Color(TEAM_COLOR_X[Team], TEAM_COLOR_Y[Team], TEAM_COLOR_Z[Team], alpha), 32);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 32);
 
 		break;
 
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW:
 
 		// 仮でアルファで画像を変える。
-		DrawFunc_Color::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle),
-			Color(TEAM_COLOR_X[Team], TEAM_COLOR_Y[Team], TEAM_COLOR_Z[Team], alpha), 32);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 32);
 
 		break;
 

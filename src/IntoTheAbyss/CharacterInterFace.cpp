@@ -388,8 +388,17 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	static const int RETICLE_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png") };
 	int team = GetWhichTeam();
 
-	CWSwingSegmentMgr.Setting(true, rbHandle, arrowHandle, lineHandle, RETICLE_GRAPH[team]);
-	CCWSwingSegmentMgr.Setting(false, lbHandle, arrowHandle, lineHandle, RETICLE_GRAPH[team]);
+	static int LINE_HANDLE[TEAM_NUM] = { 0 };
+	static int ARROW_HANDLE[TEAM_NUM] = { 0 };
+
+	if (!LINE_HANDLE[0])
+	{
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/swing_line.png", TEAM_NUM, { TEAM_NUM,1 }, LINE_HANDLE);
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/swing_arrow.png", TEAM_NUM, { TEAM_NUM,1 }, ARROW_HANDLE);
+	}
+
+	CWSwingSegmentMgr.Setting(true, rbHandle, ARROW_HANDLE[team], LINE_HANDLE[team], RETICLE_GRAPH[team]);
+	CCWSwingSegmentMgr.Setting(false, lbHandle, ARROW_HANDLE[team], LINE_HANDLE[team], RETICLE_GRAPH[team]);
 	isInputSwingRB = false;
 
 	addSwingRate = 0;
@@ -1407,8 +1416,6 @@ CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(Hon
 	bulletHitSphere.radius = size.x;
 	rbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_RB.png");
 	lbHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/button_LB.png");
-	lineHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_line.png");
-	arrowHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_arrow.png");
 	staminaGauge = std::make_shared<StaminaMgr>();
 	bulletMgr.Init();
 	barrage = std::make_unique<CircularBarrage>();

@@ -95,8 +95,6 @@ protected:
 	bool isInputSwingRB;					// RBでスイングしたかどうか falseだったらLB
 	int rbHandle;
 	int lbHandle;
-	int lineHandle;
-	int arrowHandle;
 	int reticleHandle;
 
 	//パイロットがロボから離れられる最大距離

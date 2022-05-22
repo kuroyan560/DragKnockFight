@@ -49,7 +49,7 @@ public:
 	/// <param name="Thickness">線の太さ</param>
 	/// <param name="BlendMode">ブレンドモード</param>
 	/// <param name="Miror">反転フラグ</param>
-	static void DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const std::shared_ptr<TextureBuffer>& Tex, const int& Thickness, const AlphaBlendMode& BlendMode = AlphaBlendMode_None, const Vec2<bool>& Mirror = { false,false });
+	static void DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float>& ToPos, const std::shared_ptr<TextureBuffer>& Tex, const int& Thickness, const AlphaBlendMode& BlendMode = AlphaBlendMode_Trans, const Vec2<bool>& Mirror = { false,false });
 
 	/// <summary>
 	/// 2D四角形の描画
