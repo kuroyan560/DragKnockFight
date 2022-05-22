@@ -1093,11 +1093,11 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				if (GetCharacterName() == PLAYABLE_BOSS_0)
 				{
-					SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->GetBossData().damage);
+					SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->playerData[0].damage);
 				}
 				else
 				{
-					SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->playerData[0].damage);
+					SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->GetBossData().damage);
 				}
 
 				partner.lock()->FinishSwing();
