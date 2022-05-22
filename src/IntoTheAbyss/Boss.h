@@ -63,6 +63,7 @@ public:
 	Vec2<float>pointPos;
 	float angle;
 
+	int appearBossGraphHandle;
 
 public:
 	/*===== ’è” =====*/

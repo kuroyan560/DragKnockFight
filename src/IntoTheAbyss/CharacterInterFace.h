@@ -62,8 +62,7 @@ private:
 	int gaugeReturnTimer;		// クラッシュなどした際に数値が代入され、0の時にデフォルトのゲージ量に戻る。
 	const int GAUGE_RETURN_TIMER = 60;
 
-	//登場演出
-	bool initPaticleFlag;
+
 	int moveTimer;
 
 	// 弾クラス
@@ -77,6 +76,9 @@ private:
 
 
 protected:
+	//登場演出
+	bool initPaticleFlag;
+
 	bool nowSwing;
 	bool isAdvancedEntrySwing;		// 振り回し先行入力
 	int advancedEntrySwingTimer;	// 振り回しの先行入力を受け付けてから、無効化されるまでのタイマー

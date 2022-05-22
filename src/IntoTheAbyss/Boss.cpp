@@ -64,6 +64,7 @@ Boss::Boss() :CharacterInterFace(SCALE)
 
 	initNaviAiFlag = false;
 
+	appearBossGraphHandle = animations[FRONT].graph[0];
 }
 
 void Boss::OnInit()
@@ -269,10 +270,16 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 	auto drawScale = stagingDevice.GetExtRate() * SCALE * appearExtRate;
 	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
 
-
-	DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeValue), bossScale * ScrollMgr::Instance()->zoom,
-		bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
-
+	if (!initPaticleFlag)
+	{
+		DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
+			TexHandleMgr::GetTexBuffer(appearBossGraphHandle), CRASH_TEX, stagingDevice.GetFlashAlpha());
+	}
+	else
+	{
+		DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeValue), bossScale * ScrollMgr::Instance()->zoom,
+			bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
+	}
 
 	//CWSwingSegmentMgr.Draw(RIGHT_TEAM);
 	//CCWSwingSegmentMgr.Draw(RIGHT_TEAM);
