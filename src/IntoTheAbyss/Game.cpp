@@ -408,7 +408,7 @@ void Game::Update(const bool& Loop)
 	}
 
 	// w’n‚Ì”»’è
-	DeterminationOfThePosition();
+	//DeterminationOfThePosition();
 
 	//ƒ‰ƒEƒ“ƒhI—¹‰‰oŠJŽn
 	RoundFinishEffect(Loop);
@@ -549,17 +549,43 @@ void Game::Update(const bool& Loop)
 	// —D¨ƒQ[ƒW‚ªU‚èØ‚Á‚½ƒgƒŠƒK[”»’è‚Ì‚Æ‚«‚ÉƒXƒ^ƒ“‰‰o‚ð—LŒø‰»‚·‚éB
 	if (SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).overGaugeFlag && !SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).prevOverGaugeFlag) {
 		// “G‚Ì—D¨ƒQ[ƒW‚ªU‚èØ‚Á‚½‚Æ‚¢‚¤‚±‚Æ‚ÍAƒvƒŒƒCƒ„[‚Ì—D¨ƒQ[ƒW‚ª0‚¾‚Æ‚¢‚¤‚±‚ÆB
-		StunEffect::Instance()->Activate(CharacterManager::Instance()->Left()->pos, Vec2<float>(0, 0), LEFT_TEAM);
+		/*StunEffect::Instance()->Activate(CharacterManager::Instance()->Left()->pos, Vec2<float>(0, 0), LEFT_TEAM);
 		ResultTransfer::Instance()->leftBreakCount++;
 		CharacterManager::Instance()->Left()->Break();
-		CharacterManager::Instance()->Left()->InitVel();
+		CharacterManager::Instance()->Left()->InitVel();*/
+		WinCounter::Instance()->RoundFinish(lineCenterPos, false, CharacterManager::Instance()->Left()->pos);
+		CharacterManager::Instance()->Left()->OnKnockOut();
+		roundFinishFlag = true;
+		playerOrEnemeyWinFlag = false;
+		gameStartFlag = false;
+
+		areaHitColor = Color(255, 0, 0, 255);
+		playerHitColor = Color(255, 0, 0, 255);
+
+		screenEdgeEffect.RightPlayerWin(120);
+
+		// —¼ƒLƒƒƒ‰‚Ì—\‘ªü‚ðÁ‚·B
+		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
+		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
 	}
 	if (SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).overGaugeFlag && !SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).prevOverGaugeFlag) {
 		// ƒvƒŒƒCƒ„[‚Ì—D¨ƒQ[ƒW‚ªU‚èØ‚Á‚½‚Æ‚¢‚¤‚±‚Æ‚ÍA“G‚Ì—D¨ƒQ[ƒW‚ª0‚¾‚Æ‚¢‚¤‚±‚ÆB
-		StunEffect::Instance()->Activate(CharacterManager::Instance()->Right()->pos, Vec2<float>(1200, 0), RIGHT_TEAM);
+		/*StunEffect::Instance()->Activate(CharacterManager::Instance()->Right()->pos, Vec2<float>(1200, 0), RIGHT_TEAM);
 		ResultTransfer::Instance()->rightBreakCount++;
 		CharacterManager::Instance()->Right()->Break();
-		CharacterManager::Instance()->Right()->InitVel();
+		CharacterManager::Instance()->Right()->InitVel();*/
+		//ƒvƒŒƒCƒ„[Ÿ—˜
+		WinCounter::Instance()->RoundFinish(lineCenterPos, true, CharacterManager::Instance()->Right()->pos);
+		CharacterManager::Instance()->Right()->OnKnockOut();
+		roundFinishFlag = true;
+		playerOrEnemeyWinFlag = true;
+		gameStartFlag = false;
+
+		screenEdgeEffect.LeftPlayerWin(120);
+
+		// —¼ƒLƒƒƒ‰‚Ì—\‘ªü‚ðÁ‚·B
+		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
+		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
 	}
 
 	CrashMgr::Instance()->Update();
