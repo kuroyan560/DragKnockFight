@@ -840,7 +840,8 @@ void Game::Scramble()
 			// 引っかかり判定だったら
 			if (CharacterManager::Instance()->Left()->GetStackFlag()) {
 
-				CharacterManager::Instance()->Left()->addLineLength += moveLength;
+				CharacterManager::Instance()->Left()->addLineLength += moveLength * 0.5f;
+				CharacterManager::Instance()->Right()->pos += -moveDir * Vec2<float>(moveLength * 0.5f, moveLength * 0.5f);
 
 				// 引っかかっている場合は更に押し戻す。(壁ズリを表現するため)
 				if (0 < CharacterManager::Instance()->Left()->addLineLength) {
@@ -876,7 +877,8 @@ void Game::Scramble()
 			// 引っかかり判定だったら
 			if (CharacterManager::Instance()->Right()->GetStackFlag()) {
 
-				CharacterManager::Instance()->Right()->addLineLength += moveLength;
+				CharacterManager::Instance()->Right()->addLineLength += moveLength * 0.5f;
+				CharacterManager::Instance()->Left()->pos += -moveDir * Vec2<float>(moveLength * 0.5f, moveLength * 0.5f);
 
 				// 引っかかっている場合は更に押し戻す。(壁ズリを表現するため)
 				if (0 < CharacterManager::Instance()->Right()->addLineLength) {
