@@ -67,8 +67,8 @@ private:
 	int shotCounter;	// 撃った数
 
 	const int SHOOT_DELAY = 5;				// 弾を発射する間隔。
-	const int SHOOT_COUNT = 3;
-	const float SPEED = 10.0f;				// 弾速
+	const int SHOOT_COUNT = 5;
+	const float SPEED = 15.0f;				// 弾速
 
 public:
 
@@ -91,8 +91,35 @@ private:
 
 	const int SHOOT_COUNT = 10;				// 撃つ数
 	const float MAX_SPEED = 15.0f;			// 弾速の最大値
-	const float AngleDispersion = 0.5f;		// 角度の分散具合 ラジアン
 	const float MIN_SPEED = 5.0f;			// 弾速の最小値
+	const float AngleDispersion = 0.5f;		// 角度の分散具合 ラジアン
+
+public:
+
+	/*===== メンバ関数 =====*/
+
+	void Start() override;
+	void Init() override;
+	bool Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle)override;
+
+};
+
+// 敵の方向に波状の弾幕を飛ばす。
+class WaveBarrage : public BarrageBase{
+
+private:
+
+	/*===== メンバ変数 =====*/
+
+	bool isEnd;			// 終わったかどうか。Update関数で返す値。
+	int timer;			// 弾幕の間隔などに使用する。
+	float sinTimer;		// sin波に使用する。
+
+	const float TIMER = 60.0f;				// 撃ち切るまでの合計時間
+	const float FRAME_TIMER = 0.2f;			// Sin波に加算する値
+	const float SPEED = 8.0f;				// 弾速
+	const float AngleDispersion = 1.0f;		// 角度の分散具合 ラジアン
+	const int SHOOT_DELAY = 5;				// 弾を撃つ遅延
 
 public:
 

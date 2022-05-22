@@ -163,6 +163,9 @@ bool TargetShotBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos,
 
 #pragma endregion
 
+
+#pragma region ShotGunBarrage
+
 void ShotGunBarrage::Start()
 {
 
@@ -210,4 +213,52 @@ bool ShotGunBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, co
 
 	return isEnd;
 
+}
+
+#pragma endregion
+
+void WaveBarrage::Start()
+{
+
+	/*===== 開始 =====*/
+
+	isEnd = false;
+	timer = 0;
+	sinTimer = 0;
+
+}
+
+void WaveBarrage::Init()
+{
+
+	/*===== 強制終了 =====*/
+
+	isEnd = true;
+
+}
+
+bool WaveBarrage::Update(BulletMgrBase& BulletMgr, const Vec2<float>& Pos, const Vec2<float>& TargetPos, const int& GraphHandle)
+{
+
+	/*===== 更新処理 =====*/
+
+	if (isEnd) return true;
+
+	// サイン波を更新する。
+	sinTimer += FRAME_TIMER;
+
+	float charaAngle = atan2f(TargetPos.y - Pos.y, TargetPos.x - Pos.x);
+	float shotAngle = sinf(sinTimer) * AngleDispersion;
+
+	// 弾を生成する。
+	if (timer % SHOOT_DELAY == 0)
+	{
+		BulletMgr.Generate(GraphHandle, Pos, charaAngle + shotAngle, SPEED);
+	}
+
+	// タイマーを更新し、タイマーが規定値に達したら処理を終える。
+	++timer;
+	if (TIMER <= timer) isEnd = true;
+
+	return isEnd;
 }
