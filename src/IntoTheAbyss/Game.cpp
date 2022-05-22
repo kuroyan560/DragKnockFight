@@ -441,10 +441,10 @@ void Game::Update(const bool& Loop)
 		CharacterManager::Instance()->Left()->SavePrevFramePos();
 		CharacterManager::Instance()->Right()->SavePrevFramePos();
 
-		CharacterManager::Instance()->Left()->Update(tmpMapData, lineCenterPos);
+		CharacterManager::Instance()->Left()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag);
 
 		// ボスの更新処理
-		CharacterManager::Instance()->Right()->Update(tmpMapData, lineCenterPos);
+		CharacterManager::Instance()->Right()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag);
 	}
 
 	CharacterAIData::Instance()->nowPos = CharacterManager::Instance()->Right()->pos;

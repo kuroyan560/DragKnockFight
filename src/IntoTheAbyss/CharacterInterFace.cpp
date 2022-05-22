@@ -425,11 +425,24 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 	prevSwingFlag = false;
 
+
+	bulletMgr.Init();
+	barrage->Init();
+	barrageDelayTimer = 0;
+
 	healAuraEaseRate = 1.0f;
 }
 
-void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
+void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect)
 {
+
+	if (team == WHICH_TEAM::RIGHT_TEAM) {
+
+		// 弾の更新処理
+		bulletMgr.Update();
+
+	}
+
 
 	// 振り回し中だったら線分を更新する。
 	if (nowSwing) {
@@ -530,9 +543,6 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		--stackWindowTimer;
 	}
 
-	//弾の更新
-	bulletMgr.Update();
-
 	//引っかかっている
 	if (stackMapChip)
 	{
@@ -621,6 +631,89 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 	}
 
 	staminaGauge->Update(!isPilotDetached, pos, staminaAutoHealAmount);
+
+
+	// 右のキャラだったら処理を行う。
+	if (team == WHICH_TEAM::RIGHT_TEAM && !isRoundStartEffect) {
+
+		// 弾幕の更新処理
+		static const int BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
+		bool isEnd = barrage->Update(bulletMgr, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Left()->pos, BULLET_HANDLE);
+
+		// 弾幕の更新が終わっていたら。
+		if (isEnd) {
+
+			// タイマーを更新。
+			++barrageDelayTimer;
+
+			// タイマーが規定値に達したら。
+			if (BARRAGE_DELAY_TIMER <= barrageDelayTimer) {
+
+				// 乱数を生成して、その乱数の弾幕をセットする。
+				int random = KuroFunc::GetRand(6);
+
+				switch (random)
+				{
+				case 0:
+
+					barrage = std::make_unique<WhirlpoolBarrage>();
+
+					break;
+
+				case 1:
+
+					barrage = std::make_unique<Whirlpool2WayBarrage>();
+
+					break;
+
+				case 2:
+
+					barrage = std::make_unique<CircularBarrage>();
+
+					break;
+
+				case 3:
+
+					barrage = std::make_unique<TargetShotBarrage>();
+
+					break;
+
+				case 4:
+
+					barrage = std::make_unique<TargetShot3WayBarrage>();
+
+					break;
+
+				case 5:
+
+					barrage = std::make_unique<ShotGunBarrage>();
+
+					break;
+
+				case 6:
+
+					barrage = std::make_unique<WaveBarrage>();
+
+					break;
+				default:
+					break;
+				}
+
+				barrage->Start();
+
+			}
+
+		}
+		else {
+
+			barrageDelayTimer = 0;
+
+		}
+
+
+	}
+
+
 }
 
 #include "DrawFunc.h"
@@ -1308,5 +1401,8 @@ CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(Hon
 	lineHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_line.png");
 	arrowHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/swing_arrow.png");
 	staminaGauge = std::make_shared<StaminaMgr>();
+	bulletMgr.Init();
+	barrage = std::make_unique<CircularBarrage>();
+	barrage->Init();
 }
 

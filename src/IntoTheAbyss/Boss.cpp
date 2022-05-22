@@ -63,6 +63,7 @@ Boss::Boss() :CharacterInterFace(SCALE)
 	anim = std::make_shared<PlayerAnimation>(animations);
 
 	initNaviAiFlag = false;
+
 }
 
 void Boss::OnInit()
@@ -90,10 +91,11 @@ void Boss::OnInit()
 
 	initShakeFalg = false;
 	bossScale = { 0.7f,0.7f };
+
 }
 
 #include"Camera.h"
-void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
+void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 {
 	/*===== 更新処理 =====*/
 
@@ -253,6 +255,8 @@ void Boss::OnUpdate(const std::vector<std::vector<int>> &MapData)
 	// 移動量に関する変数をここで全てvelに代入する。
 	vel = CharacterAIOrder::Instance()->vel;
 
+	
+
 }
 
 #include"DrawFunc_FillTex.h"
@@ -283,10 +287,11 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 	Vec3<Angle>lAngle = { 0.0f,0.0f,Angle::ConvertToDegree(bossGraphRadian) };
 	bossGraph.transform.SetRotate(lAngle);
 	bossGraph.Draw();*/
+
 }
 
-void Boss::Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed)
+void Boss::Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed)
 {
 	static const int BULLET_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
-	bulletMgr.Generate(BULLET_GRAPH, generatePos, forwardAngle, speed);
+	//bulletMgr.Generate(BULLET_GRAPH, generatePos, forwardAngle, speed);
 }
