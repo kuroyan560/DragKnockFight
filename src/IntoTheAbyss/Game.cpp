@@ -391,6 +391,14 @@ void Game::Init(const bool& PracticeMode)
 
 void Game::Update(const bool& Loop)
 {
+
+	if(DebugKeyManager::Instance()->DebugKeyTrigger(DIK_R, "Reset", "DIK_R"))
+	{
+		StageMgr::Instance()->SetLocalMapChipData(0, 0);
+		StageMgr::Instance()->SetLocalMapChipDrawBlock(0, 0);
+	}
+
+
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 	RoomMapChipArray tmpMapData = *mapData;
 
