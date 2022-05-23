@@ -59,14 +59,13 @@ struct BossDebugParameterData
 	int staminaDash;
 	int staminaSwing;
 	float staminaHealAmount;
-	float swingAngle;
-	float swingMax;
+
 	bool enableToDashAfterSwingFlag;
 
 	float damage;
 	BossDebugParameterData() :
 		vel(14.0f), coolTime(30), staminaMax(6), staminaDash(1), staminaSwing(2), enableToDashAfterSwingFlag(false),
-		swingAngle(0.02f), swingMax(0.11f), staminaHealAmount(1.5f), damage(10.0f)
+		staminaHealAmount(1.5f), damage(10.0f)
 	{
 	}
 };
@@ -98,6 +97,7 @@ public:
 	int roundParamImguiHandle;
 	int bossParamImguiHandle;
 	int playerParamImguiHandle;
+	int swingAngleParamImguiHandle;
 
 	MaskData maskData;
 
@@ -129,6 +129,8 @@ public:
 
 
 	bool aiFlag;
-
+	float swingAngle;
+	float swingMax;
+	bool useFinishSwingFlag;
 };
 

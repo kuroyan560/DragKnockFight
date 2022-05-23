@@ -20,13 +20,14 @@ const Color CharacterInterFace::TEAM_COLOR[TEAM_NUM] =
 
 void CharacterInterFace::SwingUpdate()
 {
-	ADD_SWING_ANGLE = DebugParameter::Instance()->GetBossData().swingAngle;
-	MAX_SWING_ANGLE = DebugParameter::Instance()->GetBossData().swingMax;
+	ADD_SWING_ANGLE = DebugParameter::Instance()->swingAngle;
+	MAX_SWING_ANGLE = DebugParameter::Instance()->swingMax;
 
 	/*===== 振り回し中に呼ばれる処理 =====*/
 
 	// 角度に加算する量を更新。
-	addSwingAngle += ADD_SWING_ANGLE * addSwingRate;
+	//addSwingAngle += ADD_SWING_ANGLE * addSwingRate;
+	addSwingAngle = ADD_SWING_ANGLE * addSwingRate;
 
 	// 振り回しの経過時間を設定。
 	++swingTimer;
@@ -47,11 +48,11 @@ void CharacterInterFace::SwingUpdate()
 	}
 
 	// 限界を超えていたら修正。
-	if (MAX_SWING_ANGLE < addSwingAngle) {
+	//if (MAX_SWING_ANGLE < addSwingAngle) {
 
-		addSwingAngle = MAX_SWING_ANGLE;
+	//	addSwingAngle = MAX_SWING_ANGLE;
 
-	}
+	//}
 
 	// 現在の角度を求める。
 	float nowAngle = atan2f(GetPartnerPos().y - pos.y, GetPartnerPos().x - pos.x);
@@ -1080,7 +1081,13 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				/*Crash(vec);
 
 				SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);*/
-				partner.lock()->FinishSwing();
+				if (DebugParameter::Instance()->useFinishSwingFlag)
+				{
+					if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
+					{
+						partner.lock()->FinishSwing();
+					}
+				}
 
 			}
 
@@ -1129,7 +1136,13 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					//SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->playerData[0].damage);
 				}
 
-				partner.lock()->FinishSwing();
+				if (DebugParameter::Instance()->useFinishSwingFlag)
+				{
+					if((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
+					{
+						partner.lock()->FinishSwing();
+					}
+				}
 
 				// チームに応じてクラッシュ数を加算する変数を変える。
 				if (team == WHICH_TEAM::LEFT_TEAM) {
