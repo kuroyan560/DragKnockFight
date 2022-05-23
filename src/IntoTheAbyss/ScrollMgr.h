@@ -9,7 +9,7 @@
 
 class ScrollMgr : public Singleton<ScrollMgr> {
 public:
-	ScrollMgr() :zoom(1.0f)
+	ScrollMgr() :zoom(2.0f)
 	{};
 	void Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, const Vec2<float>& ADJ);
 	void Update(const Vec2<float>& LineCenterPos);

@@ -24,7 +24,7 @@ public:
 	void Update();
 	// This "TargetPos" must not be affected by scroll.
 	void Focus(const Vec2<float>& TargetPos, const float& Zoom);
-	void Release() { active = 0; zoom = 1.0f; }
+	void Release() { active = 0; zoom = 2.0f; }
 
 	const int& Active() { return active; }
 };

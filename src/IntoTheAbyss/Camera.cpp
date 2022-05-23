@@ -5,7 +5,7 @@ void Camera::Init()
 	active = 0;
 	scrollAffect = { 0,0 };
 	//zoomAffect = 0.0f;
-	zoom = 1.0f;
+	zoom = 2.0f;
 }
 
 #include"ScrollMgr.h"
