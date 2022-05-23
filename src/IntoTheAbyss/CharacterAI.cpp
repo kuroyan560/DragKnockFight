@@ -3,6 +3,7 @@
 #include"ScrollMgr.h"
 #include"CharacterManager.h"
 #include"Stamina.h"
+#include"DebugParameter.h"
 
 CharacterAI::CharacterAI()
 {
@@ -163,7 +164,7 @@ void CharacterAI::Update()
 
 	//キャラクターAIに必要なデータ集め--------------------------
 
-	if (useAiFlag)
+	if (useAiFlag && DebugParameter::Instance()->aiFlag)
 	{
 		//意思決定--------------------------
 		//戦略が成功又は失敗した際
@@ -204,7 +205,11 @@ void CharacterAI::Update()
 		startFlag = strategyArray[strategyOfChoice]->startFlag;
 		CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
 	}
-
+	else
+	{
+		CharacterAIOrder::Instance()->vel = { 0.0f,0.0f };
+		CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
+	}
 
 
 }
