@@ -21,13 +21,13 @@ const Color CharacterInterFace::TEAM_COLOR[TEAM_NUM] =
 void CharacterInterFace::SwingUpdate()
 {
 
-	ADD_SWING_ANGLE = DebugParameter::Instance()->swingAngle;
+	ADD_SWING_ANGLE = Angle::ConvertToRadian(DebugParameter::Instance()->swingAngle);
 	MAX_SWING_ANGLE = DebugParameter::Instance()->swingMax;
 
 	/*===== 振り回し中に呼ばれる処理 =====*/
 
 	// 角度に加算する量を更新。
-	addSwingAngle += ADD_SWING_ANGLE * addSwingRate;
+	addSwingAngle = ADD_SWING_ANGLE * addSwingRate;
 
 	// 振り回しの経過時間を設定。
 	++swingTimer;
@@ -48,11 +48,11 @@ void CharacterInterFace::SwingUpdate()
 	}
 
 	// 限界を超えていたら修正。
-	if (MAX_SWING_ANGLE < addSwingAngle) {
+	//if (MAX_SWING_ANGLE < addSwingAngle) {
 
-		addSwingAngle = MAX_SWING_ANGLE;
+	//	addSwingAngle = MAX_SWING_ANGLE;
 
-	}
+	//}
 
 	// 現在の角度を求める。
 	float nowAngle = atan2f(GetPartnerPos().y - pos.y, GetPartnerPos().x - pos.x);
