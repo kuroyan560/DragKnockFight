@@ -753,7 +753,7 @@ void Game::Draw()
 
 	CrashMgr::Instance()->Draw();
 
-	screenEdgeEffect.Draw();
+	//screenEdgeEffect.Draw();
 
 	if (roundChangeEffect.initGameFlag && !roundFinishFlag)
 	{
@@ -767,11 +767,11 @@ void Game::Draw()
 	// プレイヤーとボス間に線を描画
 	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());
 
-	SuperiorityGauge::Instance()->Draw();
+	//SuperiorityGauge::Instance()->Draw();
 
-	miniMap.Draw();
+	//miniMap.Draw();
 
-	FaceIcon::Instance()->Draw();
+	//FaceIcon::Instance()->Draw();
 
 	WinCounter::Instance()->Draw();
 
