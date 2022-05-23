@@ -782,7 +782,7 @@ void CharacterInterFace::DrawUI()
 
 	if (GetCharacterName() != PLAYABLE_BOSS_0)
 	{
-		staminaGauge->Draw(pos);
+		//staminaGauge->Draw(pos);
 	}
 
 
