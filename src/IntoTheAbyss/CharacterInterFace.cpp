@@ -850,36 +850,37 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 	Vec2<float> moveDir = pos - prevPos;
 	float velOffset = 3.0f;
 	moveDir.Normalize();
-	INTERSECTED_LINE intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(pos, prevPos, moveDir, size, MapData, hitChipIndexBuff);
-	isHitTop = intersectedLine == INTERSECTED_TOP;
-	isHitRight = intersectedLine == INTERSECTED_RIGHT;
-	isHitLeft = intersectedLine == INTERSECTED_LEFT;
-	isHitBottom = intersectedLine == INTERSECTED_BOTTOM;
-	if (intersectedLine != INTERSECTED_NONE) hitChipIndex = hitChipIndexBuff;
+	INTERSECTED_LINE intersectedLine = INTERSECTED_NONE;
+	//MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(pos, prevPos, moveDir, size, MapData, hitChipIndexBuff);
+	//isHitTop = intersectedLine == INTERSECTED_TOP;
+	//isHitRight = intersectedLine == INTERSECTED_RIGHT;
+	//isHitLeft = intersectedLine == INTERSECTED_LEFT;
+	//isHitBottom = intersectedLine == INTERSECTED_BOTTOM;
+	//if (intersectedLine != INTERSECTED_NONE) hitChipIndex = hitChipIndexBuff;
 
-	// 左上
-	Vec2<float> velPosBuff = pos - size + Vec2<float>(velOffset, velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos - size + Vec2<float>(velOffset, velOffset), {}, {}, MapData, hitChipIndexBuff);
-	pos = velPosBuff + size - Vec2<float>(velOffset, velOffset);
-	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine, hitChipIndex, hitChipIndexBuff);
+	//// 左上
+	//Vec2<float> velPosBuff = pos - size + Vec2<float>(velOffset, velOffset);
+	//intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos - size + Vec2<float>(velOffset, velOffset), {}, {}, MapData, hitChipIndexBuff);
+	//pos = velPosBuff + size - Vec2<float>(velOffset, velOffset);
+	//SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine, hitChipIndex, hitChipIndexBuff);
 
-	// 右上
-	velPosBuff = pos + Vec2<float>(size.x, -size.y) + Vec2<float>(-velOffset, velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(size.x, -size.y) + Vec2<float>(-velOffset, velOffset), {}, {}, MapData, hitChipIndexBuff);
-	pos = velPosBuff - Vec2<float>(size.x, -size.y) - Vec2<float>(-velOffset, velOffset);
-	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine, hitChipIndex, hitChipIndexBuff);
+	//// 右上
+	//velPosBuff = pos + Vec2<float>(size.x, -size.y) + Vec2<float>(-velOffset, velOffset);
+	//intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(size.x, -size.y) + Vec2<float>(-velOffset, velOffset), {}, {}, MapData, hitChipIndexBuff);
+	//pos = velPosBuff - Vec2<float>(size.x, -size.y) - Vec2<float>(-velOffset, velOffset);
+	//SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine, hitChipIndex, hitChipIndexBuff);
 
-	// 右下
-	velPosBuff = pos + size + Vec2<float>(-velOffset, -velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + size + Vec2<float>(-velOffset, -velOffset), {}, {}, MapData, hitChipIndexBuff);
-	pos = velPosBuff - size - Vec2<float>(-velOffset, -velOffset);
-	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine, hitChipIndex, hitChipIndexBuff);
+	//// 右下
+	//velPosBuff = pos + size + Vec2<float>(-velOffset, -velOffset);
+	//intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + size + Vec2<float>(-velOffset, -velOffset), {}, {}, MapData, hitChipIndexBuff);
+	//pos = velPosBuff - size - Vec2<float>(-velOffset, -velOffset);
+	//SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine, hitChipIndex, hitChipIndexBuff);
 
-	// 左下
-	velPosBuff = pos + Vec2<float>(-size.x, size.y) + Vec2<float>(velOffset, -velOffset);
-	intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(-size.x, size.y) + Vec2<float>(velOffset, -velOffset), {}, {}, MapData, hitChipIndexBuff);
-	pos = velPosBuff - Vec2<float>(-size.x, size.y) - Vec2<float>(velOffset, -velOffset);
-	SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine, hitChipIndex, hitChipIndexBuff);
+	//// 左下
+	//velPosBuff = pos + Vec2<float>(-size.x, size.y) + Vec2<float>(velOffset, -velOffset);
+	//intersectedLine = MapChipCollider::Instance()->CheckHitMapChipBasedOnTheVel(velPosBuff, prevPos + Vec2<float>(-size.x, size.y) + Vec2<float>(velOffset, -velOffset), {}, {}, MapData, hitChipIndexBuff);
+	//pos = velPosBuff - Vec2<float>(-size.x, size.y) - Vec2<float>(velOffset, -velOffset);
+	//SaveHitInfo(isHitTop, isHitBottom, isHitLeft, isHitRight, intersectedLine, hitChipIndex, hitChipIndexBuff);
 
 	// スケールを元にしたマップチップとの当たり判定を行う。
 
