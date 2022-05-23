@@ -488,7 +488,7 @@ void Game::Update(const bool& Loop)
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
 		if (hitFlag)
 		{
-			SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
+			//SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
 			CharacterManager::Instance()->Left()->GetBulletMgr().bullets[index].Init();
 			CharacterManager::Instance()->Right()->Damage();
 		}
@@ -506,7 +506,7 @@ void Game::Update(const bool& Loop)
 		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
 		if (hitFlag)
 		{
-			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
+			//SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
 			CharacterManager::Instance()->Right()->GetBulletMgr().bullets[index].Init();
 			CharacterManager::Instance()->Left()->Damage();
 			AudioApp::Instance()->PlayWave(DAMAGED_SE);
@@ -642,7 +642,7 @@ void Game::Update(const bool& Loop)
 			zoomRate = addLineValue / MAX_ADD_ZOOM;
 		}
 		static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
-		Camera::Instance()->zoom = 1.0f - zoomRate + ZOOM_OFFSET;
+		//Camera::Instance()->zoom = 1.0f - zoomRate + ZOOM_OFFSET;
 
 		// カメラのズームが0.1f未満にならないようにする。
 		if (Camera::Instance()->zoom < 0.5f) Camera::Instance()->zoom = 0.5f;

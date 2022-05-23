@@ -10,7 +10,7 @@ class Camera : public Singleton<Camera>
 	float initZoom;
 	Camera()
 	{
-		initZoom = 0.4f;
+		initZoom = 0.3f;
 	}
 	friend class ScrollMgr;
 

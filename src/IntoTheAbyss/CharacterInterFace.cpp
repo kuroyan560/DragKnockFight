@@ -782,7 +782,7 @@ void CharacterInterFace::DrawUI()
 
 	if (GetCharacterName() != PLAYABLE_BOSS_0)
 	{
-		staminaGauge->Draw(pos);
+		//staminaGauge->Draw(pos);
 	}
 
 
@@ -1035,7 +1035,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 
 		// 一定以下だったらダメージを与えない。
-		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 2.0f) {
+		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 0.5f) {
 
 			// 触れただけでその色になるようにする。
 			MapChipType hitChipData = StageMgr::Instance()->GetLocalMapChipType(hitChipIndex);
@@ -1064,7 +1064,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 
 		}
-		else if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 4.0f) {
+		else if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 1.0f) {
 
 			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 			Vec2<float>vec = { 0,0 };
@@ -1104,11 +1104,11 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				if (GetCharacterName() == PLAYABLE_BOSS_0)
 				{
-					SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->playerData[0].damage);
+					//SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->GetBossData().damage);
 				}
 				else
 				{
-					SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->GetBossData().damage);
+					//SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->playerData[0].damage);
 				}
 
 				partner.lock()->FinishSwing();
