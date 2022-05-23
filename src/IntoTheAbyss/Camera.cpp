@@ -8,7 +8,6 @@ void Camera::Init()
 	zoom = initZoom;
 }
 
-
 #include"ShakeMgr.h"
 #include"KuroMath.h"
 #include"WinApp.h"

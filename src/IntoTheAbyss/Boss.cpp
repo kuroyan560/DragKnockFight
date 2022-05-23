@@ -79,14 +79,14 @@ void Boss::OnInit()
 
 	afterImgageTimer = 0;
 	bossCount = 0;
-	characterAi.Init();
+	//characterAi.Init();
 	anim->Init(FRONT);
 
 	//他の処理との都合上Initに一回のみ初期化
 	if (!initNaviAiFlag)
 	{
 		//パターンに渡すデータの初期化
-		navigationAi.Init(*StageMgr::Instance()->GetLocalMap());
+		//navigationAi.Init(*StageMgr::Instance()->GetLocalMap());
 		initNaviAiFlag = true;
 	}
 
@@ -211,9 +211,11 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 		navigationAi.endPoint = characterAi.endPoint;
 		navigationAi.startFlag = characterAi.startFlag;
 
-		navigationAi.Update({});
-		characterAi.Update();
-
+		if (DebugParameter::Instance()->aiFlag)
+		{
+			navigationAi.Update({});
+			characterAi.Update();
+		}
 		//ボスのAI-----------------------
 	}
 
