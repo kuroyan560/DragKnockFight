@@ -732,7 +732,8 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 {
 	// Žc‘œ‚ð•`‰æ
-	if (!GetNowBreak()) {
+	if (!GetNowBreak() && team == LEFT_TEAM) {
+		
 		CWSwingSegmentMgr.Draw(team);
 		CCWSwingSegmentMgr.Draw(team);
 	}
