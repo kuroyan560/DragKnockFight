@@ -37,12 +37,12 @@ void CharacterInterFace::SwingUpdate()
 		if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
 		{
 			// スタミナを消費
-			staminaGauge->ConsumesStamina(DebugParameter::Instance()->GetBossData().staminaSwing);
+			//staminaGauge->ConsumesStamina(DebugParameter::Instance()->GetBossData().staminaSwing);
 		}
 		else
 		{
 			// スタミナを消費
-			staminaGauge->ConsumesStamina(SWING_STAMINA);
+			//staminaGauge->ConsumesStamina(SWING_STAMINA);
 		}
 	}
 
@@ -98,6 +98,7 @@ void CharacterInterFace::SwingUpdate()
 
 		// 振り回し終わり！
 		FinishSwing();
+
 	}
 	// [最初が反時計回り] 且つ [現在が時計回り] だったら
 	if (!isSwingClockWise && 0 < crossResult && 15 < swingTimer) {
@@ -107,6 +108,7 @@ void CharacterInterFace::SwingUpdate()
 
 		// 振り回し終わり！
 		FinishSwing();
+
 	}
 
 
@@ -516,7 +518,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		}
 
 		//スタミナ消費
-		staminaGauge->ConsumesStaminaByGauge(1.0f);
+		//staminaGauge->ConsumesStaminaByGauge(1.0f);
 		//if (!staminaGauge->ConsumesStaminaByGauge(0.5f))
 		//スタミナが空っぽなら
 		if (staminaGauge->emptyTrigger)

@@ -633,7 +633,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 		dashAftImgTimer = 10;
 
 		// スタミナを消費
-		staminaGauge->ConsumesStamina(DASH_STAMINA);
+		//staminaGauge->ConsumesStamina(DASH_STAMINA);
 
 		CharacterAIData::Instance()->dashFlag = true;
 	}

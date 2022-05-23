@@ -255,8 +255,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	// ˆÚ“®—Ê‚ÉŠÖ‚·‚é•Ï”‚ð‚±‚±‚Å‘S‚Ävel‚É‘ã“ü‚·‚éB
 	vel = CharacterAIOrder::Instance()->vel;
 
-	
-
 }
 
 #include"DrawFunc_FillTex.h"

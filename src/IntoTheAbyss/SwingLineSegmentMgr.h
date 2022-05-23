@@ -87,7 +87,7 @@ private:
 
 	bool isClockWise;	// Œv‰ñ‚è‚©H
 
-	const float ANGLE_DIFFERENCE = 0.349066f;	// 20‹
+	const float ANGLE_DIFFERENCE = DirectX::XM_PI / LINE_COUNT;	// 20‹
 
 	bool isHitWallFlag;//U‚è‰ñ‚µ‚½æ‚ª•Ç‚É“–‚½‚é‚©‚Ç‚¤‚©
 public:
