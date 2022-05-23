@@ -223,27 +223,43 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			if (miniIntersectedPoint.hitLine == INTERSECTED_TOP) {
 
 				// 当たった地点の少し右が0インデックスだったら右側に移動させる。
-				Vec2<float> rightChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset) / MAP_CHIP_SIZE);
-				Vec2<float> leftChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset) / MAP_CHIP_SIZE);
-				if (StageMgr::Instance()->GetMapChipBlock(0, 0, rightChipIndex) == 0) {
+				Vec2<float> rightChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+				Vec2<float> leftChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+				if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, rightChipIndex) == 0) {
 
 					// 押し戻す。
-					pos.x = miniIntersectedPoint.hitPos.x + size.x;
+					pos.x = miniIntersectedPoint.hitPos.x + size.x + zuriOffset;
 
 				}
-				else if (StageMgr::Instance()->GetMapChipBlock(0, 0, leftChipIndex) == 0) {
+				else if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, leftChipIndex) == 0) {
 
 					// 押し戻す。
-					pos.x = miniIntersectedPoint.hitPos.x - size.x;
+					pos.x = miniIntersectedPoint.hitPos.x - size.x - zuriOffset;
 
 				}
 
-					// 押し戻す。
-					pos.y = miniIntersectedPoint.hitPos.y - size.y - offset;
+				// 押し戻す。
+				pos.y = miniIntersectedPoint.hitPos.y - size.y - offset;
 
 
 			}
 			else if (miniIntersectedPoint.hitLine == INTERSECTED_RIGHT) {
+
+				// 当たった地点の少し上が0インデックスだったら右側に移動させる。
+				Vec2<float> upChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+				Vec2<float> bottomChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+				if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, upChipIndex) == 0) {
+
+					// 押し戻す。
+					pos.y = miniIntersectedPoint.hitPos.y - size.y - zuriOffset;
+
+				}
+				else if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, bottomChipIndex) == 0) {
+
+					// 押し戻す。
+					pos.y = miniIntersectedPoint.hitPos.y + size.y + zuriOffset;
+
+				}
 
 				// 押し戻す。
 				pos.x = miniIntersectedPoint.hitPos.x + size.x + offset;
@@ -252,27 +268,43 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			else if (miniIntersectedPoint.hitLine == INTERSECTED_BOTTOM) {
 
 				// 当たった地点の少し右が0インデックスだったら右側に移動させる。
-				Vec2<float> rightChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset) / MAP_CHIP_SIZE);
-				Vec2<float> leftChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset) / MAP_CHIP_SIZE);
-				if (StageMgr::Instance()->GetMapChipBlock(0, 0, rightChipIndex) == 0) {
+				Vec2<float> rightChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+				Vec2<float> leftChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+				if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, rightChipIndex) == 0) {
 
 					// 押し戻す。
-					pos.x = miniIntersectedPoint.hitPos.x + size.x;
+					pos.x = miniIntersectedPoint.hitPos.x + size.x + zuriOffset;
 
 				}
-				else if (StageMgr::Instance()->GetMapChipBlock(0, 0, leftChipIndex) == 0) {
+				else if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, leftChipIndex) == 0) {
 
 					// 押し戻す。
-					pos.x = miniIntersectedPoint.hitPos.x - size.x;
+					pos.x = miniIntersectedPoint.hitPos.x - size.x - zuriOffset;
 
 				}
 
-					// 押し戻す。
-					pos.y = miniIntersectedPoint.hitPos.y + size.y + offset;
+				// 押し戻す。
+				pos.y = miniIntersectedPoint.hitPos.y + size.y + offset;
 
 
 			}
 			else if (miniIntersectedPoint.hitLine == INTERSECTED_LEFT) {
+
+				// 当たった地点の少し上が0インデックスだったら右側に移動させる。
+				Vec2<float> upChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+				Vec2<float> bottomChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+				if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, upChipIndex) == 0) {
+
+					// 押し戻す。
+					pos.y = miniIntersectedPoint.hitPos.y - size.y - zuriOffset;
+
+				}
+				else if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, bottomChipIndex) == 0) {
+
+					// 押し戻す。
+					pos.y = miniIntersectedPoint.hitPos.y + size.y + zuriOffset;
+
+				}
 
 				// 押し戻す。
 				pos.x = miniIntersectedPoint.hitPos.x - size.x - offset;
@@ -290,7 +322,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 	return INTERSECTED_NONE;
 }
 
-INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& pos, const Vec2<float>& size, const vector<vector<int>>& mapChipData, const INTERSECTED_LINE& direction, Vec2<int>& hitChipIndex)
+INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& size, const vector<vector<int>>& mapChipData, const INTERSECTED_LINE& direction, Vec2<int>& hitChipIndex)
 {
 	/*===== マップチップとプレイヤーの当たり判定 =====*/
 
@@ -488,24 +520,49 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			float pushBackOffset = 0.0f;
 
 			// 壁ズリを検索するオフセット。
-			float zuriOffset = 10.0f;
+			float zuriOffset = 20.0f;
+
+			// どちら側に進んでいるか。
+			bool isMoveTop = prevFramePos.y < pos.y;
+			bool isMoveRight = prevFramePos.x < pos.x;
+
+			// 大きさに寄っては無効化する。
+			bool isNullificationX = false;
+			bool isNullificationY = false;
+			if (fabs(pos.y - prevFramePos.y) < fabs(pos.x - prevFramePos.x)) {
+
+				isNullificationY = true;
+
+			}
+			else {
+
+				isNullificationX = true;
+
+			}
 
 			// 最小の交点の種類によって処理を分ける。
 			if (miniIntersectedPoint.hitLine == INTERSECTED_TOP) {
 
-				// 当たった地点の少し右が0インデックスだったら右側に移動させる。
-				Vec2<float> rightChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
-				Vec2<float> leftChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
-				if (StageMgr::Instance()->GetMapChipBlock(0, 0, rightChipIndex) == 0) {
+				// Y軸ののし上がりが無効化されていなかったら
+				if (!isNullificationY) {
 
-					// 押し戻す。
-					pos.x = miniIntersectedPoint.hitPos.x + size.x + zuriOffset;
+					// 当たった地点の少し右が0インデックスだったら右側に移動させる。
+					Vec2<float> rightChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+					Vec2<float> leftChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+					if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, rightChipIndex) == 0 && isMoveRight) {
 
-				}
-				else if (StageMgr::Instance()->GetMapChipBlock(0, 0, leftChipIndex) == 0) {
+						// 押し戻す。
+						float pushBackSize = MAP_CHIP_SIZE - RoundUp(miniIntersectedPoint.hitPos.x, MAP_CHIP_SIZE);
+						pos.x = miniIntersectedPoint.hitPos.x + pushBackSize;
 
-					// 押し戻す。
-					pos.x = miniIntersectedPoint.hitPos.x - size.x - zuriOffset;
+					}
+					else if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, leftChipIndex) == 0 && !isMoveRight) {
+
+						// 押し戻す。
+						float pushBackSize = MAP_CHIP_SIZE - RoundUp(miniIntersectedPoint.hitPos.x, MAP_CHIP_SIZE);
+						pos.x = miniIntersectedPoint.hitPos.x - pushBackSize;
+
+					}
 
 				}
 
@@ -516,25 +573,55 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			}
 			else if (miniIntersectedPoint.hitLine == INTERSECTED_RIGHT) {
 
+				// Y軸ののし上がりが無効化されていなかったら
+				if (!isNullificationX) {
+
+					// 当たった地点の少し上が0インデックスだったら右側に移動させる。
+					Vec2<float> upChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+					Vec2<float> bottomChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+					if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, upChipIndex) == 0 && isMoveTop) {
+
+						// 押し戻す。
+						float pushBackSize = MAP_CHIP_SIZE - RoundUp(miniIntersectedPoint.hitPos.y, MAP_CHIP_SIZE);
+						pos.y = miniIntersectedPoint.hitPos.y - pushBackSize;
+
+					}
+					else if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, bottomChipIndex) == 0 && !isMoveTop) {
+
+						// 押し戻す。
+						float pushBackSize = MAP_CHIP_SIZE - RoundUp(miniIntersectedPoint.hitPos.y, MAP_CHIP_SIZE);
+						pos.y = miniIntersectedPoint.hitPos.y + pushBackSize;
+
+					}
+
+				}
+
 				// 押し戻す。
 				pos.x = miniIntersectedPoint.hitPos.x + size.x + pushBackOffset;
 
 			}
 			else if (miniIntersectedPoint.hitLine == INTERSECTED_BOTTOM) {
 
-				// 当たった地点の少し右が0インデックスだったら右側に移動させる。
-				Vec2<float> rightChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
-				Vec2<float> leftChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
-				if (StageMgr::Instance()->GetMapChipBlock(0, 0, rightChipIndex) == 0) {
+				// Y軸ののし上がりが無効化されていなかったら
+				if (!isNullificationY) {
 
-					// 押し戻す。
-					pos.x = miniIntersectedPoint.hitPos.x + size.x + zuriOffset;
+					// 当たった地点の少し右が0インデックスだったら右側に移動させる。
+					Vec2<float> rightChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+					Vec2<float> leftChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+					if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, rightChipIndex) == 0 && isMoveRight) {
 
-				}
-				else if (StageMgr::Instance()->GetMapChipBlock(0, 0, leftChipIndex) == 0) {
+						// 押し戻す。
+						float pushBackSize = MAP_CHIP_SIZE - RoundUp(miniIntersectedPoint.hitPos.x, MAP_CHIP_SIZE);
+						pos.x = miniIntersectedPoint.hitPos.x + pushBackSize;
 
-					// 押し戻す。
-					pos.x = miniIntersectedPoint.hitPos.x - size.x - zuriOffset;
+					}
+					else if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, leftChipIndex) == 0 && !isMoveRight) {
+
+						// 押し戻す。
+						float pushBackSize = MAP_CHIP_SIZE - RoundUp(static_cast<size_t>(miniIntersectedPoint.hitPos.x), MAP_CHIP_SIZE);
+						pos.x = miniIntersectedPoint.hitPos.x - pushBackSize;
+
+					}
 
 				}
 
@@ -544,6 +631,29 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 			}
 			else if (miniIntersectedPoint.hitLine == INTERSECTED_LEFT) {
+
+				// Y軸ののし上がりが無効化されていなかったら
+				if (!isNullificationX) {
+
+					// 当たった地点の少し上が0インデックスだったら右側に移動させる。
+					Vec2<float> upChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y - zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+					Vec2<float> bottomChipIndex = Vec2<float>((miniIntersectedPoint.hitPos.x + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE, (miniIntersectedPoint.hitPos.y + zuriOffset + MAP_CHIP_HALF_SIZE) / MAP_CHIP_SIZE);
+					if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, upChipIndex) == 0 && isMoveTop) {
+
+						// 押し戻す。
+						float pushBackSize = MAP_CHIP_SIZE - RoundUp(miniIntersectedPoint.hitPos.y, MAP_CHIP_SIZE);
+						pos.y = miniIntersectedPoint.hitPos.y - pushBackSize;
+
+					}
+					else if (StageMgr::Instance()->GetLocalMapChipBlock(0, 0, bottomChipIndex) == 0 && !isMoveTop) {
+
+						// 押し戻す。
+						float pushBackSize = MAP_CHIP_SIZE - RoundUp(miniIntersectedPoint.hitPos.y, MAP_CHIP_SIZE);
+						pos.y = miniIntersectedPoint.hitPos.y + pushBackSize;
+
+					}
+
+				}
 
 				// 押し戻す。
 				pos.x = miniIntersectedPoint.hitPos.x - size.x - pushBackOffset;

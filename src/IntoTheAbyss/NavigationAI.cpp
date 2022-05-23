@@ -66,10 +66,10 @@ void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
 
 			// 壁とウェイポイントの当たり判定を行う。
 			Vec2<int> buff;	// 新しく当たり判定関数に機能を追加したためそれに合わせるための変数です。この場において用途はありません。
-			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_LEFT, buff);
-			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_RIGHT, buff);
-			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_TOP, buff);
-			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_BOTTOM, buff);
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(0, 0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_LEFT, buff);
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(0, 0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_RIGHT, buff);
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(0, 0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_TOP, buff);
+			wallFlag |= MapChipCollider::Instance()->CheckHitMapChipBasedOnTheScale(worldPos, Vec2<float>(0, 0), Vec2<float>(MAP_CHIP_SIZE, MAP_CHIP_SIZE), MAP_DATA, INTERSECTED_BOTTOM, buff);
 
 			//等間隔で開ける
 			wayPoints[y][x].pos = worldPos;
