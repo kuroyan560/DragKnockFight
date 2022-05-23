@@ -1081,7 +1081,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);*/
 				if (DebugParameter::Instance()->useFinishSwingFlag)
 				{
-					if (!(0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
+					if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
 					{
 						partner.lock()->FinishSwing();
 					}
@@ -1136,11 +1136,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				if (DebugParameter::Instance()->useFinishSwingFlag)
 				{
-					if(!(0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
+					if((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
 					{
 						partner.lock()->FinishSwing();
 					}
 				}
+
 				// チームに応じてクラッシュ数を加算する変数を変える。
 				if (team == WHICH_TEAM::LEFT_TEAM) {
 					++ResultTransfer::Instance()->leftCrashCount;
