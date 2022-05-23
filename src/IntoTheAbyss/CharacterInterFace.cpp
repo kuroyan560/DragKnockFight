@@ -1034,8 +1034,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 		}
 
 
-
-
 		// 一定以下だったらダメージを与えない。
 		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 0.5f) {
 
@@ -1080,12 +1078,16 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				/*Crash(vec);
 
 				SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);*/
-				if (DebugParameter::Instance()->useFinishSwingFlag)
+				if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
 				{
-					if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
+					if (DebugParameter::Instance()->useFinishSwingFlag)
 					{
 						partner.lock()->FinishSwing();
 					}
+				}
+				else
+				{
+					partner.lock()->FinishSwing();
 				}
 
 			}
@@ -1135,12 +1137,16 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					//SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->playerData[0].damage);
 				}
 
-				if (DebugParameter::Instance()->useFinishSwingFlag)
+				if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
 				{
-					if((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
+					if (DebugParameter::Instance()->useFinishSwingFlag)
 					{
 						partner.lock()->FinishSwing();
 					}
+				}
+				else
+				{
+					partner.lock()->FinishSwing();
 				}
 
 				// チームに応じてクラッシュ数を加算する変数を変える。
