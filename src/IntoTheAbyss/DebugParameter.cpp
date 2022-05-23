@@ -91,7 +91,6 @@ void DebugParameter::DrawImGui()
 		ImGui::InputInt("STAMINA_MAX", &bossDebugData[bossStageNum].staminaMax);
 		ImGui::InputInt("STAMINA_DASH", &bossDebugData[bossStageNum].staminaDash);
 		ImGui::InputInt("STAMINA_SWING", &bossDebugData[bossStageNum].staminaSwing);
-
 		ImGui::InputFloat("SWING_DAMAGE", &bossDebugData[bossStageNum].damage);
 		ImGui::InputFloat("BULLET_DAMAGE", &gaugeData->enemyBulletAddGuaugeValue);
 		ImGui::InputFloat("STAMINA_HEAL_AMOUNT", &bossDebugData[bossStageNum].staminaHealAmount);
@@ -103,7 +102,6 @@ void DebugParameter::DrawImGui()
 	{
 		ImGui::Begin("Swing");
 		ImGui::InputFloat("SWING_ANGLE", &swingAngle);
-		ImGui::InputFloat("SWING_MAX", &swingMax);
 		ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
 		ImGui::End();
 	}
