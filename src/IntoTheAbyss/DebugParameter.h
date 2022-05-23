@@ -66,7 +66,7 @@ struct BossDebugParameterData
 	float damage;
 	BossDebugParameterData() :
 		vel(14.0f), coolTime(30), staminaMax(6), staminaDash(1), staminaSwing(2), enableToDashAfterSwingFlag(false),
-		swingAngle(0.02f), swingMax(0.11f), staminaHealAmount(1.5f), damage(10.0f)
+		swingAngle(0.1f), swingMax(0.11f), staminaHealAmount(1.5f), damage(10.0f)
 	{
 	}
 };
