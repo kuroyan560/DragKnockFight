@@ -1,7 +1,7 @@
 #include "ScrollMgr.h"
 #include"../Engine/WinApp.h"
 
-const float ScrollMgr::INIT_SCROLL = 0.7f;
+const float ScrollMgr::INIT_SCROLL = 0.4f;
 
 void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, const Vec2<float>& ADJ)
 {

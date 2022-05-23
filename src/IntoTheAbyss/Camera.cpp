@@ -5,7 +5,7 @@ void Camera::Init()
 	active = 0;
 	scrollAffect = { 0,0 };
 	//zoomAffect = 0.0f;
-	zoom = 0.7f;
+	zoom = initZoom;
 }
 
 
@@ -26,7 +26,7 @@ void Camera::Update()
 	}
 	else
 	{
-		scrollAffect = KuroMath::Lerp(scrollAffect, { 0,0 }, 0.7f);
+		scrollAffect = KuroMath::Lerp(scrollAffect, { 0,0 }, initZoom);
 	}
 
 	ScrollMgr::Instance()->zoom = KuroMath::Lerp(ScrollMgr::Instance()->zoom, zoom, 0.1f);

@@ -3,6 +3,8 @@
 
 DebugParameter::DebugParameter()
 {
+	aiFlag = false;
+
 	playerData.push_back(PlayerDebugParameterData(15.0f));
 	//デフォルト
 	nowData = std::make_shared<PlayerDebugParameterData>(15.0f);
@@ -94,6 +96,11 @@ void DebugParameter::DrawImGui()
 		ImGui::Checkbox("enableToDashAfterSwingFlag", &bossDebugData[bossStageNum].enableToDashAfterSwingFlag);
 		ImGui::End();
 	}
+
+	ImGui::Begin("Ai");
+	ImGui::Checkbox("On", &aiFlag);
+	ImGui::End();
+
 }
 
 const BossDebugParameterData &DebugParameter::GetBossData()
