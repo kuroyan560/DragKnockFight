@@ -9,7 +9,8 @@
 
 class ScrollMgr : public Singleton<ScrollMgr> {
 public:
-	ScrollMgr() :zoom(1.0f)
+	static const float INIT_SCROLL;
+	ScrollMgr() :zoom(INIT_SCROLL)
 	{};
 	void Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, const Vec2<float>& ADJ);
 	void Update(const Vec2<float>& LineCenterPos);
@@ -24,6 +25,7 @@ public:
 	float zoom;						//ズーム倍率
 
 	Vec2<float> lineCenterOffset;	// 紐の中心を画面の中心に持ってくるためのオフセット 中心からずれていたらこの値を使って中心に持ってくる。
+
 
 private:
 

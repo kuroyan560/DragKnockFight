@@ -488,7 +488,7 @@ void Game::Update(const bool& Loop)
 		//‰Šú‰»‚³‚ê‚Ä‚¢‚é&&ƒvƒŒƒCƒ„[‚Æ”»’è‚ðŽæ‚Á‚½‚ç—D¨ƒQ[ƒW‚Ì•Î‚è‚ª•Ï‚í‚èA’e‚Í‰Šú‰»‚³‚ê‚é
 		if (hitFlag)
 		{
-			SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
+			//SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
 			CharacterManager::Instance()->Left()->GetBulletMgr().bullets[index].Init();
 			CharacterManager::Instance()->Right()->Damage();
 		}
@@ -506,7 +506,7 @@ void Game::Update(const bool& Loop)
 		//‰Šú‰»‚³‚ê‚Ä‚¢‚é&&ƒvƒŒƒCƒ„[‚Æ”»’è‚ðŽæ‚Á‚½‚ç—D¨ƒQ[ƒW‚Ì•Î‚è‚ª•Ï‚í‚èA’e‚Í‰Šú‰»‚³‚ê‚é
 		if (hitFlag)
 		{
-			SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
+			//SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
 			CharacterManager::Instance()->Right()->GetBulletMgr().bullets[index].Init();
 			CharacterManager::Instance()->Left()->Damage();
 			AudioApp::Instance()->PlayWave(DAMAGED_SE);
