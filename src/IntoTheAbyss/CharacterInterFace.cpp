@@ -1089,6 +1089,13 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 		}
 		else {
 
+			// ブロックを破壊する。
+			if (0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1) {
+
+				StageMgr::Instance()->WriteMapChipData(hitChipIndex, 0);
+
+			}
+
 			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 			Vec2<float>vec = { 0,0 };
 			if (partner.lock()->GetNowSwing()) {
