@@ -227,7 +227,32 @@ public:
 	void WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM);
 
 	MapChipType GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM);
+
 	MapChipType GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM);
+
+	inline const int &GetLocalMapChipBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const Vec2<float> &MAPCHIP_POS)
+	{
+		RoomMapChipArray tmp = localRoomMapChipArray;
+
+		Vec2<int>mapChipPos;
+		mapChipPos.x = MAPCHIP_POS.x;
+		mapChipPos.y = MAPCHIP_POS.y;
+
+		//Y軸のマップチップが範囲外なら-1を返す
+		if (tmp.size() <= mapChipPos.y || mapChipPos.y < 0)
+		{
+			return -1;
+		}
+		//X軸のマップチップが範囲外なら-1を返す
+		if (tmp[mapChipPos.y].size() <= mapChipPos.x || mapChipPos.x < 0)
+		{
+			return -1;
+		}
+		int result = tmp[mapChipPos.y][mapChipPos.x];
+		//指定した場所のマップチップ番号を返す
+		return result;
+	};
+
 
 	RoomMapChipArray *GetLocalMap();
 	RoomMapChipDrawArray *GetLocalDrawMap();
