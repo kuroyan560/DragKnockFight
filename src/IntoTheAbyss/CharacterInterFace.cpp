@@ -1094,6 +1094,15 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				StageMgr::Instance()->WriteMapChipData(hitChipIndex, 0);
 
+				// 左があるか？
+				if (0 < hitChipIndex.x - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(-1, 0), 0);
+				// 右があるか？
+				if (hitChipIndex.x + 1 < MapData[0].size() - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(1, 0), 0);
+				// 上があるか？
+				if (0 < hitChipIndex.y - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, -1), 0);
+				// 下があるか？
+				if (hitChipIndex.y + 1 < MapData.size() - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, 1), 0);
+
 			}
 
 			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
