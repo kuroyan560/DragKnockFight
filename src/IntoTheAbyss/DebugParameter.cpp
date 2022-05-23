@@ -26,6 +26,7 @@ DebugParameter::DebugParameter()
 	roundParamImguiHandle = DebugImGuiManager::Instance()->Add("RoundParameter");
 	bossParamImguiHandle = DebugImGuiManager::Instance()->Add("BossParameter");
 	playerParamImguiHandle = DebugImGuiManager::Instance()->Add("PlayerParameter");
+	swingAngleParamImguiHandle = DebugImGuiManager::Instance()->Add("SwingParamter");
 
 	bossStageNum = 0;
 
@@ -37,6 +38,9 @@ DebugParameter::DebugParameter()
 	//BossDebugParameterData data;
 	//bossDebugData.push_back(data);
 
+	swingAngle = 0.02f;
+	swingMax = 0.11f;
+	useFinishSwingFlag = true;
 }
 
 void DebugParameter::Update()
@@ -87,8 +91,7 @@ void DebugParameter::DrawImGui()
 		ImGui::InputInt("STAMINA_MAX", &bossDebugData[bossStageNum].staminaMax);
 		ImGui::InputInt("STAMINA_DASH", &bossDebugData[bossStageNum].staminaDash);
 		ImGui::InputInt("STAMINA_SWING", &bossDebugData[bossStageNum].staminaSwing);
-		ImGui::InputFloat("SWING_ANGLE", &bossDebugData[bossStageNum].swingAngle);
-		ImGui::InputFloat("SWING_MAX", &bossDebugData[bossStageNum].swingMax);
+
 		ImGui::InputFloat("SWING_DAMAGE", &bossDebugData[bossStageNum].damage);
 		ImGui::InputFloat("BULLET_DAMAGE", &gaugeData->enemyBulletAddGuaugeValue);
 		ImGui::InputFloat("STAMINA_HEAL_AMOUNT", &bossDebugData[bossStageNum].staminaHealAmount);
@@ -96,6 +99,15 @@ void DebugParameter::DrawImGui()
 		ImGui::Checkbox("enableToDashAfterSwingFlag", &bossDebugData[bossStageNum].enableToDashAfterSwingFlag);
 		ImGui::End();
 	}
+	if (DebugImGuiManager::Instance()->DrawFlag(swingAngleParamImguiHandle))
+	{
+		ImGui::Begin("Swing");
+		ImGui::InputFloat("SWING_ANGLE", &swingAngle);
+		ImGui::InputFloat("SWING_MAX", &swingMax);
+		ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
+		ImGui::End();
+	}
+
 
 	ImGui::Begin("Ai");
 	ImGui::Checkbox("On", &aiFlag);

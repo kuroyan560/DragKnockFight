@@ -20,8 +20,8 @@ const Color CharacterInterFace::TEAM_COLOR[TEAM_NUM] =
 
 void CharacterInterFace::SwingUpdate()
 {
-	ADD_SWING_ANGLE = DebugParameter::Instance()->GetBossData().swingAngle;
-	MAX_SWING_ANGLE = DebugParameter::Instance()->GetBossData().swingMax;
+	ADD_SWING_ANGLE = DebugParameter::Instance()->swingAngle;
+	MAX_SWING_ANGLE = DebugParameter::Instance()->swingMax;
 
 	/*===== 振り回し中に呼ばれる処理 =====*/
 
@@ -1079,7 +1079,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				/*Crash(vec);
 
 				SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);*/
-				partner.lock()->FinishSwing();
+				if (DebugParameter::Instance()->useFinishSwingFlag)
+				{
+					partner.lock()->FinishSwing();
+				}
 
 			}
 
@@ -1128,8 +1131,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					//SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->playerData[0].damage);
 				}
 
-				partner.lock()->FinishSwing();
-
+				if (DebugParameter::Instance()->useFinishSwingFlag)
+				{
+					partner.lock()->FinishSwing();
+				}
 				// チームに応じてクラッシュ数を加算する変数を変える。
 				if (team == WHICH_TEAM::LEFT_TEAM) {
 					++ResultTransfer::Instance()->leftCrashCount;
