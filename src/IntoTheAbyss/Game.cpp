@@ -642,7 +642,7 @@ void Game::Update(const bool& Loop)
 			zoomRate = addLineValue / MAX_ADD_ZOOM;
 		}
 		static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
-		Camera::Instance()->zoom = 1.0f - zoomRate + ZOOM_OFFSET;
+		//Camera::Instance()->zoom = 1.0f - zoomRate + ZOOM_OFFSET;
 
 		// カメラのズームが0.1f未満にならないようにする。
 		if (Camera::Instance()->zoom < 0.5f) Camera::Instance()->zoom = 0.5f;
