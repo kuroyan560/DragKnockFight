@@ -625,42 +625,27 @@ void Game::Update(const bool& Loop)
 	if (!Camera::Instance()->Active()) {
 
 		// 紐の伸び具合によってカメラのズーム率を変える。
-		float addLineValue = CharacterManager::Instance()->Left()->addLineLength + CharacterManager::Instance()->Right()->addLineLength;
+		float distance = CharacterManager::Instance()->Left()->pos.Distance(CharacterManager::Instance()->Right()->pos);
 
-		// 左のキャラと右のキャラのパイロットの座標を求めて、保存されている値より大きかったらそれを採用する。
-		if (CharacterManager::Instance()->Right()->GetPilotPosPtr() != nullptr) {
-			float buff = (CharacterManager::Instance()->Left()->pos - *CharacterManager::Instance()->Right()->GetPilotPosPtr()).Length();
-			if (addLineValue < buff) {
+		const float MAX_ADD_ZOOM = 700.0f;
+		const float INIT_ZOOM_RATE = 0.3f;
 
-				addLineValue = buff;
-
-			}
-		}
-		// 右のキャラと右のキャラのパイロットの座標を求めて、保存されている値より大きかったらそれを採用する。
-		if (CharacterManager::Instance()->Left()->GetPilotPosPtr() != nullptr) {
-			float buff = (CharacterManager::Instance()->Right()->pos - *CharacterManager::Instance()->Left()->GetPilotPosPtr()).Length();
-			if (addLineValue < buff) {
-
-				addLineValue = buff;
-
-			}
-		}
-
-		const float MAX_ADD_ZOOM = 1300.0f;
 		float zoomRate = 1.0f;
 		// 限界より伸びていたら。
-		if (MAX_ADD_ZOOM < addLineValue) {
+		if (MAX_ADD_ZOOM < distance) {
 			zoomRate = 1.0f;
 		}
 		else {
-			zoomRate = addLineValue / MAX_ADD_ZOOM;
+			zoomRate = distance / MAX_ADD_ZOOM;
 		}
 		static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
-		//Camera::Instance()->zoom = 1.0f - zoomRate + ZOOM_OFFSET;
+		Camera::Instance()->zoom = 0.5f;
 
 		// カメラのズームが0.1f未満にならないようにする。
-		if (Camera::Instance()->zoom < 0.5f) Camera::Instance()->zoom = 0.5f;
-
+		if (Camera::Instance()->zoom < 0.25f)
+		{
+			Camera::Instance()->zoom = 0.25f;
+		}
 	}
 	else {
 

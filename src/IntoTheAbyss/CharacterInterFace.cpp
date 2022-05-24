@@ -1194,8 +1194,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, 
 			Vec2<float>vec = { 0,0 };
 			if (partner.lock()->GetNowSwing()) {
 
-				int smokCol = 0;
-
 				// 画面端のブロックだったら判定を通さない。
 				if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
 				{
