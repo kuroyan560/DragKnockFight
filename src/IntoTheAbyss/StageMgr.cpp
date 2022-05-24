@@ -405,7 +405,9 @@ int StageMgr::GetAllLocalWallBlocksNum()
 		for (int x = 0; x < localRoomMapChipArray[y].size(); ++x)
 		{
 			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= localRoomMapChipArray[y][x] && localRoomMapChipArray[y][x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - 5;
-			if (isWallFlag)
+
+			bool isOutSideWall = y == 0 || x == 0 || y == localRoomMapChipArray.size() - 1 || x == localRoomMapChipArray[y].size() - 1;
+			if (isWallFlag && !isOutSideWall)
 			{
 				++count;
 			}
@@ -421,8 +423,10 @@ int StageMgr::GetAllWallBlocksNum(int STAGE_NUM, int ROOM_NUM)
 	{
 		for (int x = 0; x < allMapChipData[y].size(); ++x)
 		{
+			bool isOutSideWall = y == 0 || x == 0 || y == allMapChipData[STAGE_NUM][ROOM_NUM].size() - 1 || x == allMapChipData[STAGE_NUM][ROOM_NUM][y].size() - 1;
 			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[STAGE_NUM][ROOM_NUM][y][x] && allMapChipData[STAGE_NUM][ROOM_NUM][y][x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - 5;
-			if (isWallFlag)
+
+			if (isWallFlag && !isOutSideWall)
 			{
 				++count;
 			}

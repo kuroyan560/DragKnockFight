@@ -697,12 +697,13 @@ void Game::Draw()
 	if (stageNum != prevDrawChipStageNum || roomNum != prevDrawChipRoomNum)
 	{
 	}
+
 	mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 	prevDrawChipStageNum = stageNum;
 	prevDrawChipRoomNum = roomNum;
 	DrawMapChip(*mapData, *mapChipDrawData, stageNum, roomNum);
 
-	countBlock.Draw();
+
 
 	if (roundChangeEffect.readyFlag)
 	{
@@ -797,6 +798,8 @@ void Game::Draw()
 
 	GameTimer::Instance()->Draw();
 	ScoreManager::Instance()->Draw();
+
+	countBlock.Draw();
 
 	// プレイヤーとボス間に線を描画
 	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());
