@@ -3,6 +3,7 @@
 #include"MapChipCollider.h"
 #include"KuroMath.h"
 #include"KuroFunc.h"
+#include"DebugParameter.h"
 
 void MapChipGenerator::Update(const Vec2<float>& GeneratePos)
 {
@@ -60,6 +61,8 @@ void MapChipGenerator_Test::Init()
 
 void MapChipGenerator_Test::Update()
 {
+	if (!DebugParameter::Instance()->chipGenerator)return;
+
 	std::vector<Vec2<float>>targetPosVector;
 	for (auto& tp : targetPos)
 	{
@@ -93,6 +96,8 @@ void MapChipGenerator_Test::Draw()
 	static int ARROW_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png");
 	static const float ARROW_EXP = 0.4f;
 	static auto ARROW_SIZE = TexHandleMgr::GetTexBuffer(ARROW_HANDLE)->GetGraphSize() * ARROW_EXP;
+
+	if (!DebugParameter::Instance()->chipGenerator)return;
 
 	auto drawPos = ScrollMgr::Instance()->Affect(pos);
 	const auto drawRadius = ScrollMgr::Instance()->zoom * RADIUS;

@@ -441,8 +441,7 @@ void Player::OnDrawUI()
 	const auto leftButton = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
 	const auto rightButton = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB);
 
-	//tutorial.lock()->Draw(leftStickVec, rightStickVec, leftTrigger, rightTrigger);
-	tutorial.Draw(leftStickVec, rightStickVec, leftButton, rightButton);
+	//tutorial.Draw(leftStickVec, rightStickVec, leftButton, rightButton);
 }
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)

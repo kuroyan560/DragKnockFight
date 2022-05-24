@@ -26,7 +26,7 @@ DebugParameter::DebugParameter()
 	roundParamImguiHandle = DebugImGuiManager::Instance()->Add("RoundParameter");
 	bossParamImguiHandle = DebugImGuiManager::Instance()->Add("BossParameter");
 	playerParamImguiHandle = DebugImGuiManager::Instance()->Add("PlayerParameter");
-	swingAngleParamImguiHandle = DebugImGuiManager::Instance()->Add("SwingParamter");
+	swingAngleParamImguiHandle = DebugImGuiManager::Instance()->Add("Paramters");
 
 	bossStageNum = 0;
 
@@ -41,6 +41,7 @@ DebugParameter::DebugParameter()
 	swingAngle = 7.0f;
 	swingMax = 0.11f;
 	useFinishSwingFlag = true;
+	chipGenerator = false;
 }
 
 void DebugParameter::Update()
@@ -100,9 +101,10 @@ void DebugParameter::DrawImGui()
 	}
 	if (DebugImGuiManager::Instance()->DrawFlag(swingAngleParamImguiHandle))
 	{
-		ImGui::Begin("Swing");
+		ImGui::Begin("Paramters");
 		ImGui::InputFloat("SWING_ANGLE", &swingAngle);
 		ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
+		ImGui::Checkbox("chipGenerator", &chipGenerator);
 		ImGui::End();
 	}
 
