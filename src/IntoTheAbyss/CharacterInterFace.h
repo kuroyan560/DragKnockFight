@@ -184,6 +184,9 @@ public:
 	inline void InitVel() { vel = {}; }
 
 public:
+	int destroyTimer;				// 破壊してからすぐに振り回しを終わらせないためのタイマー
+	const int DESTROY_TIMER = 5;
+	bool canSwingEnd;				// 振り回しを終えることができるかのフラグ DestroyModeのときは振り回しを終わらないようにする。
 	static const int LINE_LENGTH = 150;
 	static const int ADD_LINE_LENGTH_VEL = 100;	// 移動量に応じて伸びるaddLineLengthの最大量
 	float MOVE_SPEED_PLAYER = 15.0f;			// 移動速度
