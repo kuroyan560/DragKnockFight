@@ -10,7 +10,7 @@
 StageMgr::StageMgr()
 {
 	//int allStageNum = 4;
-	int allStageNum = 1;
+	int allStageNum = 3;
 	//int allRoomNum = 10;
 	int allRoomNum = 5;
 	int nowStage = 0;
@@ -71,28 +71,28 @@ StageMgr::StageMgr()
 	animationData.push_back(std::make_shared<MapChipAnimationData>(tmp2, 10));
 
 	//std::string rootFilePass = "Resource/MapChipData/";
-	std::string rootFilePass = "resource/IntoTheAbyss/MapChipData/";
+	std::string rootFilePass = "resource/ChainCombat/MapChipData/";
 	std::string stageFilePass = "Stage";
 	std::string roomFileName = "Room_";
 
 
-	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
-	{
-		for (int roomNum = 0; roomNum < allRoomNum; ++roomNum)
-		{
-			//ファイルパス
-			std::string filePass =
-				rootFilePass + stageFilePass + std::to_string(stageNum) + "/";
-			//ファイル名
-			std::string fileName =
-				roomFileName + std::to_string(roomNum) + "_Gimmick.txt";
+	//for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
+	//{
+	//	for (int roomNum = 0; roomNum < allRoomNum; ++roomNum)
+	//	{
+	//		//ファイルパス
+	//		std::string filePass =
+	//			rootFilePass + stageFilePass + std::to_string(stageNum) + "/";
+	//		//ファイル名
+	//		std::string fileName =
+	//			roomFileName + std::to_string(roomNum) + "_Gimmick.txt";
 
-			GimmickLoader::Instance()->LoadData(stageNum, roomNum, filePass + fileName);
-		}
-	}
+	//		GimmickLoader::Instance()->LoadData(stageNum, roomNum, filePass + fileName);
+	//	}
+	//}
 
 	//ギミック共通の設定
-	GimmickLoader::Instance()->LoadData(rootFilePass + "GimmickCommonData.txt");
+	//GimmickLoader::Instance()->LoadData(rootFilePass + "GimmickCommonData.txt");
 
 
 	//ステージ毎の小部屋読み込み-----------------------

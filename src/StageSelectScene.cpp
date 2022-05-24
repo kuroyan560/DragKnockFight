@@ -132,7 +132,7 @@ void StageSelectScene::OnUpdate()
 		{
 			stageNum = 2;
 		}
-		SelectStage::Instance()->SelectRoomNum(stageNum);
+		SelectStage::Instance()->SelectStageNum(stageNum);
 	}
 
 	screenShot.Update();
