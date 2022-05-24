@@ -29,6 +29,7 @@ class RenderTarget;
 
 #include "Barrages.h"
 #include"MapChipGenerator.h"
+#include"BlockCount.h"
 
 class CharacterInterFace;
 
@@ -131,6 +132,8 @@ class Game
 
 	//テスト用
 	MapChipGenerator_Test mapChipGeneratorTest;
+
+	BlockCount countBlock;
 
 public:
 	HomeBase playerHomeBase, enemyHomeBase;

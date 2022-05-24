@@ -67,7 +67,12 @@ void CharacterInterFace::SwingUpdate()
 
 	}
 
-	// 現在の角度に角度の加算量を足す。
+	// 移動量が小さかったら呼ばない。
+	static const float OFFSET_SPEED = 0.5f;
+	float speedBuff = Vec2<float>(pos - prevPrevPos).Length();
+	//if (speedBuff < OFFSET_SPEED) {
+
+		// 現在の角度に角度の加算量を足す。
 	if (isSwingClockWise) {
 
 		// 時計回りだったら
@@ -83,6 +88,8 @@ void CharacterInterFace::SwingUpdate()
 
 	// 回転した量を保存。
 	allSwingAngle += fabs(addSwingAngle);
+
+	//}
 
 	// 回転した量がPIを超えたら振り回しを終了。
 	if (DirectX::XM_PI + DirectX::XM_PI / 2.0f <= allSwingAngle) {
@@ -132,7 +139,7 @@ void CharacterInterFace::SwingUpdate()
 
 }
 
-void CharacterInterFace::Crash(const Vec2<float> &MyVec, const int &SmokeCol)
+void CharacterInterFace::Crash(const Vec2<float>& MyVec, const int& SmokeCol)
 {
 	Vec2<bool>ext = { true,true };
 	if (MyVec.x == 0.0f)ext.y = false;
@@ -182,7 +189,7 @@ void CharacterInterFace::CrashUpdate()
 	//}
 }
 
-void CharacterInterFace::SwingPartner(const Vec2<float> &SwingTargetVec, const bool &IsClockWise)
+void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const bool& IsClockWise)
 {
 
 	// 振り回しの予測線を更新する際に使用する変数をセット。
@@ -209,6 +216,9 @@ void CharacterInterFace::SwingPartner(const Vec2<float> &SwingTargetVec, const b
 
 	// 目標地点のベクトルを保存。
 	swingTargetVec = SwingTargetVec;
+
+	partner.lock()->swingDestroyCounter.Init();
+	swingDestroyCounter.Init();
 
 	// 現在のフレームの相方とのベクトルを求める。
 	nowSwingVec = GetPartnerPos() - pos;
@@ -279,7 +289,7 @@ void CharacterInterFace::SwingPartner(const Vec2<float> &SwingTargetVec, const b
 
 }
 
-void CharacterInterFace::SetPilotDetachedFlg(const bool &Flg)
+void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 {
 	//パイロットでなくする
 	return;
@@ -310,7 +320,7 @@ void CharacterInterFace::SetPilotDetachedFlg(const bool &Flg)
 	isPilotDetached = Flg;
 }
 
-void CharacterInterFace::SaveHitInfo(bool &isHitTop, bool &isHitBottom, bool &isHitLeft, bool &isHitRight, const INTERSECTED_LINE &intersectedLine, Vec2<int> &hitChipIndex, const Vec2<int> &hitChipIndexBuff)
+void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, Vec2<int>& hitChipIndex, const Vec2<int>& hitChipIndexBuff)
 {
 	auto mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 	(*mapChipDrawData)[hitChipIndexBuff.y][hitChipIndexBuff.x].shocked = 1.0f;
@@ -365,7 +375,7 @@ void CharacterInterFace::InitSwingLineSegmetn()
 	CCWSwingSegmentMgr.Init();
 }
 
-void CharacterInterFace::Init(const Vec2<float> &GeneratePos, const bool &Appear)
+void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear)
 {
 	if (pilotGraph != -1)
 	{
@@ -379,12 +389,14 @@ void CharacterInterFace::Init(const Vec2<float> &GeneratePos, const bool &Appear
 	pos = GeneratePos;
 	vel = { 0,0 };
 
+	swingDestroyCounter.Init();
+
 	stackWindowTimer = 0;
 
 	nowSwing = false;
 
 	stackMapChip = false;
-	for (auto &flg : mapChipHit)flg = false;
+	for (auto& flg : mapChipHit)flg = false;
 
 	stagingDevice.Init();
 
@@ -399,6 +411,9 @@ void CharacterInterFace::Init(const Vec2<float> &GeneratePos, const bool &Appear
 
 	stanTimer = 0;
 	elecTimer = 0;
+
+	partner.lock()->swingDestroyCounter.Init();
+	swingDestroyCounter.Init();
 
 	stagingDevice.Init();
 
@@ -479,7 +494,7 @@ void CharacterInterFace::Init(const Vec2<float> &GeneratePos, const bool &Appear
 }
 
 #include "SlowMgr.h"
-void CharacterInterFace::Update(const std::vector<std::vector<int>> &MapData, const Vec2<float> &LineCenterPos, const bool &isRoundStartEffect)
+void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect)
 {
 
 	if (team == WHICH_TEAM::RIGHT_TEAM && 0.8f <= SlowMgr::Instance()->slowAmount) {
@@ -677,86 +692,8 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>> &MapData, co
 
 	staminaGauge->Update(!isPilotDetached, pos, staminaAutoHealAmount);
 
-
-	// 右のキャラだったら処理を行う。
-	//if (team == WHICH_TEAM::RIGHT_TEAM && !isRoundStartEffect) {
-
-	//	// 弾幕の更新処理
-	//	static const int BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
-	//	bool isEnd = barrage->Update(bulletMgr, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Left()->pos, BULLET_HANDLE);
-
-	//	// 弾幕の更新が終わっていたら。
-	//	if (isEnd) {
-
-	//		// タイマーを更新。
-	//		++barrageDelayTimer;
-
-	//		// タイマーが規定値に達したら。
-	//		if (BARRAGE_DELAY_TIMER <= barrageDelayTimer) {
-
-	//			// 乱数を生成して、その乱数の弾幕をセットする。
-	//			int random = KuroFunc::GetRand(6);
-
-	//			switch (random)
-	//			{
-	//			case 0:
-
-	//				barrage = std::make_unique<WhirlpoolBarrage>();
-
-	//				break;
-
-	//			case 1:
-
-	//				barrage = std::make_unique<Whirlpool2WayBarrage>();
-
-	//				break;
-
-	//			case 2:
-
-	//				barrage = std::make_unique<CircularBarrage>();
-
-	//				break;
-
-	//			case 3:
-
-	//				barrage = std::make_unique<TargetShotBarrage>();
-
-	//				break;
-
-	//			case 4:
-
-	//				barrage = std::make_unique<TargetShot3WayBarrage>();
-
-	//				break;
-
-	//			case 5:
-
-	//				barrage = std::make_unique<ShotGunBarrage>();
-
-	//				break;
-
-	//			case 6:
-
-	//				barrage = std::make_unique<WaveBarrage>();
-
-	//				break;
-	//			default:
-	//				break;
-	//			}
-
-	//			barrage->Start();
-
-	//		}
-
-	//	}
-	//	else {
-
-	//		barrageDelayTimer = 0;
-
-	//	}
-
-
-	//}
+	// 一回の振り回しで何個のブロックを壊したかのフラグ
+	swingDestroyCounter.Update(pos);
 
 	// ボス側でも止まるとデバッグしにくいので、プレイヤーのときのみ通るようにする。
 	if (team == WHICH_TEAM::LEFT_TEAM) {
@@ -803,7 +740,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>> &MapData, co
 
 #include "DrawFunc.h"
 #include"TexHandleMgr.h"
-void CharacterInterFace::Draw(const bool &isRoundStartEffect)
+void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 {
 	// 残像を描画
 	if (!GetNowBreak() && team == LEFT_TEAM) {
@@ -852,6 +789,12 @@ void CharacterInterFace::Draw(const bool &isRoundStartEffect)
 	//if (isStopPartner) {
 	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), reticleExp, reticleRad, TexHandleMgr::GetTexBuffer(stopReticleHandle), Color(255, 255, 255, reticleAlpha));
 	//}
+	// 
+	// 一回の振り回しで何個のブロックを壊したかのフラグ
+
+	if (team == WHICH_TEAM::LEFT_TEAM) {
+		swingDestroyCounter.Draw();
+	}
 
 }
 
@@ -893,7 +836,7 @@ void CharacterInterFace::Damage()
 #include"MapChipCollider.h"
 #include "StaminaItemMgr.h"
 #include <IntoTheAbyss/StageMgr.h>
-void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, const Vec2<float> &LineCenterPos)
+void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
 
 	/*===== 当たり判定 =====*/
@@ -1185,17 +1128,30 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, 
 			if (unBlockFlag && 0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1) {
 
 				StageMgr::Instance()->WriteMapChipData(hitChipIndex, 0);
+				partner.lock()->swingDestroyCounter.Increment();
 
 				partner.lock()->destroyTimer = DESTROY_TIMER;
 
 				// 左があるか？
-				if (0 < hitChipIndex.x - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(-1, 0), 0);
+				if (0 < hitChipIndex.x - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(-1, 0), 0);
+					partner.lock()->swingDestroyCounter.Increment();
+				}
 				// 右があるか？
-				if (hitChipIndex.x + 1 < MapData[0].size() - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(1, 0), 0);
+				if (hitChipIndex.x + 1 < MapData[0].size() - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(1, 0), 0);
+					partner.lock()->swingDestroyCounter.Increment();
+				}
 				// 上があるか？
-				if (0 < hitChipIndex.y - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, -1), 0);
+				if (0 < hitChipIndex.y - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, -1), 0);
+					partner.lock()->swingDestroyCounter.Increment();
+				}
 				// 下があるか？
-				if (hitChipIndex.y + 1 < MapData.size() - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, 1), 0);
+				if (hitChipIndex.y + 1 < MapData.size() - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, 1), 0);
+					partner.lock()->swingDestroyCounter.Increment();
+				}
 
 			}
 
@@ -1266,7 +1222,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, 
 
 }
 
-void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>> &MapData)
+void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>>& MapData)
 {
 
 	/*===== 引っかかり判定の更新処理 =====*/
@@ -1442,17 +1398,19 @@ void CharacterInterFace::FinishSwing()
 	addSwingAngle = 0;
 	swingTimer = 0;
 	allSwingAngle = 0;
+	partner.lock()->swingDestroyCounter.Init();
+	swingDestroyCounter.Init();
 
 }
 
-void CharacterInterFace::HealStamina(const int &HealAmount)
+void CharacterInterFace::HealStamina(const int& HealAmount)
 {
 	if (HealAmount)healAuraEaseRate = 0.0f;
 	staminaGauge->AddStamina(HealAmount);
 	OnStaminaHeal(HealAmount);
 }
 
-void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int> &MapChipIndex, const MapChipType &DstType, const MapChipData &SrcData)
+void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int>& MapChipIndex, const MapChipType& DstType, const MapChipData& SrcData)
 {
 
 	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
@@ -1481,7 +1439,7 @@ void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int> &MapChipInd
 
 }
 
-CharacterInterFace::CharacterInterFace(const Vec2<float> &HonraiSize) : size(HonraiSize)
+CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(HonraiSize)
 {
 	areaHitBox.center = &pos;
 	areaHitBox.size = size;
