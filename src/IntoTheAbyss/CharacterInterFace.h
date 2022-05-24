@@ -115,6 +115,10 @@ protected:
 	float reticleRad;
 	int reticleAlpha;
 
+public:
+
+	static bool isDebugModeStrongSwing;		// デバッグ用で壁に当たるまでスイング
+
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
 	std::array<int, HIT_DIR_NUM>mapChipHit;

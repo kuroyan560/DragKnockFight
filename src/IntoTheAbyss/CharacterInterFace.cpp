@@ -13,6 +13,8 @@
 #include"CharacterManager.h"
 #include "DrawFunc_Color.h"
 
+bool CharacterInterFace::isDebugModeStrongSwing;
+
 const Color CharacterInterFace::TEAM_COLOR[TEAM_NUM] =
 {
 	Color(47,255,139,255),
@@ -1124,6 +1126,16 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 		else {
 
 			bool unBlockFlag = MapData[hitChipIndex.y][hitChipIndex.x] != 18;
+
+			if (isDebugModeStrongSwing) {
+
+				if (!(unBlockFlag && 0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1)) {
+
+					partner.lock()->FinishSwing();
+
+				}
+
+			}
 			// ブロックを破壊する。
 			if (unBlockFlag && 0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1) {
 
@@ -1202,14 +1214,19 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 	}
 	else {
 
-		// 振り回しを終えることが出来たら終わる。
-		if (partner.lock()->canSwingEnd) {
 
-			--partner.lock()->destroyTimer;
+		if (!isDebugModeStrongSwing) {
 
-			if (partner.lock()->destroyTimer <= 0) {
+			// 振り回しを終えることが出来たら終わる。
+			if (partner.lock()->canSwingEnd) {
 
-				partner.lock()->FinishSwing();
+				--partner.lock()->destroyTimer;
+
+				if (partner.lock()->destroyTimer <= 0) {
+
+					partner.lock()->FinishSwing();
+
+				}
 
 			}
 
@@ -1456,6 +1473,8 @@ CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(Hon
 	stopReticleHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png");
 	reticleExp = Vec2<float>(1.0f, 1.0f);
 	reticleRad = 0;
+
+	isDebugModeStrongSwing = false;
 
 }
 
