@@ -73,21 +73,21 @@ void CharacterInterFace::SwingUpdate()
 	//if (speedBuff < OFFSET_SPEED) {
 
 		// 現在の角度に角度の加算量を足す。
-		if (isSwingClockWise) {
+	if (isSwingClockWise) {
 
-			// 時計回りだったら
-			nowAngle += addSwingAngle;
+		// 時計回りだったら
+		nowAngle += addSwingAngle;
 
-		}
-		else {
+	}
+	else {
 
-			// 反時計回りだったら
-			nowAngle -= addSwingAngle;
+		// 反時計回りだったら
+		nowAngle -= addSwingAngle;
 
-		}
+	}
 
-		// 回転した量を保存。
-		allSwingAngle += fabs(addSwingAngle);
+	// 回転した量を保存。
+	allSwingAngle += fabs(addSwingAngle);
 
 	//}
 
@@ -262,6 +262,8 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 
 	swingTimer = 0;
 
+	swingDestroyBlockCount = 0;
+
 	destroyTimer = DESTROY_TIMER;
 
 	partner.lock()->stagingDevice.StartSpin(isSwingClockWise);
@@ -406,6 +408,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 	stanTimer = 0;
 	elecTimer = 0;
+
+	swingDestroyBlockCount = 0;
 
 	stagingDevice.Init();
 
@@ -1192,17 +1196,30 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			if (unBlockFlag && 0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1) {
 
 				StageMgr::Instance()->WriteMapChipData(hitChipIndex, 0);
+				++partner.lock()->swingDestroyBlockCount;
 
 				partner.lock()->destroyTimer = DESTROY_TIMER;
 
 				// 左があるか？
-				if (0 < hitChipIndex.x - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(-1, 0), 0);
+				if (0 < hitChipIndex.x - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(-1, 0), 0);
+					++partner.lock()->swingDestroyBlockCount;
+				}
 				// 右があるか？
-				if (hitChipIndex.x + 1 < MapData[0].size() - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(1, 0), 0);
+				if (hitChipIndex.x + 1 < MapData[0].size() - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(1, 0), 0);
+					++partner.lock()->swingDestroyBlockCount;
+				}
 				// 上があるか？
-				if (0 < hitChipIndex.y - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, -1), 0);
+				if (0 < hitChipIndex.y - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, -1), 0);
+					++partner.lock()->swingDestroyBlockCount;
+				}
 				// 下があるか？
-				if (hitChipIndex.y + 1 < MapData.size() - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, 1), 0);
+				if (hitChipIndex.y + 1 < MapData.size() - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, 1), 0);
+					++partner.lock()->swingDestroyBlockCount;
+				}
 
 			}
 
@@ -1449,6 +1466,7 @@ void CharacterInterFace::FinishSwing()
 	addSwingAngle = 0;
 	swingTimer = 0;
 	allSwingAngle = 0;
+	swingDestroyBlockCount = 0;
 
 }
 

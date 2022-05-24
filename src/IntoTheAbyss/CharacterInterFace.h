@@ -201,6 +201,9 @@ public:
 	const int DASH_STAMINA = 1;		// ダッシュ時の消費スタミナ
 	bool goAreaFlag;
 
+	// 一回の振り回しでなんブロック壊したかを表示するやつ。
+	int swingDestroyBlockCount;
+
 	float staminaAutoHealAmount;
 
 	bool isStopPartner;		// 相方を止めておくためのフラグ

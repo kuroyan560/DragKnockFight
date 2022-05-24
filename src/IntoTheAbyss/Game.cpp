@@ -807,7 +807,6 @@ void Game::Draw()
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
-
 }
 
 void Game::Scramble()
