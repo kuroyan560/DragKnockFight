@@ -1231,7 +1231,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, 
 				// クラッシュ演出を追加。
 				CrashEffectMgr::Instance()->Generate(pos, GetTeamColor());
 
-				int smokeCol = 0;
 				// クラッシュさせる。
 				Crash(vec, smokeCol);
 
