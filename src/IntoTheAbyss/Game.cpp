@@ -325,8 +325,8 @@ Game::Game()
 	cameraBasePos = { 0.0f,-40.0f };
 
 	roundChangeEffect.Init();
-	StageMgr::Instance()->SetLocalMapChipData(0, 0);
-	StageMgr::Instance()->SetLocalMapChipDrawBlock(0, 0);
+	StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	StageMgr::Instance()->SetLocalMapChipDrawBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	mapData = StageMgr::Instance()->GetLocalMap();
 	RoomMapChipArray tmp = *mapData;
 
@@ -382,7 +382,7 @@ void Game::Init(const bool& PracticeMode)
 
 	CharacterManager::Instance()->CharactersGenerate();
 
-	InitGame(0, 0);
+	InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	ScrollMgr::Instance()->Reset();
 	roundChangeEffect.Init();
 	CrashEffectMgr::Instance()->Init();
@@ -396,8 +396,10 @@ void Game::Update(const bool& Loop)
 
 	if (UsersInput::Instance()->KeyOnTrigger(DIK_R))
 	{
-		StageMgr::Instance()->SetLocalMapChipData(0, 0);
-		StageMgr::Instance()->SetLocalMapChipDrawBlock(0, 0);
+		int stageNum = SelectStage::Instance()->GetStageNum();
+		int roomNum = SelectStage::Instance()->GetRoomNum();
+		StageMgr::Instance()->SetLocalMapChipData(stageNum, roomNum);
+		StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNum, roomNum);
 	}
 
 
@@ -444,15 +446,11 @@ void Game::Update(const bool& Loop)
 			playerHandMgr->Update(CharacterManager::Instance()->Left()->pos);
 		}
 	}
-
-	if (roundChangeEffect.initGameFlag)
-	{
-		mapChipGeneratorTest.Update();
-	}
-
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
 	{
+		mapChipGeneratorTest.Update();
+
 		// 座標を保存。
 		CharacterManager::Instance()->Left()->SavePrevFramePos();
 		CharacterManager::Instance()->Right()->SavePrevFramePos();
@@ -842,7 +840,7 @@ void Game::Scramble()
 			CharacterManager::Instance()->Left()->pos += leftVelGauge;
 		}
 		// 振り回され中じゃなかったら移動させる。
-		if (!CharacterManager::Instance()->Left()->GetNowSwing() && !CharacterManager::Instance()->Left()->isStopPartner) {
+		if (!CharacterManager::Instance()->Left()->GetNowSwing()) {
 			CharacterManager::Instance()->Right()->pos += rightVelGauge;
 		}
 	}
@@ -915,13 +913,7 @@ void Game::Scramble()
 			moveDir.Normalize();
 
 			// 押し戻す。
-			if (CharacterManager::Instance()->Left()->isStopPartner) {
-				CharacterManager::Instance()->Right()->addLineLength += moveLength;
-			}
-			else {
-				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
-			}
-
+			CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
 			// 引っかかり判定だったら
 			if (CharacterManager::Instance()->Right()->GetStackFlag()) {
@@ -1147,60 +1139,52 @@ Vec2<float> Game::GetStageSize()
 
 void Game::SwitchingStage()
 {
-
 	const bool enableToSelectStageFlag = 0 < debugStageData[0];
 	const bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//マップの切り替え
-	const bool up = UsersInput::Instance()->KeyOnTrigger(DIK_UP) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_UP);
-	const bool down = UsersInput::Instance()->KeyOnTrigger(DIK_DOWN) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_DOWN);
 	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_LEFT);
 	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_RIGHT);
 
-	if (up && enableToSelectStageFlag2 && nowSelectNum == 0)
-	{
-		++debugStageData[0];
-	}
-	//if (Input::isKeyTrigger(KEY_INPUT_DOWN) && enableToSelectStageFlag && nowSelectNum == 0)
-	if (down && enableToSelectStageFlag && nowSelectNum == 0)
-	{
-		--debugStageData[0];
-	}
-
-
 	const bool enableToSelectRoomFlag = 0 < debugStageData[1];
 	const bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
-	//部屋の切り替え
-	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectRoomFlag2 && nowSelectNum == 1)
-	if (up && enableToSelectRoomFlag2 && nowSelectNum == 1)
-	{
-		++debugStageData[1];
-	}
-	//if (Input::isKeyTrigger(KEY_INPUT_DOWN) && enableToSelectRoomFlag && nowSelectNum == 1)
-	if (down && enableToSelectRoomFlag && nowSelectNum == 1)
-	{
-		--debugStageData[1];
-	}
 
 	//部屋か番号に切り替え
-	//if (Input::isKeyTrigger(KEY_INPUT_LEFT) && 0 < nowSelectNum)
 	if (left && 0 < nowSelectNum)
 	{
 		--nowSelectNum;
-		debugStageData[1] = 0;
+		--debugStageData[1];
 	}
-	if (right && nowSelectNum < 1)
+	if (right && nowSelectNum < StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()))
 	{
 		++nowSelectNum;
-		debugStageData[1] = 0;
+		++debugStageData[1];
 	}
 
+	if (debugStageData[1] <= 0)
+	{
+		debugStageData[1] = 0;
+		nowSelectNum = 0;
+	}
+	if (StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) <= debugStageData[1])
+	{
+		debugStageData[1] = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
+		nowSelectNum = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
+	}
+
+	if (StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) <= nowSelectNum)
+	{
+		debugStageData[1] = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) - 1;
+	}
+
+
 	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0, A);
-	if (done && false)
+	if (done)
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
 		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
 		SelectStage::Instance()->resetStageFlag = true;
-		//mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
+
+		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	}
 
 }
@@ -1339,7 +1323,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 				{
 					readyToStartRoundFlag = true;
 					roundFinishFlag = false;
-					InitGame(0, 0);
+					InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 				}
 			}
 		}

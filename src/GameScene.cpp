@@ -73,45 +73,27 @@ void GameScene::OnDraw()
 
 void GameScene::OnImguiDebug()
 {
-	//ImGui::Begin("StageInfo");
-	//ImGui::Text("---Now---");
-	//ImGui::Text("StageNumber:%d", SelectStage::Instance()->GetStageNum());
-	//ImGui::Text("RoomNumber:%d\n\n", SelectStage::Instance()->GetRoomNum());
-	//ImGui::Text("---Select---");
-
-	//ImGui::Text("StageNumber:%d", game.debugStageData[0]);
-	////選択できないステージ番号なら表示する
-	//if (!StageMgr::Instance()->CheckStageNum(game.debugStageData[0]))
-	//{
-	//	ImGui::SameLine();
-	//	ImGui::Text("Don't use");
-	//}
-	//if (game.nowSelectNum == 0)
-	//{
-	//	ImGui::SameLine();
-	//	ImGui::Text("NowSelecting");
-	//}
-
-
-	//ImGui::Text("RoomNumber:%d", game.debugStageData[1]);
-	////選択できない部屋番号なら表示する
-	//if (!StageMgr::Instance()->CheckRoomNum(game.debugStageData[0], game.debugStageData[1]))
-	//{
-	//	ImGui::SameLine();
-	//	ImGui::Text("Don't use");
-	//}
-	//if (game.nowSelectNum == 1)
-	//{
-	//	ImGui::SameLine();
-	//	ImGui::Text("NowSelecting");
-	//}
-
-	//ImGui::Text("Up Down:SelectNumber");
-	//ImGui::Text("Left Right:SelectStageOrRoom");
-	//ImGui::Text("B Key / Home Button :StageSelectScene");
-	//ImGui::Text("Return / A Button:Done");
-	//ImGui::Text("Space / Back Button:Reset");
-	//ImGui::End();
+	ImGui::Begin("StageInfo");
+	ImGui::Text("---Now---");
+	ImGui::Text("RoomNumber:%d\n\n", SelectStage::Instance()->GetRoomNum());
+	ImGui::Text("---Select---");
+	ImGui::Text("RoomNumber:%d", game.debugStageData[1]);
+	//選択できない部屋番号なら表示する
+	if (!StageMgr::Instance()->CheckRoomNum(game.debugStageData[0], game.debugStageData[1]))
+	{
+		ImGui::SameLine();
+		ImGui::Text("Don't use");
+	}
+	if (game.nowSelectNum == 1)
+	{
+		ImGui::SameLine();
+		ImGui::Text("NowSelecting");
+	}
+	ImGui::Text("Up Down:SelectNumber");
+	ImGui::Text("Left Right:SelectStageOrRoom");
+	ImGui::Text("B Key / Home Button :StageSelectScene");
+	ImGui::Text("Return / A Button:Done");
+	ImGui::End();
 
 
 	/*ImGui::Begin("Timer");
