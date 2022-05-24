@@ -98,13 +98,13 @@ void StageSelectScene::OnUpdate()
 
 		}
 		//タイトルシーンに移動する
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
 		{
 			KuroEngine::Instance().ChangeScene(0, changeScene);
 		}
 
 		//ステージ番号を増やす
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::RB))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_RIGHT))
 		{
 			++stageNum;
 			screenShot.Next();
@@ -124,13 +124,13 @@ void StageSelectScene::OnUpdate()
 			rightArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
 		}
 
-		if (StageMgr::Instance()->GetMaxRoomNumber(0) - 1 <= stageNum)
-		{
-			stageNum = StageMgr::Instance()->GetMaxStageNumber() - 1;
-		}
-		if (stageNum <= 0)
+		if (3 <= stageNum)
 		{
 			stageNum = 0;
+		}
+		if (stageNum <= -1)
+		{
+			stageNum = 2;
 		}
 		SelectStage::Instance()->SelectRoomNum(stageNum);
 	}
