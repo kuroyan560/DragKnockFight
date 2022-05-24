@@ -87,7 +87,8 @@ void CharacterInterFace::SwingUpdate()
 	// 回転した量がPIを超えたら振り回しを終了。
 	if (DirectX::XM_PI + DirectX::XM_PI / 2.0f <= allSwingAngle) {
 
-		FinishSwing();
+		canSwingEnd = true;
+		//FinishSwing();
 
 	}
 
@@ -109,7 +110,8 @@ void CharacterInterFace::SwingUpdate()
 		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 0.5f;
 
 		// 振り回し終わり！
-		FinishSwing();
+		canSwingEnd = true;
+		//FinishSwing();
 
 	}
 	// [最初が反時計回り] 且つ [現在が時計回り] だったら
@@ -119,7 +121,8 @@ void CharacterInterFace::SwingUpdate()
 		partner.lock()->vel = (partner.lock()->pos - partner.lock()->prevPos) * 0.5f;
 
 		// 振り回し終わり！
-		FinishSwing();
+		canSwingEnd = true;
+		//FinishSwing();
 
 	}
 
@@ -248,7 +251,11 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 	//振り回しフラグの有効化
 	nowSwing = true;
 
+	canSwingEnd = false;
+
 	swingTimer = 0;
+
+	destroyTimer = DESTROY_TIMER;
 
 	partner.lock()->stagingDevice.StartSpin(isSwingClockWise);
 
@@ -1177,6 +1184,8 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				StageMgr::Instance()->WriteMapChipData(hitChipIndex, 0);
 
+				partner.lock()->destroyTimer = DESTROY_TIMER;
+
 				// 左があるか？
 				if (0 < hitChipIndex.x - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(-1, 0), 0);
 				// 右があるか？
@@ -1192,7 +1201,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			Vec2<float>vec = { 0,0 };
 			if (partner.lock()->GetNowSwing()) {
 
-				int smokCol = 0;
+				int smokeCol = 0;
 
 				// 画面端のブロックだったら判定を通さない。
 				if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
@@ -1230,6 +1239,22 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 			// ゲージがデフォルトに戻るまでのタイマーを更新。
 			gaugeReturnTimer = GAUGE_RETURN_TIMER;
+
+		}
+
+	}
+	else {
+
+		// 振り回しを終えることが出来たら終わる。
+		if (partner.lock()->canSwingEnd) {
+
+			--partner.lock()->destroyTimer;
+
+			if (partner.lock()->destroyTimer <= 0) {
+
+				partner.lock()->FinishSwing();
+
+			}
 
 		}
 
@@ -1408,6 +1433,7 @@ void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>>& MapD
 void CharacterInterFace::FinishSwing()
 {
 	nowSwing = false;
+	canSwingEnd = false;
 	partner.lock()->stagingDevice.StopSpin();
 	partner.lock()->OnSwingedFinish();
 	CWSwingSegmentMgr.Init();
