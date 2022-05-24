@@ -91,7 +91,6 @@ void MapChipGenerator_SplineOrbit::Update()
 #include"TexHandleMgr.h"
 void MapChipGenerator_SplineOrbit::Draw()
 {
-
 	static int ARROW_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png");
 	static const float ARROW_EXP = 0.4f;
 	static auto ARROW_SIZE = TexHandleMgr::GetTexBuffer(ARROW_HANDLE)->GetGraphSize() * ARROW_EXP;
@@ -119,8 +118,8 @@ void MapChipGenerator_SplineOrbit::Draw()
 
 int MapChipGenerator_RandPattern::GetSpan()
 {
-	static const int MAX = 60 * 5;
-	static const int MIN = 60 * 2;
+	static const int MAX = 60 * 9;
+	static const int MIN = 60 * 5;
 	return KuroFunc::GetRand(MIN, MAX);
 }
 
@@ -133,8 +132,8 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 	chipIdxMax.x = (*mapData)[0].size();
 	chipIdxMax.y = (*mapData).size();
 
-	static const int GENERATE_NUM_MAX = 20;
-	static const int GENERATE_NUM_MIN = 3;
+	static const int GENERATE_NUM_MAX = 5;
+	static const int GENERATE_NUM_MIN = 2;
 
 	static const enum PATTERN_TYPE { CROSS, CUBE, CIRCLE, NUM };
 	static bool INIT = false;
