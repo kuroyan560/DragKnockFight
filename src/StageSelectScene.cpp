@@ -98,13 +98,13 @@ void StageSelectScene::OnUpdate()
 
 		}
 		//タイトルシーンに移動する
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
 		{
 			KuroEngine::Instance().ChangeScene(0, changeScene);
 		}
 
 		//ステージ番号を増やす
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::RB))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_RIGHT))
 		{
 			++stageNum;
 			screenShot.Next();

@@ -103,7 +103,7 @@ void DebugParameter::DrawImGui()
 	{
 		ImGui::Begin("Paramters");
 		ImGui::InputFloat("SWING_ANGLE", &swingAngle);
-		ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
+		//ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
 		ImGui::Checkbox("chipGenerator", &chipGenerator);
 		ImGui::End();
 	}
