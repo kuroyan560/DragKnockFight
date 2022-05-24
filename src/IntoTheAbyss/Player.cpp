@@ -179,7 +179,6 @@ void Player::OnInit()
 
 	pilotGraph = playerPilotGraph[0];
 
-
 	swingGauge.Init(100);
 }
 
@@ -398,6 +397,7 @@ void Player::OnDraw(const bool& isRoundStartEffect)
 	bool mirorX = playerDirX == PLAYER_RIGHT || (isHold && (partner.lock()->pos - pos).x < 0);
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * staminaGauge->outOfStaminaEffect.GetSize() * appearExtRate,
 		stagingDevice.GetSpinRadian(), bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
+
 }
 
 void Player::OnDrawUI()

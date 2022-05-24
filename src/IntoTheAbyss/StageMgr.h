@@ -258,6 +258,12 @@ public:
 	RoomMapChipArray *GetLocalMap();
 	RoomMapChipDrawArray *GetLocalDrawMap();
 
+	int GetAllLocalWallBlocksNum();
+
+	int GetAllWallBlocksNum(int STAGE_NUM, int ROOM_NUM);
+
+
+	int GetMaxMapChipNum();
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス

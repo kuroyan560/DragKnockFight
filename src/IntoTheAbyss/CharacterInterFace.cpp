@@ -217,6 +217,9 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 	// 目標地点のベクトルを保存。
 	swingTargetVec = SwingTargetVec;
 
+	partner.lock()->swingDestroyCounter.Init();
+	swingDestroyCounter.Init();
+
 	// 現在のフレームの相方とのベクトルを求める。
 	nowSwingVec = GetPartnerPos() - pos;
 	nowSwingVec.Normalize();
@@ -386,6 +389,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	pos = GeneratePos;
 	vel = { 0,0 };
 
+	swingDestroyCounter.Init();
+
 	stackWindowTimer = 0;
 
 	nowSwing = false;
@@ -406,6 +411,9 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 	stanTimer = 0;
 	elecTimer = 0;
+
+	partner.lock()->swingDestroyCounter.Init();
+	swingDestroyCounter.Init();
 
 	stagingDevice.Init();
 
@@ -684,86 +692,8 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	staminaGauge->Update(!isPilotDetached, pos, staminaAutoHealAmount);
 
-
-	// 右のキャラだったら処理を行う。
-	//if (team == WHICH_TEAM::RIGHT_TEAM && !isRoundStartEffect) {
-
-	//	// 弾幕の更新処理
-	//	static const int BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
-	//	bool isEnd = barrage->Update(bulletMgr, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Left()->pos, BULLET_HANDLE);
-
-	//	// 弾幕の更新が終わっていたら。
-	//	if (isEnd) {
-
-	//		// タイマーを更新。
-	//		++barrageDelayTimer;
-
-	//		// タイマーが規定値に達したら。
-	//		if (BARRAGE_DELAY_TIMER <= barrageDelayTimer) {
-
-	//			// 乱数を生成して、その乱数の弾幕をセットする。
-	//			int random = KuroFunc::GetRand(6);
-
-	//			switch (random)
-	//			{
-	//			case 0:
-
-	//				barrage = std::make_unique<WhirlpoolBarrage>();
-
-	//				break;
-
-	//			case 1:
-
-	//				barrage = std::make_unique<Whirlpool2WayBarrage>();
-
-	//				break;
-
-	//			case 2:
-
-	//				barrage = std::make_unique<CircularBarrage>();
-
-	//				break;
-
-	//			case 3:
-
-	//				barrage = std::make_unique<TargetShotBarrage>();
-
-	//				break;
-
-	//			case 4:
-
-	//				barrage = std::make_unique<TargetShot3WayBarrage>();
-
-	//				break;
-
-	//			case 5:
-
-	//				barrage = std::make_unique<ShotGunBarrage>();
-
-	//				break;
-
-	//			case 6:
-
-	//				barrage = std::make_unique<WaveBarrage>();
-
-	//				break;
-	//			default:
-	//				break;
-	//			}
-
-	//			barrage->Start();
-
-	//		}
-
-	//	}
-	//	else {
-
-	//		barrageDelayTimer = 0;
-
-	//	}
-
-
-	//}
+	// 一回の振り回しで何個のブロックを壊したかのフラグ
+	swingDestroyCounter.Update(pos);
 
 	// ボス側でも止まるとデバッグしにくいので、プレイヤーのときのみ通るようにする。
 	if (team == WHICH_TEAM::LEFT_TEAM) {
@@ -859,6 +789,12 @@ void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 	//if (isStopPartner) {
 	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), reticleExp, reticleRad, TexHandleMgr::GetTexBuffer(stopReticleHandle), Color(255, 255, 255, reticleAlpha));
 	//}
+	// 
+	// 一回の振り回しで何個のブロックを壊したかのフラグ
+
+	if (team == WHICH_TEAM::LEFT_TEAM) {
+		swingDestroyCounter.Draw();
+	}
 
 }
 
@@ -1192,17 +1128,30 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			if (unBlockFlag && 0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1) {
 
 				StageMgr::Instance()->WriteMapChipData(hitChipIndex, 0);
+				partner.lock()->swingDestroyCounter.Increment();
 
 				partner.lock()->destroyTimer = DESTROY_TIMER;
 
 				// 左があるか？
-				if (0 < hitChipIndex.x - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(-1, 0), 0);
+				if (0 < hitChipIndex.x - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(-1, 0), 0);
+					partner.lock()->swingDestroyCounter.Increment();
+				}
 				// 右があるか？
-				if (hitChipIndex.x + 1 < MapData[0].size() - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(1, 0), 0);
+				if (hitChipIndex.x + 1 < MapData[0].size() - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(1, 0), 0);
+					partner.lock()->swingDestroyCounter.Increment();
+				}
 				// 上があるか？
-				if (0 < hitChipIndex.y - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, -1), 0);
+				if (0 < hitChipIndex.y - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, -1), 0);
+					partner.lock()->swingDestroyCounter.Increment();
+				}
 				// 下があるか？
-				if (hitChipIndex.y + 1 < MapData.size() - 1) StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, 1), 0);
+				if (hitChipIndex.y + 1 < MapData.size() - 1) {
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, 1), 0);
+					partner.lock()->swingDestroyCounter.Increment();
+				}
 
 			}
 
@@ -1449,6 +1398,8 @@ void CharacterInterFace::FinishSwing()
 	addSwingAngle = 0;
 	swingTimer = 0;
 	allSwingAngle = 0;
+	partner.lock()->swingDestroyCounter.Init();
+	swingDestroyCounter.Init();
 
 }
 

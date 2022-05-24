@@ -13,6 +13,7 @@
 #include"IntoTheAbyss/ResultTransfer.h"
 #include"IntoTheAbyss/DebugKeyManager.h"
 #include"IntoTheAbyss/DebugImGuiManager.h"
+#include"IntoTheAbyss/CharacterManager.h"
 
 GameScene::GameScene()
 {
