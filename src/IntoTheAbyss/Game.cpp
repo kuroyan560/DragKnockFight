@@ -310,6 +310,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.initGameFlag = true;
 		roundChangeEffect.drawFightFlag = true;
 	}
+
+	mapChipGeneratorTest.Init();
 }
 
 Game::Game()
@@ -442,6 +444,12 @@ void Game::Update(const bool& Loop)
 			playerHandMgr->Update(CharacterManager::Instance()->Left()->pos);
 		}
 	}
+
+	if (roundChangeEffect.initGameFlag)
+	{
+		mapChipGeneratorTest.Update();
+	}
+
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
 	{
@@ -743,29 +751,7 @@ void Game::Draw()
 		}
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 
-		// 照準の拡大率
-		//static Vec2<float> exp = Vec2<float>(1.0f, 1.0f);
-
-		//static bool isStop = CharacterManager::Instance()->Left()->isStopPartner;
-		//static bool prevIsStop = false;
-
-		//// 敵をストップさせている時に照準の画像を描画する。
-		//if (isStop) {
-
-		//	// 照準の画像
-		//	static const int ICON = TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png");
-
-		//	// 照準の回転角 仮でここに置く。
-		//	static float rad = 0;
-		//	rad += 0.1f;
-
-		//	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), exp, rad, TexHandleMgr::GetTexBuffer(ICON));
-
-
-		//}
-
-		//isStop = prevIsStop;
-
+		mapChipGeneratorTest.Draw();
 	}
 
 	roundChangeEffect.Draw();

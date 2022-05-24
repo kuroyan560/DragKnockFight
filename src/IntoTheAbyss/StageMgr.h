@@ -10,6 +10,7 @@
 #include"WinApp.h"
 #include"Angle.h"
 #include"KuroFunc.h"
+#include"MapChipCollider.h"
 
 /// <summary>
 /// 小部屋同士の部屋のリンク付けする際に必要な情報
@@ -379,6 +380,14 @@ public:
 			*CHIP_NUMBER = 1;
 		}
 	};
+
+	//マップの座標上のサイズを取得
+	Vec2<float>GetMapGrobalSize()
+	{
+		//インデックスのサイズ
+		Vec2<int>size(localRoomMapChipArray[0].size(), localRoomMapChipArray.size());
+		return size.Float() * MAP_CHIP_SIZE;
+	}
 
 
 private:
