@@ -46,7 +46,7 @@
 #include"CharacterManager.h"
 #include "StaminaItemMgr.h"
 
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -72,7 +72,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -167,7 +167,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -185,7 +185,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	CrashMgr::Instance()->Init();
 
@@ -372,7 +372,7 @@ Game::Game()
 	}
 }
 
-void Game::Init(const bool& PracticeMode)
+void Game::Init(const bool &PracticeMode)
 {
 	practiceMode = PracticeMode;
 
@@ -391,7 +391,7 @@ void Game::Init(const bool& PracticeMode)
 
 }
 
-void Game::Update(const bool& Loop)
+void Game::Update(const bool &Loop)
 {
 
 	if (UsersInput::Instance()->KeyOnTrigger(DIK_R))
@@ -538,7 +538,9 @@ void Game::Update(const bool& Loop)
 
 	// スクロール量の更新処理
 	//ScrollManager::Instance()->Update();
-	ScrollMgr::Instance()->Update(lineCenterPos);
+	Vec2<float> distance = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
+	Vec2<float>cPos = CharacterManager::Instance()->Left()->pos - distance / 2.0f;
+	ScrollMgr::Instance()->Update(cPos);
 
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
@@ -624,27 +626,36 @@ void Game::Update(const bool& Loop)
 
 	if (!Camera::Instance()->Active()) {
 
-		// 紐の伸び具合によってカメラのズーム率を変える。
+		//互いの距離でカメラのズーム率を変える。
 		float distance = CharacterManager::Instance()->Left()->pos.Distance(CharacterManager::Instance()->Right()->pos);
 
-		const float MAX_ADD_ZOOM = 700.0f;
-		const float INIT_ZOOM_RATE = 0.3f;
+		//最大距離
+		const float MAX_ADD_ZOOM = 3000.0f;
 
 		float zoomRate = 1.0f;
+		float deadLine = 1200.0f;//この距離以下はズームしない
+
 		// 限界より伸びていたら。
-		if (MAX_ADD_ZOOM < distance) {
+		if (MAX_ADD_ZOOM < distance)
+		{
 			zoomRate = 1.0f;
 		}
-		else {
-			zoomRate = distance / MAX_ADD_ZOOM;
+		else if (deadLine <= distance)
+		{
+			zoomRate = (distance - deadLine) / MAX_ADD_ZOOM;
+		}
+		else
+		{
+			zoomRate = 0.0f;
 		}
 		static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
-		Camera::Instance()->zoom = 0.5f;
+		Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
 
-		// カメラのズームが0.1f未満にならないようにする。
-		if (Camera::Instance()->zoom < 0.25f)
+		// カメラのズームが0.27f未満にならないようにする。
+		float minZoomValue = 0.27f;
+		if (Camera::Instance()->zoom < minZoomValue)
 		{
-			Camera::Instance()->zoom = 0.25f;
+			Camera::Instance()->zoom = minZoomValue;
 		}
 	}
 	else {
@@ -691,7 +702,7 @@ void Game::Draw()
 	if (roundChangeEffect.initGameFlag)
 	{
 		//左プレイヤー～中央のチェイン
-		auto& left = CharacterManager::Instance()->Left();
+		auto &left = CharacterManager::Instance()->Left();
 		Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
 		Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
 		if (0.0f < left->addLineLength)
@@ -701,7 +712,7 @@ void Game::Draw()
 		}
 
 		//右プレイヤー～中央のチェイン
-		auto& right = CharacterManager::Instance()->Right();
+		auto &right = CharacterManager::Instance()->Right();
 		Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
 		Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
 		if (0.0f < right->addLineLength)
@@ -1031,8 +1042,8 @@ void Game::CalCenterPos()
 
 	// 本当はScrambleの一番うしろに入れていた処理なんですが、押し戻しをした後に呼ぶ必要が出てきたので関数で分けました。
 
-	auto& left = CharacterManager::Instance()->Left();
-	auto& right = CharacterManager::Instance()->Right();
+	auto &left = CharacterManager::Instance()->Left();
+	auto &right = CharacterManager::Instance()->Right();
 
 	// 移動量に応じて本来あるべき長さにする。
 	Vec2<float> prevSubPos = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos;
@@ -1098,8 +1109,8 @@ void Game::CalCenterPos()
 		//else {
 			// 規定値以上だったら普通に場所を求める。
 
-		auto& right = CharacterManager::Instance()->Right();
-		auto& left = CharacterManager::Instance()->Left();
+		auto &right = CharacterManager::Instance()->Right();
+		auto &left = CharacterManager::Instance()->Left();
 
 		Vec2<float> rightPos = right->pos;
 		rightPos += (left->pos - right->pos).GetNormal() * right->addLineLength;
@@ -1223,7 +1234,7 @@ void Game::DeterminationOfThePosition()
 
 }
 
-void Game::RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData)
+void Game::RoundStartEffect(const bool &Loop, const RoomMapChipArray &tmpMapData)
 {
 
 	//ラウンド開始時の演出開始
@@ -1276,7 +1287,7 @@ void Game::RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData
 
 }
 
-void Game::RoundFinishEffect(const bool& Loop)
+void Game::RoundFinishEffect(const bool &Loop)
 {
 
 	//ラウンド終了演出開始
