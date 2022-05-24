@@ -705,6 +705,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 
 	// RT‚ª‰Ÿ‚³‚ê‚Ä‚¢‚Ä‘ŠŽè‚ðŽ~‚ß‚éó‘Ô‚É‚È‚Á‚Ä‚¢‚é‚©‚ð•Û‘¶B
+	isPrevStopPartner = isStopPartner;
 	isStopPartner = false;
 
 	bool RTInput = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RT);

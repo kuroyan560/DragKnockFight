@@ -11,6 +11,7 @@
 #include "CrashEffectMgr.h"
 #include "Stamina.h"
 #include"CharacterManager.h"
+#include "DrawFunc_Color.h"
 
 const Color CharacterInterFace::TEAM_COLOR[TEAM_NUM] =
 {
@@ -416,6 +417,9 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	pilotReturnTotalTime = 0;
 	gaugeReturnTimer = 0;
 
+	isStopPartner = false;
+	isPrevStopPartner = false;
+
 	// 各キャラによってスタミナゲージのデフォルト量を決定する予定。
 	//staminaGauge = std::make_shared<StaminaMgr>();
 	staminaGauge->Init();
@@ -451,6 +455,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 	reticleExp = Vec2<float>(1.0f, 1.0f);
 	reticleRad = 0;
+	reticleAlpha = 0;
 
 	addSwingAngle = 0.0f;
 }
@@ -735,6 +740,46 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	}
 
+	// ボス側でも止まるとデバッグしにくいので、プレイヤーのときのみ通るようにする。
+	if (team == WHICH_TEAM::LEFT_TEAM) {
+
+		// 敵を止めているときのレティクルの更新処理。
+		if (isStopPartner && !isPrevStopPartner) {
+
+			// 各値を調整。
+			reticleAlpha = 0;
+			reticleExp = Vec2<float>(3.0f, 3.0f);
+
+		}
+		if (isStopPartner) {
+
+			reticleAlpha += (255.0f - reticleAlpha) / 5.0f;
+			reticleExp.x += (1.0f - reticleExp.x) / 5.0f;
+			reticleExp.y += (1.0f - reticleExp.y) / 5.0f;
+
+			reticleRad += (DirectX::XM_2PI + 0.1f - reticleRad) / 20.0f;
+			if (DirectX::XM_2PI <= reticleRad) {
+
+				reticleRad = 0;
+
+			}
+
+		}
+		else {
+
+			reticleAlpha -= (reticleAlpha) / 5.0f;
+			reticleRad += (reticleRad - reticleRad) / 5.0f;
+
+			if (reticleAlpha < 10) {
+
+				reticleRad = 0;
+
+			}
+
+		}
+
+	}
+
 
 }
 
@@ -784,6 +829,12 @@ void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 	}
 
 	bulletMgr.Draw();
+
+	// 敵を止めているときの照準を描画
+	//if (isStopPartner) {
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), reticleExp, reticleRad, TexHandleMgr::GetTexBuffer(stopReticleHandle), Color(255, 255, 255, reticleAlpha));
+	//}
+
 }
 
 void CharacterInterFace::DrawUI()

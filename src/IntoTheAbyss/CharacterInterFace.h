@@ -110,6 +110,7 @@ protected:
 	int stopReticleHandle;
 	Vec2<float> reticleExp;
 	float reticleRad;
+	int reticleAlpha;
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
@@ -198,6 +199,7 @@ public:
 	float staminaAutoHealAmount;
 
 	bool isStopPartner;		// ‘Š•û‚ðŽ~‚ß‚Ä‚¨‚­‚½‚ß‚Ìƒtƒ‰ƒO
+	bool isPrevStopPartner;
 
 	Vec2<float>shakeValue;
 	bool prevSwingFlag;
