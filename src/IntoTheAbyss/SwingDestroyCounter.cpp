@@ -130,8 +130,9 @@ void SwingDestroyCounter::CheckDisitStayID(const DestroyCounter::DISIT_ID DisitI
 		if (!index.isActive) continue;
 		if (!(index.disitID == DisitID)) continue;
 
-		index.isExitReservation = true;
+			index.isExitReservation = true;
 
+		}
 	}
 }
 

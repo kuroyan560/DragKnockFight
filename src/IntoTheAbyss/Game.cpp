@@ -311,7 +311,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
-	mapChipGeneratorTest.Init();
+	mapChipGenerator[DebugParameter::Instance()->generator]->Init();
 }
 
 Game::Game()
@@ -370,6 +370,10 @@ Game::Game()
 		int hR = TexHandleMgr::LoadGraph(bossFilePass + "hold/R.png");
 		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, false);
 	}
+
+	mapChipGenerator[SPLINE_ORBIT] = std::make_shared<MapChipGenerator_SplineOrbit>();
+	mapChipGenerator[RAND_PATTERN] = std::make_shared<MapChipGenerator_RandPattern>();
+
 }
 
 void Game::Init(const bool& PracticeMode)
@@ -402,6 +406,10 @@ void Game::Update(const bool& Loop)
 		StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNum, roomNum);
 	}
 
+	if (DebugParameter::Instance()->changeGenerator)
+	{
+		mapChipGenerator[DebugParameter::Instance()->generator]->Init();
+	}
 
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 	RoomMapChipArray tmpMapData = *mapData;
@@ -460,7 +468,10 @@ void Game::Update(const bool& Loop)
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
 	{
-		mapChipGeneratorTest.Update();
+		if (roundChangeEffect.initGameFlag)
+		{
+			mapChipGenerator[DebugParameter::Instance()->generator]->Update();
+		}
 
 		// 座標を保存。
 		CharacterManager::Instance()->Left()->SavePrevFramePos();
@@ -623,6 +634,8 @@ void Game::Update(const bool& Loop)
 	// クラッシュ時の演出の更新処理。
 	CrashEffectMgr::Instance()->Update();
 
+	countBlock.Update();
+
 	// スタミナアイテムの更新処理
 	if (!readyToStartRoundFlag) {
 		StaminaItemMgr::Instance()->Update(playerHomeBase.GetRightUpPos(), enemyHomeBase.GetLeftDownPos());
@@ -688,10 +701,13 @@ void Game::Draw()
 	if (stageNum != prevDrawChipStageNum || roomNum != prevDrawChipRoomNum)
 	{
 	}
+
 	mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 	prevDrawChipStageNum = stageNum;
 	prevDrawChipRoomNum = roomNum;
 	DrawMapChip(*mapData, *mapChipDrawData, stageNum, roomNum);
+
+
 
 	if (roundChangeEffect.readyFlag)
 	{
@@ -756,7 +772,7 @@ void Game::Draw()
 		}
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 
-		mapChipGeneratorTest.Draw();
+		mapChipGenerator[DebugParameter::Instance()->generator]->Draw();
 	}
 
 	roundChangeEffect.Draw();
@@ -786,6 +802,8 @@ void Game::Draw()
 
 	GameTimer::Instance()->Draw();
 	ScoreManager::Instance()->Draw();
+
+	countBlock.Draw();
 
 	// プレイヤーとボス間に線を描画
 	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());

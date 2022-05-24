@@ -258,6 +258,12 @@ public:
 	RoomMapChipArray *GetLocalMap();
 	RoomMapChipDrawArray *GetLocalDrawMap();
 
+	int GetAllLocalWallBlocksNum();
+
+	int GetAllWallBlocksNum(int STAGE_NUM, int ROOM_NUM);
+
+
+	int GetMaxMapChipNum();
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
@@ -389,6 +395,10 @@ public:
 		return size.Float() * MAP_CHIP_SIZE;
 	}
 
+	const int GetWallGraph()
+	{
+		return mapChipGraphHandle[0];
+	}
 
 private:
 	const int &GetGimmickNumber(const int &NUMBER)
@@ -443,5 +453,6 @@ private:
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
 		}
 	}
+
 };
 

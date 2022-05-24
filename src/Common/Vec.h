@@ -120,6 +120,11 @@ struct Vec2
 		x = fmodf(x, rhs);
 		y = fmodf(y, rhs);
 	};
+
+	bool operator<(const Vec2<T>& rhs)
+	{
+		return x < rhs.x&& y < rhs.y;
+	}
 #pragma endregion
 };
 

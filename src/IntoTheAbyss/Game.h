@@ -29,6 +29,7 @@ class RenderTarget;
 
 #include "Barrages.h"
 #include"MapChipGenerator.h"
+#include"BlockCount.h"
 
 class CharacterInterFace;
 
@@ -130,7 +131,9 @@ class Game
 	std::unique_ptr<BossHandMgr> playerHandMgr;
 
 	//テスト用
-	MapChipGenerator_Test mapChipGeneratorTest;
+	std::array<std::shared_ptr<MapChipGenerator>, MAP_CHIP_GENERATOR_NUM>mapChipGenerator;
+
+	BlockCount countBlock;
 
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
