@@ -624,10 +624,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 			speed = CANCEL_DASH_SPEED;
 
 			// ジャスト回避の予測線との当たり判定を行い、マップチップとあたっていたらダッシュ速度を上げる。
-			if(CheckHitMapChip(justCancelDashStartPos, justCancelDashEndPos)){
-			
+			if (CheckHitMapChip(justCancelDashStartPos, justCancelDashEndPos)) {
+
 				speed = JUST_CANCEL_DASH_SPEED;
-			
+
 			}
 
 			// 相方の振り回しを終わらせる。
@@ -728,6 +728,18 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	// 左ショルダーの入力情報を保存。
 	isPrevLeftBottom = isInputLB;
+
+
+	// RTが押されていて相手を止める状態になっているかを保存。
+	isPrevStopPartner = isStopPartner;
+	isStopPartner = false;
+
+	bool RTInput = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RT);
+	if (RTInput) {
+
+		isStopPartner = true;
+
+	}
 
 }
 

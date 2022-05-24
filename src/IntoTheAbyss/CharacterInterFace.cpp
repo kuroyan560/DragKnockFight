@@ -11,6 +11,7 @@
 #include "CrashEffectMgr.h"
 #include "Stamina.h"
 #include"CharacterManager.h"
+#include "DrawFunc_Color.h"
 
 const Color CharacterInterFace::TEAM_COLOR[TEAM_NUM] =
 {
@@ -77,6 +78,16 @@ void CharacterInterFace::SwingUpdate()
 
 		// 反時計回りだったら
 		nowAngle -= addSwingAngle;
+
+	}
+
+	// 回転した量を保存。
+	allSwingAngle += fabs(addSwingAngle);
+
+	// 回転した量がPIを超えたら振り回しを終了。
+	if (DirectX::XM_PI + DirectX::XM_PI / 2.0f <= allSwingAngle) {
+
+		FinishSwing();
 
 	}
 
@@ -416,6 +427,9 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	pilotReturnTotalTime = 0;
 	gaugeReturnTimer = 0;
 
+	isStopPartner = false;
+	isPrevStopPartner = false;
+
 	// 各キャラによってスタミナゲージのデフォルト量を決定する予定。
 	//staminaGauge = std::make_shared<StaminaMgr>();
 	staminaGauge->Init();
@@ -448,7 +462,13 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	barrageDelayTimer = 0;
 
 	healAuraEaseRate = 1.0f;
+
+	reticleExp = Vec2<float>(1.0f, 1.0f);
+	reticleRad = 0;
+	reticleAlpha = 0;
+
 	addSwingAngle = 0.0f;
+	allSwingAngle = 0.0f;
 }
 
 #include "SlowMgr.h"
@@ -652,82 +672,122 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 
 	// 右のキャラだったら処理を行う。
-	if (team == WHICH_TEAM::RIGHT_TEAM && !isRoundStartEffect) {
+	//if (team == WHICH_TEAM::RIGHT_TEAM && !isRoundStartEffect) {
 
-		// 弾幕の更新処理
-		static const int BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
-		bool isEnd = barrage->Update(bulletMgr, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Left()->pos, BULLET_HANDLE);
+	//	// 弾幕の更新処理
+	//	static const int BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
+	//	bool isEnd = barrage->Update(bulletMgr, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Left()->pos, BULLET_HANDLE);
 
-		// 弾幕の更新が終わっていたら。
-		if (isEnd) {
+	//	// 弾幕の更新が終わっていたら。
+	//	if (isEnd) {
 
-			// タイマーを更新。
-			++barrageDelayTimer;
+	//		// タイマーを更新。
+	//		++barrageDelayTimer;
 
-			// タイマーが規定値に達したら。
-			if (BARRAGE_DELAY_TIMER <= barrageDelayTimer) {
+	//		// タイマーが規定値に達したら。
+	//		if (BARRAGE_DELAY_TIMER <= barrageDelayTimer) {
 
-				// 乱数を生成して、その乱数の弾幕をセットする。
-				int random = KuroFunc::GetRand(6);
+	//			// 乱数を生成して、その乱数の弾幕をセットする。
+	//			int random = KuroFunc::GetRand(6);
 
-				switch (random)
-				{
-				case 0:
+	//			switch (random)
+	//			{
+	//			case 0:
 
-					barrage = std::make_unique<WhirlpoolBarrage>();
+	//				barrage = std::make_unique<WhirlpoolBarrage>();
 
-					break;
+	//				break;
 
-				case 1:
+	//			case 1:
 
-					barrage = std::make_unique<Whirlpool2WayBarrage>();
+	//				barrage = std::make_unique<Whirlpool2WayBarrage>();
 
-					break;
+	//				break;
 
-				case 2:
+	//			case 2:
 
-					barrage = std::make_unique<CircularBarrage>();
+	//				barrage = std::make_unique<CircularBarrage>();
 
-					break;
+	//				break;
 
-				case 3:
+	//			case 3:
 
-					barrage = std::make_unique<TargetShotBarrage>();
+	//				barrage = std::make_unique<TargetShotBarrage>();
 
-					break;
+	//				break;
 
-				case 4:
+	//			case 4:
 
-					barrage = std::make_unique<TargetShot3WayBarrage>();
+	//				barrage = std::make_unique<TargetShot3WayBarrage>();
 
-					break;
+	//				break;
 
-				case 5:
+	//			case 5:
 
-					barrage = std::make_unique<ShotGunBarrage>();
+	//				barrage = std::make_unique<ShotGunBarrage>();
 
-					break;
+	//				break;
 
-				case 6:
+	//			case 6:
 
-					barrage = std::make_unique<WaveBarrage>();
+	//				barrage = std::make_unique<WaveBarrage>();
 
-					break;
-				default:
-					break;
-				}
+	//				break;
+	//			default:
+	//				break;
+	//			}
 
-				barrage->Start();
+	//			barrage->Start();
+
+	//		}
+
+	//	}
+	//	else {
+
+	//		barrageDelayTimer = 0;
+
+	//	}
+
+
+	//}
+
+	// ボス側でも止まるとデバッグしにくいので、プレイヤーのときのみ通るようにする。
+	if (team == WHICH_TEAM::LEFT_TEAM) {
+
+		// 敵を止めているときのレティクルの更新処理。
+		if (isStopPartner && !isPrevStopPartner) {
+
+			// 各値を調整。
+			reticleAlpha = 0;
+			reticleExp = Vec2<float>(3.0f, 3.0f);
+
+		}
+		if (isStopPartner) {
+
+			reticleAlpha += (255.0f - reticleAlpha) / 5.0f;
+			reticleExp.x += (1.0f - reticleExp.x) / 5.0f;
+			reticleExp.y += (1.0f - reticleExp.y) / 5.0f;
+
+			reticleRad += (DirectX::XM_2PI + 0.1f - reticleRad) / 20.0f;
+			if (DirectX::XM_2PI <= reticleRad) {
+
+				reticleRad = 0;
 
 			}
 
 		}
 		else {
 
-			barrageDelayTimer = 0;
+			reticleAlpha -= (reticleAlpha) / 5.0f;
+			reticleRad += (reticleRad - reticleRad) / 5.0f;
+
+			if (reticleAlpha < 10) {
+
+				reticleRad = 0;
+
+			}
 
 		}
-
 
 	}
 
@@ -780,6 +840,12 @@ void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 	}
 
 	bulletMgr.Draw();
+
+	// 敵を止めているときの照準を描画
+	//if (isStopPartner) {
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), reticleExp, reticleRad, TexHandleMgr::GetTexBuffer(stopReticleHandle), Color(255, 255, 255, reticleAlpha));
+	//}
+
 }
 
 void CharacterInterFace::DrawUI()
@@ -1421,6 +1487,7 @@ void CharacterInterFace::FinishSwing()
 	CCWSwingSegmentMgr.Init();
 	addSwingAngle = 0;
 	swingTimer = 0;
+	allSwingAngle = 0;
 
 }
 
@@ -1472,5 +1539,11 @@ CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(Hon
 	bulletMgr.Init();
 	barrage = std::make_unique<CircularBarrage>();
 	barrage->Init();
+
+
+	stopReticleHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png");
+	reticleExp = Vec2<float>(1.0f, 1.0f);
+	reticleRad = 0;
+
 }
 

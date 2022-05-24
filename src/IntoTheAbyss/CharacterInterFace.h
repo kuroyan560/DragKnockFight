@@ -86,6 +86,7 @@ protected:
 	Vec2<float> nowSwingVec;		// 現在の角度
 	Vec2<float> swingTargetVec;		// 目標地点
 	float addSwingAngle;			// 振り回しで回転させる量 だんだん増える。
+	float allSwingAngle;			// どのくらい回転量を加算したか。
 	bool isSwingClockWise;			// この振り回しが時計回りかどうか true...時計回り...右回転  false...反時計回り...左回転
 	float addSwingRate;				// 振り回し速度に加算する量 近い時に回転が遅い問題を解決する。
 	float ADD_SWING_ANGLE = 0.02f;
@@ -105,6 +106,12 @@ protected:
 	Vec2<float>pilotSize = { 64.0f,64.0f };	//パイロットのサイズ
 	int pilotGraph = -1;
 	bool pilotDrawMiror = false;
+
+	// 照準の画像
+	int stopReticleHandle;
+	Vec2<float> reticleExp;
+	float reticleRad;
+	int reticleAlpha;
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
@@ -191,6 +198,9 @@ public:
 	bool goAreaFlag;
 
 	float staminaAutoHealAmount;
+
+	bool isStopPartner;		// 相方を止めておくためのフラグ
+	bool isPrevStopPartner;
 
 	Vec2<float>shakeValue;
 	bool prevSwingFlag;
