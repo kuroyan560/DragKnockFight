@@ -81,6 +81,16 @@ void CharacterInterFace::SwingUpdate()
 
 	}
 
+	// 回転した量を保存。
+	allSwingAngle += fabs(addSwingAngle);
+
+	// 回転した量がPIを超えたら振り回しを終了。
+	if (DirectX::XM_PI + DirectX::XM_PI / 2.0f <= allSwingAngle) {
+
+		FinishSwing();
+
+	}
+
 	// この角度を現在のベクトルとして使用する。
 	nowSwingVec = { cosf(nowAngle), sinf(nowAngle) };
 
@@ -458,6 +468,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	reticleAlpha = 0;
 
 	addSwingAngle = 0.0f;
+	allSwingAngle = 0.0f;
 }
 
 #include "SlowMgr.h"
@@ -1476,6 +1487,7 @@ void CharacterInterFace::FinishSwing()
 	CCWSwingSegmentMgr.Init();
 	addSwingAngle = 0;
 	swingTimer = 0;
+	allSwingAngle = 0;
 
 }
 
