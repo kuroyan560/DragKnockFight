@@ -12,7 +12,7 @@ public:
 struct MapChipGenerator_Test
 {
 private:
-	static const float RADIUS = 64.0f;
+	const float RADIUS = 64.0f;
 
 	Vec2<float>pos;
 	float t = 0.0f;
