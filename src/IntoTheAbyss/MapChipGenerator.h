@@ -12,8 +12,9 @@ public:
 struct MapChipGenerator_Test
 {
 private:
+	static const float RADIUS = 64.0f;
+
 	Vec2<float>pos;
-	float radius = 32.0f;
 	float t = 0.0f;
 	static const int ARRAY_SIZE = 4;
 	std::array<Vec2<float>, ARRAY_SIZE>targetPos;	//Œü‚©‚¤æ”z—ñ
