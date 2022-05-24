@@ -517,7 +517,7 @@ void Game::Update(const bool& Loop)
 			//SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
 			CharacterManager::Instance()->Right()->GetBulletMgr().bullets[index].Init();
 			CharacterManager::Instance()->Left()->Damage();
-			AudioApp::Instance()->PlayWave(DAMAGED_SE);
+			//AudioApp::Instance()->PlayWave(DAMAGED_SE);
 		}
 	}
 

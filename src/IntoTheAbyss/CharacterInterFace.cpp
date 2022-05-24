@@ -443,6 +443,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	barrageDelayTimer = 0;
 
 	healAuraEaseRate = 1.0f;
+	addSwingAngle = 0.0f;
 }
 
 #include "SlowMgr.h"
