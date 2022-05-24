@@ -274,9 +274,17 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM)
 	}
 	if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == CHIPNUM)return;	//ïœâªÇ»Çµ
 
+	//âÛÇÍÇ»Ç¢ÉuÉçÉbÉNÇÕîÚÇŒÇ∑
+	if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
+	{
+		return;
+	}
+
+
 	localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] = CHIPNUM;
 	SetLocalGimmickGraphHandle(MAPCHIP_NUM, CHIPNUM);
-	if (CHIPNUM == 1)
+	int wallChip = 1;
+	if (CHIPNUM == wallChip)
 	{
 		localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
 		localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = mapChipGraphHandle[0];
