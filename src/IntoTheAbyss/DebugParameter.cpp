@@ -41,7 +41,8 @@ DebugParameter::DebugParameter()
 	swingAngle = 7.0f;
 	swingMax = 0.11f;
 	useFinishSwingFlag = true;
-	chipGenerator = false;
+	generator = 1;
+	changeGenerator = false;
 }
 
 void DebugParameter::Update()
@@ -104,7 +105,7 @@ void DebugParameter::DrawImGui()
 		ImGui::Begin("Paramters");
 		ImGui::InputFloat("SWING_ANGLE", &swingAngle);
 		//ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
-		ImGui::Checkbox("chipGenerator", &chipGenerator);
+		changeGenerator = ImGui::SliderInt("chipGenerator", &generator, 0, MAP_CHIP_GENERATOR_NUM - 1);
 		ImGui::End();
 	}
 

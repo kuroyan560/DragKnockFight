@@ -3,6 +3,7 @@
 #include"../Common/Singleton.h"
 #include<vector>
 #include"DebugImGuiManager.h"
+#include"MapChipGenerator.h"
 
 struct PlayerDebugParameterData
 {
@@ -132,6 +133,7 @@ public:
 	float swingAngle;
 	float swingMax;
 	bool useFinishSwingFlag;
-	bool chipGenerator;
+	int generator;
+	bool changeGenerator;
 };
 

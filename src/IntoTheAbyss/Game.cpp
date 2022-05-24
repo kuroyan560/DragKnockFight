@@ -311,7 +311,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
-	mapChipGenerator[mapChipGeneratorType]->Init();
+	mapChipGenerator[DebugParameter::Instance()->generator]->Init();
 }
 
 Game::Game()
@@ -406,6 +406,10 @@ void Game::Update(const bool& Loop)
 		StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNum, roomNum);
 	}
 
+	if (DebugParameter::Instance()->changeGenerator)
+	{
+		mapChipGenerator[DebugParameter::Instance()->generator]->Init();
+	}
 
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 	RoomMapChipArray tmpMapData = *mapData;
@@ -466,7 +470,7 @@ void Game::Update(const bool& Loop)
 	{
 		if (roundChangeEffect.initGameFlag)
 		{
-			mapChipGenerator[mapChipGeneratorType]->Update();
+			mapChipGenerator[DebugParameter::Instance()->generator]->Update();
 		}
 
 		// À•W‚ð•Û‘¶B
@@ -768,7 +772,7 @@ void Game::Draw()
 		}
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 
-		mapChipGenerator[mapChipGeneratorType]->Draw();
+		mapChipGenerator[DebugParameter::Instance()->generator]->Draw();
 	}
 
 	roundChangeEffect.Draw();

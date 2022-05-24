@@ -131,8 +131,7 @@ class Game
 	std::unique_ptr<BossHandMgr> playerHandMgr;
 
 	//テスト用
-	static const enum MAP_CHIP_GENERATOR { SPLINE_ORBIT, RAND_PATTERN, MAP_CHIP_GENERATOR }mapChipGeneratorType = RAND_PATTERN;
-	std::array<std::shared_ptr<MapChipGenerator>, MAP_CHIP_GENERATOR>mapChipGenerator;
+	std::array<std::shared_ptr<MapChipGenerator>, MAP_CHIP_GENERATOR_NUM>mapChipGenerator;
 
 	BlockCount countBlock;
 
