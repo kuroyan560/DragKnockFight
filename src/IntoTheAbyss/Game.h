@@ -130,7 +130,8 @@ class Game
 	std::unique_ptr<BossHandMgr> playerHandMgr;
 
 	//テスト用
-	MapChipGenerator_Test mapChipGeneratorTest;
+	static const enum MAP_CHIP_GENERATOR { SPLINE_ORBIT, RAND_PATTERN, MAP_CHIP_GENERATOR }mapChipGeneratorType = RAND_PATTERN;
+	std::array<std::shared_ptr<MapChipGenerator>, MAP_CHIP_GENERATOR>mapChipGenerator;
 
 public:
 	HomeBase playerHomeBase, enemyHomeBase;

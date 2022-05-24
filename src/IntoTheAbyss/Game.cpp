@@ -311,7 +311,7 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
-	mapChipGeneratorTest.Init();
+	mapChipGenerator[mapChipGeneratorType]->Init();
 }
 
 Game::Game()
@@ -370,6 +370,10 @@ Game::Game()
 		int hR = TexHandleMgr::LoadGraph(bossFilePass + "hold/R.png");
 		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, false);
 	}
+
+	mapChipGenerator[SPLINE_ORBIT] = std::make_shared<MapChipGenerator_SplineOrbit>();
+	mapChipGenerator[RAND_PATTERN] = std::make_shared<MapChipGenerator_RandPattern>();
+
 }
 
 void Game::Init(const bool &PracticeMode)
@@ -449,7 +453,10 @@ void Game::Update(const bool &Loop)
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
 	{
-		mapChipGeneratorTest.Update();
+		if (roundChangeEffect.initGameFlag)
+		{
+			mapChipGenerator[mapChipGeneratorType]->Update();
+		}
 
 		// 座標を保存。
 		CharacterManager::Instance()->Left()->SavePrevFramePos();
@@ -745,7 +752,7 @@ void Game::Draw()
 		}
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 
-		mapChipGeneratorTest.Draw();
+		mapChipGenerator[mapChipGeneratorType]->Draw();
 	}
 
 	roundChangeEffect.Draw();

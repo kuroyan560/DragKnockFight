@@ -389,6 +389,10 @@ public:
 		return size.Float() * MAP_CHIP_SIZE;
 	}
 
+	const int GetWallGraph()
+	{
+		return mapChipGraphHandle[0];
+	}
 
 private:
 	const int &GetGimmickNumber(const int &NUMBER)
@@ -443,5 +447,6 @@ private:
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
 		}
 	}
+
 };
 

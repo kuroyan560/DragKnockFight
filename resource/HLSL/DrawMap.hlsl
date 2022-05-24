@@ -20,6 +20,7 @@ struct VSOutput
     float radian : RADIAN;
     float shocked : SHOCKED;
     float expEaseRate : EXP_EASE_RATE;
+    float alpha : ALPHA;
 };
 
 VSOutput VSmain_Base(VSOutput input)
@@ -32,6 +33,7 @@ struct GSOutput
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD;
     float shocked : SHOCKED;
+    float alpha : ALPHA;
 };
 
 float2 RotateFloat2(float2 Pos, float Radian)
@@ -67,6 +69,7 @@ void GSmain_Base(
     
     GSOutput element;
     element.shocked = input[0].shocked;
+    element.alpha = input[0].alpha;
     
     float2 center = input[0].pos;
         
@@ -110,7 +113,8 @@ void GSmain_Base(
 PSOutput PSmain_Base(GSOutput input)
 {
     PSOutput output;
-    output.color = tex.Sample(smp, input.uv);;
+    output.color = tex.Sample(smp, input.uv);
+    output.color.w *= input.alpha;
     return output;
 }
 
@@ -128,6 +132,7 @@ void GSmain_Shocked(
     
     GSOutput element;
     element.shocked = input[0].shocked;
+    element.alpha = input[0].alpha;
     
     float2 center = input[0].pos;
         
@@ -173,6 +178,7 @@ PSOutput PSmain_Shocked(GSOutput input)
     PSOutput output;
     output.color = tex.Sample(smp, input.uv);
     output.color.xyz *= input.shocked * output.color.w * 0.8f;
+    output.color.w *= input.alpha;
     return output;
 }
 

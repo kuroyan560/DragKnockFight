@@ -15,6 +15,7 @@ struct ChipData
 	float radian = 0.0f;
 	float shocked = 0.0f;
 	float expEaseRate = 1.0f;
+	float alpha = 1.0f;
 };
 
 class DrawMap

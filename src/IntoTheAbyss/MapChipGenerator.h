@@ -1,15 +1,20 @@
 #pragma once
 #include"Vec.h"
 #include<array>
+#include<vector>
 //マップチップを能動的に生成する機能
 class MapChipGenerator
 {
+protected:
+	void Generate(const Vec2<float>& GeneratePos);
 public:
-	void Update(const Vec2<float>& GeneratePos);
+	virtual void Init() = 0;
+	virtual void Update() = 0;
+	virtual void Draw() = 0;
 };
 
 //とりあえずスプラインで動くように
-struct MapChipGenerator_Test
+class MapChipGenerator_SplineOrbit : public MapChipGenerator
 {
 private:
 	const float RADIUS = 64.0f;
@@ -18,12 +23,27 @@ private:
 	float t = 0.0f;
 	static const int ARRAY_SIZE = 4;
 	std::array<Vec2<float>, ARRAY_SIZE>targetPos;	//向かう先配列
-	MapChipGenerator generator;
 	float GetDistRate();
 	Vec2<float> GetRandPos();
 
 public:
-	void Init();
-	void Update();
-	void Draw();
+	void Init()override;
+	void Update()override;
+	void Draw()override;
+};
+
+//ランダムで生成これから出る位置に予測
+class MapChipGenerator_RandPattern : public MapChipGenerator
+{
+	typedef std::vector<Vec2<int>>OffsetPattern;
+	std::vector<Vec2<int>>predictionIdxArray;
+	int span;
+	int timer;
+	int GetSpan();
+	void DesideNextIndices();	//次の生成位置を決定
+
+public:
+	void Init()override;
+	void Update()override;
+	void Draw()override;
 };
