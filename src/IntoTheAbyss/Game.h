@@ -28,6 +28,7 @@ class RenderTarget;
 #include"BossHandMgr.h"
 
 #include "Barrages.h"
+#include"MapChipGenerator.h"
 
 class CharacterInterFace;
 
@@ -127,6 +128,10 @@ class Game
 
 	std::unique_ptr<BossHandMgr> bossHandMgr;
 	std::unique_ptr<BossHandMgr> playerHandMgr;
+
+	//テスト用
+	MapChipGenerator_Test mapChipGeneratorTest;
+
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
 

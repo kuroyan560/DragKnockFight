@@ -310,6 +310,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.initGameFlag = true;
 		roundChangeEffect.drawFightFlag = true;
 	}
+
+	mapChipGeneratorTest.Init();
 }
 
 Game::Game()
@@ -445,6 +447,8 @@ void Game::Update(const bool& Loop)
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
 	{
+		mapChipGeneratorTest.Update();
+
 		// 座標を保存。
 		CharacterManager::Instance()->Left()->SavePrevFramePos();
 		CharacterManager::Instance()->Right()->SavePrevFramePos();
@@ -742,6 +746,8 @@ void Game::Draw()
 			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos), Vec2<float>(ScrollMgr::Instance()->zoom, ScrollMgr::Instance()->zoom), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 		}
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
+
+		mapChipGeneratorTest.Draw();
 	}
 
 	roundChangeEffect.Draw();
