@@ -106,6 +106,11 @@ protected:
 	int pilotGraph = -1;
 	bool pilotDrawMiror = false;
 
+	// Æ€‚Ì‰æ‘œ
+	int stopReticleHandle;
+	Vec2<float> reticleExp;
+	float reticleRad;
+
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
 	std::array<int, HIT_DIR_NUM>mapChipHit;
@@ -191,6 +196,8 @@ public:
 	bool goAreaFlag;
 
 	float staminaAutoHealAmount;
+
+	bool isStopPartner;		// ‘Š•û‚ğ~‚ß‚Ä‚¨‚­‚½‚ß‚Ìƒtƒ‰ƒO
 
 	Vec2<float>shakeValue;
 	bool prevSwingFlag;

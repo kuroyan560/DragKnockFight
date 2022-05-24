@@ -443,6 +443,9 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	barrageDelayTimer = 0;
 
 	healAuraEaseRate = 1.0f;
+
+	reticleExp = Vec2<float>(1.0f, 1.0f);
+	reticleRad = 0;
 }
 
 #include "SlowMgr.h"
@@ -1466,5 +1469,11 @@ CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(Hon
 	bulletMgr.Init();
 	barrage = std::make_unique<CircularBarrage>();
 	barrage->Init();
+
+
+	stopReticleHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png");
+	reticleExp = Vec2<float>(1.0f, 1.0f);
+	reticleRad = 0;
+
 }
 

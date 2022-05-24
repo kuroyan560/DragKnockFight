@@ -742,6 +742,30 @@ void Game::Draw()
 			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos), Vec2<float>(ScrollMgr::Instance()->zoom, ScrollMgr::Instance()->zoom), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 		}
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
+
+		// è∆èÄÇÃägëÂó¶
+		//static Vec2<float> exp = Vec2<float>(1.0f, 1.0f);
+
+		//static bool isStop = CharacterManager::Instance()->Left()->isStopPartner;
+		//static bool prevIsStop = false;
+
+		//// ìGÇÉXÉgÉbÉvÇ≥ÇπÇƒÇ¢ÇÈéûÇ…è∆èÄÇÃâÊëúÇï`âÊÇ∑ÇÈÅB
+		//if (isStop) {
+
+		//	// è∆èÄÇÃâÊëú
+		//	static const int ICON = TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png");
+
+		//	// è∆èÄÇÃâÒì]äp âºÇ≈Ç±Ç±Ç…íuÇ≠ÅB
+		//	static float rad = 0;
+		//	rad += 0.1f;
+
+		//	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), exp, rad, TexHandleMgr::GetTexBuffer(ICON));
+
+
+		//}
+
+		//isStop = prevIsStop;
+
 	}
 
 	roundChangeEffect.Draw();
@@ -832,7 +856,7 @@ void Game::Scramble()
 			CharacterManager::Instance()->Left()->pos += leftVelGauge;
 		}
 		// êUÇËâÒÇ≥ÇÍíÜÇ∂Ç·Ç»Ç©Ç¡ÇΩÇÁà⁄ìÆÇ≥ÇπÇÈÅB
-		if (!CharacterManager::Instance()->Left()->GetNowSwing()) {
+		if (!CharacterManager::Instance()->Left()->GetNowSwing() && !CharacterManager::Instance()->Left()->isStopPartner) {
 			CharacterManager::Instance()->Right()->pos += rightVelGauge;
 		}
 	}
@@ -905,7 +929,13 @@ void Game::Scramble()
 			moveDir.Normalize();
 
 			// âüÇµñﬂÇ∑ÅB
-			CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+			if (CharacterManager::Instance()->Left()->isStopPartner) {
+				CharacterManager::Instance()->Right()->addLineLength += moveLength;
+			}
+			else {
+				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+			}
+
 
 			// à¯Ç¡Ç©Ç©ÇËîªíËÇæÇ¡ÇΩÇÁ
 			if (CharacterManager::Instance()->Right()->GetStackFlag()) {
