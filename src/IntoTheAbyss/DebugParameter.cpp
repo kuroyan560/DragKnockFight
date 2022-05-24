@@ -38,7 +38,7 @@ DebugParameter::DebugParameter()
 	//BossDebugParameterData data;
 	//bossDebugData.push_back(data);
 
-	swingAngle = 31.4f;
+	swingAngle = 7.0f;
 	swingMax = 0.11f;
 	useFinishSwingFlag = true;
 }

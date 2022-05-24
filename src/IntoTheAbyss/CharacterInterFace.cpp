@@ -184,6 +184,11 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 	//パイロット切り離し中なら使えない
 	if (isPilotDetached)return;
 
+	//相手との距離が一定以下なら使えない
+	static const float SWING_DIST_LIMIT = 120.0f;
+	float dist = partner.lock()->pos.Distance(pos);
+	if (dist < SWING_DIST_LIMIT)return;
+
 	partner.lock()->OnSwinged();
 
 	AudioApp::Instance()->PlayWave(SE);
@@ -446,6 +451,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 	reticleExp = Vec2<float>(1.0f, 1.0f);
 	reticleRad = 0;
+
+	addSwingAngle = 0.0f;
 }
 
 #include "SlowMgr.h"
