@@ -373,6 +373,7 @@ Game::Game()
 
 	mapChipGenerator[SPLINE_ORBIT] = std::make_shared<MapChipGenerator_SplineOrbit>();
 	mapChipGenerator[RAND_PATTERN] = std::make_shared<MapChipGenerator_RandPattern>();
+	mapChipGenerator[CHANGE_MAP] = std::make_shared<MapChipGenerator_ChangeMap>();
 
 }
 

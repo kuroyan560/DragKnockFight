@@ -2,7 +2,13 @@
 #include"Vec.h"
 #include<array>
 #include<vector>
-static const enum MAP_CHIP_GENERATOR { SPLINE_ORBIT, RAND_PATTERN, MAP_CHIP_GENERATOR_NUM };
+static const enum MAP_CHIP_GENERATOR 
+{
+	SPLINE_ORBIT,
+	RAND_PATTERN,
+	CHANGE_MAP,
+	MAP_CHIP_GENERATOR_NUM
+};
 
 //マップチップを能動的に生成する機能
 class MapChipGenerator
@@ -48,4 +54,18 @@ public:
 	void Init()override;
 	void Update()override;
 	void Draw()override;
+};
+
+//マップチップを一定時間ごとに切り替える
+class MapChipGenerator_ChangeMap :public MapChipGenerator
+{
+public:
+	void Init()override;
+	void Update()override;
+	void Draw()override;
+
+private:
+	int changeMapTimer;
+
+	int setMapNum;
 };
