@@ -130,9 +130,8 @@ void SwingDestroyCounter::CheckDisitStayID(const DestroyCounter::DISIT_ID DisitI
 		if (!index.isActive) continue;
 		if (!(index.disitID == DisitID)) continue;
 
-			index.isExitReservation = true;
+		index.isExitReservation = true;
 
-		}
 	}
 }
 
@@ -297,6 +296,6 @@ void DestroyCounter::Draw(std::array<int, 12> NumberHandle)
 	/*===== •`‰æˆ— =====*/
 
 	float zoom = ScrollMgr::Instance()->zoom;
-	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos - Vec2<float>((FONT_SIZE * zoom) * static_cast<int>(disitID), 0)), Vec2<float>(1.0f * zoom, 1.0f * zoom), 0, TexHandleMgr::GetTexBuffer(NumberHandle[disit]), Color(255, 255, 255, alpha));
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos - Vec2<float>(FONT_SIZE * static_cast<int>(disitID), 0)), Vec2<float>(1.4f * zoom, 1.4f * zoom), 0, TexHandleMgr::GetTexBuffer(NumberHandle[disit]), Color(255, 255, 255, alpha));
 
 }
