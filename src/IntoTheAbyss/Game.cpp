@@ -446,11 +446,15 @@ void Game::Update(const bool& Loop)
 			playerHandMgr->Update(CharacterManager::Instance()->Left()->pos);
 		}
 	}
+
+	if (roundChangeEffect.initGameFlag)
+	{
+		mapChipGeneratorTest.Update();
+	}
+
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
 	{
-		mapChipGeneratorTest.Update();
-
 		// 座標を保存。
 		CharacterManager::Instance()->Left()->SavePrevFramePos();
 		CharacterManager::Instance()->Right()->SavePrevFramePos();

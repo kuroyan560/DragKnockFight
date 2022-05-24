@@ -31,7 +31,7 @@ void MapChipGenerator::Update(const Vec2<float>& GeneratePos)
 
 float MapChipGenerator_Test::GetDistRate()
 {
-	static const float DIST_BASE = 2000.0f;	//１とする距離
+	static const float DIST_BASE = 500.0f;	//１とする距離
 	float dist = targetPos[1].Distance(targetPos[2]);
 	return DIST_BASE / dist;
 }
@@ -40,8 +40,8 @@ Vec2<float> MapChipGenerator_Test::GetRandPos()
 {
 	//マップ内のランダムな座標を取得
 	Vec2<float>range = StageMgr::Instance()->GetMapGrobalSize();
-	range -= radius * 2.0f;
-	return Vec2<float>(radius + KuroFunc::GetRand(range.x), radius + KuroFunc::GetRand(range.y));
+	range -= RADIUS * 2.0f;
+	return Vec2<float>(RADIUS + KuroFunc::GetRand(range.x), RADIUS + KuroFunc::GetRand(range.y));
 }
 
 void MapChipGenerator_Test::Init()
@@ -86,7 +86,31 @@ void MapChipGenerator_Test::Update()
 
 #include"DrawFunc.h"
 #include"ScrollMgr.h"
+#include"TexHandleMgr.h"
 void MapChipGenerator_Test::Draw()
 {
-	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->zoom * radius, Color(1.0f, 0.0f, 0.0f, 0.0f), true);
+
+	static int ARROW_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png");
+	static const float ARROW_EXP = 0.4f;
+	static auto ARROW_SIZE = TexHandleMgr::GetTexBuffer(ARROW_HANDLE)->GetGraphSize() * ARROW_EXP;
+
+	auto drawPos = ScrollMgr::Instance()->Affect(pos);
+	const auto drawRadius = ScrollMgr::Instance()->zoom * RADIUS;
+	const auto winSize = WinApp::Instance()->GetExpandWinSize();
+
+	//画面外のときは矢印
+	if (drawPos.x + drawRadius < 0.0f || winSize.x < drawPos.x - drawRadius || drawPos.y + drawRadius < 0.0f || winSize.y < drawPos.y - drawRadius)
+	{
+		if (drawPos.x + ARROW_SIZE.x < 0.0f)drawPos.x = ARROW_SIZE.x;
+		else if (winSize.x < drawPos.x - ARROW_SIZE.x)drawPos.x = winSize.x - ARROW_SIZE.x;
+		if (drawPos.y + ARROW_SIZE.y < 0.0f)drawPos.y = ARROW_SIZE.y;
+		else if (winSize.y < drawPos.y - ARROW_SIZE.y)drawPos.y = winSize.y - ARROW_SIZE.y;
+
+		float rad = KuroFunc::GetAngle(WinApp::Instance()->GetExpandWinCenter(), drawPos);
+		DrawFunc::DrawRotaGraph2D(drawPos, { ARROW_EXP,ARROW_EXP }, rad, TexHandleMgr::GetTexBuffer(ARROW_HANDLE));
+	}
+	else
+	{
+		DrawFunc::DrawCircle2D(drawPos, drawRadius, Color(47, 255, 139, 255), false, 3);
+	}
 }
