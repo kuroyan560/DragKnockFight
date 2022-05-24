@@ -74,7 +74,7 @@ void DrawMap::Draw(const std::shared_ptr<TextureBuffer>& Tex)
 	vertexBuff->sendVertexNum = chipNum;
 	vertexBuff->Mapping(&chipDatas[0]);
 
-	float zoom = ScrollMgr::Instance()->zoom * 1.6f;
+	float zoom = ScrollMgr::Instance()->zoom * 1.6f * 1.5f;
 	EXT_RATE_BUFF->Mapping(&zoom);
 
 	KuroEngine::Instance().Graphics().SetPipeline(PIPELINE_BASE);

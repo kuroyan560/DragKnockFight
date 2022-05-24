@@ -8,8 +8,8 @@
 using namespace std;
 
 // マップサイズ
-const float MAP_CHIP_HALF_SIZE = 25.0f;
-const float MAP_CHIP_SIZE = 50.0f;
+const float MAP_CHIP_SIZE = 50.0f * 1.5f;
+const float MAP_CHIP_HALF_SIZE = MAP_CHIP_SIZE / 2.0f;
 
 class MapChipCollider : public Singleton<MapChipCollider> {
 
