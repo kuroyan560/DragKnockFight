@@ -1150,16 +1150,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			Vec2<float>vec = { 0,0 };
 			if (partner.lock()->GetNowSwing()) {
 
-				if (isHitLeft)vec.x = -1.0f;
-				else if (isHitRight)vec.x = 1.0f;
-				if (isHitTop)vec.y = -1.0f;
-				else if (isHitBottom)vec.y = 1.0f;
-
-				/*Crash(vec);
-
-				SuperiorityGauge::Instance()->AddPlayerGauge(5.0f);*/
+				// 端のブロックだったら判定を行わない。
 				if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
 				{
+					// 破壊するモードじゃなかったら判定を通さない。
 					if (DebugParameter::Instance()->useFinishSwingFlag)
 					{
 						partner.lock()->FinishSwing();
@@ -1198,27 +1192,13 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			Vec2<float>vec = { 0,0 };
 			if (partner.lock()->GetNowSwing()) {
 
-				int smokeCol = 0;
+				int smokCol = 0;
 
-				if (isHitLeft)vec.x = -1.0f;
-				else if (isHitRight)vec.x = 1.0f;
-				if (isHitTop)vec.y = -1.0f;
-				else if (isHitBottom)vec.y = 1.0f;
-
-				//CrashMgr::Instance()->Crash(pos, crashDevice, ext);
-				//SuperiorityGauge::Instance()->AddPlayerGauge(DebugParameter::Instance()->gaugeData->swingDamageValue);
-
-				if (GetCharacterName() == PLAYABLE_BOSS_0)
-				{
-					//SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->GetBossData().damage);
-				}
-				else
-				{
-					//SuperiorityGauge::Instance()->AddGauge(team, -DebugParameter::Instance()->playerData[0].damage);
-				}
-
+				// 画面端のブロックだったら判定を通さない。
 				if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
 				{
+
+					// 一気に破壊する状態だったらFinishを呼ばない。
 					if (DebugParameter::Instance()->useFinishSwingFlag)
 					{
 						partner.lock()->FinishSwing();
@@ -1239,59 +1219,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				// クラッシュ演出を追加。
 				CrashEffectMgr::Instance()->Generate(pos, GetTeamColor());
-
-				// 今自分がどっちのチームかを取得。
-				StaminaItem::CHARA_ID charaID;
-				if (team != WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::LEFT;
-				if (team == WHICH_TEAM::LEFT_TEAM) charaID = StaminaItem::CHARA_ID::RIGHT;
-
-				// あたったチップが色ブロックだったら。
-				MapChipType hitChipData = StageMgr::Instance()->GetLocalMapChipType(hitChipIndex);
-				auto mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
-
-
-				if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
-
-					smokeCol = 1;
-					(*mapChipDrawData)[hitChipIndex.y][hitChipIndex.x].expEaseRate = 0.0f;
-
-					// 自分が右側のキャラだったら。
-					if (team == WHICH_TEAM::RIGHT_TEAM) {
-
-						// アイテムを生成する。
-						StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, StaminaItem::CHARA_ID::LEFT, partner.lock()->pos);
-
-					}
-					// 自分が左側のキャラだったら。
-					else {
-
-						// アイテムを生成する。
-						StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &pos, StaminaItem::CHARA_ID::LEFT, partner.lock()->pos);
-
-					}
-
-				}
-				else if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
-
-					smokeCol = 2;
-					(*mapChipDrawData)[hitChipIndex.y][hitChipIndex.x].expEaseRate = 0.0f;
-
-					// 自分が右側のキャラだったら。
-					if (team == WHICH_TEAM::RIGHT_TEAM) {
-
-						// アイテムを生成する。
-						StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &pos, StaminaItem::CHARA_ID::RIGHT, partner.lock()->pos);
-
-					}
-					// 自分が左側のキャラだったら。
-					else {
-
-						// アイテムを生成する。
-						StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &partner.lock()->pos, StaminaItem::CHARA_ID::RIGHT, partner.lock()->pos);
-
-					}
-
-				}
 
 				// クラッシュさせる。
 				Crash(vec, smokeCol);

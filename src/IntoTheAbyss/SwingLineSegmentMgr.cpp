@@ -120,7 +120,7 @@ void SwingLineSegmentMgr::Init()
 
 }
 
-void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const vector<vector<int>>& MapData)
+void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const vector<vector<int>>& MapData, const bool& IsUseFinishSwing)
 {
 
 	/*===== 更新処理 =====*/
@@ -194,60 +194,62 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 
 	// 一度マップチップに当たったらそれ以降は描画しないand当たり判定を行わないようにするために使用。
 	int isHitMapChip = false;
-	for (int index = 0; index < LINE_COUNT; ++index) {
-
-		// 既にマップチップと当たっていたら処理を飛ばす and 無効化する。
-		if (isHitMapChip) {
-
-			lineSegments[index].Deactivate();
-			continue;
-
-		}
-
-		// マップチップと当たり判定を行う。
-		Vec2<float> resultPos = CheckHitMapChip(lineSegments[index].GetStart(), lineSegments[index].GetEnd());
-
-		// 値が-1だったら当たっていないということなので、処理を飛ばす。
-		if (resultPos.x == -1) continue;
-
-		// マップチップと当たった判定にする。
-		lineSegments[index].SetEnd(resultPos);
-
-		// スイング中だったら交点のところの線分を矢印にする。
-		//if (IsSwing) {
-		lineSegments[index].SetID(SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW);
-		lineSegments[index].SetHandle(arrowHandle);
-		//}
-
-		isHitMapChip = true;
-
-		// 照準の位置を保存。
-		reticlePos = resultPos;
-
-	}
-
-	// 照準の位置がふっとばされていたら、線分の終端に置く。
-	if (reticlePos.x < -100) {
-
-		reticlePos = lineSegments[LINE_COUNT - 1].GetEnd();
-
-	}
-
-	// マップチップと当たっていたら、全ての線分の色をちょっとだけ濃くする。
-	isHitWallFlag = false;
-	if (isHitMapChip) {
+	if (IsUseFinishSwing) {
 		for (int index = 0; index < LINE_COUNT; ++index) {
 
-			// 線分は濃くしない。	橋本さんから貰う画像を入れる際はこの処理はいらなくなる。
-			if (lineSegments[index].GetID() == SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW)
-			{
-				isHitWallFlag = true;
+			// 既にマップチップと当たっていたら処理を飛ばす and 無効化する。
+			if (isHitMapChip) {
+
+				lineSegments[index].Deactivate();
 				continue;
+
 			}
-			lineSegments[index].SetAlpha(200);
+
+			// マップチップと当たり判定を行う。
+			Vec2<float> resultPos = CheckHitMapChip(lineSegments[index].GetStart(), lineSegments[index].GetEnd());
+
+			// 値が-1だったら当たっていないということなので、処理を飛ばす。
+			if (resultPos.x == -1) continue;
+
+			// マップチップと当たった判定にする。
+			lineSegments[index].SetEnd(resultPos);
+
+			// スイング中だったら交点のところの線分を矢印にする。
+			//if (IsSwing) {
+			lineSegments[index].SetID(SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW);
+			lineSegments[index].SetHandle(arrowHandle);
+			//}
+
+			isHitMapChip = true;
+
+			// 照準の位置を保存。
+			reticlePos = resultPos;
 
 		}
 
+		// 照準の位置がふっとばされていたら、線分の終端に置く。
+		if (reticlePos.x < -100) {
+
+			reticlePos = lineSegments[LINE_COUNT - 1].GetEnd();
+
+		}
+
+		// マップチップと当たっていたら、全ての線分の色をちょっとだけ濃くする。
+		isHitWallFlag = false;
+		if (isHitMapChip) {
+			for (int index = 0; index < LINE_COUNT; ++index) {
+
+				// 線分は濃くしない。	橋本さんから貰う画像を入れる際はこの処理はいらなくなる。
+				if (lineSegments[index].GetID() == SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW)
+				{
+					isHitWallFlag = true;
+					continue;
+				}
+				lineSegments[index].SetAlpha(200);
+
+			}
+
+		}
 	}
 
 }

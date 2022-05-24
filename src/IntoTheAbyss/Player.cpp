@@ -681,14 +681,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		if (isClockWise) {
 
-			CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+			CWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData, !isDestroyMode);
 			CWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 			CCWSwingSegmentMgr.Init();
 
 		}
 		else {
 
-			CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData);
+			CCWSwingSegmentMgr.Update(pos, Vec2<float>(partner.lock()->pos - pos).GetNormal(), Vec2<float>(pos - partner.lock()->pos).Length(), MapData, !isDestroyMode);
 			CCWSwingSegmentMgr.SetSwingStartPos(partner.lock()->pos);
 			CWSwingSegmentMgr.Init();
 
@@ -736,7 +736,17 @@ void Player::Input(const vector<vector<int>>& MapData)
 	bool RTInput = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RT);
 	if (RTInput) {
 
+
 		isStopPartner = true;
+
+	}
+
+
+	// 破壊モードかのフラグを保存。
+	isDestroyMode = false;
+	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT)) {
+
+		isDestroyMode = true;
 
 	}
 
