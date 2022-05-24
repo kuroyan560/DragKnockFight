@@ -98,7 +98,7 @@ void StageSelectScene::OnUpdate()
 
 		}
 		//タイトルシーンに移動する
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
 		{
 			KuroEngine::Instance().ChangeScene(0, changeScene);
 		}
@@ -114,7 +114,7 @@ void StageSelectScene::OnUpdate()
 			leftArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
 		}
 		//ステージ番号を減らす
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::LB))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
 		{
 			--stageNum;
 			screenShot.Prev();
