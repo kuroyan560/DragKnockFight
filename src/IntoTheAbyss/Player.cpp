@@ -484,7 +484,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	if (0 < GetStackWinTimer()) return;
 
 	// 振り回しているときは入力を受け付けない。
-	if (nowSwing) return;
+	//if (nowSwing) return;
 
 	// 振り回されているフラグ
 	bool isSwingPartner = partner.lock()->GetNowSwing();
@@ -506,16 +506,20 @@ void Player::Input(const vector<vector<int>>& MapData)
 	isPrevInputRightStick = isInputRightStick;
 	isInputRightStick = 0.9f < inputRightVec.Length();
 
+	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::X)) {
+
+		int a = 0;
+
+	}
+
 	// 入力のデッドラインを設ける。
 	float inputRate = inputLeftVec.Length();
 	if (inputRate >= 0.5f) {
 
 		// 移動を受け付ける。
-		if (vel.Length() < MOVE_SPEED_PLAYER) {
-			vel.x = inputLeftVec.x * (MOVE_SPEED_PLAYER * inputRate);
-			vel.y = inputLeftVec.y * (MOVE_SPEED_PLAYER * inputRate);
-			autoPilotMove = vel;
-		}
+		vel.x = inputLeftVec.x * (MOVE_SPEED_PLAYER * inputRate);
+		vel.y = inputLeftVec.y * (MOVE_SPEED_PLAYER * inputRate);
+		autoPilotMove = vel;
 
 		if (inputLeftVec.x < 0)playerDirX = PLAYER_LEFT;
 		else if (0 < inputLeftVec.x)playerDirX = PLAYER_RIGHT;
@@ -618,26 +622,26 @@ void Player::Input(const vector<vector<int>>& MapData)
 		float speed = 0;
 
 		// 相方が振り回し中だったら。
-		if (partner.lock()->GetNowSwing()) {
+		//if (partner.lock()->GetNowSwing()) {
 
-			speed = CANCEL_DASH_SPEED;
+		//	speed = CANCEL_DASH_SPEED;
 
-			// ジャスト回避の予測線との当たり判定を行い、マップチップとあたっていたらダッシュ速度を上げる。
-			if (CheckHitMapChip(justCancelDashStartPos, justCancelDashEndPos)) {
+		//	// ジャスト回避の予測線との当たり判定を行い、マップチップとあたっていたらダッシュ速度を上げる。
+		//	if (CheckHitMapChip(justCancelDashStartPos, justCancelDashEndPos)) {
 
-				speed = JUST_CANCEL_DASH_SPEED;
+		//		speed = JUST_CANCEL_DASH_SPEED;
 
-			}
+		//	}
 
-			// 相方の振り回しを終わらせる。
-			partner.lock()->FinishSwing();
+		//	// 相方の振り回しを終わらせる。
+		//	partner.lock()->FinishSwing();
 
-		}
-		else {
+		//}
+		//else {
 
-			speed = DASH_SPEED;
+		speed = DASH_SPEED;
 
-		}
+		//}
 
 		vel += inputLeftVec * speed;
 

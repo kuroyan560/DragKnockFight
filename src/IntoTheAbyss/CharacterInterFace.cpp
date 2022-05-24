@@ -67,22 +67,29 @@ void CharacterInterFace::SwingUpdate()
 
 	}
 
-	// 現在の角度に角度の加算量を足す。
-	if (isSwingClockWise) {
+	// 移動量が小さかったら呼ばない。
+	static const float OFFSET_SPEED = 0.5f;
+	float speedBuff = Vec2<float>(pos - prevPrevPos).Length();
+	//if (speedBuff < OFFSET_SPEED) {
 
-		// 時計回りだったら
-		nowAngle += addSwingAngle;
+		// 現在の角度に角度の加算量を足す。
+		if (isSwingClockWise) {
 
-	}
-	else {
+			// 時計回りだったら
+			nowAngle += addSwingAngle;
 
-		// 反時計回りだったら
-		nowAngle -= addSwingAngle;
+		}
+		else {
 
-	}
+			// 反時計回りだったら
+			nowAngle -= addSwingAngle;
 
-	// 回転した量を保存。
-	allSwingAngle += fabs(addSwingAngle);
+		}
+
+		// 回転した量を保存。
+		allSwingAngle += fabs(addSwingAngle);
+
+	//}
 
 	// 回転した量がPIを超えたら振り回しを終了。
 	if (DirectX::XM_PI + DirectX::XM_PI / 2.0f <= allSwingAngle) {
@@ -132,7 +139,7 @@ void CharacterInterFace::SwingUpdate()
 
 }
 
-void CharacterInterFace::Crash(const Vec2<float> &MyVec, const int &SmokeCol)
+void CharacterInterFace::Crash(const Vec2<float>& MyVec, const int& SmokeCol)
 {
 	Vec2<bool>ext = { true,true };
 	if (MyVec.x == 0.0f)ext.y = false;
@@ -182,7 +189,7 @@ void CharacterInterFace::CrashUpdate()
 	//}
 }
 
-void CharacterInterFace::SwingPartner(const Vec2<float> &SwingTargetVec, const bool &IsClockWise)
+void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const bool& IsClockWise)
 {
 
 	// 振り回しの予測線を更新する際に使用する変数をセット。
@@ -279,7 +286,7 @@ void CharacterInterFace::SwingPartner(const Vec2<float> &SwingTargetVec, const b
 
 }
 
-void CharacterInterFace::SetPilotDetachedFlg(const bool &Flg)
+void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 {
 	//パイロットでなくする
 	return;
@@ -310,7 +317,7 @@ void CharacterInterFace::SetPilotDetachedFlg(const bool &Flg)
 	isPilotDetached = Flg;
 }
 
-void CharacterInterFace::SaveHitInfo(bool &isHitTop, bool &isHitBottom, bool &isHitLeft, bool &isHitRight, const INTERSECTED_LINE &intersectedLine, Vec2<int> &hitChipIndex, const Vec2<int> &hitChipIndexBuff)
+void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, Vec2<int>& hitChipIndex, const Vec2<int>& hitChipIndexBuff)
 {
 	auto mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 	(*mapChipDrawData)[hitChipIndexBuff.y][hitChipIndexBuff.x].shocked = 1.0f;
@@ -365,7 +372,7 @@ void CharacterInterFace::InitSwingLineSegmetn()
 	CCWSwingSegmentMgr.Init();
 }
 
-void CharacterInterFace::Init(const Vec2<float> &GeneratePos, const bool &Appear)
+void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear)
 {
 	if (pilotGraph != -1)
 	{
@@ -384,7 +391,7 @@ void CharacterInterFace::Init(const Vec2<float> &GeneratePos, const bool &Appear
 	nowSwing = false;
 
 	stackMapChip = false;
-	for (auto &flg : mapChipHit)flg = false;
+	for (auto& flg : mapChipHit)flg = false;
 
 	stagingDevice.Init();
 
@@ -479,7 +486,7 @@ void CharacterInterFace::Init(const Vec2<float> &GeneratePos, const bool &Appear
 }
 
 #include "SlowMgr.h"
-void CharacterInterFace::Update(const std::vector<std::vector<int>> &MapData, const Vec2<float> &LineCenterPos, const bool &isRoundStartEffect)
+void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect)
 {
 
 	if (team == WHICH_TEAM::RIGHT_TEAM && 0.8f <= SlowMgr::Instance()->slowAmount) {
@@ -803,7 +810,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>> &MapData, co
 
 #include "DrawFunc.h"
 #include"TexHandleMgr.h"
-void CharacterInterFace::Draw(const bool &isRoundStartEffect)
+void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 {
 	// 残像を描画
 	if (!GetNowBreak() && team == LEFT_TEAM) {
@@ -893,7 +900,7 @@ void CharacterInterFace::Damage()
 #include"MapChipCollider.h"
 #include "StaminaItemMgr.h"
 #include <IntoTheAbyss/StageMgr.h>
-void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, const Vec2<float> &LineCenterPos)
+void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos)
 {
 
 	/*===== 当たり判定 =====*/
@@ -1267,7 +1274,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, 
 
 }
 
-void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>> &MapData)
+void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>>& MapData)
 {
 
 	/*===== 引っかかり判定の更新処理 =====*/
@@ -1446,14 +1453,14 @@ void CharacterInterFace::FinishSwing()
 
 }
 
-void CharacterInterFace::HealStamina(const int &HealAmount)
+void CharacterInterFace::HealStamina(const int& HealAmount)
 {
 	if (HealAmount)healAuraEaseRate = 0.0f;
 	staminaGauge->AddStamina(HealAmount);
 	OnStaminaHeal(HealAmount);
 }
 
-void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int> &MapChipIndex, const MapChipType &DstType, const MapChipData &SrcData)
+void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int>& MapChipIndex, const MapChipType& DstType, const MapChipData& SrcData)
 {
 
 	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
@@ -1482,7 +1489,7 @@ void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int> &MapChipInd
 
 }
 
-CharacterInterFace::CharacterInterFace(const Vec2<float> &HonraiSize) : size(HonraiSize)
+CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(HonraiSize)
 {
 	areaHitBox.center = &pos;
 	areaHitBox.size = size;
