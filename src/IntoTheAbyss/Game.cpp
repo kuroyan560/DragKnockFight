@@ -840,7 +840,7 @@ void Game::Scramble()
 			CharacterManager::Instance()->Left()->pos += leftVelGauge;
 		}
 		// U‚è‰ñ‚³‚ê’†‚¶‚á‚È‚©‚Á‚½‚çˆÚ“®‚³‚¹‚éB
-		if (!CharacterManager::Instance()->Left()->GetNowSwing()) {
+		if (!CharacterManager::Instance()->Left()->GetNowSwing() && !CharacterManager::Instance()->Left()->isStopPartner) {
 			CharacterManager::Instance()->Right()->pos += rightVelGauge;
 		}
 	}
@@ -913,7 +913,13 @@ void Game::Scramble()
 			moveDir.Normalize();
 
 			// ‰Ÿ‚µ–ß‚·B
-			CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+			if (CharacterManager::Instance()->Left()->isStopPartner) {
+				CharacterManager::Instance()->Right()->addLineLength += moveLength;
+			}
+			else {
+				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+			}
+
 
 			// ˆø‚Á‚©‚©‚è”»’è‚¾‚Á‚½‚ç
 			if (CharacterManager::Instance()->Right()->GetStackFlag()) {
