@@ -54,7 +54,7 @@ void SwingDestroyCounter::Draw()
 {
 
 	/*===== •`‰æˆ— =====*/
-
+	return;
 	for (int index = 0; index < DESTROY_COUNTER; ++index) {
 
 		if (!destroyCounter[index].isActive) continue;

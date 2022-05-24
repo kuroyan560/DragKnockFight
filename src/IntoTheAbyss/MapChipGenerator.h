@@ -2,6 +2,8 @@
 #include"Vec.h"
 #include<array>
 #include<vector>
+static const enum MAP_CHIP_GENERATOR { SPLINE_ORBIT, RAND_PATTERN, MAP_CHIP_GENERATOR_NUM };
+
 //マップチップを能動的に生成する機能
 class MapChipGenerator
 {
