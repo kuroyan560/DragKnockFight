@@ -210,8 +210,6 @@ void CharacterAI::Update()
 		CharacterAIOrder::Instance()->vel = { 0.0f,0.0f };
 		CharacterManager::Instance()->Right()->vel = CharacterAIOrder::Instance()->vel;
 	}
-
-
 }
 
 void CharacterAI::Draw()

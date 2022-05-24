@@ -18,6 +18,7 @@ class LightManager;
 #include"Tutorial.h"
 
 #include"RunOutOfStaminaEffect.h"
+#include"Gauge.h"
 
 static const enum PLAYER_ANIM
 {
@@ -134,6 +135,7 @@ public:
 	Vec2<float> justCancelDashEndPos;
 
 
+	Gauge swingGauge;
 public:
 
 	/*-- ƒƒ“ƒoŠÖ” --*/

@@ -12,7 +12,7 @@ StageMgr::StageMgr()
 	//int allStageNum = 4;
 	int allStageNum = 1;
 	//int allRoomNum = 10;
-	int allRoomNum = 1;
+	int allRoomNum = 5;
 	int nowStage = 0;
 
 	allMapChipData.resize(allStageNum);
@@ -267,13 +267,20 @@ const bool &StageMgr::CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMB
 
 void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM)
 {
-	if (localRoomMapChipArray.size() <= MAPCHIP_NUM.y && localRoomMapChipArray[MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
+	//配列外参照
+	if (MAPCHIP_NUM.y < 0 || localRoomMapChipArray.size() <= MAPCHIP_NUM.y || MAPCHIP_NUM.x < 0 || localRoomMapChipArray[MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
 	{
-		//配列外参照
 		return;
 	}
+	if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == CHIPNUM)return;	//変化なし
+
 	localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] = CHIPNUM;
 	SetLocalGimmickGraphHandle(MAPCHIP_NUM, CHIPNUM);
+	if (CHIPNUM == 1)
+	{
+		localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+		localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = mapChipGraphHandle[0];
+	}
 }
 
 MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM)

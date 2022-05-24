@@ -310,6 +310,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.initGameFlag = true;
 		roundChangeEffect.drawFightFlag = true;
 	}
+
+	mapChipGeneratorTest.Init();
 }
 
 Game::Game()
@@ -394,8 +396,10 @@ void Game::Update(const bool& Loop)
 
 	if (UsersInput::Instance()->KeyOnTrigger(DIK_R))
 	{
-		StageMgr::Instance()->SetLocalMapChipData(0, 0);
-		StageMgr::Instance()->SetLocalMapChipDrawBlock(0, 0);
+		int stageNum = SelectStage::Instance()->GetStageNum();
+		int roomNum = SelectStage::Instance()->GetRoomNum();
+		StageMgr::Instance()->SetLocalMapChipData(stageNum, roomNum);
+		StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNum, roomNum);
 	}
 
 
@@ -442,6 +446,12 @@ void Game::Update(const bool& Loop)
 			playerHandMgr->Update(CharacterManager::Instance()->Left()->pos);
 		}
 	}
+
+	if (roundChangeEffect.initGameFlag)
+	{
+		mapChipGeneratorTest.Update();
+	}
+
 	// プレイヤーの更新処理
 	if (!roundFinishFlag)
 	{
@@ -743,29 +753,7 @@ void Game::Draw()
 		}
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 
-		// 照準の拡大率
-		//static Vec2<float> exp = Vec2<float>(1.0f, 1.0f);
-
-		//static bool isStop = CharacterManager::Instance()->Left()->isStopPartner;
-		//static bool prevIsStop = false;
-
-		//// 敵をストップさせている時に照準の画像を描画する。
-		//if (isStop) {
-
-		//	// 照準の画像
-		//	static const int ICON = TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png");
-
-		//	// 照準の回転角 仮でここに置く。
-		//	static float rad = 0;
-		//	rad += 0.1f;
-
-		//	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), exp, rad, TexHandleMgr::GetTexBuffer(ICON));
-
-
-		//}
-
-		//isStop = prevIsStop;
-
+		mapChipGeneratorTest.Draw();
 	}
 
 	roundChangeEffect.Draw();
@@ -1161,60 +1149,52 @@ Vec2<float> Game::GetStageSize()
 
 void Game::SwitchingStage()
 {
-
 	const bool enableToSelectStageFlag = 0 < debugStageData[0];
 	const bool enableToSelectStageFlag2 = debugStageData[0] < StageMgr::Instance()->GetMaxStageNumber() - 1;
 	//マップの切り替え
-	const bool up = UsersInput::Instance()->KeyOnTrigger(DIK_UP) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_UP);
-	const bool down = UsersInput::Instance()->KeyOnTrigger(DIK_DOWN) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_DOWN);
 	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_LEFT);
 	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_RIGHT);
 
-	if (up && enableToSelectStageFlag2 && nowSelectNum == 0)
-	{
-		++debugStageData[0];
-	}
-	//if (Input::isKeyTrigger(KEY_INPUT_DOWN) && enableToSelectStageFlag && nowSelectNum == 0)
-	if (down && enableToSelectStageFlag && nowSelectNum == 0)
-	{
-		--debugStageData[0];
-	}
-
-
 	const bool enableToSelectRoomFlag = 0 < debugStageData[1];
 	const bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
-	//部屋の切り替え
-	//if (Input::isKeyTrigger(KEY_INPUT_UP) && enableToSelectRoomFlag2 && nowSelectNum == 1)
-	if (up && enableToSelectRoomFlag2 && nowSelectNum == 1)
-	{
-		++debugStageData[1];
-	}
-	//if (Input::isKeyTrigger(KEY_INPUT_DOWN) && enableToSelectRoomFlag && nowSelectNum == 1)
-	if (down && enableToSelectRoomFlag && nowSelectNum == 1)
-	{
-		--debugStageData[1];
-	}
 
 	//部屋か番号に切り替え
-	//if (Input::isKeyTrigger(KEY_INPUT_LEFT) && 0 < nowSelectNum)
 	if (left && 0 < nowSelectNum)
 	{
 		--nowSelectNum;
-		debugStageData[1] = 0;
+		--debugStageData[1];
 	}
-	if (right && nowSelectNum < 1)
+	if (right && nowSelectNum < StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()))
 	{
 		++nowSelectNum;
-		debugStageData[1] = 0;
+		++debugStageData[1];
 	}
 
+	if (debugStageData[1] <= 0)
+	{
+		debugStageData[1] = 0;
+		nowSelectNum = 0;
+	}
+	if (StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) <= debugStageData[1])
+	{
+		debugStageData[1] = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
+		nowSelectNum = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
+	}
+
+	if (StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) <= nowSelectNum)
+	{
+		debugStageData[1] = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) - 1;
+	}
+
+
 	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0, A);
-	if (done && false)
+	if (done)
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
 		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
 		SelectStage::Instance()->resetStageFlag = true;
-		//mapData = StageMgr::Instance()->GetMapChipData(debugStageData[0], debugStageData[1]);
+
+		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	}
 
 }

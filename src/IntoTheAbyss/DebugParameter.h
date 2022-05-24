@@ -132,5 +132,6 @@ public:
 	float swingAngle;
 	float swingMax;
 	bool useFinishSwingFlag;
+	bool chipGenerator;
 };
 

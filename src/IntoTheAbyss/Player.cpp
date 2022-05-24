@@ -178,6 +178,9 @@ void Player::OnInit()
 	CCWSwingSegmentMgr.Init();
 
 	pilotGraph = playerPilotGraph[0];
+
+
+	swingGauge.Init(100);
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -218,6 +221,11 @@ void Player::OnUpdate(const vector<vector<int>>& MapData)
 	if (GetCanMove())Input(MapData);
 
 	/*===== 更新処理 =====*/
+
+	swingGauge.Update(pos);
+
+
+
 
 	// 先行入力タイマーを更新。
 	if (isAdvancedEntrySwing) {
@@ -368,6 +376,9 @@ void Player::OnDraw(const bool& isRoundStartEffect)
 	//残像描画
 	afImg.Draw();
 
+
+	swingGauge.Draw();
+
 	//muffler.Draw(LigManager);
 
 	// デバッグ用で振り回しキャンセルラインの描画を行う。
@@ -430,8 +441,7 @@ void Player::OnDrawUI()
 	const auto leftButton = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
 	const auto rightButton = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB);
 
-	//tutorial.lock()->Draw(leftStickVec, rightStickVec, leftTrigger, rightTrigger);
-	tutorial.Draw(leftStickVec, rightStickVec, leftButton, rightButton);
+	//tutorial.Draw(leftStickVec, rightStickVec, leftButton, rightButton);
 }
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)
@@ -557,6 +567,12 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		SwingPartner({ swingVec }, isClockWise);
 
+		if (swingGauge.canUseGague() && UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT))
+		{
+			swingGauge.Use();
+			DebugParameter::Instance()->useFinishSwingFlag = false;
+		}
+
 		isInputSwingRB = isInputRB;
 
 		//キャラクターAI用のデータ集め
@@ -574,6 +590,13 @@ void Player::Input(const vector<vector<int>>& MapData)
 		//キャラクターAI用のデータ集め
 		CharacterAIData::Instance()->swingFlag = false;
 	}
+
+	if (!GetNowSwing())
+	{
+		DebugParameter::Instance()->useFinishSwingFlag = true;
+	}
+
+
 
 	static const int DASH_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/dash.wav", 0.4f);
 
@@ -683,6 +706,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 		prevSwingFlag = false;
 	}
 	if (UsersInput::Instance()->ControllerOffTrigger(controllerIdx, XBOX_BUTTON::RB))SetPilotDetachedFlg(false);
+
+
 
 	// 入力されていなくて、スイング中じゃなかったら予測線を消す。
 	if ((inputRightVec.Length() <= 0.5f && !nowSwing) || IsPilotOutSide()) {
