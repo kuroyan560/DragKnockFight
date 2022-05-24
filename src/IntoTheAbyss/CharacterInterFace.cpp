@@ -661,84 +661,84 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 
 	// 右のキャラだったら処理を行う。
-	if (team == WHICH_TEAM::RIGHT_TEAM && !isRoundStartEffect) {
+	//if (team == WHICH_TEAM::RIGHT_TEAM && !isRoundStartEffect) {
 
-		// 弾幕の更新処理
-		static const int BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
-		bool isEnd = barrage->Update(bulletMgr, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Left()->pos, BULLET_HANDLE);
+	//	// 弾幕の更新処理
+	//	static const int BULLET_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/bullet_enemy.png");
+	//	bool isEnd = barrage->Update(bulletMgr, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Left()->pos, BULLET_HANDLE);
 
-		// 弾幕の更新が終わっていたら。
-		if (isEnd) {
+	//	// 弾幕の更新が終わっていたら。
+	//	if (isEnd) {
 
-			// タイマーを更新。
-			++barrageDelayTimer;
+	//		// タイマーを更新。
+	//		++barrageDelayTimer;
 
-			// タイマーが規定値に達したら。
-			if (BARRAGE_DELAY_TIMER <= barrageDelayTimer) {
+	//		// タイマーが規定値に達したら。
+	//		if (BARRAGE_DELAY_TIMER <= barrageDelayTimer) {
 
-				// 乱数を生成して、その乱数の弾幕をセットする。
-				int random = KuroFunc::GetRand(6);
+	//			// 乱数を生成して、その乱数の弾幕をセットする。
+	//			int random = KuroFunc::GetRand(6);
 
-				switch (random)
-				{
-				case 0:
+	//			switch (random)
+	//			{
+	//			case 0:
 
-					barrage = std::make_unique<WhirlpoolBarrage>();
+	//				barrage = std::make_unique<WhirlpoolBarrage>();
 
-					break;
+	//				break;
 
-				case 1:
+	//			case 1:
 
-					barrage = std::make_unique<Whirlpool2WayBarrage>();
+	//				barrage = std::make_unique<Whirlpool2WayBarrage>();
 
-					break;
+	//				break;
 
-				case 2:
+	//			case 2:
 
-					barrage = std::make_unique<CircularBarrage>();
+	//				barrage = std::make_unique<CircularBarrage>();
 
-					break;
+	//				break;
 
-				case 3:
+	//			case 3:
 
-					barrage = std::make_unique<TargetShotBarrage>();
+	//				barrage = std::make_unique<TargetShotBarrage>();
 
-					break;
+	//				break;
 
-				case 4:
+	//			case 4:
 
-					barrage = std::make_unique<TargetShot3WayBarrage>();
+	//				barrage = std::make_unique<TargetShot3WayBarrage>();
 
-					break;
+	//				break;
 
-				case 5:
+	//			case 5:
 
-					barrage = std::make_unique<ShotGunBarrage>();
+	//				barrage = std::make_unique<ShotGunBarrage>();
 
-					break;
+	//				break;
 
-				case 6:
+	//			case 6:
 
-					barrage = std::make_unique<WaveBarrage>();
+	//				barrage = std::make_unique<WaveBarrage>();
 
-					break;
-				default:
-					break;
-				}
+	//				break;
+	//			default:
+	//				break;
+	//			}
 
-				barrage->Start();
+	//			barrage->Start();
 
-			}
+	//		}
 
-		}
-		else {
+	//	}
+	//	else {
 
-			barrageDelayTimer = 0;
+	//		barrageDelayTimer = 0;
 
-		}
+	//	}
 
 
-	}
+	//}
 
 	// ボス側でも止まるとデバッグしにくいので、プレイヤーのときのみ通るようにする。
 	if (team == WHICH_TEAM::LEFT_TEAM) {
