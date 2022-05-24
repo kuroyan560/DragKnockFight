@@ -94,7 +94,6 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("Left Right:SelectStageOrRoom");
 	ImGui::Text("B Key / Home Button :StageSelectScene");
 	ImGui::Text("Return / A Button:Done");
-	ImGui::Text("SwingCount %d", CharacterManager::Instance()->Left()->swingDestroyBlockCount);
 	ImGui::End();
 
 

@@ -13,6 +13,7 @@
 #include"CharacterInfo.h"
 #include"StageMgr.h"
 #include"Barrages.h"
+#include "SwingDestroyCounter.h"
 
 class StaminaMgr;
 
@@ -201,8 +202,7 @@ public:
 	const int DASH_STAMINA = 1;		// ダッシュ時の消費スタミナ
 	bool goAreaFlag;
 
-	// 一回の振り回しでなんブロック壊したかを表示するやつ。
-	int swingDestroyBlockCount;
+	SwingDestroyCounter swingDestroyCounter;	// 一回の振り回しで何回壊したかのクラス
 
 	float staminaAutoHealAmount;
 
