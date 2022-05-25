@@ -180,6 +180,9 @@ void Player::OnInit()
 	pilotGraph = playerPilotGraph[0];
 
 	swingGauge.Init(100);
+
+	consecutiveSwingTimer = 0;
+
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -506,6 +509,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 	isPrevInputRightStick = isInputRightStick;
 	isInputRightStick = 0.9f < inputRightVec.Length();
 
+	// スティックが入力されていなかったら連続で振り回しするためのタイマーを設定する。
+	if (!isInputRightStick) {
+		consecutiveSwingTimer = 0;
+	}
+	else {
+		++consecutiveSwingTimer;
+	}
+
 	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::X)) {
 
 		int a = 0;
@@ -559,10 +570,17 @@ void Player::Input(const vector<vector<int>>& MapData)
 	bool isSwingStamina = staminaGauge->CheckCanAction(SWING_STAMINA);
 
 	// RTが押されたら
-	bool canSwing = (!isInputRightStick && isPrevInputRightStick) && isSwingStamina && !IsPilotOutSide();
-	if ((!isSwingPartner && canSwing || isAdvancedEntrySwing)) {
+	const int CONSECUTIVE_SWING_TIMER = 10;
+	bool canSwing = (!isInputRightStick && isPrevInputRightStick) || (isInputRightStick && CONSECUTIVE_SWING_TIMER < consecutiveSwingTimer);
+	if ((!nowSwing && canSwing)) {
 
 		// 振り回しの処理
+
+		if (CONSECUTIVE_SWING_TIMER <= consecutiveSwingTimer) {
+
+			consecutiveSwingTimer = 0;
+
+		}
 
 		// 外積の左右判定により、時計回りか反時計回り家を取得する。負の値が左、正の値が右。
 		Vec2<float> posBuff = partner.lock()->pos - pos;

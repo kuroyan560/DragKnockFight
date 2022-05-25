@@ -351,7 +351,7 @@ Game::Game()
 
 
 	StageMgr::Instance()->GetMapChipType(0, 0, Vec2<int>(20, 20));
-	StageMgr::Instance()->WriteMapChipData(Vec2<int>(20, 20), 0);
+	StageMgr::Instance()->WriteMapChipData(Vec2<int>(20, 20), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 	{
 		std::string bossFilePass = "resource/ChainCombat/boss/0/arm/";
@@ -850,6 +850,10 @@ void Game::Scramble()
 	Vec2<float> leftVelGauge;
 	Vec2<float> rightVelGauge;
 
+	// 右側のキャラが吹っ飛ぶマップチップに当たった際の移動量の処理を行う。
+	CharacterManager::Instance()->Right()->pos += CharacterManager::Instance()->Right()->bounceVel;
+	CharacterManager::Instance()->Right()->addLineLength += CharacterManager::Instance()->Right()->bounceVel.Length();
+
 	// 移動量を取得。 優勢ゲージはここで更新。
 	double leftVel = CharacterManager::Instance()->Left()->vel.Length() * SlowMgr::Instance()->slowAmount;
 	leftVelGauge = CharacterManager::Instance()->Left()->vel * SlowMgr::Instance()->slowAmount;
@@ -866,6 +870,9 @@ void Game::Scramble()
 		// 振り回され中じゃなかったら移動させる。
 		if (!CharacterManager::Instance()->Left()->GetNowSwing() && !CharacterManager::Instance()->Left()->isStopPartner) {
 			CharacterManager::Instance()->Right()->pos += rightVelGauge;
+		}
+		else if (CharacterManager::Instance()->Left()->isStopPartner) {
+			CharacterManager::Instance()->Right()->pos += leftVelGauge;
 		}
 	}
 
@@ -937,12 +944,7 @@ void Game::Scramble()
 			moveDir.Normalize();
 
 			// 押し戻す。
-			if (CharacterManager::Instance()->Left()->isStopPartner) {
-				CharacterManager::Instance()->Right()->addLineLength += moveLength;
-			}
-			else {
-				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
-			}
+			CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
 
 			// 引っかかり判定だったら
@@ -1207,7 +1209,9 @@ void Game::SwitchingStage()
 	}
 
 
-	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN) || UsersInput::Instance()->ControllerOnTrigger(0, A);
+	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN)
+		|| (UsersInput::Instance()->ControllerInput(0, A) && UsersInput::Instance()->ControllerOnTrigger(0, B))
+		|| (UsersInput::Instance()->ControllerOnTrigger(0, A) && UsersInput::Instance()->ControllerInput(0, B));
 	if (done)
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
