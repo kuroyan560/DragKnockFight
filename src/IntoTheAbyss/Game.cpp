@@ -1213,8 +1213,8 @@ void Game::SwitchingStage()
 	}
 
 
-	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN)
-		|| (UsersInput::Instance()->ControllerInput(0, A) && UsersInput::Instance()->ControllerOnTrigger(0, B))
+	const bool done = /*UsersInput::Instance()->KeyOnTrigger(DIK_RETURN)
+		||*/ (UsersInput::Instance()->ControllerInput(0, A) && UsersInput::Instance()->ControllerOnTrigger(0, B))
 		|| (UsersInput::Instance()->ControllerOnTrigger(0, A) && UsersInput::Instance()->ControllerInput(0, B));
 	if (done)
 	{
