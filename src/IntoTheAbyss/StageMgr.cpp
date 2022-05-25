@@ -441,6 +441,19 @@ int StageMgr::GetMaxMapChipNum()
 	return chipNum;
 }
 
+int StageMgr::GetEnableToUseRoomNumber(int STAGE_NUMBER)
+{
+	int count = 0;
+	for (int i = 0; i < allMapChipData[STAGE_NUMBER].size(); ++i)
+	{
+		if (allMapChipData[STAGE_NUMBER][i].size() != 0)
+		{
+			++count;
+		}
+	}
+	return count;
+}
+
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
 {
 	bool sideFlag = false;

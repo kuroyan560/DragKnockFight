@@ -66,6 +66,9 @@ public:
 
 private:
 	int changeMapTimer;
+	int changeMapMaxTimer;
 
-	int setMapNum;
+	int setMapNumber;
+	int stageNumber;
+	int maxRoomNumber;
 };

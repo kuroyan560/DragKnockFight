@@ -265,21 +265,29 @@ void MapChipGenerator_RandPattern::Draw()
 void MapChipGenerator_ChangeMap::Init()
 {
 	changeMapTimer = 0;
-	setMapNum = 0;
+	setMapNumber = 1;
+
+	stageNumber = SelectStage::Instance()->GetStageNum();
+	maxRoomNumber = StageMgr::Instance()->GetEnableToUseRoomNumber(stageNumber);
+
+	changeMapMaxTimer = 120;
 }
 
 void MapChipGenerator_ChangeMap::Update()
 {
-	if (120 <= changeMapTimer)
+	if (changeMapMaxTimer <= changeMapTimer)
 	{
-		SelectStage::Instance()->SelectRoomNum(setMapNum);
-		StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), setMapNum);
-		StageMgr::Instance()->SetLocalMapChipDrawBlock(SelectStage::Instance()->GetStageNum(), setMapNum);
-
-		++setMapNum;
-		if (setMapNum == 2)
+		if (setMapNumber < maxRoomNumber)
 		{
-			setMapNum = 0;
+			SelectStage::Instance()->SelectRoomNum(setMapNumber);
+			StageMgr::Instance()->SetLocalMapChipData(stageNumber, setMapNumber);
+			StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNumber, setMapNumber);
+		}
+
+		++setMapNumber;
+		if (maxRoomNumber + 1 <= setMapNumber)
+		{
+			setMapNumber = 0;
 		}
 		changeMapTimer = 0;
 	}

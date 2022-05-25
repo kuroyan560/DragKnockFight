@@ -262,8 +262,11 @@ public:
 
 	int GetAllWallBlocksNum(int STAGE_NUM, int ROOM_NUM);
 
-
 	int GetMaxMapChipNum();
+
+	int GetEnableToUseRoomNumber(int STAGE_NUMBER);
+
+
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
