@@ -102,7 +102,9 @@ public:
 	void Draw();
 
 	// ’l‚ğ‰ÁZB
-	void Increment();
+	void Increment(int INCRE_NUM = 1);
+
+
 
 	bool IsZero() { return !nowCounter; }
 
