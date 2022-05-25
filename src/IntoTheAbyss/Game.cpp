@@ -284,8 +284,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//responePos.y += 50;
 	lineCenterPos = playerResponePos - cameraBasePos;
 
-	Vec2<float>plPos(StageMgr::Instance()->GetPlayerPos());
-	Vec2<float>enPos(StageMgr::Instance()->GetBossPos());
+	Vec2<float>plPos(StageMgr::Instance()->GetPlayerResponePos());
+	Vec2<float>enPos(StageMgr::Instance()->GetBossResponePos());
 
 	CharacterManager::Instance()->CharactersInit(plPos, enPos, !practiceMode);
 
@@ -699,13 +699,13 @@ void Game::Update(const bool& Loop)
 			zoomRate = 0.0f;
 		}
 		static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
-		Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
+		ScrollMgr::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
 
 		// カメラのズームが0.27f未満にならないようにする。
 		float minZoomValue = 0.20f;
-		if (Camera::Instance()->zoom < minZoomValue)
+		if (ScrollMgr::Instance()->zoom < minZoomValue)
 		{
-			Camera::Instance()->zoom = minZoomValue;
+			ScrollMgr::Instance()->zoom = minZoomValue;
 		}
 	}
 	else {
