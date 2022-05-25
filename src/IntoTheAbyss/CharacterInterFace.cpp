@@ -1097,7 +1097,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				// ブロックを破壊する。
 				if (unBlockFlag && 0 < hitChipIndex[index].x && hitChipIndex[index].x < MapData[0].size() - 1 && 0 < hitChipIndex[index].y && hitChipIndex[index].y < MapData.size() - 1) {
 
-					StageMgr::Instance()->WriteMapChipData(hitChipIndex[index], 0);
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex[index], 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 					partner.lock()->swingDestroyCounter.Increment();
 
 					partner.lock()->destroyTimer = DESTROY_TIMER;
@@ -1106,22 +1106,22 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 					// 左があるか？
 					if (0 < hitChipIndex[index].x - 1 && StageMgr::Instance()->GetLocalMapChipBlock(0, 0, nowHitChipIndex + Vec2<float>(-1, 0)) != 0) {
-						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, 0), 0);
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, 0), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 						partner.lock()->swingDestroyCounter.Increment();
 					}
 					// 右があるか？
 					if (hitChipIndex[index].x + 1 < MapData[0].size() - 1 && StageMgr::Instance()->GetLocalMapChipBlock(0, 0, nowHitChipIndex + Vec2<float>(1, 0)) != 0) {
-						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, 0), 0);
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, 0), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 						partner.lock()->swingDestroyCounter.Increment();
 					}
 					// 上があるか？
 					if (0 < hitChipIndex[index].y - 1) {
-						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, -1), 0 && StageMgr::Instance()->GetLocalMapChipBlock(0, 0, nowHitChipIndex + Vec2<float>(0, -1)) != 0);
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, -1), 0 && StageMgr::Instance()->GetLocalMapChipBlock(0, 0, nowHitChipIndex + Vec2<float>(0, -1)) != 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 						partner.lock()->swingDestroyCounter.Increment();
 					}
 					// 下があるか？
 					if (hitChipIndex[index].y + 1 < MapData.size() - 1) {
-						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, 1), 0 && StageMgr::Instance()->GetLocalMapChipBlock(0, 0, nowHitChipIndex + Vec2<float>(0, 1)) != 0);
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, 1), 0 && StageMgr::Instance()->GetLocalMapChipBlock(0, 0, nowHitChipIndex + Vec2<float>(0, 1)) != 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 						partner.lock()->swingDestroyCounter.Increment();
 					}
 
@@ -1392,29 +1392,29 @@ void CharacterInterFace::HealStamina(const int& HealAmount)
 void CharacterInterFace::OverWriteMapChipValueAround(const Vec2<int>& MapChipIndex, const MapChipType& DstType, const MapChipData& SrcData)
 {
 
-	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-	if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(-1, 0)) == DstType) {
-		// トゲブロックを棘無し状態にさせる。
-		StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(-1, 0), SrcData);
-	}
+	//// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
+	//if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(-1, 0)) == DstType) {
+	//	// トゲブロックを棘無し状態にさせる。
+	//	StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(-1, 0), SrcData);
+	//}
 
-	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-	if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(1, 0)) == DstType) {
-		// トゲブロックを棘無し状態にさせる。
-		StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(1, 0), SrcData);
-	}
+	//// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
+	//if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(1, 0)) == DstType) {
+	//	// トゲブロックを棘無し状態にさせる。
+	//	StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(1, 0), SrcData);
+	//}
 
-	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-	if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(0, -1)) == DstType) {
-		// トゲブロックを棘無し状態にさせる。
-		StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(0, -1), SrcData);
-	}
+	//// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
+	//if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(0, -1)) == DstType) {
+	//	// トゲブロックを棘無し状態にさせる。
+	//	StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(0, -1), SrcData);
+	//}
 
-	// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
-	if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(0, 1)) == DstType) {
-		// トゲブロックを棘無し状態にさせる。
-		StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(0, 1), SrcData);
-	}
+	//// 指定されたインデックスの左側のチップも左側か右側のブロックかを調べる。
+	//if (StageMgr::Instance()->GetLocalMapChipType(MapChipIndex + Vec2<int>(0, 1)) == DstType) {
+	//	// トゲブロックを棘無し状態にさせる。
+	//	StageMgr::Instance()->WriteMapChipData(MapChipIndex + Vec2<int>(0, 1), SrcData);
+	//}
 
 }
 

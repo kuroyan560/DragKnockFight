@@ -5,6 +5,7 @@
 #include"KuroFunc.h"
 #include"DebugParameter.h"
 #include<algorithm>
+#include "CharacterManager.h"
 
 void MapChipGenerator::Generate(const Vec2<float>& GeneratePos)
 {
@@ -27,7 +28,7 @@ void MapChipGenerator::Generate(const Vec2<float>& GeneratePos)
 
 	for (auto& idx : generateIndices)
 	{
-		StageMgr::Instance()->WriteMapChipData(idx, 1);
+		StageMgr::Instance()->WriteMapChipData(idx, 1, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 	}
 }
 
@@ -138,10 +139,10 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 	static const enum PATTERN_TYPE { CROSS, CUBE, CIRCLE, NUM };
 	static bool INIT = false;
 	static OffsetPattern PATTERN[NUM];
-	if(!INIT)
+	if (!INIT)
 	{
-		PATTERN[CROSS] = 
-		{ 
+		PATTERN[CROSS] =
+		{
 			{0,0},	//íÜâõ
 			{0,-1},	//è„
 			{0,1},
@@ -173,7 +174,7 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 				Vec2<int>offsetIdx;
 				offsetIdx.x = offsetPos.x / MAP_CHIP_SIZE;
 				offsetIdx.y = offsetPos.y / MAP_CHIP_SIZE;
-				
+
 				bool same = false;
 				for (auto& idx : PATTERN[CIRCLE])
 				{
@@ -181,7 +182,7 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 					same = true;
 					break;
 				}
-				if(!same)PATTERN[CIRCLE].emplace_back(offsetIdx);
+				if (!same)PATTERN[CIRCLE].emplace_back(offsetIdx);
 			}
 		}
 
@@ -222,7 +223,7 @@ void MapChipGenerator_RandPattern::Update()
 	{
 		for (auto& idx : predictionIdxArray)
 		{
-			StageMgr::Instance()->WriteMapChipData(idx, 1);
+			StageMgr::Instance()->WriteMapChipData(idx, 1, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 		}
 		DesideNextIndices();
 		timer = 0;
