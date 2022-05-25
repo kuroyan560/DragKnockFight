@@ -41,9 +41,9 @@ enum MapChipData
 {
 	MAPCHIP_TYPE_STATIC_BLOCK,
 	MAPCHIP_TYPE_STATIC_CHANGE_AREA = 17,
-	MAPCHIP_TYPE_STATIC_COLOR_LEFT,
-	MAPCHIP_TYPE_STATIC_COLOR_RIGHT,
-	MAPCHIP_TYPE_STATIC_ELEC_ON,
+	MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK,
+	MAPCHIP_TYPE_STATIC_RARE_BLOCK,
+	MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK,
 	MAPCHIP_TYPE_STATIC_ELEC_OFF,
 	MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS,
 	MAPCHIP_TYPE_MAX
@@ -231,7 +231,7 @@ public:
 
 	MapChipType GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM);
 
-	inline const int &GetLocalMapChipBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const Vec2<float> &MAPCHIP_POS)
+	inline const int &GetLocalMapChipBlock(const Vec2<int> &MAPCHIP_POS)
 	{
 		RoomMapChipArray tmp = localRoomMapChipArray;
 
@@ -419,17 +419,17 @@ private:
 	void SetLocalGimmickGraphHandle(const Vec2<int> &MAPCHIP_NUM, const int &CHIP_NUM)
 	{
 		//ï`âÊÇÃèëÇ´ä∑Ç¶
-		if (CHIP_NUM == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
+		if (CHIP_NUM == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)
 		{
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_GREEN];
 		}
-		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_RARE_BLOCK)
 		{
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_RED];
 		}
-		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_ON)
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)
 		{
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
