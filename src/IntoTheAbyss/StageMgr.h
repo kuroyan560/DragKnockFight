@@ -405,8 +405,10 @@ public:
 		return size.Float() * MAP_CHIP_SIZE;
 	}
 
-	const int GetWallGraph()
+	const int GetChipGraoh(const int& ChipType)
 	{
+		if (ChipType == MAPCHIP_TYPE_STATIC_RARE_BLOCK)return gimmcikGraphHandle[GMMICK_RED];
+		else if (ChipType == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)return sparkGraphHandle[0];
 		return mapChipGraphHandle[0];
 	}
 
