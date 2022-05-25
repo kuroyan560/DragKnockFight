@@ -4,6 +4,7 @@
 #include"../Engine/ImguiApp.h"
 #include"../Common/Vec.h"
 #include<array>
+#include"KuroFunc.h"
 
 class ScoreManager :public Singleton<ScoreManager>
 {
@@ -21,15 +22,18 @@ public:
 	void Debug();
 	const float& GetScore() { return honraiScore; }
 private:
+	enum MODE { APPEAR, STAY, EXIT, MODE_NUM, NONE = MODE_NUM }mode = NONE;
+	const std::array<int, MODE_NUM> totalTime = { 30,120,30 };
+	int timer;
+
 	float score;
 	float honraiScore;
 
 	std::vector<int>numberHandle;
 	std::array<int, 12> number;
+	int scoreGraph;
 
-	Vec2<float>scorePos;
-	Vec2<float>basePos;
-	Vec2<float>texSize;
+	float scoreOffsetY;
 
 	int moveInterval;
 	float rate;
@@ -37,7 +41,7 @@ private:
 	std::vector<int> CountNumber(int TIME)
 	{
 		float score = TIME;
-		std::vector<int> Number(9);
+		std::vector<int> Number(KuroFunc::GetDigit(TIME));
 		for (int i = 0; i < Number.size(); ++i)
 		{
 			Number[i] = -1;

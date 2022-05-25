@@ -350,8 +350,6 @@ Game::Game()
 	//BackGround::Instance()->Init(GetStageSize());
 
 	GameTimer::Instance()->Init(120);
-	ScoreManager::Instance()->Init();
-
 
 	StageMgr::Instance()->GetMapChipType(0, 0, Vec2<int>(20, 20));
 	StageMgr::Instance()->WriteMapChipData(Vec2<int>(20, 20), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
