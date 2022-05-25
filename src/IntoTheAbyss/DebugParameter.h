@@ -135,5 +135,6 @@ public:
 	bool useFinishSwingFlag;
 	int generator;
 	bool changeGenerator;
+	float comboResetDist;
 };
 

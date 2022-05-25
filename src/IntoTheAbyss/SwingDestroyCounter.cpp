@@ -19,6 +19,7 @@ SwingDestroyCounter::SwingDestroyCounter()
 	nowCounter = 0;
 
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, Vec2<int>(12, 1), numberHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_yellow.png", 12, Vec2<int>(12, 1), numberHandle_yellow.data());
 
 }
 
@@ -78,8 +79,14 @@ void SwingDestroyCounter::Draw()
 
 		if (!destroyCounter[index].isActive) continue;
 
-		destroyCounter[index].Draw(numberHandle);
-
+		if (nowCounter < 100)
+		{
+			destroyCounter[index].Draw(numberHandle);
+		}
+		else
+		{
+			destroyCounter[index].Draw(numberHandle_yellow);
+		}
 	}
 
 }
@@ -247,7 +254,7 @@ void DestroyCounter::Update(const Vec2<float>& CharaPos)
 		}
 
 		// 自動的に消えるタイマーを更新する。
-		--exitTimer;
+		//--exitTimer;
 		if (exitTimer <= 0) {
 
 			SetExit();

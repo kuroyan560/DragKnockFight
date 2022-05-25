@@ -219,8 +219,8 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 	// 目標地点のベクトルを保存。
 	swingTargetVec = SwingTargetVec;
 
-	partner.lock()->swingDestroyCounter.AllExit();
-	swingDestroyCounter.AllExit();
+	//partner.lock()->swingDestroyCounter.AllExit();
+	//swingDestroyCounter.AllExit();
 
 	// 現在のフレームの相方とのベクトルを求める。
 	nowSwingVec = GetPartnerPos() - pos;
@@ -498,6 +498,12 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 #include "SlowMgr.h"
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect)
 {
+	float dist = partner.lock()->pos.Distance(this->pos);
+	if (!swingDestroyCounter.IsZero() && dist <= DebugParameter::Instance()->comboResetDist)
+	{
+		partner.lock()->swingDestroyCounter.AllExit();
+		swingDestroyCounter.AllExit();
+	}
 
 	if (team == WHICH_TEAM::RIGHT_TEAM && 0.8f <= SlowMgr::Instance()->slowAmount) {
 

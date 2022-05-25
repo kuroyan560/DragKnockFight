@@ -43,6 +43,7 @@ DebugParameter::DebugParameter()
 	useFinishSwingFlag = true;
 	generator = 1;
 	changeGenerator = false;
+	comboResetDist = 300.0f;
 }
 
 void DebugParameter::Update()
@@ -106,6 +107,7 @@ void DebugParameter::DrawImGui()
 		ImGui::InputFloat("SWING_ANGLE", &swingAngle);
 		//ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
 		changeGenerator = ImGui::SliderInt("chipGenerator", &generator, 0, MAP_CHIP_GENERATOR_NUM - 1);
+		ImGui::InputFloat("ComboResetDist", &comboResetDist);
 		ImGui::End();
 	}
 

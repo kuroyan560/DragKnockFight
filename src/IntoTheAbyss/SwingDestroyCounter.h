@@ -77,6 +77,7 @@ private:
 	static const int DESTROY_COUNTER = 400;
 	std::array<DestroyCounter, DESTROY_COUNTER> destroyCounter;		// UIに使用する数字1つ。
 	std::array<int, 12> numberHandle;
+	std::array<int, 12> numberHandle_yellow;
 
 	int nowCounter;		// 現在の破壊数。これの値を元にUIのクラスの数字を設定する。
 
@@ -103,6 +104,7 @@ public:
 	// 値を加算。
 	void Increment();
 
+	bool IsZero() { return !nowCounter; }
 
 private:
 
