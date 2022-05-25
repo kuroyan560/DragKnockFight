@@ -279,21 +279,6 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	Vec2<float> playerResponePos((tmp[0].size() * MAP_CHIP_SIZE) * 0.5f, (tmp.size() * MAP_CHIP_SIZE) * 0.5f);
 	Vec2<float> enemyResponePos;
 
-	for (int y = 0; y < tmp.size(); ++y)
-	{
-		for (int x = 0; x < tmp[y].size(); ++x)
-		{
-			if (tmp[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_PLAYER)
-			{
-				playerResponePos = Vec2<float>(x * 50.0f, y * 50.0f);
-			}
-			if (tmp[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_BOSS)
-			{
-				enemyResponePos = Vec2<float>(x * 50.0f, y * 50.0f);
-			}
-		}
-	}
-
 	//スクロールを上にずらす用
 	//responePos.x -= 100;
 	//responePos.y += 50;
@@ -302,7 +287,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	Vec2<float>plPos(StageMgr::Instance()->GetPlayerResponePos());
 	Vec2<float>enPos(StageMgr::Instance()->GetBossResponePos());
 
-	CharacterManager::Instance()->CharactersInit(plPos, enPos, !practiceMode );
+	CharacterManager::Instance()->CharactersInit(plPos, enPos, !practiceMode);
 
 	//miniMap.CalucurateCurrentPos(lineCenterPos);
 	// 二人の距離を求める。
@@ -318,9 +303,9 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 
 	Camera::Instance()->Init();
+	ScoreManager::Instance()->Init();
 	GameTimer::Instance()->Init(120);
 	GameTimer::Instance()->Start();
-	ScoreManager::Instance()->Init();
 
 	firstLoadFlag = false;
 	lineExtendScale = lineExtendMaxScale;
@@ -346,6 +331,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	}
 
 	mapChipGenerator[DebugParameter::Instance()->generator]->Init();
+
+	stageRap.Init();
 }
 
 Game::Game()
@@ -672,6 +659,8 @@ void Game::Update(const bool& Loop)
 	CrashEffectMgr::Instance()->Update();
 
 	countBlock.Update();
+	stageRap.Update();
+
 
 	// スタミナアイテムの更新処理
 	if (!readyToStartRoundFlag) {
@@ -854,6 +843,7 @@ void Game::Draw()
 	ScoreManager::Instance()->Draw();
 
 	countBlock.Draw();
+	stageRap.Draw();
 
 	// プレイヤーとボス間に線を描画
 	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());
