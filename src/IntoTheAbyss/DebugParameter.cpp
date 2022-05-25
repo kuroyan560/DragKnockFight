@@ -42,8 +42,12 @@ DebugParameter::DebugParameter()
 	swingMax = 0.11f;
 	useFinishSwingFlag = true;
 	generator = 1;
+	generatorSpanMax = 60 * 9;
+	generatorSpanMin = 60 * 5;
 	changeGenerator = false;
 	comboResetDist = 300.0f;
+
+
 }
 
 void DebugParameter::Update()
@@ -108,6 +112,13 @@ void DebugParameter::DrawImGui()
 		//ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
 		changeGenerator = ImGui::SliderInt("chipGenerator", &generator, 0, MAP_CHIP_GENERATOR_NUM - 1);
 		ImGui::InputFloat("ComboResetDist", &comboResetDist);
+		if (generator == RAND_PATTERN)
+		{
+			ImGui::Separator();
+			ImGui::InputInt("generatorSpanMin", &generatorSpanMin);
+			ImGui::InputInt("generatorSpanMax", &generatorSpanMax);
+			assert(generatorSpanMin < generatorSpanMax);
+		}
 		ImGui::End();
 	}
 

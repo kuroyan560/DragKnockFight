@@ -118,9 +118,9 @@ void MapChipGenerator_SplineOrbit::Draw()
 
 int MapChipGenerator_RandPattern::GetSpan()
 {
-	static const int MAX = 60 * 9;
-	static const int MIN = 60 * 5;
-	return KuroFunc::GetRand(MIN, MAX);
+	//static const int MAX = 60 * 9;
+	//static const int MIN = 60 * 5;
+	return KuroFunc::GetRand(DebugParameter::Instance()->generatorSpanMin, DebugParameter::Instance()->generatorSpanMax);
 }
 
 void MapChipGenerator_RandPattern::DesideNextIndices()
