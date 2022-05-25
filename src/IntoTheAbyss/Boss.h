@@ -47,7 +47,19 @@ public:
 	bool initNaviAiFlag;
 	//ボスのパターン制御-----------------------
 
+	enum CrashMode
+	{
+		NONE_LEVEL,
+		FIRST_LEVEL,
+		SECOND_LEVEL,
+		THIRD_LEVEL
+	};
+	CrashMode bossCrashModel;
+	int flashTimer;
+	std::array<int, 3>flashMaxTimer;
+
 	float bossGraphRadian;
+
 
 	//ボスのパラメーター変更
 	int bossImGuiHandle;
@@ -64,6 +76,9 @@ public:
 	float angle;
 
 	int appearBossGraphHandle;
+
+
+	int crashNumber;
 
 public:
 	/*===== 定数 =====*/

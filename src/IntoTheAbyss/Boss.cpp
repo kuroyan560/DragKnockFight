@@ -93,6 +93,10 @@ void Boss::OnInit()
 	initShakeFalg = false;
 	bossScale = { 0.7f,0.7f };
 
+	flashTimer = 0;
+	flashMaxTimer[0] = 120;
+	flashMaxTimer[1] = 60;
+	flashMaxTimer[2] = 30;
 }
 
 #include"Camera.h"
@@ -161,6 +165,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	{
 		bossGraphRadian = 0.0f;
 	}
+
 
 
 
@@ -258,6 +263,16 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	// ˆÚ“®—Ê‚ÉŠÖ‚·‚é•Ï”‚ð‚±‚±‚Å‘S‚Ävel‚É‘ã“ü‚·‚éB
 	vel = CharacterAIOrder::Instance()->vel;
 
+
+	bossCrashModel = NONE_LEVEL;
+	if (bossCrashModel != NONE_LEVEL && flashMaxTimer[bossCrashModel] <= flashTimer)
+	{
+		stagingDevice.Flash(flashMaxTimer[bossCrashModel], 0.7f);
+		flashTimer = 0;
+	}
+	++flashTimer;
+	//
+
 }
 
 #include"DrawFunc_FillTex.h"
@@ -268,7 +283,24 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
 	auto drawPos = pos + stagingDevice.GetShake();
 	auto drawScale = stagingDevice.GetExtRate() * SCALE * appearExtRate;
-	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
+
+	static std::shared_ptr<TextureBuffer> CRASH_TEX = {};
+	switch (bossCrashModel)
+	{
+	case Boss::FIRST_LEVEL:
+
+		CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 255, 255, 255));
+		break;
+	case Boss::SECOND_LEVEL:
+		CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(0, 0, 255, 255));
+		break;
+	case Boss::THIRD_LEVEL:
+		CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(0, 255, 0, 255));
+		break;
+	default:
+		break;
+	}
+
 
 	if (!initPaticleFlag)
 	{
