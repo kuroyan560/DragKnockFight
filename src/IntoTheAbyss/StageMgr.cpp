@@ -280,15 +280,20 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM,
 		return;
 	}
 
-	// 左側のキャラと円形の当たり判定を行って、当たっていたらブロックを生成しない。
-	Vec2<float> mapChipPos = Vec2<float>(MAPCHIP_NUM.x * MAP_CHIP_SIZE + MAP_CHIP_HALF_SIZE, MAPCHIP_NUM.y * MAP_CHIP_SIZE + MAP_CHIP_HALF_SIZE);
-	if (Vec2<float>(mapChipPos - LeftCharaPos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + LeftCharaSize) {
-		return;
-	}
+	// 削る場合は通さない。
+	if (CHIPNUM != 0) {
 
-	// 右側のキャラと円形の当たり判定を行って、当たっていたらブロックを生成しない。
-	if (Vec2<float>(mapChipPos - RightCharaPos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + RightCharaSize) {
-		return;
+		// 左側のキャラと円形の当たり判定を行って、当たっていたらブロックを生成しない。
+		Vec2<float> mapChipPos = Vec2<float>(MAPCHIP_NUM.x * MAP_CHIP_SIZE + MAP_CHIP_HALF_SIZE, MAPCHIP_NUM.y * MAP_CHIP_SIZE + MAP_CHIP_HALF_SIZE);
+		if (Vec2<float>(mapChipPos - LeftCharaPos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + LeftCharaSize) {
+			return;
+		}
+
+		// 右側のキャラと円形の当たり判定を行って、当たっていたらブロックを生成しない。
+		if (Vec2<float>(mapChipPos - RightCharaPos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + RightCharaSize) {
+			return;
+		}
+
 	}
 
 
