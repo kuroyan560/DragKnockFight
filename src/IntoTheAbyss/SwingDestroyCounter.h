@@ -74,7 +74,7 @@ private:
 
 	/*===== メンバ変数 =====*/
 
-	static const int DESTROY_COUNTER = 400;
+	static const int DESTROY_COUNTER = 600;
 	std::array<DestroyCounter, DESTROY_COUNTER> destroyCounter;		// UIに使用する数字1つ。
 	std::array<int, 12> numberHandle;
 	std::array<int, 12> numberHandle_yellow;

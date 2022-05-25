@@ -1102,24 +1102,26 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 					partner.lock()->destroyTimer = DESTROY_TIMER;
 
+					Vec2<float> nowHitChipIndex = Vec2<float>(hitChipIndex[index].x, hitChipIndex[index].y);
+
 					// 左があるか？
-					if (0 < hitChipIndex[index].x - 1) {
+					if (0 < hitChipIndex[index].x - 1 && StageMgr::Instance()->GetLocalMapChipBlock(0, 0, nowHitChipIndex + Vec2<float>(-1, 0)) != 0) {
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, 0), 0);
 						partner.lock()->swingDestroyCounter.Increment();
 					}
 					// 右があるか？
-					if (hitChipIndex[index].x + 1 < MapData[0].size() - 1) {
+					if (hitChipIndex[index].x + 1 < MapData[0].size() - 1 && StageMgr::Instance()->GetLocalMapChipBlock(0, 0, nowHitChipIndex + Vec2<float>(1, 0)) != 0) {
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, 0), 0);
 						partner.lock()->swingDestroyCounter.Increment();
 					}
 					// 上があるか？
 					if (0 < hitChipIndex[index].y - 1) {
-						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, -1), 0);
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, -1), 0 && StageMgr::Instance()->GetLocalMapChipBlock(0, 0, nowHitChipIndex + Vec2<float>(0, -1)) != 0);
 						partner.lock()->swingDestroyCounter.Increment();
 					}
 					// 下があるか？
 					if (hitChipIndex[index].y + 1 < MapData.size() - 1) {
-						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, 1), 0);
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, 1), 0 && StageMgr::Instance()->GetLocalMapChipBlock(0, 0, nowHitChipIndex + Vec2<float>(0, 1)) != 0);
 						partner.lock()->swingDestroyCounter.Increment();
 					}
 

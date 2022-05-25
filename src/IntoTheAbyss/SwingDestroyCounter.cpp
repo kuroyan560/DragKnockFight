@@ -181,7 +181,7 @@ void DestroyCounter::SetEntry(const int& Disit, const DISIT_ID DisitID)
 	exitTimer = EXIT_TIMER;
 	status = STATUS::ENTRY;
 	alpha = 0;
-	exitReservationTimer = 10;
+	exitReservationTimer = 1;
 
 }
 
