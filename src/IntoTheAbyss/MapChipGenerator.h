@@ -14,6 +14,8 @@ static const enum MAP_CHIP_GENERATOR
 class MapChipGenerator
 {
 protected:
+	bool CanChange(const Vec2<int>& Idx);
+	int GetRandChipType();
 	void Generate(const Vec2<float>& GeneratePos);
 public:
 	virtual void Init() = 0;
@@ -44,7 +46,12 @@ public:
 class MapChipGenerator_RandPattern : public MapChipGenerator
 {
 	typedef std::vector<Vec2<int>>OffsetPattern;
-	std::vector<Vec2<int>>predictionIdxArray;
+	struct Prediction
+	{
+		Vec2<int>idx;
+		int type;
+	};
+	std::vector<Prediction>predictionIdxArray;
 	int span;
 	int timer;
 	int GetSpan();

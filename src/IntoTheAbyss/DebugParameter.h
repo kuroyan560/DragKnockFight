@@ -138,6 +138,8 @@ public:
 	int generatorSpanMax;
 	bool changeGenerator;
 	float comboResetDist;
+	float emitRare;
+	float emitBounce;
 
 	int timer;
 	int totalCombo;

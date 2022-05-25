@@ -8,6 +8,43 @@
 #include<algorithm>
 #include "CharacterManager.h"
 
+bool MapChipGenerator::CanChange(const Vec2<int>& Idx)
+{
+	auto mapData = StageMgr::Instance()->GetLocalMap();
+	Vec2<int> idxSize = { (int)(*mapData)[0].size(),(int)(*mapData).size() };
+
+	if (Idx.x <= 0)return false;
+	else if (idxSize.x - 1 <= Idx.x)return false;
+	if (Idx.y <= 0)return false;
+	else if (idxSize.y - 1 <= Idx.y)return false;
+
+	auto type = (*mapData)[Idx.y][Idx.x];
+	if (type == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)return false;
+	if (type == MAPCHIP_TYPE_STATIC_RARE_BLOCK)return false;
+	if (type == 1)return false;
+	return true;
+}
+
+int MapChipGenerator::GetRandChipType()
+{
+	//出現確率
+	const int RARE = DebugParameter::Instance()->emitRare;
+	const int BOUNCE = DebugParameter::Instance()->emitBounce;
+
+	int appearType = 1;
+
+	float rate = KuroFunc::GetRand(99.0f);
+	if (rate < (RARE < BOUNCE ? RARE : BOUNCE))
+	{
+		appearType = MAPCHIP_TYPE_STATIC_RARE_BLOCK;
+	}
+	else if (rate < RARE + BOUNCE)
+	{
+		appearType = MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK;
+	}
+	return appearType;
+}
+
 void MapChipGenerator::Generate(const Vec2<float> &GeneratePos)
 {
 	//生成座標を基にその場所のチップ番号取得
@@ -29,7 +66,8 @@ void MapChipGenerator::Generate(const Vec2<float> &GeneratePos)
 
 	for (auto &idx : generateIndices)
 	{
-		StageMgr::Instance()->WriteMapChipData(idx, 1, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+		if (!CanChange(idx))continue;
+		StageMgr::Instance()->WriteMapChipData(idx, GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 	}
 }
 
@@ -204,7 +242,11 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 			if (idx.y < 0)continue;
 			if (chipIdxMax.y <= idx.y)continue;
 
-			predictionIdxArray.emplace_back(idx);
+			if (!CanChange(idx))continue;
+
+			predictionIdxArray.emplace_back();
+			predictionIdxArray.back().idx = idx;
+			predictionIdxArray.back().type = GetRandChipType();
 		}
 	}
 }
@@ -222,9 +264,10 @@ void MapChipGenerator_RandPattern::Update()
 
 	if (span <= timer)
 	{
-		for (auto &idx : predictionIdxArray)
+		for (auto &pre : predictionIdxArray)
 		{
-			StageMgr::Instance()->WriteMapChipData(idx, 1, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+			if (!CanChange(pre.idx))continue;
+			StageMgr::Instance()->WriteMapChipData(pre.idx, pre.type, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 		}
 		DesideNextIndices();
 		timer = 0;
@@ -235,7 +278,9 @@ void MapChipGenerator_RandPattern::Update()
 #include"DrawMap.h"
 void MapChipGenerator_RandPattern::Draw()
 {
-	static DrawMap DRAW_MAP;
+	static DrawMap DRAW_MAP_WALL;
+	static DrawMap DRAW_MAP_RARE;
+	static DrawMap DRAW_MAP_BOUNCE;
 
 	// 描画するチップのサイズ
 	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
@@ -245,11 +290,11 @@ void MapChipGenerator_RandPattern::Draw()
 	predictionRate = KuroMath::Ease(In, Circ, predictionRate, 0.0f, 1.0f);
 
 
-	for (const auto &idx : predictionIdxArray)
+	for (const auto &pred : predictionIdxArray)
 	{
 		ChipData chipData;
 		// スクロール量から描画する位置を求める。
-		const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ idx.x * MAP_CHIP_SIZE,idx.y * MAP_CHIP_SIZE });
+		const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ pred.idx.x * MAP_CHIP_SIZE,pred.idx.y * MAP_CHIP_SIZE });
 
 		// 画面外だったら描画しない。
 		if (drawPos.x < -DRAW_MAP_CHIP_SIZE || drawPos.x > WinApp::Instance()->GetWinSize().x + DRAW_MAP_CHIP_SIZE) continue;
@@ -257,9 +302,23 @@ void MapChipGenerator_RandPattern::Draw()
 
 		chipData.pos = drawPos;
 		chipData.alpha = predictionRate;
-		DRAW_MAP.AddChip(chipData);
+
+		if (pred.type == MAPCHIP_TYPE_STATIC_RARE_BLOCK)
+		{
+			DRAW_MAP_RARE.AddChip(chipData);
+		}
+		else if (pred.type == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)
+		{
+			DRAW_MAP_BOUNCE.AddChip(chipData);
+		}
+		else
+		{
+			DRAW_MAP_WALL.AddChip(chipData);
+		}
 	}
-	DRAW_MAP.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetWallGraph()));
+	DRAW_MAP_WALL.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(1)));
+	DRAW_MAP_RARE.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(MAPCHIP_TYPE_STATIC_RARE_BLOCK)));
+	DRAW_MAP_BOUNCE.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)));
 }
 
 void MapChipGenerator_ChangeMap::Init()
