@@ -692,6 +692,19 @@ void Game::Update(const bool& Loop)
 
 	}
 
+
+	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
+	const float BOUNCE_DISTANCE = 300.0f; // ある程度の距離
+	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE) {
+
+		Vec2<float> charaDir = Vec2<float>(CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal();
+
+		// 吹っ飛ばす量
+		const float BOUNCE_POWER = 50.0f;
+		CharacterManager::Instance()->Right()->bounceVel = charaDir * BOUNCE_POWER;
+
+	}
+
 }
 
 void Game::Draw()
