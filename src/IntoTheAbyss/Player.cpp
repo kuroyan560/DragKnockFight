@@ -570,7 +570,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 	bool isSwingStamina = staminaGauge->CheckCanAction(SWING_STAMINA);
 
 	// RT‚ª‰Ÿ‚³‚ê‚½‚ç
-	const int CONSECUTIVE_SWING_TIMER = 10;
 	bool canSwing = (!isInputRightStick && isPrevInputRightStick) || (isInputRightStick && CONSECUTIVE_SWING_TIMER < consecutiveSwingTimer);
 	if ((!nowSwing && canSwing)) {
 

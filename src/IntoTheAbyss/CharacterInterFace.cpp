@@ -438,6 +438,8 @@ void CharacterInterFace::Init(const Vec2<float> &GeneratePos, const bool &Appear
 	advancedEntrySwingTimer = 0;
 	isAdvancedEntrySwing = false;
 
+	CONSECUTIVE_SWING_TIMER = 10;
+
 	damageTimer = 0;
 
 	static const int RETICLE_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png") };
