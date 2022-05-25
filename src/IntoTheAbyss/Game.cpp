@@ -850,6 +850,10 @@ void Game::Scramble()
 	Vec2<float> leftVelGauge;
 	Vec2<float> rightVelGauge;
 
+	// 右側のキャラが吹っ飛ぶマップチップに当たった際の移動量の処理を行う。
+	CharacterManager::Instance()->Right()->pos += CharacterManager::Instance()->Right()->bounceVel;
+	CharacterManager::Instance()->Right()->addLineLength += CharacterManager::Instance()->Right()->bounceVel.Length();
+
 	// 移動量を取得。 優勢ゲージはここで更新。
 	double leftVel = CharacterManager::Instance()->Left()->vel.Length() * SlowMgr::Instance()->slowAmount;
 	leftVelGauge = CharacterManager::Instance()->Left()->vel * SlowMgr::Instance()->slowAmount;
@@ -940,9 +944,7 @@ void Game::Scramble()
 			moveDir.Normalize();
 
 			// 押し戻す。
-			
-				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
-			
+			CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
 
 			// 引っかかり判定だったら

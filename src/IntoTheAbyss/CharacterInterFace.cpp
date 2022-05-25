@@ -423,6 +423,8 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 	isHold = false;
 
+	bounceVel = Vec2<float>();
+
 	advancedEntrySwingTimer = 0;
 	isAdvancedEntrySwing = false;
 
@@ -742,6 +744,11 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		}
 
 	}
+
+
+	// 吹っ飛ばすブロックに合った際の吹っ飛ぶ量の移動量を0に近づける。
+	if (bounceVel.x != 0) bounceVel.x -= bounceVel.x / 10.0f;
+	if (bounceVel.y != 0) bounceVel.y -= bounceVel.y / 10.0f;
 
 
 }
@@ -1085,6 +1092,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				bool unBlockFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] != 18;
 
+				// デバッグで[マップ端のブロックか壊れないブロックに当たるまで振り回しをやめない]機能のために書いた処理
 				if (isDebugModeStrongSwing) {
 
 					if (!(unBlockFlag && 0 < hitChipIndex[index].x && hitChipIndex[index].x < MapData[0].size() - 1 && 0 < hitChipIndex[index].y && hitChipIndex[index].y < MapData.size() - 1)) {
@@ -1094,6 +1102,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					}
 
 				}
+
 				// ブロックを破壊する。
 				if (unBlockFlag && 0 < hitChipIndex[index].x && hitChipIndex[index].x < MapData[0].size() - 1 && 0 < hitChipIndex[index].y && hitChipIndex[index].y < MapData.size() - 1) {
 
@@ -1127,6 +1136,16 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				}
 
+				// 壊れないブロックに当たったらふっとばすようにする。
+				if (!unBlockFlag) {
+
+					const float BOUNCE_VEL = 100;
+					Vec2<float> bouceVec = Vec2<float>(pos - partner.lock()->pos).GetNormal();
+					bounceVel = bouceVec * BOUNCE_VEL;
+
+				}
+
+
 				// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 				Vec2<float>vec = { 0,0 };
 				if (partner.lock()->GetNowSwing()) {
@@ -1136,7 +1155,8 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					{
 						bool dontBrokeFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 18;
 						// 一気に破壊する状態だったらFinishを呼ばない。
-						if (DebugParameter::Instance()->useFinishSwingFlag || dontBrokeFlag)
+						//if (DebugParameter::Instance()->useFinishSwingFlag || dontBrokeFlag)
+						if (DebugParameter::Instance()->useFinishSwingFlag)
 						{
 							partner.lock()->FinishSwing();
 						}
