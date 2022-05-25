@@ -280,15 +280,46 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	StaminaItemMgr::Instance()->Init();
 
-	Vec2<float> responePos((tmp[0].size() * MAP_CHIP_SIZE) * 0.5f, (tmp.size() * MAP_CHIP_SIZE) * 0.5f);
+	Vec2<float> playerResponePos((tmp[0].size() * MAP_CHIP_SIZE) * 0.5f, (tmp.size() * MAP_CHIP_SIZE) * 0.5f);
+	Vec2<float> enemyResponePos;
+
+	for (int y = 0; y < tmp.size(); ++y)
+	{
+		for (int x = 0; x < tmp[y].size(); ++x)
+		{
+			if (tmp[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_PLAYER)
+			{
+				playerResponePos = Vec2<float>(x * 50.0f, y * 50.0f);
+			}
+			if (tmp[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_BOSS)
+			{
+				enemyResponePos = Vec2<float>(x * 50.0f, y * 50.0f);
+			}
+		}
+	}
 
 	//スクロールを上にずらす用
 	//responePos.x -= 100;
 	//responePos.y += 50;
-	lineCenterPos = responePos - cameraBasePos;
-	CharacterManager::Instance()->CharactersInit(lineCenterPos, !practiceMode);
+	lineCenterPos = playerResponePos - cameraBasePos;
 
-	miniMap.CalucurateCurrentPos(lineCenterPos);
+	Vec2<float>plPos(StageMgr::Instance()->GetPlayerPos());
+	Vec2<float>enPos(StageMgr::Instance()->GetBossPos());
+
+	CharacterManager::Instance()->CharactersInit(plPos, enPos, !practiceMode );
+
+	//miniMap.CalucurateCurrentPos(lineCenterPos);
+	// 二人の距離を求める。
+	float charaLength = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
+	// 紐を伸ばす量を求める。
+	float addLength = charaLength - (CharacterInterFace::LINE_LENGTH * 4.0f);
+	// 紐を伸ばす。
+	CharacterManager::Instance()->Right()->addLineLength = addLength;
+
+
+	Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
+	ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
+
 
 	Camera::Instance()->Init();
 	GameTimer::Instance()->Init(120);
@@ -344,7 +375,10 @@ Game::Game()
 	responePos.x -= 25;
 	responePos.y += 50;
 	responeScrollPos = responePos;
-	ScrollMgr::Instance()->Init(responeScrollPos, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
+
+
+	//Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
+	//ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
 
 	Camera::Instance()->Init();
 	SuperiorityGauge::Instance()->Init();
@@ -354,8 +388,6 @@ Game::Game()
 	//BackGround::Instance()->Init(GetStageSize());
 
 	GameTimer::Instance()->Init(120);
-	ScoreManager::Instance()->Init();
-
 
 	StageMgr::Instance()->GetMapChipType(0, 0, Vec2<int>(20, 20));
 	StageMgr::Instance()->WriteMapChipData(Vec2<int>(20, 20), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
@@ -380,6 +412,7 @@ Game::Game()
 
 	mapChipGenerator[SPLINE_ORBIT] = std::make_shared<MapChipGenerator_SplineOrbit>();
 	mapChipGenerator[RAND_PATTERN] = std::make_shared<MapChipGenerator_RandPattern>();
+	mapChipGenerator[CHANGE_MAP] = std::make_shared<MapChipGenerator_ChangeMap>();
 
 }
 
@@ -468,7 +501,7 @@ void Game::Update(const bool& Loop)
 		}
 		{
 			Vec2<float> sub = CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos;
-			playerHandMgr->Hold(-sub.GetNormal(), CharacterManager::Instance()->Left()->prevSwingFlag || CharacterManager::Instance()->Left()->GetNowSwing());
+			playerHandMgr->Hold(-sub.GetNormal(), true);
 			playerHandMgr->Update(CharacterManager::Instance()->Left()->pos);
 		}
 	}
@@ -609,7 +642,7 @@ void Game::Update(const bool& Loop)
 		float distance = CharacterManager::Instance()->Left()->pos.Distance(CharacterManager::Instance()->Right()->pos);
 
 		//最大距離
-		const float MAX_ADD_ZOOM = 3000.0f;
+		const float MAX_ADD_ZOOM = 3500.0f;
 
 		float zoomRate = 1.0f;
 		float deadLine = 1200.0f;//この距離以下はズームしない
@@ -631,7 +664,7 @@ void Game::Update(const bool& Loop)
 		Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
 
 		// カメラのズームが0.27f未満にならないようにする。
-		float minZoomValue = 0.27f;
+		float minZoomValue = 0.20f;
 		if (Camera::Instance()->zoom < minZoomValue)
 		{
 			Camera::Instance()->zoom = minZoomValue;
@@ -1150,40 +1183,35 @@ void Game::SwitchingStage()
 	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_LEFT);
 	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_RIGHT);
 
-	const bool enableToSelectRoomFlag = 0 < debugStageData[1];
-	const bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
+	int maxStageNum = StageMgr::Instance()->GetEnableToUseStageNumber();
+
 
 	//部屋か番号に切り替え
 	if (left && 0 < nowSelectNum)
 	{
 		--nowSelectNum;
-		--debugStageData[1];
+		--debugStageData[0];
 	}
-	if (right && nowSelectNum < StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()))
+	if (right && nowSelectNum < maxStageNum)
 	{
 		++nowSelectNum;
-		++debugStageData[1];
+		++debugStageData[0];
 	}
 
-	if (debugStageData[1] <= 0)
+	if (debugStageData[0] <= 0)
 	{
-		debugStageData[1] = 0;
+		debugStageData[0] = 0;
 		nowSelectNum = 0;
 	}
-	if (StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) <= debugStageData[1])
+	if (maxStageNum <= debugStageData[0])
 	{
-		debugStageData[1] = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
-		nowSelectNum = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
-	}
-
-	if (StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) <= nowSelectNum)
-	{
-		debugStageData[1] = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) - 1;
+		debugStageData[0] = maxStageNum - 1;
+		nowSelectNum = maxStageNum - 1;
 	}
 
 
-	const bool done = UsersInput::Instance()->KeyOnTrigger(DIK_RETURN)
-		|| (UsersInput::Instance()->ControllerInput(0, A) && UsersInput::Instance()->ControllerOnTrigger(0, B))
+	const bool done = /*UsersInput::Instance()->KeyOnTrigger(DIK_RETURN)
+		||*/ (UsersInput::Instance()->ControllerInput(0, A) && UsersInput::Instance()->ControllerOnTrigger(0, B))
 		|| (UsersInput::Instance()->ControllerOnTrigger(0, A) && UsersInput::Instance()->ControllerInput(0, B));
 	if (done)
 	{

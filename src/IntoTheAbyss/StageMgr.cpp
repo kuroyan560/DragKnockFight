@@ -10,7 +10,7 @@
 StageMgr::StageMgr()
 {
 	//int allStageNum = 4;
-	int allStageNum = 1;
+	int allStageNum = 10;
 	//int allRoomNum = 10;
 	int allRoomNum = 5;
 	int nowStage = 0;
@@ -71,28 +71,28 @@ StageMgr::StageMgr()
 	animationData.push_back(std::make_shared<MapChipAnimationData>(tmp2, 10));
 
 	//std::string rootFilePass = "Resource/MapChipData/";
-	std::string rootFilePass = "resource/IntoTheAbyss/MapChipData/";
+	std::string rootFilePass = "resource/ChainCombat/MapChipData/";
 	std::string stageFilePass = "Stage";
 	std::string roomFileName = "Room_";
 
 
-	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
-	{
-		for (int roomNum = 0; roomNum < allRoomNum; ++roomNum)
-		{
-			//ファイルパス
-			std::string filePass =
-				rootFilePass + stageFilePass + std::to_string(stageNum) + "/";
-			//ファイル名
-			std::string fileName =
-				roomFileName + std::to_string(roomNum) + "_Gimmick.txt";
+	//for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
+	//{
+	//	for (int roomNum = 0; roomNum < allRoomNum; ++roomNum)
+	//	{
+	//		//ファイルパス
+	//		std::string filePass =
+	//			rootFilePass + stageFilePass + std::to_string(stageNum) + "/";
+	//		//ファイル名
+	//		std::string fileName =
+	//			roomFileName + std::to_string(roomNum) + "_Gimmick.txt";
 
-			GimmickLoader::Instance()->LoadData(stageNum, roomNum, filePass + fileName);
-		}
-	}
+	//		GimmickLoader::Instance()->LoadData(stageNum, roomNum, filePass + fileName);
+	//	}
+	//}
 
 	//ギミック共通の設定
-	GimmickLoader::Instance()->LoadData(rootFilePass + "GimmickCommonData.txt");
+	//GimmickLoader::Instance()->LoadData(rootFilePass + "GimmickCommonData.txt");
 
 
 	//ステージ毎の小部屋読み込み-----------------------
@@ -457,7 +457,61 @@ int StageMgr::GetMaxMapChipNum()
 	return chipNum;
 }
 
-bool StageMgr::CheckDoor(vector<Vec2<float>>* DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
+int StageMgr::GetEnableToUseRoomNumber(int STAGE_NUMBER)
+{
+	int count = 0;
+	for (int i = 0; i < allMapChipData[STAGE_NUMBER].size(); ++i)
+	{
+		if (allMapChipData[STAGE_NUMBER][i].size() != 0)
+		{
+			++count;
+		}
+	}
+	return count;
+}
+
+int StageMgr::GetEnableToUseStageNumber()
+{
+	int count = 0;
+	for (int i = 0; i < allMapChipData.size(); ++i)
+	{
+		if (allMapChipData[i][0].size() != 0)
+		{
+			++count;
+		}
+	}
+	return count;
+}
+
+const Vec2<float> &StageMgr::GetPlayerPos()
+{
+	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
+	{
+		for (int x = 0; x < localRoomMapChipArray[y].size(); ++x)
+		{
+			if (localRoomMapChipArray[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_PLAYER)
+			{
+				return Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+			}
+		}
+	}
+}
+
+const Vec2<float> &StageMgr::GetBossPos()
+{
+	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
+	{
+		for (int x = 0; x < localRoomMapChipArray[y].size(); ++x)
+		{
+			if (localRoomMapChipArray[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_BOSS)
+			{
+				return Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+			}
+		}
+	}
+}
+
+bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
 {
 	bool sideFlag = false;
 

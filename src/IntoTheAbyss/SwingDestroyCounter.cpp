@@ -39,6 +39,7 @@ void SwingDestroyCounter::Init()
 }
 
 #include"DebugParameter.h"
+#include"ScoreManager.h"
 void SwingDestroyCounter::AllExit()
 {
 
@@ -53,6 +54,7 @@ void SwingDestroyCounter::AllExit()
 	}
 
 	DebugParameter::Instance()->totalCombo += nowCounter;
+	ScoreManager::Instance()->Add(nowCounter);
 	nowCounter = 0;
 
 }

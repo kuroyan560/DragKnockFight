@@ -1,2 +1,0 @@
-name Thown
-hitBox 0 0

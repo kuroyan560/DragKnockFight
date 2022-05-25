@@ -25,8 +25,9 @@ public:
 
 private:
 	int selectNum;
-	std::array<int, 3> screenShotHandle;
-	std::array<int, 3> stageNumberHandle;
+	static const int STAGE_MAX_NUM = 10;
+	std::array<int, STAGE_MAX_NUM> screenShotHandle;
+	std::array<int, STAGE_MAX_NUM> stageNumberHandle;
 	LerpData screenShotLerpData;
 	LerpData stageNumberData;
 

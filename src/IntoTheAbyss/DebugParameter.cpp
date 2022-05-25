@@ -46,6 +46,8 @@ DebugParameter::DebugParameter()
 	generatorSpanMin = 60 * 5;
 	changeGenerator = false;
 	comboResetDist = 300.0f;
+	emitRare = 1.0f;
+	emitBounce = 2.0f;
 }
 
 void DebugParameter::Update()
@@ -68,6 +70,7 @@ void DebugParameter::Update()
 	}
 }
 
+#include"CharacterManager.h"
 void DebugParameter::DrawImGui()
 {
 	if (DebugImGuiManager::Instance()->DrawFlag(playerParamImguiHandle))
@@ -117,15 +120,22 @@ void DebugParameter::DrawImGui()
 
 		ImGui::InputFloat("SWING_ANGLE", &swingAngle);
 		//ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
-		changeGenerator = ImGui::SliderInt("chipGenerator", &generator, 0, MAP_CHIP_GENERATOR_NUM - 1);
 		ImGui::InputFloat("ComboResetDist", &comboResetDist);
+		ImGui::Checkbox("StrongSwing", &CharacterManager::Instance()->Left()->isDebugModeStrongSwing);
+		ImGui::SliderInt("ConsecutiveSwingDelay", &CharacterManager::Instance()->Left()->CONSECUTIVE_SWING_TIMER, 1, 30);
+
+		ImGui::Separator();
+		changeGenerator = ImGui::SliderInt("chipGenerator", &generator, 0, MAP_CHIP_GENERATOR_NUM - 1);
+		ImGui::SliderFloat("EmitRare", &emitRare, 0.0f, 3.0f);
+		ImGui::SliderFloat("EmitBounce", &emitBounce, 0.0f, 3.0f);
+
 		if (generator == RAND_PATTERN)
 		{
-			ImGui::Separator();
 			ImGui::InputInt("generatorSpanMin", &generatorSpanMin);
 			ImGui::InputInt("generatorSpanMax", &generatorSpanMax);
 			assert(generatorSpanMin < generatorSpanMax);
 		}
+
 		ImGui::End();
 	}
 
