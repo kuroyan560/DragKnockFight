@@ -376,6 +376,7 @@ Game::Game()
 
 	mapChipGenerator[SPLINE_ORBIT] = std::make_shared<MapChipGenerator_SplineOrbit>();
 	mapChipGenerator[RAND_PATTERN] = std::make_shared<MapChipGenerator_RandPattern>();
+	mapChipGenerator[CHANGE_MAP] = std::make_shared<MapChipGenerator_ChangeMap>();
 
 }
 
@@ -1181,35 +1182,30 @@ void Game::SwitchingStage()
 	const bool left = UsersInput::Instance()->KeyOnTrigger(DIK_LEFT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_LEFT);
 	const bool right = UsersInput::Instance()->KeyOnTrigger(DIK_RIGHT) || UsersInput::Instance()->ControllerOnTrigger(0, DPAD_RIGHT);
 
-	const bool enableToSelectRoomFlag = 0 < debugStageData[1];
-	const bool enableToSelectRoomFlag2 = debugStageData[1] < StageMgr::Instance()->GetMaxRoomNumber(debugStageData[0]) - 1;
+	int maxStageNum = StageMgr::Instance()->GetEnableToUseStageNumber();
+
 
 	//ïîâÆÇ©î‘çÜÇ…êÿÇËë÷Ç¶
 	if (left && 0 < nowSelectNum)
 	{
 		--nowSelectNum;
-		--debugStageData[1];
+		--debugStageData[0];
 	}
-	if (right && nowSelectNum < StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()))
+	if (right && nowSelectNum < maxStageNum)
 	{
 		++nowSelectNum;
-		++debugStageData[1];
+		++debugStageData[0];
 	}
 
-	if (debugStageData[1] <= 0)
+	if (debugStageData[0] <= 0)
 	{
-		debugStageData[1] = 0;
+		debugStageData[0] = 0;
 		nowSelectNum = 0;
 	}
-	if (StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) <= debugStageData[1])
+	if (maxStageNum <= debugStageData[0])
 	{
-		debugStageData[1] = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
-		nowSelectNum = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
-	}
-
-	if (StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) <= nowSelectNum)
-	{
-		debugStageData[1] = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum()) - 1;
+		debugStageData[0] = maxStageNum - 1;
+		nowSelectNum = maxStageNum - 1;
 	}
 
 

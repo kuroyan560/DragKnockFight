@@ -76,9 +76,9 @@ void GameScene::OnImguiDebug()
 {
 	ImGui::Begin("StageInfo");
 	ImGui::Text("---Now---");
-	ImGui::Text("RoomNumber:%d\n\n", SelectStage::Instance()->GetRoomNum());
+	ImGui::Text("StageNumber:%d\n\n", SelectStage::Instance()->GetStageNum());
 	ImGui::Text("---Select---");
-	ImGui::Text("RoomNumber:%d", game.debugStageData[1]);
+	ImGui::Text("StageNumber:%d", game.debugStageData[0]);
 	//‘I‘ð‚Å‚«‚È‚¢•”‰®”Ô†‚È‚ç•\Ž¦‚·‚é
 	if (!StageMgr::Instance()->CheckRoomNum(game.debugStageData[0], game.debugStageData[1]))
 	{

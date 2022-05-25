@@ -4,10 +4,11 @@
 #include"KuroMath.h"
 #include"KuroFunc.h"
 #include"DebugParameter.h"
+#include"SelectStage.h"
 #include<algorithm>
 #include "CharacterManager.h"
 
-void MapChipGenerator::Generate(const Vec2<float>& GeneratePos)
+void MapChipGenerator::Generate(const Vec2<float> &GeneratePos)
 {
 	//生成座標を基にその場所のチップ番号取得
 	Vec2<int>centerIdx =
@@ -26,7 +27,7 @@ void MapChipGenerator::Generate(const Vec2<float>& GeneratePos)
 		centerIdx + Vec2<int>(1,0),	//右
 	};
 
-	for (auto& idx : generateIndices)
+	for (auto &idx : generateIndices)
 	{
 		StageMgr::Instance()->WriteMapChipData(idx, 1, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 	}
@@ -64,7 +65,7 @@ void MapChipGenerator_SplineOrbit::Init()
 void MapChipGenerator_SplineOrbit::Update()
 {
 	std::vector<Vec2<float>>targetPosVector;
-	for (auto& tp : targetPos)
+	for (auto &tp : targetPos)
 	{
 		targetPosVector.emplace_back(tp);
 	}
@@ -176,7 +177,7 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 				offsetIdx.y = offsetPos.y / MAP_CHIP_SIZE;
 
 				bool same = false;
-				for (auto& idx : PATTERN[CIRCLE])
+				for (auto &idx : PATTERN[CIRCLE])
 				{
 					if (idx != offsetIdx)continue;
 					same = true;
@@ -195,7 +196,7 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 		Vec2<int>centerIdx = { KuroFunc::GetRand(chipIdxMax.x - 1),KuroFunc::GetRand(chipIdxMax.y - 1) };
 
 		const auto patternType = PATTERN[KuroFunc::GetRand(PATTERN_TYPE::NUM - 1)];
-		for (auto& offsetIdx : patternType)
+		for (auto &offsetIdx : patternType)
 		{
 			Vec2<int> idx = offsetIdx + centerIdx;
 			if (idx.x < 0)continue;
@@ -221,7 +222,7 @@ void MapChipGenerator_RandPattern::Update()
 
 	if (span <= timer)
 	{
-		for (auto& idx : predictionIdxArray)
+		for (auto &idx : predictionIdxArray)
 		{
 			StageMgr::Instance()->WriteMapChipData(idx, 1, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 		}
@@ -244,7 +245,7 @@ void MapChipGenerator_RandPattern::Draw()
 	predictionRate = KuroMath::Ease(In, Circ, predictionRate, 0.0f, 1.0f);
 
 
-	for (const auto& idx : predictionIdxArray)
+	for (const auto &idx : predictionIdxArray)
 	{
 		ChipData chipData;
 		// スクロール量から描画する位置を求める。
@@ -259,4 +260,41 @@ void MapChipGenerator_RandPattern::Draw()
 		DRAW_MAP.AddChip(chipData);
 	}
 	DRAW_MAP.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetWallGraph()));
+}
+
+void MapChipGenerator_ChangeMap::Init()
+{
+	changeMapTimer = 0;
+	setMapNumber = 1;
+
+	stageNumber = SelectStage::Instance()->GetStageNum();
+	maxRoomNumber = StageMgr::Instance()->GetEnableToUseRoomNumber(stageNumber);
+
+	changeMapMaxTimer = 120;
+}
+
+void MapChipGenerator_ChangeMap::Update()
+{
+	if (changeMapMaxTimer <= changeMapTimer)
+	{
+		if (setMapNumber < maxRoomNumber)
+		{
+			SelectStage::Instance()->SelectRoomNum(setMapNumber);
+			StageMgr::Instance()->SetLocalMapChipData(stageNumber, setMapNumber);
+			StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNumber, setMapNumber);
+		}
+
+		++setMapNumber;
+		if (maxRoomNumber + 1 <= setMapNumber)
+		{
+			setMapNumber = 0;
+		}
+		changeMapTimer = 0;
+	}
+
+	++changeMapTimer;
+}
+
+void MapChipGenerator_ChangeMap::Draw()
+{
 }
