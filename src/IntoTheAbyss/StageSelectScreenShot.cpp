@@ -8,9 +8,23 @@ StageSelectScreenShot::StageSelectScreenShot()
 	screenShotHandle[0] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/0.png");
 	screenShotHandle[1] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/1.png");
 	screenShotHandle[2] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/2.png");
+	screenShotHandle[3] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/2.png");
+	screenShotHandle[4] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/2.png");
+	screenShotHandle[5] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/2.png");
+	screenShotHandle[6] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/2.png");
+	screenShotHandle[7] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/2.png");
+	screenShotHandle[8] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/2.png");
+	screenShotHandle[9] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/2.png");
 	stageNumberHandle[0] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/0.png");
 	stageNumberHandle[1] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/1.png");
 	stageNumberHandle[2] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
+	stageNumberHandle[3] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
+	stageNumberHandle[4] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
+	stageNumberHandle[5] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
+	stageNumberHandle[6] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
+	stageNumberHandle[7] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
+	stageNumberHandle[8] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
+	stageNumberHandle[9] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
 	selectNum = 0;
 }
 

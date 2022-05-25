@@ -124,13 +124,13 @@ void StageSelectScene::OnUpdate()
 			rightArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
 		}
 
-		if (3 <= stageNum)
+		if (STAGE_MAX_NUM <= stageNum)
 		{
 			stageNum = 0;
 		}
 		if (stageNum <= -1)
 		{
-			stageNum = 2;
+			stageNum = STAGE_MAX_NUM - 1;
 		}
 		SelectStage::Instance()->SelectStageNum(stageNum);
 	}

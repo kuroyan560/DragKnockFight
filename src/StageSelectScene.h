@@ -35,5 +35,7 @@ public:
 
 	// ステージ番号
 	int stageNum;
+
+	static const int STAGE_MAX_NUM = 10;
 };
 
