@@ -271,9 +271,8 @@ public:
 	int GetEnableToUseStageNumber();
 
 
-	const Vec2<float> &GetPlayerPos();
-	const Vec2<float> &GetBossPos();
-
+	const Vec2<float> &GetPlayerResponePos();
+	const Vec2<float> &GetBossResponePos();
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
