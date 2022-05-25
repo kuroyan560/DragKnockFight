@@ -867,6 +867,9 @@ void Game::Scramble()
 		if (!CharacterManager::Instance()->Left()->GetNowSwing() && !CharacterManager::Instance()->Left()->isStopPartner) {
 			CharacterManager::Instance()->Right()->pos += rightVelGauge;
 		}
+		else if (CharacterManager::Instance()->Left()->isStopPartner) {
+			CharacterManager::Instance()->Right()->pos += leftVelGauge;
+		}
 	}
 
 	// ü•ª‚Ì’·‚³

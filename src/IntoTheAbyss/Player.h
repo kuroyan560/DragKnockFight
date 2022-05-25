@@ -93,6 +93,10 @@ public:
 	//直前の通常移動量（オートパイロット用）
 	Vec2<float>autoPilotMove;
 
+	// 連続で弱攻撃するためのタイマー
+	int consecutiveSwingTimer;
+
+
 public:
 
 	/*-- 定数 --*/
