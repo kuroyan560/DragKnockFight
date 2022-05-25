@@ -41,7 +41,7 @@ DebugParameter::DebugParameter()
 	swingAngle = 7.0f;
 	swingMax = 0.11f;
 	useFinishSwingFlag = true;
-	generator = 1;
+	generator = 0;
 	generatorSpanMax = 60 * 9;
 	generatorSpanMin = 60 * 5;
 	changeGenerator = false;
