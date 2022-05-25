@@ -940,12 +940,9 @@ void Game::Scramble()
 			moveDir.Normalize();
 
 			// ‰Ÿ‚µ–ß‚·B
-			if (CharacterManager::Instance()->Left()->isStopPartner) {
-				CharacterManager::Instance()->Right()->addLineLength += moveLength;
-			}
-			else {
+			
 				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
-			}
+			
 
 
 			// ˆø‚Á‚©‚©‚è”»’è‚¾‚Á‚½‚ç
