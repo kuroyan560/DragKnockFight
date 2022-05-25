@@ -299,8 +299,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//responePos.y += 50;
 	lineCenterPos = playerResponePos - cameraBasePos;
 
-	Vec2<float>plPos(StageMgr::Instance()->GetPlayerResponePos());
-	Vec2<float>enPos(StageMgr::Instance()->GetBossResponePos());
+	Vec2<float>plPos(StageMgr::Instance()->GetPlayerPos());
+	Vec2<float>enPos(StageMgr::Instance()->GetBossPos());
 
 	CharacterManager::Instance()->CharactersInit(plPos, enPos, !practiceMode );
 
