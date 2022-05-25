@@ -38,6 +38,7 @@ void SwingDestroyCounter::Init()
 
 }
 
+#include"DebugParameter.h"
 void SwingDestroyCounter::AllExit()
 {
 
@@ -51,6 +52,7 @@ void SwingDestroyCounter::AllExit()
 
 	}
 
+	DebugParameter::Instance()->totalCombo += nowCounter;
 	nowCounter = 0;
 
 }

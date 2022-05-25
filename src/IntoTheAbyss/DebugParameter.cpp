@@ -46,8 +46,6 @@ DebugParameter::DebugParameter()
 	generatorSpanMin = 60 * 5;
 	changeGenerator = false;
 	comboResetDist = 300.0f;
-
-
 }
 
 void DebugParameter::Update()
@@ -108,6 +106,15 @@ void DebugParameter::DrawImGui()
 	if (DebugImGuiManager::Instance()->DrawFlag(swingAngleParamImguiHandle))
 	{
 		ImGui::Begin("Paramters");
+
+		int sec = timer / 60;
+		int min = sec / 60;
+		sec -= min * 60;
+		ImGui::Text("Timer %d : %d", min, sec);
+		ImGui::Text("TotalCombo %d", totalCombo);
+
+		ImGui::Separator();
+
 		ImGui::InputFloat("SWING_ANGLE", &swingAngle);
 		//ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
 		changeGenerator = ImGui::SliderInt("chipGenerator", &generator, 0, MAP_CHIP_GENERATOR_NUM - 1);

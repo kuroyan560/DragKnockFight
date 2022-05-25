@@ -187,6 +187,9 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 #include"PlayerHand.h"
 void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
+	DebugParameter::Instance()->totalCombo = 0;
+	DebugParameter::Instance()->timer = 0;
+
 	CrashMgr::Instance()->Init();
 
 	int stageNum = STAGE_NUM;
@@ -470,6 +473,7 @@ void Game::Update(const bool& Loop)
 	{
 		if (roundChangeEffect.initGameFlag)
 		{
+			DebugParameter::Instance()->timer++;
 			mapChipGenerator[DebugParameter::Instance()->generator]->Update();
 		}
 

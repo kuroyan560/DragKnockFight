@@ -138,5 +138,8 @@ public:
 	int generatorSpanMax;
 	bool changeGenerator;
 	float comboResetDist;
+
+	int timer;
+	int totalCombo;
 };
 
