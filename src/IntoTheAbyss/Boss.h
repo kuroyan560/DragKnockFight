@@ -49,14 +49,15 @@ public:
 
 	enum CrashMode
 	{
-		NONE_LEVEL,
+		NONE_LEVEL = -1,
 		FIRST_LEVEL,
 		SECOND_LEVEL,
 		THIRD_LEVEL
 	};
 	CrashMode bossCrashModel;
 	int flashTimer;
-	std::array<int, 3>flashMaxTimer;
+	std::array<int, 3>flashMaxTimer;//フラッシュの間隔
+	std::array<int, 3>crashMaxNum;	//段階ごとでどれくらいブロックを壊したら切り替わるか
 
 	float bossGraphRadian;
 
@@ -102,16 +103,16 @@ private:
 	void OnInit()override;
 
 	// 更新処理
-	void OnUpdate(const std::vector<std::vector<int>>& MapData)override;
+	void OnUpdate(const std::vector<std::vector<int>> &MapData)override;
 
 	//スウィング中も呼び出される更新処理
 	void OnUpdateNoRelatedSwing()override {}
 
 	// 描画処理
-	void OnDraw(const bool& isRoundStartEffect)override;
+	void OnDraw(const bool &isRoundStartEffect)override;
 	void OnDrawUI()override {}
 
-	void OnHitMapChip(const HIT_DIR& Dir)override {}
+	void OnHitMapChip(const HIT_DIR &Dir)override {}
 
 	void OnBreak()override {}
 	void OnBreakFinish()override {}
@@ -128,7 +129,7 @@ private:
 		CharacterAIData::Instance()->addTimer = HealAmount;
 	};
 
-	void Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed);
+	void Shot(const Vec2<float> &generatePos, const float &forwardAngle, const float &speed);
 
 public:
 	void OnKnockOut()override {};

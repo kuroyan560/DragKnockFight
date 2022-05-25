@@ -94,9 +94,13 @@ void Boss::OnInit()
 	bossScale = { 0.7f,0.7f };
 
 	flashTimer = 0;
-	flashMaxTimer[0] = 120;
-	flashMaxTimer[1] = 60;
-	flashMaxTimer[2] = 30;
+	flashMaxTimer[FIRST_LEVEL] = 120;
+	flashMaxTimer[SECOND_LEVEL] = 60;
+	flashMaxTimer[THIRD_LEVEL] = 30;
+
+	crashMaxNum[FIRST_LEVEL] = 100;
+	crashMaxNum[SECOND_LEVEL] = 500;
+	crashMaxNum[THIRD_LEVEL] = 1000;
 }
 
 #include"Camera.h"
@@ -264,14 +268,36 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	vel = CharacterAIOrder::Instance()->vel;
 
 
-	bossCrashModel = NONE_LEVEL;
+	//現在壊したブロックの数
+	int crashNum = 0;
+
+	//壊したブロックの数によって段階を分ける----------------------------------------------
+	if (crashNum < crashMaxNum[FIRST_LEVEL])
+	{
+		bossCrashModel = NONE_LEVEL;
+	}
+	if (crashMaxNum[FIRST_LEVEL] <= crashNum)
+	{
+		bossCrashModel = FIRST_LEVEL;
+	}
+	if (crashMaxNum[SECOND_LEVEL] <= crashNum)
+	{
+		bossCrashModel = SECOND_LEVEL;
+	}
+	if (crashMaxNum[THIRD_LEVEL] <= crashNum)
+	{
+		bossCrashModel = THIRD_LEVEL;
+	}
+	//壊したブロックの数によって段階を分ける----------------------------------------------
+
+	//フラッシュする----------------------------------------------
 	if (bossCrashModel != NONE_LEVEL && flashMaxTimer[bossCrashModel] <= flashTimer)
 	{
 		stagingDevice.Flash(flashMaxTimer[bossCrashModel], 0.7f);
 		flashTimer = 0;
 	}
 	++flashTimer;
-	//
+	//フラッシュする----------------------------------------------
 
 }
 
@@ -285,6 +311,8 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 	auto drawScale = stagingDevice.GetExtRate() * SCALE * appearExtRate;
 
 	static std::shared_ptr<TextureBuffer> CRASH_TEX = {};
+
+	//フラッシュする色を変える----------------------------------------------
 	switch (bossCrashModel)
 	{
 	case Boss::FIRST_LEVEL:
@@ -300,6 +328,7 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 	default:
 		break;
 	}
+	//フラッシュする色を変える----------------------------------------------
 
 
 	if (!initPaticleFlag)
