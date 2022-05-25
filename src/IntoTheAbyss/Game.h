@@ -31,6 +31,8 @@ class RenderTarget;
 #include"MapChipGenerator.h"
 #include"BlockCount.h"
 
+#include"StageRap.h"
+
 class CharacterInterFace;
 
 struct MassChipData
@@ -134,6 +136,8 @@ class Game
 	std::array<std::shared_ptr<MapChipGenerator>, MAP_CHIP_GENERATOR_NUM>mapChipGenerator;
 
 	BlockCount countBlock;
+
+	StageRap stageRap;
 
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
