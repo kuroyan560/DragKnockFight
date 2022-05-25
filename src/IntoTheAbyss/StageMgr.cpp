@@ -483,6 +483,34 @@ int StageMgr::GetEnableToUseStageNumber()
 	return count;
 }
 
+const Vec2<float> &StageMgr::GetPlayerPos()
+{
+	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
+	{
+		for (int x = 0; x < localRoomMapChipArray[y].size(); ++x)
+		{
+			if (localRoomMapChipArray[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_PLAYER)
+			{
+				return Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+			}
+		}
+	}
+}
+
+const Vec2<float> &StageMgr::GetBossPos()
+{
+	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
+	{
+		for (int x = 0; x < localRoomMapChipArray[y].size(); ++x)
+		{
+			if (localRoomMapChipArray[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_BOSS)
+			{
+				return Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
+			}
+		}
+	}
+}
+
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
 {
 	bool sideFlag = false;
