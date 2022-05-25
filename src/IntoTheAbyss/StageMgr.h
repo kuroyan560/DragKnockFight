@@ -266,6 +266,8 @@ public:
 
 	int GetEnableToUseRoomNumber(int STAGE_NUMBER);
 
+	int GetEnableToUseStageNumber();
+
 
 
 private:
