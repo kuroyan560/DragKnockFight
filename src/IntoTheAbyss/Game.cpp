@@ -303,8 +303,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//responePos.y += 50;
 	lineCenterPos = playerResponePos - cameraBasePos;
 
-	Vec2<float>plPos(StageMgr::Instance()->GetPlayerPos());
-	Vec2<float>enPos(StageMgr::Instance()->GetBossPos());
+	Vec2<float>plPos(StageMgr::Instance()->GetPlayerResponePos());
+	Vec2<float>enPos(StageMgr::Instance()->GetBossResponePos());
 
 	CharacterManager::Instance()->CharactersInit(plPos, enPos, !practiceMode );
 
@@ -684,8 +684,8 @@ void Game::Update(const bool& Loop)
 		// I—¹‰‰o‚ªs‚í‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
 		if (!roundFinishFlag) {
 
-			//roundFinishFlag = true;
-			//RoundFinishEffect::Instance()->Start();
+			roundFinishFlag = true;
+			RoundFinishEffect::Instance()->Start();
 
 		}
 
