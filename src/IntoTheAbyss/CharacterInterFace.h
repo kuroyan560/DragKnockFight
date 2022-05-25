@@ -118,6 +118,7 @@ protected:
 public:
 
 	static bool isDebugModeStrongSwing;		// デバッグ用で壁に当たるまでスイング
+	Vec2<float>size;	//サイズ
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
@@ -131,7 +132,6 @@ protected:
 	std::weak_ptr<CharacterInterFace>partner;
 	StagingInterFace stagingDevice;
 	static const int INIT_SIZE = 5;
-	Vec2<float>size;	//サイズ
 	Vec2<float>appearExtRate;	//登場演出
 
 	//[キャラごとに違う関数]
@@ -169,7 +169,7 @@ protected:
 	bool IsPilotOutSide() { return isPilotDetached || pilotReturnTimer < pilotReturnTotalTime; }
 
 	// 当たり判定情報保存。
-	void SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, Vec2<int>& hitChipIndex, const Vec2<int>& hitChipIndexBuff);
+	void SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, vector<Vec2<int>>& hitChipIndex, const Vec2<int>& hitChipIndexBuff);
 
 public:
 	//登場演出が完了したか

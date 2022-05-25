@@ -351,7 +351,7 @@ Game::Game()
 
 
 	StageMgr::Instance()->GetMapChipType(0, 0, Vec2<int>(20, 20));
-	StageMgr::Instance()->WriteMapChipData(Vec2<int>(20, 20), 0);
+	StageMgr::Instance()->WriteMapChipData(Vec2<int>(20, 20), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 	{
 		std::string bossFilePass = "resource/ChainCombat/boss/0/arm/";
