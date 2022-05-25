@@ -749,8 +749,8 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 
 	// 吹っ飛ばすブロックに合った際の吹っ飛ぶ量の移動量を0に近づける。
-	if (bounceVel.x != 0) bounceVel.x -= bounceVel.x / 10.0f;
-	if (bounceVel.y != 0) bounceVel.y -= bounceVel.y / 10.0f;
+	if (bounceVel.x != 0) bounceVel.x -= bounceVel.x / 20.0f;
+	if (bounceVel.y != 0) bounceVel.y -= bounceVel.y / 20.0f;
 
 
 }
@@ -1093,6 +1093,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			for (int index = 0; index < HITCHIP_INDEX; ++index) {
 
 				bool unBlockFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] != 18;
+				bool bounceBlockFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 20;
 
 				// デバッグで[マップ端のブロックか壊れないブロックに当たるまで振り回しをやめない]機能のために書いた処理
 				if (isDebugModeStrongSwing) {
@@ -1139,7 +1140,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				}
 
 				// 壊れないブロックに当たったらふっとばすようにする。
-				if (!unBlockFlag) {
+				if (bounceBlockFlag) {
 
 					const float BOUNCE_VEL = 100;
 					Vec2<float> bouceVec = Vec2<float>(pos - partner.lock()->pos).GetNormal();
@@ -1157,8 +1158,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					{
 						bool dontBrokeFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 18;
 						// 一気に破壊する状態だったらFinishを呼ばない。
-						//if (DebugParameter::Instance()->useFinishSwingFlag || dontBrokeFlag)
-						if (DebugParameter::Instance()->useFinishSwingFlag)
+						if (DebugParameter::Instance()->useFinishSwingFlag || dontBrokeFlag)
 						{
 							partner.lock()->FinishSwing();
 						}
