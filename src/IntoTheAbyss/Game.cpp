@@ -46,6 +46,10 @@
 #include"CharacterManager.h"
 #include "StaminaItemMgr.h"
 
+#include "RoundFinishEffect.h"
+
+#include "RoundFinishParticle.h"
+
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
@@ -577,59 +581,6 @@ void Game::Update(const bool& Loop)
 	WinCounter::Instance()->Update();
 
 
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_Q, "AddLeftSuperiorityGauge", TO_STRING(DIK_Q)))
-	{
-		SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, 10.0f);
-	}
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_W, "AddRightSuperiorityGauge", TO_STRING(DIK_W)))
-	{
-		SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, 10.0f);
-	}
-
-
-
-	// 優勢ゲージが振り切ったトリガー判定のときにスタン演出を有効化する。
-	if (SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).overGaugeFlag && !SuperiorityGauge::Instance()->GetGaugeData(RIGHT_TEAM).prevOverGaugeFlag) {
-		// 敵の優勢ゲージが振り切ったということは、プレイヤーの優勢ゲージが0だということ。
-		/*StunEffect::Instance()->Activate(CharacterManager::Instance()->Left()->pos, Vec2<float>(0, 0), LEFT_TEAM);
-		ResultTransfer::Instance()->leftBreakCount++;
-		CharacterManager::Instance()->Left()->Break();
-		CharacterManager::Instance()->Left()->InitVel();*/
-		WinCounter::Instance()->RoundFinish(lineCenterPos, false, CharacterManager::Instance()->Left()->pos);
-		CharacterManager::Instance()->Left()->OnKnockOut();
-		roundFinishFlag = true;
-		playerOrEnemeyWinFlag = false;
-		gameStartFlag = false;
-
-		areaHitColor = Color(255, 0, 0, 255);
-		playerHitColor = Color(255, 0, 0, 255);
-
-		screenEdgeEffect.RightPlayerWin(120);
-
-		// 両キャラの予測線を消す。
-		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
-		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
-	}
-	if (SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).overGaugeFlag && !SuperiorityGauge::Instance()->GetGaugeData(LEFT_TEAM).prevOverGaugeFlag) {
-		// プレイヤーの優勢ゲージが振り切ったということは、敵の優勢ゲージが0だということ。
-		/*StunEffect::Instance()->Activate(CharacterManager::Instance()->Right()->pos, Vec2<float>(1200, 0), RIGHT_TEAM);
-		ResultTransfer::Instance()->rightBreakCount++;
-		CharacterManager::Instance()->Right()->Break();
-		CharacterManager::Instance()->Right()->InitVel();*/
-		//プレイヤー勝利
-		WinCounter::Instance()->RoundFinish(lineCenterPos, true, CharacterManager::Instance()->Right()->pos);
-		CharacterManager::Instance()->Right()->OnKnockOut();
-		roundFinishFlag = true;
-		playerOrEnemeyWinFlag = true;
-		gameStartFlag = false;
-
-		screenEdgeEffect.LeftPlayerWin(120);
-
-		// 両キャラの予測線を消す。
-		CharacterManager::Instance()->Right()->InitSwingLineSegmetn();
-		CharacterManager::Instance()->Left()->InitSwingLineSegmetn();
-	}
-
 	CrashMgr::Instance()->Update();
 
 	// 残像を更新。
@@ -694,14 +645,16 @@ void Game::Update(const bool& Loop)
 
 
 	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
-	const float BOUNCE_DISTANCE = 300.0f; // ある程度の距離
+	const float BOUNCE_DISTANCE = 100.0f; // ある程度の距離
 	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE) {
 
-		Vec2<float> charaDir = Vec2<float>(CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal();
+		// 終了演出が行われていなかったら
+		if (!roundFinishFlag) {
 
-		// 吹っ飛ばす量
-		const float BOUNCE_POWER = 50.0f;
-		CharacterManager::Instance()->Right()->bounceVel = charaDir * BOUNCE_POWER;
+			//roundFinishFlag = true;
+			//RoundFinishEffect::Instance()->Start();
+
+		}
 
 	}
 
@@ -852,6 +805,9 @@ void Game::Draw()
 		Vec2<float>rightDownPos = *enemyHomeBase.hitBox.center + enemyHomeBase.hitBox.size / 2.0f;
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
+
+	// ラウンド終了時のパーティクルを描画
+	RoundFinishParticleMgr::Instance()->Draw();
 
 }
 
@@ -1351,33 +1307,35 @@ void Game::RoundFinishEffect(const bool& Loop)
 		//時間計測ストップ
 		GameTimer::Instance()->SetInterruput(true);
 
+		RoundFinishEffect::Instance()->Update(lineCenterPos);
+
 		//勝利数カウント演出
-		if (!WinCounter::Instance()->GetNowAnimation())
-		{
-			//どちらかが３勝とったらゲーム終了
-			if (WinCounter::Instance()->GetGameFinish() && !Loop)
-			{
-				ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
-				if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
-				else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
-				turnResultScene = true;
-			}
-			//次のラウンドへ
-			else
-			{
-				//練習モード
-				if (Loop)WinCounter::Instance()->Reset();
+		//if (!WinCounter::Instance()->GetNowAnimation())
+		//{
+		//	//どちらかが３勝とったらゲーム終了
+		//	if (WinCounter::Instance()->GetGameFinish() && !Loop)
+		//	{
+		//		ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
+		//		if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
+		//		else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
+		//		turnResultScene = true;
+		//	}
+		//	//次のラウンドへ
+		//	else
+		//	{
+		//		//練習モード
+		//		if (Loop)WinCounter::Instance()->Reset();
 
-				++roundTimer;
+		//		++roundTimer;
 
-				if (60 <= roundTimer)
-				{
-					readyToStartRoundFlag = true;
-					roundFinishFlag = false;
-					InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-				}
-			}
-		}
+		//		if (60 <= roundTimer)
+		//		{
+		//			readyToStartRoundFlag = true;
+		//			roundFinishFlag = false;
+		//			InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+		//		}
+		//	}
+		//}
 	}
 
 }

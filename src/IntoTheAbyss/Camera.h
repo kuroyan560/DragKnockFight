@@ -16,6 +16,7 @@ class Camera : public Singleton<Camera>
 
 	// If camera focuses on something, it will be active.
 	int active;
+	float lerpAmount;
 public:
 	// Info to focus.
 	Vec2<float>target;
@@ -29,7 +30,7 @@ public:
 	void Init();
 	void Update();
 	// This "TargetPos" must not be affected by scroll.
-	void Focus(const Vec2<float>& TargetPos, const float& Zoom);
+	void Focus(const Vec2<float>& TargetPos, const float& Zoom, const float& LerpAmount = 0.1f);
 	void Release() { active = 0; zoom = initZoom; }
 
 	const int& Active() { return active; }
