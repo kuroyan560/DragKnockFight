@@ -275,7 +275,7 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM,
 	if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == CHIPNUM)return;	//ïœâªÇ»Çµ
 
 	//âÛÇÍÇ»Ç¢ÉuÉçÉbÉNÇÕîÚÇŒÇ∑
-	if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
+	if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)
 	{
 		return;
 	}
@@ -321,7 +321,7 @@ MapChipType StageMgr::GetMapChipType(const int& STAGE_NUM, const int& ROOM_NUM, 
 	{
 		return MAPCHIP_BLOCK_WALL;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON)
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)
 	{
 		return MAPCHIP_BLOCK_ELEC_ON;
 	}
@@ -329,11 +329,11 @@ MapChipType StageMgr::GetMapChipType(const int& STAGE_NUM, const int& ROOM_NUM, 
 	{
 		return MAPCHIP_BLOCK_ELEC_OFF;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)
 	{
 		return MAPCHIP_BLOCK_COLOR_LEFT;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_RARE_BLOCK)
 	{
 		return MAPCHIP_BLOCK_COLOR_RIGHT;
 	}
@@ -369,7 +369,7 @@ MapChipType StageMgr::GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM)
 	{
 		return MAPCHIP_BLOCK_WALL;
 	}
-	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON)
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)
 	{
 		return MAPCHIP_BLOCK_ELEC_ON;
 	}
@@ -377,11 +377,11 @@ MapChipType StageMgr::GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM)
 	{
 		return MAPCHIP_BLOCK_ELEC_OFF;
 	}
-	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_LEFT)
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)
 	{
 		return MAPCHIP_BLOCK_COLOR_LEFT;
 	}
-	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_COLOR_RIGHT)
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_RARE_BLOCK)
 	{
 		return MAPCHIP_BLOCK_COLOR_RIGHT;
 	}
