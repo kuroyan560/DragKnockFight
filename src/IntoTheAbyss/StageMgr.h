@@ -46,6 +46,8 @@ enum MapChipData
 	MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK,
 	MAPCHIP_TYPE_STATIC_ELEC_OFF,
 	MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS,
+	MAPCHIP_TYPE_STATIC_RESPONE_PLAYER = 30,
+	MAPCHIP_TYPE_STATIC_RESPONE_BOSS = 31,
 	MAPCHIP_TYPE_MAX
 };
 
@@ -225,7 +227,7 @@ public:
 	std::vector<std::shared_ptr<MapChipAnimationData>> animationData;//マップチップのアニメーション情報の一覧
 
 
-	void WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM, const Vec2<float>& LeftCharaPos, const float& LeftCharaSize, const Vec2<float>& RightCharaPos, const float& RightCharaSize);
+	void WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM, const Vec2<float> &LeftCharaPos, const float &LeftCharaSize, const Vec2<float> &RightCharaPos, const float &RightCharaSize);
 
 	MapChipType GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM);
 
@@ -268,6 +270,9 @@ public:
 
 	int GetEnableToUseStageNumber();
 
+
+	const Vec2<float> &GetPlayerPos();
+	const Vec2<float> &GetBossPos();
 
 
 private:

@@ -7,7 +7,7 @@ CharacterManager::CharacterManager()
 {
 }
 
-std::shared_ptr<CharacterInterFace> CharacterManager::CreateCharacter(const  PLAYABLE_CHARACTER_NAME& CharacterName, const WHICH_TEAM& Team)
+std::shared_ptr<CharacterInterFace> CharacterManager::CreateCharacter(const  PLAYABLE_CHARACTER_NAME &CharacterName, const WHICH_TEAM &Team)
 {
 	switch (CharacterName)
 	{
@@ -113,11 +113,10 @@ void CharacterManager::CharactersGenerate()
 	}
 }
 
-void CharacterManager::CharactersInit(const Vec2<float>& RespawnPos, const bool& Appear)
+void CharacterManager::CharactersInit(const Vec2<float>& PlayerRespawnPos, const Vec2<float>& EnemyResponePos, const bool &Appear)
 {
-	const auto offset = Vec2<float>(CharacterInterFace::LINE_LENGTH, 0.0f);
-	characters[LEFT_TEAM]->Init(RespawnPos - offset, Appear);
-	characters[RIGHT_TEAM]->Init(RespawnPos + offset, Appear);
+	characters[LEFT_TEAM]->Init(PlayerRespawnPos, Appear);
+	characters[RIGHT_TEAM]->Init(EnemyResponePos, Appear);
 }
 
 void CharacterManager::PracticeMode()

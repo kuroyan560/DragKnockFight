@@ -276,15 +276,46 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	StaminaItemMgr::Instance()->Init();
 
-	Vec2<float> responePos((tmp[0].size() * MAP_CHIP_SIZE) * 0.5f, (tmp.size() * MAP_CHIP_SIZE) * 0.5f);
+	Vec2<float> playerResponePos((tmp[0].size() * MAP_CHIP_SIZE) * 0.5f, (tmp.size() * MAP_CHIP_SIZE) * 0.5f);
+	Vec2<float> enemyResponePos;
+
+	for (int y = 0; y < tmp.size(); ++y)
+	{
+		for (int x = 0; x < tmp[y].size(); ++x)
+		{
+			if (tmp[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_PLAYER)
+			{
+				playerResponePos = Vec2<float>(x * 50.0f, y * 50.0f);
+			}
+			if (tmp[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_BOSS)
+			{
+				enemyResponePos = Vec2<float>(x * 50.0f, y * 50.0f);
+			}
+		}
+	}
 
 	//スクロールを上にずらす用
 	//responePos.x -= 100;
 	//responePos.y += 50;
-	lineCenterPos = responePos - cameraBasePos;
-	CharacterManager::Instance()->CharactersInit(lineCenterPos, !practiceMode);
+	lineCenterPos = playerResponePos - cameraBasePos;
 
-	miniMap.CalucurateCurrentPos(lineCenterPos);
+	Vec2<float>plPos(StageMgr::Instance()->GetPlayerResponePos());
+	Vec2<float>enPos(StageMgr::Instance()->GetBossResponePos());
+
+	CharacterManager::Instance()->CharactersInit(plPos, enPos, !practiceMode );
+
+	//miniMap.CalucurateCurrentPos(lineCenterPos);
+	// 二人の距離を求める。
+	float charaLength = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
+	// 紐を伸ばす量を求める。
+	float addLength = charaLength - (CharacterInterFace::LINE_LENGTH * 4.0f);
+	// 紐を伸ばす。
+	CharacterManager::Instance()->Right()->addLineLength = addLength;
+
+
+	Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
+	ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
+
 
 	Camera::Instance()->Init();
 	GameTimer::Instance()->Init(120);
@@ -340,7 +371,10 @@ Game::Game()
 	responePos.x -= 25;
 	responePos.y += 50;
 	responeScrollPos = responePos;
-	ScrollMgr::Instance()->Init(responeScrollPos, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
+
+
+	//Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
+	//ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
 
 	Camera::Instance()->Init();
 	SuperiorityGauge::Instance()->Init();
@@ -659,7 +693,7 @@ void Game::Update(const bool& Loop)
 		float distance = CharacterManager::Instance()->Left()->pos.Distance(CharacterManager::Instance()->Right()->pos);
 
 		//最大距離
-		const float MAX_ADD_ZOOM = 3000.0f;
+		const float MAX_ADD_ZOOM = 3500.0f;
 
 		float zoomRate = 1.0f;
 		float deadLine = 1200.0f;//この距離以下はズームしない
@@ -681,7 +715,7 @@ void Game::Update(const bool& Loop)
 		Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
 
 		// カメラのズームが0.27f未満にならないようにする。
-		float minZoomValue = 0.27f;
+		float minZoomValue = 0.20f;
 		if (Camera::Instance()->zoom < minZoomValue)
 		{
 			Camera::Instance()->zoom = minZoomValue;
