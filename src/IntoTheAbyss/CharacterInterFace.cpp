@@ -322,7 +322,7 @@ void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 	isPilotDetached = Flg;
 }
 
-void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, Vec2<int>& hitChipIndex, const Vec2<int>& hitChipIndexBuff)
+void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, vector<Vec2<int>>& hitChipIndex, const Vec2<int>& hitChipIndexBuff)
 {
 	auto mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 	(*mapChipDrawData)[hitChipIndexBuff.y][hitChipIndexBuff.x].shocked = 1.0f;
@@ -331,7 +331,7 @@ void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& is
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_BOTTOM) isHitBottom = true;
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_LEFT) isHitLeft = true;
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_RIGHT) isHitRight = true;
-	if (intersectedLine != INTERSECTED_LINE::INTERSECTED_NONE) hitChipIndex = hitChipIndexBuff;
+	if (intersectedLine != INTERSECTED_LINE::INTERSECTED_NONE) hitChipIndex.emplace_back(hitChipIndexBuff);
 }
 
 void CharacterInterFace::Appear()
@@ -874,7 +874,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 	bool isHitRight = false;
 	bool isHitLeft = false;
 	bool isHitBottom = false;
-	Vec2<int> hitChipIndex;
+	vector<Vec2<int>> hitChipIndex;
 	Vec2<int> hitChipIndexBuff;		// 一次保存用
 
 	// 移動量を元にしたマップチップとの当たり判定を行う。
@@ -886,7 +886,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 	isHitRight = intersectedLine == INTERSECTED_RIGHT;
 	isHitLeft = intersectedLine == INTERSECTED_LEFT;
 	isHitBottom = intersectedLine == INTERSECTED_BOTTOM;
-	if (intersectedLine != INTERSECTED_NONE) hitChipIndex = hitChipIndexBuff;
+	if (intersectedLine != INTERSECTED_NONE) hitChipIndex.emplace_back(hitChipIndexBuff);
 
 	// 左上
 	Vec2<float> velPosBuff = pos - size + Vec2<float>(velOffset, velOffset);
@@ -1075,140 +1075,94 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 		// 一定以下だったらダメージを与えない。
 		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 0.5f) {
 
-			// 触れただけでその色になるようにする。
-			MapChipType hitChipData = StageMgr::Instance()->GetLocalMapChipType(hitChipIndex);
-			if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_LEFT) {
-
-				// 自分が右側のキャラだったら。
-				if (team == WHICH_TEAM::RIGHT_TEAM) {
-
-					// ブロックを右の色にする。
-					//StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_RIGHT);
-
-				}
-
-			}
-			else if (hitChipData == MapChipType::MAPCHIP_BLOCK_COLOR_RIGHT) {
-
-				// 自分が左側のキャラだったら。
-				if (team == WHICH_TEAM::LEFT_TEAM) {
-
-					// ブロックを右の色にする。
-					//StageMgr::Instance()->WriteMapChipData(hitChipIndex, MapChipData::MAPCHIP_TYPE_STATIC_COLOR_LEFT);
-
-				}
-
-			}
-
-
-		}
-		else if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 1.0f) {
-
-			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
-			Vec2<float>vec = { 0,0 };
-			if (partner.lock()->GetNowSwing()) {
-
-				// 端のブロックだったら判定を行わない。
-				if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
-				{
-					bool dontBrokeFlag = MapData[hitChipIndex.y][hitChipIndex.x] == 18;
-					// 破壊するモードじゃなかったら判定を通さない。
-					if (DebugParameter::Instance()->useFinishSwingFlag && dontBrokeFlag)
-					{
-						partner.lock()->FinishSwing();
-					}
-				}
-				else
-				{
-					partner.lock()->FinishSwing();
-				}
-
-			}
-
-			// ゲージがデフォルトに戻るまでのタイマーを更新。
-			gaugeReturnTimer = GAUGE_RETURN_TIMER;
 
 		}
 		else {
 
-			bool unBlockFlag = MapData[hitChipIndex.y][hitChipIndex.x] != 18;
+			const int HITCHIP_INDEX = hitChipIndex.size();
 
-			if (isDebugModeStrongSwing) {
+			for (int index = 0; index < HITCHIP_INDEX; ++index) {
 
-				if (!(unBlockFlag && 0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1)) {
+				bool unBlockFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] != 18;
 
-					partner.lock()->FinishSwing();
+				if (isDebugModeStrongSwing) {
+
+					if (!(unBlockFlag && 0 < hitChipIndex[index].x && hitChipIndex[index].x < MapData[0].size() - 1 && 0 < hitChipIndex[index].y && hitChipIndex[index].y < MapData.size() - 1)) {
+
+						partner.lock()->FinishSwing();
+
+					}
 
 				}
+				// ブロックを破壊する。
+				if (unBlockFlag && 0 < hitChipIndex[index].x && hitChipIndex[index].x < MapData[0].size() - 1 && 0 < hitChipIndex[index].y && hitChipIndex[index].y < MapData.size() - 1) {
 
-			}
-			// ブロックを破壊する。
-			if (unBlockFlag && 0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1) {
-
-				StageMgr::Instance()->WriteMapChipData(hitChipIndex, 0);
-				partner.lock()->swingDestroyCounter.Increment();
-
-				partner.lock()->destroyTimer = DESTROY_TIMER;
-
-				// 左があるか？
-				if (0 < hitChipIndex.x - 1) {
-					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(-1, 0), 0);
+					StageMgr::Instance()->WriteMapChipData(hitChipIndex[index], 0);
 					partner.lock()->swingDestroyCounter.Increment();
-				}
-				// 右があるか？
-				if (hitChipIndex.x + 1 < MapData[0].size() - 1) {
-					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(1, 0), 0);
-					partner.lock()->swingDestroyCounter.Increment();
-				}
-				// 上があるか？
-				if (0 < hitChipIndex.y - 1) {
-					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, -1), 0);
-					partner.lock()->swingDestroyCounter.Increment();
-				}
-				// 下があるか？
-				if (hitChipIndex.y + 1 < MapData.size() - 1) {
-					StageMgr::Instance()->WriteMapChipData(hitChipIndex + Vec2<int>(0, 1), 0);
-					partner.lock()->swingDestroyCounter.Increment();
+
+					partner.lock()->destroyTimer = DESTROY_TIMER;
+
+					// 左があるか？
+					if (0 < hitChipIndex[index].x - 1) {
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, 0), 0);
+						partner.lock()->swingDestroyCounter.Increment();
+					}
+					// 右があるか？
+					if (hitChipIndex[index].x + 1 < MapData[0].size() - 1) {
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, 0), 0);
+						partner.lock()->swingDestroyCounter.Increment();
+					}
+					// 上があるか？
+					if (0 < hitChipIndex[index].y - 1) {
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, -1), 0);
+						partner.lock()->swingDestroyCounter.Increment();
+					}
+					// 下があるか？
+					if (hitChipIndex[index].y + 1 < MapData.size() - 1) {
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, 1), 0);
+						partner.lock()->swingDestroyCounter.Increment();
+					}
+
 				}
 
-			}
+				// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
+				Vec2<float>vec = { 0,0 };
+				if (partner.lock()->GetNowSwing()) {
 
-			// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
-			Vec2<float>vec = { 0,0 };
-			if (partner.lock()->GetNowSwing()) {
-
-				// 画面端のブロックだったら判定を通さない。
-				if ((0 < hitChipIndex.x && hitChipIndex.x < MapData[0].size() - 1 && 0 < hitChipIndex.y && hitChipIndex.y < MapData.size() - 1))
-				{
-					bool dontBrokeFlag = MapData[hitChipIndex.y][hitChipIndex.x] == 18;
-					// 一気に破壊する状態だったらFinishを呼ばない。
-					if (DebugParameter::Instance()->useFinishSwingFlag || dontBrokeFlag)
+					// 画面端のブロックだったら判定を通さない。
+					if ((0 < hitChipIndex[index].x && hitChipIndex[index].x < MapData[0].size() - 1 && 0 < hitChipIndex[index].y && hitChipIndex[index].y < MapData.size() - 1))
+					{
+						bool dontBrokeFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 18;
+						// 一気に破壊する状態だったらFinishを呼ばない。
+						if (DebugParameter::Instance()->useFinishSwingFlag || dontBrokeFlag)
+						{
+							partner.lock()->FinishSwing();
+						}
+					}
+					else
 					{
 						partner.lock()->FinishSwing();
 					}
-				}
-				else
-				{
-					partner.lock()->FinishSwing();
-				}
 
-				// チームに応じてクラッシュ数を加算する変数を変える。
-				if (team == WHICH_TEAM::LEFT_TEAM) {
-					++ResultTransfer::Instance()->leftCrashCount;
+					// チームに応じてクラッシュ数を加算する変数を変える。
+					if (team == WHICH_TEAM::LEFT_TEAM) {
+						++ResultTransfer::Instance()->leftCrashCount;
+					}
+					else {
+						++ResultTransfer::Instance()->rightCrashCount;
+					}
+
+					// クラッシュ演出を追加。
+					CrashEffectMgr::Instance()->Generate(pos, GetTeamColor());
+
+					int smokeCol = 0;
+					// クラッシュさせる。
+					Crash(vec, smokeCol);
+
+					CWSwingSegmentMgr.Init();
+					CCWSwingSegmentMgr.Init();
+
 				}
-				else {
-					++ResultTransfer::Instance()->rightCrashCount;
-				}
-
-				// クラッシュ演出を追加。
-				CrashEffectMgr::Instance()->Generate(pos, GetTeamColor());
-
-				int smokeCol = 0;
-				// クラッシュさせる。
-				Crash(vec, smokeCol);
-
-				CWSwingSegmentMgr.Init();
-				CCWSwingSegmentMgr.Init();
 
 			}
 
