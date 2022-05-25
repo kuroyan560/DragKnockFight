@@ -12,6 +12,7 @@
 #include "Stamina.h"
 #include"CharacterManager.h"
 #include "DrawFunc_Color.h"
+#include"StaminaItemMgr.h"
 
 bool CharacterInterFace::isDebugModeStrongSwing;
 
@@ -1220,6 +1221,17 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, 
 						}
 					}
 
+					bool rareGet = false;
+					for (auto& r : rare)
+					{
+						if (!r.rareFlag)continue;
+						rareGet = true;
+						break;
+					}
+
+					StaminaItemMgr::Instance()->GenerateCrash(pos, StaminaItemMgr::GENERATE_STATUS::CRASH, &pos, 
+						rareGet ? StaminaItem::CHARA_ID::RARE_SCORE : StaminaItem::CHARA_ID::SCORE, partner.lock()->pos);
+
 				}
 
 				// 壊れないブロックに当たったらふっとばすようにする。
@@ -1489,6 +1501,7 @@ void CharacterInterFace::FinishSwing()
 
 void CharacterInterFace::HealStamina(const int &HealAmount)
 {
+	return;
 	if (HealAmount)healAuraEaseRate = 0.0f;
 	staminaGauge->AddStamina(HealAmount);
 	OnStaminaHeal(HealAmount);

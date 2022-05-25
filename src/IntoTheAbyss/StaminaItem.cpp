@@ -34,7 +34,6 @@ void StaminaItem::Init()
 
 void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& ForwardVec, const float& HealAmount, const float& Vel, STAMINA_ITEM_ID ItemID, const bool& IsAcquired, Vec2<float>* CharaPos, CHARA_ID CharaID)
 {
-
 	/*===== ê∂ê¨èàóù =====*/
 
 	// ïœêîÇë„ì¸Ç∑ÇÈÅB
@@ -57,9 +56,14 @@ void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& Fo
 		{
 			graph = GRAPH_HANDLE[STAR_COLOR::LEFT];
 		}
+		else if(CharaID == CHARA_ID::SCORE)
+		{
+			//graph = GRAPH_HANDLE[STAR_COLOR::RIGHT];
+			graph = GRAPH_HANDLE[STAR_COLOR::PIRPLE];
+		}
 		else
 		{
-			graph = GRAPH_HANDLE[STAR_COLOR::RIGHT];
+			graph = GRAPH_HANDLE[STAR_COLOR::YELLOW];
 		}
 	}
 
@@ -232,7 +236,8 @@ void StaminaItem::Acquire(Vec2<float>* CharaPos, CHARA_ID CharaID)
 	}
 	else
 	{
-		graph = GRAPH_HANDLE[STAR_COLOR::RIGHT];
+		//graph = GRAPH_HANDLE[STAR_COLOR::RIGHT];
+		graph = GRAPH_HANDLE[STAR_COLOR::PIRPLE];
 	}
 
 }

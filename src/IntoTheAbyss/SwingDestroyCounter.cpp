@@ -42,7 +42,6 @@ void SwingDestroyCounter::Init()
 #include"ScoreManager.h"
 void SwingDestroyCounter::AllExit()
 {
-
 	/*===== ‚·‚×‚Ä‚ğExitó‘Ô‚É‚·‚é =====*/
 
 	for (int index = 0; index < DESTROY_COUNTER; ++index) {
