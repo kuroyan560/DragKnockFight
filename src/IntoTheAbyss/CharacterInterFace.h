@@ -119,6 +119,7 @@ public:
 
 	static bool isDebugModeStrongSwing;		// デバッグ用で壁に当たるまでスイング
 	Vec2<float>size;	//サイズ
+	Vec2<float> bounceVel;	// バウンドで紐が伸びるやつの移動量 velをそのまま使うと色々バグりそうなので新設しました。
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
