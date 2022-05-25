@@ -68,7 +68,9 @@ StageMgr::StageMgr()
 
 	vector<int>tmp2(12);
 	TexHandleMgr::LoadDivGraph("resource/IntoTheAbyss/chip_spark.png", 12, { 12,1 }, tmp2.data());
-	animationData.push_back(std::make_shared<MapChipAnimationData>(tmp2, 10));
+	vector<int>tmp3(1);
+	tmp3[0] = tmp2[0];
+	animationData.push_back(std::make_shared<MapChipAnimationData>(tmp3, 10));
 
 	//std::string rootFilePass = "Resource/MapChipData/";
 	std::string rootFilePass = "resource/ChainCombat/MapChipData/";

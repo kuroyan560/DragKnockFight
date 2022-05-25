@@ -670,7 +670,8 @@ void Game::Update(const bool& Loop)
 	// スタミナアイテムの当たり判定処理
 	int healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Left()->pos, 30, 70, StaminaItem::CHARA_ID::LEFT, CharacterManager::Instance()->Left()->GetPilotPosPtr());
 	CharacterManager::Instance()->Left()->HealStamina(healAmount);
-	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 90, 70, StaminaItem::CHARA_ID::RIGHT, CharacterManager::Instance()->Right()->GetPilotPosPtr());
+	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 90, 70, StaminaItem::CHARA_ID::SCORE, CharacterManager::Instance()->Right()->GetPilotPosPtr());
+	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 90, 70, StaminaItem::CHARA_ID::RARE_SCORE, CharacterManager::Instance()->Right()->GetPilotPosPtr());
 	CharacterManager::Instance()->Right()->HealStamina(healAmount);
 
 

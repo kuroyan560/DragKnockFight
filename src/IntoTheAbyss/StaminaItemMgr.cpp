@@ -32,35 +32,32 @@ void StaminaItemMgr::GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STAT
 	float rate = 0;
 
 	// 位置関係に応じて生成する量を増やす。
-	switch (CharaID)
+	if (CharaID == StaminaItem::CHARA_ID::LEFT)
 	{
-	case StaminaItem::CHARA_ID::LEFT:
-
 		// 半分より左に行ってなかったら処理を飛ばす。
-		if (areaHalfPos < SwingCharaPos.x) break;
+		if (!(areaHalfPos < SwingCharaPos.x))
+		{
+			// 増やすべき割合を求める。
+			rate = SwingCharaPos.x / areaHalfPos;
 
-		// 増やすべき割合を求める。
-		rate = SwingCharaPos.x / areaHalfPos;
-
-		// 増やす。
-		generateCount += (1.0f - rate) * ADD_GENERATE_CRASH;
-
-		break;
-	case StaminaItem::CHARA_ID::RIGHT:
-
-		// 半分より右に行ってなかったら処理を飛ばす。
-		if (SwingCharaPos.x < areaHalfPos) break;
-
-		// 増やすべき割合を求める。
-		rate = (SwingCharaPos.x - areaHalfPos) / areaHalfPos;
-
-		// 増やす。
-		generateCount += rate * ADD_GENERATE_CRASH;
-
-		break;
-	default:
-		break;
+			// 増やす。
+			generateCount += (1.0f - rate) * ADD_GENERATE_CRASH;
+		}
 	}
+	else if (CharaID == StaminaItem::CHARA_ID::SCORE || CharaID == StaminaItem::CHARA_ID::RARE_SCORE)
+	{
+		// 半分より右に行ってなかったら処理を飛ばす。
+		if (!(SwingCharaPos.x < areaHalfPos))
+		{
+			// 増やすべき割合を求める。
+			rate = (SwingCharaPos.x - areaHalfPos) / areaHalfPos;
+
+			// 増やす。
+			generateCount += rate * ADD_GENERATE_CRASH;
+		}
+	}
+
+	generateCount = GENERATE_CRASH;
 
 	for (int generate = 0; generate < generateCount; ++generate) {
 
@@ -209,7 +206,7 @@ int StaminaItemMgr::CheckHit(Vec2<float>* CharaPos, const float& CharaRadius, co
 	std::vector<int>seHandles;
 	for (int i = 0; i < getNum; ++i)
 	{
-		seHandles.emplace_back(SE[KuroFunc::GetRand(1)]);
+		//seHandles.emplace_back(SE[KuroFunc::GetRand(1)]);
 	}
 	AudioApp::Instance()->PlayWaveArray(seHandles);
 
