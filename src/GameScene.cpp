@@ -94,8 +94,6 @@ void GameScene::OnImguiDebug()
 	ImGui::Text("Left Right:SelectStageOrRoom");
 	ImGui::Text("B Key / Home Button :StageSelectScene");
 	ImGui::Text("Return / A Button:Done");
-	ImGui::Checkbox("StrongSwing", &CharacterManager::Instance()->Left()->isDebugModeStrongSwing);
-	ImGui::SliderInt("ConsecutiveSwingDelay", &CharacterManager::Instance()->Left()->CONSECUTIVE_SWING_TIMER, 1, 30);
 	ImGui::End();
 
 
