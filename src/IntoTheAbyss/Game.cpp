@@ -465,7 +465,7 @@ void Game::Update(const bool& Loop)
 		}
 		{
 			Vec2<float> sub = CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos;
-			playerHandMgr->Hold(-sub.GetNormal(), CharacterManager::Instance()->Left()->prevSwingFlag || CharacterManager::Instance()->Left()->GetNowSwing());
+			playerHandMgr->Hold(-sub.GetNormal(), true);
 			playerHandMgr->Update(CharacterManager::Instance()->Left()->pos);
 		}
 	}
