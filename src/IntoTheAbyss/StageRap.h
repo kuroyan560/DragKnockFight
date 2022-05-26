@@ -8,10 +8,11 @@ class StageRap
 public:
 	StageRap();
 
-	void Init();
+	void Init(int RAP_MAX_NUM);
 	void Update();
 	void Draw();
 
+	void Increment();
 private:
 	Vec2<float>pos,size;
 	int rapNum, rapMaxNum;

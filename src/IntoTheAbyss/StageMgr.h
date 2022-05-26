@@ -396,12 +396,15 @@ public:
 		}
 	};
 
+	//マップのインデックスのサイズを取得
+	Vec2<int>GetMapIdxSize()
+	{
+		return Vec2<int>(localRoomMapChipArray[0].size(), localRoomMapChipArray.size());
+	}
 	//マップの座標上のサイズを取得
 	Vec2<float>GetMapGrobalSize()
 	{
-		//インデックスのサイズ
-		Vec2<int>size(localRoomMapChipArray[0].size(), localRoomMapChipArray.size());
-		return size.Float() * MAP_CHIP_SIZE;
+		return GetMapIdxSize().Float() * MAP_CHIP_SIZE;
 	}
 
 	const int GetChipGraoh(const int& ChipType)

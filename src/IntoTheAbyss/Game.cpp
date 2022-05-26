@@ -336,7 +336,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	mapChipGenerator[DebugParameter::Instance()->generator]->Init();
 
-	stageRap.Init();
+	stageRap.Init(3);
 }
 
 Game::Game()
@@ -397,6 +397,7 @@ Game::Game()
 		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, false);
 	}
 
+	mapChipGenerator[NON_GENERATE] = std::make_shared<MapChipGenerator_Non>();
 	mapChipGenerator[SPLINE_ORBIT] = std::make_shared<MapChipGenerator_SplineOrbit>();
 	mapChipGenerator[RAND_PATTERN] = std::make_shared<MapChipGenerator_RandPattern>();
 	mapChipGenerator[CHANGE_MAP] = std::make_shared<MapChipGenerator_ChangeMap>();
@@ -424,7 +425,6 @@ void Game::Init(const bool& PracticeMode)
 
 void Game::Update(const bool& Loop)
 {
-
 	if (UsersInput::Instance()->KeyOnTrigger(DIK_R))
 	{
 		int stageNum = SelectStage::Instance()->GetStageNum();
@@ -621,7 +621,8 @@ void Game::Update(const bool& Loop)
 	// スタミナアイテムの当たり判定処理
 	int healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Left()->pos, 30, 70, StaminaItem::CHARA_ID::LEFT, CharacterManager::Instance()->Left()->GetPilotPosPtr());
 	CharacterManager::Instance()->Left()->HealStamina(healAmount);
-	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 90, 70, StaminaItem::CHARA_ID::RIGHT, CharacterManager::Instance()->Right()->GetPilotPosPtr());
+	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 90, 70, StaminaItem::CHARA_ID::SCORE, CharacterManager::Instance()->Right()->GetPilotPosPtr());
+	healAmount = StaminaItemMgr::Instance()->CheckHit(&CharacterManager::Instance()->Right()->pos, 90, 70, StaminaItem::CHARA_ID::RARE_SCORE, CharacterManager::Instance()->Right()->GetPilotPosPtr());
 	CharacterManager::Instance()->Right()->HealStamina(healAmount);
 
 
@@ -650,13 +651,13 @@ void Game::Update(const bool& Loop)
 			zoomRate = 0.0f;
 		}
 		static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
-		Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
+		ScrollMgr::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
 
 		// カメラのズームが0.27f未満にならないようにする。
 		float minZoomValue = 0.20f;
-		if (Camera::Instance()->zoom < minZoomValue)
+		if (ScrollMgr::Instance()->zoom < minZoomValue)
 		{
-			Camera::Instance()->zoom = minZoomValue;
+			ScrollMgr::Instance()->zoom = minZoomValue;
 		}
 	}
 	else {
@@ -1063,7 +1064,6 @@ void Game::Scramble()
 
 void Game::CalCenterPos()
 {
-
 	/*===== 中心点を求める処理 =====*/
 
 	// 本当はScrambleの一番うしろに入れていた処理なんですが、押し戻しをした後に呼ぶ必要が出てきたので関数で分けました。

@@ -93,6 +93,14 @@ void Boss::OnInit()
 	initShakeFalg = false;
 	bossScale = { 0.7f,0.7f };
 
+	flashTimer = 0;
+	flashMaxTimer[FIRST_LEVEL] = 120;
+	flashMaxTimer[SECOND_LEVEL] = 60;
+	flashMaxTimer[THIRD_LEVEL] = 30;
+
+	crashMaxNum[FIRST_LEVEL] = 100;
+	crashMaxNum[SECOND_LEVEL] = 500;
+	crashMaxNum[THIRD_LEVEL] = 1000;
 }
 
 #include"Camera.h"
@@ -161,6 +169,7 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	{
 		bossGraphRadian = 0.0f;
 	}
+
 
 
 
@@ -258,6 +267,38 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	// 移動量に関する変数をここで全てvelに代入する。
 	vel = CharacterAIOrder::Instance()->vel;
 
+
+	//現在壊したブロックの数
+	int crashNum = 0;
+
+	//壊したブロックの数によって段階を分ける----------------------------------------------
+	if (crashNum < crashMaxNum[FIRST_LEVEL])
+	{
+		bossCrashModel = NONE_LEVEL;
+	}
+	if (crashMaxNum[FIRST_LEVEL] <= crashNum)
+	{
+		bossCrashModel = FIRST_LEVEL;
+	}
+	if (crashMaxNum[SECOND_LEVEL] <= crashNum)
+	{
+		bossCrashModel = SECOND_LEVEL;
+	}
+	if (crashMaxNum[THIRD_LEVEL] <= crashNum)
+	{
+		bossCrashModel = THIRD_LEVEL;
+	}
+	//壊したブロックの数によって段階を分ける----------------------------------------------
+
+	//フラッシュする----------------------------------------------
+	if (bossCrashModel != NONE_LEVEL && flashMaxTimer[bossCrashModel] <= flashTimer)
+	{
+		stagingDevice.Flash(flashMaxTimer[bossCrashModel], 0.7f);
+		flashTimer = 0;
+	}
+	++flashTimer;
+	//フラッシュする----------------------------------------------
+
 }
 
 #include"DrawFunc_FillTex.h"
@@ -268,7 +309,27 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
 	auto drawPos = pos + stagingDevice.GetShake();
 	auto drawScale = stagingDevice.GetExtRate() * SCALE * appearExtRate;
-	static auto CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 0, 0, 255));
+
+	static std::shared_ptr<TextureBuffer> CRASH_TEX = {};
+
+	//フラッシュする色を変える----------------------------------------------
+	switch (bossCrashModel)
+	{
+	case Boss::FIRST_LEVEL:
+
+		CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(255, 255, 255, 255));
+		break;
+	case Boss::SECOND_LEVEL:
+		CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(0, 0, 255, 255));
+		break;
+	case Boss::THIRD_LEVEL:
+		CRASH_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(0, 255, 0, 255));
+		break;
+	default:
+		break;
+	}
+	//フラッシュする色を変える----------------------------------------------
+
 
 	if (!initPaticleFlag)
 	{

@@ -58,10 +58,9 @@ Vec2<float> MapChipCollider::CalIntersectPoint(Vec2<float> posA1, Vec2<float> po
 	return Vec2<float>(posA1.x + (posA2.x - posA1.x) * t, posA1.y + (posA2.y - posA1.y) * t);
 }
 
-INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& vel, const Vec2<float>& size, const vector<vector<int>>& mapChipData, Vec2<int>& hitChipIndex)
+INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& vel, const Vec2<float>& size, const vector<vector<int>>& mapChipData, Vec2<int>& hitChipIndex, bool OnlyUnBrokenBlock)
 {
 	/*===== マップチップとプレイヤーの当たり判定 =====*/
-
 
 	// プレイヤーの移動量を取得
 	Vec2<float> lineStartPos = prevFramePos;
@@ -74,6 +73,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 		// マップの横
 		const int WIDTH = mapChipData[height].size();
 		for (int width = 0; width < WIDTH; ++width) {
+
+			//壊れないブロックとのみ当たり判定を取る
+			if (OnlyUnBrokenBlock)
+			{
+				if (mapChipData[height][width] != MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)continue;
+			}
 
 			// マップIDが0だったら処理を飛ばす。
 			if (!(mapChipSizeData.min <= mapChipData[height][width] && mapChipData[height][width] <= mapChipSizeData.max)) continue;
@@ -322,7 +327,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 	return INTERSECTED_NONE;
 }
 
-INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& size, const vector<vector<int>>& mapChipData, const INTERSECTED_LINE& direction, Vec2<int>& hitChipIndex)
+INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& size, const vector<vector<int>>& mapChipData, const INTERSECTED_LINE& direction, Vec2<int>& hitChipIndex, bool OnlyUnBrokenBlock)
 {
 	/*===== マップチップとプレイヤーの当たり判定 =====*/
 
@@ -371,7 +376,6 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 
 	}
 
-
 	const int HEIGHT = mapChipData.size();
 	SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 	for (int height = 0; height < HEIGHT; ++height) {
@@ -379,6 +383,12 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 		// マップの横
 		const int WIDTH = mapChipData[height].size();
 		for (int width = 0; width < WIDTH; ++width) {
+
+			//壊れないブロックとのみ当たり判定を取る
+			if (OnlyUnBrokenBlock)
+			{
+				if (mapChipData[height][width] != MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)continue;
+			}
 
 			// マップIDが0だったら処理を飛ばす。
 			if (!(mapChipSizeData.min <= mapChipData[height][width] && mapChipData[height][width] <= mapChipSizeData.max)) continue;

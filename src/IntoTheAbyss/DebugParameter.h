@@ -143,5 +143,7 @@ public:
 
 	int timer;
 	int totalCombo;
+
+	bool hitPlayer;
 };
 

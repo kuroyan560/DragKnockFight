@@ -23,7 +23,7 @@ void BlockCount::Update()
 	nowNumber = CountNumber(countLocalAllBlockNum);
 	maxNumber = CountNumber(countAllBlockNum);
 
-	basePos = { 1280.0f / 2.0f - 200.0f,50.0f };
+	basePos = { 1280.0f / 2.0f - 200.0f,90.0f };
 }
 
 void BlockCount::Draw()
@@ -31,12 +31,13 @@ void BlockCount::Draw()
 	Vec2<float>texSize(48.0f, 44.0f);
 	Vec2<float>centralPos;
 	int offset = 0;
-	float size = 0.8f;
+	float size = 0.4f;
 	//����
 	for (int i = 0; i < nowNumber.size(); i++)
 	{
 		offset = i;
-		centralPos = { basePos.x + i * texSize.x, basePos.y };
+
+		centralPos = { 65.0f + basePos.x + (i * texSize.x - 15.0f * i), basePos.y };
 		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[nowNumber[i]]));
 	}
 
@@ -48,7 +49,7 @@ void BlockCount::Draw()
 	//�ő�
 	for (int i = 0; i < maxNumber.size(); i++)
 	{
-		centralPos = { basePos.x + (offset + i) * texSize.x, basePos.y };
+		centralPos = { basePos.x - 17.0f + (offset + i) * texSize.x - 15.0f * i, basePos.y };
 		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[maxNumber[i]]));
 	}
 }

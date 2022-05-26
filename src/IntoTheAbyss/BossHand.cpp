@@ -46,6 +46,7 @@ void BossHand::Update(const Vec2<float> &POS, float RADIUS, float ANGLE, bool HO
 
 void BossHand::Draw(bool SCROL_ON)
 {
+	return;
 	if (SCROL_ON)
 	{
 		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), size * ScrollMgr::Instance()->zoom, radian, TexHandleMgr::GetTexBuffer(nowHnadle));

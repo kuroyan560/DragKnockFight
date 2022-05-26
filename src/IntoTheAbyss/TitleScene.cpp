@@ -54,7 +54,7 @@ void TitleScene::OnUpdate()
 	//チュートリアル選択画面
 	if (tutorialQuestion)
 	{
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT, 0.0f))
 		{
 			AudioApp::Instance()->PlayWave(SE);
 			if (!tutorialSelect)tutorialSelect = true;
@@ -63,7 +63,7 @@ void TitleScene::OnUpdate()
 				tutorialYes = true;
 			}
 		}
-		else if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_RIGHT))
+		else if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_RIGHT, 0.0f))
 		{
 			AudioApp::Instance()->PlayWave(SE);
 			if (!tutorialSelect)tutorialSelect = true;

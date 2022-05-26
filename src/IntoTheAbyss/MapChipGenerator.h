@@ -4,6 +4,7 @@
 #include<vector>
 static const enum MAP_CHIP_GENERATOR 
 {
+	NON_GENERATE,
 	SPLINE_ORBIT,
 	RAND_PATTERN,
 	CHANGE_MAP,
@@ -21,6 +22,14 @@ public:
 	virtual void Init() = 0;
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
+};
+
+class MapChipGenerator_Non : public MapChipGenerator
+{
+public:
+	void Init()override {};
+	void Update()override {};
+	void Draw()override {};
 };
 
 //‚Æ‚è‚ ‚¦‚¸ƒXƒvƒ‰ƒCƒ“‚Å“®‚­‚æ‚¤‚É

@@ -1,5 +1,6 @@
 #include "DebugParameter.h"
 #include"SelectStage.h"
+#include"CharacterInterFace.h"
 
 DebugParameter::DebugParameter()
 {
@@ -48,6 +49,8 @@ DebugParameter::DebugParameter()
 	comboResetDist = 300.0f;
 	emitRare = 1.0f;
 	emitBounce = 2.0f;
+
+	hitPlayer = false;
 }
 
 void DebugParameter::Update()
@@ -118,11 +121,16 @@ void DebugParameter::DrawImGui()
 
 		ImGui::Separator();
 
+		ImGui::Checkbox("PlayerCheckHit", &hitPlayer);
+
+		ImGui::Separator();
+
 		ImGui::InputFloat("SWING_ANGLE", &swingAngle);
 		//ImGui::Checkbox("useFinishSwing", &useFinishSwingFlag);
 		ImGui::InputFloat("ComboResetDist", &comboResetDist);
 		ImGui::Checkbox("StrongSwing", &CharacterManager::Instance()->Left()->isDebugModeStrongSwing);
 		ImGui::SliderInt("ConsecutiveSwingDelay", &CharacterManager::Instance()->Left()->CONSECUTIVE_SWING_TIMER, 1, 30);
+		ImGui::SliderInt("AddLineLengthValue", &CharacterManager::Instance()->Left()->ADD_LINE_LENGTH_VEL, 1, 30);
 
 		ImGui::Separator();
 		changeGenerator = ImGui::SliderInt("chipGenerator", &generator, 0, MAP_CHIP_GENERATOR_NUM - 1);

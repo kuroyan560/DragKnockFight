@@ -20,7 +20,7 @@ private:
 	const int SPONE_TIMER = 60;	// アイテムが自動スポーンするタイマー
 	const int SPONE_COUNT = 3;	// 一回のスポーンでアイテムがすぽーんする数
 
-	const int GENERATE_CRASH = 5;		// クラッシュ時に生成するアイテム
+	const int GENERATE_CRASH = 3;		// クラッシュ時に生成するアイテム
 	const int ADD_GENERATE_CRASH = 10;	// クラッシュ時に生成するアイテム
 	const float HEAL_AMOUNT = 20;	// アイテム1個のヒール量
 	const float CRASH_VEL = 20;		// クラッシュした際にアイテムが広がる量(演出用)
