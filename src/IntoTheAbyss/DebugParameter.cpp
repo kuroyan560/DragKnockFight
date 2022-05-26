@@ -51,6 +51,8 @@ DebugParameter::DebugParameter()
 	emitBounce = 2.0f;
 
 	hitPlayer = false;
+
+	canDestroyBounceVel = 2.0f;
 }
 
 void DebugParameter::Update()
@@ -131,6 +133,7 @@ void DebugParameter::DrawImGui()
 		ImGui::Checkbox("StrongSwing", &CharacterManager::Instance()->Left()->isDebugModeStrongSwing);
 		ImGui::SliderInt("ConsecutiveSwingDelay", &CharacterManager::Instance()->Left()->CONSECUTIVE_SWING_TIMER, 1, 30);
 		ImGui::SliderInt("AddLineLengthValue", &CharacterManager::Instance()->Left()->ADD_LINE_LENGTH_VEL, 1, 30);
+		ImGui::InputFloat("CanDestroyBoundVel", &canDestroyBounceVel);
 
 		ImGui::Separator();
 		changeGenerator = ImGui::SliderInt("chipGenerator", &generator, 0, MAP_CHIP_GENERATOR_NUM - 1);
