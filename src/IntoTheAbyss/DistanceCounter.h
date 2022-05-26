@@ -1,6 +1,7 @@
 #pragma once
 #include "Vec.h"
 #include "Singleton.h"
+#include <array>
 
 class DistanceCounter : public Singleton<DistanceCounter> {
 
@@ -12,6 +13,8 @@ public:
 	Vec2<float> lineCenterPos;	// 2キャラ間の中心点の座標
 
 	const float DEAD_LINE = 300.0f;		// 当たったら終わりの距離
+
+	std::array<int, 12> fontGraph;
 
 
 public:
