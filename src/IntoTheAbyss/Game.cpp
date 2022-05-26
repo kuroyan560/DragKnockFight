@@ -49,6 +49,7 @@
 #include "RoundFinishEffect.h"
 
 #include "RoundFinishParticle.h"
+#include "DistanceCounter.h"
 
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
@@ -383,8 +384,6 @@ Game::Game()
 
 	GameTimer::Instance()->Init(120);
 
-	StageMgr::Instance()->GetMapChipType(0, 0, Vec2<int>(20, 20));
-	StageMgr::Instance()->WriteMapChipData(Vec2<int>(20, 20), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 	{
 		std::string bossFilePass = "resource/ChainCombat/boss/0/arm/";
@@ -671,12 +670,11 @@ void Game::Update(const bool& Loop)
 
 
 	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
-	const float BOUNCE_DISTANCE = 300.0f; // ある程度の距離
 	bool isBlockEmpty = countBlock.CheckNowNomberIsZero();
-	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE || isBlockEmpty) {
+	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty) {
 		//if (isBlockEmpty) {
 
-			// 終了演出が行われていなかったら
+		// 終了演出が行われていなかったら
 		if (!roundFinishFlag) {
 
 			roundFinishFlag = true;
@@ -689,6 +687,9 @@ void Game::Update(const bool& Loop)
 		}
 
 	}
+
+	// 紐の距離を計算するクラスを更新する。
+	DistanceCounter::Instance()->Update();
 
 }
 
@@ -734,53 +735,61 @@ void Game::Draw()
 	if (roundChangeEffect.initGameFlag)
 	{
 		//左プレイヤー～中央のチェイン
-		auto& left = CharacterManager::Instance()->Left();
-		Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
-		Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
-		if (0.0f < left->addLineLength)
-		{
-			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(left->pos), ScrollMgr::Instance()->Affect(leftChainBorderPos),
-				TexHandleMgr::GetTexBuffer(PLAYER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-		}
+		//auto& left = CharacterManager::Instance()->Left();
+		//Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
+		//Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
+		//if (0.0f < left->addLineLength)
+		//{
+		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(left->pos), ScrollMgr::Instance()->Affect(leftChainBorderPos),
+		//		TexHandleMgr::GetTexBuffer(PLAYER_CHAIN_GRAPH), CHAIN_THICKNESS);
+		//}
 
-		//右プレイヤー～中央のチェイン
-		auto& right = CharacterManager::Instance()->Right();
-		Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
-		Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
-		if (0.0f < right->addLineLength)
-		{
-			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(right->pos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
-				TexHandleMgr::GetTexBuffer(ENEMY_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-		}
+		////右プレイヤー～中央のチェイン
+		//auto& right = CharacterManager::Instance()->Right();
+		//Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
+		//Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
+		//if (0.0f < right->addLineLength)
+		//{
+		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(right->pos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
+		//		TexHandleMgr::GetTexBuffer(ENEMY_CHAIN_GRAPH), CHAIN_THICKNESS);
+		//}
 
-		float charaDistance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
-		//中央チェイン
-		if (charaDistance < CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f) {
+		//float charaDistance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
+		////中央チェイン
+		//if (charaDistance < CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f) {
 
-			// 既定値より短かったら。
-			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos),
-				TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+		//	// 既定値より短かったら。
+		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos),
+		//		TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);
 
-		}
-		else {
+		//}
+		//else {
 
-			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftChainBorderPos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
-				TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
+		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftChainBorderPos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
+		//		TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);
 
-		}
+		//}
+
+		// 左のキャラ ~ 右のキャラ間に線を描画
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);
 
 		// 線分の中心に円を描画
-		if (roundChangeEffect.drawFightFlag)
+		/*if (roundChangeEffect.drawFightFlag)
 		{
 			static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
 			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos), Vec2<float>(ScrollMgr::Instance()->zoom, ScrollMgr::Instance()->zoom), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
-		}
+		}*/
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 
-		mapChipGenerator->Draw();
-	}
+		// 線分の中心に円を描画
+		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos), Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 
-	roundChangeEffect.Draw();
+		mapChipGenerator->Draw();
+
+		DistanceCounter::Instance()->Draw();
+
+	}
 
 	if (roundChangeEffect.initGameFlag || drawCharaFlag)
 	{
@@ -789,6 +798,8 @@ void Game::Draw()
 		CharacterManager::Instance()->Left()->Draw(readyToStartRoundFlag);
 		CharacterManager::Instance()->Right()->Draw(readyToStartRoundFlag);
 	}
+
+	roundChangeEffect.Draw();
 
 	// クラッシュ時の演出の描画処理。
 	CrashEffectMgr::Instance()->Draw();

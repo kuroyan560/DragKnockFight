@@ -26,6 +26,9 @@ void StageSelectScene::OnInitialize()
 	leftChara.Init(Vec2<float>(-550.0f, 881.0f), leftCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/luna.png"));
 	Vec2<float> rightCharaPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x * 1.75f - 55.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y - 7.0f));
 	rightChara.Init(Vec2<float>(1830.0f, 881.0f), rightCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/lacy.png"));
+
+	isPrevInputStickRight = false;
+	isPrevInputSticlLeft = false;
 }
 
 void StageSelectScene::OnUpdate()
@@ -103,8 +106,14 @@ void StageSelectScene::OnUpdate()
 			KuroEngine::Instance().ChangeScene(0, changeScene);
 		}
 
+		// 入力の更新処理
+		Vec2<float> leftStickInput = UsersInput::Instance()->GetLeftStickVecFuna(0);
+		leftStickInput /= {32768.0f, 32768.0f};
+		bool isInputRight = 0.9 <= leftStickInput.x;
+		bool isInputLeft = leftStickInput.x <= -0.9f;
+
 		//ステージ番号を増やす
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_RIGHT))
+		if (!isPrevInputStickRight && isInputRight)
 		{
 			++stageNum;
 			screenShot.Next();
@@ -114,7 +123,7 @@ void StageSelectScene::OnUpdate()
 			leftArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
 		}
 		//ステージ番号を減らす
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
+		if (!isPrevInputSticlLeft && isInputLeft)
 		{
 			--stageNum;
 			screenShot.Prev();
@@ -123,6 +132,9 @@ void StageSelectScene::OnUpdate()
 			leftArrow.SetExpSize(Vec2<float>(0.5f, 0.5f));
 			rightArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
 		}
+
+		isPrevInputStickRight = isInputRight;
+		isPrevInputSticlLeft = isInputLeft;
 
 		if (STAGE_MAX_NUM <= stageNum)
 		{
