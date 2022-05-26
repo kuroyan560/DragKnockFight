@@ -291,8 +291,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//responePos.y += 50;
 	lineCenterPos = playerResponePos - cameraBasePos;
 
-	Vec2<float>plPos(StageMgr::Instance()->GetPlayerResponePos());
-	Vec2<float>enPos(StageMgr::Instance()->GetBossResponePos());
+	Vec2<float>plPos(StageMgr::Instance()->GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()));
+	Vec2<float>enPos(StageMgr::Instance()->GetBossResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()));
 
 	CharacterManager::Instance()->CharactersInit(plPos, enPos, !practiceMode);
 
@@ -338,8 +338,6 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	}
 
 	mapChipGenerator->Init();
-
-	stageRap.Init(3);
 
 
 	countBlock.Init();
@@ -417,8 +415,8 @@ void Game::Init(const bool& PracticeMode)
 
 	CharacterManager::Instance()->CharactersGenerate();
 
-	InitGame(SelectStage::Instance()->GetStageNum(), 0);
 	SelectStage::Instance()->SelectRoomNum(0);
+	InitGame(SelectStage::Instance()->GetStageNum(), 0);
 	ScrollMgr::Instance()->Reset();
 	roundChangeEffect.Init();
 	CrashEffectMgr::Instance()->Init();
@@ -428,6 +426,7 @@ void Game::Init(const bool& PracticeMode)
 	drawCharaFlag = false;
 	RoundFinishEffect::Instance()->Init();
 
+	stageRap.Init(StageMgr::Instance()->GetMaxLap(SelectStage::Instance()->GetStageNum()));
 }
 
 void Game::Update(const bool& Loop)
@@ -1355,7 +1354,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 		const int nowRoomNum = SelectStage::Instance()->GetRoomNum();
 
 		if (RoundFinishEffect::Instance()->changeMap &&
-			!StageMgr::Instance()->HaveMap(SelectStage::Instance()->GetStageNum(), nowRoomNum + 1) && RoundFinishEffect::Instance()->changeMap)
+			!SelectStage::Instance()->HaveNextLap() && RoundFinishEffect::Instance()->changeMap)
 		{
 			ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
 			if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
@@ -1387,6 +1386,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 				mapChipGenerator->RegisterMap();
 				RoundFinishEffect::Instance()->changeMap = false;
 				countBlock.Init();
+				stageRap.Increment();
 
 				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 			}

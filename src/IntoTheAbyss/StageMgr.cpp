@@ -529,13 +529,13 @@ int StageMgr::GetEnableToUseStageNumber()
 	return count;
 }
 
-Vec2<float>StageMgr::GetPlayerResponePos()
+Vec2<float>StageMgr::GetPlayerResponePos(const int& StageNum, const int& RoomNum)
 {
-	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
+	for (int y = 0; y < allMapChipData[StageNum][RoomNum].size(); ++y)
 	{
-		for (int x = 0; x < localRoomMapChipArray[y].size(); ++x)
+		for (int x = 0; x < allMapChipData[StageNum][RoomNum][y].size(); ++x)
 		{
-			if (localRoomMapChipArray[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_PLAYER)
+			if (allMapChipData[StageNum][RoomNum][y][x] == MAPCHIP_TYPE_STATIC_RESPONE_PLAYER)
 			{
 				return Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 			}
@@ -544,13 +544,13 @@ Vec2<float>StageMgr::GetPlayerResponePos()
 	return Vec2<float>(0.0f, 0.0f);
 }
 
-Vec2<float>StageMgr::GetBossResponePos()
+Vec2<float>StageMgr::GetBossResponePos(const int& StageNum, const int& RoomNum)
 {
-	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
+	for (int y = 0; y < allMapChipData[StageNum][RoomNum].size(); ++y)
 	{
-		for (int x = 0; x < localRoomMapChipArray[y].size(); ++x)
+		for (int x = 0; x < allMapChipData[StageNum][RoomNum][y].size(); ++x)
 		{
-			if (localRoomMapChipArray[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_BOSS)
+			if (allMapChipData[StageNum][RoomNum][y][x] == MAPCHIP_TYPE_STATIC_RESPONE_BOSS)
 			{
 				return Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 			}
