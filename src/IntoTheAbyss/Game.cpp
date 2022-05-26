@@ -510,10 +510,10 @@ void Game::Update(const bool& Loop)
 	CharacterManager::Instance()->Left()->SavePrevFramePos();
 	CharacterManager::Instance()->Right()->SavePrevFramePos();
 
-	CharacterManager::Instance()->Left()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag, roundFinishFlag);
+	CharacterManager::Instance()->Left()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag, roundFinishFlag, SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 
 	// ボスの更新処理
-	CharacterManager::Instance()->Right()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag, roundFinishFlag);
+	CharacterManager::Instance()->Right()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag, roundFinishFlag, SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	//}
 
 	CharacterAIData::Instance()->nowPos = CharacterManager::Instance()->Right()->pos;
@@ -1352,6 +1352,9 @@ void Game::RoundFinishEffect(const bool& Loop)
 				countBlock.Init();
 				stageRap.Increment();
 				DistanceCounter::Instance()->isExpSmall = false;
+
+				// ひだりのキャラの貫通振り回しの数を初期化。
+				CharacterManager::Instance()->Left()->nowStrongSwingCount = 0;
 
 				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 			}

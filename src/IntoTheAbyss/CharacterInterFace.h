@@ -122,6 +122,9 @@ public:
 	Vec2<float> bounceVel;	// バウンドで紐が伸びるやつの移動量 velをそのまま使うと色々バグりそうなので新設しました。
 	int CONSECUTIVE_SWING_TIMER;
 
+	int nowStrongSwingCount;		// 今貫通振り回しを何回しているか。
+	int maxStrongSwingCount;		// 何回貫通振り回しができるか。
+
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };
 	std::array<int, HIT_DIR_NUM>mapChipHit;
@@ -225,7 +228,7 @@ public:
 		characterName = Name;
 	}
 	void Init(const Vec2<float>& GeneratePos, const bool& Appear);	//ラウンド開始時に呼び出される
-	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect, const bool& isRoundFinishEffect);
+	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect, const bool& isRoundFinishEffect, const int& NowStageNum, const int& NowRoomNum);
 	void Draw(const bool& isRoundStartEffect);
 	void DrawUI();
 	//当たり判定

@@ -401,6 +401,9 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	initPaticleFlag = false;
 	moveTimer = 0;
 
+	nowStrongSwingCount = 0;
+	maxStrongSwingCount = 0;
+
 	pos = GeneratePos;
 	vel = { 0,0 };
 
@@ -513,8 +516,11 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 }
 
 #include "SlowMgr.h"
-void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect, const bool& isRoundFinishEffect)
+void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect, const bool& isRoundFinishEffect, const int& NowStageNum, const int& NowRoomNum)
 {
+
+	// Œ»ÝU‚è‰ñ‚¹‚éÅ‘å”‚ðŽæ“¾B
+	maxStrongSwingCount = StageMgr::Instance()->GetSwingCount(NowStageNum, NowRoomNum);
 
 	if (isRoundFinishEffect) {
 
@@ -1347,7 +1353,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					{
 						bool dontBrokeFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 18;
 						// ˆê‹C‚É”j‰ó‚·‚éó‘Ô‚¾‚Á‚½‚çFinish‚ðŒÄ‚Î‚È‚¢B
-						if (DebugParameter::Instance()->useFinishSwingFlag || dontBrokeFlag)
+						if (!partner.lock()->isDestroyMode || dontBrokeFlag)
 						{
 							partner.lock()->FinishSwing();
 						}
@@ -1643,6 +1649,7 @@ CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(Hon
 	barrage = std::make_unique<CircularBarrage>();
 	barrage->Init();
 
+	nowStrongSwingCount = 0;
 
 	stopReticleHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png");
 	reticleExp = Vec2<float>(1.0f, 1.0f);

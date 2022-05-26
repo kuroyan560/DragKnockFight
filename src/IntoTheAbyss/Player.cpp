@@ -485,12 +485,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 	// 壁に挟まって判定が無効化されている間は処理を受け付けない。
 	if (0 < GetStackWinTimer()) return;
 
-	// 振り回しているときは入力を受け付けない。
-	//if (nowSwing) return;
-
-	// 振り回されているフラグ
-	bool isSwingPartner = partner.lock()->GetNowSwing();
-
 	// 振り回されている状態の時に踏ん張りの状態になっているかフラグ(実際には踏ん張っていない)。
 	bool isSwingPartnerHold = false;
 
@@ -565,9 +559,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 	Vec2<float> subPos = pos - partner.lock()->pos;
 	swingVec = (subPos).GetNormal();
 
-	// スタミナが残っているか？
-	bool isSwingStamina = staminaGauge->CheckCanAction(SWING_STAMINA);
-
 	// RTが押されたら
 	bool canSwing = (!isInputRightStick && isPrevInputRightStick) || (isInputRightStick && CONSECUTIVE_SWING_TIMER < consecutiveSwingTimer);
 	if ((!nowSwing && canSwing)) {
@@ -595,20 +586,13 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 		isInputSwingRB = isInputRB;
 
+		// 貫通振り回し状態だったら、貫通振り回し状態のカウントを増やす。
+		if (isDestroyMode) {
+			++nowStrongSwingCount;
+		}
+
 		//キャラクターAI用のデータ集め
 		CharacterAIData::Instance()->swingFlag = true;
-	}
-	//else if (isSwingPartner && canSwing && !isGripPowerEmpty && isInputRightStick) {
-	else if (isSwingPartner && canSwing && isInputRightStick) {
-
-		// 先行入力を保存。
-		isAdvancedEntrySwing = true;
-		advancedEntrySwingTimer = ADVANCED_ENTRY_SWING_TIMER;
-	}
-	else
-	{
-		//キャラクターAI用のデータ集め
-		CharacterAIData::Instance()->swingFlag = false;
 	}
 
 	if (!GetNowSwing())
@@ -620,14 +604,11 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	static const int DASH_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/dash.wav", 0.4f);
 
-	// スタミナが残っているか？
-	bool isDashStamina = staminaGauge->CheckCanAction(DASH_STAMINA);
-
 	// 入力のデッドラインを設ける。
 	inputLeftVec = UsersInput::Instance()->GetLeftStickVecFuna(controllerIdx);
 	inputLeftVec /= {32768.0f, 32768.0f};
 	inputRate = inputLeftVec.Length();
-	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate && isDashStamina) {
+	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate) {
 
 		AudioApp::Instance()->PlayWave(DASH_SE);
 
@@ -636,24 +617,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 		const float CANCEL_DASH_SPEED = 35.0f;
 		const float JUST_CANCEL_DASH_SPEED = 40.0f;
 		float speed = 0;
-
-		// 相方が振り回し中だったら。
-		//if (partner.lock()->GetNowSwing()) {
-
-		//	speed = CANCEL_DASH_SPEED;
-
-		//	// ジャスト回避の予測線との当たり判定を行い、マップチップとあたっていたらダッシュ速度を上げる。
-		//	if (CheckHitMapChip(justCancelDashStartPos, justCancelDashEndPos)) {
-
-		//		speed = JUST_CANCEL_DASH_SPEED;
-
-		//	}
-
-		//	// 相方の振り回しを終わらせる。
-		//	partner.lock()->FinishSwing();
-
-		//}
-		//else {
 
 		speed = DASH_SPEED;
 
@@ -685,11 +648,8 @@ void Player::Input(const vector<vector<int>>& MapData)
 		CharacterAIData::Instance()->dashFlag = false;
 	}
 
-	// スタミナが残っているか？
-	isSwingStamina = staminaGauge->CheckCanAction(SWING_STAMINA);
-
 	// 右スティックが入力されていたら、予測線を出す。
-	if (isInputRightStick && isSwingStamina) {
+	if (isInputRightStick) {
 
 		// 時計回りかどうか。負の値が左、正の値が右。
 		inputRightVec.Normalize();
@@ -764,7 +724,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	// 破壊モードかのフラグを保存。
 	isDestroyMode = false;
-	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT)) {
+	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && nowStrongSwingCount < maxStrongSwingCount) {
 
 		isDestroyMode = true;
 
