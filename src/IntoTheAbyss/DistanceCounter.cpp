@@ -49,11 +49,13 @@ void DistanceCounter::Draw()
 	/*===== 描画処理 =====*/
 
 	// インデックスごとにずらす量
-	const float INDEX_OFFSET = 256.0f;
+	const float INDEX_OFFSET = 62.0f;
 	// 描画する数字を決める。
 	const int distanceDisitCount = KuroFunc::GetDigit(distance);
 	// 描画でずらすオフセットの値。
 	const float OFFSET_X = static_cast<float>(distanceDisitCount) / 2.0f;
+	// 描画座標
+	Vec2<float> drawPos = ScrollMgr::Instance()->Affect(lineCenterPos);
 	for (int index = 0; index < distanceDisitCount; ++index) {
 
 		// 描画する数字。
@@ -65,7 +67,7 @@ void DistanceCounter::Draw()
 		zoom = 1.0f - zoom;
 
 		// 描画する。
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos - Vec2<float>((INDEX_OFFSET * zoom) * index, 0)), Vec2<float>(1.0f, 1.0f), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]));
+		DrawFunc::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * index, 0), Vec2<float>(zoom, zoom), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]));
 
 	}
 
