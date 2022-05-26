@@ -58,10 +58,6 @@ std::vector<int> BlockCount::CountNumber(int TIME)
 {
 	float score = TIME;
 	std::vector<int> Number(KuroFunc::GetDigit(TIME));
-	Number[0] = -1;
-	Number[1] = -1;
-	Number[2] = -1;
-	Number[3] = -1;
 
 	int tmp = score;
 	//�X�R�A�v�Z
