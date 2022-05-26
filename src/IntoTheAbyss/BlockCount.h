@@ -14,6 +14,19 @@ public:
 
 	std::vector<int> CountNumber(int TIME);
 
+	inline bool GetNowNumber() {
+
+		bool result = true;
+
+		for (int index = 0; index < nowNumber.size(); ++index) {
+
+			result &= nowNumber[index] == 0;
+
+		}
+
+		return result;
+	}
+
 private:
 	std::vector<int> number;
 	std::vector<int> maxNumber;

@@ -28,6 +28,10 @@ public:
 	bool isEnd;					// 演出が終わったかのフラグ
 	Vec2<float> shakeAmount;	// シェイクさせる処理全般に使用するやつ
 
+	bool isPerfect;				// すべてのブロックを壊したかのフラグ
+	Vec2<float> perfectPos;		// [Perfect]の座標
+	Vec2<float> perfectExp;		// [Perfect]の拡縮
+
 	// 各ステータスの時間
 	const int NUM1_ZOOMIN_TIMER = 90;
 	const int NUM2_ENEMY_SHAKE_TIMER = 120;
@@ -35,6 +39,8 @@ public:
 	const int NUM4_RETURN_DEFPOS_TIMER = 120;
 	const int NUM5_RETURN_PLAYER_DEF_POS = 120;
 
+	// パーフェクトの画像の動く量。
+	const float PERFECT_MOVE_POS_Y = 500.0f;
 
 
 public:
@@ -46,7 +52,7 @@ public:
 	void Init();
 
 	// 開始処理
-	void Start();
+	void Start(const bool& IsPerfect);
 
 	// 更新処理
 	void Update(const Vec2<float>& LineCenterPos);

@@ -4,6 +4,8 @@
 #include "StageMgr.h"
 #include "ScoreManager.h"
 #include "WinCounter.h"
+#include "DrawFunc.h"
+#include "ScrollMgr.h"
 
 RoundFinishEffect::RoundFinishEffect()
 {
@@ -29,7 +31,7 @@ void RoundFinishEffect::Init()
 
 }
 
-void RoundFinishEffect::Start()
+void RoundFinishEffect::Start(const bool& IsPerfect)
 {
 
 	/*===== 初期化処理 =====*/
@@ -38,6 +40,7 @@ void RoundFinishEffect::Start()
 	timer = 0;
 	isEnd = false;
 	shakeAmount = Vec2<float>();
+	isPerfect = IsPerfect;
 
 }
 
@@ -103,6 +106,10 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 			RoundFinishParticleMgr::Instance()->Init();
 			RoundFinishParticleMgr::Instance()->Generate(CharacterManager::Instance()->Right()->pos);
 
+			// パーフェクトの画像を動かす。
+			perfectPos = CharacterManager::Instance()->Right()->pos;
+			perfectExp = { 1.0f,1.0f };
+
 		}
 
 		break;
@@ -140,12 +147,21 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		}
 
+		// パーフェクトの画像を動かす。
+		perfectPos.y += ((perfectPos.y + PERFECT_MOVE_POS_Y) - perfectPos.y) / 10.0f;
+		perfectExp.x += (1.0f - perfectExp.x) / 10.0f;
+		perfectExp.y += (1.0f - perfectExp.y) / 10.0f;
+
 
 		break;
 
 	case RoundFinishEffect::EFFECT_STATUS::NUM4_RETURN_DEFPOS:
 
 		/*-- 第四段階 --*/
+
+		// パーフェクトの画像を小さくする。
+		perfectExp.x -= perfectExp.x / 10.0f;
+		perfectExp.y -= perfectExp.y / 10.0f;
 
 		// 座標を規定値に戻す。
 		playerDefPos = StageMgr::Instance()->GetPlayerResponePos();
@@ -161,11 +177,13 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		++timer;
 		if (NUM4_RETURN_DEFPOS_TIMER <= timer) {
 
-			isEnd = true;
+			//isEnd = true;
 			timer = 0;
-			status = EFFECT_STATUS::NUM5_RETURN_PLAYER_DEFPOS;
+			status = EFFECT_STATUS::NUM1_ZOOMIN;
 
-			++WinCounter::Instance()->countRound;
+			//++WinCounter::Instance()->countRound;
+
+			perfectExp = {};
 
 		}
 
@@ -187,7 +205,10 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		if (NUM5_RETURN_PLAYER_DEF_POS <= timer) {
 
-			isEnd = true;
+			//isEnd = true;
+
+			timer = 0;
+			status = EFFECT_STATUS::NUM1_ZOOMIN;
 
 			//++WinCounter::Instance()->countRound;
 
@@ -212,6 +233,8 @@ void RoundFinishEffect::Draw()
 
 	/*===== 描画処理 =====*/
 
+	Vec2<float> perfectExpZoom = { perfectExp.x * ScrollMgr::Instance()->zoom, perfectExp.y * ScrollMgr::Instance()->zoom };
 
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(perfectPos), perfectExpZoom, 0, TexHandleMgr::GetTexBuffer(1));
 
 }

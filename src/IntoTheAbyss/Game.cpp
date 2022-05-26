@@ -673,13 +673,15 @@ void Game::Update(const bool& Loop)
 
 	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
 	const float BOUNCE_DISTANCE = 300.0f; // ある程度の距離
-	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE) {
+	bool isBlockEmpty = countBlock.GetNowNumber();
+	//if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE || isBlockEmpty) {
+	if (isBlockEmpty) {
 
 		// 終了演出が行われていなかったら
 		if (!roundFinishFlag) {
 
 			roundFinishFlag = true;
-			RoundFinishEffect::Instance()->Start();
+			RoundFinishEffect::Instance()->Start(isBlockEmpty);
 
 		}
 
@@ -836,6 +838,9 @@ void Game::Draw()
 		Vec2<float>rightDownPos = *enemyHomeBase.hitBox.center + enemyHomeBase.hitBox.size / 2.0f;
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
+
+	// ラウンド終了時の演出を描画。
+	RoundFinishEffect::Instance()->Draw();
 
 }
 
