@@ -678,13 +678,17 @@ void Game::Update(const bool& Loop)
 	const float BOUNCE_DISTANCE = 300.0f; // ある程度の距離
 	bool isBlockEmpty = countBlock.CheckNowNomberIsZero();
 	//if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE || isBlockEmpty) {
-	if (isBlockEmpty) {
+		if (isBlockEmpty) {
 
-		// 終了演出が行われていなかったら
+			// 終了演出が行われていなかったら
 		if (!roundFinishFlag) {
 
 			roundFinishFlag = true;
-			RoundFinishEffect::Instance()->Start(isBlockEmpty, static_cast<float>(countBlock.GetNowNumberInt()) / static_cast<float>(countBlock.GetMaxNumberInt()));
+
+			float nowBlockCount = countBlock.countNowBlockNum;
+			float maxBclokCount = countBlock.countAllBlockNum;
+			float destroyRate = nowBlockCount / maxBclokCount;
+			RoundFinishEffect::Instance()->Start(isBlockEmpty, 1.0f - destroyRate);
 
 		}
 

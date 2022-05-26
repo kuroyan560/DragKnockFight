@@ -12,15 +12,16 @@ BlockCount::BlockCount()
 
 void BlockCount::Init()
 {
-	int countAllBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
+	countAllBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
 	maxNumber = CountNumber(countAllBlockNum);
+	countNowBlockNum = countAllBlockNum;
 }
 
 
 void BlockCount::Update()
 {
-	int countLocalAllBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
-	nowNumber = CountNumber(countLocalAllBlockNum);
+	countNowBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
+	nowNumber = CountNumber(countNowBlockNum);
 
 	basePos = { 1280.0f / 2.0f - 200.0f,90.0f };
 }

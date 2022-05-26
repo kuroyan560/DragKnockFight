@@ -19,9 +19,9 @@ RoundFinishEffect::RoundFinishEffect()
 	shakeAmount = Vec2<float>();
 
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/perfect.png", 3, Vec2<int>(3, 1), perfectGraph.data());
-	//goodGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/perfect.png");
-	//greatGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/perfect.png");
-	//excellentGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/perfect.png");
+	goodGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
+	greatGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/great.png");
+	excellentGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellent.png");
 
 }
 
@@ -51,7 +51,7 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate)
 	perfectAnimIndex = 0;
 
 	static const float GOOD_PER = 0.5f;
-	static const float GREAT_PER = 8.0f;
+	static const float GREAT_PER = 0.8f;
 
 	// 引数の割合からどの画像を使用するかをチェックする。
 	if (Rate <= GOOD_PER) {
@@ -76,6 +76,8 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 {
 
 	/*===== 更新処理 =====*/
+
+	if (isEnd) return;
 
 	// パーフェクトの画像の動く量。
 	const float PERFECT_MOVE_POS_Y = -15.0f;
@@ -196,8 +198,13 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		/*-- 第四段階 --*/
 
 		// パーフェクトの画像を小さくする。
-		perfectExp.x -= perfectExp.x / 10.0f;
-		perfectExp.y -= perfectExp.y / 10.0f;
+		perfectExp.x -= perfectExp.x / 5.0f;
+		perfectExp.y -= perfectExp.y / 5.0f;
+		if (perfectExp.x <= 0.05f) {
+
+			perfectExp = { 1.0f,1.0f };
+
+		}
 
 		// 座標を規定値に戻す。
 		playerDefPos = StageMgr::Instance()->GetPlayerResponePos();
@@ -213,11 +220,11 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		++timer;
 		if (NUM4_RETURN_DEFPOS_TIMER <= timer) {
 
-			//isEnd = true;
+			isEnd = true;
 			timer = 0;
 			status = EFFECT_STATUS::NUM1_ZOOMIN;
 
-			//++WinCounter::Instance()->countRound;
+			++WinCounter::Instance()->countRound;
 
 			perfectExp = {};
 
@@ -241,12 +248,12 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		if (NUM5_RETURN_PLAYER_DEF_POS <= timer) {
 
-			//isEnd = true;
+			isEnd = true;
 
 			timer = 0;
 			status = EFFECT_STATUS::NUM1_ZOOMIN;
 
-			//++WinCounter::Instance()->countRound;
+			++WinCounter::Instance()->countRound;
 
 		}
 

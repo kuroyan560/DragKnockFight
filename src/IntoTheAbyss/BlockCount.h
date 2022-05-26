@@ -27,37 +27,8 @@ public:
 		return result;
 	}
 
-	// NowNumber‚ğintŒ^‚Å•Ô‚·B
-	inline int GetNowNumberInt() {
-
-		int resultValue = 0;
-
-		const int NOWNUMBER_SIZE = nowNumber.size();
-		for (int index = 0; index < NOWNUMBER_SIZE; ++index) {
-
-			resultValue += nowNumber[index] + (index * 10.0f);
-
-		}
-
-		return resultValue;
-
-	}
-
-	// MaxNumber‚ğintŒ^‚Å•Ô‚·B
-	inline int GetMaxNumberInt() {
-
-		int resultValue = 0;
-
-		const int NOWNUMBER_SIZE = maxNumber.size();
-		for (int index = 0; index < NOWNUMBER_SIZE; ++index) {
-
-			resultValue += maxNumber[index] + (index * 10.0f);
-
-		}
-
-		return resultValue;
-
-	}
+	int countAllBlockNum;
+	int countNowBlockNum;
 
 
 private:

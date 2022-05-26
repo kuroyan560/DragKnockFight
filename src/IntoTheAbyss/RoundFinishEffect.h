@@ -27,6 +27,9 @@ public:
 	int goodGraph;
 	int greatGraph;
 	int excellentGraph;
+
+	int useGraph;
+
 	int perfectAnimTimer;
 	int perfectAnimIndex;
 	float perfectMoveAmount;
@@ -60,7 +63,7 @@ public:
 	void Init();
 
 	// 開始処理
-	void Start(const bool& IsPerfect);
+	void Start(const bool& IsPerfect, const float& Rate);
 
 	// 更新処理
 	void Update(const Vec2<float>& LineCenterPos);
