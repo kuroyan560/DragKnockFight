@@ -333,6 +333,9 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	mapChipGenerator[DebugParameter::Instance()->generator]->Init();
 
 	stageRap.Init(3);
+
+
+	countBlock.Init();
 }
 
 Game::Game()

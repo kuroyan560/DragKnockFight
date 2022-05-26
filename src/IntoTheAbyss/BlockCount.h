@@ -12,7 +12,6 @@ public:
 	void Update();
 	void Draw();
 
-	std::vector<int> CountNumber(int TIME);
 
 private:
 	std::vector<int> number;
@@ -23,4 +22,6 @@ private:
 
 
 	Vec2<float>basePos;
+
+	std::vector<int> CountNumber(int TIME);
 };

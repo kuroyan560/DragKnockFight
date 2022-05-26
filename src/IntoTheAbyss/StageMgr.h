@@ -260,7 +260,7 @@ public:
 	RoomMapChipArray *GetLocalMap();
 	RoomMapChipDrawArray *GetLocalDrawMap();
 
-	int GetAllLocalWallBlocksNum();
+	int GetAllLocalWallBlocksNum(int RARE_BLOCK_COUNT = 10);
 
 	int GetAllWallBlocksNum(int STAGE_NUM, int ROOM_NUM);
 
