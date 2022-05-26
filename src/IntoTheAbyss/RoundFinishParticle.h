@@ -16,8 +16,8 @@ public:
 	bool isActive;
 	bool isReturn;
 
-	const float MIN_MOVE_LENGTH = 50.0f;
-	const float MAX_MOVE_LENGTH = 100.0f;
+	const float MIN_MOVE_LENGTH = 150.0f;
+	const float MAX_MOVE_LENGTH = 200.0f;
 
 
 public:
@@ -47,7 +47,7 @@ public:
 
 	/*===== ÉÅÉìÉoïœêî =====*/
 
-	static const int MAX_PARTICLE = 40;
+	static const int MAX_PARTICLE = 70;
 	std::array<RoundFinishParticle, MAX_PARTICLE> particles;
 
 	std::array<int, 3> particleGraph;

@@ -493,8 +493,8 @@ void Game::Update(const bool& Loop)
 		}
 	}
 	// プレイヤーの更新処理
-	if (!roundFinishFlag)
-	{
+	//if (!roundFinishFlag)
+	//{
 		if (roundChangeEffect.initGameFlag)
 		{
 			DebugParameter::Instance()->timer++;
@@ -509,7 +509,7 @@ void Game::Update(const bool& Loop)
 
 		// ボスの更新処理
 		CharacterManager::Instance()->Right()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag);
-	}
+	//}
 
 	CharacterAIData::Instance()->nowPos = CharacterManager::Instance()->Right()->pos;
 	// プレイヤーとボスの引っ張り合いの処理
@@ -588,6 +588,7 @@ void Game::Update(const bool& Loop)
 
 	// スクロール量の更新処理
 	//ScrollManager::Instance()->Update();
+	Camera::Instance()->Update();
 	Vec2<float> distance = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
 	Vec2<float>cPos = CharacterManager::Instance()->Left()->pos - distance / 2.0f;
 	ScrollMgr::Instance()->Update(cPos);
@@ -596,7 +597,6 @@ void Game::Update(const bool& Loop)
 	ParticleMgr::Instance()->Update();
 
 	//BackGround::Instance()->Update();
-	Camera::Instance()->Update();
 	FaceIcon::Instance()->Update();
 	WinCounter::Instance()->Update();
 
@@ -667,7 +667,7 @@ void Game::Update(const bool& Loop)
 
 
 	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
-	const float BOUNCE_DISTANCE = 100.0f; // ある程度の距離
+	const float BOUNCE_DISTANCE = 300.0f; // ある程度の距離
 	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE) {
 
 		// 終了演出が行われていなかったら
@@ -699,6 +699,9 @@ void Game::Draw()
 	prevDrawChipRoomNum = roomNum;
 	DrawMapChip(*mapData, *mapChipDrawData, stageNum, roomNum);
 
+
+	// ラウンド終了時のパーティクルを描画
+	RoundFinishParticleMgr::Instance()->Draw();
 
 
 	if (roundChangeEffect.readyFlag)
@@ -828,9 +831,6 @@ void Game::Draw()
 		Vec2<float>rightDownPos = *enemyHomeBase.hitBox.center + enemyHomeBase.hitBox.size / 2.0f;
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
-
-	// ラウンド終了時のパーティクルを描画
-	RoundFinishParticleMgr::Instance()->Draw();
 
 }
 
@@ -1314,7 +1314,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 {
 
 	//ラウンド終了演出開始
-	if (roundFinishFlag)
+	if (roundFinishFlag && !readyToStartRoundFlag)
 	{
 		//動けなくする
 		CharacterManager::Instance()->Left()->SetCanMove(false);
@@ -1326,6 +1326,17 @@ void Game::RoundFinishEffect(const bool& Loop)
 		GameTimer::Instance()->SetInterruput(true);
 
 		RoundFinishEffect::Instance()->Update(lineCenterPos);
+		bool isEnd = RoundFinishEffect::Instance()->isEnd;
+
+		if (isEnd) {
+
+
+			readyToStartRoundFlag = true;
+			roundFinishFlag = false;
+			InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+
+
+		}
 
 		//勝利数カウント演出
 		//if (!WinCounter::Instance()->GetNowAnimation())

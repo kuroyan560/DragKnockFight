@@ -495,6 +495,7 @@ const Vec2<float> &StageMgr::GetPlayerResponePos()
 			}
 		}
 	}
+	return Vec2<float>(0.0f,0.0f);
 }
 
 const Vec2<float> &StageMgr::GetBossResponePos()
@@ -509,6 +510,7 @@ const Vec2<float> &StageMgr::GetBossResponePos()
 			}
 		}
 	}
+	return Vec2<float>(0.0f,0.0f);
 }
 
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)

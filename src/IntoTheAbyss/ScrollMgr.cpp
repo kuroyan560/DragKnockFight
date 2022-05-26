@@ -25,8 +25,14 @@ void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, con
 
 void ScrollMgr::Update(const Vec2<float>& LineCenterPos)
 {
-	scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x - Camera::Instance()->scrollAffect.x) / 5.0f;
-	scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y - Camera::Instance()->scrollAffect.y) / 5.0f;
+	if (Camera::Instance()->active) {
+		scrollAmount.x = honraiScrollAmount.x - Camera::Instance()->scrollAffect.x;
+		scrollAmount.y = honraiScrollAmount.y - Camera::Instance()->scrollAffect.y;
+	}
+	else {
+		scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x - Camera::Instance()->scrollAffect.x) / 5.0f;
+		scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y - Camera::Instance()->scrollAffect.y) / 5.0f;
+	}
 
 	// 線の中心にスクロール量などをかける。
 	Vec2<float> scrollShakeZoom = scrollAmount + ShakeMgr::Instance()->shakeAmount;
@@ -41,7 +47,12 @@ void ScrollMgr::Update(const Vec2<float>& LineCenterPos)
 	Vec2<float> lineCenterOffsetBuff = Vec2<float>((float)windowCenter.x, (float)windowCenter.y) - lineCenterPos;
 
 	// 補完をかける。
-	lineCenterOffset += (lineCenterOffsetBuff - lineCenterOffset) / 5.0f;
+	if (Camera::Instance()->active) {
+		lineCenterOffset = lineCenterOffsetBuff;
+	}
+	else {
+		lineCenterOffset += (lineCenterOffsetBuff - lineCenterOffset) / 5.0f;
+	}
 
 }
 
@@ -55,35 +66,35 @@ void ScrollMgr::CalucurateScroll(const Vec2<float>& VEL, const Vec2<float>& PLAY
 
 	//プレイヤー座標よりライン外に出たらスクロール量は変化しない
 
-	if (!warpFlag)
-	{
-		honraiScrollAmount -= VEL;
+	//if (!warpFlag)
+	//{
+	//	honraiScrollAmount -= VEL;
 
-		const float adj = 50.0f / 2.0f;
-		const Vec2<float>scrollMaxValue = (endPos - startPos) - Vec2<float>(adj, adj);
-		const Vec2<float>scrollMinValue = Vec2<float>(-adj, -adj);
+	//	const float adj = 50.0f / 2.0f;
+	//	const Vec2<float>scrollMaxValue = (endPos - startPos) - Vec2<float>(adj, adj);
+	//	const Vec2<float>scrollMinValue = Vec2<float>(-adj, -adj);
 
-		if (PLAYER_POS.x <= startPos.x - adjLine.x)
-		{
-			honraiScrollAmount.x = scrollMinValue.x;
-		}
-		if (endPos.x - adjLine.x - adj <= PLAYER_POS.x)
-		{
-			honraiScrollAmount.x = scrollMaxValue.x;
-		}
+	//	if (PLAYER_POS.x <= startPos.x - adjLine.x)
+	//	{
+	//		honraiScrollAmount.x = scrollMinValue.x;
+	//	}
+	//	if (endPos.x - adjLine.x - adj <= PLAYER_POS.x)
+	//	{
+	//		honraiScrollAmount.x = scrollMaxValue.x;
+	//	}
 
-		const bool getMinVelFlag = PLAYER_POS.y <= startPos.y - adjLine.y;
-		if (getMinVelFlag)
-		{
-			honraiScrollAmount.y = scrollMinValue.y;
-		}
+	//	const bool getMinVelFlag = PLAYER_POS.y <= startPos.y - adjLine.y;
+	//	if (getMinVelFlag)
+	//	{
+	//		honraiScrollAmount.y = scrollMinValue.y;
+	//	}
 
-		const bool getMaxVelFlag = endPos.y - adjLine.y - adj <= PLAYER_POS.y;
-		if (getMaxVelFlag)
-		{
-			honraiScrollAmount.y = scrollMaxValue.y;
-		}
-	}
+	//	const bool getMaxVelFlag = endPos.y - adjLine.y - adj <= PLAYER_POS.y;
+	//	if (getMaxVelFlag)
+	//	{
+	//		honraiScrollAmount.y = scrollMaxValue.y;
+	//	}
+	//}
 	warpFlag = false;
 }
 
@@ -97,10 +108,10 @@ Vec2<float> ScrollMgr::Affect(const Vec2<float>& Pos)
 
 void ScrollMgr::Warp(const Vec2<float> POS)
 {
-	warpFlag = true;
-	honraiScrollAmount = { 0.0f,0.0f };
-	Vec2<float>startPos = CaluStartScrollLine(windowHalfSize - adjLine);
-	honraiScrollAmount = (POS + adjLine) - startPos;
+	//warpFlag = true;
+	//honraiScrollAmount = { 0.0f,0.0f };
+	//Vec2<float>startPos = CaluStartScrollLine(windowHalfSize - adjLine);
+	//honraiScrollAmount = (POS + adjLine) - startPos;
 }
 
 void ScrollMgr::Reset()

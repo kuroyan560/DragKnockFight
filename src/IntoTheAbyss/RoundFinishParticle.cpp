@@ -3,6 +3,7 @@
 #include "ScrollMgr.h"
 #include "DrawFunc.h"
 #include "TexHandleMgr.h"
+#include "CharacterManager.h"
 
 RoundFinishParticle::RoundFinishParticle()
 {
@@ -39,6 +40,7 @@ void RoundFinishParticle::Generate(const Vec2<float>& CharaPos, const int& UseGr
 
 	pos = CharaPos;
 	dir = Vec2<float>(KuroFunc::GetRand(2.0f) - 1.0f, KuroFunc::GetRand(2.0f) - 1.0f);
+	dir.Normalize();
 	changeLength = KuroFunc::GetRand(MIN_MOVE_LENGTH + MAX_MOVE_LENGTH) - MIN_MOVE_LENGTH;
 	useGraphHanlde = UseGraphHandle;
 	isActive = true;
@@ -54,13 +56,34 @@ void RoundFinishParticle::Update(const Vec2<float>& LeftCharaPos)
 
 	if (isReturn) {
 
-		pos.x += (LeftCharaPos.x - pos.x) / 10.0f;
-		pos.y += (LeftCharaPos.y - pos.y) / 10.0f;
+		if (0 < changeLength) {
+
+			dir = Vec2<float>(pos - CharacterManager::Instance()->Right()->pos).GetNormal();
+
+			pos += dir * changeLength;
+			changeLength -= changeLength / 10.0f;
+
+			if (changeLength < 0.1f) {
+
+				changeLength = 0;
+
+			}
+
+		}
+		else {
+
+			pos.x += (LeftCharaPos.x - pos.x) / 5.0f;
+			pos.y += (LeftCharaPos.y - pos.y) / 5.0f;
+
+		}
+
+		if ((LeftCharaPos - pos).Length() < 5.0f) Init();
 
 	}
 	else {
 		changeLength -= changeLength / 10.0f;
 		pos += dir * changeLength;
+
 	}
 
 }
@@ -164,6 +187,7 @@ void RoundFinishParticleMgr::SetReturn()
 		if (!index.isActive) continue;
 
 		index.isReturn = true;
+		index.changeLength = 30;
 
 	}
 
