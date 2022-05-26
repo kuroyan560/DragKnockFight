@@ -302,7 +302,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	// “ñl‚Ì‹——£‚ğ‹‚ß‚éB
 	float charaLength = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
 	// •R‚ğL‚Î‚·—Ê‚ğ‹‚ß‚éB
-	float addLength = charaLength - (CharacterInterFace::LINE_LENGTH * 4.0f);
+	float addLength = charaLength - (CharacterInterFace::LINE_LENGTH * 2.0f);
 	// •R‚ğL‚Î‚·B
 	CharacterManager::Instance()->Right()->addLineLength = addLength;
 
