@@ -202,7 +202,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		perfectExp.y -= perfectExp.y / 5.0f;
 		if (perfectExp.x <= 0.05f) {
 
-			perfectExp = { 1.0f,1.0f };
+			perfectExp = { 0.0f,0.0f };
 
 		}
 

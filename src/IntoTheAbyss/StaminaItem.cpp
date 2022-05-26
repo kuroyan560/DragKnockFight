@@ -46,6 +46,7 @@ void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& Fo
 	charaID = CharaID;
 	graph = GRAPH_HANDLE[STAR_COLOR::NONE];
 	isActive = true;
+	expRate = 1.0f;
 
 	// 初めから取得されている状態だったら参照を保存する。
 	if (isAcquired && CharaPos != nullptr) {
@@ -56,7 +57,7 @@ void StaminaItem::Generate(const Vec2<float>& GeneratePos, const Vec2<float>& Fo
 		{
 			graph = GRAPH_HANDLE[STAR_COLOR::LEFT];
 		}
-		else if(CharaID == CHARA_ID::SCORE)
+		else if (CharaID == CHARA_ID::SCORE)
 		{
 			//graph = GRAPH_HANDLE[STAR_COLOR::RIGHT];
 			graph = GRAPH_HANDLE[STAR_COLOR::PIRPLE];
@@ -104,9 +105,25 @@ void StaminaItem::Update()
 		if (vel <= 0 && charaPos != nullptr) {
 
 			// 移動すべき角度を求める。
-			moveAngle = atan2f(charaPos->y - pos.y, charaPos->x - pos.x);
+			/*moveAngle = atan2f(charaPos->y - pos.y, charaPos->x - pos.x);
 
-			pos += {cosf(moveAngle)* TRACING_SPEED, sinf(moveAngle)* TRACING_SPEED};
+			addTracingSpeed += 10.0f;
+
+			if (TRACING_SPEED * 5.0f < addTracingSpeed) {
+
+				addTracingSpeed = TRACING_SPEED * 5.0f;
+
+			}
+
+			pos += {cosf(moveAngle)* (TRACING_SPEED + addTracingSpeed), sinf(moveAngle)* (TRACING_SPEED + addTracingSpeed)};*/
+
+			/*pos.x += (charaPos->x - pos.x) / 5.0f;
+			pos.y += (charaPos->y - pos.y) / 5.0f;*/
+
+			expRate -= expRate / 10.0f;
+
+			if (expRate < 0.05) Init();
+
 
 		}
 
@@ -127,9 +144,30 @@ void StaminaItem::Update()
 		if (vel <= 0 && charaPos != nullptr) {
 
 			// 移動すべき角度を求める。
-			moveAngle = atan2f(charaPos->y - pos.y, charaPos->x - pos.x);
+			/*moveAngle = atan2f(charaPos->y - pos.y, charaPos->x - pos.x);
 
-			pos += {cosf(moveAngle)* TRACING_SPEED, sinf(moveAngle)* TRACING_SPEED};
+			pos += {cosf(moveAngle)* TRACING_SPEED, sinf(moveAngle)* TRACING_SPEED};*/
+
+
+			//// イージングタイマーを更新。
+			//easingTimer += 0.05f;
+
+			//// イージング量を計算。
+			//float easingRate = KuroMath::Ease(Out, Exp, easingTimer, 0, 1.0f);
+
+			//// 移動量を計算
+			//float nowChangeRate = (*charaPos - pos).Length();
+
+			//// 移動方向を計算。
+			//Vec2<float> dir = (*charaPos - pos).GetNormal();
+
+			//// 移動させる。
+			//pos = easingPos + dir * nowChangeRate;
+
+
+			expRate -= expRate / 10.0f;
+
+			if (expRate < 0.05) Init();
 
 		}
 
@@ -155,7 +193,7 @@ void StaminaItem::Draw()
 
 	//DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(pos), DRAW_RADIUS * Camera::Instance()->zoom, itemColor, isAcquired);
 	//const float extDiffer = isAcquired ? 1.0f : 0.75f;
-	const float extDiffer = 1.0f;
+	const float extDiffer = expRate;
 	const Vec2<float>extRate = { Camera::Instance()->zoom * extDiffer,Camera::Instance()->zoom * extDiffer };
 	static const float ALPHA_MIN = 0.6f;
 	const float alpha = isAcquired ? 1.0f : (sin(flashRad) * (1.0f - ALPHA_MIN) + ALPHA_MIN);

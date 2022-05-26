@@ -10,7 +10,7 @@ private:
 
 	/*===== メンバ変数 =====*/
 
-	static const int ITEM_COUNT = 200;
+	static const int ITEM_COUNT = 500;
 	std::array<StaminaItem, ITEM_COUNT> item;
 
 	float areaLeftPos;		// 戦闘エリアの左の座標
