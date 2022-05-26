@@ -172,11 +172,16 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 
 
 
-
 	// パートナーが振り回していたら残像を出す。
 	if (partner.lock()->GetNowSwing()) {
 		AfterImageMgr::Instance()->Generate(pos, {}, 0, anim->GetGraphHandle(), Color(239, 1, 144, 255), true, size);
 		anim->ChangeAnim(DAMAGE);
+	}
+
+	//バウンド中残像を出す
+	if (0.1f < bounceVel.Length())
+	{
+		AfterImageMgr::Instance()->Generate(pos, {}, 0, anim->GetGraphHandle(), Color(239, 1, 144, 255), true, size);
 	}
 
 	//プレイヤーを振り回し終えた後にダッシュする

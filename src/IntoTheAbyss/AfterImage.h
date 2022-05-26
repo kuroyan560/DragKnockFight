@@ -32,7 +32,7 @@ private:
 
 	/*===== ƒƒ“ƒo•Ï” =====*/
 
-	static const int AFTERIMAGE_COUNT = 50;
+	static const int AFTERIMAGE_COUNT = 500;
 	std::array<AfterImage, AFTERIMAGE_COUNT> afterImages;
 	int delay;				// c‘œ‚ğ¶¬‚·‚é’x‰„
 	const int DELAY = 2;	// c‘œ‚ğ¶¬‚·‚é’x‰„

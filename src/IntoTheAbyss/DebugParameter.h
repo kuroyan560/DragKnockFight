@@ -145,5 +145,7 @@ public:
 	int totalCombo;
 
 	bool hitPlayer;
+
+	float canDestroyBounceVel;
 };
 
