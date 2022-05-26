@@ -57,7 +57,7 @@ void BlockCount::Draw()
 std::vector<int> BlockCount::CountNumber(int TIME)
 {
 	float score = TIME;
-	std::vector<int> Number(4);
+	std::vector<int> Number(KuroFunc::GetDigit(TIME));
 	Number[0] = -1;
 	Number[1] = -1;
 	Number[2] = -1;
