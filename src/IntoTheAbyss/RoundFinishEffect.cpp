@@ -72,10 +72,14 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate)
 		useGraph = excellentGraph;
 
 	}
+
 }
 
 void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 {
+
+	static const int EXPLOSION_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/break.wav");
+	static const int READY_EXPLOSION_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/readyExplosion.wav", 0.5f);
 
 	/*===== çXêVèàóù =====*/
 
@@ -107,7 +111,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			timer = 0;
 			status = EFFECT_STATUS::NUM2_ENEMY_SHAKE;
-
+			AudioApp::Instance()->PlayWave(READY_EXPLOSION_SE);
 		}
 
 		break;
@@ -145,6 +149,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 			perfectExp = { 0.0f,0.0f };
 			perfectMoveAmount = PERFECT_MOVE_POS_Y;
 
+			AudioApp::Instance()->PlayWave(EXPLOSION_SE);
 		}
 
 		break;

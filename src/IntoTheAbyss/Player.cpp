@@ -182,7 +182,7 @@ void Player::OnInit()
 	swingGauge.Init(100);
 
 	consecutiveSwingTimer = 0;
-
+	DebugParameter::Instance()->useFinishSwingFlag = true;
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -411,7 +411,6 @@ void Player::OnDrawUI()
 		 D3D12App::Instance()->GenerateTextureBuffer(Color(47,255,139,LINE_ALPHA)),
 		 D3D12App::Instance()->GenerateTextureBuffer(Color(239,1,144,LINE_ALPHA))
 	};
-	static const int RETICLE_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png") };
 	static const int ARROW_GRAPH[TEAM_NUM] = { TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_player.png"),TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png") };
 	static const Angle ARROW_ANGLE_OFFSET = Angle(1);
 	static const float ARROW_DIST_OFFSET = 32.0f;
