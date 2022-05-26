@@ -18,6 +18,7 @@ void ScoreManager::Init()
 	scoreOffsetY = 0.0f;
 	honraiScore = 0;
 	score = 0;
+	mode = NONE;
 }
 
 void ScoreManager::Add(const int &ADD_POINT)

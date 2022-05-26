@@ -34,7 +34,8 @@ void RoundFinishEffect::Init()
 	timer = 0;
 	isEnd = true;
 	shakeAmount = Vec2<float>();
-
+	changeMap = false;
+	perfectExp = {};
 }
 
 void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate)
@@ -49,6 +50,7 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate)
 	isPerfect = IsPerfect;
 	perfectAnimTimer = 0;
 	perfectAnimIndex = 0;
+	finishLap = false;
 
 	static const float GOOD_PER = 0.5f;
 	static const float GREAT_PER = 0.8f;
@@ -69,7 +71,6 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate)
 		useGraph = excellentGraph;
 
 	}
-
 }
 
 void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
@@ -178,10 +179,9 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		if (NUM3_ENEMY_EXP_TIMER <= timer) {
 
-			status = EFFECT_STATUS::NUM1_ZOOMIN;
 			timer = 0;
 			status = EFFECT_STATUS::NUM4_RETURN_DEFPOS;
-
+			changeMap = true;
 		}
 
 		// パーフェクトの画像を動かす。
@@ -221,7 +221,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		if (NUM4_RETURN_DEFPOS_TIMER <= timer) {
 
 			isEnd = true;
-			timer = 0;
+			//timer = 0;
 			status = EFFECT_STATUS::NUM1_ZOOMIN;
 
 			++WinCounter::Instance()->countRound;
@@ -291,7 +291,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 void RoundFinishEffect::Draw()
 {
-
+	if (isEnd)return;
 	/*===== 描画処理 =====*/
 
 	std::shared_ptr<TextureBuffer> drawGraph = 0;

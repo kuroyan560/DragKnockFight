@@ -134,8 +134,7 @@ class Game
 	std::unique_ptr<BossHandMgr> bossHandMgr;
 	std::unique_ptr<BossHandMgr> playerHandMgr;
 
-	//テスト用
-	std::array<std::shared_ptr<MapChipGenerator>, MAP_CHIP_GENERATOR_NUM>mapChipGenerator;
+	std::shared_ptr<MapChipGenerator_ChangeMap>mapChipGenerator;
 
 	BlockCount countBlock;
 

@@ -397,21 +397,40 @@ public:
 	};
 
 	//マップのインデックスのサイズを取得
-	Vec2<int>GetMapIdxSize()
+	Vec2<int>GetMapIdxSize(const int& StageNum, const int& RoomNum)
+	{
+		return Vec2<int>(allMapChipData[StageNum][RoomNum][0].size(), allMapChipData[StageNum][RoomNum].size());
+	}
+
+	Vec2<int>GetLocalMapIdxSize()
 	{
 		return Vec2<int>(localRoomMapChipArray[0].size(), localRoomMapChipArray.size());
 	}
 	//マップの座標上のサイズを取得
-	Vec2<float>GetMapGrobalSize()
+	Vec2<float>GetLocalMapGrobalSize()
 	{
-		return GetMapIdxSize().Float() * MAP_CHIP_SIZE;
+		return GetLocalMapIdxSize().Float() * MAP_CHIP_SIZE;
 	}
 
 	const int GetChipGraoh(const int& ChipType)
 	{
 		if (ChipType == MAPCHIP_TYPE_STATIC_RARE_BLOCK)return gimmcikGraphHandle[GMMICK_RED];
 		else if (ChipType == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)return sparkGraphHandle[0];
+		else if (ChipType == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)return gimmcikGraphHandle[GMMICK_GREEN];
+		else if (ChipType == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)return gimmcikGraphHandle[GMMICK_ELEC_OFF];
 		return mapChipGraphHandle[0];
+	}
+
+	const bool HaveMap(const int& StageNum, const int& RoomNum)
+	{
+		if (allMapChipData.size() <= StageNum)return false;
+		if (allMapChipData[StageNum].size() <= RoomNum)return false;
+		if (allMapChipData[StageNum][RoomNum].empty())return false;
+		return true;
+	}
+	const RoomMapChipArray& GetMap(const int& StageNum, const int& RoomNum)
+	{
+		return allMapChipData[StageNum][RoomNum];
 	}
 
 private:

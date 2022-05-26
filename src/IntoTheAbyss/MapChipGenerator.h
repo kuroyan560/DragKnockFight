@@ -72,19 +72,22 @@ public:
 	void Draw()override;
 };
 
-//マップチップを一定時間ごとに切り替える
+//マップチップをラウンドごとに切り替える
 class MapChipGenerator_ChangeMap :public MapChipGenerator
 {
+	struct Prediction
+	{
+		Vec2<int>idx;
+		int type;
+	};
+	std::vector<Prediction>predictionIdxArray;
 public:
 	void Init()override;
 	void Update()override;
 	void Draw()override;
+	void RegisterMap();
 
 private:
-	int changeMapTimer;
-	int changeMapMaxTimer;
-
 	int setMapNumber;
 	int stageNumber;
-	int maxRoomNumber;
 };

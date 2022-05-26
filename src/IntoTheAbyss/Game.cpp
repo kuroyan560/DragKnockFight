@@ -336,12 +336,14 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
-	mapChipGenerator[DebugParameter::Instance()->generator]->Init();
+	mapChipGenerator->Init();
 
 	stageRap.Init(3);
 
 
 	countBlock.Init();
+	ScoreManager::Instance()->Init();
+	roundFinishFlag = false;
 }
 
 Game::Game()
@@ -402,10 +404,7 @@ Game::Game()
 		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, false);
 	}
 
-	mapChipGenerator[NON_GENERATE] = std::make_shared<MapChipGenerator_Non>();
-	mapChipGenerator[SPLINE_ORBIT] = std::make_shared<MapChipGenerator_SplineOrbit>();
-	mapChipGenerator[RAND_PATTERN] = std::make_shared<MapChipGenerator_RandPattern>();
-	mapChipGenerator[CHANGE_MAP] = std::make_shared<MapChipGenerator_ChangeMap>();
+	mapChipGenerator = std::make_shared<MapChipGenerator_ChangeMap>();
 
 }
 
@@ -419,7 +418,8 @@ void Game::Init(const bool& PracticeMode)
 
 	CharacterManager::Instance()->CharactersGenerate();
 
-	InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	InitGame(SelectStage::Instance()->GetStageNum(), 0);
+	SelectStage::Instance()->SelectRoomNum(0);
 	ScrollMgr::Instance()->Reset();
 	roundChangeEffect.Init();
 	CrashEffectMgr::Instance()->Init();
@@ -427,6 +427,7 @@ void Game::Init(const bool& PracticeMode)
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 
 	drawCharaFlag = false;
+	RoundFinishEffect::Instance()->Init();
 
 }
 
@@ -438,11 +439,6 @@ void Game::Update(const bool& Loop)
 		int roomNum = SelectStage::Instance()->GetRoomNum();
 		StageMgr::Instance()->SetLocalMapChipData(stageNum, roomNum);
 		StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNum, roomNum);
-	}
-
-	if (DebugParameter::Instance()->changeGenerator)
-	{
-		mapChipGenerator[DebugParameter::Instance()->generator]->Init();
 	}
 
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
@@ -505,7 +501,7 @@ void Game::Update(const bool& Loop)
 	if (roundChangeEffect.initGameFlag)
 	{
 		DebugParameter::Instance()->timer++;
-		mapChipGenerator[DebugParameter::Instance()->generator]->Update();
+		mapChipGenerator->Update();
 	}
 
 	// 座標を保存。
@@ -781,7 +777,7 @@ void Game::Draw()
 		}
 		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
 
-		mapChipGenerator[DebugParameter::Instance()->generator]->Draw();
+		mapChipGenerator->Draw();
 	}
 
 	roundChangeEffect.Draw();
@@ -1344,50 +1340,51 @@ void Game::RoundFinishEffect(const bool& Loop)
 		GameTimer::Instance()->SetInterruput(true);
 
 		RoundFinishEffect::Instance()->Update(lineCenterPos);
+
+		const int nowRoomNum = SelectStage::Instance()->GetRoomNum();
+
+		if (RoundFinishEffect::Instance()->changeMap &&
+			!StageMgr::Instance()->HaveMap(SelectStage::Instance()->GetStageNum(), nowRoomNum + 1) && RoundFinishEffect::Instance()->changeMap)
+		{
+			ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
+			if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
+			else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
+			turnResultScene = true;
+			return;
+		}
+
 		bool isEnd = RoundFinishEffect::Instance()->isEnd;
 
 		if (isEnd) {
 
+			//次のラウンドへ
+				//練習モード
+			if (Loop)WinCounter::Instance()->Reset();
 
-			//勝利数カウント演出
-			if (!WinCounter::Instance()->GetNowAnimation())
+			++roundTimer;
+
+			if (60 <= roundTimer)
 			{
-				//どちらかが３勝とったらゲーム終了
-				if (WinCounter::Instance()->GetGameFinish() && !Loop)
-				{
-					ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
-					if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
-					else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
-					turnResultScene = true;
-				}
-				//次のラウンドへ
-				else
-				{
-					//練習モード
-					if (Loop)WinCounter::Instance()->Reset();
+				readyToStartRoundFlag = true;
+				roundFinishFlag = false;
 
-					++roundTimer;
+				SelectStage::Instance()->SelectRoomNum(nowRoomNum + 1);
+				StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+				StageMgr::Instance()->SetLocalMapChipDrawBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+				mapData = StageMgr::Instance()->GetLocalMap();
+				mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
+				mapChipGenerator->RegisterMap();
+				RoundFinishEffect::Instance()->changeMap = false;
+				countBlock.Init();
 
-					if (60 <= roundTimer)
-					{
-						readyToStartRoundFlag = true;
-						roundFinishFlag = false;
-
-						StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-						StageMgr::Instance()->SetLocalMapChipDrawBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-						mapData = StageMgr::Instance()->GetLocalMap();
-						mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
-
-						//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-					}
-
-					drawCharaFlag = true;
-
-					// AddLineLengthを伸ばす。
-					CharacterManager::Instance()->Right()->addLineLength = CharacterManager::Instance()->Right()->pos.Distance(CharacterManager::Instance()->Left()->pos) - CharacterInterFace::LINE_LENGTH * 2.0f;
-
-				}
+				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 			}
+
+			drawCharaFlag = true;
+
+			// AddLineLengthを伸ばす。
+			CharacterManager::Instance()->Right()->addLineLength = CharacterManager::Instance()->Right()->pos.Distance(CharacterManager::Instance()->Left()->pos) - CharacterInterFace::LINE_LENGTH * 2.0f;
+
 
 
 		}

@@ -39,6 +39,8 @@ public:
 
 	int timer;					// 各タイマー
 	bool isEnd;					// 演出が終わったかのフラグ
+	bool finishLap;
+	bool changeMap;
 	Vec2<float> shakeAmount;	// シェイクさせる処理全般に使用するやつ
 
 	bool isPerfect;				// すべてのブロックを壊したかのフラグ
@@ -51,7 +53,6 @@ public:
 	const int NUM3_ENEMY_EXP_TIMER = 240;
 	const int NUM4_RETURN_DEFPOS_TIMER = 120;
 	const int NUM5_RETURN_PLAYER_DEF_POS = 120;
-
 
 
 public:
