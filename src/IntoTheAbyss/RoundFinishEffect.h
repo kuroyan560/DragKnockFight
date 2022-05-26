@@ -1,0 +1,55 @@
+#pragma once
+#include "Vec.h"
+#include "CharacterManager.h"
+#include "Camera.h"
+#include "Singleton.h"
+
+#include "RoundFinishParticle.h"
+
+class RoundFinishEffect : public Singleton<RoundFinishEffect> {
+
+public:
+
+	/*===== メンバ変数 =====*/
+
+	enum class EFFECT_STATUS {
+
+		NUM1_ZOOMIN,			// ①二人の真ん中にズームインする。
+		NUM2_ENEMY_SHAKE,		// ②敵をシェイクさせる。
+		NUM3_ENEMY_EXP,			// ③敵を爆発させる。
+		NUM4_EXP_END,			// ④爆発を終わらせる。
+		NUM5_RETURN_DEFPOS,		// ⑤各キャラを規定の座標に戻す。
+
+	};
+
+	EFFECT_STATUS status;		// ステータス
+
+	int timer;					// 各タイマー
+	bool isEnd;					// 演出が終わったかのフラグ
+	Vec2<float> shakeAmount;	// シェイクさせる処理全般に使用するやつ
+
+	// 各ステータスの時間
+	const int NUM1_ZOOMIN_TIMER = 90;
+	const int NUM2_ENEMY_SHAKE_TIMER = 150;
+	const int NUM3_ENEMY_EXP_TIMER = 120;
+
+
+
+public:
+
+	// コンストラクタ
+	RoundFinishEffect();
+
+	// 初期化処理
+	void Init();
+
+	// 開始処理
+	void Start();
+
+	// 更新処理
+	void Update(const Vec2<float>& LineCenterPos);
+
+	// 描画処理
+	void Draw();
+
+};
