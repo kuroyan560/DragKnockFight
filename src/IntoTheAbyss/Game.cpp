@@ -728,6 +728,9 @@ void Game::Update(const bool& Loop)
 
 	}
 
+
+	pmgr.Update();
+
 }
 
 void Game::Draw()
@@ -747,7 +750,7 @@ void Game::Draw()
 	prevDrawChipRoomNum = roomNum;
 	DrawMapChip(*mapData, *mapChipDrawData, stageNum, roomNum);
 
-
+	pmgr.Draw();
 
 	if (roundChangeEffect.readyFlag)
 	{
