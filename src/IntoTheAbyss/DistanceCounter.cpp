@@ -39,4 +39,7 @@ void DistanceCounter::Update()
 
 void DistanceCounter::Draw()
 {
+
+	/*===== •`‰æˆ— =====*/
+
 }

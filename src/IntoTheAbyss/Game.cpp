@@ -792,6 +792,9 @@ void Game::Draw()
 		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos), Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 
 		mapChipGenerator[DebugParameter::Instance()->generator]->Draw();
+
+		DistanceCounter::Instance()->Draw();
+
 	}
 
 	if (roundChangeEffect.initGameFlag || drawCharaFlag)
