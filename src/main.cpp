@@ -47,10 +47,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	std::vector<BaseScene*>sceneList =
 	{
+		new ResultScene(),
 		new TitleScene(),
 		new StageSelectScene(),
 		new GameScene(),
-		new ResultScene(),
 		new TutorialScene()
 	};
 	int awakeScene = 0;	//開始時のステージ番号

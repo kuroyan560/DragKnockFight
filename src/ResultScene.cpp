@@ -58,6 +58,35 @@ void ResultScene::OnInitialize()
 
 void ResultScene::OnUpdate()
 {
+	if(UsersInput::Instance()->KeyOnTrigger(DIK_J))
+	{
+		resultUITimer = 0;
+		breakEnemyUITimer = 0;
+		breakPlayerUITimer = 0;
+		crashEnemyUITimer = 0;
+		crashPlayerUITimer = 0;
+		scoreUITimer = 0;
+		delayTimer = 0;
+		resultEasingAmount = 0;
+		breakEnemyEasingAmount = 0;
+		breakPlayerEasingAmount = 0;
+		crashEnemyEasingAmount = 0;
+		crashPlayerEasingAmount = 0;
+		scoreEffectTimer = 0;
+		targetScore = ResultTransfer::Instance()->resultScore;
+		prevScore = { 1,2,3,4,5,6,7,8,9 };
+		scoreSize = { 1 };
+		scoreEffectEasingAmount = 0;
+
+		breakEnemyAmount = ResultTransfer::Instance()->rightBreakCount;
+		breakPlayerAmount = ResultTransfer::Instance()->leftBreakCount;
+		crashEnemyAmount = ResultTransfer::Instance()->rightCrashCount;
+		crashPlayerAmount = ResultTransfer::Instance()->leftCrashCount;
+		winnerName = ResultTransfer::Instance()->winner;
+	}
+
+
+
 	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/resultScore.wav", 0.13f);
 
 	Vec2<float> windowSize = WinApp::Instance()->GetWinSize().Float();
@@ -69,6 +98,7 @@ void ResultScene::OnUpdate()
 	bool isSkip = false;
 
 	// 遅延が発生していなかったら。
+	//フォントの横移動
 	if (DELAY_TIMER <= delayTimer) {
 
 		// [RESULT]の画像 [RESULT]のタイマーが既定値以下だったら。
@@ -124,32 +154,33 @@ void ResultScene::OnUpdate()
 				isSkip = true;
 			}
 		}
-		//// [SCORE]画像 タイマーが規定値以下だったら。
-		//if (scoreUITimer < SCORE_UI_TIMER && CRASH_ENEMY_UI_TIMER <= crashPlayerUITimer) {
-		//	++scoreUITimer;
-		//	// タイマーが規定値に達したら。
-		//	if (SCORE_UI_TIMER <= scoreUITimer) {
-		//		delayTimer = -180;
-		//	}
-		//	else {
-		//		delayTimer = DELAY_TIMER;
-		//	}
-		//}
-		//// スコアのタイマーが規定値以下だったら。
-		//if (scoreEffectTimer < SCORE_EFFECT_TIMER && SCORE_UI_TIMER <= scoreUITimer) {
-		//	++scoreEffectTimer;
-		//	// タイマーが規定値に達したら。
-		//	if (SCORE_EFFECT_TIMER <= scoreEffectTimer) {
-		//		delayTimer = 0;
-		//	}
-		//	else {
-		//		delayTimer = DELAY_TIMER;
-		//	}
-		//}
+		// [SCORE]画像 タイマーが規定値以下だったら。
+		if (scoreUITimer < SCORE_UI_TIMER && CRASH_ENEMY_UI_TIMER <= crashPlayerUITimer) {
+			++scoreUITimer;
+			// タイマーが規定値に達したら。
+			if (SCORE_UI_TIMER <= scoreUITimer) {
+				delayTimer = -180;
+			}
+			else {
+				delayTimer = DELAY_TIMER;
+			}
+		}
+		// スコアのタイマーが規定値以下だったら。
+		if (scoreEffectTimer < SCORE_EFFECT_TIMER && SCORE_UI_TIMER <= scoreUITimer) {
+			++scoreEffectTimer;
+			// タイマーが規定値に達したら。
+			if (SCORE_EFFECT_TIMER <= scoreEffectTimer) {
+				delayTimer = 0;
+			}
+			else {
+				delayTimer = DELAY_TIMER;
+			}
+		}
 
 	}
 
 	// イージング量を更新。
+	//イージングの動き
 	resultEasingAmount = KuroMath::Ease(Out, Cubic, (float)resultUITimer / RESULT_UI_TIMER, 0.0f, 1.0f);
 	breakEnemyEasingAmount = KuroMath::Ease(Out, Cubic, (float)breakEnemyUITimer / BREAK_ENEMY_UI_TIMER, 0.0f, 1.0f);
 	breakPlayerEasingAmount = KuroMath::Ease(Out, Cubic, (float)breakPlayerUITimer / BREAK_PLAYER_UI_TIMER, 0.0f, 1.0f);
@@ -187,8 +218,8 @@ void ResultScene::OnDraw()
 
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 	//DrawFunc::DrawBox2D(Vec2<float>(0, 0), windowSize, Color(0, 0, 0, 255), DXGI_FORMAT_R8G8B8A8_UNORM);
-	DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(winnerFrameHandle));
-	DrawFunc::DrawGraph({ 25.0f,30.0f }, TexHandleMgr::GetTexBuffer(winnerGraph[winnerName]));
+	//DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(winnerFrameHandle));
+	//DrawFunc::DrawGraph({ 25.0f,30.0f }, TexHandleMgr::GetTexBuffer(winnerGraph[winnerName]));
 
 	// [RESULT] と [BREAK]の描画処理
 	{
@@ -201,6 +232,8 @@ void ResultScene::OnDraw()
 	}
 
 	// [SCORE] の描画処理
+	DrawSCORE(scoreEasingAmount, scoreEffectEasingAmount);
+
 	DrawSCORE(scoreEasingAmount, scoreEffectEasingAmount);
 
 }

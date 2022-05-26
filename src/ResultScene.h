@@ -64,12 +64,12 @@ public:
 	const Vec2<int> WINDOW_CENTER = WinApp::Instance()->GetWinCenter();
 
 	// イージング結果の座標
-	const Vec2<float> RESULT_POS = { (float)WINDOW_CENTER.x - 90.0f, 30.0f };
-	const Vec2<float> BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x + 10.0f, 150.0f };
-	const Vec2<float> CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x + 110.0f, 250.0f };
-	const Vec2<float> BREAK_PLAYER_POS = { (float)WINDOW_CENTER.x + 110.0f, 420.0f };
-	const Vec2<float> CRASH_PLAYER_POS = { (float)WINDOW_CENTER.x + 10.0f, 520.0f };
-	const Vec2<float> SCORE_POS = { (float)WINDOW_CENTER.x - 90.0f, (float)WINDOW_CENTER.y + 30.0f };
+	const Vec2<float> RESULT_POS = { (float)WINDOW_CENTER.x - 200.0f, 30.0f };
+	const Vec2<float> BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 150.0f };
+	const Vec2<float> CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 250.0f };
+	const Vec2<float> BREAK_PLAYER_POS = { (float)WINDOW_CENTER.x - 110.0f, 350.0f };
+	const Vec2<float> CRASH_PLAYER_POS = { (float)WINDOW_CENTER.x - 110.0f, 450.0f };
+	const Vec2<float> SCORE_POS = { (float)WINDOW_CENTER.x - 100.0f, (float)WINDOW_CENTER.y + 180.0f };
 
 	// 各タイマーのデフォルト値
 	const int RESULT_UI_TIMER = 20;
