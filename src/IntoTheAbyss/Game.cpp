@@ -733,61 +733,20 @@ void Game::Draw()
 	// プレイヤーとボス間に線を描画
 	if (roundChangeEffect.initGameFlag)
 	{
-		//左プレイヤー～中央のチェイン
-		//auto& left = CharacterManager::Instance()->Left();
-		//Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
-		//Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
-		//if (0.0f < left->addLineLength)
-		//{
-		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(left->pos), ScrollMgr::Instance()->Affect(leftChainBorderPos),
-		//		TexHandleMgr::GetTexBuffer(PLAYER_CHAIN_GRAPH), CHAIN_THICKNESS);
-		//}
-
-		////右プレイヤー～中央のチェイン
-		//auto& right = CharacterManager::Instance()->Right();
-		//Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
-		//Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
-		//if (0.0f < right->addLineLength)
-		//{
-		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(right->pos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
-		//		TexHandleMgr::GetTexBuffer(ENEMY_CHAIN_GRAPH), CHAIN_THICKNESS);
-		//}
-
-		//float charaDistance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
-		////中央チェイン
-		//if (charaDistance < CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f) {
-
-		//	// 既定値より短かったら。
-		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos),
-		//		TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);
-
-		//}
-		//else {
-
-		//	DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftChainBorderPos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
-		//		TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);
-
-		//}
+		mapChipGenerator->Draw();
 
 		// 左のキャラ ~ 右のキャラ間に線を描画
 		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);
 
 		// 線分の中心に円を描画
-		/*if (roundChangeEffect.drawFightFlag)
-		{
-			static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
-			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos), Vec2<float>(ScrollMgr::Instance()->zoom, ScrollMgr::Instance()->zoom), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
-		}*/
-		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
-
-		// 線分の中心に円を描画
 		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
 		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos), Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 
-		mapChipGenerator->Draw();
 
-		DistanceCounter::Instance()->Draw();
-
+		if (!roundFinishFlag)
+		{
+			DistanceCounter::Instance()->Draw();
+		}
 	}
 
 	if (roundChangeEffect.initGameFlag || drawCharaFlag)
@@ -1303,7 +1262,7 @@ void Game::RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData
 			if (!AudioApp::Instance()->NowPlay(bgm))
 			{
 				AudioApp::Instance()->ChangeVolume(bgm, 0.1f);
-				//AudioApp::Instance()->PlayWave(bgm, true);
+				AudioApp::Instance()->PlayWave(bgm, true);
 			}
 		}
 
