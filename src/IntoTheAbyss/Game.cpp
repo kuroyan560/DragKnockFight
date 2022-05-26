@@ -728,6 +728,9 @@ void Game::Update(const bool& Loop)
 
 	}
 
+
+
+
 }
 
 void Game::Draw()
@@ -746,8 +749,6 @@ void Game::Draw()
 	prevDrawChipStageNum = stageNum;
 	prevDrawChipRoomNum = roomNum;
 	DrawMapChip(*mapData, *mapChipDrawData, stageNum, roomNum);
-
-
 
 	if (roundChangeEffect.readyFlag)
 	{
@@ -845,6 +846,8 @@ void Game::Draw()
 
 	countBlock.Draw();
 	stageRap.Draw();
+
+
 
 	// プレイヤーとボス間に線を描画
 	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());
