@@ -228,6 +228,8 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			perfectExp = {};
 
+			ScoreManager::Instance()->destroyPoint = 0;
+
 		}
 
 		break;
