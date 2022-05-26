@@ -12,7 +12,6 @@ public:
 	void Update();
 	void Draw();
 
-	std::vector<int> CountNumber(int TIME);
 
 	inline bool GetNowNumber() {
 
@@ -36,4 +35,6 @@ private:
 
 
 	Vec2<float>basePos;
+
+	std::vector<int> CountNumber(int TIME);
 };

@@ -339,6 +339,9 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	mapChipGenerator[DebugParameter::Instance()->generator]->Init();
 
 	stageRap.Init(3);
+
+
+	countBlock.Init();
 }
 
 Game::Game()
@@ -807,6 +810,8 @@ void Game::Draw()
 
 	countBlock.Draw();
 	stageRap.Draw();
+
+
 
 	// プレイヤーとボス間に線を描画
 	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());

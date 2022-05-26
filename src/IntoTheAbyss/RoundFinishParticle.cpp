@@ -145,6 +145,9 @@ void RoundFinishParticleMgr::Update(const Vec2<float>& LeftCharaPos)
 
 	/*===== XVˆ— =====*/
 
+	float nowRate = static_cast<float>(easingTimer) / static_cast<float>(EASING_TIMER);
+	float nowEasing = KuroMath::Ease(Out, Cubic, nowRate, 0.0f, 1.0f);
+
 	for (auto& index : particles) {
 
 		if (!index.isActive) continue;

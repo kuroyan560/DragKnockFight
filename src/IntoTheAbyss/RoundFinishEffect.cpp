@@ -118,6 +118,9 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		/*-- 第三段階 --*/
 
+		// カメラを一気に引く。
+		Camera::Instance()->Focus(LineCenterPos, 0.5f, 0.3f);
+
 		// タイマーを更新して次へ。
 		++timer;
 		if (NUM3_ENEMY_EXP_TIMER / 2.0f == timer) {
@@ -142,6 +145,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		if (NUM3_ENEMY_EXP_TIMER <= timer) {
 
+			status = EFFECT_STATUS::NUM1_ZOOMIN;
 			timer = 0;
 			status = EFFECT_STATUS::NUM4_RETURN_DEFPOS;
 

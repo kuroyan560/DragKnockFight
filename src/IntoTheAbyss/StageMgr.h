@@ -260,7 +260,7 @@ public:
 	RoomMapChipArray *GetLocalMap();
 	RoomMapChipDrawArray *GetLocalDrawMap();
 
-	int GetAllLocalWallBlocksNum();
+	int GetAllLocalWallBlocksNum(int RARE_BLOCK_COUNT = 10);
 
 	int GetAllWallBlocksNum(int STAGE_NUM, int ROOM_NUM);
 
@@ -271,8 +271,8 @@ public:
 	int GetEnableToUseStageNumber();
 
 
-	const Vec2<float> &GetPlayerResponePos();
-	const Vec2<float> &GetBossResponePos();
+	Vec2<float>GetPlayerResponePos();
+	Vec2<float>GetBossResponePos();
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス

@@ -415,19 +415,24 @@ RoomMapChipDrawArray* StageMgr::GetLocalDrawMap()
 	return &localRoomMapChipDrawArray;
 }
 
-int StageMgr::GetAllLocalWallBlocksNum()
+int StageMgr::GetAllLocalWallBlocksNum(int RARE_BLOCK_COUNT)
 {
 	int count = 0;
 	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
 	{
 		for (int x = 0; x < localRoomMapChipArray[y].size(); ++x)
 		{
-			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= localRoomMapChipArray[y][x] && localRoomMapChipArray[y][x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - 5;
-
+			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= localRoomMapChipArray[y][x] && localRoomMapChipArray[y][x] <= MAPCHIP_TYPE_STATIC_CHANGE_AREA - 1;
 			bool isOutSideWall = y == 0 || x == 0 || y == localRoomMapChipArray.size() - 1 || x == localRoomMapChipArray[y].size() - 1;
+			bool isRareFlag = localRoomMapChipArray[y][x] == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
+
 			if (isWallFlag && !isOutSideWall)
 			{
 				++count;
+			}
+			else if (isRareFlag)
+			{
+				count += RARE_BLOCK_COUNT;
 			}
 		}
 	}
@@ -442,7 +447,7 @@ int StageMgr::GetAllWallBlocksNum(int STAGE_NUM, int ROOM_NUM)
 		for (int x = 0; x < allMapChipData[y].size(); ++x)
 		{
 			bool isOutSideWall = y == 0 || x == 0 || y == allMapChipData[STAGE_NUM][ROOM_NUM].size() - 1 || x == allMapChipData[STAGE_NUM][ROOM_NUM][y].size() - 1;
-			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[STAGE_NUM][ROOM_NUM][y][x] && allMapChipData[STAGE_NUM][ROOM_NUM][y][x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - 5;
+			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[STAGE_NUM][ROOM_NUM][y][x] && allMapChipData[STAGE_NUM][ROOM_NUM][y][x] <= MAPCHIP_TYPE_STATIC_CHANGE_AREA - 1;
 
 			if (isWallFlag && !isOutSideWall)
 			{
@@ -485,7 +490,7 @@ int StageMgr::GetEnableToUseStageNumber()
 	return count;
 }
 
-const Vec2<float> &StageMgr::GetPlayerResponePos()
+Vec2<float>StageMgr::GetPlayerResponePos()
 {
 	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
 	{
@@ -500,7 +505,7 @@ const Vec2<float> &StageMgr::GetPlayerResponePos()
 	return Vec2<float>(0.0f, 0.0f);
 }
 
-const Vec2<float> &StageMgr::GetBossResponePos()
+Vec2<float>StageMgr::GetBossResponePos()
 {
 	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
 	{
