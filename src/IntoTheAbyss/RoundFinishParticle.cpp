@@ -63,7 +63,7 @@ void RoundFinishParticle::Update(const Vec2<float>& LeftCharaPos)
 			pos += dir * changeLength;
 			changeLength -= changeLength / 10.0f;
 
-			if (changeLength < 0.1f) {
+			if (changeLength < 0.2f) {
 
 				changeLength = 0;
 

@@ -1170,6 +1170,8 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 			}
 
+		}
+
 
 		// 一定以下だったらダメージを与えない。
 		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 0.5f && !(DebugParameter::Instance()->canDestroyBounceVel < bounceVel.Length())) {
