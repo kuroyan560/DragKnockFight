@@ -327,7 +327,7 @@ MapChipType StageMgr::GetMapChipType(const int& STAGE_NUM, const int& ROOM_NUM, 
 	{
 		return MAPCHIP_BLOCK_ELEC_ON;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_OFF)
+	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)
 	{
 		return MAPCHIP_BLOCK_ELEC_OFF;
 	}
@@ -375,7 +375,7 @@ MapChipType StageMgr::GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM)
 	{
 		return MAPCHIP_BLOCK_ELEC_ON;
 	}
-	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_OFF)
+	else if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)
 	{
 		return MAPCHIP_BLOCK_ELEC_OFF;
 	}
@@ -422,6 +422,8 @@ int StageMgr::GetAllLocalWallBlocksNum(int RARE_BLOCK_COUNT)
 	{
 		for (int x = 0; x < localRoomMapChipArray[y].size(); ++x)
 		{
+			if (localRoomMapChipArray[y][x] == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)continue;
+
 			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= localRoomMapChipArray[y][x] && localRoomMapChipArray[y][x] <= MAPCHIP_TYPE_STATIC_CHANGE_AREA - 1;
 			bool isOutSideWall = y == 0 || x == 0 || y == localRoomMapChipArray.size() - 1 || x == localRoomMapChipArray[y].size() - 1;
 			bool isRareFlag = localRoomMapChipArray[y][x] == MAPCHIP_TYPE_STATIC_RARE_BLOCK;

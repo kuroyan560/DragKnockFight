@@ -1207,6 +1207,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					{
 						bool rareFlag;
 						bool unBrokenFlag;
+						bool nonScoreFlg;
 						int num;
 
 						int GetNum()
@@ -1214,6 +1215,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 							if (rareFlag)
 							{
 								return 10;
+							}
+							else if (nonScoreFlg)
+							{
+								return 0;
 							}
 							else
 							{
@@ -1225,36 +1230,47 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					std::array<RareData, 5>rare;
 					rare[C].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 					rare[C].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
+					rare[C].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
 
 					rare[L].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, 0)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 					rare[L].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, 0)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
+					rare[L].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
 
 					rare[R].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, 0)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 					rare[R].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, 0)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
+					rare[R].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
 
 					rare[T].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(0, -1)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 					rare[T].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(0, -1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
+					rare[T].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
 
 					rare[B].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(0, 1)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 					rare[B].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(0, 1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
+					rare[B].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
 
 
 					StageMgr::Instance()->WriteMapChipData(hitChipIndex[index], 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
-					for (int i = 0; i < rare[C].GetNum(); ++i)
+					if (!rare[C].nonScoreFlg)
 					{
-						partner.lock()->swingDestroyCounter.Increment();
+						for (int i = 0; i < rare[C].GetNum(); ++i)
+						{
+							partner.lock()->swingDestroyCounter.Increment();
+						}
+						partner.lock()->destroyTimer = DESTROY_TIMER;
 					}
-					partner.lock()->destroyTimer = DESTROY_TIMER;
 
 					// 左があるか？
 					if (0 < hitChipIndex[index].x - 1 && StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, 0)) != 0 && !rare[L].unBrokenFlag)
 					{
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, 0), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
-						for (int i = 0; i < rare[L].GetNum(); ++i)
+						if (!rare[L].nonScoreFlg)
 						{
-							partner.lock()->swingDestroyCounter.Increment();
+							for (int i = 0; i < rare[L].GetNum(); ++i)
+							{
+								partner.lock()->swingDestroyCounter.Increment();
+							}
 						}
 					}
 					// 右があるか？
@@ -1262,9 +1278,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					{
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, 0), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
-						for (int i = 0; i < rare[R].GetNum(); ++i)
+						if (!rare[R].nonScoreFlg)
 						{
-							partner.lock()->swingDestroyCounter.Increment();
+							for (int i = 0; i < rare[R].GetNum(); ++i)
+							{
+								partner.lock()->swingDestroyCounter.Increment();
+							}
 						}
 					}
 					// 上があるか？
@@ -1272,9 +1291,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					{
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, -1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
-						for (int i = 0; i < rare[T].GetNum(); ++i)
+						if (!rare[T].nonScoreFlg)
 						{
-							partner.lock()->swingDestroyCounter.Increment();
+							for (int i = 0; i < rare[T].GetNum(); ++i)
+							{
+								partner.lock()->swingDestroyCounter.Increment();
+							}
 						}
 					}
 					// 下があるか？
@@ -1282,9 +1304,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					{
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, 1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
-						for (int i = 0; i < rare[B].GetNum(); ++i)
+						if (!rare[B].nonScoreFlg)
 						{
-							partner.lock()->swingDestroyCounter.Increment();
+							for (int i = 0; i < rare[B].GetNum(); ++i)
+							{
+								partner.lock()->swingDestroyCounter.Increment();
+							}
 						}
 					}
 
