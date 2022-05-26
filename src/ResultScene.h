@@ -143,4 +143,7 @@ private:
 		std::reverse(Number.begin(), Number.end());
 		return Number;
 	}
+
+
+	void DrawBreakCount(int BREAK_NOW_COUNT, int BREAK_MAX_COUNT);
 };

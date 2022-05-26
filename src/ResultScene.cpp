@@ -277,8 +277,10 @@ void ResultScene::OnDraw()
 		//DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX + 90.0f, 155.0f) + Vec2<float>(300.0f, 0.0f), TexHandleMgr::GetTexBuffer(scoreHandle));
 
 
-		DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount, false);
-		DrawBREAK(CRASH_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount, true);
+		DrawBreakCount(1000, 15000);
+
+		//DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount, false);
+		//DrawBREAK(CRASH_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount, true);
 
 		//DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, breakEnemyHandle, breakEnemyAmount);
 		//DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, crashEnemyHandle, crashEnemyAmount);
@@ -406,4 +408,44 @@ void ResultScene::DrawSCORE(const float &easingTimer, const double &scoreEffectE
 
 	}
 
+}
+
+void ResultScene::DrawBreakCount(int BREAK_NOW_COUNT, int BREAK_MAX_COUNT)
+{
+	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
+	Vec2<float> drawPos = Vec2<float>(windowSize.x / 2.0f, 430.0f);
+
+	
+
+	const int FONT_SIZE = 66.3f;
+	//現在
+	{
+		nowSize = breakSize;
+		for (int i = 0; i < KuroFunc::GetDigit(BREAK_NOW_COUNT) - 1; ++i)
+		{
+			drawPos.x -= FONT_SIZE * nowSize.x;
+		}
+
+		std::vector<int>number = CountNumber(BREAK_NOW_COUNT);
+		for (int i = 0; i < number.size(); ++i)
+		{
+			DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
+			// フォントサイズ分移動させる。
+			drawPos.x += FONT_SIZE * nowSize.x;
+		}
+	}
+
+	//最大
+	{
+		drawPos.x += FONT_SIZE * (nowSize.x / 2.0f);
+		drawPos.y += 25.0f;
+		nowSize = maxSize;
+		std::vector<int>number = CountNumber(BREAK_MAX_COUNT);
+		for (int i = 0; i < number.size(); ++i)
+		{
+			DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
+			// フォントサイズ分移動させる。
+			drawPos.x += FONT_SIZE * nowSize.x;
+		}
+	}
 }
