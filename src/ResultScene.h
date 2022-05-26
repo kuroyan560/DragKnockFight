@@ -21,6 +21,7 @@ class ResultScene : public BaseScene
 	int crashPlayerHandle;		// CRASHの画像ハンドル プレイヤー
 	int scoreHandle;			// SCOREの画像ハンドル
 	int crossHandle;			// *の画像ハンドル
+	int roundHandle;			// ROUNDの描画
 	std::array<int, 12> blueNumberHandle;// 青の数字の画像ハンドル
 	std::array<int, 12> goldNumberHandle;// 金の数字の画像ハンドル
 
@@ -29,6 +30,7 @@ class ResultScene : public BaseScene
 	float scoreEffectTimer;			// スコアをガラガラ表示するために使用するタイマー
 	std::array<int, 10> prevScore;	// 前フレームのスコア
 	std::array<float, 10> scoreSize;// スコアのサイズ
+	float defaultSize;
 
 	// 各タイマー
 	int resultUITimer;			// リザルトの画像のイージングに使用するタイマー
@@ -64,6 +66,7 @@ public:
 
 	// イージング結果の座標
 	Vec2<float> RESULT_POS = { (float)WINDOW_CENTER.x - 200.0f, 30.0f };
+	Vec2<float> ROUND_POS = { (float)WINDOW_CENTER.x - 200.0f, 180.0f };
 	Vec2<float> BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 150.0f };
 	Vec2<float> CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 250.0f };
 	Vec2<float> BREAK_PLAYER_POS = { (float)WINDOW_CENTER.x - 110.0f, 350.0f };
@@ -80,7 +83,7 @@ public:
 	int DELAY_TIMER = 30;
 	int SCORE_EFFECT_TIMER = 180;
 
-
+	int rapNumber;
 public:
 	ResultScene();
 	void OnInitialize()override;
@@ -108,4 +111,34 @@ private:
 	// [SCORE][スコア]を描画
 	void DrawSCORE(const float& easingTimer, const double& scoreEffectEasingTimer);
 
+
+	std::vector<int> CountNumber(int TIME)
+	{
+		float score = TIME;
+		std::vector<int> Number(KuroFunc::GetDigit(TIME));
+		for (int i = 0; i < Number.size(); ++i)
+		{
+			Number[i] = -1;
+		}
+
+		int tmp = score;
+		//スコア計算
+		for (int i = 0; tmp > 0; ++i)
+		{
+			float result = tmp % 10;
+			//Number.push_back(result);
+			Number[i] = result;
+			tmp /= 10.0f;
+		}
+		//0埋め
+		for (int i = 0; i < Number.size(); ++i)
+		{
+			if (Number[i] == -1)
+			{
+				Number[i] = 0;
+			}
+		}
+		std::reverse(Number.begin(), Number.end());
+		return Number;
+	}
 };
