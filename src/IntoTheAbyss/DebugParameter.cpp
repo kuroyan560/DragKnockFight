@@ -48,6 +48,8 @@ DebugParameter::DebugParameter()
 	comboResetDist = 300.0f;
 	emitRare = 1.0f;
 	emitBounce = 2.0f;
+
+	hitPlayer = true;
 }
 
 void DebugParameter::Update()
@@ -115,6 +117,10 @@ void DebugParameter::DrawImGui()
 		sec -= min * 60;
 		ImGui::Text("Timer %d : %d", min, sec);
 		ImGui::Text("TotalCombo %d", totalCombo);
+
+		ImGui::Separator();
+
+		ImGui::Checkbox("PlayerCheckHit", &hitPlayer);
 
 		ImGui::Separator();
 

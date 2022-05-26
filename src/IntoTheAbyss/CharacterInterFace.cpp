@@ -869,6 +869,8 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, 
 
 	/*===== “–‚½‚è”»’è =====*/
 
+	if (team == LEFT_TEAM && !DebugParameter::Instance()->hitPlayer)return;
+
 	//“–‚½‚è”»’è
 	if (!hitCheck)return;
 

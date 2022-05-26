@@ -393,6 +393,7 @@ Game::Game()
 		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, false);
 	}
 
+	mapChipGenerator[NON_GENERATE] = std::make_shared<MapChipGenerator_Non>();
 	mapChipGenerator[SPLINE_ORBIT] = std::make_shared<MapChipGenerator_SplineOrbit>();
 	mapChipGenerator[RAND_PATTERN] = std::make_shared<MapChipGenerator_RandPattern>();
 	mapChipGenerator[CHANGE_MAP] = std::make_shared<MapChipGenerator_ChangeMap>();
@@ -420,7 +421,6 @@ void Game::Init(const bool& PracticeMode)
 
 void Game::Update(const bool& Loop)
 {
-
 	if (UsersInput::Instance()->KeyOnTrigger(DIK_R))
 	{
 		int stageNum = SelectStage::Instance()->GetStageNum();
