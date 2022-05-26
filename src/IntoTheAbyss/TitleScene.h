@@ -4,6 +4,7 @@
 #include"ScreenEdgeEffect.h"
 #include"PictureStory.h"
 #include"BehaviorPredection.h"
+#include"MaskSceneTransition.h"
 
 class TitleScene : public BaseScene
 {
@@ -56,6 +57,6 @@ public:
 	void OnImguiDebug()override;
 	void OnFinalize()override;
 
-	std::shared_ptr<SceneCange> changeScene;
+	std::shared_ptr<MaskSceneTransition> changeScene;
 };
 

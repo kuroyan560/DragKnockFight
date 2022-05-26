@@ -680,7 +680,7 @@ void Game::Update(const bool& Loop)
 	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE || isBlockEmpty) {
 		//if (isBlockEmpty) {
 
-			// 終了演出が行われていなかったら
+		// 終了演出が行われていなかったら
 		if (!roundFinishFlag) {
 
 			roundFinishFlag = true;
