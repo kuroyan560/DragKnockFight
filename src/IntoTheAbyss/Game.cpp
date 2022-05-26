@@ -223,6 +223,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	debugStageData[0] = stageNum;
 	debugStageData[1] = roomNum;
 
+	drawCharaFlag = false;
+
 	//ScrollMgr::Instance()->honraiScrollAmount = { -1060.0f,-490.0f };
 	alphaValue = 0;
 
@@ -421,6 +423,8 @@ void Game::Init(const bool& PracticeMode)
 
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 
+	drawCharaFlag = false;
+
 }
 
 void Game::Update(const bool& Loop)
@@ -495,20 +499,20 @@ void Game::Update(const bool& Loop)
 	// プレイヤーの更新処理
 	//if (!roundFinishFlag)
 	//{
-		if (roundChangeEffect.initGameFlag)
-		{
-			DebugParameter::Instance()->timer++;
-			mapChipGenerator[DebugParameter::Instance()->generator]->Update();
-		}
+	if (roundChangeEffect.initGameFlag)
+	{
+		DebugParameter::Instance()->timer++;
+		mapChipGenerator[DebugParameter::Instance()->generator]->Update();
+	}
 
-		// 座標を保存。
-		CharacterManager::Instance()->Left()->SavePrevFramePos();
-		CharacterManager::Instance()->Right()->SavePrevFramePos();
+	// 座標を保存。
+	CharacterManager::Instance()->Left()->SavePrevFramePos();
+	CharacterManager::Instance()->Right()->SavePrevFramePos();
 
-		CharacterManager::Instance()->Left()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag);
+	CharacterManager::Instance()->Left()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag, roundFinishFlag);
 
-		// ボスの更新処理
-		CharacterManager::Instance()->Right()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag);
+	// ボスの更新処理
+	CharacterManager::Instance()->Right()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag, roundFinishFlag);
 	//}
 
 	CharacterAIData::Instance()->nowPos = CharacterManager::Instance()->Right()->pos;
@@ -516,8 +520,8 @@ void Game::Update(const bool& Loop)
 	Scramble();
 
 	// プレイヤーとボスの当たり判定処理
-	CharacterManager::Instance()->Left()->CheckHit(tmpMapData, lineCenterPos);
-	CharacterManager::Instance()->Right()->CheckHit(tmpMapData, lineCenterPos);
+	CharacterManager::Instance()->Left()->CheckHit(tmpMapData, lineCenterPos, roundFinishFlag);
+	CharacterManager::Instance()->Right()->CheckHit(tmpMapData, lineCenterPos, roundFinishFlag);
 	CharacterAIData::Instance()->prevPos = CharacterManager::Instance()->Right()->pos;
 
 	miniMap.Update();
@@ -651,13 +655,13 @@ void Game::Update(const bool& Loop)
 			zoomRate = 0.0f;
 		}
 		static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
-		ScrollMgr::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
+		Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
 
 		// カメラのズームが0.27f未満にならないようにする。
 		float minZoomValue = 0.20f;
-		if (ScrollMgr::Instance()->zoom < minZoomValue)
+		if (Camera::Instance()->zoom < minZoomValue)
 		{
-			ScrollMgr::Instance()->zoom = minZoomValue;
+			Camera::Instance()->zoom = minZoomValue;
 		}
 	}
 	else {
@@ -705,7 +709,7 @@ void Game::Draw()
 	RoundFinishParticleMgr::Instance()->Draw();
 
 
-	if (roundChangeEffect.readyFlag)
+	if (roundChangeEffect.readyFlag || drawCharaFlag)
 	{
 		bossHandMgr->Draw();
 		playerHandMgr->Draw();
@@ -773,7 +777,7 @@ void Game::Draw()
 
 	roundChangeEffect.Draw();
 
-	if (roundChangeEffect.initGameFlag)
+	if (roundChangeEffect.initGameFlag || drawCharaFlag)
 	{
 		// 残像を描画
 		AfterImageMgr::Instance()->Draw();
@@ -1331,9 +1335,45 @@ void Game::RoundFinishEffect(const bool& Loop)
 		if (isEnd) {
 
 
-			readyToStartRoundFlag = true;
-			roundFinishFlag = false;
-			InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+			//勝利数カウント演出
+			if (!WinCounter::Instance()->GetNowAnimation())
+			{
+				//どちらかが３勝とったらゲーム終了
+				if (WinCounter::Instance()->GetGameFinish() && !Loop)
+				{
+					ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
+					if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
+					else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
+					turnResultScene = true;
+				}
+				//次のラウンドへ
+				else
+				{
+					//練習モード
+					if (Loop)WinCounter::Instance()->Reset();
+
+					++roundTimer;
+
+					if (60 <= roundTimer)
+					{
+						readyToStartRoundFlag = true;
+						roundFinishFlag = false;
+
+						StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+						StageMgr::Instance()->SetLocalMapChipDrawBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+						mapData = StageMgr::Instance()->GetLocalMap();
+						mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
+
+						//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+					}
+
+					drawCharaFlag = true;
+
+					// AddLineLengthを伸ばす。
+					CharacterManager::Instance()->Right()->addLineLength = CharacterManager::Instance()->Right()->pos.Distance(CharacterManager::Instance()->Left()->pos) - CharacterInterFace::LINE_LENGTH * 2.0f;
+
+				}
+			}
 
 
 		}

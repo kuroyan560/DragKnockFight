@@ -105,7 +105,7 @@ void RoundFinishParticleMgr::Init()
 	static int first = 0;
 	if (first == 0) {
 
-		TexHandleMgr::LoadDivGraph("resource/ChainCombat/backGround_star.png", 3, Vec2<int>(3, 1), particleGraph.data());
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/backGround_star.png", 4, Vec2<int>(4, 1), particleGraph.data());
 
 		++first;
 

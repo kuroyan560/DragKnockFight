@@ -18,6 +18,7 @@ public:
 		NUM2_ENEMY_SHAKE,		// ②敵をシェイクさせる。
 		NUM3_ENEMY_EXP,			// ③敵を爆発させる。
 		NUM4_RETURN_DEFPOS,		// ⑤各キャラを規定の座標に戻す。
+		NUM5_RETURN_PLAYER_DEFPOS,
 
 	};
 
@@ -32,6 +33,7 @@ public:
 	const int NUM2_ENEMY_SHAKE_TIMER = 150;
 	const int NUM3_ENEMY_EXP_TIMER = 240;
 	const int NUM4_RETURN_DEFPOS_TIMER = 120;
+	const int NUM5_RETURN_PLAYER_DEF_POS = 120;
 
 
 

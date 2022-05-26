@@ -3,6 +3,7 @@
 #include "UsersInput.h"
 #include "StageMgr.h"
 #include "ScoreManager.h"
+#include "WinCounter.h"
 
 RoundFinishEffect::RoundFinishEffect()
 {
@@ -161,8 +162,37 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		if (NUM4_RETURN_DEFPOS_TIMER <= timer) {
 
 			isEnd = true;
+			timer = 0;
+			status = EFFECT_STATUS::NUM5_RETURN_PLAYER_DEFPOS;
+
+			++WinCounter::Instance()->countRound;
 
 		}
+
+		break;
+
+	case RoundFinishEffect::EFFECT_STATUS::NUM5_RETURN_PLAYER_DEFPOS:
+
+		/*-- 第五段階 --*/
+
+		// プレイヤーの座標を規定値に戻す。
+
+		++timer;
+
+		playerDefPos = StageMgr::Instance()->GetPlayerResponePos();
+		enemyDefPos = StageMgr::Instance()->GetBossResponePos();
+
+		CharacterManager::Instance()->Left()->pos += (playerDefPos - CharacterManager::Instance()->Left()->pos) / 30.0f;
+
+
+		if (NUM5_RETURN_PLAYER_DEF_POS <= timer) {
+
+			isEnd = true;
+
+			//++WinCounter::Instance()->countRound;
+
+		}
+
 
 		break;
 

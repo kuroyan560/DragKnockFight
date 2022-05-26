@@ -52,7 +52,7 @@ private:
 
 	/*===== ƒƒ“ƒo•Ï” =====*/
 
-	static const int CRASH_EFFECT_AMOUNT = 30;
+	static const int CRASH_EFFECT_AMOUNT = 100;
 	std::array<ClassEffect, CRASH_EFFECT_AMOUNT> crashEffects;
 
 
