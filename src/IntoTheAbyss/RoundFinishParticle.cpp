@@ -3,6 +3,7 @@
 #include "ScrollMgr.h"
 #include "DrawFunc.h"
 #include "TexHandleMgr.h"
+#include "CharacterManager.h"
 
 RoundFinishParticle::RoundFinishParticle()
 {
@@ -32,13 +33,14 @@ void RoundFinishParticle::Init()
 
 }
 
-void RoundFinishParticle::Generate(const int& UseGraphHandle)
+void RoundFinishParticle::Generate(const Vec2<float>& CharaPos, const int& UseGraphHandle)
 {
 
 	/*===== 初期化処理 =====*/
 
-	pos = {};
+	pos = CharaPos;
 	dir = Vec2<float>(KuroFunc::GetRand(2.0f) - 1.0f, KuroFunc::GetRand(2.0f) - 1.0f);
+	dir.Normalize();
 	changeLength = KuroFunc::GetRand(MIN_MOVE_LENGTH + MAX_MOVE_LENGTH) - MIN_MOVE_LENGTH;
 	useGraphHanlde = UseGraphHandle;
 	isActive = true;
@@ -46,7 +48,7 @@ void RoundFinishParticle::Generate(const int& UseGraphHandle)
 
 }
 
-void RoundFinishParticle::Update(const Vec2<float>& CharaPos, const float& Rate, const Vec2<float>& LeftCharaPos)
+void RoundFinishParticle::Update(const Vec2<float>& LeftCharaPos)
 {
 
 	/*===== 更新処理 =====*/
@@ -54,12 +56,34 @@ void RoundFinishParticle::Update(const Vec2<float>& CharaPos, const float& Rate,
 
 	if (isReturn) {
 
-		pos.x += (pos.x - LeftCharaPos.x) / 30.0f;
-		pos.y += (pos.y - LeftCharaPos.y) / 30.0f;
+		if (0 < changeLength) {
+
+			dir = Vec2<float>(pos - CharacterManager::Instance()->Right()->pos).GetNormal();
+
+			pos += dir * changeLength;
+			changeLength -= changeLength / 10.0f;
+
+			if (changeLength < 0.2f) {
+
+				changeLength = 0;
+
+			}
+
+		}
+		else {
+
+			pos.x += (LeftCharaPos.x - pos.x) / 5.0f;
+			pos.y += (LeftCharaPos.y - pos.y) / 5.0f;
+
+		}
+
+		if ((LeftCharaPos - pos).Length() < 5.0f) Init();
 
 	}
 	else {
-		pos = CharaPos + dir * (Rate * changeLength);
+		changeLength -= changeLength / 10.0f;
+		pos += dir * changeLength;
+
 	}
 
 }
@@ -81,7 +105,7 @@ void RoundFinishParticleMgr::Init()
 	static int first = 0;
 	if (first == 0) {
 
-		TexHandleMgr::LoadDivGraph("resource/ChainCombat/backGround_star.png", 3, Vec2<int>(3, 1), particleGraph.data());
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/backGround_star.png", 4, Vec2<int>(4, 1), particleGraph.data());
 
 		++first;
 
@@ -98,7 +122,7 @@ void RoundFinishParticleMgr::Init()
 
 }
 
-void RoundFinishParticleMgr::Generate()
+void RoundFinishParticleMgr::Generate(const Vec2<float>& CharaPos)
 {
 
 	/*=====	生成処理 =====*/
@@ -108,7 +132,7 @@ void RoundFinishParticleMgr::Generate()
 		// 使用する画像をランダムに生成。
 		int useHandle = KuroFunc::GetRand(2);
 
-		index.Generate(particleGraph[useHandle]);
+		index.Generate(CharaPos, particleGraph[useHandle]);
 
 	}
 
@@ -116,7 +140,7 @@ void RoundFinishParticleMgr::Generate()
 
 }
 
-void RoundFinishParticleMgr::Update(const Vec2<float>& CharaPos, const Vec2<float>& LeftCharaPos)
+void RoundFinishParticleMgr::Update(const Vec2<float>& LeftCharaPos)
 {
 
 	/*===== 更新処理 =====*/
@@ -126,7 +150,9 @@ void RoundFinishParticleMgr::Update(const Vec2<float>& CharaPos, const Vec2<floa
 
 	for (auto& index : particles) {
 
-		index.Update(CharaPos, nowEasing, LeftCharaPos);
+		if (!index.isActive) continue;
+
+		index.Update(LeftCharaPos);
 
 	}
 
@@ -164,6 +190,7 @@ void RoundFinishParticleMgr::SetReturn()
 		if (!index.isActive) continue;
 
 		index.isReturn = true;
+		index.changeLength = 30;
 
 	}
 

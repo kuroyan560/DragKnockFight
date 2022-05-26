@@ -225,11 +225,11 @@ public:
 		characterName = Name;
 	}
 	void Init(const Vec2<float>& GeneratePos, const bool& Appear);	//ラウンド開始時に呼び出される
-	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect);
+	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect, const bool& isRoundFinishEffect);
 	void Draw(const bool& isRoundStartEffect);
 	void DrawUI();
 	//当たり判定
-	void CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos);
+	void CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundFinish);
 	void CheckHitStuck(const std::vector<std::vector<int>>& MapData);
 
 	//スタン

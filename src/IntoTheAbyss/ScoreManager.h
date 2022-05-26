@@ -15,6 +15,11 @@ public:
 
 	void Init();
 	void Add(const int &ADD_POINT);
+
+	// ó’éûÇ≈é¿ëïÇµÇ‹ÇµÇΩÅB
+	int destroyPoint;
+	void AddDestroyPoint();
+
 	void Sub(const int &SUB_POINT);
 	void Update();
 	void Draw();

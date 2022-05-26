@@ -107,6 +107,8 @@ class Game
 	int roundTimer;
 	int bgm;
 
+	bool drawCharaFlag;
+
 	bool firstLoadFlag;
 	void InitGame(const int& STAGE_NUM, const int& ROOM_NUM);
 

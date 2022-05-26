@@ -10,7 +10,7 @@ private:
 
 	/*===== メンバ変数 =====*/
 
-	static const int ITEM_COUNT = 100;
+	static const int ITEM_COUNT = 200;
 	std::array<StaminaItem, ITEM_COUNT> item;
 
 	float areaLeftPos;		// 戦闘エリアの左の座標
@@ -20,8 +20,8 @@ private:
 	const int SPONE_TIMER = 60;	// アイテムが自動スポーンするタイマー
 	const int SPONE_COUNT = 3;	// 一回のスポーンでアイテムがすぽーんする数
 
-	const int GENERATE_CRASH = 3;		// クラッシュ時に生成するアイテム
-	const int ADD_GENERATE_CRASH = 10;	// クラッシュ時に生成するアイテム
+	const int GENERATE_CRASH = 2;		// クラッシュ時に生成するアイテム
+	const int ADD_GENERATE_CRASH = 2;	// クラッシュ時に生成するアイテム
 	const float HEAL_AMOUNT = 20;	// アイテム1個のヒール量
 	const float CRASH_VEL = 20;		// クラッシュした際にアイテムが広がる量(演出用)
 

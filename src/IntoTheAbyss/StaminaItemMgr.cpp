@@ -27,36 +27,6 @@ void StaminaItemMgr::GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STAT
 	// 生成するデフォルト量をセット。
 	int generateCount = GENERATE_CRASH;
 
-	// 戦闘エリアの中心地点。
-	float areaHalfPos = areaRighPos / 2.0f;
-	float rate = 0;
-
-	// 位置関係に応じて生成する量を増やす。
-	if (CharaID == StaminaItem::CHARA_ID::LEFT)
-	{
-		// 半分より左に行ってなかったら処理を飛ばす。
-		if (!(areaHalfPos < SwingCharaPos.x))
-		{
-			// 増やすべき割合を求める。
-			rate = SwingCharaPos.x / areaHalfPos;
-
-			// 増やす。
-			generateCount += (1.0f - rate) * ADD_GENERATE_CRASH;
-		}
-	}
-	else if (CharaID == StaminaItem::CHARA_ID::SCORE || CharaID == StaminaItem::CHARA_ID::RARE_SCORE)
-	{
-		// 半分より右に行ってなかったら処理を飛ばす。
-		if (!(SwingCharaPos.x < areaHalfPos))
-		{
-			// 増やすべき割合を求める。
-			rate = (SwingCharaPos.x - areaHalfPos) / areaHalfPos;
-
-			// 増やす。
-			generateCount += rate * ADD_GENERATE_CRASH;
-		}
-	}
-
 	generateCount = GENERATE_CRASH;
 
 	for (int generate = 0; generate < generateCount; ++generate) {

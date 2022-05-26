@@ -30,6 +30,16 @@ void ScoreManager::Add(const int &ADD_POINT)
 	mode = APPEAR;
 }
 
+void ScoreManager::AddDestroyPoint()
+{
+	honraiScore += destroyPoint;
+
+	timer = 0;
+	if (mode == EXIT)mode = STAY;
+	if (mode != NONE)return;
+	mode = APPEAR;
+}
+
 void ScoreManager::Sub(const int &SUB_POINT)
 {
 	honraiScore -= SUB_POINT;

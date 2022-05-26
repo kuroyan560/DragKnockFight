@@ -16,8 +16,8 @@ public:
 	bool isActive;
 	bool isReturn;
 
-	const float MIN_MOVE_LENGTH = 700.0f;
-	const float MAX_MOVE_LENGTH = 1000.0f;
+	const float MIN_MOVE_LENGTH = 150.0f;
+	const float MAX_MOVE_LENGTH = 200.0f;
 
 
 public:
@@ -31,10 +31,10 @@ public:
 	void Init();
 
 	// 生成処理
-	void Generate(const int& UseGraphHandle);
+	void Generate(const Vec2<float>& CharaPos, const int& UseGraphHandle);
 
 	// 更新処理
-	void Update(const Vec2<float>& CharaPos, const float& Rate, const Vec2<float>& LeftCharaPos);
+	void Update(const Vec2<float>& LeftCharaPos);
 
 	// 描画処理
 	void Draw();
@@ -47,7 +47,7 @@ public:
 
 	/*===== メンバ変数 =====*/
 
-	static const int MAX_PARTICLE = 40;
+	static const int MAX_PARTICLE = 70;
 	std::array<RoundFinishParticle, MAX_PARTICLE> particles;
 
 	std::array<int, 3> particleGraph;
@@ -64,10 +64,10 @@ public:
 	void Init();
 
 	// 生成処理
-	void Generate();
+	void Generate(const Vec2<float>& CharaPos);
 
 	// 更新処理
-	void Update(const Vec2<float>& CharaPos, const Vec2<float>& LeftCharaPos);
+	void Update(const Vec2<float>& LeftCharaPos);
 
 	// 描画処理
 	void Draw();

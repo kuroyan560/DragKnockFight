@@ -23,7 +23,6 @@ class WinCounter : public Singleton<WinCounter>
 	int lunaAnimHandle;
 
 	//試合関連
-	int countRound;						//ラウンド数
 	int countLeftWin, countRightWin;	//勝利数
 	int drawCountLeft, drawCountRight;	//勝利数描画数
 
@@ -56,6 +55,9 @@ class WinCounter : public Singleton<WinCounter>
 	KNOCK_OUT_PHASE knockOutPhase;
 
 public:
+	int countRound;						//ラウンド数
+
+
 	void Reset()
 	{
 		countRound = 0;

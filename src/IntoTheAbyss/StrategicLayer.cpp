@@ -24,7 +24,7 @@ float IStrategicLayer::GetGaugeStatus()
 
 IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &DATA)
 {
-	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
+	std::array<StaminaItem, 200>item = StaminaItemMgr::Instance()->GetItemArray();
 
 	RoomMapChipArray *mapData = StageMgr::Instance()->GetLocalMap();
 
@@ -103,7 +103,7 @@ void RestoreStamina::Init()
 
 void RestoreStamina::Update()
 {
-	std::array<StaminaItem, 100>item = StaminaItemMgr::Instance()->GetItemArray();
+	std::array<StaminaItem, 200>item = StaminaItemMgr::Instance()->GetItemArray();
 
 
 	//アイテム探索を開始
