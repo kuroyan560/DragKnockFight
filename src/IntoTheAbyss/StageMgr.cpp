@@ -490,7 +490,7 @@ int StageMgr::GetEnableToUseStageNumber()
 	return count;
 }
 
-const Vec2<float> &StageMgr::GetPlayerResponePos()
+Vec2<float>StageMgr::GetPlayerResponePos()
 {
 	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
 	{
@@ -505,7 +505,7 @@ const Vec2<float> &StageMgr::GetPlayerResponePos()
 	return Vec2<float>(0.0f, 0.0f);
 }
 
-const Vec2<float> &StageMgr::GetBossResponePos()
+Vec2<float>StageMgr::GetBossResponePos()
 {
 	for (int y = 0; y < localRoomMapChipArray.size(); ++y)
 	{
