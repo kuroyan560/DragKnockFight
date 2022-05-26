@@ -62,10 +62,10 @@ void DistanceCounter::Draw()
 		if (drawDisit < 0 || 9 < drawDisit) continue;
 
 		float zoom = ScrollMgr::Instance()->zoom;
-		//zoom = 1.0f - zoom;
+		zoom = 1.0f - zoom;
 
 		// •`‰æ‚·‚éB
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos - Vec2<float>((INDEX_OFFSET * (1.0f - zoom)) * index, 0)), Vec2<float>(1.0f * (1.0f - zoom), 1.0f * (1.0f - zoom)), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos - Vec2<float>((INDEX_OFFSET * zoom) * index, 0)), Vec2<float>(1.0f * zoom, 1.0f * zoom), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]));
 
 	}
 
