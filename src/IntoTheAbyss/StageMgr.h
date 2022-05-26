@@ -274,6 +274,8 @@ public:
 	Vec2<float>GetPlayerResponePos();
 	Vec2<float>GetBossResponePos();
 
+	std::vector<std::vector<int>> swingCount;
+
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
 
