@@ -78,20 +78,57 @@ StageMgr::StageMgr()
 	std::string roomFileName = "Room_";
 
 
-	//for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
-	//{
-	//	for (int roomNum = 0; roomNum < allRoomNum; ++roomNum)
-	//	{
-	//		//ファイルパス
-	//		std::string filePass =
-	//			rootFilePass + stageFilePass + std::to_string(stageNum) + "/";
-	//		//ファイル名
-	//		std::string fileName =
-	//			roomFileName + std::to_string(roomNum) + "_Gimmick.txt";
+	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
+	{
+		//ファイルパス
+		std::string filePass =
+			rootFilePass + stageFilePass + std::to_string(stageNum) + "/";
+		//ファイル名
+		std::string fileName = filePass + "swingCount.txt";
 
-	//		GimmickLoader::Instance()->LoadData(stageNum, roomNum, filePass + fileName);
-	//	}
-	//}
+		// ファイルデータ
+		std::ifstream ifs;
+		// ファイルを開く。
+		ifs.open(fileName);
+		// ファイルが開けたかをチェックする。
+		if (ifs.fail())
+		{
+			//失敗
+			continue;
+			return;
+		}
+		//ファイルから情報を選択
+		string line;
+		int roomNum = 0;
+		swingCount.push_back({});
+		while (getline(ifs, line))
+		{
+			//一行分の文字列をストリームに変換して解析しやすくなる
+			istringstream line_stream(line);
+
+			//半角スペース区切りで行の先頭文字列を取得
+			string key;//ここでvかf等の判断をする
+			getline(line_stream, key, ' ');
+
+			int num = -1;
+			if (key == "room0")
+			{
+				line_stream >> num;
+				swingCount[stageNum].push_back(num);
+			}
+			if (key == "room1")
+			{
+				line_stream >> num;
+				swingCount[stageNum].push_back(num);
+			}
+			if (key == "room2")
+			{
+				line_stream >> num;
+				swingCount[stageNum].push_back(num);
+			}
+		}
+		ifs.close();
+	}
 
 	//ギミック共通の設定
 	//GimmickLoader::Instance()->LoadData(rootFilePass + "GimmickCommonData.txt");
@@ -520,6 +557,11 @@ Vec2<float>StageMgr::GetBossResponePos()
 		}
 	}
 	return Vec2<float>(0.0f, 0.0f);
+}
+
+int StageMgr::GetSwingCount(int STAGE_NUM, int ROOM_NUM)
+{
+	return swingCount[STAGE_NUM][ROOM_NUM];
 }
 
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
