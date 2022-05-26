@@ -37,7 +37,7 @@ public:
 	STATUS status;		// 現在のステータス
 	DISIT_ID disitID;	// 桁数
 
-	const float ADD_EASING_TIMER = 0.05f;
+	const float ADD_EASING_TIMER = 0.1f;
 	const float EASING_CHANGE = 100.0f;
 	const float FONT_SIZE = 128.0f;
 	const int EXIT_TIMER = 120;

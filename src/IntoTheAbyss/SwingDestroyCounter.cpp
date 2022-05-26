@@ -252,6 +252,7 @@ void DestroyCounter::Update(const Vec2<float>& CharaPos)
 
 				//status = STATUS::EXIT;
 				SetExit();
+				Init();
 
 			}
 

@@ -15,6 +15,11 @@ DistanceCounter::DistanceCounter()
 
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, Vec2<int>(12, 1), fontGraph.data());
 
+	isExpSmall = false;
+	exp = 1.0f;
+
+	shakeAmount = {};
+
 }
 
 void DistanceCounter::Init()
@@ -24,6 +29,11 @@ void DistanceCounter::Init()
 
 	distance = 0;
 	lineCenterPos = { -1000,-10000 };
+
+	isExpSmall = false;
+	exp = 1.0f;
+
+	shakeAmount = {};
 
 }
 
@@ -41,6 +51,30 @@ void DistanceCounter::Update()
 	// 2点間の距離を求める。
 	distance = (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).Length() - DEAD_LINE;
 
+	if (isExpSmall) {
+
+		exp -= exp / 10.0f;
+
+	}
+	else {
+
+		exp += (1.0f - exp) / 10.0f;
+
+	}
+
+	// シェイクの更新処理
+	if (distance < MAX_SHAKE_DISTANCE) {
+
+		// 割合を求める。
+		float shakeRate = distance / MAX_SHAKE_DISTANCE;
+		shakeRate = 1.0f - shakeRate;
+
+		float shakeValue = shakeRate * MAX_SHAKE_AMOUNT;
+
+		shakeAmount = { KuroFunc::GetRand(shakeValue * 2.0f) - shakeValue, KuroFunc::GetRand(shakeValue * 2.0f) - shakeValue };
+
+	}
+
 }
 
 void DistanceCounter::Draw()
@@ -55,7 +89,7 @@ void DistanceCounter::Draw()
 	// 描画でずらすオフセットの値。
 	const float OFFSET_X = static_cast<float>(distanceDisitCount) / 2.0f;
 	// 描画座標
-	Vec2<float> drawPos = ScrollMgr::Instance()->Affect(lineCenterPos);
+	Vec2<float> drawPos = ScrollMgr::Instance()->Affect(lineCenterPos + shakeAmount);
 	for (int index = 0; index < distanceDisitCount; ++index) {
 
 		// 描画する数字。
@@ -67,7 +101,7 @@ void DistanceCounter::Draw()
 		zoom = 1.0f - zoom;
 
 		// 描画する。
-		DrawFunc::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * index, 0), Vec2<float>(zoom, zoom), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]));
+		DrawFunc::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * index + OFFSET_X * zoom, 0), Vec2<float>(zoom * exp, zoom * exp), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]));
 
 	}
 

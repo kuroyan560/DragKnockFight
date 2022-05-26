@@ -132,6 +132,8 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		shakeAmount = Vec2<float>(KuroFunc::GetRand(nowShakeAmount * 2.0f) - nowShakeAmount, KuroFunc::GetRand(nowShakeAmount * 2.0f) - nowShakeAmount);
 		CharacterManager::Instance()->Right()->pos += shakeAmount;
 
+		UsersInput::Instance()->ShakeController(0, 0.1f, 6);
+
 		// タイマーを更新して次へ。
 		++timer;
 		if (NUM2_ENEMY_SHAKE_TIMER <= timer) {
@@ -174,12 +176,14 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		else if (timer == NUM3_ENEMY_EXP_TIMER * 0.75) {
 
 			ScoreManager::Instance()->AddDestroyPoint();
+			UsersInput::Instance()->ShakeController(0, 0.5f, 12);
 
 		}
 		else if (timer < NUM3_ENEMY_EXP_TIMER / 2.0f) {
 
 			// カメラを一気に引く。
 			Camera::Instance()->Focus(LineCenterPos, 0.5f, 0.3f);
+			UsersInput::Instance()->ShakeController(0, 1.0f, 5);
 
 		}
 

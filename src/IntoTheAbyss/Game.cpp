@@ -233,6 +233,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	SelectStage::Instance()->resetStageFlag = false;
 	restartTimer = 0.0f;
 
+	DistanceCounter::Instance()->Init();
+
 
 	{
 		Vec2<float>playerLeftUpPos;
@@ -427,6 +429,8 @@ void Game::Init(const bool& PracticeMode)
 	RoundFinishEffect::Instance()->Init();
 
 	stageRap.Init(StageMgr::Instance()->GetMaxLap(SelectStage::Instance()->GetStageNum()));
+
+	DistanceCounter::Instance()->Init();
 }
 
 void Game::Update(const bool& Loop)
@@ -682,6 +686,7 @@ void Game::Update(const bool& Loop)
 			float maxBclokCount = countBlock.countAllBlockNum;
 			float destroyRate = nowBlockCount / maxBclokCount;
 			RoundFinishEffect::Instance()->Start(isBlockEmpty, 1.0f - destroyRate);
+			DistanceCounter::Instance()->isExpSmall = true;
 
 		}
 
@@ -1387,6 +1392,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 				RoundFinishEffect::Instance()->changeMap = false;
 				countBlock.Init();
 				stageRap.Increment();
+				DistanceCounter::Instance()->isExpSmall = false;
 
 				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 			}
