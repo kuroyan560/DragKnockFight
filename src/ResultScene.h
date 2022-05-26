@@ -60,6 +60,8 @@ class ResultScene : public BaseScene
 	int winnerGraph[PLAYABLE_CHARACTER_NUM];
 	PLAYABLE_CHARACTER_NAME winnerName;
 
+	Vec2<float> nowSize,breakSize, maxSize;
+
 public:
 
 	const Vec2<int> WINDOW_CENTER = WinApp::Instance()->GetWinCenter();
@@ -106,7 +108,7 @@ private:
 	}
 
 	// [BREAK]‚ð•`‰æ
-	void DrawBREAK(const Vec2<float>& targetPosm, const float& easingTimer, const int& graphHandle, const int& breakCount);
+	void DrawBREAK(const Vec2<float> &targetPosm, const float &easingTimer, const int &graphHandle, const int &breakCount, bool SIZE_FLAG);
 
 	// [SCORE][ƒXƒRƒA]‚ð•`‰æ
 	void DrawSCORE(const float& easingTimer, const double& scoreEffectEasingTimer);

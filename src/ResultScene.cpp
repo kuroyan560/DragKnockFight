@@ -61,7 +61,7 @@ void ResultScene::OnInitialize()
 
 void ResultScene::OnUpdate()
 {
-	if(UsersInput::Instance()->KeyOnTrigger(DIK_J))
+	if (UsersInput::Instance()->KeyOnTrigger(DIK_J))
 	{
 		resultUITimer = 0;
 		breakEnemyUITimer = 0;
@@ -87,6 +87,9 @@ void ResultScene::OnUpdate()
 		crashPlayerAmount = ResultTransfer::Instance()->leftCrashCount;
 		winnerName = ResultTransfer::Instance()->winner;
 		rapNumber = 3;
+
+		maxSize = { 0.5f,0.5f };
+		breakSize = { 1.5f,1.5f };
 	}
 
 
@@ -204,7 +207,7 @@ void ResultScene::OnUpdate()
 
 	}
 
-	switch (rapNumber)
+	/*switch (rapNumber)
 	{
 	case 1:
 		BREAK_ENEMY_UI_TIMER = 20;
@@ -217,29 +220,30 @@ void ResultScene::OnUpdate()
 	case 2:
 		BREAK_ENEMY_UI_TIMER = 20;
 		BREAK_PLAYER_UI_TIMER = 2;
-		CRASH_ENEMY_UI_TIMER = 20;
+
 		CRASH_PLAYER_UI_TIMER = 2;
 
 		BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 300.0f };
 		CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 400.0f };
 		break;
 	case 3:
-		BREAK_ENEMY_UI_TIMER = 20;
+
 		BREAK_PLAYER_UI_TIMER = 20;
 		CRASH_ENEMY_UI_TIMER = 20;
 		CRASH_PLAYER_UI_TIMER = 2;
 
-		BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 260.0f };
-		CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 360.0f };
+
 		BREAK_PLAYER_POS = { (float)WINDOW_CENTER.x - 110.0f, 460.0f };
 		break;
 	default:
 		break;
-	}
+	}*/
 
-
-
-
+	BREAK_ENEMY_UI_TIMER = 20;
+	CRASH_ENEMY_UI_TIMER = 20;
+	BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x - 200.0f , 360.0f };
+	CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x - 150.0f, 380.0f };
+	breakEnemyAmount = 0;
 	// リザルト画面へ飛ばす
 	if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A)) {
 		static int bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
@@ -263,34 +267,19 @@ void ResultScene::OnDraw()
 
 	// [RESULT] と [BREAK]の描画処理
 
-	
+
 
 	{
 		float easingPosX = resultEasingAmount * (RESULT_POS.x - windowSize.x);
 		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX, RESULT_POS.y), TexHandleMgr::GetTexBuffer(resultHandle));
 
-		DrawFunc::DrawRotaGraph2D(Vec2<float>(windowSize.x + easingPosX-20.0f, ROUND_POS.y) + Vec2<float>(220.0f, 0.0f), Vec2<float>(0.5f, 0.5f), 0.0f, TexHandleMgr::GetTexBuffer(roundHandle));
+		//DrawFunc::DrawRotaGraph2D(Vec2<float>(windowSize.x + easingPosX - 20.0f, ROUND_POS.y) + Vec2<float>(220.0f, 0.0f), Vec2<float>(0.5f, 0.5f), 0.0f, TexHandleMgr::GetTexBuffer(roundHandle));
+		//DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX + 90.0f, 155.0f) + Vec2<float>(300.0f, 0.0f), TexHandleMgr::GetTexBuffer(scoreHandle));
 
-		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX+90.0f, 155.0f) + Vec2<float>(300.0f, 0.0f), TexHandleMgr::GetTexBuffer(scoreHandle));
 
+		DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount, false);
+		DrawBREAK(CRASH_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount, true);
 
-		switch (rapNumber)
-		{
-		case 1:
-			DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount);
-			break;
-		case 2:
-			DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount);
-			DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, blueNumberHandle[1], crashEnemyAmount);
-			break;
-		case 3:
-			DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount);
-			DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, blueNumberHandle[1], crashEnemyAmount);
-			DrawBREAK(BREAK_PLAYER_POS, breakPlayerEasingAmount, blueNumberHandle[2], breakPlayerAmount);
-			break;
-		default:
-			break;
-		}
 		//DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, breakEnemyHandle, breakEnemyAmount);
 		//DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, crashEnemyHandle, crashEnemyAmount);
 		//DrawBREAK(BREAK_PLAYER_POS, breakPlayerEasingAmount, breakPlayerHandle, breakPlayerAmount);
@@ -298,7 +287,7 @@ void ResultScene::OnDraw()
 	}
 
 	// [SCORE] の描画処理
-	DrawSCORE(scoreEasingAmount, scoreEffectEasingAmount);
+	//DrawSCORE(scoreEasingAmount, scoreEffectEasingAmount);
 
 }
 
@@ -312,29 +301,50 @@ void ResultScene::OnFinalize()
 	AudioApp::Instance()->StopWave(BGM);
 }
 
-void ResultScene::DrawBREAK(const Vec2<float>& targetPosm, const float& easingTimer, const int& graphHandle, const int& breakCount)
+void ResultScene::DrawBREAK(const Vec2<float> &targetPosm, const float &easingTimer, const int &graphHandle, const int &breakCount, bool SIZE_FLAG)
 {
 
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 
 	// イージングをかけた位置を求めて[BREAK]を描画をする。
 	float easingPosX = easingTimer * (targetPosm.x - windowSize.x);
-	Vec2<float> drawPos = Vec2<float>(windowSize.x + easingPosX, targetPosm.y) + Vec2<float>(80.0f, 0.0f);
-	DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(graphHandle));
+	Vec2<float> drawPos = Vec2<float>(windowSize.x + easingPosX, targetPosm.y);
+	//DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(graphHandle));
 
 	// BREAKの画像サイズ分右に動かした位置に*を描画する。
-	drawPos = drawPos + Vec2<float>(160.0f, 0.0f);
+	//drawPos = drawPos + Vec2<float>(160.0f, 0.0f);
 	//DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(blueNumberHandle[0]));
 
 	// 数字のフォント分移動させる。
-	const int FONT_SIZE = 66.3f;
-	drawPos.x += FONT_SIZE;
+
+	int FONT_SIZE = 66.3f;
+	if (SIZE_FLAG)
+	{
+		nowSize = maxSize;
+		FONT_SIZE *= nowSize.x;
+		
+		for (int i = 0; i < KuroFunc::GetDigit(breakCount) - 1; ++i)
+		{
+			drawPos.x += FONT_SIZE;
+		}
+	}
+	else
+	{
+		nowSize = breakSize;
+		FONT_SIZE *= nowSize.x;
+
+		for (int i = 0; i < KuroFunc::GetDigit(breakCount) - 1; ++i)
+		{
+			drawPos.x -= FONT_SIZE;
+		}
+	}
 
 
-	std::vector<int>number = CountNumber(100);
+
+	std::vector<int>number = CountNumber(breakCount);
 	for (int i = 0; i < number.size(); ++i)
 	{
-		DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
+		DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
 		// フォントサイズ分移動させる。
 		drawPos.x += FONT_SIZE;
 	}
@@ -360,7 +370,7 @@ void ResultScene::DrawBREAK(const Vec2<float>& targetPosm, const float& easingTi
 
 }
 
-void ResultScene::DrawSCORE(const float& easingTimer, const double& scoreEffectEasingTimer)
+void ResultScene::DrawSCORE(const float &easingTimer, const double &scoreEffectEasingTimer)
 {
 
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
