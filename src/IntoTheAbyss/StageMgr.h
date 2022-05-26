@@ -274,7 +274,8 @@ public:
 	Vec2<float>GetPlayerResponePos();
 	Vec2<float>GetBossResponePos();
 
-	std::vector<std::vector<int>> swingCount;
+	
+	int GetSwingCount(int STAGE_NUM, int ROOM_NUM);
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
@@ -302,6 +303,10 @@ private:
 	array<int, 30> mapChipGraphHandle;
 	array<int, 3> gimmcikGraphHandle;
 	array<int, 12> sparkGraphHandle;
+
+
+	std::vector<std::vector<int>> swingCount;
+
 	enum MapChipDrawEnum
 	{
 		MAPCHIP_DRAW_WALL_LEFT_UP,

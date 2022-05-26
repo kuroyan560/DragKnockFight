@@ -559,6 +559,11 @@ Vec2<float>StageMgr::GetBossResponePos()
 	return Vec2<float>(0.0f, 0.0f);
 }
 
+int StageMgr::GetSwingCount(int STAGE_NUM, int ROOM_NUM)
+{
+	return swingCount[STAGE_NUM][ROOM_NUM];
+}
+
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
 {
 	bool sideFlag = false;
