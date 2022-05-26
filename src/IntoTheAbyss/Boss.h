@@ -18,6 +18,9 @@ using namespace std;
 #include"BulletMgrBase.h"
 #include"Barrages.h"
 
+#include"StarParticleMgr.h"
+
+
 // プレイヤーと引っ張り合うボスクラス
 class Boss : public CharacterInterFace
 {
@@ -80,6 +83,8 @@ public:
 
 
 	int crashNumber;
+
+	StarParticleMgr starParticleMgr;
 
 public:
 	/*===== 定数 =====*/

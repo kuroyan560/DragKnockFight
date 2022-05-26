@@ -1,5 +1,6 @@
 #include "StarParticleMgr.h"
 #include"../Common/KuroFunc.h"
+#include"CharacterManager.h"
 
 StarParticleMgr::StarParticleMgr()
 {
@@ -11,24 +12,25 @@ void StarParticleMgr::Init()
 
 void StarParticleMgr::Update()
 {
-	float size = 200.0f;
+	if (CharacterManager::Instance()->Left()->GetNowSwing())
+	{
+		nowParticleNum = particleMax;
+	}
+	else
+	{
+		nowParticleNum = particleNomalMax;
+	}
 
-	float num = particleMax - tracPatricle;
+
+	float num = nowParticleNum - tracPatricle;
 	tracPatricle += num * 0.1f;
-
-
 	for (int i = 0; i < tracPatricle; ++i)
 	{
 		if (!paticles[i].isAlive())
 		{
-
-
+			float size = 200.0f;
 			Vec2<float>emittPos = { pos.x - size / 2.0f,pos.y - size / 2.0f };
 			Vec2<float>emittSize = { KuroFunc::GetRand(size),KuroFunc::GetRand(size) };
-
-			//Vec2<float>angle(KuroFunc::GetRand(360.0f), KuroFunc::GetRand(360.0f));
-			//Vec2<float>radian(cosf(Angle::ConvertToRadian(angle.x)), sinf(Angle::ConvertToRadian(angle.y)));
-			//paticles[i].Init(emittPos+emittSize, radian * 0.0f, KuroFunc::GetRand(120));
 
 
 			float angel = 270 + KuroFunc::GetRand(180);
@@ -50,4 +52,13 @@ void StarParticleMgr::Draw()
 	{
 		paticles[i].Draw();
 	}
+}
+
+void StarParticleMgr::ParticleLevel(int NORMAL_PARTICLE_NUM, int SWING_PARTICLE_NUM)
+{
+	pos = CharacterManager::Instance()->Right()->pos;
+	vel = CharacterManager::Instance()->Right()->vel;
+
+	particleMax = SWING_PARTICLE_NUM;
+	particleNomalMax = SWING_PARTICLE_NUM;
 }

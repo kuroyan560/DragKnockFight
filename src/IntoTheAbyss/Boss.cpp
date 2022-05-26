@@ -171,7 +171,26 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	}
 
 
+	switch (bossCrashModel)
+	{
+	case Boss::NONE_LEVEL:
+		starParticleMgr.ParticleLevel(0, 0);
+		break;
+	case Boss::FIRST_LEVEL:
+		starParticleMgr.ParticleLevel(15, 50);
+		break;
+	case Boss::SECOND_LEVEL:
+		starParticleMgr.ParticleLevel(20, 100);
+		break;
+	case Boss::THIRD_LEVEL:
+		starParticleMgr.ParticleLevel(30, 150);
+		break;
+	default:
+		break;
+	}
 
+
+	starParticleMgr.Update();
 
 	// パートナーが振り回していたら残像を出す。
 	if (partner.lock()->GetNowSwing()) {
@@ -299,6 +318,8 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	++flashTimer;
 	//フラッシュする----------------------------------------------
 
+
+
 }
 
 #include"DrawFunc_FillTex.h"
@@ -347,7 +368,7 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 
 	//navigationAi.Draw();
 	characterAi.Draw();
-
+	starParticleMgr.Draw();
 	/*bossGraph.SetTexture(TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()));
 	bossGraph.SetColor(Color(255, 0, 0, static_cast<int>(255 * stagingDevice.GetFlashAlpha())));
 	bossGraph.transform.SetPos(ScrollMgr::Instance()->Affect(drawPos));

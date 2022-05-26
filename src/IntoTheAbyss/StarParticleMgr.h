@@ -12,11 +12,13 @@ public:
 	void Update();
 	void Draw();
 
-	Vec2<float>pos,vel;
-	int particleMax;
-	int tracPatricle;
-private:
-	std::array<StarParticle, 100>paticles;
 
+	void ParticleLevel(int NORMAL_PARTICLE_NUM, int SWING_PARTICLE_NUM);
+
+private:
+	std::array<StarParticle, 200>paticles;
+	Vec2<float>pos, vel;
+	int particleMax, particleNomalMax, nowParticleNum;
+	int tracPatricle;
 };
 

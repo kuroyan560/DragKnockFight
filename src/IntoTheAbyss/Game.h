@@ -32,7 +32,6 @@ class RenderTarget;
 #include"BlockCount.h"
 
 #include"StageRap.h"
-#include"../IntoTheAbyss/StarParticleMgr.h"
 
 class CharacterInterFace;
 
@@ -140,8 +139,6 @@ class Game
 
 	StageRap stageRap;
 
-
-	StarParticleMgr pmgr;
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
 

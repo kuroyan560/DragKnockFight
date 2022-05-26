@@ -728,19 +728,8 @@ void Game::Update(const bool& Loop)
 
 	}
 
-	pmgr.pos = CharacterManager::Instance()->Right()->pos;
-	pmgr.vel = CharacterManager::Instance()->Right()->vel;
 
-	if (CharacterManager::Instance()->Left()->GetNowSwing())
-	{
-		pmgr.particleMax = 100;
-	}
-	else
-	{
-		pmgr.particleMax = 15;
-	}
-	
-	pmgr.Update();
+
 
 }
 
@@ -858,8 +847,6 @@ void Game::Draw()
 	countBlock.Draw();
 	stageRap.Draw();
 
-
-	pmgr.Draw();
 
 
 	// プレイヤーとボス間に線を描画
