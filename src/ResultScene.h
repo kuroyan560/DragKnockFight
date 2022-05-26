@@ -12,7 +12,6 @@
 
 class ResultScene : public BaseScene
 {
-
 	int backGroundHandle;		// 背景(仮)の画像ハンドル
 	int winnerFrameHandle;		// 勝者のフレームの画像ハンドル
 	int resultHandle;			// リザルトの画像ハンドル
@@ -64,22 +63,22 @@ public:
 	const Vec2<int> WINDOW_CENTER = WinApp::Instance()->GetWinCenter();
 
 	// イージング結果の座標
-	const Vec2<float> RESULT_POS = { (float)WINDOW_CENTER.x - 200.0f, 30.0f };
-	const Vec2<float> BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 150.0f };
-	const Vec2<float> CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 250.0f };
-	const Vec2<float> BREAK_PLAYER_POS = { (float)WINDOW_CENTER.x - 110.0f, 350.0f };
-	const Vec2<float> CRASH_PLAYER_POS = { (float)WINDOW_CENTER.x - 110.0f, 450.0f };
-	const Vec2<float> SCORE_POS = { (float)WINDOW_CENTER.x - 100.0f, (float)WINDOW_CENTER.y + 180.0f };
+	Vec2<float> RESULT_POS = { (float)WINDOW_CENTER.x - 200.0f, 30.0f };
+	Vec2<float> BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 150.0f };
+	Vec2<float> CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 250.0f };
+	Vec2<float> BREAK_PLAYER_POS = { (float)WINDOW_CENTER.x - 110.0f, 350.0f };
+	Vec2<float> CRASH_PLAYER_POS = { (float)WINDOW_CENTER.x - 110.0f, 450.0f };
+	Vec2<float> SCORE_POS = { (float)WINDOW_CENTER.x - 100.0f, (float)WINDOW_CENTER.y + 180.0f };
 
 	// 各タイマーのデフォルト値
 	const int RESULT_UI_TIMER = 20;
-	const int BREAK_ENEMY_UI_TIMER = 20;
-	const int BREAK_PLAYER_UI_TIMER = 20;
-	const int CRASH_ENEMY_UI_TIMER = 20;
-	const int CRASH_PLAYER_UI_TIMER = 20;
-	const int SCORE_UI_TIMER = 40;
-	const int DELAY_TIMER = 30;
-	const int SCORE_EFFECT_TIMER = 180;
+	int BREAK_ENEMY_UI_TIMER = 20;
+	int BREAK_PLAYER_UI_TIMER = 20;
+	int CRASH_ENEMY_UI_TIMER = 20;
+	int CRASH_PLAYER_UI_TIMER = 20;
+	int SCORE_UI_TIMER = 40;
+	int DELAY_TIMER = 30;
+	int SCORE_EFFECT_TIMER = 180;
 
 
 public:

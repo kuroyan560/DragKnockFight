@@ -5,6 +5,7 @@
 #include "KuroMath.h"
 #include "UsersInput.h"
 #include "IntoTheAbyss/ResultTransfer.h"
+#include"IntoTheAbyss/ScoreKeep.h"
 
 ResultScene::ResultScene()
 {
@@ -155,7 +156,7 @@ void ResultScene::OnUpdate()
 			}
 		}
 		// [SCORE]画像 タイマーが規定値以下だったら。
-		if (scoreUITimer < SCORE_UI_TIMER && CRASH_ENEMY_UI_TIMER <= crashPlayerUITimer) {
+		if (scoreUITimer < SCORE_UI_TIMER && CRASH_PLAYER_UI_TIMER <= crashPlayerUITimer) {
 			++scoreUITimer;
 			// タイマーが規定値に達したら。
 			if (SCORE_UI_TIMER <= scoreUITimer) {
@@ -222,13 +223,66 @@ void ResultScene::OnDraw()
 	//DrawFunc::DrawGraph({ 25.0f,30.0f }, TexHandleMgr::GetTexBuffer(winnerGraph[winnerName]));
 
 	// [RESULT] と [BREAK]の描画処理
+	int num = 3;
+	switch (num)
+	{
+	case 1:
+		BREAK_ENEMY_UI_TIMER = 20;
+		BREAK_PLAYER_UI_TIMER = 2;
+		CRASH_ENEMY_UI_TIMER = 2;
+		CRASH_PLAYER_UI_TIMER = 2;
+
+		BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 300.0f };
+		break;
+	case 2:
+		BREAK_ENEMY_UI_TIMER = 20;
+		BREAK_PLAYER_UI_TIMER = 2;
+		CRASH_ENEMY_UI_TIMER = 20;
+		CRASH_PLAYER_UI_TIMER = 2;
+
+		BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 250.0f };
+		CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 350.0f };
+		break;
+	case 3:
+		BREAK_ENEMY_UI_TIMER = 20;
+		BREAK_PLAYER_UI_TIMER = 20;
+		CRASH_ENEMY_UI_TIMER = 20;
+		CRASH_PLAYER_UI_TIMER = 2;
+
+		BREAK_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 200.0f };
+		CRASH_ENEMY_POS = { (float)WINDOW_CENTER.x - 110.0f, 300.0f };
+		BREAK_PLAYER_POS = { (float)WINDOW_CENTER.x - 110.0f, 400.0f };
+		break;
+	default:
+		break;
+	}
+
+
 	{
 		float easingPosX = resultEasingAmount * (RESULT_POS.x - windowSize.x);
 		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX, RESULT_POS.y), TexHandleMgr::GetTexBuffer(resultHandle));
-		DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, breakEnemyHandle, breakEnemyAmount);
-		DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, crashEnemyHandle, crashEnemyAmount);
-		DrawBREAK(BREAK_PLAYER_POS, breakPlayerEasingAmount, breakPlayerHandle, breakPlayerAmount);
-		DrawBREAK(CRASH_PLAYER_POS, crashPlayerEasingAmount, crashPlayerHandle, crashPlayerAmount);
+
+		switch (num)
+		{
+		case 1:
+			DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, breakEnemyHandle, breakEnemyAmount);
+			break;
+		case 2:
+			DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, breakEnemyHandle, breakEnemyAmount);
+			DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, crashEnemyHandle, crashEnemyAmount);
+			break;
+		case 3:
+			DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, breakEnemyHandle, breakEnemyAmount);
+			DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, crashEnemyHandle, crashEnemyAmount);
+			DrawBREAK(BREAK_PLAYER_POS, breakPlayerEasingAmount, breakPlayerHandle, breakPlayerAmount);
+			break;
+		default:
+			break;
+		}
+		//DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, breakEnemyHandle, breakEnemyAmount);
+		//DrawBREAK(CRASH_ENEMY_POS, crashEnemyEasingAmount, crashEnemyHandle, crashEnemyAmount);
+		//DrawBREAK(BREAK_PLAYER_POS, breakPlayerEasingAmount, breakPlayerHandle, breakPlayerAmount);
+		//DrawBREAK(CRASH_PLAYER_POS, crashPlayerEasingAmount, crashPlayerHandle, crashPlayerAmount);
 	}
 
 	// [SCORE] の描画処理
