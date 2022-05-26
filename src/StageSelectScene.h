@@ -21,6 +21,8 @@ class StageSelectScene : public BaseScene
 	StageSelectCharacterImage leftChara;	// ¶‘¤‚ÌƒLƒƒƒ‰
 	StageSelectCharacterImage rightChara;	// ‰E‘¤‚ÌƒLƒƒƒ‰
 
+	bool isPrevInputStickRight;
+	bool isPrevInputSticlLeft;
 
 public:
 	StageSelectScene();
