@@ -72,6 +72,19 @@ void SwingDestroyCounter::Update(const Vec2<float>& CharaPos)
 
 	}
 
+	// すべてをExitするタイマーが規定値に達していたら
+	if (0 < exitTimer) {
+
+		--exitTimer;
+
+		if (exitTimer <= 0) {
+
+			AllExit();
+
+		}
+
+	}
+
 }
 
 void SwingDestroyCounter::Draw()
@@ -129,6 +142,8 @@ void SwingDestroyCounter::Increment(int INCRE_NUM)
 
 	}
 
+	exitTimer = EXIT_TIMER;
+
 }
 
 void SwingDestroyCounter::CheckDisitStayID(const DestroyCounter::DISIT_ID DisitID)
@@ -155,6 +170,7 @@ DestroyCounter::DestroyCounter()
 	easingTimer = 0;
 	isActive = false;
 	status = STATUS::NONE;
+	exitTimer = 0;
 
 }
 
@@ -170,6 +186,7 @@ void DestroyCounter::Init()
 	status = STATUS::NONE;
 	isExitReservation = false;
 	alpha = 0;
+	exitTimer = 0;
 
 }
 
@@ -252,7 +269,7 @@ void DestroyCounter::Update(const Vec2<float>& CharaPos)
 
 				//status = STATUS::EXIT;
 				SetExit();
-				Init();
+				//Init();
 
 			}
 

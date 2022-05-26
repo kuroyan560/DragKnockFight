@@ -79,6 +79,10 @@ private:
 	std::array<int, 12> numberHandle;
 	std::array<int, 12> numberHandle_yellow;
 
+	// 加算されてから一定時間経過したら全てExit状態にするためのフラグ
+	int exitTimer;
+	const int EXIT_TIMER = 180;
+
 	int nowCounter;		// 現在の破壊数。これの値を元にUIのクラスの数字を設定する。
 
 
