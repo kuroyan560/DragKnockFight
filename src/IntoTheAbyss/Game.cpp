@@ -784,8 +784,6 @@ void Game::Draw()
 		mapChipGenerator[DebugParameter::Instance()->generator]->Draw();
 	}
 
-	roundChangeEffect.Draw();
-
 	if (roundChangeEffect.initGameFlag || drawCharaFlag)
 	{
 		// 残像を描画
@@ -793,6 +791,8 @@ void Game::Draw()
 		CharacterManager::Instance()->Left()->Draw(readyToStartRoundFlag);
 		CharacterManager::Instance()->Right()->Draw(readyToStartRoundFlag);
 	}
+
+	roundChangeEffect.Draw();
 
 	// クラッシュ時の演出の描画処理。
 	CrashEffectMgr::Instance()->Draw();
