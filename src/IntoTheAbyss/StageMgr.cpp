@@ -9,10 +9,18 @@
 
 StageMgr::StageMgr()
 {
+	std::string rootFilePass = "resource/ChainCombat/MapChipData/";
+	std::string stageFilePass = "Stage";
+	std::string roomFileName = "Room_";
+
+	int allStageNum = 0;
+	while (KuroFunc::ExistDir(rootFilePass + stageFilePass + std::to_string(allStageNum)))
+	{
+		allStageNum++;
+	}
+
 	//int allStageNum = 4;
-	int allStageNum = 10;
 	//int allRoomNum = 10;
-	int allRoomNum = 5;
 	int nowStage = 0;
 
 	allMapChipData.resize(allStageNum);
@@ -73,9 +81,6 @@ StageMgr::StageMgr()
 	animationData.push_back(std::make_shared<MapChipAnimationData>(tmp3, 10));
 
 	//std::string rootFilePass = "Resource/MapChipData/";
-	std::string rootFilePass = "resource/ChainCombat/MapChipData/";
-	std::string stageFilePass = "Stage";
-	std::string roomFileName = "Room_";
 
 
 	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
@@ -137,12 +142,19 @@ StageMgr::StageMgr()
 	//ステージ毎の小部屋読み込み-----------------------
 	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
 	{
+		std::string stageDir = rootFilePass + "Stage" + std::to_string(stageNum);
+		int allRoomNum = 0;
+		while (KuroFunc::ExistFile(stageDir + "/" + roomFileName + std::to_string(allRoomNum) + ".csv"))
+		{
+			allRoomNum++;
+		}
+
 		for (int roomNum = 0; roomNum < allRoomNum; ++roomNum)
 		{
 			RoomMapChipArray data;	//小部屋の読み込み
-			std::string filePass = rootFilePass + stageFilePass + std::to_string(stageNum) + "/";	//Stageまでのファイルパス
+			std::string filePass = stageDir + "/" + roomFileName + std::to_string(roomNum) + ".csv";	//Stageまでのファイルパス
 			//Stageまでのファイルパス+小部屋のファイルパス
-			loder.CSVLoad(&data, filePass + roomFileName + std::to_string(roomNum) + ".csv");
+			loder.CSVLoad(&data, filePass);
 			//データの追加
 			allMapChipData[stageNum].push_back(data);
 		}

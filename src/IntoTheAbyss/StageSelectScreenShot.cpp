@@ -3,29 +3,29 @@
 #include"../Engine/DrawFunc.h"
 #include"IntoTheAbyss/StageSelectOffsetPosDebug.h"
 
-StageSelectScreenShot::StageSelectScreenShot()
+StageSelectScreenShot::StageSelectScreenShot(int* SelectNum) : selectNumPtr(SelectNum)
 {
-	screenShotHandle[0] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/0.png");
-	screenShotHandle[1] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/1.png");
-	screenShotHandle[2] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/2.png");
-	screenShotHandle[3] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/3.png");
-	screenShotHandle[4] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/4.png");
-	screenShotHandle[5] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/5.png");
-	screenShotHandle[6] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/6.png");
-	screenShotHandle[7] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/7.png");
-	screenShotHandle[8] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/8.png");
-	screenShotHandle[9] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/9.png");
-	stageNumberHandle[0] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/0.png");
-	stageNumberHandle[1] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/1.png");
-	stageNumberHandle[2] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
-	stageNumberHandle[3] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
-	stageNumberHandle[4] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
-	stageNumberHandle[5] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
-	stageNumberHandle[6] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
-	stageNumberHandle[7] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
-	stageNumberHandle[8] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
-	stageNumberHandle[9] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/2.png");
-	selectNum = 0;
+	int screenShotNum = 0;
+	while (KuroFunc::ExistFile("resource/ChainCombat/select_scene/stage_screen_shot/" + std::to_string(screenShotNum) + ".png"))
+	{
+		screenShotNum++;
+	}
+	screenShotHandle.resize(screenShotNum);
+	for (int i = 0; i < screenShotNum; ++i)
+	{
+		screenShotHandle[i] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_screen_shot/" + std::to_string(i) + ".png");
+	}
+
+	int stageTagNum = 0;
+	while (KuroFunc::ExistFile("resource/ChainCombat/select_scene/stage_tag/" + std::to_string(stageTagNum) + ".png"))
+	{
+		stageTagNum++;
+	}
+	stageNumberHandle.resize(stageTagNum);
+	for (int i = 0; i < stageTagNum; ++i)
+	{
+		stageNumberHandle[i] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/" + std::to_string(i) + ".png");
+	}
 }
 
 void StageSelectScreenShot::Init()
@@ -42,6 +42,14 @@ void StageSelectScreenShot::Init()
 
 void StageSelectScreenShot::Update()
 {
+	static int prevNum = *selectNumPtr;
+	if (prevNum != *selectNumPtr)
+	{
+		// ステージの番号のUIを縮小させる。
+		stageNumberExpData.size = Vec2<float>(-1.0f, -1.0f);
+		prevNum = *selectNumPtr;
+	}
+
 	if (zoomOutFlag)
 	{
 
@@ -98,31 +106,8 @@ void StageSelectScreenShot::Draw()
 
 
 	Vec2<float> debugPos = StageSelectOffsetPosDebug::Instance()->pos;
-	DrawFunc::DrawRotaGraph2D(screenShotLerpData.pos + expData.pos + debugPos, screenShotLerpData.size + expData.size, 0.0f, TexHandleMgr::GetTexBuffer(screenShotHandle[selectNum]));
-	DrawFunc::DrawRotaGraph2D(stageNumberData.pos + stageNumberExpData.pos + debugPos + lissajousCurve, stageNumberData.size + stageNumberExpData.size, 0.0f, TexHandleMgr::GetTexBuffer(stageNumberHandle[selectNum]));
-}
-
-void StageSelectScreenShot::Next()
-{
-	++selectNum;
-
-	// ステージの番号のUIを縮小させる。
-	stageNumberExpData.size = Vec2<float>(-1.0f, -1.0f);
-
-	// 最大値に達したら最初のハンドルに戻す。
-	if (screenShotHandle.size() - 1 < selectNum) selectNum = 0;
-
-}
-
-void StageSelectScreenShot::Prev()
-{
-	--selectNum;
-
-	// ステージの番号のUIを縮小させる。
-	stageNumberExpData.size = Vec2<float>(-1.0f, -1.0f);
-
-	// 最小値に達したら最初のハンドルに戻す。
-	if (selectNum < 0) selectNum = screenShotHandle.size() - 1;
+	DrawFunc::DrawRotaGraph2D(screenShotLerpData.pos + expData.pos + debugPos, screenShotLerpData.size + expData.size, 0.0f, TexHandleMgr::GetTexBuffer(screenShotHandle[*selectNumPtr]));
+	DrawFunc::DrawRotaGraph2D(stageNumberData.pos + stageNumberExpData.pos + debugPos + lissajousCurve, stageNumberData.size + stageNumberExpData.size, 0.0f, TexHandleMgr::GetTexBuffer(stageNumberHandle[*selectNumPtr]));
 }
 
 void StageSelectScreenShot::ImGuiDraw()

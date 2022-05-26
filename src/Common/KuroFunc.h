@@ -35,6 +35,7 @@ namespace KuroFunc
 	bool InScreen(Vec3<float> WorldPos, const Matrix& ViewMat, const Matrix& ProjMat, const Vec2<int>& WinSize);
 
 	bool ExistFile(const std::string FilePass);
+	bool ExistDir(const std::string FileDir);
 
 	//ベジエ用
 	float GetYFromXOnBezier(float x, const Vec2<float>& a, const Vec2<float>& b, uint8_t n);

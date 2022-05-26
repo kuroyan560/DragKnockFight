@@ -432,17 +432,11 @@ public:
 	{
 		if (allMapChipData.size() <= StageNum)return false;
 		if (allMapChipData[StageNum].size() <= RoomNum)return false;
-		if (allMapChipData[StageNum][RoomNum].empty())return false;
 		return true;
 	}
 	const int GetMaxLap(const int& StageNum)
 	{
-		int lap = 0;
-		for (auto& roomArray : allMapChipData[StageNum])
-		{
-			if (!roomArray.empty())lap++;
-		}
-		return lap;
+		return allMapChipData[StageNum].size();
 	}
 	const RoomMapChipArray& GetMap(const int& StageNum, const int& RoomNum)
 	{
