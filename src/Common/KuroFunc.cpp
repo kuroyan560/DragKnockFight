@@ -181,6 +181,13 @@ bool KuroFunc::ExistFile(const std::string FilePass)
 	return ifs.is_open();
 }
 
+#include<sys/stat.h>
+bool KuroFunc::ExistDir(const std::string FileDir)
+{
+	static struct stat statBuff;
+	return stat(FileDir.c_str(), &statBuff) == 0;
+}
+
 float KuroFunc::GetYFromXOnBezier(float x, const Vec2<float>& a, const Vec2<float>& b, uint8_t n)
 {
 	if (a.x == a.y && b.x == b.y)

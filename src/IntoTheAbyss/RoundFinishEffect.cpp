@@ -7,6 +7,7 @@
 #include "DrawFunc.h"
 #include "ScrollMgr.h"
 #include "WinApp.h"
+#include"SelectStage.h"
 
 RoundFinishEffect::RoundFinishEffect()
 {
@@ -71,10 +72,14 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate)
 		useGraph = excellentGraph;
 
 	}
+
 }
 
 void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 {
+
+	static const int EXPLOSION_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/break.wav");
+	static const int READY_EXPLOSION_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/readyExplosion.wav", 0.5f);
 
 	/*===== 更新処理 =====*/
 
@@ -106,7 +111,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			timer = 0;
 			status = EFFECT_STATUS::NUM2_ENEMY_SHAKE;
-
+			AudioApp::Instance()->PlayWave(READY_EXPLOSION_SE);
 		}
 
 		break;
@@ -144,6 +149,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 			perfectExp = { 0.0f,0.0f };
 			perfectMoveAmount = PERFECT_MOVE_POS_Y;
 
+			AudioApp::Instance()->PlayWave(EXPLOSION_SE);
 		}
 
 		break;
@@ -207,8 +213,11 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		}
 
 		// 座標を規定値に戻す。
-		playerDefPos = StageMgr::Instance()->GetPlayerResponePos();
-		enemyDefPos = StageMgr::Instance()->GetBossResponePos();
+		if (SelectStage::Instance()->HaveNextLap())
+		{
+			playerDefPos = StageMgr::Instance()->GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+			enemyDefPos = StageMgr::Instance()->GetBossResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+		}
 		//playerDefPos = Vec2<float>(100, 700);
 		//enemyDefPos = Vec2<float>(5000, 700);
 
@@ -242,8 +251,12 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		++timer;
 
-		playerDefPos = StageMgr::Instance()->GetPlayerResponePos();
-		enemyDefPos = StageMgr::Instance()->GetBossResponePos();
+		// 座標を規定値に戻す。
+		if (SelectStage::Instance()->HaveNextLap())
+		{
+			playerDefPos = StageMgr::Instance()->GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+			enemyDefPos = StageMgr::Instance()->GetBossResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+		}
 
 		CharacterManager::Instance()->Left()->pos += (playerDefPos - CharacterManager::Instance()->Left()->pos) / 30.0f;
 

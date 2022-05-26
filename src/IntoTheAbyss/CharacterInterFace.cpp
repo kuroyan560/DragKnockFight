@@ -875,7 +875,7 @@ void CharacterInterFace::Damage()
 #include <IntoTheAbyss/StageMgr.h>
 void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundFinish)
 {
-
+	static const int BOUND_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/dash.wav");
 	/*===== “–‚½‚è”»’è =====*/
 
 	//“–‚½‚è”»’è
@@ -1334,6 +1334,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					Vec2<float> bouceVec = Vec2<float>(pos - partner.lock()->pos).GetNormal();
 					bounceVel = bouceVec * BOUNCE_VEL;
 					ParticleMgr::Instance()->Generate(pos, { 0,0 }, BOUND);
+					AudioApp::Instance()->PlayWave(BOUND_SE);
 				}
 
 

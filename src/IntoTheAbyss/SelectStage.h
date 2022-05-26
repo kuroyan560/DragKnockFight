@@ -17,6 +17,7 @@ public:
 
 	const int &GetStageNum();
 	const int &GetRoomNum();
+	bool HaveNextLap();	//次ラップがあるか
 
 	bool resetStageFlag;//ステージをリセットする処理
 private:

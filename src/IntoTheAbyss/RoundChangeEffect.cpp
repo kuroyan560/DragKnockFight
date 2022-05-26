@@ -350,17 +350,17 @@ void RoundChangeEffect::Draw()
 		{
 			DrawFunc_Mask::DrawRotaGraph2D(nextNumberData->maskPos, nextNumberData->size, 0.0f, TexHandleMgr::GetTexBuffer(nextNumberData->handle), nextNumberData->pos, Vec2<float>(120.0f, 120.0f));
 		}
-		playerReticle->transform.SetPos(playerReticleData->pos);
-		playerReticle->transform.SetScale(playerReticleData->size);
-		playerReticle->SetTexture(TexHandleMgr::GetTexBuffer(playerReticleData->handle));
-		playerReticle->SetColor(Color(255, 255, 255, playerReticleAlpha));
-		playerReticle->Draw(AlphaBlendMode_Trans);
+		//playerReticle->transform.SetPos(playerReticleData->pos);
+		//playerReticle->transform.SetScale(playerReticleData->size);
+		//playerReticle->SetTexture(TexHandleMgr::GetTexBuffer(playerReticleData->handle));
+		//playerReticle->SetColor(Color(255, 255, 255, playerReticleAlpha));
+		//playerReticle->Draw(AlphaBlendMode_Trans);
 
-		enemyReticle->transform.SetPos(enemyReticleData->pos);
-		enemyReticle->transform.SetScale(enemyReticleData->size);
-		enemyReticle->SetTexture(TexHandleMgr::GetTexBuffer(enemyReticleData->handle));
-		enemyReticle->SetColor(Color(255, 255, 255, enemyReticleAlpha));
-		enemyReticle->Draw(AlphaBlendMode_Trans);
+		//enemyReticle->transform.SetPos(enemyReticleData->pos);
+		//enemyReticle->transform.SetScale(enemyReticleData->size);
+		//enemyReticle->SetTexture(TexHandleMgr::GetTexBuffer(enemyReticleData->handle));
+		//enemyReticle->SetColor(Color(255, 255, 255, enemyReticleAlpha));
+		//enemyReticle->Draw(AlphaBlendMode_Trans);
 
 		if (drawFightFlag)
 		{

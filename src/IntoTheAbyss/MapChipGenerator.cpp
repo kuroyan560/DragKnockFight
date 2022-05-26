@@ -361,7 +361,7 @@ void MapChipGenerator_ChangeMap::Draw()
 	static DrawMap DRAW_MAP_UNBROKEN;
 	static DrawMap DRAW_MAP_NON_SCORE;
 	static DrawMap DRAW_MAP_EMPTY;
-	static const auto EMPTY_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(0.0f, 0.0f, 0.0f, 0.0f));
+	static const auto EMPTY_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, 255), DXGI_FORMAT_R32G32B32A32_FLOAT, 32);
 
 	if (!RoundFinishEffect::Instance()->changeMap)return;
 

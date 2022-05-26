@@ -4,7 +4,7 @@
 #include"IntoTheAbyss/CharacterManager.h"
 #include"IntoTheAbyss/StageSelectOffsetPosDebug.h"
 
-StageSelectScene::StageSelectScene()
+StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 {
 	changeScene = std::make_shared<SceneCange>();
 	stageNum = 0;
@@ -42,6 +42,12 @@ void StageSelectScene::OnUpdate()
 
 	if (charactersSelect)
 	{
+		//時短デバッグ用　キャラ選択飛ばす
+		{
+			KuroEngine::Instance().ChangeScene(2, changeScene);
+			SelectStage::Instance()->resetStageFlag = true;
+		}
+
 		//キャラクター選択更新
 		CharacterManager::Instance()->CharactersSelectUpdate();
 
@@ -116,7 +122,6 @@ void StageSelectScene::OnUpdate()
 		if (!isPrevInputStickRight && isInputRight)
 		{
 			++stageNum;
-			screenShot.Next();
 			stageSelect.SetExp(Vec2<float>(0, 40), Vec2<float>(0.2f, 0.2f));
 			screenShot.SetExp(Vec2<float>(0, 0), Vec2<float>(0.1f, 0.1f));
 			rightArrow.SetExpSize(Vec2<float>(0.5f, 0.5f));
@@ -126,7 +131,6 @@ void StageSelectScene::OnUpdate()
 		if (!isPrevInputSticlLeft && isInputLeft)
 		{
 			--stageNum;
-			screenShot.Prev();
 			stageSelect.SetExp(Vec2<float>(0, 40), Vec2<float>(0.2f, 0.2f));
 			screenShot.SetExp(Vec2<float>(0, 0), Vec2<float>(0.1f, 0.12f));
 			leftArrow.SetExpSize(Vec2<float>(0.5f, 0.5f));
@@ -136,13 +140,14 @@ void StageSelectScene::OnUpdate()
 		isPrevInputStickRight = isInputRight;
 		isPrevInputSticlLeft = isInputLeft;
 
-		if (STAGE_MAX_NUM <= stageNum)
+		int maxSelectNum = min(screenShot.GetCanMaxSelectNum(), StageMgr::Instance()->GetMaxStageNumber());
+		if (maxSelectNum <= stageNum)
 		{
 			stageNum = 0;
 		}
 		if (stageNum <= -1)
 		{
-			stageNum = STAGE_MAX_NUM - 1;
+			stageNum = maxSelectNum - 1;
 		}
 		SelectStage::Instance()->SelectStageNum(stageNum);
 	}
@@ -183,7 +188,6 @@ void StageSelectScene::OnUpdate()
 
 void StageSelectScene::OnDraw()
 {
-	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	stageSelect.Draw();
 	screenShot.Draw();

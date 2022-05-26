@@ -54,6 +54,12 @@ void TitleScene::OnUpdate()
 	//チュートリアル選択画面
 	if (tutorialQuestion)
 	{
+		//デバッグ時短用
+		{
+			KuroEngine::Instance().ChangeScene(1, changeScene);
+			AudioApp::Instance()->PlayWave(SE);
+		}
+
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT, 0.0f))
 		{
 			AudioApp::Instance()->PlayWave(SE);

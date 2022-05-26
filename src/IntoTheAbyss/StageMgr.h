@@ -271,8 +271,8 @@ public:
 	int GetEnableToUseStageNumber();
 
 
-	Vec2<float>GetPlayerResponePos();
-	Vec2<float>GetBossResponePos();
+	Vec2<float>GetPlayerResponePos(const int& StageNum, const int& RoomNum);
+	Vec2<float>GetBossResponePos(const int& StageNum, const int& RoomNum);
 
 	
 	int GetSwingCount(int STAGE_NUM, int ROOM_NUM);
@@ -432,8 +432,11 @@ public:
 	{
 		if (allMapChipData.size() <= StageNum)return false;
 		if (allMapChipData[StageNum].size() <= RoomNum)return false;
-		if (allMapChipData[StageNum][RoomNum].empty())return false;
 		return true;
+	}
+	const int GetMaxLap(const int& StageNum)
+	{
+		return allMapChipData[StageNum].size();
 	}
 	const RoomMapChipArray& GetMap(const int& StageNum, const int& RoomNum)
 	{
