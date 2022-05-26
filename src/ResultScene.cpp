@@ -18,6 +18,7 @@ ResultScene::ResultScene()
 	crashPlayerHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/crash_green.png");;
 	roundHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/round.png");;
 	scoreHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/score.png");
+	slashHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/score.png");
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, blueNumberHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_yellow.png", 12, { 12, 1 }, goldNumberHandle.data());
 
@@ -277,7 +278,7 @@ void ResultScene::OnDraw()
 		//DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX + 90.0f, 155.0f) + Vec2<float>(300.0f, 0.0f), TexHandleMgr::GetTexBuffer(scoreHandle));
 
 
-		DrawBreakCount(1000, 15000);
+		DrawBreakCount(breakEnemyEasingAmount, 1000, 15000);
 
 		//DrawBREAK(BREAK_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount, false);
 		//DrawBREAK(CRASH_ENEMY_POS, breakEnemyEasingAmount, blueNumberHandle[0], breakEnemyAmount, true);
@@ -324,7 +325,7 @@ void ResultScene::DrawBREAK(const Vec2<float> &targetPosm, const float &easingTi
 	{
 		nowSize = maxSize;
 		FONT_SIZE *= nowSize.x;
-		
+
 		for (int i = 0; i < KuroFunc::GetDigit(breakCount) - 1; ++i)
 		{
 			drawPos.x += FONT_SIZE;
@@ -410,12 +411,14 @@ void ResultScene::DrawSCORE(const float &easingTimer, const double &scoreEffectE
 
 }
 
-void ResultScene::DrawBreakCount(int BREAK_NOW_COUNT, int BREAK_MAX_COUNT)
+void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, int BREAK_MAX_COUNT)
 {
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
-	Vec2<float> drawPos = Vec2<float>(windowSize.x / 2.0f, 430.0f);
 
-	
+	const float baseX = 500.0f;
+	float easingPosX = scoreEasingAmount * (windowSize.x / 2.0f+ baseX);
+	Vec2<float> drawPos = Vec2<float>((windowSize.x+ baseX) - easingPosX, 430.0f);
+
 
 	const int FONT_SIZE = 66.3f;
 	//åªç›
@@ -434,6 +437,9 @@ void ResultScene::DrawBreakCount(int BREAK_NOW_COUNT, int BREAK_MAX_COUNT)
 			drawPos.x += FONT_SIZE * nowSize.x;
 		}
 	}
+
+	//ÉXÉâÉbÉVÉÖ
+	//DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));
 
 	//ç≈ëÂ
 	{

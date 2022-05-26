@@ -22,6 +22,7 @@ class ResultScene : public BaseScene
 	int scoreHandle;			// SCOREの画像ハンドル
 	int crossHandle;			// *の画像ハンドル
 	int roundHandle;			// ROUNDの描画
+	int slashHandle;
 	std::array<int, 12> blueNumberHandle;// 青の数字の画像ハンドル
 	std::array<int, 12> goldNumberHandle;// 金の数字の画像ハンドル
 
@@ -145,5 +146,5 @@ private:
 	}
 
 
-	void DrawBreakCount(int BREAK_NOW_COUNT, int BREAK_MAX_COUNT);
+	void DrawBreakCount(float scoreEasingAmount,int BREAK_NOW_COUNT, int BREAK_MAX_COUNT);
 };
