@@ -12,10 +12,10 @@ public:
 	void Update();
 	void Draw();
 
-
+	Vec2<float>pos,vel;
+	int particleMax;
+	int tracPatricle;
 private:
-	Vec2<float>pos;
-
 	std::array<StarParticle, 100>paticles;
 
 };

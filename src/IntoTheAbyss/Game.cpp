@@ -728,7 +728,18 @@ void Game::Update(const bool& Loop)
 
 	}
 
+	pmgr.pos = CharacterManager::Instance()->Right()->pos;
+	pmgr.vel = CharacterManager::Instance()->Right()->vel;
 
+	if (CharacterManager::Instance()->Left()->GetNowSwing())
+	{
+		pmgr.particleMax = 100;
+	}
+	else
+	{
+		pmgr.particleMax = 15;
+	}
+	
 	pmgr.Update();
 
 }
@@ -749,8 +760,6 @@ void Game::Draw()
 	prevDrawChipStageNum = stageNum;
 	prevDrawChipRoomNum = roomNum;
 	DrawMapChip(*mapData, *mapChipDrawData, stageNum, roomNum);
-
-	pmgr.Draw();
 
 	if (roundChangeEffect.readyFlag)
 	{
@@ -848,6 +857,10 @@ void Game::Draw()
 
 	countBlock.Draw();
 	stageRap.Draw();
+
+
+	pmgr.Draw();
+
 
 	// プレイヤーとボス間に線を描画
 	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());

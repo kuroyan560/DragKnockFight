@@ -33,11 +33,11 @@ void StarParticle::Update()
 {
 	if (initFlag)
 	{
-		pos += vel;
+		Vec2<float>lVel = { sinf(3.14f / 60.0f * timer) * 1.3f, vel.y };
+		pos += lVel;
 
 		float rate = static_cast<float>(timer) / static_cast<float>(finishTimer);
 		size = { 1.0f - rate,1.0f - rate };
-
 
 		if (finishTimer <= timer)
 		{
