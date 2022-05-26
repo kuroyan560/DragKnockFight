@@ -132,7 +132,7 @@ void DebugParameter::DrawImGui()
 		ImGui::InputFloat("ComboResetDist", &comboResetDist);
 		ImGui::Checkbox("StrongSwing", &CharacterManager::Instance()->Left()->isDebugModeStrongSwing);
 		ImGui::SliderInt("ConsecutiveSwingDelay", &CharacterManager::Instance()->Left()->CONSECUTIVE_SWING_TIMER, 1, 30);
-		ImGui::SliderInt("AddLineLengthValue", &CharacterManager::Instance()->Left()->ADD_LINE_LENGTH_VEL, 1, 30);
+		ImGui::InputInt("AddLineLengthValue", &CharacterManager::Instance()->Left()->ADD_LINE_LENGTH_VEL, 1, 30);
 		ImGui::InputFloat("CanDestroyBoundVel", &canDestroyBounceVel);
 
 		ImGui::Separator();

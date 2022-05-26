@@ -1243,8 +1243,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, 
 					const float BOUNCE_VEL = 100;
 					Vec2<float> bouceVec = Vec2<float>(pos - partner.lock()->pos).GetNormal();
 					bounceVel = bouceVec * BOUNCE_VEL;
-					//ParticleMgr::Instance()->Generate(pos, bounceVel.GetNormal(), BULLET);
-
+					ParticleMgr::Instance()->Generate(pos, { 0,0 }, BOUND);
 				}
 
 

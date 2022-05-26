@@ -154,7 +154,8 @@ void StaminaItem::Draw()
 	if (drawPos.y < -50 || windowSize.y + 50 < drawPos.y) return;
 
 	//DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(pos), DRAW_RADIUS * Camera::Instance()->zoom, itemColor, isAcquired);
-	const float extDiffer = isAcquired ? 1.0f : 0.75f;
+	//const float extDiffer = isAcquired ? 1.0f : 0.75f;
+	const float extDiffer = 1.0f;
 	const Vec2<float>extRate = { Camera::Instance()->zoom * extDiffer,Camera::Instance()->zoom * extDiffer };
 	static const float ALPHA_MIN = 0.6f;
 	const float alpha = isAcquired ? 1.0f : (sin(flashRad) * (1.0f - ALPHA_MIN) + ALPHA_MIN);

@@ -12,13 +12,13 @@ class ConstantBuffer;
 class TextureBuffer;
 class LightManager;
 
-static const enum PARTICLE_TYPE { DASH, BULLET, CRASH_W, CRASH_G, CRASH_R };
+static const enum PARTICLE_TYPE { DASH, BULLET, CRASH_W, CRASH_G, CRASH_R, BOUND };
 
 class ParticleMgr : public Singleton<ParticleMgr>
 {
 	static const int MAX_NUM = 300;
 
-	static const enum PARTICLE_CUMPUTE_TYPE { NORMAL_SMOKE, FAST_SMOKE, EMIT_STAR, DEFAULT = NORMAL_SMOKE };
+	static const enum PARTICLE_CUMPUTE_TYPE { NORMAL_SMOKE, FAST_SMOKE, EMIT_STAR, SLIME_EXPLOSION, DEFAULT = NORMAL_SMOKE };
 	struct Particle
 	{
 		Color mulColor;
@@ -68,7 +68,7 @@ class ParticleMgr : public Singleton<ParticleMgr>
 	//テクスチャは同じサイズである必要がある
 	static const int TEX_SIZE = 64;
 	static const int SMOKE_NUM = 4;
-	static const enum PARTICLE_TEX { WHITE, SMOKE_0, SMOKE_1, SMOKE_2, SMOKE_3, STAR, TEX_NUM = 9 };
+	static const enum PARTICLE_TEX { WHITE, SMOKE_0, SMOKE_1, SMOKE_2, SMOKE_3, STAR, SLIME, TEX_NUM = 9 };
 	std::shared_ptr<TextureBuffer>textures[TEX_NUM];
 
 	void EmitParticle(const Vec2<float>& EmitPos, const Vec2<float>& EmitVec, const int& Type, const int& TexIdx, const Color& MulColor = Color());

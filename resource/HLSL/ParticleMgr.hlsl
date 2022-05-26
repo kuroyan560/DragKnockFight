@@ -84,7 +84,15 @@ void CSmain(uint3 DTid : SV_DispatchThreadID)
             //v.alpha = Easing_Circ_In(t, v.lifeSpan / 2.0f, 1.0f, 0.0f);
         }
     }
+    //SLIME_EXPLOSION
     else if(v.type == 3)
+    {
+        float2 toPos = v.emitPos + v.emitVec * v.speed;
+        v.pos = Easing_Exp_Out(v.life, v.lifeSpan, v.emitPos, toPos);
+        v.radian += v.emitRadian;
+        v.scale = Easing_Circ_In(v.life, v.lifeSpan, v.emitScale, 0.0f);
+    }
+    else if (v.type == 4)
     {
         
     }

@@ -57,6 +57,20 @@ void ParticleMgr::Particle::Generate(const Vec2<float>& GeneratePos, const Vec2<
 
 		lifeSpan = KuroFunc::GetRand(35, 45);
 	}
+	else if (type == PARTICLE_CUMPUTE_TYPE::SLIME_EXPLOSION)
+	{
+		//”š”­‚Ì”ò‹——£‚Æ‚µ‚Äˆµ‚¤
+		//speed = KuroFunc::GetRand(300.0f, 400.0f);
+		speed = 400.0f;
+		emitSpeed = speed;
+
+		scale = KuroFunc::GetRand(40.0f, 70.0f);
+		emitScale = scale;
+		radian = Angle::ConvertToRadian(KuroFunc::GetRand(360));
+		emitRadian = Angle::ConvertToRadian(2);	//‰ñ“]‘¬“x‚Æ‚µ‚ÄŽg‚¤
+
+		lifeSpan = 50;
+	}
 }
 
 ParticleMgr::ParticleMgr()
@@ -149,6 +163,7 @@ ParticleMgr::ParticleMgr()
 	}
 
 	textures[STAR] = D3D12App::Instance()->GenerateTextureBuffer("resource/ChainCombat/star.png");
+	textures[SLIME] = D3D12App::Instance()->GenerateTextureBuffer("resource/ChainCombat/slime.png");
 }
 
 void ParticleMgr::Init()
@@ -244,9 +259,7 @@ void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVe
 		if (Type == CRASH_R)mulCol = CharacterInterFace::TEAM_COLOR[RIGHT_TEAM];
 		else if (Type == CRASH_G)mulCol = CharacterInterFace::TEAM_COLOR[LEFT_TEAM];
 
-		static const int SMOKE_EMIT_MAX = 25;
-		static const int SMOKE_EMIT_MIN = 15;
-		const int smokeNum = KuroFunc::GetRand(SMOKE_EMIT_MIN, SMOKE_EMIT_MAX);
+		const int smokeNum = KuroFunc::GetRand(15, 25);
 
 		static const float SMOKE_EMIT_DEGREE = 45;
 		const Vec2<float>smokeStartEmitVec = KuroMath::RotateVec2(-EmitVec, Angle::ConvertToRadian(-SMOKE_EMIT_DEGREE / 2.0f));
@@ -267,6 +280,17 @@ void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVe
 		{
 			emitVec = KuroMath::RotateVec2(smokeStartEmitVec, Angle::ConvertToRadian(starRadianUint * i));
 			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::EMIT_STAR, PARTICLE_TEX::STAR);
+		}
+	}
+	else if (Type == BOUND)
+	{
+		const int num = 18;
+		float radUint = Angle::ROUND() / num;
+
+		for (int i = 0; i < num; ++i)
+		{
+			const Vec2<float>emitVec(cos(radUint * i), sin(radUint * i));
+			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::SLIME_EXPLOSION, PARTICLE_TEX::SLIME);
 		}
 	}
 	
