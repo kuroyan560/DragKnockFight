@@ -3,6 +3,7 @@
 #include "CharacterManager.h"
 #include "Camera.h"
 #include "Singleton.h"
+#include <array>
 
 #include "RoundFinishParticle.h"
 
@@ -22,6 +23,15 @@ public:
 
 	};
 
+	std::array<int, 3> perfectGraph;
+	int goodGraph;
+	int greatGraph;
+	int excellentGraph;
+	int perfectAnimTimer;
+	int perfectAnimIndex;
+	float perfectMoveAmount;
+	const int PERFECT_ANIM_TIMER = 10;
+
 	EFFECT_STATUS status;		// ステータス
 
 	int timer;					// 各タイマー
@@ -39,8 +49,6 @@ public:
 	const int NUM4_RETURN_DEFPOS_TIMER = 120;
 	const int NUM5_RETURN_PLAYER_DEF_POS = 120;
 
-	// パーフェクトの画像の動く量。
-	const float PERFECT_MOVE_POS_Y = 500.0f;
 
 
 public:

@@ -6,6 +6,7 @@
 #include "WinCounter.h"
 #include "DrawFunc.h"
 #include "ScrollMgr.h"
+#include "WinApp.h"
 
 RoundFinishEffect::RoundFinishEffect()
 {
@@ -16,6 +17,11 @@ RoundFinishEffect::RoundFinishEffect()
 	timer = 0;
 	isEnd = true;
 	shakeAmount = Vec2<float>();
+
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/perfect.png", 3, Vec2<int>(3, 1), perfectGraph.data());
+	//goodGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/perfect.png");
+	//greatGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/perfect.png");
+	//excellentGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/perfect.png");
 
 }
 
@@ -31,7 +37,7 @@ void RoundFinishEffect::Init()
 
 }
 
-void RoundFinishEffect::Start(const bool& IsPerfect)
+void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate)
 {
 
 	/*===== 初期化処理 =====*/
@@ -41,6 +47,28 @@ void RoundFinishEffect::Start(const bool& IsPerfect)
 	isEnd = false;
 	shakeAmount = Vec2<float>();
 	isPerfect = IsPerfect;
+	perfectAnimTimer = 0;
+	perfectAnimIndex = 0;
+
+	static const float GOOD_PER = 0.5f;
+	static const float GREAT_PER = 8.0f;
+
+	// 引数の割合からどの画像を使用するかをチェックする。
+	if (Rate <= GOOD_PER) {
+
+		useGraph = goodGraph;
+
+	}
+	else if (Rate <= GREAT_PER) {
+
+		useGraph = greatGraph;
+
+	}
+	else {
+
+		useGraph = excellentGraph;
+
+	}
 
 }
 
@@ -49,6 +77,8 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 	/*===== 更新処理 =====*/
 
+	// パーフェクトの画像の動く量。
+	const float PERFECT_MOVE_POS_Y = -15.0f;
 
 	const float SHAKE_AMOUNT = 10.0f;
 	float shakeRate = 0;
@@ -107,8 +137,9 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 			RoundFinishParticleMgr::Instance()->Generate(CharacterManager::Instance()->Right()->pos);
 
 			// パーフェクトの画像を動かす。
-			perfectPos = CharacterManager::Instance()->Right()->pos;
-			perfectExp = { 1.0f,1.0f };
+			perfectPos = WinApp::Instance()->GetWinDifferRate() * Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
+			perfectExp = { 0.0f,0.0f };
+			perfectMoveAmount = PERFECT_MOVE_POS_Y;
 
 		}
 
@@ -152,7 +183,8 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		}
 
 		// パーフェクトの画像を動かす。
-		perfectPos.y += ((perfectPos.y + PERFECT_MOVE_POS_Y) - perfectPos.y) / 10.0f;
+		perfectMoveAmount -= perfectMoveAmount / 10.0f;
+		perfectPos.y += perfectMoveAmount;
 		perfectExp.x += (1.0f - perfectExp.x) / 10.0f;
 		perfectExp.y += (1.0f - perfectExp.y) / 10.0f;
 
@@ -230,15 +262,44 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 	// ラウンド終了時のパーティクルを更新。
 	RoundFinishParticleMgr::Instance()->Update(CharacterManager::Instance()->Left()->pos);
 
+	// パーフェクト画像をアニメーションさせる。
+	++perfectAnimTimer;
+	if (PERFECT_ANIM_TIMER <= perfectAnimTimer) {
+
+		perfectAnimTimer = 0;
+
+		++perfectAnimIndex;
+
+		if (3 <= perfectAnimIndex) {
+
+			perfectAnimIndex = 0;
+
+		}
+
+	}
+
 }
+
+#include <memory>
 
 void RoundFinishEffect::Draw()
 {
 
 	/*===== 描画処理 =====*/
 
-	Vec2<float> perfectExpZoom = { perfectExp.x * ScrollMgr::Instance()->zoom, perfectExp.y * ScrollMgr::Instance()->zoom };
+	std::shared_ptr<TextureBuffer> drawGraph = 0;
 
-	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(perfectPos), perfectExpZoom, 0, TexHandleMgr::GetTexBuffer(1));
+	if (isPerfect) {
+
+		drawGraph = TexHandleMgr::GetTexBuffer(perfectGraph[perfectAnimIndex]);
+
+	}
+	else {
+
+		drawGraph = TexHandleMgr::GetTexBuffer(useGraph);
+
+	}
+
+	DrawFunc::DrawRotaGraph2D(perfectPos, perfectExp, 0, drawGraph);
 
 }

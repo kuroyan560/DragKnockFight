@@ -676,7 +676,7 @@ void Game::Update(const bool& Loop)
 
 	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
 	const float BOUNCE_DISTANCE = 300.0f; // ある程度の距離
-	bool isBlockEmpty = countBlock.GetNowNumber();
+	bool isBlockEmpty = countBlock.CheckNowNomberIsZero();
 	//if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE || isBlockEmpty) {
 	if (isBlockEmpty) {
 
@@ -684,7 +684,7 @@ void Game::Update(const bool& Loop)
 		if (!roundFinishFlag) {
 
 			roundFinishFlag = true;
-			RoundFinishEffect::Instance()->Start(isBlockEmpty);
+			RoundFinishEffect::Instance()->Start(isBlockEmpty, static_cast<float>(countBlock.GetNowNumberInt()) / static_cast<float>(countBlock.GetMaxNumberInt()));
 
 		}
 
