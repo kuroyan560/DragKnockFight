@@ -761,9 +761,7 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>> &MapData, co
 
 
 	// 吹っ飛ばすブロックに合った際の吹っ飛ぶ量の移動量を0に近づける。
-	if (bounceVel.x != 0) bounceVel.x -= bounceVel.x / 20.0f;
-	if (bounceVel.y != 0) bounceVel.y -= bounceVel.y / 20.0f;
-
+	bounceVel = KuroMath::Lerp(bounceVel, { 0,0 }, 0.08f);
 
 }
 
@@ -1245,6 +1243,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>> &MapData, 
 					const float BOUNCE_VEL = 100;
 					Vec2<float> bouceVec = Vec2<float>(pos - partner.lock()->pos).GetNormal();
 					bounceVel = bouceVec * BOUNCE_VEL;
+					//ParticleMgr::Instance()->Generate(pos, bounceVel.GetNormal(), BULLET);
 
 				}
 
