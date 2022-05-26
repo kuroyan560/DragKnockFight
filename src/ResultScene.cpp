@@ -55,6 +55,9 @@ void ResultScene::OnUpdate()
 
 		maxSize = { 0.5f,0.5f };
 		breakSize = { 1.5f,1.5f };
+
+		breakCount = 0;
+		baseBreakCount = 0;
 	}
 
 
@@ -93,6 +96,7 @@ void ResultScene::OnUpdate()
 			// タイマーが規定値に達したら。
 			if (BREAK_COUNTUI__TIMER <= breakEnemyUITimer) {
 				delayTimer = DELAY_TIMER;
+				baseBreakCount = 10000;
 				isSkip = true;
 				AudioApp::Instance()->PlayWave(SE);
 			}
@@ -103,6 +107,10 @@ void ResultScene::OnUpdate()
 	//イージングの動き
 	resultEasingAmount = KuroMath::Ease(Out, Cubic, (float)resultUITimer / RESULT_UI_TIMER, 0.0f, 1.0f);
 	breakCountEasingAmount = KuroMath::Ease(Out, Cubic, (float)breakEnemyUITimer / BREAK_COUNTUI__TIMER, 0.0f, 1.0f);
+
+
+
+	breakCount = KuroMath::Lerp(breakCount, baseBreakCount, 0.1f);
 
 
 	// リザルト画面へ飛ばす
@@ -127,7 +135,8 @@ void ResultScene::OnDraw()
 		float easingPosX = resultEasingAmount * (RESULT_POS.x - windowSize.x);
 		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX, RESULT_POS.y), TexHandleMgr::GetTexBuffer(resultHandle));
 
-		DrawBreakCount(breakCountEasingAmount, 1000, 15000);
+		
+		DrawBreakCount(breakCountEasingAmount, static_cast<int>(breakCount), 15000);
 	}
 }
 

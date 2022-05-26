@@ -20,6 +20,9 @@ class ResultScene : public BaseScene
 	int slashHandle;			//スラッシュ
 	std::array<int, 12> blueNumberHandle;// 青の数字の画像ハンドル
 
+	//スコア
+	float baseBreakCount, breakCount;
+
 
 	// 各タイマー
 	int resultUITimer;			// リザルトの画像のイージングに使用するタイマー
