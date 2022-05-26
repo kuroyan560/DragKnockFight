@@ -49,6 +49,7 @@
 #include "RoundFinishEffect.h"
 
 #include "RoundFinishParticle.h"
+#include "DistanceCounter.h"
 
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
@@ -675,9 +676,8 @@ void Game::Update(const bool& Loop)
 
 
 	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
-	const float BOUNCE_DISTANCE = 300.0f; // ある程度の距離
 	bool isBlockEmpty = countBlock.CheckNowNomberIsZero();
-	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE || isBlockEmpty) {
+	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty) {
 		//if (isBlockEmpty) {
 
 		// 終了演出が行われていなかったら
@@ -693,6 +693,9 @@ void Game::Update(const bool& Loop)
 		}
 
 	}
+
+	// 紐の距離を計算するクラスを更新する。
+	DistanceCounter::Instance()->Update();
 
 }
 
@@ -786,9 +789,7 @@ void Game::Draw()
 
 		// 線分の中心に円を描画
 		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
-		Vec2<float> lineCenterPosBuff = CharacterManager::Instance()->Right()->pos + CharacterManager::Instance()->Left()->pos;
-		lineCenterPosBuff /= 2.0f;
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPosBuff), Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos), Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 
 		mapChipGenerator[DebugParameter::Instance()->generator]->Draw();
 	}

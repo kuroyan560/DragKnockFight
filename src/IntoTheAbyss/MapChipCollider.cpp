@@ -324,6 +324,8 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 
 	}
 
+	hitChipIndex = { -1,-1 };
+
 	return INTERSECTED_NONE;
 }
 
@@ -684,6 +686,8 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 		}
 
 	}
+
+	hitChipIndex = { -1,-1 };
 
 	return INTERSECTED_NONE;
 }
