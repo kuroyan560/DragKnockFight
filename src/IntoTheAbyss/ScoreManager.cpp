@@ -18,9 +18,11 @@ void ScoreManager::Init()
 	scoreOffsetY = 0.0f;
 	honraiScore = 0;
 	score = 0;
+	mode = NONE;
+	destroyPoint = 0;
 }
 
-void ScoreManager::Add(const int &ADD_POINT)
+void ScoreManager::Add(const int& ADD_POINT)
 {
 	honraiScore += ADD_POINT;
 
@@ -40,7 +42,7 @@ void ScoreManager::AddDestroyPoint()
 	mode = APPEAR;
 }
 
-void ScoreManager::Sub(const int &SUB_POINT)
+void ScoreManager::Sub(const int& SUB_POINT)
 {
 	honraiScore -= SUB_POINT;
 }
@@ -136,7 +138,7 @@ void ScoreManager::Draw()
 void ScoreManager::Debug()
 {
 	ImGui::Begin("ScoreManager");
-	ImGui::Text("Score:%f",score);
+	ImGui::Text("Score:%f", score);
 	for (int i = 0; i < numberHandle.size(); ++i)
 	{
 		ImGui::Text("%d", numberHandle[i]);

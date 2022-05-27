@@ -5,13 +5,10 @@
 class StageSelectScreenShot
 {
 public:
-	StageSelectScreenShot();
+	StageSelectScreenShot(int* SelectNum);
 	void Init();
 	void Update();
 	void Draw();
-
-	void Next();
-	void Prev();
 
 	void ImGuiDraw();
 
@@ -23,11 +20,11 @@ public:
 		expData.size = expRate;
 	};
 
+	int GetCanMaxSelectNum() { return min(screenShotHandle.size(), stageNumberHandle.size()); }
+
 private:
-	int selectNum;
-	static const int STAGE_MAX_NUM = 10;
-	std::array<int, STAGE_MAX_NUM> screenShotHandle;
-	std::array<int, STAGE_MAX_NUM> stageNumberHandle;
+	std::vector<int>screenShotHandle;
+	std::vector<int> stageNumberHandle;
 	LerpData screenShotLerpData;
 	LerpData stageNumberData;
 
@@ -39,5 +36,6 @@ private:
 
 	float timer;		// リサージュ曲線に使用するタイマー
 
+	int* selectNumPtr;
 };
 

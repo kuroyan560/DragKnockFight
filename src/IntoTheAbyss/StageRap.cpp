@@ -9,7 +9,7 @@ StageRap::StageRap()
 
 void StageRap::Init(int RAP_MAX_NUM)
 {
-	rapNum = 0;
+	rapNum = 1;
 	rapMaxNum = RAP_MAX_NUM;
 	pos = { 580.0f,40.0f };
 	size = { 0.8f,0.8f };

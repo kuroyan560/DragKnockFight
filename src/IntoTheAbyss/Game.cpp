@@ -49,6 +49,7 @@
 #include "RoundFinishEffect.h"
 
 #include "RoundFinishParticle.h"
+#include "DistanceCounter.h"
 
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
@@ -232,6 +233,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	SelectStage::Instance()->resetStageFlag = false;
 	restartTimer = 0.0f;
 
+	DistanceCounter::Instance()->Init();
+
 
 	{
 		Vec2<float>playerLeftUpPos;
@@ -290,8 +293,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//responePos.y += 50;
 	lineCenterPos = playerResponePos - cameraBasePos;
 
-	Vec2<float>plPos(StageMgr::Instance()->GetPlayerResponePos());
-	Vec2<float>enPos(StageMgr::Instance()->GetBossResponePos());
+	Vec2<float>plPos(StageMgr::Instance()->GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()));
+	Vec2<float>enPos(StageMgr::Instance()->GetBossResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()));
 
 	CharacterManager::Instance()->CharactersInit(plPos, enPos, !practiceMode);
 
@@ -299,7 +302,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	// 二人の距離を求める。
 	float charaLength = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
 	// 紐を伸ばす量を求める。
-	float addLength = charaLength - (CharacterInterFace::LINE_LENGTH * 4.0f);
+	float addLength = charaLength - (CharacterInterFace::LINE_LENGTH * 2.0f);
 	// 紐を伸ばす。
 	CharacterManager::Instance()->Right()->addLineLength = addLength;
 
@@ -336,12 +339,12 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
-	mapChipGenerator[DebugParameter::Instance()->generator]->Init();
-
-	stageRap.Init(3);
+	mapChipGenerator->Init();
 
 
 	countBlock.Init();
+	ScoreManager::Instance()->Init();
+	roundFinishFlag = false;
 }
 
 Game::Game()
@@ -381,8 +384,6 @@ Game::Game()
 
 	GameTimer::Instance()->Init(120);
 
-	StageMgr::Instance()->GetMapChipType(0, 0, Vec2<int>(20, 20));
-	StageMgr::Instance()->WriteMapChipData(Vec2<int>(20, 20), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 	{
 		std::string bossFilePass = "resource/ChainCombat/boss/0/arm/";
@@ -402,10 +403,7 @@ Game::Game()
 		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, false);
 	}
 
-	mapChipGenerator[NON_GENERATE] = std::make_shared<MapChipGenerator_Non>();
-	mapChipGenerator[SPLINE_ORBIT] = std::make_shared<MapChipGenerator_SplineOrbit>();
-	mapChipGenerator[RAND_PATTERN] = std::make_shared<MapChipGenerator_RandPattern>();
-	mapChipGenerator[CHANGE_MAP] = std::make_shared<MapChipGenerator_ChangeMap>();
+	mapChipGenerator = std::make_shared<MapChipGenerator_ChangeMap>();
 
 }
 
@@ -419,7 +417,8 @@ void Game::Init(const bool& PracticeMode)
 
 	CharacterManager::Instance()->CharactersGenerate();
 
-	InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	SelectStage::Instance()->SelectRoomNum(0);
+	InitGame(SelectStage::Instance()->GetStageNum(), 0);
 	ScrollMgr::Instance()->Reset();
 	roundChangeEffect.Init();
 	CrashEffectMgr::Instance()->Init();
@@ -427,7 +426,11 @@ void Game::Init(const bool& PracticeMode)
 	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
 
 	drawCharaFlag = false;
+	RoundFinishEffect::Instance()->Init();
 
+	stageRap.Init(StageMgr::Instance()->GetMaxLap(SelectStage::Instance()->GetStageNum()));
+
+	DistanceCounter::Instance()->Init();
 }
 
 void Game::Update(const bool& Loop)
@@ -438,11 +441,6 @@ void Game::Update(const bool& Loop)
 		int roomNum = SelectStage::Instance()->GetRoomNum();
 		StageMgr::Instance()->SetLocalMapChipData(stageNum, roomNum);
 		StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNum, roomNum);
-	}
-
-	if (DebugParameter::Instance()->changeGenerator)
-	{
-		mapChipGenerator[DebugParameter::Instance()->generator]->Init();
 	}
 
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
@@ -505,17 +503,17 @@ void Game::Update(const bool& Loop)
 	if (roundChangeEffect.initGameFlag)
 	{
 		DebugParameter::Instance()->timer++;
-		mapChipGenerator[DebugParameter::Instance()->generator]->Update();
+		mapChipGenerator->Update();
 	}
 
 	// 座標を保存。
 	CharacterManager::Instance()->Left()->SavePrevFramePos();
 	CharacterManager::Instance()->Right()->SavePrevFramePos();
 
-	CharacterManager::Instance()->Left()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag, roundFinishFlag);
+	CharacterManager::Instance()->Left()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag, roundFinishFlag, SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 
 	// ボスの更新処理
-	CharacterManager::Instance()->Right()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag, roundFinishFlag);
+	CharacterManager::Instance()->Right()->Update(tmpMapData, lineCenterPos, readyToStartRoundFlag, roundFinishFlag, SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	//}
 
 	CharacterAIData::Instance()->nowPos = CharacterManager::Instance()->Right()->pos;
@@ -675,18 +673,27 @@ void Game::Update(const bool& Loop)
 
 
 	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
-	const float BOUNCE_DISTANCE = 300.0f; // ある程度の距離
-	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= BOUNCE_DISTANCE) {
+	bool isBlockEmpty = countBlock.CheckNowNomberIsZero();
+	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty) {
+		//if (isBlockEmpty) {
 
 		// 終了演出が行われていなかったら
 		if (!roundFinishFlag) {
 
 			roundFinishFlag = true;
-			RoundFinishEffect::Instance()->Start();
+
+			float nowBlockCount = countBlock.countNowBlockNum;
+			float maxBclokCount = countBlock.countAllBlockNum;
+			float destroyRate = nowBlockCount / maxBclokCount;
+			RoundFinishEffect::Instance()->Start(isBlockEmpty, 1.0f - destroyRate);
+			DistanceCounter::Instance()->isExpSmall = true;
 
 		}
 
 	}
+
+	// 紐の距離を計算するクラスを更新する。
+	DistanceCounter::Instance()->Update();
 
 }
 
@@ -731,54 +738,21 @@ void Game::Draw()
 	// プレイヤーとボス間に線を描画
 	if (roundChangeEffect.initGameFlag)
 	{
-		//左プレイヤー～中央のチェイン
-		auto& left = CharacterManager::Instance()->Left();
-		Vec2<float>leftLineCenterDir = (lineCenterPos - left->pos).GetNormal();
-		Vec2<float>leftChainBorderPos = left->pos + leftLineCenterDir * left->addLineLength;	//中央チェインと左プレイヤーチェインとの変わり目
-		if (0.0f < left->addLineLength)
-		{
-			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(left->pos), ScrollMgr::Instance()->Affect(leftChainBorderPos),
-				TexHandleMgr::GetTexBuffer(PLAYER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-		}
+		mapChipGenerator->Draw();
 
-		//右プレイヤー～中央のチェイン
-		auto& right = CharacterManager::Instance()->Right();
-		Vec2<float>rightLineCenterDir = (lineCenterPos - right->pos).GetNormal();
-		Vec2<float>rightChainBorderPos = right->pos + rightLineCenterDir * right->addLineLength;	//中央チェインと右プレイヤーチェインとの変わり目
-		if (0.0f < right->addLineLength)
-		{
-			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(right->pos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
-				TexHandleMgr::GetTexBuffer(ENEMY_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-		}
-
-		float charaDistance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length();
-		//中央チェイン
-		if (charaDistance < CharacterManager::Instance()->Left()->LINE_LENGTH * 2.0f) {
-
-			// 既定値より短かったら。
-			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos),
-				TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-
-		}
-		else {
-
-			DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(leftChainBorderPos), ScrollMgr::Instance()->Affect(rightChainBorderPos),
-				TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
-
-		}
+		// 左のキャラ ~ 右のキャラ間に線を描画
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);
 
 		// 線分の中心に円を描画
-		if (roundChangeEffect.drawFightFlag)
+		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos), Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+
+
+		if (!roundFinishFlag)
 		{
-			static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
-			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(lineCenterPos), Vec2<float>(ScrollMgr::Instance()->zoom, ScrollMgr::Instance()->zoom), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+			DistanceCounter::Instance()->Draw();
 		}
-		//DrawFunc::DrawCircle2D(playerDefLength + playerBossDir * lineLengthPlayer - scrollShakeAmount, 10, Color());
-
-		mapChipGenerator[DebugParameter::Instance()->generator]->Draw();
 	}
-
-	roundChangeEffect.Draw();
 
 	if (roundChangeEffect.initGameFlag || drawCharaFlag)
 	{
@@ -787,6 +761,8 @@ void Game::Draw()
 		CharacterManager::Instance()->Left()->Draw(readyToStartRoundFlag);
 		CharacterManager::Instance()->Right()->Draw(readyToStartRoundFlag);
 	}
+
+	roundChangeEffect.Draw();
 
 	// クラッシュ時の演出の描画処理。
 	CrashEffectMgr::Instance()->Draw();
@@ -841,6 +817,9 @@ void Game::Draw()
 		Vec2<float>rightDownPos = *enemyHomeBase.hitBox.center + enemyHomeBase.hitBox.size / 2.0f;
 		//DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(leftUpPos), ScrollMgr::Instance()->Affect(rightDownPos), areaHitColor, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
+
+	// ラウンド終了時の演出を描画。
+	RoundFinishEffect::Instance()->Draw();
 
 }
 
@@ -1288,7 +1267,7 @@ void Game::RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData
 			if (!AudioApp::Instance()->NowPlay(bgm))
 			{
 				AudioApp::Instance()->ChangeVolume(bgm, 0.1f);
-				//AudioApp::Instance()->PlayWave(bgm, true);
+				AudioApp::Instance()->PlayWave(bgm, true);
 			}
 		}
 
@@ -1335,50 +1314,56 @@ void Game::RoundFinishEffect(const bool& Loop)
 		GameTimer::Instance()->SetInterruput(true);
 
 		RoundFinishEffect::Instance()->Update(lineCenterPos);
+
+		const int nowRoomNum = SelectStage::Instance()->GetRoomNum();
+
+		if (RoundFinishEffect::Instance()->changeMap &&
+			!SelectStage::Instance()->HaveNextLap() && RoundFinishEffect::Instance()->changeMap)
+		{
+			ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
+			if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
+			else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
+			turnResultScene = true;
+			return;
+		}
+
 		bool isEnd = RoundFinishEffect::Instance()->isEnd;
 
 		if (isEnd) {
 
+			//次のラウンドへ
+				//練習モード
+			if (Loop)WinCounter::Instance()->Reset();
 
-			//勝利数カウント演出
-			if (!WinCounter::Instance()->GetNowAnimation())
+			++roundTimer;
+
+			if (60 <= roundTimer)
 			{
-				//どちらかが３勝とったらゲーム終了
-				if (WinCounter::Instance()->GetGameFinish() && !Loop)
-				{
-					ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
-					if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
-					else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
-					turnResultScene = true;
-				}
-				//次のラウンドへ
-				else
-				{
-					//練習モード
-					if (Loop)WinCounter::Instance()->Reset();
+				readyToStartRoundFlag = true;
+				roundFinishFlag = false;
 
-					++roundTimer;
+				SelectStage::Instance()->SelectRoomNum(nowRoomNum + 1);
+				StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+				StageMgr::Instance()->SetLocalMapChipDrawBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+				mapData = StageMgr::Instance()->GetLocalMap();
+				mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
+				mapChipGenerator->RegisterMap();
+				RoundFinishEffect::Instance()->changeMap = false;
+				countBlock.Init();
+				stageRap.Increment();
+				DistanceCounter::Instance()->isExpSmall = false;
 
-					if (60 <= roundTimer)
-					{
-						readyToStartRoundFlag = true;
-						roundFinishFlag = false;
+				// ひだりのキャラの貫通振り回しの数を初期化。
+				CharacterManager::Instance()->Left()->nowStrongSwingCount = 0;
 
-						StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-						StageMgr::Instance()->SetLocalMapChipDrawBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-						mapData = StageMgr::Instance()->GetLocalMap();
-						mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
-
-						//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-					}
-
-					drawCharaFlag = true;
-
-					// AddLineLengthを伸ばす。
-					CharacterManager::Instance()->Right()->addLineLength = CharacterManager::Instance()->Right()->pos.Distance(CharacterManager::Instance()->Left()->pos) - CharacterInterFace::LINE_LENGTH * 2.0f;
-
-				}
+				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 			}
+
+			drawCharaFlag = true;
+
+			// AddLineLengthを伸ばす。
+			CharacterManager::Instance()->Right()->addLineLength = CharacterManager::Instance()->Right()->pos.Distance(CharacterManager::Instance()->Left()->pos) - CharacterInterFace::LINE_LENGTH * 2.0f;
+
 
 
 		}

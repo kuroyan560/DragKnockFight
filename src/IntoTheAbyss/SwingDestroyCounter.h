@@ -37,7 +37,7 @@ public:
 	STATUS status;		// 現在のステータス
 	DISIT_ID disitID;	// 桁数
 
-	const float ADD_EASING_TIMER = 0.05f;
+	const float ADD_EASING_TIMER = 0.1f;
 	const float EASING_CHANGE = 100.0f;
 	const float FONT_SIZE = 128.0f;
 	const int EXIT_TIMER = 120;
@@ -78,6 +78,10 @@ private:
 	std::array<DestroyCounter, DESTROY_COUNTER> destroyCounter;		// UIに使用する数字1つ。
 	std::array<int, 12> numberHandle;
 	std::array<int, 12> numberHandle_yellow;
+
+	// 加算されてから一定時間経過したら全てExit状態にするためのフラグ
+	int exitTimer;
+	const int EXIT_TIMER = 180;
 
 	int nowCounter;		// 現在の破壊数。これの値を元にUIのクラスの数字を設定する。
 

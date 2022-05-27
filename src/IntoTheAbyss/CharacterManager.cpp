@@ -104,7 +104,18 @@ void CharacterManager::CharactersGenerate()
 	//キャラクター生成
 	for (int i = 0; i < TEAM_NUM; ++i)
 	{
-		characters[i] = CreateCharacter(characterName[i], (WHICH_TEAM)i);
+		switch (characterName[i])
+		{
+		case PLAYABLE_LUNA:
+			characters[i] = std::make_shared<Player>(characterName[i], (WHICH_TEAM)i);
+			break;
+		case PLAYABLE_LACY:
+			characters[i] = std::make_shared<Player>(characterName[i], (WHICH_TEAM)i);
+			break;
+		case PLAYABLE_BOSS_0:
+			characters[i] = std::make_shared<Boss>();
+			break;
+		}
 	}
 	//どちらのキャラクターも生成完了してからでないと、情報登録出来ない
 	for (int i = 0; i < TEAM_NUM; ++i)

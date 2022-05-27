@@ -845,7 +845,7 @@ void NavigationAI::CheckNumberOfItemHeldCount()
 	}
 
 	// スタミナアイテムのいちに応じてWayPointのアイテム保持数を変更する。
-	std::array<StaminaItem, 200> staminaItem = StaminaItemMgr::Instance()->GetItemArray();
+	std::array<StaminaItem, 500> staminaItem = StaminaItemMgr::Instance()->GetItemArray();
 	const int ITEM_COUNT = staminaItem.size();
 	for (int index = 0; index < ITEM_COUNT; ++index) {
 

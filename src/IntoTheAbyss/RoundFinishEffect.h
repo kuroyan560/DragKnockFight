@@ -3,6 +3,7 @@
 #include "CharacterManager.h"
 #include "Camera.h"
 #include "Singleton.h"
+#include <array>
 
 #include "RoundFinishParticle.h"
 
@@ -22,11 +23,29 @@ public:
 
 	};
 
+	std::array<int, 3> perfectGraph;
+	int goodGraph;
+	int greatGraph;
+	int excellentGraph;
+
+	int useGraph;
+
+	int perfectAnimTimer;
+	int perfectAnimIndex;
+	float perfectMoveAmount;
+	const int PERFECT_ANIM_TIMER = 10;
+
 	EFFECT_STATUS status;		// ステータス
 
 	int timer;					// 各タイマー
 	bool isEnd;					// 演出が終わったかのフラグ
+	bool finishLap;
+	bool changeMap;
 	Vec2<float> shakeAmount;	// シェイクさせる処理全般に使用するやつ
+
+	bool isPerfect;				// すべてのブロックを壊したかのフラグ
+	Vec2<float> perfectPos;		// [Perfect]の座標
+	Vec2<float> perfectExp;		// [Perfect]の拡縮
 
 	// 各ステータスの時間
 	const int NUM1_ZOOMIN_TIMER = 90;
@@ -34,7 +53,6 @@ public:
 	const int NUM3_ENEMY_EXP_TIMER = 240;
 	const int NUM4_RETURN_DEFPOS_TIMER = 120;
 	const int NUM5_RETURN_PLAYER_DEF_POS = 120;
-
 
 
 public:
@@ -46,7 +64,7 @@ public:
 	void Init();
 
 	// 開始処理
-	void Start();
+	void Start(const bool& IsPerfect, const float& Rate);
 
 	// 更新処理
 	void Update(const Vec2<float>& LineCenterPos);

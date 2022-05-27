@@ -117,7 +117,7 @@ void ResultScene::OnUpdate()
 	if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A)) {
 		static int bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 		AudioApp::Instance()->StopWave(bgm);
-		KuroEngine::Instance().ChangeScene(0, changeScene);
+		KuroEngine::Instance().ChangeScene(1, changeScene);
 	}
 
 }

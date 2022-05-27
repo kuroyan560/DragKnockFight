@@ -44,7 +44,7 @@ enum MapChipData
 	MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK,
 	MAPCHIP_TYPE_STATIC_RARE_BLOCK,
 	MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK,
-	MAPCHIP_TYPE_STATIC_ELEC_OFF,
+	MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK,
 	MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS,
 	MAPCHIP_TYPE_STATIC_RESPONE_PLAYER = 30,
 	MAPCHIP_TYPE_STATIC_RESPONE_BOSS = 31,
@@ -271,8 +271,11 @@ public:
 	int GetEnableToUseStageNumber();
 
 
-	const Vec2<float> &GetPlayerResponePos();
-	const Vec2<float> &GetBossResponePos();
+	Vec2<float>GetPlayerResponePos(const int& StageNum, const int& RoomNum);
+	Vec2<float>GetBossResponePos(const int& StageNum, const int& RoomNum);
+
+	
+	int GetSwingCount(int STAGE_NUM, int ROOM_NUM);
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
@@ -300,6 +303,10 @@ private:
 	array<int, 30> mapChipGraphHandle;
 	array<int, 3> gimmcikGraphHandle;
 	array<int, 12> sparkGraphHandle;
+
+
+	std::vector<std::vector<int>> swingCount;
+
 	enum MapChipDrawEnum
 	{
 		MAPCHIP_DRAW_WALL_LEFT_UP,
@@ -397,21 +404,43 @@ public:
 	};
 
 	//マップのインデックスのサイズを取得
-	Vec2<int>GetMapIdxSize()
+	Vec2<int>GetMapIdxSize(const int& StageNum, const int& RoomNum)
+	{
+		return Vec2<int>(allMapChipData[StageNum][RoomNum][0].size(), allMapChipData[StageNum][RoomNum].size());
+	}
+
+	Vec2<int>GetLocalMapIdxSize()
 	{
 		return Vec2<int>(localRoomMapChipArray[0].size(), localRoomMapChipArray.size());
 	}
 	//マップの座標上のサイズを取得
-	Vec2<float>GetMapGrobalSize()
+	Vec2<float>GetLocalMapGrobalSize()
 	{
-		return GetMapIdxSize().Float() * MAP_CHIP_SIZE;
+		return GetLocalMapIdxSize().Float() * MAP_CHIP_SIZE;
 	}
 
 	const int GetChipGraoh(const int& ChipType)
 	{
 		if (ChipType == MAPCHIP_TYPE_STATIC_RARE_BLOCK)return gimmcikGraphHandle[GMMICK_RED];
 		else if (ChipType == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)return sparkGraphHandle[0];
+		else if (ChipType == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)return gimmcikGraphHandle[GMMICK_GREEN];
+		else if (ChipType == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)return gimmcikGraphHandle[GMMICK_ELEC_OFF];
 		return mapChipGraphHandle[0];
+	}
+
+	const bool HaveMap(const int& StageNum, const int& RoomNum)
+	{
+		if (allMapChipData.size() <= StageNum)return false;
+		if (allMapChipData[StageNum].size() <= RoomNum)return false;
+		return true;
+	}
+	const int GetMaxLap(const int& StageNum)
+	{
+		return allMapChipData[StageNum].size();
+	}
+	const RoomMapChipArray& GetMap(const int& StageNum, const int& RoomNum)
+	{
+		return allMapChipData[StageNum][RoomNum];
 	}
 
 private:
@@ -450,7 +479,7 @@ private:
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
 		}
-		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_OFF)
+		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)
 		{
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
 			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_ELEC_OFF];

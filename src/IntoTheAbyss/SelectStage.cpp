@@ -16,3 +16,9 @@ const int &SelectStage::GetRoomNum()
 {
 	return roomNum;
 }
+
+#include"StageMgr.h"
+bool SelectStage::HaveNextLap()
+{
+	return StageMgr::Instance()->HaveMap(SelectStage::Instance()->GetStageNum(), roomNum + 1);
+}

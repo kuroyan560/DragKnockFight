@@ -27,7 +27,7 @@ void StaminaItemMgr::GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STAT
 	// 生成するデフォルト量をセット。
 	int generateCount = GENERATE_CRASH;
 
-	generateCount = GENERATE_CRASH;
+	generateCount = 2;
 
 	for (int generate = 0; generate < generateCount; ++generate) {
 
@@ -42,7 +42,7 @@ void StaminaItemMgr::GenerateCrash(const Vec2<float>& GeneratePos, GENERATE_STAT
 			randomVec.Normalize();
 
 			// 生成する。
-			item[index].Generate(GeneratePos, randomVec, HEAL_AMOUNT, CRASH_VEL, StaminaItem::STAMINA_ITEM_ID::CRASH_ITEM, true, CharaPos, CharaID);
+			item[index].Generate(GeneratePos, randomVec, 20.0f, 20.0f, StaminaItem::STAMINA_ITEM_ID::CRASH_ITEM, true, CharaPos, CharaID);
 
 			break;
 

@@ -269,7 +269,7 @@ void SwingLineSegmentMgr::Draw(const WHICH_TEAM& Team)
 
 	// Æ€‚ğ•`‰æB
 	Vec2<float> size = { 32,32 };
-	DrawFunc::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(reticlePos - size), ScrollMgr::Instance()->Affect(reticlePos + size), TexHandleMgr::GetTexBuffer(reticleHandle));
+	//DrawFunc::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(reticlePos - size), ScrollMgr::Instance()->Affect(reticlePos + size), TexHandleMgr::GetTexBuffer(reticleHandle));
 
 }
 

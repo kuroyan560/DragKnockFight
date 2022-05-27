@@ -4,6 +4,7 @@
 #include"ScreenEdgeEffect.h"
 #include"PictureStory.h"
 #include"BehaviorPredection.h"
+#include"MaskSceneTransition.h"
 
 class TitleScene : public BaseScene
 {

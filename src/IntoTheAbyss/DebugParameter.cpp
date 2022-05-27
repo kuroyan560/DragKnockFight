@@ -42,10 +42,6 @@ DebugParameter::DebugParameter()
 	swingAngle = 7.0f;
 	swingMax = 0.11f;
 	useFinishSwingFlag = true;
-	generator = 0;
-	generatorSpanMax = 60 * 9;
-	generatorSpanMin = 60 * 5;
-	changeGenerator = false;
 	comboResetDist = 300.0f;
 	emitRare = 1.0f;
 	emitBounce = 2.0f;
@@ -134,18 +130,6 @@ void DebugParameter::DrawImGui()
 		ImGui::SliderInt("ConsecutiveSwingDelay", &CharacterManager::Instance()->Left()->CONSECUTIVE_SWING_TIMER, 1, 30);
 		ImGui::InputInt("AddLineLengthValue", &CharacterManager::Instance()->Left()->ADD_LINE_LENGTH_VEL, 1, 30);
 		ImGui::InputFloat("CanDestroyBoundVel", &canDestroyBounceVel);
-
-		ImGui::Separator();
-		changeGenerator = ImGui::SliderInt("chipGenerator", &generator, 0, MAP_CHIP_GENERATOR_NUM - 1);
-		ImGui::SliderFloat("EmitRare", &emitRare, 0.0f, 3.0f);
-		ImGui::SliderFloat("EmitBounce", &emitBounce, 0.0f, 3.0f);
-
-		if (generator == RAND_PATTERN)
-		{
-			ImGui::InputInt("generatorSpanMin", &generatorSpanMin);
-			ImGui::InputInt("generatorSpanMax", &generatorSpanMax);
-			assert(generatorSpanMin < generatorSpanMax);
-		}
 
 		ImGui::End();
 	}

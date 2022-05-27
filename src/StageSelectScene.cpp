@@ -4,7 +4,7 @@
 #include"IntoTheAbyss/CharacterManager.h"
 #include"IntoTheAbyss/StageSelectOffsetPosDebug.h"
 
-StageSelectScene::StageSelectScene()
+StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 {
 	changeScene = std::make_shared<SceneCange>();
 	stageNum = 0;
@@ -26,6 +26,9 @@ void StageSelectScene::OnInitialize()
 	leftChara.Init(Vec2<float>(-550.0f, 881.0f), leftCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/luna.png"));
 	Vec2<float> rightCharaPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x * 1.75f - 55.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y - 7.0f));
 	rightChara.Init(Vec2<float>(1830.0f, 881.0f), rightCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/lacy.png"));
+
+	isPrevInputStickRight = false;
+	isPrevInputSticlLeft = false;
 }
 
 void StageSelectScene::OnUpdate()
@@ -39,6 +42,12 @@ void StageSelectScene::OnUpdate()
 
 	if (charactersSelect)
 	{
+		//時短デバッグ用　キャラ選択飛ばす
+		{
+			KuroEngine::Instance().ChangeScene(2, changeScene);
+			SelectStage::Instance()->resetStageFlag = true;
+		}
+
 		//キャラクター選択更新
 		CharacterManager::Instance()->CharactersSelectUpdate();
 
@@ -103,34 +112,42 @@ void StageSelectScene::OnUpdate()
 			KuroEngine::Instance().ChangeScene(0, changeScene);
 		}
 
+		// 入力の更新処理
+		Vec2<float> leftStickInput = UsersInput::Instance()->GetLeftStickVecFuna(0);
+		leftStickInput /= {32768.0f, 32768.0f};
+		bool isInputRight = 0.9 <= leftStickInput.x;
+		bool isInputLeft = leftStickInput.x <= -0.9f;
+
 		//ステージ番号を増やす
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_RIGHT))
+		if (!isPrevInputStickRight && isInputRight)
 		{
 			++stageNum;
-			screenShot.Next();
 			stageSelect.SetExp(Vec2<float>(0, 40), Vec2<float>(0.2f, 0.2f));
 			screenShot.SetExp(Vec2<float>(0, 0), Vec2<float>(0.1f, 0.1f));
 			rightArrow.SetExpSize(Vec2<float>(0.5f, 0.5f));
 			leftArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
 		}
 		//ステージ番号を減らす
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT))
+		if (!isPrevInputSticlLeft && isInputLeft)
 		{
 			--stageNum;
-			screenShot.Prev();
 			stageSelect.SetExp(Vec2<float>(0, 40), Vec2<float>(0.2f, 0.2f));
 			screenShot.SetExp(Vec2<float>(0, 0), Vec2<float>(0.1f, 0.12f));
 			leftArrow.SetExpSize(Vec2<float>(0.5f, 0.5f));
 			rightArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
 		}
 
-		if (STAGE_MAX_NUM <= stageNum)
+		isPrevInputStickRight = isInputRight;
+		isPrevInputSticlLeft = isInputLeft;
+
+		int maxSelectNum = min(screenShot.GetCanMaxSelectNum(), StageMgr::Instance()->GetMaxStageNumber());
+		if (maxSelectNum <= stageNum)
 		{
 			stageNum = 0;
 		}
 		if (stageNum <= -1)
 		{
-			stageNum = STAGE_MAX_NUM - 1;
+			stageNum = maxSelectNum - 1;
 		}
 		SelectStage::Instance()->SelectStageNum(stageNum);
 	}
@@ -171,7 +188,6 @@ void StageSelectScene::OnUpdate()
 
 void StageSelectScene::OnDraw()
 {
-	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	stageSelect.Draw();
 	screenShot.Draw();

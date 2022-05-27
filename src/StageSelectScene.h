@@ -21,6 +21,8 @@ class StageSelectScene : public BaseScene
 	StageSelectCharacterImage leftChara;	// 左側のキャラ
 	StageSelectCharacterImage rightChara;	// 右側のキャラ
 
+	bool isPrevInputStickRight;
+	bool isPrevInputSticlLeft;
 
 public:
 	StageSelectScene();
@@ -35,7 +37,5 @@ public:
 
 	// ステージ番号
 	int stageNum;
-
-	static const int STAGE_MAX_NUM = 10;
 };
 

@@ -4,6 +4,10 @@
 #include "StageMgr.h"
 #include "ScoreManager.h"
 #include "WinCounter.h"
+#include "DrawFunc.h"
+#include "ScrollMgr.h"
+#include "WinApp.h"
+#include"SelectStage.h"
 
 RoundFinishEffect::RoundFinishEffect()
 {
@@ -14,6 +18,11 @@ RoundFinishEffect::RoundFinishEffect()
 	timer = 0;
 	isEnd = true;
 	shakeAmount = Vec2<float>();
+
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/perfect.png", 3, Vec2<int>(3, 1), perfectGraph.data());
+	goodGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
+	greatGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/great.png");
+	excellentGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellent.png");
 
 }
 
@@ -26,10 +35,11 @@ void RoundFinishEffect::Init()
 	timer = 0;
 	isEnd = true;
 	shakeAmount = Vec2<float>();
-
+	changeMap = false;
+	perfectExp = {};
 }
 
-void RoundFinishEffect::Start()
+void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate)
 {
 
 	/*===== 初期化処理 =====*/
@@ -38,14 +48,45 @@ void RoundFinishEffect::Start()
 	timer = 0;
 	isEnd = false;
 	shakeAmount = Vec2<float>();
+	isPerfect = IsPerfect;
+	perfectAnimTimer = 0;
+	perfectAnimIndex = 0;
+	finishLap = false;
+
+	static const float GOOD_PER = 0.5f;
+	static const float GREAT_PER = 0.8f;
+
+	// 引数の割合からどの画像を使用するかをチェックする。
+	if (Rate <= GOOD_PER) {
+
+		useGraph = goodGraph;
+
+	}
+	else if (Rate <= GREAT_PER) {
+
+		useGraph = greatGraph;
+
+	}
+	else {
+
+		useGraph = excellentGraph;
+
+	}
 
 }
 
 void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 {
 
+	static const int EXPLOSION_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/break.wav");
+	static const int READY_EXPLOSION_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/readyExplosion.wav", 0.5f);
+
 	/*===== 更新処理 =====*/
 
+	if (isEnd) return;
+
+	// パーフェクトの画像の動く量。
+	const float PERFECT_MOVE_POS_Y = -15.0f;
 
 	const float SHAKE_AMOUNT = 10.0f;
 	float shakeRate = 0;
@@ -70,7 +111,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			timer = 0;
 			status = EFFECT_STATUS::NUM2_ENEMY_SHAKE;
-
+			AudioApp::Instance()->PlayWave(READY_EXPLOSION_SE);
 		}
 
 		break;
@@ -91,6 +132,8 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		shakeAmount = Vec2<float>(KuroFunc::GetRand(nowShakeAmount * 2.0f) - nowShakeAmount, KuroFunc::GetRand(nowShakeAmount * 2.0f) - nowShakeAmount);
 		CharacterManager::Instance()->Right()->pos += shakeAmount;
 
+		UsersInput::Instance()->ShakeController(0, 0.1f, 6);
+
 		// タイマーを更新して次へ。
 		++timer;
 		if (NUM2_ENEMY_SHAKE_TIMER <= timer) {
@@ -103,6 +146,12 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 			RoundFinishParticleMgr::Instance()->Init();
 			RoundFinishParticleMgr::Instance()->Generate(CharacterManager::Instance()->Right()->pos);
 
+			// パーフェクトの画像を動かす。
+			perfectPos = WinApp::Instance()->GetWinDifferRate() * Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
+			perfectExp = { 0.0f,0.0f };
+			perfectMoveAmount = PERFECT_MOVE_POS_Y;
+
+			AudioApp::Instance()->PlayWave(EXPLOSION_SE);
 		}
 
 		break;
@@ -127,22 +176,29 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		else if (timer == NUM3_ENEMY_EXP_TIMER * 0.75) {
 
 			ScoreManager::Instance()->AddDestroyPoint();
+			UsersInput::Instance()->ShakeController(0, 0.5f, 12);
 
 		}
 		else if (timer < NUM3_ENEMY_EXP_TIMER / 2.0f) {
 
 			// カメラを一気に引く。
 			Camera::Instance()->Focus(LineCenterPos, 0.5f, 0.3f);
+			UsersInput::Instance()->ShakeController(0, 1.0f, 5);
 
 		}
 
 		if (NUM3_ENEMY_EXP_TIMER <= timer) {
 
-			status = EFFECT_STATUS::NUM1_ZOOMIN;
 			timer = 0;
 			status = EFFECT_STATUS::NUM4_RETURN_DEFPOS;
-
+			changeMap = true;
 		}
+
+		// パーフェクトの画像を動かす。
+		perfectMoveAmount -= perfectMoveAmount / 10.0f;
+		perfectPos.y += perfectMoveAmount;
+		perfectExp.x += (1.0f - perfectExp.x) / 10.0f;
+		perfectExp.y += (1.0f - perfectExp.y) / 10.0f;
 
 
 		break;
@@ -151,9 +207,21 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		/*-- 第四段階 --*/
 
+		// パーフェクトの画像を小さくする。
+		perfectExp.x -= perfectExp.x / 5.0f;
+		perfectExp.y -= perfectExp.y / 5.0f;
+		if (perfectExp.x <= 0.05f) {
+
+			perfectExp = { 0.0f,0.0f };
+
+		}
+
 		// 座標を規定値に戻す。
-		playerDefPos = StageMgr::Instance()->GetPlayerResponePos();
-		enemyDefPos = StageMgr::Instance()->GetBossResponePos();
+		if (SelectStage::Instance()->HaveNextLap())
+		{
+			playerDefPos = StageMgr::Instance()->GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+			enemyDefPos = StageMgr::Instance()->GetBossResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+		}
 		//playerDefPos = Vec2<float>(100, 700);
 		//enemyDefPos = Vec2<float>(5000, 700);
 
@@ -166,10 +234,14 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		if (NUM4_RETURN_DEFPOS_TIMER <= timer) {
 
 			isEnd = true;
-			timer = 0;
-			status = EFFECT_STATUS::NUM5_RETURN_PLAYER_DEFPOS;
+			//timer = 0;
+			status = EFFECT_STATUS::NUM1_ZOOMIN;
 
 			++WinCounter::Instance()->countRound;
+
+			perfectExp = {};
+
+			ScoreManager::Instance()->destroyPoint = 0;
 
 		}
 
@@ -183,8 +255,12 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		++timer;
 
-		playerDefPos = StageMgr::Instance()->GetPlayerResponePos();
-		enemyDefPos = StageMgr::Instance()->GetBossResponePos();
+		// 座標を規定値に戻す。
+		if (SelectStage::Instance()->HaveNextLap())
+		{
+			playerDefPos = StageMgr::Instance()->GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+			enemyDefPos = StageMgr::Instance()->GetBossResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+		}
 
 		CharacterManager::Instance()->Left()->pos += (playerDefPos - CharacterManager::Instance()->Left()->pos) / 30.0f;
 
@@ -193,7 +269,10 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			isEnd = true;
 
-			//++WinCounter::Instance()->countRound;
+			timer = 0;
+			status = EFFECT_STATUS::NUM1_ZOOMIN;
+
+			++WinCounter::Instance()->countRound;
 
 		}
 
@@ -209,13 +288,44 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 	// ラウンド終了時のパーティクルを更新。
 	RoundFinishParticleMgr::Instance()->Update(CharacterManager::Instance()->Left()->pos);
 
+	// パーフェクト画像をアニメーションさせる。
+	++perfectAnimTimer;
+	if (PERFECT_ANIM_TIMER <= perfectAnimTimer) {
+
+		perfectAnimTimer = 0;
+
+		++perfectAnimIndex;
+
+		if (3 <= perfectAnimIndex) {
+
+			perfectAnimIndex = 0;
+
+		}
+
+	}
+
 }
+
+#include <memory>
 
 void RoundFinishEffect::Draw()
 {
-
+	if (isEnd)return;
 	/*===== 描画処理 =====*/
 
+	std::shared_ptr<TextureBuffer> drawGraph = 0;
 
+	if (isPerfect) {
+
+		drawGraph = TexHandleMgr::GetTexBuffer(perfectGraph[perfectAnimIndex]);
+
+	}
+	else {
+
+		drawGraph = TexHandleMgr::GetTexBuffer(useGraph);
+
+	}
+
+	DrawFunc::DrawRotaGraph2D(perfectPos, perfectExp, 0, drawGraph);
 
 }

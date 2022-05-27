@@ -133,10 +133,6 @@ public:
 	float swingAngle;
 	float swingMax;
 	bool useFinishSwingFlag;
-	int generator;
-	int generatorSpanMin;
-	int generatorSpanMax;
-	bool changeGenerator;
 	float comboResetDist;
 	float emitRare;
 	float emitBounce;
