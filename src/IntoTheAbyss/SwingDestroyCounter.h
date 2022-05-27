@@ -39,7 +39,7 @@ public:
 	DISIT_ID disitID;	// 桁数
 
 	const float ADD_EASING_TIMER = 0.1f;
-	const float EASING_CHANGE = 100.0f;
+	const float EASING_CHANGE = 200.0f;
 	const float FONT_SIZE = 128.0f;
 	const int EXIT_TIMER = 120;
 
@@ -75,7 +75,7 @@ private:
 
 	/*===== メンバ変数 =====*/
 
-	static const int DESTROY_COUNTER = 600;
+	static const int DESTROY_COUNTER = 400;
 	std::array<DestroyCounter, DESTROY_COUNTER> destroyCounter;		// UIに使用する数字1つ。
 	std::array<int, 12> numberHandle;
 	std::array<int, 12> numberHandle_yellow;

@@ -190,6 +190,7 @@ void DestroyCounter::Init()
 	isInitReservation = false;
 	alpha = 0;
 	exitTimer = 0;
+	pos = {};
 
 }
 
@@ -216,7 +217,7 @@ void DestroyCounter::SetExit()
 	/*===== 終了する =====*/
 
 	easingTimer = 0;
-	isActive = true;
+	//isActive = true;
 	status = STATUS::EXIT;
 	alpha = 255;
 
@@ -279,17 +280,17 @@ void DestroyCounter::Update(const Vec2<float>& CharaPos)
 
 		}
 
-		if (isInitReservation) {
-
-			Init();
-
-		}
-
 		// 自動的に消えるタイマーを更新する。
 		//--exitTimer;
 		if (exitTimer <= 0) {
 
 			SetExit();
+
+		}
+
+		if (isInitReservation) {
+
+			Init();
 
 		}
 
