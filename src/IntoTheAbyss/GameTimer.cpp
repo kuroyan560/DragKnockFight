@@ -12,12 +12,12 @@ GameTimer::GameTimer()
 	flame = -1;
 
 	number.resize(12);
-	texSize = { 48,44 };
+	texSize = { 64,44 };
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, number.data());
 
 	//スコア無効、タイマーを中心に描画
-	timerPos.x = WinApp::Instance()->GetExpandWinCenter().x - texSize.x * 2.0f - 300.0f;
-	timerPos.y = 62.0f;
+	timerPos.x = texSize.x * 2.0f - 42;
+	timerPos.y = 46.0f;
 }
 
 void GameTimer::Init(int TIME)
@@ -138,7 +138,7 @@ void GameTimer::Draw()
 {
 	Vec2<float>centralPos;
 	int offset = 0;
-	float size = 0.8f;
+	float size = 0.92f;
 	//分
 	for (int i = 0; i < minitueHandle.size(); i++)
 	{
