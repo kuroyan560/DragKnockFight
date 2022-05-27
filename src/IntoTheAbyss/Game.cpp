@@ -315,7 +315,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	Camera::Instance()->Init();
 	ScoreManager::Instance()->Init();
-	GameTimer::Instance()->Init(120);
+	GameTimer::Instance()->Init(60);
 	GameTimer::Instance()->Start();
 
 	firstLoadFlag = false;
@@ -510,6 +510,8 @@ void Game::Update(const bool& Loop)
 		mapChipGenerator->Update();
 	}
 
+
+
 	// 座標を保存。
 	CharacterManager::Instance()->Left()->SavePrevFramePos();
 	CharacterManager::Instance()->Right()->SavePrevFramePos();
@@ -675,9 +677,13 @@ void Game::Update(const bool& Loop)
 	}
 
 
+
 	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
 	bool isBlockEmpty = countBlock.CheckNowNomberIsZero();
-	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty) {
+	bool timeUpFlag = GameTimer::Instance()->TimeUpFlag();
+
+	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty || timeUpFlag)
+	{
 		//if (isBlockEmpty) {
 
 		// 終了演出が行われていなかったら
