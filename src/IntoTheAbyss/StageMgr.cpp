@@ -131,7 +131,7 @@ StageMgr::StageMgr()
 		// ファイルを開く。
 		ifs.open(fileName);
 		// ファイルが開けたかをチェックする。
-		assert(ifs.fail());	//何らかの理由で失敗
+		//assert(ifs.fail());	//何らかの理由で失敗
 		//ファイルから情報を選択
 		string line;
 		while (getline(ifs, line))
