@@ -143,6 +143,8 @@ class Game
 
 	int gameTimer;
 
+	float addLineLengthSubAmount;
+
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
 

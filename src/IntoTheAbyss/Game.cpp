@@ -355,6 +355,8 @@ Game::Game()
 {
 	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 
+	addLineLengthSubAmount = 5.0f;
+
 	playerHomeBase.Init({ 0.0f,0.0f }, { 0.0f,0.0f }, true);
 	enemyHomeBase.Init({ 0.0f,0.0f }, { 800.0f,1000.0f }, false);
 	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
@@ -898,7 +900,7 @@ void Game::Scramble()
 		}
 	}
 
-	const float ADD_LINE_LENGTH_SUB_AMOUNT = 5.0f;
+	const float ADD_LINE_LENGTH_SUB_AMOUNT = addLineLengthSubAmount;
 
 	// ‚Ç‚¿‚ç‚ÌƒLƒƒƒ‰‚àˆø‚Á‚©‚©‚Á‚Ä‚¢‚é‚©
 	bool isBothStuck = CharacterManager::Instance()->Right()->GetStackFlag() && CharacterManager::Instance()->Left()->GetStackFlag();

@@ -136,7 +136,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		lerpRate += lerpRateBuff * 0.3f;
 
 		// 敵にフォーカスを合わせる。
-		Camera::Instance()->Focus(CharacterManager::Instance()->Right()->pos + WinApp::Instance()->GetExpandWinCenter() * 2.0f, 1.5f, 0.01f);
+		Camera::Instance()->Focus(CharacterManager::Instance()->Right()->pos, 1.5f, 0.01f);
 
 		// 敵をシェイクさせる。
 		shakeRate = static_cast<float>(timer) / static_cast<float>(NUM2_ENEMY_SHAKE_TIMER);
