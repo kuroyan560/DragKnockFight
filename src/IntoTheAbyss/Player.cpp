@@ -554,6 +554,14 @@ void Player::Input(const vector<vector<int>>& MapData)
 		tutorial.TurnActive();
 	}
 
+	// 破壊モードかのフラグを保存。
+	isDestroyMode = false;
+	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && nowStrongSwingCount <= maxStrongSwingCount) {
+
+		isDestroyMode = true;
+
+	}
+
 
 	// 相方との位置関係においての逆ベクトルに振り回す。
 	Vec2<float> subPos = pos - partner.lock()->pos;
@@ -721,14 +729,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	}
 
-
-	// 破壊モードかのフラグを保存。
-	isDestroyMode = false;
-	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && nowStrongSwingCount < maxStrongSwingCount) {
-
-		isDestroyMode = true;
-
-	}
 
 }
 

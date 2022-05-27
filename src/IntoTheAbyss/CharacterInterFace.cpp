@@ -390,6 +390,14 @@ void CharacterInterFace::InitSwingLineSegmetn()
 	CCWSwingSegmentMgr.Init();
 }
 
+void CharacterInterFace::InitRoundFinish()
+{
+
+	FinishSwing();
+	OnInit();
+
+}
+
 void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear)
 {
 	if (pilotGraph != -1)
@@ -1341,6 +1349,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					bounceVel = bouceVec * BOUNCE_VEL;
 					ParticleMgr::Instance()->Generate(pos, { 0,0 }, BOUND);
 					AudioApp::Instance()->PlayWave(BOUND_SE);
+
+					// 大きめのシェイクを発生させる。
+					UsersInput::Instance()->ShakeController(0, 0.9f, 20);
+
 				}
 
 

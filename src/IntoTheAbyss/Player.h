@@ -183,11 +183,11 @@ private:
 		// 入力受付無効化タイマーをセッティングする。
 		inputInvalidTimerByCrash = INPUT_INVALID_TIMER;
 		anim->ChangeAnim(SWINGED);
-		UsersInput::Instance()->ShakeController(controllerIdx, 0.8f, 13);
+		UsersInput::Instance()->ShakeController(controllerIdx, 0.5f, 13);
 	}
 	void OnPartnerCrash()override
 	{
-		UsersInput::Instance()->ShakeController(controllerIdx, 0.8f, 13);
+		UsersInput::Instance()->ShakeController(controllerIdx, 0.5f, 13);
 	}
 	void OnPilotLeave()override	//パイロットがロボから離れた瞬間
 	{

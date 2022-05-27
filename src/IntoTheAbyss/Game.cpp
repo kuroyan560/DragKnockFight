@@ -1274,6 +1274,9 @@ void Game::RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData
 		//登場演出
 		if (roundChangeEffect.initGameFlag)
 		{
+			// シェイクを発生させる。
+			UsersInput::Instance()->ShakeController(0, 1.0f, 9);
+
 			CharacterManager::Instance()->Left()->Appear();
 			CharacterManager::Instance()->Right()->Appear();
 			if (CharacterManager::Instance()->Left()->CompleteAppear() && CharacterManager::Instance()->Right()->CompleteAppear())	//どちらのキャラも登場演出完了
@@ -1355,6 +1358,10 @@ void Game::RoundFinishEffect(const bool& Loop)
 
 				// ひだりのキャラの貫通振り回しの数を初期化。
 				CharacterManager::Instance()->Left()->nowStrongSwingCount = 0;
+
+				// ランド終了時に初期化したい変数を初期化する。
+				CharacterManager::Instance()->Left()->InitRoundFinish();
+				CharacterManager::Instance()->Right()->InitRoundFinish();
 
 				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 			}

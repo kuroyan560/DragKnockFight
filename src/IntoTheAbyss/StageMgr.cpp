@@ -82,59 +82,6 @@ StageMgr::StageMgr()
 
 	//std::string rootFilePass = "Resource/MapChipData/";
 
-
-	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
-	{
-		//ファイルパス
-		std::string filePass =
-			rootFilePass + stageFilePass + std::to_string(stageNum) + "/";
-		//ファイル名
-		std::string fileName = filePass + "swingCount.txt";
-
-		// ファイルデータ
-		std::ifstream ifs;
-		// ファイルを開く。
-		ifs.open(fileName);
-		// ファイルが開けたかをチェックする。
-		if (ifs.fail())
-		{
-			//失敗
-			continue;
-			return;
-		}
-		//ファイルから情報を選択
-		string line;
-		int roomNum = 0;
-		swingCount.push_back({});
-		while (getline(ifs, line))
-		{
-			//一行分の文字列をストリームに変換して解析しやすくなる
-			istringstream line_stream(line);
-
-			//半角スペース区切りで行の先頭文字列を取得
-			string key;//ここでvかf等の判断をする
-			getline(line_stream, key, ' ');
-
-			int num = -1;
-			if (key == "room0")
-			{
-				line_stream >> num;
-				swingCount[stageNum].push_back(num);
-			}
-			if (key == "room1")
-			{
-				line_stream >> num;
-				swingCount[stageNum].push_back(num);
-			}
-			if (key == "room2")
-			{
-				line_stream >> num;
-				swingCount[stageNum].push_back(num);
-			}
-		}
-		ifs.close();
-	}
-
 	//ギミック共通の設定
 	//GimmickLoader::Instance()->LoadData(rootFilePass + "GimmickCommonData.txt");
 
@@ -160,6 +107,56 @@ StageMgr::StageMgr()
 		}
 	}
 	//ステージ毎の小部屋読み込み-----------------------
+
+	swingCount.resize(allStageNum);
+	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
+	{
+		//ファイルパス
+		std::string filePass =
+			rootFilePass + stageFilePass + std::to_string(stageNum) + "/";
+		//ファイル名
+		std::string fileName = filePass + "swingCount.txt";
+
+		const int thisStageRoomCount = allMapChipData[stageNum].size();
+		swingCount[stageNum].resize(thisStageRoomCount, 0);	//振り回し可能回数０で埋める
+
+		//ファイルが存在しないならそもそも振り回しが出来ないステージ
+		if (!KuroFunc::ExistFile(fileName))
+		{
+			continue;
+		}
+
+		// ファイルデータ
+		std::ifstream ifs;
+		// ファイルを開く。
+		ifs.open(fileName);
+		// ファイルが開けたかをチェックする。
+		assert(ifs.fail());	//何らかの理由で失敗
+		//ファイルから情報を選択
+		string line;
+		while (getline(ifs, line))
+		{
+			//一行分の文字列をストリームに変換して解析しやすくなる
+			istringstream line_stream(line);
+
+			//半角スペース区切りで行の先頭文字列を取得
+			string key;//ここでvかf等の判断をする
+			getline(line_stream, key, ' ');
+
+			int num = -1;
+			for (int roomCount = 0; roomCount < thisStageRoomCount; ++roomCount)
+			{
+				std::string roomkey = "room" + std::to_string(roomCount);
+				if (key == roomkey)
+				{
+					line_stream >> num;
+					swingCount[stageNum][roomCount] = num;
+					break;
+				}
+			}
+		}
+		ifs.close();
+	}
 
 
 	//小部屋同士の繋がりを読み込み-----------------------
