@@ -107,7 +107,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		/*-- 第一段階 --*/
 
 		// カメラを二人の真ん中にフォーカスさせる。
-		Camera::Instance()->Focus(LineCenterPos, cameraZoom, 0.1f);
+		Camera::Instance()->Focus(LineCenterPos, cameraZoom + 0.02f, 0.1f);
 
 		// タイマーを更新して次へ。
 		++timer;
@@ -126,15 +126,6 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		// 座標からシェイク量を引く。
 		CharacterManager::Instance()->Right()->pos -= shakeAmount;
-
-		// ラープの速度を計算する。
-		lerpRate = 0.01f;
-
-		lerpRateBuff = (cameraZoom - 0.2f) / 0.2f;
-
-		lerpRateBuff = 1.0f - lerpRateBuff;
-
-		lerpRate += lerpRateBuff * 0.3f;
 
 		// 敵にフォーカスを合わせる。
 		Camera::Instance()->Focus(CharacterManager::Instance()->Right()->pos, 2.0f, 0.1f);
