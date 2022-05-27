@@ -7,6 +7,7 @@
 #include "IntoTheAbyss/ResultTransfer.h"
 #include"IntoTheAbyss/ScoreKeep.h"
 #include"IntoTheAbyss/EavaluationDataMgr.h"
+#include"IntoTheAbyss/DebugKeyManager.h"
 
 ResultScene::ResultScene()
 {
@@ -58,8 +59,10 @@ void ResultScene::OnInitialize()
 	}
 	defaultSize = 1.5f;
 	bigFontFlag = false;
+
+	evaluationEasingTimer = 0;
+	intervalTimer = 0;
 	evaluationFlag = false;
-	evaluationNowHandle = goodHandle;
 
 	perfectInterval = 0;
 	perfectIndex = 0;
@@ -67,7 +70,7 @@ void ResultScene::OnInitialize()
 
 void ResultScene::OnUpdate()
 {
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_J))
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_J, "ResetResult", TO_STRING(DIK_J)))
 	{
 		resultUITimer = 0;
 		breakEnemyUITimer = 0;
@@ -265,7 +268,7 @@ void ResultScene::OnDraw()
 		}
 		else
 		{
-			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
+			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX-30, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
 		}
 	}
 
