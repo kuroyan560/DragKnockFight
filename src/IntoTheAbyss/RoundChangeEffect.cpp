@@ -37,7 +37,7 @@ RoundChangeEffect::RoundChangeEffect()
 	round4SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round4.wav", VOL);
 	round5SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round5.wav", VOL);
 
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 13, { 13, 1 }, numberHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, numberHandle.data());
 
 
 	numberData->handle = numberHandle[0];

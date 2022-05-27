@@ -12,10 +12,9 @@ GameTimer::GameTimer()
 	flame = -1;
 	timerPos = { 714,62 };
 
-	static const int NUM = 13;
-	number.resize(NUM);
+	number.resize(12);
 	texSize = { 48,44 };
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", NUM, { NUM, 1 }, number.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, number.data());
 
 	//スコア無効、タイマーを中心に描画
 	timerPos.x = WinApp::Instance()->GetExpandWinCenter().x - texSize.x * 2.0f;
