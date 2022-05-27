@@ -1226,6 +1226,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					rare[B].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(0, 1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
 					rare[B].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
 
+
 					rare[LT].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, -1)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 					rare[LT].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, -1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
 					rare[LT].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;

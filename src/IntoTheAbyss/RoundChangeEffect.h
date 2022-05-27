@@ -113,8 +113,8 @@ private:
 		shakeAmount.y = KuroFunc::GetRand(maxShakeAmount * 2.0f) - maxShakeAmount;
 	};
 
-	std::unique_ptr<Sprite>playerReticle;
-	std::unique_ptr<Sprite>enemyReticle;
+	//std::unique_ptr<Sprite>playerReticle;
+	//std::unique_ptr<Sprite>enemyReticle;
 	int playerReticleAlpha;
 	int enemyReticleAlpha;
 

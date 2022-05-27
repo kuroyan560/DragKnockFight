@@ -19,8 +19,8 @@ RoundChangeEffect::RoundChangeEffect()
 	enemyReticleData = std::make_unique<DrawData>();
 	nextNumberData = std::make_unique<DrawData>();
 
-	playerReticle = std::make_unique<Sprite>();
-	enemyReticle = std::make_unique<Sprite>();
+	//playerReticle = std::make_unique<Sprite>();
+	//enemyReticle = std::make_unique<Sprite>();
 
 	roundData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/round.png");
 	readyData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/ready.png");
@@ -334,6 +334,7 @@ void RoundChangeEffect::Update()
 			readyToInitFlag = false;
 		}
 #pragma endregion
+
 	}
 }
 
