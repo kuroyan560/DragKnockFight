@@ -474,6 +474,11 @@ void Game::Update(const bool& Loop)
 		//sceneChangeDeadFlag = player.isDead;
 	}
 
+
+	addLineLengthSubAmount = DebugParameter::Instance()->addLineLengthSubAmount;
+
+
+
 	// w’n‚Ì”»’è
 	//DeterminationOfThePosition();
 
