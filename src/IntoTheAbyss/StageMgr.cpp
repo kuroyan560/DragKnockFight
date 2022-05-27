@@ -127,35 +127,35 @@ StageMgr::StageMgr()
 		}
 
 		// ファイルデータ
-		std::ifstream ifs;
-		// ファイルを開く。
-		ifs.open(fileName);
-		// ファイルが開けたかをチェックする。
-		assert(ifs.fail());	//何らかの理由で失敗
-		//ファイルから情報を選択
-		string line;
-		while (getline(ifs, line))
-		{
-			//一行分の文字列をストリームに変換して解析しやすくなる
-			istringstream line_stream(line);
+		//std::ifstream ifs;
+		//// ファイルを開く。
+		//ifs.open(fileName);
+		//// ファイルが開けたかをチェックする。
+		//assert(ifs.fail());	//何らかの理由で失敗
+		////ファイルから情報を選択
+		//string line;
+		//while (getline(ifs, line))
+		//{
+		//	//一行分の文字列をストリームに変換して解析しやすくなる
+		//	istringstream line_stream(line);
 
-			//半角スペース区切りで行の先頭文字列を取得
-			string key;//ここでvかf等の判断をする
-			getline(line_stream, key, ' ');
+		//	//半角スペース区切りで行の先頭文字列を取得
+		//	string key;//ここでvかf等の判断をする
+		//	getline(line_stream, key, ' ');
 
-			int num = -1;
-			for (int roomCount = 0; roomCount < thisStageRoomCount; ++roomCount)
-			{
-				std::string roomkey = "room" + std::to_string(roomCount);
-				if (key == roomkey)
-				{
-					line_stream >> num;
-					swingCount[stageNum][roomCount] = num;
-					break;
-				}
-			}
-		}
-		ifs.close();
+		//	int num = -1;
+		//	for (int roomCount = 0; roomCount < thisStageRoomCount; ++roomCount)
+		//	{
+		//		std::string roomkey = "room" + std::to_string(roomCount);
+		//		if (key == roomkey)
+		//		{
+		//			line_stream >> num;
+		//			swingCount[stageNum][roomCount] = num;
+		//			break;
+		//		}
+		//	}
+		//}
+		//ifs.close();
 	}
 
 
