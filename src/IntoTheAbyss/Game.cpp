@@ -1264,7 +1264,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 		//時間計測ストップ
 		GameTimer::Instance()->SetInterruput(true);
 
-		RoundFinishEffect::Instance()->Update(lineCenterPos);
+		RoundFinishEffect::Instance()->Update(DistanceCounter::Instance()->lineCenterPos);
 
 		const int nowRoomNum = SelectStage::Instance()->GetRoomNum();
 
