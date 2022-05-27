@@ -3,7 +3,7 @@
 
 StageRap::StageRap()
 {
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, numberHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 13, { 13, 1 }, numberHandle.data());
 	slashHandle = numberHandle[10];
 }
 
