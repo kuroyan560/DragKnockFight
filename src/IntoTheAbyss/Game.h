@@ -33,6 +33,7 @@ class RenderTarget;
 
 #include"StageRap.h"
 
+
 class CharacterInterFace;
 
 struct MassChipData
@@ -139,6 +140,8 @@ class Game
 	BlockCount countBlock;
 
 	StageRap stageRap;
+
+	int gameTimer;
 
 public:
 	HomeBase playerHomeBase, enemyHomeBase;

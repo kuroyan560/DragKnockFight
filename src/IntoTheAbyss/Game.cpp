@@ -51,6 +51,8 @@
 #include "RoundFinishParticle.h"
 #include "DistanceCounter.h"
 
+#include"ScoreKeep.h"
+
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
@@ -310,10 +312,10 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
 	ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
 
-
+	gameTimer = 30;
 	Camera::Instance()->Init();
 	ScoreManager::Instance()->Init();
-	GameTimer::Instance()->Init(120);
+	GameTimer::Instance()->Init(gameTimer);
 	GameTimer::Instance()->Start();
 
 	firstLoadFlag = false;
@@ -345,6 +347,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	countBlock.Init();
 	ScoreManager::Instance()->Init();
 	roundFinishFlag = false;
+
+	ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), StageMgr::Instance()->GetAllRoomWallBlocksNum(stageNum));
 }
 
 Game::Game()
@@ -381,8 +385,6 @@ Game::Game()
 	readyToStartRoundFlag = true;
 	//背景に星
 	//BackGround::Instance()->Init(GetStageSize());
-
-	GameTimer::Instance()->Init(120);
 
 
 	{
@@ -506,6 +508,8 @@ void Game::Update(const bool& Loop)
 		mapChipGenerator->Update();
 	}
 
+
+
 	// 座標を保存。
 	CharacterManager::Instance()->Left()->SavePrevFramePos();
 	CharacterManager::Instance()->Right()->SavePrevFramePos();
@@ -617,7 +621,6 @@ void Game::Update(const bool& Loop)
 	countBlock.Update();
 	stageRap.Update();
 
-
 	// スタミナアイテムの更新処理
 	if (!readyToStartRoundFlag) {
 		StaminaItemMgr::Instance()->Update(playerHomeBase.GetRightUpPos(), enemyHomeBase.GetLeftDownPos());
@@ -672,9 +675,13 @@ void Game::Update(const bool& Loop)
 	}
 
 
+
 	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
 	bool isBlockEmpty = countBlock.CheckNowNomberIsZero();
-	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty) {
+	bool timeUpFlag = GameTimer::Instance()->TimeUpFlag();
+
+	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty || timeUpFlag)
+	{
 		//if (isBlockEmpty) {
 
 		// 終了演出が行われていなかったら
@@ -785,17 +792,6 @@ void Game::Draw()
 	countBlock.Draw();
 	stageRap.Draw();
 
-
-
-	// プレイヤーとボス間に線を描画
-	//DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(player.centerPos), ScrollMgr::Instance()->Affect(boss.pos), Color());
-
-	//SuperiorityGauge::Instance()->Draw();
-
-	//miniMap.Draw();
-
-	//FaceIcon::Instance()->Draw();
-
 	WinCounter::Instance()->Draw();
 
 	StunEffect::Instance()->Draw();
@@ -871,82 +867,35 @@ void Game::Scramble()
 	// どちらかが振り回しているか。
 	bool isSwingNow = CharacterManager::Instance()->Left()->GetNowSwing() || CharacterManager::Instance()->Right()->GetNowSwing();
 
+	// 距離を求める。
+	charaLength = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
 
-	// どちらの移動量が多いかを取得。どちらも同じ場合は処理を飛ばす。
-	if (leftVelGauge.Length() < rightVelGauge.Length()) {
+	// ボスをプレイヤーの方に移動させる。
+	if (LINE < charaLength) {
 
-		// 右側のほうが移動量が大きかったら。
-		// 右側のキャラを中心とした位置に左側のキャラを持ってくる。
+		// 押し戻し量
+		float moveLength = charaLength - LINE;
 
-		// 距離を求める。
-		charaLength = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
+		// 押し戻し方向
+		Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos);
+		moveDir.Normalize();
 
-		// 左側のキャラを右側のキャラの方に移動させる。
-		if (LINE < charaLength) {
+		// 押し戻す。
+		CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
 
-			// 押し戻し量
-			float moveLength = charaLength - LINE;
 
-			// 押し戻し方向
-			Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos);
-			moveDir.Normalize();
+		// 引っかかり判定だったら
+		if (CharacterManager::Instance()->Right()->GetStackFlag()) {
 
-			// 押し戻す。
-			CharacterManager::Instance()->Left()->pos += moveDir * Vec2<float>(moveLength, moveLength);
+			CharacterManager::Instance()->Right()->addLineLength += moveLength;
+			//CharacterManager::Instance()->Left()->pos += -moveDir * Vec2<float>(moveLength, moveLength);
 
-			// 引っかかり判定だったら
-			if (CharacterManager::Instance()->Left()->GetStackFlag()) {
-
-				CharacterManager::Instance()->Left()->addLineLength += moveLength;
-				//CharacterManager::Instance()->Right()->pos += -moveDir * Vec2<float>(moveLength, moveLength);
-
-				// 引っかかっている場合は更に押し戻す。(壁ズリを表現するため)
-				if (0 < CharacterManager::Instance()->Left()->addLineLength) {
-					CharacterManager::Instance()->Left()->pos += moveDir * Vec2<float>(moveLength, moveLength);
-				}
-
+			// 引っかかっている場合は更に押し戻す。(壁ズリを表現するため)
+			if (0 < CharacterManager::Instance()->Right()->addLineLength) {
+				CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
 			}
 
 		}
-
-	}
-	else if (rightVelGauge.Length() < leftVelGauge.Length()) {
-
-		// 左側のほうが移動量が大きかったら。
-		// 左側のキャラを中心とした位置に右側のキャラを持ってくる。
-
-		// 距離を求める。
-		charaLength = Vec2<float>(CharacterManager::Instance()->Left()->pos).Distance(CharacterManager::Instance()->Right()->pos);
-
-		// ボスをプレイヤーの方に移動させる。
-		if (LINE < charaLength) {
-
-			// 押し戻し量
-			float moveLength = charaLength - LINE;
-
-			// 押し戻し方向
-			Vec2<float> moveDir = Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos);
-			moveDir.Normalize();
-
-			// 押し戻す。
-			CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
-
-
-			// 引っかかり判定だったら
-			if (CharacterManager::Instance()->Right()->GetStackFlag()) {
-
-				CharacterManager::Instance()->Right()->addLineLength += moveLength;
-				//CharacterManager::Instance()->Left()->pos += -moveDir * Vec2<float>(moveLength, moveLength);
-
-				// 引っかかっている場合は更に押し戻す。(壁ズリを表現するため)
-				if (0 < CharacterManager::Instance()->Right()->addLineLength) {
-					CharacterManager::Instance()->Right()->pos += moveDir * Vec2<float>(moveLength, moveLength);
-				}
-
-			}
-
-		}
-
 	}
 
 	const float ADD_LINE_LENGTH_SUB_AMOUNT = 5.0f;
@@ -957,7 +906,7 @@ void Game::Scramble()
 	Vec2<float> movedVel = (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Right()->prevPos);
 	movedVel += (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos);
 	// 右側の紐の処理
-	if (!isBothStuck && 0 < CharacterManager::Instance()->Right()->addLineLength && !isSwingNow) {
+	if (0 < CharacterManager::Instance()->Right()->addLineLength) {
 
 		// 引く量 0未満にならないようにするため。
 		float subAmount = ADD_LINE_LENGTH_SUB_AMOUNT;
@@ -982,11 +931,8 @@ void Game::Scramble()
 		// [今の長さ] が [初期長さ * 2] + [左の紐の長さ] 以上だったら処理を行う。
 		if (CharacterInterFace::LINE_LENGTH * 2.0f + CharacterManager::Instance()->Left()->addLineLength < charaLength) {
 
-			// 動いていたら
-			if (1.0f < movedVel.Length()) {
-			}
 			// 右側が引っかかっていたら。
-			else if (CharacterManager::Instance()->Right()->GetStackFlag()) {
+			if (CharacterManager::Instance()->Right()->GetStackFlag()) {
 				// 右側が引っかかっているときは代わりに左側を動かす。
 				CharacterManager::Instance()->Left()->pos += (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos).GetNormal() * subAmount;
 			}
@@ -1275,7 +1221,7 @@ void Game::RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData
 		if (roundChangeEffect.initGameFlag)
 		{
 			// シェイクを発生させる。
-			UsersInput::Instance()->ShakeController(0, 1.0f, 9);
+			UsersInput::Instance()->ShakeController(0, 1.0f, 6);
 
 			CharacterManager::Instance()->Left()->Appear();
 			CharacterManager::Instance()->Right()->Appear();
@@ -1352,6 +1298,9 @@ void Game::RoundFinishEffect(const bool& Loop)
 				mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 				mapChipGenerator->RegisterMap();
 				RoundFinishEffect::Instance()->changeMap = false;
+
+				ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.countAllBlockNum - countBlock.countNowBlockNum);
+
 				countBlock.Init();
 				stageRap.Increment();
 				DistanceCounter::Instance()->isExpSmall = false;
@@ -1361,6 +1310,9 @@ void Game::RoundFinishEffect(const bool& Loop)
 				CharacterManager::Instance()->Right()->InitRoundFinish();
 
 				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+
+				GameTimer::Instance()->Init(gameTimer);
+				GameTimer::Instance()->Start();
 			}
 
 			drawCharaFlag = true;

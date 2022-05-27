@@ -47,13 +47,13 @@ void BlockCount::Draw()
 		DrawFunc::DrawRotaGraph2D(drawPos - Vec2<float>(25.0f, 0.0f), Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[nowNumber[i]]));
 	}
 
-	DrawFunc::DrawRotaGraph2D(basePos + Vec2<float>(-8.0f, 0.0f), Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[10]));
+	DrawFunc::DrawRotaGraph2D(basePos + Vec2<float>(-8.0f, 0.0f), Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[11]));
 	drawPos = basePos + Vec2<float>(10.0f, 0.0f);
 	//�ő�
 	for (int i = 0; i < maxNumber.size(); i++)
 	{
 		drawPos.x += texSize.x;
-		DrawFunc::DrawRotaGraph2D(drawPos - Vec2<float>(25.0f, 0.0f), Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[maxNumber[i]]));
+		DrawFunc::DrawRotaGraph2D(drawPos - Vec2<float>(20.0f, 0.0f), Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[maxNumber[i]]));
 	}
 }
 
