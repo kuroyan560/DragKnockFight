@@ -18,6 +18,7 @@ public:
 	const float DEAD_LINE = 300.0f;		// “–‚½‚Á‚½‚çI‚í‚è‚Ì‹——£
 
 	std::array<int, 12> fontGraph;
+	std::array<int, 12> redFontGraph;
 
 	bool isExpSmall;	// ¬‚³‚­‚·‚é‚©‚Ç‚¤‚©ƒtƒ‰ƒO
 	float exp;			// ¡‚Ì‘å‚«‚³‚ÌŠ„‡

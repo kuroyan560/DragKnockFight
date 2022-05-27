@@ -4,6 +4,7 @@
 #include "ScrollMgr.h"
 #include "KuroFunc.h"
 #include "DrawFunc.h"
+#include "DrawFunc_FillTex.h"
 
 DistanceCounter::DistanceCounter()
 {
@@ -14,6 +15,7 @@ DistanceCounter::DistanceCounter()
 	lineCenterPos = { -1000,-10000 };
 
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, Vec2<int>(12, 1), fontGraph.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_yellow.png", 12, Vec2<int>(12, 1), redFontGraph.data());
 
 	isExpSmall = false;
 	exp = 1.0f;
@@ -90,6 +92,9 @@ void DistanceCounter::Draw()
 	const float OFFSET_X = static_cast<float>(distanceDisitCount) / 2.0f;
 	// ï`âÊç¿ïW
 	Vec2<float> drawPos = ScrollMgr::Instance()->Affect(lineCenterPos + shakeAmount);
+	// ãóó£Ç…ÇÊÇÈÉåÅ[Ég
+	float rate = 1.0f - (distance / (MAX_SHAKE_DISTANCE * 1.5f));
+	if (rate < 0) rate = 0;
 	for (int index = 0; index < distanceDisitCount; ++index) {
 
 		// ï`âÊÇ∑ÇÈêîéöÅB
@@ -101,7 +106,7 @@ void DistanceCounter::Draw()
 		zoom = 1.0f - zoom;
 
 		// ï`âÊÇ∑ÇÈÅB
-		DrawFunc::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * index + OFFSET_X * zoom, 0), Vec2<float>(zoom * exp, zoom * exp), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]));
+		DrawFunc_FillTex::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * index + OFFSET_X * zoom, 0), Vec2<float>(zoom * exp, zoom * exp), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]), TexHandleMgr::GetTexBuffer(redFontGraph[drawDisit]), rate);
 
 	}
 
