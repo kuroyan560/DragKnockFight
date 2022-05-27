@@ -126,6 +126,10 @@ void Player::OnInit()
 
 	/*===== 初期化処理 =====*/
 
+	// 現在振り回せる最大数を取得。
+	maxStrongSwingCount = StageMgr::Instance()->GetSwingCount(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	nowStrongSwingCount = 0;
+
 	//プレイヤーの向き初期化
 	//playerDir = DEFAULT;
 
@@ -183,6 +187,8 @@ void Player::OnInit()
 
 	consecutiveSwingTimer = 0;
 	DebugParameter::Instance()->useFinishSwingFlag = true;
+
+	strongSwingUI.resize(maxStrongSwingCount);
 }
 
 void Player::OnUpdate(const vector<vector<int>>& MapData)
@@ -445,13 +451,9 @@ void Player::OnDrawUI()
 
 	//tutorial.Draw(leftStickVec, rightStickVec, leftButton, rightButton);
 
-	static const int STRONG_SWING_COUNT_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/canSwingCount.png");
-	for (int i = 0; i < maxStrongSwingCount + 1 - nowStrongSwingCount; ++i)
+	for (int i = 0; i < maxStrongSwingCount; ++i)
 	{
-		Vec2<float>drawPos(30, WinApp::Instance()->GetExpandWinSize().y);
-		const float offsetY = 70;
-		drawPos.y -= offsetY * i;
-		DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(STRONG_SWING_COUNT_GRAPH));
+		strongSwingUI[i].Draw(i);
 	}
 }
 
@@ -565,10 +567,10 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 	// 破壊モードかのフラグを保存。
 	isDestroyMode = false;
-	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && nowStrongSwingCount <= maxStrongSwingCount) {
+	if (maxStrongSwingCount && UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && nowStrongSwingCount <= maxStrongSwingCount) {
 
 		isDestroyMode = true;
-
+		strongSwingUI[maxStrongSwingCount - nowStrongSwingCount].Disappear();
 	}
 
 

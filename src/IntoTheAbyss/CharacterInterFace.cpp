@@ -390,6 +390,7 @@ void CharacterInterFace::InitSwingLineSegmetn()
 	CCWSwingSegmentMgr.Init();
 }
 
+#include"SelectStage.h"
 void CharacterInterFace::InitRoundFinish()
 {
 
@@ -408,9 +409,6 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	else appearExtRate = { 1.0f,1.0f };
 	initPaticleFlag = false;
 	moveTimer = 0;
-
-	nowStrongSwingCount = 0;
-	maxStrongSwingCount = 0;
 
 	pos = GeneratePos;
 	vel = { 0,0 };
@@ -443,7 +441,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 	stagingDevice.Init();
 
-	OnInit();
+	InitRoundFinish();
 
 	isHold = false;
 
@@ -526,10 +524,6 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 #include "SlowMgr.h"
 void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect, const bool& isRoundFinishEffect, const int& NowStageNum, const int& NowRoomNum)
 {
-
-	// Œ»ÝU‚è‰ñ‚¹‚éÅ‘å”‚ðŽæ“¾B
-	maxStrongSwingCount = StageMgr::Instance()->GetSwingCount(NowStageNum, NowRoomNum);
-
 	if (isRoundFinishEffect) {
 
 		CWSwingSegmentMgr.Init();
@@ -1728,8 +1722,6 @@ CharacterInterFace::CharacterInterFace(const Vec2<float>& HonraiSize) : size(Hon
 	bulletMgr.Init();
 	barrage = std::make_unique<CircularBarrage>();
 	barrage->Init();
-
-	nowStrongSwingCount = 0;
 
 	stopReticleHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/reticle_enemy.png");
 	reticleExp = Vec2<float>(1.0f, 1.0f);

@@ -1356,9 +1356,6 @@ void Game::RoundFinishEffect(const bool& Loop)
 				stageRap.Increment();
 				DistanceCounter::Instance()->isExpSmall = false;
 
-				// ひだりのキャラの貫通振り回しの数を初期化。
-				CharacterManager::Instance()->Left()->nowStrongSwingCount = 0;
-
 				// ランド終了時に初期化したい変数を初期化する。
 				CharacterManager::Instance()->Left()->InitRoundFinish();
 				CharacterManager::Instance()->Right()->InitRoundFinish();

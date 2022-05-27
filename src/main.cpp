@@ -33,7 +33,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #ifdef _DEBUG
 	engineOption.frameRate = 43;
 #else
-	engineOption.frameRate = 200;
+	engineOption.frameRate = 60;
 #endif
 
 	engineOption.imguiActive = true;
