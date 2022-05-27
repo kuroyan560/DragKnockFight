@@ -40,8 +40,16 @@ void CharacterInterFace::SwingUpdate()
 	// 割合を求める。
 	addSwingRate = 1.0f;
 
-	if (addSwingRate < 0) addSwingRate = 0;
-	if (1 < addSwingRate) addSwingRate = 1;
+	// 3000 ~ 15000の間だったら回転角度を減らす。
+	if (3000.0f <= partnerDistance) {
+
+		addSwingRate = (partnerDistance - 3000.0f) / 12000.0f;
+		//addSwingRate = 1.0f - addSwingRate;
+
+	}
+
+	if (addSwingRate < 0.0f) addSwingRate = 0.0f;
+	if (1.0f < addSwingRate) addSwingRate = 1.0f;
 
 	// 角度に加算する量を更新。
 	addSwingAngle = ADD_SWING_ANGLE * addSwingRate;
@@ -1151,6 +1159,23 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 		}
 
 
+
+		const int HITCHIP_INDEX = hitChipIndex.size();
+
+		if (team == WHICH_TEAM::RIGHT_TEAM) {
+
+			for (int index = 0; index < HITCHIP_INDEX; ++index) {
+				// 壊れないブロックに当たったらバウンス移動量を初期化する。
+				if (MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 18) {
+
+					//bounceVel = {};
+
+				}
+			}
+
+		}
+
+
 		// 一定以下だったらダメージを与えない。
 		if (partner.lock()->addSwingAngle <= ADD_SWING_ANGLE * 0.5f && !(DebugParameter::Instance()->canDestroyBounceVel < bounceVel.Length())) {
 
@@ -1158,8 +1183,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 		}
 		else
 		{
-
-			const int HITCHIP_INDEX = hitChipIndex.size();
 
 			for (int index = 0; index < HITCHIP_INDEX; ++index) {
 
@@ -1175,6 +1198,10 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 					}
 
+				}
+
+				if (!unBlockFlag) {
+					partner.lock()->FinishSwing();
 				}
 
 				// ブロックを破壊する。
@@ -1262,6 +1289,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 吹っ飛ぶブロックかどうかをチェック。
 						bounceBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x - 1] == 20;
 
+						// 壊れないブロックかどうかをチェック。
+						unBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x - 1] == 18;
+
 						if (!rare[L].nonScoreFlg)
 						{
 							for (int i = 0; i < rare[L].GetNum(); ++i)
@@ -1277,6 +1307,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 						// 吹っ飛ぶブロックかどうかをチェック。
 						bounceBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x + 1] == 20;
+
+						// 壊れないブロックかどうかをチェック。
+						unBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x + 1] == 18;
 
 						if (!rare[R].nonScoreFlg)
 						{
@@ -1294,6 +1327,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 吹っ飛ぶブロックかどうかをチェック。
 						bounceBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x] == 20;
 
+						// 壊れないブロックかどうかをチェック。
+						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x] == 18;
+
 						if (!rare[T].nonScoreFlg)
 						{
 							for (int i = 0; i < rare[T].GetNum(); ++i)
@@ -1309,6 +1345,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 						// 吹っ飛ぶブロックかどうかをチェック。
 						bounceBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x] == 20;
+
+						// 壊れないブロックかどうかをチェック。
+						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x] == 18;
 
 						if (!rare[B].nonScoreFlg)
 						{
@@ -1326,6 +1365,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 吹っ飛ぶブロックかどうかをチェック。
 						bounceBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x - 1] == 20;
 
+						// 壊れないブロックかどうかをチェック。
+						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x - 1] == 18;
+
 						if (!rare[LT].nonScoreFlg)
 						{
 							for (int i = 0; i < rare[LT].GetNum(); ++i)
@@ -1341,6 +1383,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 						// 吹っ飛ぶブロックかどうかをチェック。
 						bounceBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x - 1] == 20;
+
+						// 壊れないブロックかどうかをチェック。
+						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x - 1] == 18;
 
 						if (!rare[LB].nonScoreFlg)
 						{
@@ -1358,6 +1403,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 吹っ飛ぶブロックかどうかをチェック。
 						bounceBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x + 1] == 20;
 
+						// 壊れないブロックかどうかをチェック。
+						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x + 1] == 18;
+
 						if (!rare[RB].nonScoreFlg)
 						{
 							for (int i = 0; i < rare[RB].GetNum(); ++i)
@@ -1373,6 +1421,9 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 						// 吹っ飛ぶブロックかどうかをチェック。
 						bounceBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x + 1] == 20;
+
+						// 壊れないブロックかどうかをチェック。
+						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x + 1] == 18;
 
 						if (!rare[RT].nonScoreFlg)
 						{
@@ -1410,10 +1461,18 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				}
 
+				// 壊れないブロックに当たったら振り回しを終える。
+				if (!unBlockFlag) {
+
+					FinishSwing();
+					partner.lock()->FinishSwing();
+
+				}
+
 
 				// 振り回されている状態だったら、シェイクを発生させて振り回し状態を解除する。
 				Vec2<float>vec = { 0,0 };
-				if (partner.lock()->GetNowSwing()) {
+				if (unBlockFlag) {
 
 					// 画面端のブロックだったら判定を通さない。
 					if ((0 < hitChipIndex[index].x && hitChipIndex[index].x < MapData[0].size() - 1 && 0 < hitChipIndex[index].y && hitChipIndex[index].y < MapData.size() - 1))
