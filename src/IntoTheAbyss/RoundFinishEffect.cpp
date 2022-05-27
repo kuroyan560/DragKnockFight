@@ -8,6 +8,7 @@
 #include "ScrollMgr.h"
 #include "WinApp.h"
 #include"SelectStage.h"
+#include"EavaluationDataMgr.h"
 
 RoundFinishEffect::RoundFinishEffect()
 {
@@ -54,8 +55,8 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 	finishLap = false;
 	cameraZoom = CameraZoom;
 
-	static const float GOOD_PER = 0.5f;
-	static const float GREAT_PER = 0.8f;
+	static const float GOOD_PER = EavaluationDataMgr::Instance()->GOOD_RATE;
+	static const float GREAT_PER = EavaluationDataMgr::Instance()->GREAT_RATE;
 
 	// 引数の割合からどの画像を使用するかをチェックする。
 	if (Rate <= GOOD_PER) {
@@ -308,7 +309,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		++perfectAnimIndex;
 
-		if (3 <= perfectAnimIndex) {
+		if (EavaluationDataMgr::Instance()->PERFECT_ANIMATION_INTERVAL <= perfectAnimIndex) {
 
 			perfectAnimIndex = 0;
 
