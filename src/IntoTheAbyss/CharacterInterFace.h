@@ -221,6 +221,9 @@ public:
 	Vec2<float>shakeValue;
 	bool prevSwingFlag;
 
+	// ƒ‰ƒCƒ“ƒhI—¹‚É‰Šú‰»‚µ‚½‚¢•Ï”‚ğ‰Šú‰»‚·‚éŠÖ”
+	void InitRoundFinish();
+
 	void RegisterCharacterInfo(const std::shared_ptr<CharacterInterFace>Partner, const WHICH_TEAM& Team, const PLAYABLE_CHARACTER_NAME& Name)
 	{
 		partner = Partner;
