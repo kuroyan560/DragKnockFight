@@ -20,18 +20,18 @@ void Camera::Update()
 	if (active)
 	{
 		//•`‰æã‚ÌˆÊ’u‚ğ‹‚ß‚é
-		//const auto targetOnDraw =  Vec2<double>(static_cast<double>(ScrollMgr::Instance()->Affect(target).x),static_cast<double>(ScrollMgr::Instance()->Affect(target).x));
-		////‰æ–Ê’†‰›‚Æ‚Ì·•ª‚ğ‹‚ß‚é
-		//const auto differ = targetOnDraw - Vec2<double>(static_cast<double>(WinApp::Instance()->GetExpandWinCenter().x),static_cast<double>(WinApp::Instance()->GetExpandWinCenter().y)) - scrollAffect;
+		const auto targetondraw =  ScrollMgr::Instance()->Affect(target);
+		//‰æ–Ê’†‰›‚Æ‚Ì·•ª‚ğ‹‚ß‚é
+		const auto differ = targetondraw - WinApp::Instance()->GetExpandWinCenter() - scrollAffect;
 
-		//int a = 0;
+		int a = 0;
 
-		const auto differ = (target - ScrollMgr::Instance()->scrollAmount - WinApp::Instance()->GetExpandWinCenter()) - scrollAffect;
+		//const auto differ = (target - ScrollMgr::Instance()->scrollAmount) - scrollAffect;
 
 		//‹ß‚Ã‚¢‚Ä‚¢‚­
-		scrollAffect.x = KuroMath::Lerp(scrollAffect.x, -differ.x, lerpAmount);
-		scrollAffect.y = KuroMath::Lerp(scrollAffect.y, -differ.y, lerpAmount);
-		//scrollAffect = -differ;
+		//scrollAffect.x = KuroMath::Lerp(scrollAffect.x, -differ.x, lerpAmount);
+		//scrollAffect.y = KuroMath::Lerp(scrollAffect.y, -differ.y, lerpAmount);
+		scrollAffect = -differ;
 	}
 	else
 	{

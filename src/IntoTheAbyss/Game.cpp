@@ -675,11 +675,11 @@ void Game::Update(const bool& Loop)
 			Camera::Instance()->zoom = minZoomValue;
 		}
 	}
-	else {
+	//else {
 
-		ScrollMgr::Instance()->lineCenterOffset = {};
+		//ScrollMgr::Instance()->lineCenterOffset = {};
 
-	}
+	//}
 
 
 
