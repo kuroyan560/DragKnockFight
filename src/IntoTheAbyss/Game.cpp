@@ -312,10 +312,10 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
 	ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
 
-
+	gameTimer = 30;
 	Camera::Instance()->Init();
 	ScoreManager::Instance()->Init();
-	GameTimer::Instance()->Init(60);
+	GameTimer::Instance()->Init(gameTimer);
 	GameTimer::Instance()->Start();
 
 	firstLoadFlag = false;
@@ -385,8 +385,6 @@ Game::Game()
 	readyToStartRoundFlag = true;
 	//”wŒi‚É¯
 	//BackGround::Instance()->Init(GetStageSize());
-
-	GameTimer::Instance()->Init(120);
 
 
 	{
@@ -1315,6 +1313,9 @@ void Game::RoundFinishEffect(const bool& Loop)
 				CharacterManager::Instance()->Right()->InitRoundFinish();
 
 				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+
+				GameTimer::Instance()->Init(gameTimer);
+				GameTimer::Instance()->Start();
 			}
 
 			drawCharaFlag = true;
