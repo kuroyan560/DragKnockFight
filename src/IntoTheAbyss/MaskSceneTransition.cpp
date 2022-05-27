@@ -6,10 +6,12 @@
 #include "WinApp.h"
 #include "D3D12App.h"
 #include "KuroEngine.h"
+#include "DrawMapChipForSceneChange.h"
 
 MaskSceneTransition::MaskSceneTransition()
 {
 	maskHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/scene_transition/scene_transition_mask.png");
+	startFlag = false;
 }
 
 MaskSceneTransition::~MaskSceneTransition()
@@ -18,8 +20,12 @@ MaskSceneTransition::~MaskSceneTransition()
 
 void MaskSceneTransition::OnStart()
 {
-	expRate = 30.0f;
-	angle = 0;
+	if (!startFlag)
+	{
+		expRate = 30.0f;
+		angle = 0;
+		startFlag = true;
+	}
 }
 
 bool MaskSceneTransition::OnUpdate()
@@ -32,11 +38,9 @@ bool MaskSceneTransition::OnUpdate()
 	}
 
 	if (fabs(expRate) < 0.001f) {
-
 		expRate = 0;
-
+		startFlag = false;
 		return true;
-
 	}
 
 	return false;
@@ -44,10 +48,11 @@ bool MaskSceneTransition::OnUpdate()
 
 void MaskSceneTransition::OnDraw()
 {
+	if (startFlag)
+	{
+		Vec2<float> windowCenter = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
 
-	Vec2<float> windowCenter = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
-
-	DrawFunc::DrawRotaGraph2D(windowCenter, Vec2<float>(expRate, expRate), angle, TexHandleMgr::GetTexBuffer(maskHandle));
-	//DrawFunc_Mask::DrawGraphByMaskGraph(windowCenter, D3D12App::Instance()->GetBackBuffRenderTarget(), windowCenter, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<bool>(false, false));
-
+		//DrawFunc::DrawRotaGraph2D(windowCenter, Vec2<float>(expRate, expRate), angle, DrawMapChipForSceneChange::Instance()->mapBuffer);
+		DrawFunc_Mask::DrawGraphByMaskGraph(windowCenter, DrawMapChipForSceneChange::Instance()->mapBuffer, windowCenter, DrawMapChipForSceneChange::Instance()->mapBuffer, Vec2<bool>(false, false));
+	}
 }

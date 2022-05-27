@@ -14,4 +14,5 @@ class MaskSceneTransition : public SceneTransition{
 	float expRate;		// ‰æ‘œ‚ÌŠg‘å—¦
 	float angle;		// ‰ñ“]Šp“x
 
+	bool startFlag;
 };

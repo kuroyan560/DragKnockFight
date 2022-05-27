@@ -6,7 +6,7 @@
 
 StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 {
-	changeScene = std::make_shared<SceneCange>();
+	changeScene = std::make_shared<MaskSceneTransition>();
 	stageNum = 0;
 }
 
@@ -29,6 +29,8 @@ void StageSelectScene::OnInitialize()
 
 	isPrevInputStickRight = false;
 	isPrevInputSticlLeft = false;
+
+	DrawMapChipForSceneChange::Instance()->Init(0);
 }
 
 void StageSelectScene::OnUpdate()
@@ -105,6 +107,8 @@ void StageSelectScene::OnUpdate()
 			// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
 			screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
 
+			DrawMapChipForSceneChange::Instance()->Finalize();
+
 		}
 		//タイトルシーンに移動する
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
@@ -152,6 +156,7 @@ void StageSelectScene::OnUpdate()
 		SelectStage::Instance()->SelectStageNum(stageNum);
 	}
 
+
 	screenShot.Update();
 	stageSelect.Update();
 	rightArrow.Update(false);
@@ -196,6 +201,8 @@ void StageSelectScene::OnDraw()
 	// ひだりのキャラの描画処理
 	leftChara.Draw();
 	rightChara.Draw();
+
+	DrawMapChipForSceneChange::Instance()->Draw();
 }
 
 void StageSelectScene::OnImguiDebug()

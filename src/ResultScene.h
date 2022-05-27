@@ -20,9 +20,9 @@ class ResultScene : public BaseScene
 	int slashHandle;			//スラッシュ
 	int goodHandle;				//Goodの画像ハンドル
 	int greatHandle;			//Greatの画像ハンドル
-	int excellentHandle;			//Excellentの画像ハンドル
-	int evaluationNowHandle;
-	bool evaluationFlag;
+	int excellentHandle;		//Excellentの画像ハンドル
+	int evaluationNowHandle;	
+	bool evaluationFlag;		
 	std::array<int, 3> perfectHandle; //スラッシュ
 	std::array<int, 12> blueNumberHandle;// 青の数字の画像ハンドル
 
