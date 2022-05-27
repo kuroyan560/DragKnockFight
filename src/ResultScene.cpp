@@ -116,7 +116,7 @@ void ResultScene::OnUpdate()
 			++breakEnemyUITimer;
 			// タイマーが規定値に達したら。
 			if (BREAK_COUNTUI_TIMER <= breakEnemyUITimer) {
-				baseBreakCount = 10000;
+				baseBreakCount = ScoreKeep::Instance()->GetAddScore();
 
 				delayTimer = DELAY_TIMER;
 				isSkip = true;
@@ -187,7 +187,7 @@ void ResultScene::OnDraw()
 		DrawFunc::DrawGraph(Vec2<float>(440.0f, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
 
 
-		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), 15000);
+		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum());
 	}
 }
 
