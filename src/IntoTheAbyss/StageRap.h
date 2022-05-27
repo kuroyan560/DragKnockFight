@@ -13,6 +13,8 @@ public:
 	void Draw();
 
 	void Increment();
+
+	int GetRapNum();
 private:
 	Vec2<float>pos,size;
 	int rapNum, rapMaxNum;

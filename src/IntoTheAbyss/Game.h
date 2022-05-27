@@ -33,6 +33,7 @@ class RenderTarget;
 
 #include"StageRap.h"
 
+
 class CharacterInterFace;
 
 struct MassChipData

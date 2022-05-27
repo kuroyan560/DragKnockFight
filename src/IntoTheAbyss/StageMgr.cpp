@@ -256,12 +256,12 @@ StageMgr::StageMgr()
 	//GimmickLoader::Instance()->ErrorCheck();
 }
 
-void StageMgr::SetLocalMapChipData(const int& STAGE_NUMBER, const int& ROOM_NUMBER)
+void StageMgr::SetLocalMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	localRoomMapChipArray = allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
 }
 
-const int& StageMgr::GetRelationData(const int& STAGE_NUMBER, const int& ROOM_NUMBER, const int& DOOR_NUMBER)
+const int &StageMgr::GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER)
 {
 	for (int doorIndex = 0; doorIndex < relationRoomData[STAGE_NUMBER][ROOM_NUMBER].size(); ++doorIndex)
 	{
@@ -279,12 +279,12 @@ const SizeData StageMgr::GetMapChipSizeData(MapChipData TYPE)
 }
 
 
-void StageMgr::SetLocalMapChipDrawBlock(const int& STAGE_NUMBER, const int& ROOM_NUMBER)
+void StageMgr::SetLocalMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	localRoomMapChipDrawArray = allMapChipDrawData[STAGE_NUMBER][ROOM_NUMBER];
 }
 
-const bool& StageMgr::CheckStageNum(const int& STAGE_NUMBER)
+const bool &StageMgr::CheckStageNum(const int &STAGE_NUMBER)
 {
 	if (0 <= STAGE_NUMBER && STAGE_NUMBER < allMapChipDrawData.size())
 	{
@@ -296,7 +296,7 @@ const bool& StageMgr::CheckStageNum(const int& STAGE_NUMBER)
 	}
 }
 
-const bool& StageMgr::CheckRoomNum(const int& STAGE_NUMBER, const int& ROOM_NUMBER)
+const bool &StageMgr::CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
 	bool checkStageFlag = 0 <= STAGE_NUMBER && STAGE_NUMBER < allMapChipDrawData.size();//ステージ番号が配列内にあるか確認
 
@@ -313,7 +313,7 @@ const bool& StageMgr::CheckRoomNum(const int& STAGE_NUMBER, const int& ROOM_NUMB
 	return false;
 }
 
-void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM, const Vec2<float>& LeftCharaPos, const float& LeftCharaSize, const Vec2<float>& RightCharaPos, const float& RightCharaSize)
+void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM, const Vec2<float> &LeftCharaPos, const float &LeftCharaSize, const Vec2<float> &RightCharaPos, const float &RightCharaSize)
 {
 	//配列外参照
 	if (MAPCHIP_NUM.y < 0 || localRoomMapChipArray.size() <= MAPCHIP_NUM.y || MAPCHIP_NUM.x < 0 || localRoomMapChipArray[MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
@@ -355,7 +355,7 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM,
 	}
 }
 
-MapChipType StageMgr::GetMapChipType(const int& STAGE_NUM, const int& ROOM_NUM, const Vec2<int> MAPCHIP_NUM)
+MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM)
 {
 	if (allMapChipData[STAGE_NUM][ROOM_NUM].size() <= MAPCHIP_NUM.y && allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
 	{
@@ -451,12 +451,12 @@ MapChipType StageMgr::GetLocalMapChipType(const Vec2<int> MAPCHIP_NUM)
 	}
 }
 
-RoomMapChipArray* StageMgr::GetLocalMap()
+RoomMapChipArray *StageMgr::GetLocalMap()
 {
 	return &localRoomMapChipArray;
 }
 
-RoomMapChipDrawArray* StageMgr::GetLocalDrawMap()
+RoomMapChipDrawArray *StageMgr::GetLocalDrawMap()
 {
 	return &localRoomMapChipDrawArray;
 }
@@ -484,6 +484,20 @@ int StageMgr::GetAllLocalWallBlocksNum(int RARE_BLOCK_COUNT)
 			}
 		}
 	}
+	return count;
+}
+
+int StageMgr::GetAllRoomWallBlocksNum(int STAGE_NUM, int RARE_BLOCK_COUNT)
+{
+	int count = 0;
+
+	for (int stageIndex = 0; stageIndex < allMapChipData[STAGE_NUM].size(); ++stageIndex)
+	{
+
+
+
+	}
+
 	return count;
 }
 
@@ -538,7 +552,7 @@ int StageMgr::GetEnableToUseStageNumber()
 	return count;
 }
 
-Vec2<float>StageMgr::GetPlayerResponePos(const int& StageNum, const int& RoomNum)
+Vec2<float>StageMgr::GetPlayerResponePos(const int &StageNum, const int &RoomNum)
 {
 	for (int y = 0; y < allMapChipData[StageNum][RoomNum].size(); ++y)
 	{
@@ -553,7 +567,7 @@ Vec2<float>StageMgr::GetPlayerResponePos(const int& StageNum, const int& RoomNum
 	return Vec2<float>(0.0f, 0.0f);
 }
 
-Vec2<float>StageMgr::GetBossResponePos(const int& StageNum, const int& RoomNum)
+Vec2<float>StageMgr::GetBossResponePos(const int &StageNum, const int &RoomNum)
 {
 	for (int y = 0; y < allMapChipData[StageNum][RoomNum].size(); ++y)
 	{
@@ -635,7 +649,7 @@ bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM,
 	return sideFlag;
 }
 
-void StageMgr::SetGimmickGraphHandle(const int& STAGE_NUM, const int& ROOM_NUM, const Vec2<int>& MAPCHIP_NUM)
+void StageMgr::SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM)
 {
 	//描画の書き換え
 	if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_COLOR_RIGHT)

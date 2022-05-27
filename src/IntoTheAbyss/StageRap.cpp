@@ -46,3 +46,8 @@ void StageRap::Increment()
 {
 	++rapNum;
 }
+
+int StageRap::GetRapNum()
+{
+	return rapNum;
+}

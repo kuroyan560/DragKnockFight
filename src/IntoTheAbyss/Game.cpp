@@ -51,6 +51,8 @@
 #include "RoundFinishParticle.h"
 #include "DistanceCounter.h"
 
+#include"ScoreKeep.h"
+
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
@@ -345,6 +347,9 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	countBlock.Init();
 	ScoreManager::Instance()->Init();
 	roundFinishFlag = false;
+
+	ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(SelectStage::Instance()->GetStageNum()), 1000);
+
 }
 
 Game::Game()
@@ -616,7 +621,6 @@ void Game::Update(const bool& Loop)
 
 	countBlock.Update();
 	stageRap.Update();
-
 
 	// スタミナアイテムの更新処理
 	if (!readyToStartRoundFlag) {
@@ -1362,6 +1366,8 @@ void Game::RoundFinishEffect(const bool& Loop)
 				// ランド終了時に初期化したい変数を初期化する。
 				CharacterManager::Instance()->Left()->InitRoundFinish();
 				CharacterManager::Instance()->Right()->InitRoundFinish();
+
+				ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.countNowBlockNum);
 
 				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 			}

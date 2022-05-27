@@ -261,13 +261,13 @@ public:
 	RoomMapChipDrawArray *GetLocalDrawMap();
 
 	int GetAllLocalWallBlocksNum(int RARE_BLOCK_COUNT = 10);
-
+	int GetAllRoomWallBlocksNum(int STAGE_NUM, int RARE_BLOCK_COUNT = 10);
 	int GetAllWallBlocksNum(int STAGE_NUM, int ROOM_NUM);
+
 
 	int GetMaxMapChipNum();
 
 	int GetEnableToUseRoomNumber(int STAGE_NUMBER);
-
 	int GetEnableToUseStageNumber();
 
 

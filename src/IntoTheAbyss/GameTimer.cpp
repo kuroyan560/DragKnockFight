@@ -122,8 +122,6 @@ void GameTimer::Update()
 
 void GameTimer::Draw()
 {
-	return;
-
 	Vec2<float>centralPos;
 	int offset = 0;
 	float size = 0.8f;
