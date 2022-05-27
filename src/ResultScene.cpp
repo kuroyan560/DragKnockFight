@@ -136,7 +136,7 @@ void ResultScene::OnDraw()
 		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX, RESULT_POS.y), TexHandleMgr::GetTexBuffer(resultHandle));
 
 		
-		DrawBreakCount(breakCountEasingAmount, static_cast<int>(breakCount), 15000);
+		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), 15000);
 	}
 }
 
