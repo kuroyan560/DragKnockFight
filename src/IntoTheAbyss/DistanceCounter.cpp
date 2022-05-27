@@ -15,7 +15,7 @@ DistanceCounter::DistanceCounter()
 	lineCenterPos = { -1000,-10000 };
 
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, Vec2<int>(12, 1), fontGraph.data());
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_yellow.png", 12, Vec2<int>(12, 1), redFontGraph.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_red.png", 11, Vec2<int>(11, 1), redFontGraph.data());
 
 	isExpSmall = false;
 	exp = 1.0f;
