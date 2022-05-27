@@ -491,10 +491,28 @@ int StageMgr::GetAllRoomWallBlocksNum(int STAGE_NUM, int RARE_BLOCK_COUNT)
 {
 	int count = 0;
 
-	for (int stageIndex = 0; stageIndex < allMapChipData[STAGE_NUM].size(); ++stageIndex)
+	for (int roomNum = 0; roomNum < allMapChipData[STAGE_NUM].size(); ++roomNum)
 	{
+		for (int y = 0; y < allMapChipData[STAGE_NUM][roomNum].size(); ++y)
+		{
+			for (int x = 0; x < allMapChipData[STAGE_NUM][roomNum][y].size(); ++x)
+			{
+				if (allMapChipData[STAGE_NUM][roomNum][y][x] == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)continue;
 
+				bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[STAGE_NUM][roomNum][y][x] && allMapChipData[STAGE_NUM][roomNum][y][x] <= MAPCHIP_TYPE_STATIC_CHANGE_AREA - 1;
+				bool isOutSideWall = y == 0 || x == 0 || y == allMapChipData[STAGE_NUM][roomNum].size() - 1 || x == allMapChipData[STAGE_NUM][roomNum][y].size() - 1;
+				bool isRareFlag = allMapChipData[STAGE_NUM][roomNum][y][x] == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 
+				if (isWallFlag && !isOutSideWall)
+				{
+					++count;
+				}
+				else if (isRareFlag)
+				{
+					count += RARE_BLOCK_COUNT;
+				}
+			}
+		}
 
 	}
 

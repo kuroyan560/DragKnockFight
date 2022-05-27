@@ -348,8 +348,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	ScoreManager::Instance()->Init();
 	roundFinishFlag = false;
 
-	ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(SelectStage::Instance()->GetStageNum()), 1000);
-
+	ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), StageMgr::Instance()->GetAllRoomWallBlocksNum(stageNum));
 }
 
 Game::Game()
@@ -1356,6 +1355,9 @@ void Game::RoundFinishEffect(const bool& Loop)
 				mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 				mapChipGenerator->RegisterMap();
 				RoundFinishEffect::Instance()->changeMap = false;
+
+				ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.countAllBlockNum - countBlock.countNowBlockNum);
+
 				countBlock.Init();
 				stageRap.Increment();
 				DistanceCounter::Instance()->isExpSmall = false;
@@ -1366,8 +1368,6 @@ void Game::RoundFinishEffect(const bool& Loop)
 				// ƒ‰ƒ“ƒhI—¹Žž‚É‰Šú‰»‚µ‚½‚¢•Ï”‚ð‰Šú‰»‚·‚éB
 				CharacterManager::Instance()->Left()->InitRoundFinish();
 				CharacterManager::Instance()->Right()->InitRoundFinish();
-
-				ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.countNowBlockNum);
 
 				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 			}
