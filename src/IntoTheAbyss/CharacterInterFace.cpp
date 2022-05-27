@@ -40,11 +40,16 @@ void CharacterInterFace::SwingUpdate()
 	// 割合を求める。
 	addSwingRate = 1.0f;
 
-	// 3000 ~ 15000の間だったら回転角度を減らす。
+	// 3000 ~ 7000の間だったら回転角度を減らす。
 	if (3000.0f <= partnerDistance) {
 
-		addSwingRate = (partnerDistance - 3000.0f) / 12000.0f;
-		//addSwingRate = 1.0f - addSwingRate;
+		addSwingRate = (partnerDistance - 3000.0f) / 4000.0f;
+		addSwingRate = 1.0f - addSwingRate;
+
+	}
+	else if (7000.0f <= partnerDistance) {
+
+		addSwingRate = 0.1f;
 
 	}
 

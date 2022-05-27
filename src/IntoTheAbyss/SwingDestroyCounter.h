@@ -34,6 +34,7 @@ public:
 	float easingTimer;	// 挙動にイージングをかけるためのタイマー
 	bool isActive;		// 有効化されているかのフラグ
 	bool isExitReservation;	// Exit予約
+	int isInitReservation;
 	STATUS status;		// 現在のステータス
 	DISIT_ID disitID;	// 桁数
 
