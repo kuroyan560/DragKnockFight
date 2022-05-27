@@ -444,6 +444,15 @@ void Player::OnDrawUI()
 	const auto rightButton = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB);
 
 	//tutorial.Draw(leftStickVec, rightStickVec, leftButton, rightButton);
+
+	static const int STRONG_SWING_COUNT_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/canSwingCount.png");
+	for (int i = 0; i < maxStrongSwingCount + 1 - nowStrongSwingCount; ++i)
+	{
+		Vec2<float>drawPos(30, WinApp::Instance()->GetExpandWinSize().y);
+		const float offsetY = 70;
+		drawPos.y -= offsetY * i;
+		DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(STRONG_SWING_COUNT_GRAPH));
+	}
 }
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)
