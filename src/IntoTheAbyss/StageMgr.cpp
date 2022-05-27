@@ -120,7 +120,7 @@ StageMgr::StageMgr()
 
 		const int thisStageRoomCount = allMapChipData[stageNum].size();
 		swingCount[stageNum].resize(thisStageRoomCount, 0);	//振り回し可能回数０で埋める
-		gameMaxTimer[stageNum].resize(thisStageRoomCount, 0);	//振り回し可能回数０で埋める
+		gameMaxTimer[stageNum].resize(thisStageRoomCount, 20);	//振り回し可能回数０で埋める
 
 		//ファイルが存在しないならそもそも振り回しが出来ないステージ
 		if (!KuroFunc::ExistFile(fileName))
