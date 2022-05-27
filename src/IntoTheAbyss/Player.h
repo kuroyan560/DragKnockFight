@@ -19,6 +19,7 @@ class LightManager;
 
 #include"RunOutOfStaminaEffect.h"
 #include"Gauge.h"
+#include"StrongSwingUI.h"
 
 static const enum PLAYER_ANIM
 {
@@ -96,6 +97,9 @@ public:
 	// 連続で弱攻撃するためのタイマー
 	int consecutiveSwingTimer;
 
+	int nowStrongSwingCount;		// 今貫通振り回しを何回しているか。
+	int maxStrongSwingCount;		// 何回貫通振り回しができるか。
+	std::vector<StrongSwingUI>strongSwingUI;
 
 public:
 

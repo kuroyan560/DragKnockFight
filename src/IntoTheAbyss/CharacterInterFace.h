@@ -14,6 +14,7 @@
 #include"StageMgr.h"
 #include"Barrages.h"
 #include "SwingDestroyCounter.h"
+#include"StrongSwingUI.h"
 
 class StaminaMgr;
 
@@ -75,6 +76,7 @@ private:
 	//スタミナ回復時オーラ
 	float healAuraEaseRate = 0.0f;
 
+	std::vector<StrongSwingUI>strongSwingUI;
 
 protected:
 	//登場演出
@@ -121,9 +123,6 @@ public:
 	Vec2<float>size;	//サイズ
 	Vec2<float> bounceVel;	// バウンドで紐が伸びるやつの移動量 velをそのまま使うと色々バグりそうなので新設しました。
 	int CONSECUTIVE_SWING_TIMER;
-
-	int nowStrongSwingCount;		// 今貫通振り回しを何回しているか。
-	int maxStrongSwingCount;		// 何回貫通振り回しができるか。
 
 protected:
 	static const enum HIT_DIR { LEFT, RIGHT, TOP, BOTTOM, HIT_DIR_NUM };

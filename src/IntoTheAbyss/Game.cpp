@@ -312,7 +312,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
 	ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
 
-	gameTimer = 10;
+	gameTimer = StageMgr::Instance()->GetMaxTime(stageNum, roomNum);
 	Camera::Instance()->Init();
 	ScoreManager::Instance()->Init();
 	GameTimer::Instance()->Init(gameTimer);
@@ -1305,15 +1305,12 @@ void Game::RoundFinishEffect(const bool& Loop)
 				stageRap.Increment();
 				DistanceCounter::Instance()->isExpSmall = false;
 
-				// ひだりのキャラの貫通振り回しの数を初期化。
-				CharacterManager::Instance()->Left()->nowStrongSwingCount = 0;
-
 				// ランド終了時に初期化したい変数を初期化する。
 				CharacterManager::Instance()->Left()->InitRoundFinish();
 				CharacterManager::Instance()->Right()->InitRoundFinish();
 
 				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-
+				gameTimer = StageMgr::Instance()->GetMaxTime(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 				GameTimer::Instance()->Init(gameTimer);
 				GameTimer::Instance()->Start();
 			}
