@@ -31,33 +31,23 @@ void CharacterInterFace::SwingUpdate()
 
 	/*===== 振り回し中に呼ばれる処理 =====*/
 
+
+	// 角度に加算する量の割合を決める。
+	float partnerDistance = (pos - partner.lock()->pos).Length();
+
+	const float MAX_LENGTH = 2000.0f;
+
+	// 割合を求める。
+	addSwingRate = 1.0f;
+
+	if (addSwingRate < 0) addSwingRate = 0;
+	if (1 < addSwingRate) addSwingRate = 1;
+
 	// 角度に加算する量を更新。
 	addSwingAngle = ADD_SWING_ANGLE * addSwingRate;
 
 	// 振り回しの経過時間を設定。
 	++swingTimer;
-
-	// このタイミングでスタミナを消費する。
-	if (swingTimer == 5) {
-		//現状はこれで間に合わせる。
-		if (CharacterManager::Instance()->Right()->GetCharacterName() == PLAYABLE_BOSS_0)
-		{
-			// スタミナを消費
-			//staminaGauge->ConsumesStamina(DebugParameter::Instance()->GetBossData().staminaSwing);
-		}
-		else
-		{
-			// スタミナを消費
-			//staminaGauge->ConsumesStamina(SWING_STAMINA);
-		}
-	}
-
-	// 限界を超えていたら修正。
-	//if (MAX_SWING_ANGLE < addSwingAngle) {
-
-	//	addSwingAngle = MAX_SWING_ANGLE;
-
-	//}
 
 	// 現在の角度を求める。
 	float nowAngle = atan2f(GetPartnerPos().y - pos.y, GetPartnerPos().x - pos.x);
@@ -105,9 +95,6 @@ void CharacterInterFace::SwingUpdate()
 
 	// この角度を現在のベクトルとして使用する。
 	nowSwingVec = { cosf(nowAngle), sinf(nowAngle) };
-
-	// 相方をここで振り回してしまう！
-	float partnerDistance = (pos - partner.lock()->pos).Length();
 
 	partner.lock()->pos = pos + nowSwingVec * partnerDistance;
 
@@ -272,24 +259,6 @@ void CharacterInterFace::SwingPartner(const Vec2<float>& SwingTargetVec, const b
 	destroyTimer = DESTROY_TIMER;
 
 	partner.lock()->stagingDevice.StartSpin(isSwingClockWise);
-
-	// 角度に加算する量の割合を決める。
-	float partnerDistance = (pos - partner.lock()->pos).Length();
-
-	const float MAX_LENGTH = 150.0f;
-
-	// 距離が規定値以上だったら1.0fを代入する。
-	if (MAX_LENGTH < partnerDistance) {
-
-		addSwingRate = 1.0f;
-
-	}
-	else {
-
-		// 割合を求める。
-		addSwingRate = (partnerDistance / MAX_LENGTH) * 2.0f + 1.0f;
-
-	}
 
 }
 
@@ -1273,11 +1242,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					rare[RB].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, 1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
 					rare[RB].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
 
-					if (!rare[C].nonScoreFlg && StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) != 0)
+					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) != 0)
 					{
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index], 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 						for (int i = 0; i < rare[C].GetNum(); ++i)
 						{
+							if (rare[C].nonScoreFlg) continue;
 							partner.lock()->swingDestroyCounter.Increment();
 						}
 						partner.lock()->destroyTimer = DESTROY_TIMER;
