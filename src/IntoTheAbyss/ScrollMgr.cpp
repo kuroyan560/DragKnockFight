@@ -26,12 +26,12 @@ void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, con
 void ScrollMgr::Update(const Vec2<float>& LineCenterPos)
 {
 	if (Camera::Instance()->active) {
-		/*scrollAmount.x = honraiScrollAmount.x - Camera::Instance()->scrollAffect.x;
-		scrollAmount.y = honraiScrollAmount.y - Camera::Instance()->scrollAffect.y;*/
+		scrollAmount.x = honraiScrollAmount.x - Camera::Instance()->scrollAffect.x;
+		scrollAmount.y = honraiScrollAmount.y - Camera::Instance()->scrollAffect.y;
 	}
 	else {
-		scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x) / 5.0f;
-		scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y) / 5.0f;
+		scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x - Camera::Instance()->scrollAffect.x) / 5.0f;
+		scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y - Camera::Instance()->scrollAffect.y) / 5.0f;
 	}
 
 	// 線の中心にスクロール量などをかける。
