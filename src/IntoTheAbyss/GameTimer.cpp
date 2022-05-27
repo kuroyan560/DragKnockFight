@@ -16,7 +16,7 @@ GameTimer::GameTimer()
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, number.data());
 
 	//スコア無効、タイマーを中心に描画
-	timerPos.x = WinApp::Instance()->GetExpandWinCenter().x - texSize.x * 2.0f;
+	timerPos.x = WinApp::Instance()->GetExpandWinCenter().x - texSize.x * 2.0f - 300.0f;
 	timerPos.y = 62.0f;
 }
 

@@ -141,6 +141,8 @@ class Game
 
 	StageRap stageRap;
 
+	int gameTimer;
+
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
 
