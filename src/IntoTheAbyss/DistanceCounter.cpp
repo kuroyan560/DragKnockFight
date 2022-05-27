@@ -93,8 +93,9 @@ void DistanceCounter::Draw()
 	// 描画座標
 	Vec2<float> drawPos = ScrollMgr::Instance()->Affect(lineCenterPos + shakeAmount);
 	// 距離によるレート
-	float rate = 1.0f - (distance / (MAX_SHAKE_DISTANCE * 1.5f));
+	float rate = 1.0f - (distance / (MAX_SHAKE_DISTANCE * 2.0f));
 	if (rate < 0) rate = 0;
+	rate = KuroMath::Ease(InOut, Exp, rate, 0.0f, 1.0f);
 	for (int index = 0; index < distanceDisitCount; ++index) {
 
 		// 描画する数字。
