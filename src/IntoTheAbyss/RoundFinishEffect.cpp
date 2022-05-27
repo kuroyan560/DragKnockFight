@@ -137,7 +137,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		lerpRate += lerpRateBuff * 0.3f;
 
 		// 敵にフォーカスを合わせる。
-		Camera::Instance()->Focus(CharacterManager::Instance()->Right()->pos, 1.5f, 0.01f);
+		Camera::Instance()->Focus(CharacterManager::Instance()->Right()->pos, 2.0f, 0.1f);
 
 		// 敵をシェイクさせる。
 		shakeRate = static_cast<float>(timer) / static_cast<float>(NUM2_ENEMY_SHAKE_TIMER);
@@ -174,7 +174,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		/*-- 第三段階 --*/
 
 		// カメラを一気に引く。
-		Camera::Instance()->Focus(LineCenterPos, 0.5f, 0.3f);
+		Camera::Instance()->Focus(LineCenterPos, cameraZoom, 0.3f);
 
 		// タイマーを更新して次へ。
 		++timer;
@@ -195,7 +195,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		else if (timer < NUM3_ENEMY_EXP_TIMER / 2.0f) {
 
 			// カメラを一気に引く。
-			Camera::Instance()->Focus(LineCenterPos, 0.5f, 0.3f);
+			Camera::Instance()->Focus(LineCenterPos, cameraZoom, 0.3f);
 			UsersInput::Instance()->ShakeController(0, 1.0f, 5);
 
 		}
