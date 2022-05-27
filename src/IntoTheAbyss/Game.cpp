@@ -315,7 +315,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	Camera::Instance()->Init();
 	ScoreManager::Instance()->Init();
-	GameTimer::Instance()->Init(120);
+	GameTimer::Instance()->Init(60);
 	GameTimer::Instance()->Start();
 
 	firstLoadFlag = false;
@@ -348,8 +348,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	ScoreManager::Instance()->Init();
 	roundFinishFlag = false;
 
-	ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(SelectStage::Instance()->GetStageNum()), 1000);
-
+	ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), StageMgr::Instance()->GetAllRoomWallBlocksNum(stageNum));
 }
 
 Game::Game()
@@ -510,6 +509,8 @@ void Game::Update(const bool& Loop)
 		DebugParameter::Instance()->timer++;
 		mapChipGenerator->Update();
 	}
+
+
 
 	// 座標を保存。
 	CharacterManager::Instance()->Left()->SavePrevFramePos();
@@ -676,9 +677,13 @@ void Game::Update(const bool& Loop)
 	}
 
 
+
 	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
 	bool isBlockEmpty = countBlock.CheckNowNomberIsZero();
-	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty) {
+	bool timeUpFlag = GameTimer::Instance()->TimeUpFlag();
+
+	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty || timeUpFlag)
+	{
 		//if (isBlockEmpty) {
 
 		// 終了演出が行われていなかったら
@@ -1295,6 +1300,9 @@ void Game::RoundFinishEffect(const bool& Loop)
 				mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 				mapChipGenerator->RegisterMap();
 				RoundFinishEffect::Instance()->changeMap = false;
+
+				ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.countAllBlockNum - countBlock.countNowBlockNum);
+
 				countBlock.Init();
 				stageRap.Increment();
 				DistanceCounter::Instance()->isExpSmall = false;
@@ -1305,8 +1313,6 @@ void Game::RoundFinishEffect(const bool& Loop)
 				// ランド終了時に初期化したい変数を初期化する。
 				CharacterManager::Instance()->Left()->InitRoundFinish();
 				CharacterManager::Instance()->Right()->InitRoundFinish();
-
-				ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.countNowBlockNum);
 
 				//InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 			}

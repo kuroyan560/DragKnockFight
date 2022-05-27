@@ -16,7 +16,7 @@ ResultScene::ResultScene()
 	roundHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/round.png");;
 	//slashHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/score.png");
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, blueNumberHandle.data());
-	slashHandle = blueNumberHandle[10];
+	slashHandle = blueNumberHandle[11];
 
 
 	changeScene = std::make_shared<SceneCange>();
