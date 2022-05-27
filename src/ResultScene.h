@@ -42,7 +42,7 @@ class ResultScene : public BaseScene
 	float easeEvaluationPosY;
 	int intervalTimer;
 	bool timeUpFlag;
-	float evaX;
+	float evaluationPosX;
 
 	int perfectIndex,perfectInterval;
 

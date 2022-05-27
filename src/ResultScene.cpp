@@ -6,6 +6,7 @@
 #include "UsersInput.h"
 #include "IntoTheAbyss/ResultTransfer.h"
 #include"IntoTheAbyss/ScoreKeep.h"
+#include"IntoTheAbyss/EavaluationDataMgr.h"
 
 ResultScene::ResultScene()
 {
@@ -133,7 +134,7 @@ void ResultScene::OnUpdate()
 			++breakEnemyUITimer;
 			// タイマーが規定値に達したら。
 			if (BREAK_COUNTUI_TIMER <= breakEnemyUITimer) {
-				baseBreakCount = 10000;
+				baseBreakCount = ScoreKeep::Instance()->GetAddScore();
 
 				delayTimer = DELAY_TIMER;
 				isSkip = true;
@@ -191,8 +192,8 @@ void ResultScene::OnUpdate()
 
 
 	float rate = static_cast<float>(baseBreakCount) / static_cast<float>(ScoreKeep::Instance()->GetMaxNum());
-	const float GOOD = 0.5f;
-	const float PERFECT = 0.8f;
+	const float GOOD_RATE = EavaluationDataMgr::Instance()->GOOD_RATE;
+	const float GREAT_RATE = EavaluationDataMgr::Instance()->GREAT_RATE;
 
 	if (bigFontFlag)
 	{
@@ -206,13 +207,13 @@ void ResultScene::OnUpdate()
 		easeEvaluationPosY = -KuroMath::Ease(Out, Back, static_cast<float>(evaluationEasingTimer) / static_cast<float>(EVALUATION_EFFECT_TIMER), 0.0f, 1.0f) * 30.0f;
 	}
 
-	if (rate <= GOOD)
+	if (rate <= GOOD_RATE)
 	{
 		evaluationNowHandle = goodHandle;
 	}
-	else if (rate <= PERFECT)
+	else if (rate <= GREAT_RATE)
 	{
-		evaluationNowHandle = goodHandle;
+		evaluationNowHandle = greatHandle;
 	}
 	else
 	{
@@ -221,15 +222,20 @@ void ResultScene::OnUpdate()
 
 	if (evaluationFlag)
 	{
-		if (perfectInterval % 5 == 0 && perfectIndex < 2)
+		if (EavaluationDataMgr::Instance()->PERFECT_ANIMATION_INTERVAL <= perfectInterval && perfectIndex < 2)
 		{
 			++perfectIndex;
+			perfectInterval = 0;
+		}
+		else if (EavaluationDataMgr::Instance()->PERFECT_ANIMATION_INTERVAL <= perfectInterval && 2 <= perfectIndex)
+		{
+			perfectIndex = 0;
+			perfectInterval = 0;
 		}
 		else
 		{
-			perfectIndex = 0;
+			++perfectInterval;
 		}
-		++perfectInterval;
 	}
 
 
@@ -255,11 +261,11 @@ void ResultScene::OnDraw()
 	{
 		if (evaluationFlag)
 		{
-			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
+			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(perfectHandle[perfectIndex]));
 		}
 		else
 		{
-			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(perfectHandle[perfectIndex]));
+			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
 		}
 	}
 
@@ -318,8 +324,8 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 		}
 	}
 
-	evaX = leftX + (drawPos.x - leftX) / 2.0f;
-	evaX -= 20.0f;
+	evaluationPosX = leftX + (drawPos.x - leftX) / 2.0f;
+	evaluationPosX -= 20.0f;
 
 	//スラッシュ
 	DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));

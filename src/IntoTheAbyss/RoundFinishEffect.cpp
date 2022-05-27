@@ -297,7 +297,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		++perfectAnimIndex;
 
-		if (3 <= perfectAnimIndex) {
+		if (EavaluationDataMgr::Instance()->PERFECT_ANIMATION_INTERVAL <= perfectAnimIndex) {
 
 			perfectAnimIndex = 0;
 
