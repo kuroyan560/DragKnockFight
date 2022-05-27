@@ -95,7 +95,7 @@ void StaminaItem::Update()
 		}
 
 		// ˆÚ“®—Ê‚ğ0‚É‹ß‚Ã‚¯‚éB
-		vel -= vel / 10.0f;
+		vel -= vel / 5.0f;
 		if (vel < 3.0f) vel = 0;
 
 		// ˆÚ“®—Ê‚ğ‘«‚·B
@@ -165,7 +165,7 @@ void StaminaItem::Update()
 			//pos = easingPos + dir * nowChangeRate;
 
 
-			expRate -= expRate / 10.0f;
+			expRate -= expRate / 5.0f;
 
 			if (expRate < 0.05) Init();
 
