@@ -1280,7 +1280,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index], 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 						for (int i = 0; i < rare[C].GetNum(); ++i)
 						{
-							if (rare[C].nonScoreFlg) continue;
+							if (rare[C].nonScoreFlg || MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 20) continue;
 							partner.lock()->swingDestroyCounter.Increment();
 						}
 						partner.lock()->destroyTimer = DESTROY_TIMER;
@@ -1297,7 +1297,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 壊れないブロックかどうかをチェック。
 						unBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x - 1] == 18;
 
-						if (!rare[L].nonScoreFlg)
+						if (!rare[L].nonScoreFlg && MapData[hitChipIndex[index].y][hitChipIndex[index].x - 1] != 20)
 						{
 							for (int i = 0; i < rare[L].GetNum(); ++i)
 							{
@@ -1316,7 +1316,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 壊れないブロックかどうかをチェック。
 						unBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x + 1] == 18;
 
-						if (!rare[R].nonScoreFlg)
+						if (!rare[R].nonScoreFlg && MapData[hitChipIndex[index].y][hitChipIndex[index].x + 1] != 20)
 						{
 							for (int i = 0; i < rare[R].GetNum(); ++i)
 							{
@@ -1335,7 +1335,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 壊れないブロックかどうかをチェック。
 						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x] == 18;
 
-						if (!rare[T].nonScoreFlg)
+						if (!rare[T].nonScoreFlg && MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x] != 20)
 						{
 							for (int i = 0; i < rare[T].GetNum(); ++i)
 							{
@@ -1354,7 +1354,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 壊れないブロックかどうかをチェック。
 						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x] == 18;
 
-						if (!rare[B].nonScoreFlg)
+						if (!rare[B].nonScoreFlg && MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x] != 20)
 						{
 							for (int i = 0; i < rare[B].GetNum(); ++i)
 							{
@@ -1373,7 +1373,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 壊れないブロックかどうかをチェック。
 						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x - 1] == 18;
 
-						if (!rare[LT].nonScoreFlg)
+						if (!rare[LT].nonScoreFlg && MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x - 1] != 20)
 						{
 							for (int i = 0; i < rare[LT].GetNum(); ++i)
 							{
@@ -1392,7 +1392,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 壊れないブロックかどうかをチェック。
 						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x - 1] == 18;
 
-						if (!rare[LB].nonScoreFlg)
+						if (!rare[LB].nonScoreFlg && MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x - 1] != 20)
 						{
 							for (int i = 0; i < rare[LB].GetNum(); ++i)
 							{
@@ -1411,7 +1411,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 壊れないブロックかどうかをチェック。
 						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x + 1] == 18;
 
-						if (!rare[RB].nonScoreFlg)
+						if (!rare[RB].nonScoreFlg && MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x + 1] != 20)
 						{
 							for (int i = 0; i < rare[RB].GetNum(); ++i)
 							{
@@ -1430,7 +1430,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						// 壊れないブロックかどうかをチェック。
 						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x + 1] == 18;
 
-						if (!rare[RT].nonScoreFlg)
+						if (!rare[RT].nonScoreFlg && MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x + 1] != 20)
 						{
 							for (int i = 0; i < rare[RT].GetNum(); ++i)
 							{

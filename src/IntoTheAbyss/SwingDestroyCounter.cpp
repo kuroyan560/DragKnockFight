@@ -279,7 +279,11 @@ void DestroyCounter::Update(const Vec2<float>& CharaPos)
 
 		}
 
-		if (isInitReservation) Init();
+		if (isInitReservation) {
+
+			Init();
+
+		}
 
 		// 自動的に消えるタイマーを更新する。
 		//--exitTimer;
