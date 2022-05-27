@@ -18,7 +18,7 @@ SwingDestroyCounter::SwingDestroyCounter()
 
 	nowCounter = 0;
 
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, Vec2<int>(12, 1), numberHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 13, Vec2<int>(13, 1), numberHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_yellow.png", 12, Vec2<int>(12, 1), numberHandle_yellow.data());
 
 }

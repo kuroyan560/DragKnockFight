@@ -16,7 +16,7 @@ ResultScene::ResultScene()
 	crashEnemyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/crash_red.png");;
 	crashPlayerHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/crash_green.png");;
 	scoreHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/score.png");
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, blueNumberHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 13, { 13, 1 }, blueNumberHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num_yellow.png", 12, { 12, 1 }, goldNumberHandle.data());
 
 	changeScene = std::make_shared<SceneCange>();
