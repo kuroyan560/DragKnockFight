@@ -52,9 +52,6 @@ void SwingDestroyCounter::AllExit()
 
 	}
 
-	DebugParameter::Instance()->totalCombo += nowCounter;
-	//ScoreManager::Instance()->Add(nowCounter);
-	ScoreManager::Instance()->destroyPoint = nowCounter;
 	nowCounter = 0;
 
 }
@@ -141,6 +138,11 @@ void SwingDestroyCounter::Increment(int INCRE_NUM)
 		}
 
 	}
+	
+
+	DebugParameter::Instance()->totalCombo += INCRE_NUM;
+	//ScoreManager::Instance()->Add(nowCounter);
+	ScoreManager::Instance()->destroyPoint += INCRE_NUM;
 
 	exitTimer = EXIT_TIMER;
 
