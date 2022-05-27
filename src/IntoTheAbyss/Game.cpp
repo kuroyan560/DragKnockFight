@@ -545,6 +545,9 @@ void Game::Update(const bool& Loop)
 	// スタン演出クラスの更新処理
 	StunEffect::Instance()->Update();
 
+	//スコアを常に代入
+	ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.countAllBlockNum - countBlock.countNowBlockNum);
+
 
 	/*===== 当たり判定 =====*/
 
@@ -1298,8 +1301,6 @@ void Game::RoundFinishEffect(const bool& Loop)
 				mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 				mapChipGenerator->RegisterMap();
 				RoundFinishEffect::Instance()->changeMap = false;
-
-				ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.countAllBlockNum - countBlock.countNowBlockNum);
 
 				countBlock.Init();
 				stageRap.Increment();

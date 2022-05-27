@@ -18,6 +18,12 @@ class ResultScene : public BaseScene
 	int breakEnemyHandle;		// BREAKの画像ハンドル 敵
 	int roundHandle;			// ROUNDの描画
 	int slashHandle;			//スラッシュ
+	int goodHandle;				//Goodの画像ハンドル
+	int greatHandle;			//Greatの画像ハンドル
+	int excellentHandle;			//Excellentの画像ハンドル
+	int evaluationNowHandle;
+	bool evaluationFlag;
+	std::array<int, 3> perfectHandle; //スラッシュ
 	std::array<int, 12> blueNumberHandle;// 青の数字の画像ハンドル
 
 	//スコア
@@ -32,10 +38,18 @@ class ResultScene : public BaseScene
 	bool bigFontFlag;
 	float defaultSize;
 
+	//評価
+	float easeEvaluationPosY;
+	int intervalTimer;
+	bool timeUpFlag;
+	float evaX;
+
+	int perfectIndex,perfectInterval;
 
 	// 各タイマー
 	int resultUITimer;			// リザルトの画像のイージングに使用するタイマー
 	int breakEnemyUITimer;		// BREAKの画像ハンドル敵に使用するタイマー
+	int evaluationEasingTimer;
 	int delayTimer;				// 各イージングの間の遅延タイマー
 
 
@@ -59,9 +73,10 @@ public:
 
 	// 各タイマーのデフォルト値
 	const int RESULT_UI_TIMER = 20;
-	int BREAK_COUNTUI_TIMER = 20;
-	int SCORE_EFFECT_TIMER = 20;
-	int DELAY_TIMER = 30;
+	const int BREAK_COUNTUI_TIMER = 20;
+	const int SCORE_EFFECT_TIMER = 20;
+	const int EVALUATION_EFFECT_TIMER = 20;
+	const int DELAY_TIMER = 30;
 
 public:
 	ResultScene();
