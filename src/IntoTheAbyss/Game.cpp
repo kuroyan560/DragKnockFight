@@ -315,7 +315,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	Camera::Instance()->Init();
 	ScoreManager::Instance()->Init();
-	GameTimer::Instance()->Init(60);
+	GameTimer::Instance()->Init(5);
 	GameTimer::Instance()->Start();
 
 	firstLoadFlag = false;
@@ -385,8 +385,6 @@ Game::Game()
 	readyToStartRoundFlag = true;
 	//”wŒi‚É¯
 	//BackGround::Instance()->Init(GetStageSize());
-
-	GameTimer::Instance()->Init(120);
 
 
 	{

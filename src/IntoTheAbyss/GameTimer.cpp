@@ -10,7 +10,6 @@ GameTimer::GameTimer()
 	startFlag = false;
 	timer = -1;
 	flame = -1;
-	timerPos = { 714,62 };
 
 	number.resize(12);
 	texSize = { 48,44 };
@@ -18,6 +17,7 @@ GameTimer::GameTimer()
 
 	//スコア無効、タイマーを中心に描画
 	timerPos.x = WinApp::Instance()->GetExpandWinCenter().x - texSize.x * 2.0f;
+	timerPos.y = 62.0f;
 }
 
 void GameTimer::Init(int TIME)
@@ -31,19 +31,33 @@ void GameTimer::Init(int TIME)
 	countDownNum = 3;
 
 	countDownFlag = false;
-
-	int minite = timer;
+	int minite = 0;
 	int second = 0;
 	int t = 0;
-	for (; 60 <= minite;)
+
+	if (60 <= timer)
 	{
-		minite -= 60;
-		if (minite <= 60)
+		minite = timer;
+		second = 0;
+		t = 0;
+		for (; 60 <= minite;)
 		{
-			second = minite;
+			minite -= 60;
+			if (minite <= 60)
+			{
+				second = minite;
+			}
+			++t;
 		}
-		++t;
 	}
+	else
+	{
+		minite = 0;
+		second = timer;
+		t = 0;
+	}
+
+
 	//分
 	minitueHandle = CountNumber(t);
 	timeHandle = CountNumber(second);
