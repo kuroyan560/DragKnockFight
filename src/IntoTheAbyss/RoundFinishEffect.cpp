@@ -39,7 +39,7 @@ void RoundFinishEffect::Init()
 	perfectExp = {};
 }
 
-void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate)
+void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const float& CameraZoom)
 {
 
 	/*===== 初期化処理 =====*/
@@ -52,6 +52,7 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate)
 	perfectAnimTimer = 0;
 	perfectAnimIndex = 0;
 	finishLap = false;
+	cameraZoom = CameraZoom;
 
 	static const float GOOD_PER = 0.5f;
 	static const float GREAT_PER = 0.8f;
@@ -93,6 +94,8 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 	float nowShakeAmount = 0;
 	Vec2<float> playerDefPos = {};
 	Vec2<float> enemyDefPos = {};
+	float lerpRate = 0;
+	float lerpRateBuff = 0;
 
 	float mul = 0.0001f;
 
@@ -103,7 +106,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		/*-- 第一段階 --*/
 
 		// カメラを二人の真ん中にフォーカスさせる。
-		Camera::Instance()->Focus(LineCenterPos, 1.0f, 0.1f);
+		Camera::Instance()->Focus(LineCenterPos, cameraZoom, 0.1f);
 
 		// タイマーを更新して次へ。
 		++timer;
@@ -123,8 +126,17 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		// 座標からシェイク量を引く。
 		CharacterManager::Instance()->Right()->pos -= shakeAmount;
 
+		// ラープの速度を計算する。
+		lerpRate = 0.01f;
+
+		lerpRateBuff = (cameraZoom - 0.2f) / 0.2f;
+
+		lerpRateBuff = 1.0f - lerpRateBuff;
+
+		lerpRate += lerpRateBuff * 0.3f;
+
 		// 敵にフォーカスを合わせる。
-		Camera::Instance()->Focus(CharacterManager::Instance()->Right()->pos, 1.5f, 0.01f);
+		Camera::Instance()->Focus(CharacterManager::Instance()->Right()->pos + WinApp::Instance()->GetExpandWinCenter() * 2.0f, 1.5f, 0.01f);
 
 		// 敵をシェイクさせる。
 		shakeRate = static_cast<float>(timer) / static_cast<float>(NUM2_ENEMY_SHAKE_TIMER);

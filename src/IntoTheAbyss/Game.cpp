@@ -312,7 +312,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
 	ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
 
-	gameTimer = 30;
+	gameTimer = 10;
 	Camera::Instance()->Init();
 	ScoreManager::Instance()->Init();
 	GameTimer::Instance()->Init(gameTimer);
@@ -692,7 +692,7 @@ void Game::Update(const bool& Loop)
 			float nowBlockCount = countBlock.countNowBlockNum;
 			float maxBclokCount = countBlock.countAllBlockNum;
 			float destroyRate = nowBlockCount / maxBclokCount;
-			RoundFinishEffect::Instance()->Start(isBlockEmpty, 1.0f - destroyRate);
+			RoundFinishEffect::Instance()->Start(isBlockEmpty, 1.0f - destroyRate, Camera::Instance()->zoom);
 			DistanceCounter::Instance()->isExpSmall = true;
 
 		}

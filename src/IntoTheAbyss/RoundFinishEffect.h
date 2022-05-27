@@ -47,6 +47,8 @@ public:
 	Vec2<float> perfectPos;		// [Perfect]の座標
 	Vec2<float> perfectExp;		// [Perfect]の拡縮
 
+	float cameraZoom;
+
 	// 各ステータスの時間
 	const int NUM1_ZOOMIN_TIMER = 90;
 	const int NUM2_ENEMY_SHAKE_TIMER = 120;
@@ -64,7 +66,7 @@ public:
 	void Init();
 
 	// 開始処理
-	void Start(const bool& IsPerfect, const float& Rate);
+	void Start(const bool& IsPerfect, const float& Rate, const float& CameraZoom);
 
 	// 更新処理
 	void Update(const Vec2<float>& LineCenterPos);
