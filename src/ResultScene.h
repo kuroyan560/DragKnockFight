@@ -24,6 +24,15 @@ class ResultScene : public BaseScene
 	float baseBreakCount, breakCount;
 
 
+	// スコア
+	int targetScore;				// イージングの目標値
+	float scoreEffectTimer;			// スコアをガラガラ表示するために使用するタイマー
+	std::array<int, 10> prevScore;	// 前フレームのスコア
+	std::array<float, 10> scoreSize;// スコアのサイズ
+	bool bigFontFlag;
+	float defaultSize;
+
+
 	// 各タイマー
 	int resultUITimer;			// リザルトの画像のイージングに使用するタイマー
 	int breakEnemyUITimer;		// BREAKの画像ハンドル敵に使用するタイマー
@@ -51,6 +60,7 @@ public:
 	// 各タイマーのデフォルト値
 	const int RESULT_UI_TIMER = 20;
 	int BREAK_COUNTUI__TIMER = 20;
+	int SCORE_EFFECT_TIMER = 20;
 	int DELAY_TIMER = 30;
 
 public:

@@ -40,6 +40,8 @@ void ResultScene::OnInitialize()
 
 	maxSize = { 0.5f,0.5f };
 	breakSize = { 1.5f,1.5f };
+	bigFontFlag = false;
+	defaultSize = 1.5f;
 }
 
 void ResultScene::OnUpdate()
@@ -57,7 +59,16 @@ void ResultScene::OnUpdate()
 		breakSize = { 1.5f,1.5f };
 
 		breakCount = 0;
-		baseBreakCount = 0;
+		baseBreakCount = -1;
+
+		scoreEffectTimer = 0;
+
+		for (int i = 0; i < scoreSize.size(); ++i)
+		{
+			scoreSize[i] = 1.5f;
+		}
+		defaultSize = 1.5f;
+		bigFontFlag = false;
 	}
 
 
@@ -95,10 +106,23 @@ void ResultScene::OnUpdate()
 			++breakEnemyUITimer;
 			// タイマーが規定値に達したら。
 			if (BREAK_COUNTUI__TIMER <= breakEnemyUITimer) {
-				delayTimer = DELAY_TIMER;
 				baseBreakCount = 10000;
+
+				delayTimer = DELAY_TIMER;
 				isSkip = true;
 				AudioApp::Instance()->PlayWave(SE);
+			}
+		}
+
+		// スコアのタイマーが規定値以下だったら。
+		if (scoreEffectTimer < SCORE_EFFECT_TIMER && BREAK_COUNTUI__TIMER <= breakEnemyUITimer) {
+			++scoreEffectTimer;
+			// タイマーが規定値に達したら。
+			if (SCORE_EFFECT_TIMER <= scoreEffectTimer) {
+				delayTimer = 0;
+			}
+			else {
+				delayTimer = DELAY_TIMER;
 			}
 		}
 	}
@@ -110,8 +134,6 @@ void ResultScene::OnUpdate()
 
 
 
-	breakCount = KuroMath::Lerp(breakCount, baseBreakCount, 0.1f);
-
 
 	// リザルト画面へ飛ばす
 	if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A)) {
@@ -120,6 +142,40 @@ void ResultScene::OnUpdate()
 		KuroEngine::Instance().ChangeScene(1, changeScene);
 	}
 
+
+	// スコアのサイズをデフォルトに近づける。
+	for (int index = 0; index < 10; ++index) {
+		scoreSize[index] += (defaultSize - scoreSize[index]) / 10.0f;
+	}
+
+
+	bool prevFlag = 0.94f <= static_cast<float>(scoreEffectTimer) / static_cast<float>(SCORE_EFFECT_TIMER);
+	bool nextFlag = static_cast<float>(scoreEffectTimer) / static_cast<float>(SCORE_EFFECT_TIMER) <= 0.99f;
+
+
+	if (prevFlag)
+	{
+		bool debug = false;
+	}
+
+	if (nextFlag)
+	{
+		bool debug = false;
+	}
+
+
+	// スコアエフェクトのタイマーの割合が0.9を超えたら、一気に全部変える。
+	if (ceil(breakCount) == baseBreakCount && !bigFontFlag)
+	{
+		scoreEffectTimer = SCORE_EFFECT_TIMER;
+
+		for (int index = 0; index < 10; ++index) {
+			scoreSize[index] = defaultSize + 1.7f;
+		}
+		bigFontFlag = true;
+	}
+
+	breakCount = KuroMath::Ease(In, Cubic, static_cast<float>(scoreEffectTimer) / static_cast<float>(SCORE_EFFECT_TIMER), 0.0f, 1.0f) * baseBreakCount;
 }
 
 void ResultScene::OnDraw()
@@ -135,7 +191,7 @@ void ResultScene::OnDraw()
 		float easingPosX = resultEasingAmount * (RESULT_POS.x - windowSize.x);
 		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX, RESULT_POS.y), TexHandleMgr::GetTexBuffer(resultHandle));
 
-		
+
 		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), 15000);
 	}
 }
@@ -155,8 +211,8 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 
 	const float baseX = 500.0f;
-	float easingPosX = scoreEasingAmount * (windowSize.x / 2.0f+ baseX);
-	Vec2<float> drawPos = Vec2<float>((windowSize.x+ baseX) - easingPosX, 430.0f);
+	float easingPosX = scoreEasingAmount * (windowSize.x / 2.0f + baseX);
+	Vec2<float> drawPos = Vec2<float>((windowSize.x + baseX) - easingPosX, 430.0f);
 
 
 	const int FONT_SIZE = 66.3f;
@@ -171,9 +227,21 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 		std::vector<int>number = CountNumber(BREAK_NOW_COUNT);
 		for (int i = 0; i < number.size(); ++i)
 		{
-			DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
+			// 数字を求めて描画する。
+			int disit = GetDisit(BREAK_NOW_COUNT, i);
+
+			if (!bigFontFlag)
+			{
+				// スコアが前フレームの値と違っていたら大きくする。
+				if (prevScore[i] != disit) scoreSize[i] = defaultSize + 0.5f;
+			}
+
+			DrawFunc::DrawRotaGraph2D(drawPos, Vec2<float>(scoreSize[i], scoreSize[i]), 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
 			// フォントサイズ分移動させる。
 			drawPos.x += FONT_SIZE * nowSize.x;
+
+			// このフレームのスコアを保存。
+			prevScore[i] = disit;
 		}
 	}
 
@@ -193,4 +261,40 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 			drawPos.x += FONT_SIZE * nowSize.x;
 		}
 	}
+
+
+
+	//Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
+
+	//float easingPosX = scoreEasingAmount * (SCORE_POS.x - windowSize.x);
+
+
+	//SCORE_POS.y = (float)WINDOW_CENTER.y + 180.0f;
+	//Vec2<float> drawPos = Vec2<float>(windowSize.x + easingPosX - 150.0f, SCORE_POS.y);
+	//// 数字のフォントサイズ
+	//const int FONT_SIZE = 66.3f * defaultSize;
+
+	//// 現在の数字を求める。
+	//int nowScore = scoreEffectEasingTimer * targetScore;
+
+	//drawPos.y = 640.0f;
+
+	//for (int index = 10; 0 < index; --index) {
+
+	//	// 数字を求めて描画する。
+	//	int disit = GetDisit(nowScore, index - 1);
+
+	//	// スコアが前フレームの値と違っていたら大きくする。
+	//	if (prevScore[index - 1] != disit) scoreSize[index - 1] = 1.5f;
+
+	//	DrawFunc::DrawRotaGraph2D(drawPos, Vec2<float>(scoreSize[index - 1], scoreSize[index - 1]), 0, TexHandleMgr::GetTexBuffer(goldNumberHandle[disit]));
+
+	//	// フォントサイズ分移動させる。
+	//	drawPos.x += FONT_SIZE;
+
+	//	// このフレームのスコアを保存。
+	//	prevScore[index - 1] = disit;
+
+	//}
+
 }
