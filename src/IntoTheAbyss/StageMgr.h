@@ -276,6 +276,7 @@ public:
 
 	
 	int GetSwingCount(int STAGE_NUM, int ROOM_NUM);
+	int GetMaxTime(int STAGE_NUM, int ROOM_NUM);
 
 private:
 	CSVLoader loder;	//CSVデータを読み込む為のクラス
@@ -306,6 +307,7 @@ private:
 
 
 	std::vector<std::vector<int>> swingCount;
+	std::vector<std::vector<int>> gameMaxTimer;
 
 	enum MapChipDrawEnum
 	{

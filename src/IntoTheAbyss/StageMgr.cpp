@@ -109,16 +109,18 @@ StageMgr::StageMgr()
 	//ステージ毎の小部屋読み込み-----------------------
 
 	swingCount.resize(allStageNum);
+	gameMaxTimer.resize(allStageNum);
 	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
 	{
 		//ファイルパス
 		std::string filePass =
 			rootFilePass + stageFilePass + std::to_string(stageNum) + "/";
 		//ファイル名
-		std::string fileName = filePass + "swingCount.txt";
+		std::string fileName = filePass + "StageManager.txt";
 
 		const int thisStageRoomCount = allMapChipData[stageNum].size();
 		swingCount[stageNum].resize(thisStageRoomCount, 0);	//振り回し可能回数０で埋める
+		gameMaxTimer[stageNum].resize(thisStageRoomCount, 0);	//振り回し可能回数０で埋める
 
 		//ファイルが存在しないならそもそも振り回しが出来ないステージ
 		if (!KuroFunc::ExistFile(fileName))
@@ -152,6 +154,15 @@ StageMgr::StageMgr()
 					line_stream >> num;
 					swingCount[stageNum][roomCount] = num;
 					break;
+				}
+
+				std::string timerkey = "timer" + std::to_string(roomCount);
+				if (key == timerkey)
+				{
+					line_stream >> num;
+					gameMaxTimer[stageNum][roomCount] = num;
+					break;
+
 				}
 			}
 		}
@@ -603,6 +614,11 @@ Vec2<float>StageMgr::GetBossResponePos(const int &StageNum, const int &RoomNum)
 int StageMgr::GetSwingCount(int STAGE_NUM, int ROOM_NUM)
 {
 	return swingCount[STAGE_NUM][ROOM_NUM];
+}
+
+int StageMgr::GetMaxTime(int STAGE_NUM, int ROOM_NUM)
+{
+	return gameMaxTimer[STAGE_NUM][ROOM_NUM];
 }
 
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
