@@ -49,6 +49,7 @@ DebugParameter::DebugParameter()
 	hitPlayer = false;
 
 	canDestroyBounceVel = 2.0f;
+	addLineLengthSubAmount = 5.0f;
 }
 
 void DebugParameter::Update()
@@ -129,8 +130,8 @@ void DebugParameter::DrawImGui()
 		ImGui::Checkbox("StrongSwing", &CharacterManager::Instance()->Left()->isDebugModeStrongSwing);
 		ImGui::SliderInt("ConsecutiveSwingDelay", &CharacterManager::Instance()->Left()->CONSECUTIVE_SWING_TIMER, 1, 30);
 		ImGui::InputInt("AddLineLengthValue", &CharacterManager::Instance()->Left()->ADD_LINE_LENGTH_VEL, 1, 30);
+		ImGui::SliderFloat("addLineLengthSubAmount", &addLineLengthSubAmount, 1, 10);
 		ImGui::InputFloat("CanDestroyBoundVel", &canDestroyBounceVel);
-
 		ImGui::End();
 	}
 

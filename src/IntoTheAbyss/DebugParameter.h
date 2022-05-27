@@ -143,5 +143,6 @@ public:
 	bool hitPlayer;
 
 	float canDestroyBounceVel;
+	float addLineLengthSubAmount;
 };
 
