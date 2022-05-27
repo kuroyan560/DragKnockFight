@@ -138,7 +138,7 @@ void SwingDestroyCounter::Increment(int INCRE_NUM)
 		}
 
 	}
-	
+
 
 	DebugParameter::Instance()->totalCombo += INCRE_NUM;
 	//ScoreManager::Instance()->Add(nowCounter);
@@ -158,7 +158,7 @@ void SwingDestroyCounter::CheckDisitStayID(const DestroyCounter::DISIT_ID DisitI
 		if (!index.isActive) continue;
 		if (!(index.disitID == DisitID)) continue;
 
-		index.isExitReservation = true;
+		index.isInitReservation = true;
 
 	}
 }
@@ -187,8 +187,10 @@ void DestroyCounter::Init()
 	isActive = false;
 	status = STATUS::NONE;
 	isExitReservation = false;
+	isInitReservation = false;
 	alpha = 0;
 	exitTimer = 0;
+	pos = {};
 
 }
 
@@ -201,6 +203,7 @@ void DestroyCounter::SetEntry(const int& Disit, const DISIT_ID DisitID)
 	disitID = DisitID;
 	easingTimer = 0;
 	isActive = true;
+	isInitReservation = false;
 	exitTimer = EXIT_TIMER;
 	status = STATUS::ENTRY;
 	alpha = 0;
@@ -214,7 +217,7 @@ void DestroyCounter::SetExit()
 	/*===== èIóπÇ∑ÇÈ =====*/
 
 	easingTimer = 0;
-	isActive = true;
+	//isActive = true;
 	status = STATUS::EXIT;
 	alpha = 255;
 
@@ -282,6 +285,12 @@ void DestroyCounter::Update(const Vec2<float>& CharaPos)
 		if (exitTimer <= 0) {
 
 			SetExit();
+
+		}
+
+		if (isInitReservation) {
+
+			Init();
 
 		}
 

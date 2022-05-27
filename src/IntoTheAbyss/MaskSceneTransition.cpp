@@ -44,6 +44,7 @@ bool MaskSceneTransition::OnUpdate()
 	}
 
 	return false;
+
 }
 
 void MaskSceneTransition::OnDraw()
