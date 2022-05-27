@@ -6,6 +6,8 @@
 #include "UsersInput.h"
 #include "IntoTheAbyss/ResultTransfer.h"
 #include"IntoTheAbyss/ScoreKeep.h"
+#include"IntoTheAbyss/EavaluationDataMgr.h"
+#include"IntoTheAbyss/DebugKeyManager.h"
 
 ResultScene::ResultScene()
 {
@@ -13,10 +15,14 @@ ResultScene::ResultScene()
 	winnerFrameHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/winnerFrame.png");
 	resultHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/result.png");
 	breakEnemyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/break_enemy.png");
-	roundHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/round.png");;
-	//slashHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/score.png");
+	roundHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/round.png");
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, blueNumberHandle.data());
 	slashHandle = blueNumberHandle[11];
+
+	goodHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
+	greatHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/great.png");
+	excellentHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellent.png");
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/perfect.png", 3, Vec2<int>(3, 1), perfectHandle.data());
 
 
 	changeScene = std::make_shared<SceneCange>();
@@ -24,6 +30,7 @@ ResultScene::ResultScene()
 	winnerGraph[PLAYABLE_LUNA] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/luna.png");
 	winnerGraph[PLAYABLE_LACY] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
 	winnerGraph[PLAYABLE_BOSS_0] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
+
 }
 
 void ResultScene::OnInitialize()
@@ -52,11 +59,18 @@ void ResultScene::OnInitialize()
 	}
 	defaultSize = 1.5f;
 	bigFontFlag = false;
+
+	evaluationEasingTimer = 0;
+	intervalTimer = 0;
+	evaluationFlag = false;
+
+	perfectInterval = 0;
+	perfectIndex = 0;
 }
 
 void ResultScene::OnUpdate()
 {
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_J))
+	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_J, "ResetResult", TO_STRING(DIK_J)))
 	{
 		resultUITimer = 0;
 		breakEnemyUITimer = 0;
@@ -79,6 +93,13 @@ void ResultScene::OnUpdate()
 		}
 		defaultSize = 1.5f;
 		bigFontFlag = false;
+
+		evaluationEasingTimer = 0;
+		intervalTimer = 0;
+		evaluationFlag = false;
+
+		perfectInterval = 0;
+		perfectIndex = 0;
 	}
 
 
@@ -171,6 +192,56 @@ void ResultScene::OnUpdate()
 	}
 
 	breakCount = KuroMath::Ease(In, Cubic, static_cast<float>(scoreEffectTimer) / static_cast<float>(SCORE_EFFECT_TIMER), 0.0f, 1.0f) * baseBreakCount;
+
+
+	float rate = static_cast<float>(baseBreakCount) / static_cast<float>(ScoreKeep::Instance()->GetMaxNum());
+	const float GOOD_RATE = EavaluationDataMgr::Instance()->GOOD_RATE;
+	const float GREAT_RATE = EavaluationDataMgr::Instance()->GREAT_RATE;
+
+	if (bigFontFlag)
+	{
+		++intervalTimer;
+	}
+	timeUpFlag = 35 <= intervalTimer;
+
+	if (bigFontFlag && evaluationEasingTimer < EVALUATION_EFFECT_TIMER && timeUpFlag)
+	{
+		++evaluationEasingTimer;
+		easeEvaluationPosY = -KuroMath::Ease(Out, Back, static_cast<float>(evaluationEasingTimer) / static_cast<float>(EVALUATION_EFFECT_TIMER), 0.0f, 1.0f) * 30.0f;
+	}
+
+	if (rate <= GOOD_RATE)
+	{
+		evaluationNowHandle = goodHandle;
+	}
+	else if (rate <= GREAT_RATE)
+	{
+		evaluationNowHandle = greatHandle;
+	}
+	else
+	{
+		evaluationFlag = true;
+	}
+
+	if (evaluationFlag)
+	{
+		if (EavaluationDataMgr::Instance()->PERFECT_ANIMATION_INTERVAL <= perfectInterval && perfectIndex < 2)
+		{
+			++perfectIndex;
+			perfectInterval = 0;
+		}
+		else if (EavaluationDataMgr::Instance()->PERFECT_ANIMATION_INTERVAL <= perfectInterval && 2 <= perfectIndex)
+		{
+			perfectIndex = 0;
+			perfectInterval = 0;
+		}
+		else
+		{
+			++perfectInterval;
+		}
+	}
+
+
 }
 
 void ResultScene::OnDraw()
@@ -186,9 +257,21 @@ void ResultScene::OnDraw()
 		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
 		DrawFunc::DrawGraph(Vec2<float>(440.0f, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
 
-
 		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum());
 	}
+
+	if (bigFontFlag && timeUpFlag)
+	{
+		if (evaluationFlag)
+		{
+			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(perfectHandle[perfectIndex]));
+		}
+		else
+		{
+			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX-30, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
+		}
+	}
+
 }
 
 void ResultScene::OnImguiDebug()
@@ -211,6 +294,8 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 
 
 	const int FONT_SIZE = 66.3f;
+
+	float leftX = 0.0f;
 	//åªç›
 	{
 		nowSize = breakSize;
@@ -218,6 +303,8 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 		{
 			drawPos.x -= FONT_SIZE * nowSize.x;
 		}
+		leftX = drawPos.x;
+
 
 		std::vector<int>number = CountNumber(BREAK_NOW_COUNT);
 		for (int i = 0; i < number.size(); ++i)
@@ -239,6 +326,9 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 			prevScore[i] = disit;
 		}
 	}
+
+	evaluationPosX = leftX + (drawPos.x - leftX) / 2.0f;
+	evaluationPosX -= 20.0f;
 
 	//ÉXÉâÉbÉVÉÖ
 	DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));
