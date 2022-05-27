@@ -355,7 +355,7 @@ Game::Game()
 {
 	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 
-	addLineLengthSubAmount = 5.0f;
+	addLineLengthSubAmount = 1.0f;
 
 	playerHomeBase.Init({ 0.0f,0.0f }, { 0.0f,0.0f }, true);
 	enemyHomeBase.Init({ 0.0f,0.0f }, { 800.0f,1000.0f }, false);

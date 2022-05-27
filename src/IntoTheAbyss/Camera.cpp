@@ -26,7 +26,7 @@ void Camera::Update()
 
 		//int a = 0;
 
-		const auto differ = (target - ScrollMgr::Instance()->scrollAmount) - scrollAffect;
+		const auto differ = (target - ScrollMgr::Instance()->scrollAmount - WinApp::Instance()->GetExpandWinCenter()) - scrollAffect;
 
 		//‹ß‚Ã‚¢‚Ä‚¢‚­
 		scrollAffect.x = KuroMath::Lerp(scrollAffect.x, -differ.x, lerpAmount);
