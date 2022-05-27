@@ -174,7 +174,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		/*-- 第三段階 --*/
 
 		// カメラを一気に引く。
-		Camera::Instance()->Focus(LineCenterPos, 0.5f, 0.3f);
+		Camera::Instance()->Focus(LineCenterPos, cameraZoom, 0.3f);
 
 		// タイマーを更新して次へ。
 		++timer;
@@ -195,7 +195,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		else if (timer < NUM3_ENEMY_EXP_TIMER / 2.0f) {
 
 			// カメラを一気に引く。
-			Camera::Instance()->Focus(LineCenterPos, 0.5f, 0.3f);
+			Camera::Instance()->Focus(LineCenterPos, cameraZoom, 0.3f);
 			UsersInput::Instance()->ShakeController(0, 1.0f, 5);
 
 		}
