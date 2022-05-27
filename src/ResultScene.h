@@ -59,7 +59,7 @@ public:
 
 	// 各タイマーのデフォルト値
 	const int RESULT_UI_TIMER = 20;
-	int BREAK_COUNTUI__TIMER = 20;
+	int BREAK_COUNTUI_TIMER = 20;
 	int SCORE_EFFECT_TIMER = 20;
 	int DELAY_TIMER = 30;
 

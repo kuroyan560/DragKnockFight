@@ -533,7 +533,7 @@ int StageMgr::GetEnableToUseStageNumber()
 	int count = 0;
 	for (int i = 0; i < allMapChipData.size(); ++i)
 	{
-		if (allMapChipData[i][0].size() != 0)
+		if (allMapChipData[i].size() != 0)
 		{
 			++count;
 		}

@@ -112,10 +112,10 @@ void ResultScene::OnUpdate()
 			}
 		}
 		// [BREAK]敵の画像 タイマーが規定値以下だったら。
-		if (!isSkip && breakEnemyUITimer < BREAK_COUNTUI__TIMER && RESULT_UI_TIMER <= resultUITimer) {
+		if (!isSkip && breakEnemyUITimer < BREAK_COUNTUI_TIMER && RESULT_UI_TIMER <= resultUITimer) {
 			++breakEnemyUITimer;
 			// タイマーが規定値に達したら。
-			if (BREAK_COUNTUI__TIMER <= breakEnemyUITimer) {
+			if (BREAK_COUNTUI_TIMER <= breakEnemyUITimer) {
 				baseBreakCount = 10000;
 
 				delayTimer = DELAY_TIMER;
@@ -125,7 +125,7 @@ void ResultScene::OnUpdate()
 		}
 
 		// スコアのタイマーが規定値以下だったら。
-		if (scoreEffectTimer < SCORE_EFFECT_TIMER && BREAK_COUNTUI__TIMER <= breakEnemyUITimer) {
+		if (scoreEffectTimer < SCORE_EFFECT_TIMER && BREAK_COUNTUI_TIMER <= breakEnemyUITimer) {
 			++scoreEffectTimer;
 			// タイマーが規定値に達したら。
 			if (SCORE_EFFECT_TIMER <= scoreEffectTimer) {
@@ -139,8 +139,8 @@ void ResultScene::OnUpdate()
 
 	// イージング量を更新。
 	//イージングの動き
-	resultEasingAmount = KuroMath::Ease(Out, Cubic, (float)resultUITimer / RESULT_UI_TIMER, 0.0f, 1.0f);
-	breakCountEasingAmount = KuroMath::Ease(Out, Cubic, (float)breakEnemyUITimer / BREAK_COUNTUI__TIMER, 0.0f, 1.0f);
+	resultEasingAmount = KuroMath::Ease(Out, Cubic,  static_cast<float>(resultUITimer) / static_cast<float>( RESULT_UI_TIMER), 0.0f, 1.0f);
+	breakCountEasingAmount = KuroMath::Ease(Out, Cubic,  static_cast<float>(breakEnemyUITimer) / static_cast<float>(BREAK_COUNTUI_TIMER), 0.0f, 1.0f);
 
 
 
@@ -156,21 +156,6 @@ void ResultScene::OnUpdate()
 	// スコアのサイズをデフォルトに近づける。
 	for (int index = 0; index < 10; ++index) {
 		scoreSize[index] += (defaultSize - scoreSize[index]) / 10.0f;
-	}
-
-
-	bool prevFlag = 0.94f <= static_cast<float>(scoreEffectTimer) / static_cast<float>(SCORE_EFFECT_TIMER);
-	bool nextFlag = static_cast<float>(scoreEffectTimer) / static_cast<float>(SCORE_EFFECT_TIMER) <= 0.99f;
-
-
-	if (prevFlag)
-	{
-		bool debug = false;
-	}
-
-	if (nextFlag)
-	{
-		bool debug = false;
 	}
 
 
@@ -195,7 +180,7 @@ void ResultScene::OnDraw()
 
 	ResultTransfer::Instance()->Draw();
 
-	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
+	Vec2<float> windowSize = { static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y) };
 
 	{
 		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
@@ -218,7 +203,7 @@ void ResultScene::OnFinalize()
 
 void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, int BREAK_MAX_COUNT)
 {
-	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
+	Vec2<float> windowSize = { static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y) };
 
 	const float baseX = 500.0f;
 	float easingPosY = scoreEasingAmount * (windowSize.y / 2.0f + baseX);
@@ -274,12 +259,12 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 
 
 
-	//Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
+	//Vec2<float> windowSize = {  static_cast<float>WinApp::Instance()->GetWinSize().x,  static_cast<float>WinApp::Instance()->GetWinSize().y };
 
 	//float easingPosX = scoreEasingAmount * (SCORE_POS.x - windowSize.x);
 
 
-	//SCORE_POS.y = (float)WINDOW_CENTER.y + 180.0f;
+	//SCORE_POS.y =  static_cast<float>WINDOW_CENTER.y + 180.0f;
 	//Vec2<float> drawPos = Vec2<float>(windowSize.x + easingPosX - 150.0f, SCORE_POS.y);
 	//// 数字のフォントサイズ
 	//const int FONT_SIZE = 66.3f * defaultSize;
