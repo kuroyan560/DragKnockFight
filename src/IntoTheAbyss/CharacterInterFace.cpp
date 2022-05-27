@@ -1257,6 +1257,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					rare[B].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(0, 1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
 					rare[B].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
 
+
 					rare[LT].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, -1)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 					rare[LT].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, -1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
 					rare[LT].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
@@ -1350,7 +1351,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						}
 					}
 					// 左上があるか？
-					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, -1)) != 0 && !rare[B].unBrokenFlag)
+					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, -1)) != 0 && !rare[LT].unBrokenFlag)
 					{
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, -1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
@@ -1359,14 +1360,14 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						
 						if (!rare[LT].nonScoreFlg)
 						{
-							for (int i = 0; i < rare[B].GetNum(); ++i)
+							for (int i = 0; i < rare[LT].GetNum(); ++i)
 							{
 								partner.lock()->swingDestroyCounter.Increment();
 							}
 						}
 					}
 					// 左下があるか？
-					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, 1)) != 0 && !rare[B].unBrokenFlag)
+					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, 1)) != 0 && !rare[LB].unBrokenFlag)
 					{
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, 1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
@@ -1375,14 +1376,14 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						
 						if (!rare[LB].nonScoreFlg)
 						{
-							for (int i = 0; i < rare[B].GetNum(); ++i)
+							for (int i = 0; i < rare[LB].GetNum(); ++i)
 							{
 								partner.lock()->swingDestroyCounter.Increment();
 							}
 						}
 					}
 					// 右下があるか？
-					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, 1)) != 0 && !rare[B].unBrokenFlag)
+					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, 1)) != 0 && !rare[RB].unBrokenFlag)
 					{
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, 1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
@@ -1391,14 +1392,14 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						
 						if (!rare[RB].nonScoreFlg)
 						{
-							for (int i = 0; i < rare[B].GetNum(); ++i)
+							for (int i = 0; i < rare[RB].GetNum(); ++i)
 							{
 								partner.lock()->swingDestroyCounter.Increment();
 							}
 						}
 					}
 					// 右上があるか？
-					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, -1)) != 0 && !rare[B].unBrokenFlag)
+					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, -1)) != 0 && !rare[RT].unBrokenFlag)
 					{
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, -1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
@@ -1407,7 +1408,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						
 						if (!rare[RT].nonScoreFlg)
 						{
-							for (int i = 0; i < rare[B].GetNum(); ++i)
+							for (int i = 0; i < rare[RT].GetNum(); ++i)
 							{
 								partner.lock()->swingDestroyCounter.Increment();
 							}
