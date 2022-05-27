@@ -22,7 +22,7 @@ void StrongSwingUI::Draw(const int& MyIdx)
 	{
 		Vec2<float>drawPos(30, WinApp::Instance()->GetExpandWinSize().y);
 		const float offsetY = 70;
-		drawPos.y -= offsetY * MyIdx;
+		drawPos.y -= offsetY * (MyIdx + 1);
 		DrawFunc::DrawGraph(drawPos, TexHandleMgr::GetTexBuffer(STRONG_SWING_COUNT_GRAPH));
 	}
 }

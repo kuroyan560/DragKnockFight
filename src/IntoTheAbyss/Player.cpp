@@ -188,6 +188,7 @@ void Player::OnInit()
 	consecutiveSwingTimer = 0;
 	DebugParameter::Instance()->useFinishSwingFlag = true;
 
+	strongSwingUI.clear();
 	strongSwingUI.resize(maxStrongSwingCount);
 }
 
@@ -570,7 +571,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 	if (maxStrongSwingCount && UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LT) && nowStrongSwingCount <= maxStrongSwingCount) {
 
 		isDestroyMode = true;
-		strongSwingUI[maxStrongSwingCount - nowStrongSwingCount].Disappear();
 	}
 
 
@@ -608,6 +608,11 @@ void Player::Input(const vector<vector<int>>& MapData)
 		// 貫通振り回し状態だったら、貫通振り回し状態のカウントを増やす。
 		if (isDestroyMode) {
 			++nowStrongSwingCount;
+
+			if (nowStrongSwingCount <= maxStrongSwingCount)
+			{
+				strongSwingUI[maxStrongSwingCount - nowStrongSwingCount].Disappear();
+			}
 		}
 
 		//キャラクターAI用のデータ集め
