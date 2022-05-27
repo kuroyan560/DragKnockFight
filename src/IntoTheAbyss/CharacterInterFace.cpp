@@ -1217,7 +1217,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 				// ブロックを破壊する。
 				if (unBlockFlag && 0 < hitChipIndex[index].x && hitChipIndex[index].x < MapData[0].size() - 1 && 0 < hitChipIndex[index].y && hitChipIndex[index].y < MapData.size() - 1) {
 
-					enum { C, L, R, T, B };
+					enum { C, L, R, T, B, LT, LB, RT, RB };
 					struct RareData
 					{
 						bool rareFlag;
@@ -1242,7 +1242,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						}
 					};
 
-					std::array<RareData, 5>rare;
+					std::array<RareData, 9>rare;
 					rare[C].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 					rare[C].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
 					rare[C].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
@@ -1262,6 +1262,22 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					rare[B].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(0, 1)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 					rare[B].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(0, 1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
 					rare[B].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
+
+					rare[LT].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, -1)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
+					rare[LT].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, -1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
+					rare[LT].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
+
+					rare[LB].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, 1)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
+					rare[LB].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, 1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
+					rare[LB].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
+
+					rare[RT].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, -1)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
+					rare[RT].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, -1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
+					rare[RT].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
+
+					rare[RB].rareFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, 1)) == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
+					rare[RB].unBrokenFlag = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, 1)) == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK;
+					rare[RB].nonScoreFlg = StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index]) == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK;
 
 
 					StageMgr::Instance()->WriteMapChipData(hitChipIndex[index], 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
@@ -1320,6 +1336,58 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, 1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 						if (!rare[B].nonScoreFlg)
+						{
+							for (int i = 0; i < rare[B].GetNum(); ++i)
+							{
+								partner.lock()->swingDestroyCounter.Increment();
+							}
+						}
+					}
+					// 左上があるか？
+					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, -1)) != 0 && !rare[B].unBrokenFlag)
+					{
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, -1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+
+						if (!rare[LT].nonScoreFlg)
+						{
+							for (int i = 0; i < rare[B].GetNum(); ++i)
+							{
+								partner.lock()->swingDestroyCounter.Increment();
+							}
+						}
+					}
+					// 左下があるか？
+					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(-1, 1)) != 0 && !rare[B].unBrokenFlag)
+					{
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, 1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+
+						if (!rare[LB].nonScoreFlg)
+						{
+							for (int i = 0; i < rare[B].GetNum(); ++i)
+							{
+								partner.lock()->swingDestroyCounter.Increment();
+							}
+						}
+					}
+					// 右下があるか？
+					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, 1)) != 0 && !rare[B].unBrokenFlag)
+					{
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, 1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+
+						if (!rare[RB].nonScoreFlg)
+						{
+							for (int i = 0; i < rare[B].GetNum(); ++i)
+							{
+								partner.lock()->swingDestroyCounter.Increment();
+							}
+						}
+					}
+					// 右上があるか？
+					if (StageMgr::Instance()->GetLocalMapChipBlock(hitChipIndex[index] + Vec2<int>(1, -1)) != 0 && !rare[B].unBrokenFlag)
+					{
+						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, -1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+
+						if (!rare[RT].nonScoreFlg)
 						{
 							for (int i = 0; i < rare[B].GetNum(); ++i)
 							{
