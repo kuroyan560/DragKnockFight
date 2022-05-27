@@ -104,6 +104,8 @@ void CharacterManager::CharactersGenerate()
 	//キャラクター生成
 	for (int i = 0; i < TEAM_NUM; ++i)
 	{
+		characters[i].reset();
+
 		switch (characterName[i])
 		{
 		case PLAYABLE_LUNA:
