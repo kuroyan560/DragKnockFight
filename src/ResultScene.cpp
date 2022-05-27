@@ -14,8 +14,10 @@ ResultScene::ResultScene()
 	resultHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/result.png");
 	breakEnemyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/break_enemy.png");
 	roundHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/round.png");;
-	slashHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/score.png");
+	//slashHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/score.png");
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, blueNumberHandle.data());
+	slashHandle = blueNumberHandle[10];
+
 
 	changeScene = std::make_shared<SceneCange>();
 
@@ -34,14 +36,22 @@ void ResultScene::OnInitialize()
 	delayTimer = 0;
 	resultEasingAmount = 0;
 	breakCountEasingAmount = 0;
-
 	winnerName = ResultTransfer::Instance()->winner;
-
 
 	maxSize = { 0.5f,0.5f };
 	breakSize = { 1.5f,1.5f };
-	bigFontFlag = false;
+
+	breakCount = 0;
+	baseBreakCount = -1;
+
+	scoreEffectTimer = 0;
+
+	for (int i = 0; i < scoreSize.size(); ++i)
+	{
+		scoreSize[i] = 1.5f;
+	}
 	defaultSize = 1.5f;
+	bigFontFlag = false;
 }
 
 void ResultScene::OnUpdate()
@@ -188,8 +198,8 @@ void ResultScene::OnDraw()
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 
 	{
-		float easingPosX = resultEasingAmount * (RESULT_POS.x - windowSize.x);
-		DrawFunc::DrawGraph(Vec2<float>(windowSize.x + easingPosX, RESULT_POS.y), TexHandleMgr::GetTexBuffer(resultHandle));
+		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
+		DrawFunc::DrawGraph(Vec2<float>(440.0f, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
 
 
 		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), 15000);
@@ -211,8 +221,8 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 	Vec2<float> windowSize = { (float)WinApp::Instance()->GetWinSize().x, (float)WinApp::Instance()->GetWinSize().y };
 
 	const float baseX = 500.0f;
-	float easingPosX = scoreEasingAmount * (windowSize.x / 2.0f + baseX);
-	Vec2<float> drawPos = Vec2<float>((windowSize.x + baseX) - easingPosX, 430.0f);
+	float easingPosY = scoreEasingAmount * (windowSize.y / 2.0f + baseX);
+	Vec2<float> drawPos = Vec2<float>(840.0f, windowSize.y + baseX - easingPosY);
 
 
 	const int FONT_SIZE = 66.3f;
@@ -246,7 +256,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 	}
 
 	//ÉXÉâÉbÉVÉÖ
-	//DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));
+	DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));
 
 	//ç≈ëÂ
 	{
