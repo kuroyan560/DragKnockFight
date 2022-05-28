@@ -88,8 +88,8 @@ public:
 	/// <param name="Tex">テクスチャ</param>
 	/// <param name="MaskCenter">マスク画像の中心座標</param>
 	/// <param name="MaskTex">マスク画像</param>
+	/// <param name="MaskExp">マスク拡大率</param>
 	/// <param name="Miror">反転フラグ</param>
-	static void DrawGraphByMaskGraph(const Vec2<float>& Center, const std::shared_ptr<TextureBuffer>& Tex, const Vec2<float>& MaskCenter, const std::shared_ptr<TextureBuffer>& MaskTex, const Vec2<bool>& Mirror);
-
+	static void DrawGraphByMaskGraph(const Vec2<float>& Center, const std::shared_ptr<TextureBuffer>& Tex, const Vec2<float>& MaskCenter, const std::shared_ptr<TextureBuffer>& MaskTex, const Vec2<float>& MaskExp = { 1.0f,1.0f }, const Vec2<bool>& Mirror = { false ,false });
 };
 

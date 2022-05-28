@@ -173,7 +173,7 @@ void DrawFunc_Mask::DrawLine2DGraph(const Vec2<float>& FromPos, const Vec2<float
 	DrawRotaGraph2D(centerPos, expRate, KuroFunc::GetAngle(vec), Tex, maskCenterPos,maskSize, { 0.5f,0.5f }, Mirror);
 }
 
-void DrawFunc_Mask::DrawGraphByMaskGraph(const Vec2<float>& Center, const std::shared_ptr<TextureBuffer>& Tex, const Vec2<float>& MaskCenter, const std::shared_ptr<TextureBuffer>& MaskTex, const Vec2<bool>& Mirror)
+void DrawFunc_Mask::DrawGraphByMaskGraph(const Vec2<float>& Center, const std::shared_ptr<TextureBuffer>& Tex, const Vec2<float>& MaskCenter, const std::shared_ptr<TextureBuffer>& MaskTex, const Vec2<float>& MaskExp, const Vec2<bool>& Mirror)
 {
 	//DrawGraphByMaskGraphêÍópí∏ì_
 	class Vertex
@@ -181,9 +181,10 @@ void DrawFunc_Mask::DrawGraphByMaskGraph(const Vec2<float>& Center, const std::s
 	public:
 		Vec2<float>center;
 		Vec2<float>maskCenterPos;
+		Vec2<float>maskExp;
 		Vec2<int>mirror;
-		Vertex(const Vec2<float>& Center, const Vec2<float>& MaskCenterPos, const Vec2<bool>& Mirror)
-			:center(Center), maskCenterPos(MaskCenterPos), mirror({ Mirror.x ? 1 : 0,Mirror.y ? 1 : 0 }) {}
+		Vertex(const Vec2<float>& Center, const Vec2<float>& MaskCenterPos, const Vec2<float>& MaskExp, const Vec2<bool>& Mirror)
+			:center(Center), maskCenterPos(MaskCenterPos), maskExp(MaskExp), mirror({ Mirror.x ? 1 : 0,Mirror.y ? 1 : 0 }) {}
 	};
 
 	static std::shared_ptr<GraphicsPipeline>ROTA_GRAPH_PIPELINE;
@@ -214,6 +215,7 @@ void DrawFunc_Mask::DrawGraphByMaskGraph(const Vec2<float>& Center, const std::s
 		{
 			InputLayoutParam("CENTER",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("MASK_CENTER",DXGI_FORMAT_R32G32_FLOAT),
+			InputLayoutParam("MASK_EXP",DXGI_FORMAT_R32G32_FLOAT),
 			InputLayoutParam("MIRROR",DXGI_FORMAT_R32G32_SINT),
 		};
 
@@ -230,7 +232,7 @@ void DrawFunc_Mask::DrawGraphByMaskGraph(const Vec2<float>& Center, const std::s
 		ROTA_GRAPH_VERTEX_BUFF.emplace_back(D3D12App::Instance()->GenerateVertexBuffer(sizeof(Vertex), 1, nullptr, ("DrawGraphByMaskGraph -" + std::to_string(DRAW_BY_MASK_GRAPH_COUNT)).c_str()));
 	}
 
-	Vertex vertex(Center, MaskCenter, Mirror);
+	Vertex vertex(Center, MaskCenter, MaskExp, Mirror);
 	ROTA_GRAPH_VERTEX_BUFF[DRAW_BY_MASK_GRAPH_COUNT]->Mapping(&vertex);
 
 	KuroEngine::Instance().Graphics().ObjectRender(ROTA_GRAPH_VERTEX_BUFF[DRAW_BY_MASK_GRAPH_COUNT],

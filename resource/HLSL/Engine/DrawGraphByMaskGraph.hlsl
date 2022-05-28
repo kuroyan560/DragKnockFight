@@ -7,6 +7,7 @@ struct VSOutput
 {
     float4 center : CENTER;
     float4 maskCenter : MASK_CENTER;
+    float2 maskExp : MASK_EXP;
     int2 mirror : MIRROR;
 };
 
@@ -43,8 +44,8 @@ void GSmain(
     uint2 maskTexSize;
     maskTex.GetDimensions(maskTexSize.x, maskTexSize.y);
     
-    float width_h = maskTexSize.x / 2.0f;
-    float height_h = maskTexSize.y / 2.0f;
+    float width_h = maskTexSize.x / 2.0f * input[0].maskExp.x;
+    float height_h = maskTexSize.y / 2.0f * input[0].maskExp.y;
     float2 uvOffset = (input[0].center.xy - input[0].maskCenter.xy) / -maskTexSize;
     
     GSOutput element;

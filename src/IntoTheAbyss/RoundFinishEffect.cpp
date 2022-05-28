@@ -9,6 +9,7 @@
 #include "WinApp.h"
 #include"SelectStage.h"
 #include"EavaluationDataMgr.h"
+#include <IntoTheAbyss/Boss.h>
 
 RoundFinishEffect::RoundFinishEffect()
 {
@@ -144,6 +145,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			// 座標からシェイク量を引く。
 			CharacterManager::Instance()->Right()->pos -= shakeAmount;
+			std::dynamic_pointer_cast<Boss>(CharacterManager::Instance()->Right())->anim->ChangeAnim(Boss::EXPLOSION_OPEN);
 
 			timer = 0;
 			status = EFFECT_STATUS::NUM3_ENEMY_EXP;
@@ -196,6 +198,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 			timer = 0;
 			status = EFFECT_STATUS::NUM4_RETURN_DEFPOS;
 			changeMap = true;
+			std::dynamic_pointer_cast<Boss>(CharacterManager::Instance()->Right())->anim->ChangeAnim(Boss::EXPLOSION_CLOSE);
 		}
 
 		// パーフェクトの画像を動かす。

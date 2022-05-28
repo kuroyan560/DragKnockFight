@@ -27,44 +27,37 @@
 static const Vec2<float> SCALE = { 80.0f,80.0f };
 Boss::Boss() :CharacterInterFace(SCALE)
 {
-	//graphHandle[FRONT] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy.png");
-	//graphHandle[BACK] = TexHandleMgr::LoadGraph("resource/ChainCombat/boss/enemy_back.png");
-
-	const std::string BossRelative = "resource/ChainCombat/boss/0/";
+	const std::string IronBallRelative = "resource/ChainCombat/ironBall/";
 
 	std::vector<Anim>animations;
 	animations.resize(ANIMAHANDLE_MAX);
 
-	static const int DEFAULT_FRONT_NUM = 12;
-	animations[FRONT].graph.resize(DEFAULT_FRONT_NUM);
-	TexHandleMgr::LoadDivGraph(BossRelative + "default.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[FRONT].graph.data());
-	animations[FRONT].interval = 5;
-	animations[FRONT].loop = true;
+	//DEFAULT
+	static const int DEFAULT_NUM = 1;
+	animations[DEFAULT].graph.resize(DEFAULT_NUM);
+	animations[DEFAULT].graph[0] = TexHandleMgr::LoadGraph(IronBallRelative + "default.png");
+	animations[DEFAULT].interval = 0;
+	animations[DEFAULT].loop = true;
 
-	static const int DEFAULT_BACK_NUM = 12;
-	animations[BACK].graph.resize(DEFAULT_BACK_NUM);
-	TexHandleMgr::LoadDivGraph(BossRelative + "default_back.png", DEFAULT_FRONT_NUM, { DEFAULT_FRONT_NUM,1 }, animations[BACK].graph.data());
-	animations[BACK].interval = 5;
-	animations[BACK].loop = true;
+	//EXPLOSION_OPEN
+	static const int EXPLOSION_OPEN_NUM = 3;
+	animations[EXPLOSION_OPEN].graph.resize(EXPLOSION_OPEN_NUM);
+	TexHandleMgr::LoadDivGraph(IronBallRelative + "explosion_open.png", EXPLOSION_OPEN_NUM, Vec2<int>(EXPLOSION_OPEN_NUM, 1), animations[EXPLOSION_OPEN].graph.data());
+	animations[EXPLOSION_OPEN].interval = 5;
+	animations[EXPLOSION_OPEN].loop = false;
 
-	static const int DEFAULT_DAMAGE_NUM = 1;
-	animations[DAMAGE].graph.resize(DEFAULT_DAMAGE_NUM);
-	animations[DAMAGE].graph[0] = TexHandleMgr::LoadGraph(BossRelative + "damage.png");
-	animations[DAMAGE].interval = 0;
-	animations[DAMAGE].loop = false;
-
-	static const int SWING_NUM = 1;
-	animations[SWING].graph.resize(SWING_NUM);
-	animations[SWING].graph[0] = TexHandleMgr::LoadGraph(BossRelative + "swing.png");
-	animations[SWING].interval = 0;
-	animations[SWING].loop = false;
-
+	//EXPLOSION_CLOSE
+	static const int EXPLOSION_CLOSE_NUM = 4;
+	animations[EXPLOSION_CLOSE].graph.resize(EXPLOSION_CLOSE_NUM);
+	TexHandleMgr::LoadDivGraph(IronBallRelative + "explosion_close.png", EXPLOSION_CLOSE_NUM, Vec2<int>(EXPLOSION_CLOSE_NUM, 1), animations[EXPLOSION_CLOSE].graph.data());
+	animations[EXPLOSION_CLOSE].interval = 5;
+	animations[EXPLOSION_CLOSE].loop = false;
 
 	anim = std::make_shared<PlayerAnimation>(animations);
 
 	initNaviAiFlag = false;
 
-	appearBossGraphHandle = animations[FRONT].graph[0];
+	appearBossGraphHandle = animations[DEFAULT].graph[0];
 }
 
 void Boss::OnInit()
@@ -80,7 +73,7 @@ void Boss::OnInit()
 	afterImgageTimer = 0;
 	bossCount = 0;
 	//characterAi.Init();
-	anim->Init(FRONT);
+	anim->Init(DEFAULT);
 
 	//他の処理との都合上Initに一回のみ初期化
 	if (!initNaviAiFlag)
@@ -107,22 +100,6 @@ void Boss::OnInit()
 void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 {
 	/*===== 更新処理 =====*/
-
-	//移動時の画像切り替え
-	if (signbit(CharacterAIData::Instance()->prevPos.x - CharacterAIData::Instance()->nowPos.x))
-	{
-		anim->ChangeAnim(BACK);
-	}
-	else
-	{
-		anim->ChangeAnim(FRONT);
-	}
-	//振り回し中の画像切り替え
-	if (GetNowSwing() || CharacterAIOrder::Instance()->prevSwingFlag)
-	{
-		anim->ChangeAnim(SWING);
-	}
-
 
 	//揺れ開始
 	if (CharacterAIOrder::Instance()->prevSwingFlag && !initShakeFalg)
@@ -195,7 +172,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	// パートナーが振り回していたら残像を出す。
 	if (partner.lock()->GetNowSwing()) {
 		AfterImageMgr::Instance()->Generate(pos, {}, 0, anim->GetGraphHandle(), Color(239, 1, 144, 255), true, size);
-		anim->ChangeAnim(DAMAGE);
 	}
 
 	//バウンド中残像を出す
@@ -232,10 +208,8 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	// [硬直中] [スタン演出中] は動かさない
 	if (0 < afterSwingDelay || StunEffect::Instance()->isActive) {
 		// 何もしない。
-		anim->ChangeAnim(DAMAGE);
 	}
 	else if (isSwingNow) {
-		anim->ChangeAnim(DAMAGE);
 	}
 	else if (GetCanMove()) {
 		//ボスのAI-----------------------
@@ -323,9 +297,6 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	}
 	++flashTimer;
 	//フラッシュする----------------------------------------------
-
-
-
 }
 
 #include"DrawFunc_FillTex.h"
