@@ -97,6 +97,13 @@ void GameTimer::Update()
 	startFlag = countDownFlag;
 	if (startFlag && !timeUpFlag)
 	{
+
+		//ŠÔØ‚ê
+		if (timer <= 1 && flame <= 0)
+		{
+			timeUpFlag = true;
+		}
+
 		//ŠÔ‚ÌƒJƒEƒ“ƒg
 		if (0 < flame)
 		{
@@ -114,12 +121,6 @@ void GameTimer::Update()
 
 			}
 
-		}
-
-		//ŠÔØ‚ê
-		if (timer <= 0 && flame <= 0)
-		{
-			timeUpFlag = true;
 		}
 
 		int minite = timer;
