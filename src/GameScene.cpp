@@ -66,10 +66,10 @@ void GameScene::OnDraw()
 	game.Draw();
 
 	// スクショを保存。
-	if (isSS) {
+	if (isSS)
+	{
 		KuroEngine::Instance().Graphics().CopyTexture(ResultTransfer::Instance()->backGround, D3D12App::Instance()->GetBackBuffRenderTarget());
 	}
-
 }
 
 void GameScene::OnImguiDebug()

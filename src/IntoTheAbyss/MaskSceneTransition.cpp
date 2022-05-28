@@ -22,7 +22,7 @@ void MaskSceneTransition::OnStart()
 {
 	if (!startFlag)
 	{
-		expRate = 30.0f;
+		expRate = 0.0f;
 		angle = 0;
 		startFlag = true;
 	}
@@ -32,18 +32,20 @@ bool MaskSceneTransition::OnUpdate()
 {
 
 	// ‰æ‘œ‚ğ0‚É‹ß‚Ã‚¯‚éB
-	if (0 < expRate) {
-		expRate -= expRate / 5.0f;
+	if (30 < expRate)
+	{
+		expRate += 30.0f / 5.0f;
 		//angle += 0.1f;
 	}
 
-	if (fabs(expRate) < 0.001f) {
+	if (30 <= fabs(expRate))
+	{
 		expRate = 0;
 		startFlag = false;
 		return true;
 	}
 
-	return false;
+	return true;
 
 }
 
@@ -53,7 +55,7 @@ void MaskSceneTransition::OnDraw()
 	{
 		Vec2<float> windowCenter = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
 
-		//DrawFunc::DrawRotaGraph2D(windowCenter, Vec2<float>(expRate, expRate), angle, DrawMapChipForSceneChange::Instance()->mapBuffer);
-		DrawFunc_Mask::DrawGraphByMaskGraph(windowCenter, DrawMapChipForSceneChange::Instance()->mapBuffer, windowCenter, DrawMapChipForSceneChange::Instance()->mapBuffer, Vec2<bool>(false, false));
+		//DrawFunc::DrawRotaGraph2D(windowCenter, Vec2<float>(expRate, expRate), angle, TexHandleMgr::GetTexBuffer(maskHandle));
+		//DrawFunc_Mask::DrawGraphByMaskGraph(windowCenter, DrawMapChipForSceneChange::Instance()->mapBuffer, windowCenter, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<bool>(false, false));
 	}
 }
