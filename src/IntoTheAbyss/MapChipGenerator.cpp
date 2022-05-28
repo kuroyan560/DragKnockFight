@@ -45,7 +45,7 @@ int MapChipGenerator::GetRandChipType()
 	return appearType;
 }
 
-void MapChipGenerator::Generate(const Vec2<float> &GeneratePos)
+void MapChipGenerator::Generate(const Vec2<float>& GeneratePos)
 {
 	//生成座標を基にその場所のチップ番号取得
 	Vec2<int>centerIdx =
@@ -64,7 +64,7 @@ void MapChipGenerator::Generate(const Vec2<float> &GeneratePos)
 		centerIdx + Vec2<int>(1,0),	//右
 	};
 
-	for (auto &idx : generateIndices)
+	for (auto& idx : generateIndices)
 	{
 		if (!CanChange(idx))continue;
 		StageMgr::Instance()->WriteMapChipData(idx, GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
@@ -103,7 +103,7 @@ void MapChipGenerator_SplineOrbit::Init()
 void MapChipGenerator_SplineOrbit::Update()
 {
 	std::vector<Vec2<float>>targetPosVector;
-	for (auto &tp : targetPos)
+	for (auto& tp : targetPos)
 	{
 		targetPosVector.emplace_back(tp);
 	}
@@ -176,7 +176,7 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 	static const int GENERATE_NUM_MAX = 5;
 	static const int GENERATE_NUM_MIN = 2;
 
-	static const enum PATTERN_TYPE { CROSS, CUBE, CIRCLE, NUM };
+	static const enum PATTERN_TYPE { CROSS, CUBE, CIRCLE, HORIZON, VERT, NUM };
 	static bool INIT = false;
 	static OffsetPattern PATTERN[NUM];
 	if (!INIT)
@@ -216,7 +216,7 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 				offsetIdx.y = offsetPos.y / MAP_CHIP_SIZE;
 
 				bool same = false;
-				for (auto &idx : PATTERN[CIRCLE])
+				for (auto& idx : PATTERN[CIRCLE])
 				{
 					if (idx != offsetIdx)continue;
 					same = true;
@@ -225,6 +225,26 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 				if (!same)PATTERN[CIRCLE].emplace_back(offsetIdx);
 			}
 		}
+
+		// 水平垂直なやつでどこまで伸ばすかの値
+		static const int HORI_VERT_LENGTH = 30;
+
+		// 水平なやつ
+		for (int index = -HORI_VERT_LENGTH; index < HORI_VERT_LENGTH; ++index) {
+
+
+			PATTERN[HORIZON].emplace_back(Vec2<int>(index, 0));
+
+		}
+
+		// 垂直なやつ
+		for (int index = -HORI_VERT_LENGTH; index < HORI_VERT_LENGTH; ++index) {
+
+
+			PATTERN[VERT].emplace_back(Vec2<int>(0, index));
+
+		}
+
 
 		INIT = true;
 	};
@@ -235,7 +255,7 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 		Vec2<int>centerIdx = { KuroFunc::GetRand(chipIdxMax.x - 1),KuroFunc::GetRand(chipIdxMax.y - 1) };
 
 		const auto patternType = PATTERN[KuroFunc::GetRand(PATTERN_TYPE::NUM - 1)];
-		for (auto &offsetIdx : patternType)
+		for (auto& offsetIdx : patternType)
 		{
 			Vec2<int> idx = offsetIdx + centerIdx;
 			if (idx.x < 0)continue;
@@ -265,7 +285,7 @@ void MapChipGenerator_RandPattern::Update()
 
 	if (span <= timer)
 	{
-		for (auto &pre : predictionIdxArray)
+		for (auto& pre : predictionIdxArray)
 		{
 			if (!CanChange(pre.idx))continue;
 			StageMgr::Instance()->WriteMapChipData(pre.idx, pre.type, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
@@ -291,7 +311,7 @@ void MapChipGenerator_RandPattern::Draw()
 	predictionRate = KuroMath::Ease(In, Circ, predictionRate, 0.0f, 1.0f);
 
 
-	for (const auto &pred : predictionIdxArray)
+	for (const auto& pred : predictionIdxArray)
 	{
 		ChipData chipData;
 		// スクロール量から描画する位置を求める。
