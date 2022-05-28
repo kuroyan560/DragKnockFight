@@ -15,4 +15,6 @@ class MaskSceneTransition : public SceneTransition{
 	float angle;		// ‰ñ“]Šp“x
 	float t;
 	bool startFlag;
+
+	Vec2<float>pos;
 };

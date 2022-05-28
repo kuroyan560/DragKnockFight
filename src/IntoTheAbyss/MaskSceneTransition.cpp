@@ -31,6 +31,9 @@ void MaskSceneTransition::OnStart()
 
 bool MaskSceneTransition::OnUpdate()
 {
+	Vec2<float>initPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
+
+
 	if (t <= 1.0f)
 	{
 		t += 1.0f / 120.0f;
@@ -41,13 +44,11 @@ bool MaskSceneTransition::OnUpdate()
 	}
 
 	// ‰æ‘œ‚ð0‚É‹ß‚Ã‚¯‚éB
-	if (expRate < 30)
-	{
-		expRate = KuroMath::Ease(Out, Cubic, t, 0.0f, 1.0f) * 10.0f;
-		//angle += 0.1f;
-	}
+	expRate = KuroMath::Ease(In, Cubic, t, 0.0f, 1.0f) * 30.0f;
+	//pos.y = initPos.y + KuroMath::Ease(In, Cubic, t, 0.0f, 1.0f) * 40.0f;
+	pos = initPos;
 
-	if (10 <= expRate)
+	if (30 <= expRate)
 	{
 		expRate = 0;
 		startFlag = false;
@@ -61,10 +62,7 @@ void MaskSceneTransition::OnDraw()
 {
 	if (startFlag)
 	{
-		Vec2<float> windowCenter = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
-		Vec2<float> windowCenter2 = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
-
 		//DrawFunc::DrawRotaGraph2D(windowCenter, Vec2<float>(expRate, expRate), angle, TexHandleMgr::GetTexBuffer(maskHandle));
-		DrawFunc_Mask::DrawGraphByMaskGraph(windowCenter, DrawMapChipForSceneChange::Instance()->mapBuffer, windowCenter2, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<float>(expRate, expRate));
+		DrawFunc_Mask::DrawGraphByMaskGraph(pos, DrawMapChipForSceneChange::Instance()->mapBuffer, pos, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<float>(expRate, expRate));
 	}
 }
