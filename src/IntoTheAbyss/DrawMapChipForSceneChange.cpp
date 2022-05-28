@@ -6,6 +6,7 @@
 DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 {
 	auto backBuff = D3D12App::Instance()->GetBackBuffRenderTarget();
+	Vec2<int>s(WinApp::Instance()->GetExpandWinSize().x, WinApp::Instance()->GetExpandWinSize().y);
 	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), backBuff->GetGraphSize(), L"SceneChangeMapSS");
 }
 
@@ -16,14 +17,33 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM)
 	stageNum = STAGE_NUM;
 	isSS = true;
 
-	//RoomMapChipArray tmp = *StageMgr::Instance()->GetLocalMap();
-	//Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
-	//ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), { 0.0f,-40.0f });
+	playerPos = StageMgr::Instance()->GetPlayerResponePos(STAGE_NUM, 0);
+	bossPos = StageMgr::Instance()->GetBossResponePos(STAGE_NUM, 0);
+
+	RoomMapChipArray tmp = *StageMgr::Instance()->GetLocalMap();
+	Vec2<float>distance = (bossPos - playerPos) / 2.0f;
+	centralPos = playerPos + distance;
+
+	Vec2<float>mapSize(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE);
+	Vec2<float>adj = { 0.0f,-40.0f };
+	ScrollMgr::Instance()->Init(centralPos, mapSize, adj);
+
+	Camera::Instance()->Init();
+	Camera::Instance()->Zoom(playerPos, bossPos);
+
+	ScrollMgr::Instance()->zoom = Camera::Instance()->zoom;
 }
 
 void DrawMapChipForSceneChange::Finalize()
 {
 	isSS = false;
+}
+
+void DrawMapChipForSceneChange::Update()
+{
+	Camera::Instance()->Update();
+	ScrollMgr::Instance()->Update(centralPos);
+	//ScrollMgr::Instance()->Update(Vec2<float>(1575.0f, 225.0f));
 }
 
 void DrawMapChipForSceneChange::Draw()
@@ -33,6 +53,7 @@ void DrawMapChipForSceneChange::Draw()
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		KuroEngine::Instance().Graphics().ClearRenderTarget({ mapBuffer });
 		DrawMapChip(*StageMgr::Instance()->GetLocalMap(), *StageMgr::Instance()->GetLocalDrawMap(), stageNum, 0);
+		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	}
 }
 
@@ -41,7 +62,7 @@ void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipDa
 	std::map<int, std::vector<ChipData>>datas;
 
 	// 描画するチップのサイズ
-	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * 1.0f;
+	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
 	SizeData wallChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
 

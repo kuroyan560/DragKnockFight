@@ -13,6 +13,8 @@ class MaskSceneTransition : public SceneTransition{
 	int maskHandle;		// シーンチェンジのマスクの画像
 	float expRate;		// 画像の拡大率
 	float angle;		// 回転角度
-
+	float t;
 	bool startFlag;
+
+	Vec2<float>pos, backGroundPos;
 };

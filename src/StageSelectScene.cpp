@@ -31,6 +31,7 @@ void StageSelectScene::OnInitialize()
 	isPrevInputSticlLeft = false;
 
 	DrawMapChipForSceneChange::Instance()->Init(0);
+	prevStageNum = -1;
 }
 
 void StageSelectScene::OnUpdate()
@@ -80,7 +81,6 @@ void StageSelectScene::OnUpdate()
 
 			// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
 			screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
-
 		}
 	}
 	else
@@ -89,23 +89,23 @@ void StageSelectScene::OnUpdate()
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A) && 1.0f <= stageSelect.GetLerpData().timer)
 		{
 			charactersSelect = true;
-			screenShot.SetZoomFlag(true);		// ズームアウトさせる
-			stageSelect.SetZoomFlag(true);		// ズームアウトさせる
+			//screenShot.SetZoomFlag(true);		// ズームアウトさせる
+			//stageSelect.SetZoomFlag(true);		// ズームアウトさせる
 
 			// 矢印をズームアウトさせる。
-			rightArrow.SetZoomOut(true);
-			leftArrow.SetZoomOut(true);
+			//rightArrow.SetZoomOut(true);
+			//leftArrow.SetZoomOut(true);
 
 			// 矢印をデフォルトの場所に移動させる。
-			rightArrow.SetExitPos(Vec2<float>(2000, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), Vec2<float>(0.0f, 0.0f));
-			leftArrow.SetExitPos(Vec2<float>(-1000, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), Vec2<float>(0.0f, 0.0f));
+			//rightArrow.SetExitPos(Vec2<float>(2000, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), Vec2<float>(0.0f, 0.0f));
+			//leftArrow.SetExitPos(Vec2<float>(-1000, static_cast<float>(WinApp::Instance()->GetWinCenter().y)), Vec2<float>(0.0f, 0.0f));
 
 			// キャラのカードをズームアウトさせる。
-			leftChara.SetIsZoomOut(true);
-			rightChara.SetIsZoomOut(true);
+			//leftChara.SetIsZoomOut(true);
+			//rightChara.SetIsZoomOut(true);
 
 			// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
-			screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
+			//screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
 
 			DrawMapChipForSceneChange::Instance()->Finalize();
 
@@ -156,11 +156,17 @@ void StageSelectScene::OnUpdate()
 		SelectStage::Instance()->SelectStageNum(stageNum);
 	}
 
+	if (stageNum != prevStageNum)
+	{
+		DrawMapChipForSceneChange::Instance()->Init(stageNum);
+	}
+	prevStageNum = stageNum;
 
 	screenShot.Update();
 	stageSelect.Update();
 	rightArrow.Update(false);
 	leftArrow.Update(true);
+	DrawMapChipForSceneChange::Instance()->Update();
 
 	// 背景のキャラカードの更新処理
 	leftChara.Update();
@@ -203,6 +209,7 @@ void StageSelectScene::OnDraw()
 	rightChara.Draw();
 
 	DrawMapChipForSceneChange::Instance()->Draw();
+
 }
 
 void StageSelectScene::OnImguiDebug()

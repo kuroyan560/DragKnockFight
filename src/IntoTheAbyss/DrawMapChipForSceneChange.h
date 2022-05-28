@@ -13,8 +13,9 @@ public:
 
 	void Init(int STAGE_NUM);
 	void Finalize();
-
+	void Update();
 	void Draw();
+
 	std::shared_ptr<RenderTarget> mapBuffer;
 private:
 	void DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum);
@@ -22,5 +23,5 @@ private:
 	int stageNum;
 	std::vector<DrawMap>drawMap;
 	bool isSS;
+	Vec2<float>centralPos,playerPos,bossPos;
 };
-
