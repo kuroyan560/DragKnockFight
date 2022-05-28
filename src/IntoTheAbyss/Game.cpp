@@ -316,7 +316,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	gameTimer = StageMgr::Instance()->GetMaxTime(stageNum, roomNum);
 	Camera::Instance()->Init();
 	ScoreManager::Instance()->Init();
-	GameTimer::Instance()->Init(900);
+	GameTimer::Instance()->Init(gameTimer);
 	GameTimer::Instance()->Start();
 
 	firstLoadFlag = false;
