@@ -29,17 +29,17 @@ void StageRap::Update()
 
 void StageRap::Draw()
 {
-	DrawFunc::DrawRotaGraph2D(pos, size, 0.0f, TexHandleMgr::GetTexBuffer(numberHandle[rapNum]));
+	//DrawFunc::DrawRotaGraph2D(pos, size, 0.0f, TexHandleMgr::GetTexBuffer(numberHandle[rapNum]));
 
-	{
-		Vec2<float> lPos = pos + Vec2<float>(50.0f, 0.0f);
-		DrawFunc::DrawRotaGraph2D(lPos, size, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));
-	}
+	//{
+	//	Vec2<float> lPos = pos + Vec2<float>(50.0f, 0.0f);
+	//	DrawFunc::DrawRotaGraph2D(lPos, size, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));
+	//}
 
-	{
-		Vec2<float> lPos = pos + Vec2<float>(109.0f, 0.0f);
-		DrawFunc::DrawRotaGraph2D(lPos, size, 0.0f, TexHandleMgr::GetTexBuffer(numberHandle[rapMaxNum]));
-	}
+	//{
+	//	Vec2<float> lPos = pos + Vec2<float>(109.0f, 0.0f);
+	//	DrawFunc::DrawRotaGraph2D(lPos, size, 0.0f, TexHandleMgr::GetTexBuffer(numberHandle[rapMaxNum]));
+	//}
 }
 
 void StageRap::Increment()
