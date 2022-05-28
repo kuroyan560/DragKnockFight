@@ -31,8 +31,8 @@ void MaskSceneTransition::OnStart()
 
 bool MaskSceneTransition::OnUpdate()
 {
-	//Vec2<float>adjPos = { -35.0f,-2.0f };//プレイヤーとボスの距離基準での調整
-	Vec2<float>adjPos = { -28.0f,5.0f };
+	Vec2<float>adjPos = { -35.0f,-2.0f };//プレイヤーとボスの距離基準での調整
+	//Vec2<float>adjPos = { -28.0f,5.0f };
 	//Vec2<float>adjPos = {0.0f,0.0f };
 	Vec2<float>initPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y)) + adjPos;
 
@@ -68,6 +68,6 @@ void MaskSceneTransition::OnDraw()
 {
 	if (startFlag)
 	{
-		DrawFunc_Mask::DrawGraphByMaskGraph(pos, DrawMapChipForSceneChange::Instance()->mapBuffer, backGroundPos, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<float>(expRate, expRate));
+		DrawFunc_Mask::DrawGraphByMaskGraph(pos, backGroundTex, backGroundPos, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<float>(expRate, expRate));
 	}
 }

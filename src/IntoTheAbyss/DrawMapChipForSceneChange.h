@@ -8,12 +8,12 @@
 #include"LocalScrollMgr.h"
 #include"LocalCamera.h"
 
-class DrawMapChipForSceneChange :public Singleton<DrawMapChipForSceneChange>
+class DrawMapChipForSceneChange
 {
 public:
 	DrawMapChipForSceneChange();
 
-	void Init(int STAGE_NUM);
+	void Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG);
 	void Finalize();
 	void Update();
 	void Draw();
@@ -31,4 +31,10 @@ private:
 	//ã÷ífÇÃãZÅAéûíZÇÃà◊égóp
 	LocalScrollMgr scroll;
 	std::shared_ptr<LocalCamera> camera;
+
+	bool sceneChageFlag;
+
+	RoomMapChipArray mapChip;
+	RoomMapChipDrawArray mapChipDraw;
+
 };

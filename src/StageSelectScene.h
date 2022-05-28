@@ -37,6 +37,13 @@ public:
 	// シーンチェンジに使用する。
 	std::shared_ptr<MaskSceneTransition>changeScene;
 
+	enum
+	{
+		STAGE_SELECT,
+		SCENE_CHANGE
+	};
+	std::array<std::array<DrawMapChipForSceneChange, 2>, 7>mapScreenShot;
+
 	// ステージ番号
 	int stageNum,prevStageNum;
 };

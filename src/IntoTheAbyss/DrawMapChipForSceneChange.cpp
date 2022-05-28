@@ -11,14 +11,21 @@ DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 
 	camera = std::make_shared<LocalCamera>();
 	scroll.camera = camera;
+
+	sceneChageFlag = false;
 }
 
-void DrawMapChipForSceneChange::Init(int STAGE_NUM)
+void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG)
 {
 	StageMgr::Instance()->SetLocalMapChipData(STAGE_NUM, 0);
 	StageMgr::Instance()->SetLocalMapChipDrawBlock(STAGE_NUM, 0);
+
+	mapChip = *StageMgr::Instance()->GetLocalMap();
+	mapChipDraw = *StageMgr::Instance()->GetLocalDrawMap();
+
 	stageNum = STAGE_NUM;
 	isSS = true;
+
 
 	playerPos = StageMgr::Instance()->GetPlayerResponePos(STAGE_NUM, 0);
 	bossPos = StageMgr::Instance()->GetBossResponePos(STAGE_NUM, 0);
@@ -30,17 +37,29 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM)
 	Vec2<float>mapSize(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE);
 	Vec2<float>adj = { 0.0f,-40.0f };
 
-	centralPos = mapSize / 2.0f;
+
+	sceneChageFlag = SCENE_CHANGE_FLAG;
+	if (sceneChageFlag)
+	{
+		Camera::Instance()->Init();
+		Camera::Instance()->Zoom(playerPos, bossPos);
+		ScrollMgr::Instance()->Init(centralPos, mapSize, adj);
+	}
+	else
+	{
+		centralPos = mapSize / 2.0f;
+		playerPos.x = 0.0f;
+		bossPos.x = tmp[0].size() * MAP_CHIP_SIZE;
+	}
+
 	scroll.Init(centralPos, mapSize, adj);
-	ScrollMgr::Instance()->Init(centralPos, mapSize, adj);
 
 	camera->Init();
-	playerPos.x = 0.0f;
-	bossPos.x = tmp[0].size() * MAP_CHIP_SIZE;
 	camera->Zoom(playerPos, bossPos);
 
 
 	scroll.zoom = camera->zoom;
+
 }
 
 void DrawMapChipForSceneChange::Finalize()
@@ -52,6 +71,10 @@ void DrawMapChipForSceneChange::Update()
 {
 	camera->Update();
 	scroll.Update(centralPos);
+	if (sceneChageFlag)
+	{
+		ScrollMgr::Instance()->Update(centralPos);
+	}
 }
 
 void DrawMapChipForSceneChange::Draw()
@@ -60,7 +83,7 @@ void DrawMapChipForSceneChange::Draw()
 	{
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		KuroEngine::Instance().Graphics().ClearRenderTarget({ mapBuffer });
-		DrawMapChip(*StageMgr::Instance()->GetLocalMap(), *StageMgr::Instance()->GetLocalDrawMap(), stageNum, 0);
+		DrawMapChip(mapChip, mapChipDraw, stageNum, 0);
 		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	}
 }

@@ -9,6 +9,7 @@ public:
 	bool OnUpdate()override;
 	void OnDraw()override;
 
+	std::shared_ptr<RenderTarget>backGroundTex;
 private:
 	int maskHandle;		// シーンチェンジのマスクの画像
 	float expRate;		// 画像の拡大率
