@@ -99,10 +99,10 @@ void GSmain(
 
 float4 PSmain(GSOutput input) : SV_TARGET
 {
-    clip(step(0.0f, input.pos.x));
-    clip(step(input.pos.x, 1.0f));
-    clip(step(0.0f, input.pos.y));
-    clip(step(input.pos.y, 1.0f));
+    clip(step(0.0f, input.maskUv.x));
+    clip(step(input.maskUv.x, 1.0f));
+    clip(step(0.0f, input.maskUv.y));
+    clip(step(input.maskUv.y, 1.0f));
     
     float4 maskCol = maskTex.Sample(smp, input.maskUv);
     float4 texCol = tex.Sample(smp, input.texUv);
