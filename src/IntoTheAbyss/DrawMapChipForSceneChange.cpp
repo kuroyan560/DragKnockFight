@@ -8,6 +8,9 @@ DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 	auto backBuff = D3D12App::Instance()->GetBackBuffRenderTarget();
 	Vec2<int>s(WinApp::Instance()->GetExpandWinSize().x, WinApp::Instance()->GetExpandWinSize().y);
 	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), backBuff->GetGraphSize(), L"SceneChangeMapSS");
+
+	camera = std::make_shared<LocalCamera>();
+	scroll.camera = camera;
 }
 
 void DrawMapChipForSceneChange::Init(int STAGE_NUM)
@@ -26,12 +29,18 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM)
 
 	Vec2<float>mapSize(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE);
 	Vec2<float>adj = { 0.0f,-40.0f };
+
+	centralPos = mapSize / 2.0f;
+	scroll.Init(centralPos, mapSize, adj);
 	ScrollMgr::Instance()->Init(centralPos, mapSize, adj);
 
-	Camera::Instance()->Init();
-	Camera::Instance()->Zoom(playerPos, bossPos);
+	camera->Init();
+	playerPos.x = 0.0f;
+	bossPos.x = tmp[0].size() * MAP_CHIP_SIZE;
+	camera->Zoom(playerPos, bossPos);
 
-	ScrollMgr::Instance()->zoom = Camera::Instance()->zoom;
+
+	scroll.zoom = camera->zoom;
 }
 
 void DrawMapChipForSceneChange::Finalize()
@@ -41,9 +50,8 @@ void DrawMapChipForSceneChange::Finalize()
 
 void DrawMapChipForSceneChange::Update()
 {
-	Camera::Instance()->Update();
-	ScrollMgr::Instance()->Update(centralPos);
-	//ScrollMgr::Instance()->Update(Vec2<float>(1575.0f, 225.0f));
+	camera->Update();
+	scroll.Update(centralPos);
 }
 
 void DrawMapChipForSceneChange::Draw()
@@ -62,7 +70,7 @@ void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipDa
 	std::map<int, std::vector<ChipData>>datas;
 
 	// 描画するチップのサイズ
-	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
+	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * scroll.zoom;
 	SizeData wallChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
 
@@ -82,7 +90,7 @@ void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipDa
 			if (blockFlag)
 			{
 				// スクロール量から描画する位置を求める。
-				const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE });
+				const Vec2<float> drawPos = scroll.Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE });
 
 				// 画面外だったら描画しない。
 				if (drawPos.x < -DRAW_MAP_CHIP_SIZE || drawPos.x > WinApp::Instance()->GetWinSize().x + DRAW_MAP_CHIP_SIZE) continue;

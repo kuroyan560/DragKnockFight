@@ -31,8 +31,10 @@ void MaskSceneTransition::OnStart()
 
 bool MaskSceneTransition::OnUpdate()
 {
-	Vec2<float>initPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x - 35.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y-2.0f));
-
+	//Vec2<float>adjPos = { -35.0f,-2.0f };//プレイヤーとボスの距離基準での調整
+	Vec2<float>adjPos = { -28.0f,5.0f };
+	//Vec2<float>adjPos = {0.0f,0.0f };
+	Vec2<float>initPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y)) + adjPos;
 
 	if (t <= 1.0f)
 	{

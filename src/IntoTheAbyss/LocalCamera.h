@@ -1,23 +1,21 @@
 #pragma once
 #include"Vec.h"
-#include"Singleton.h"
 #include"ScrollMgr.h"
 
-class Camera : public Singleton<Camera>
+/// <summary>
+/// ï°êªóp
+/// </summary>
+class LocalCamera
 {
-	friend class Singleton<Camera>;
-
+public:
 	float initZoom;
-	Camera()
+	LocalCamera()
 	{
 		initZoom = 0.2f;
 	}
-	friend class ScrollMgr;
-
 	// If camera focuses on something, it will be active.
 	int active;
 	float lerpAmount;
-public:
 	// Info to focus.
 	Vec2<float>target;
 	float zoom;
@@ -26,7 +24,6 @@ public:
 	Vec2<float>scrollAffect;
 	//float zoomAffect;
 
-public:
 	void Init();
 	void Update();
 	// This "TargetPos" must not be affected by scroll.

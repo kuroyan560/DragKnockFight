@@ -1,6 +1,6 @@
-#include "Camera.h"
+#include "LocalCamera.h"
 
-void Camera::Init()
+void LocalCamera::Init()
 {
 	active = 0;
 	scrollAffect = { 0,0 };
@@ -12,7 +12,7 @@ void Camera::Init()
 #include"ShakeMgr.h"
 #include"KuroMath.h"
 #include"WinApp.h"
-void Camera::Update()
+void LocalCamera::Update()
 {
 
 	ScrollMgr::Instance()->zoom = KuroMath::Lerp(ScrollMgr::Instance()->zoom, zoom, lerpAmount);
@@ -20,7 +20,7 @@ void Camera::Update()
 	if (active)
 	{
 		//描画上の位置を求める
-		const auto targetondraw =  ScrollMgr::Instance()->Affect(target);
+		const auto targetondraw = ScrollMgr::Instance()->Affect(target);
 		//画面中央との差分を求める
 		const auto differ = targetondraw - WinApp::Instance()->GetExpandWinCenter() - scrollAffect;
 
@@ -40,7 +40,7 @@ void Camera::Update()
 	}
 }
 
-void Camera::Focus(const Vec2<float>& TargetPos, const float& Zoom, const float& LerpAmount)
+void LocalCamera::Focus(const Vec2<float> &TargetPos, const float &Zoom, const float &LerpAmount)
 {
 	target = TargetPos;
 	zoom = Zoom;
@@ -48,7 +48,7 @@ void Camera::Focus(const Vec2<float>& TargetPos, const float& Zoom, const float&
 	lerpAmount = LerpAmount;
 }
 
-void Camera::Zoom(const Vec2<float> &PLAYER_POS, const Vec2<float> &BOSS_POS, float MIN_ZOOM_SIZE)
+void LocalCamera::Zoom(const Vec2<float> &PLAYER_POS, const Vec2<float> &BOSS_POS, float MIN_ZOOM_SIZE)
 {
 	//互いの距離でカメラのズーム率を変える。
 	float distance = PLAYER_POS.Distance(BOSS_POS);

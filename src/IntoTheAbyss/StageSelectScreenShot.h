@@ -22,6 +22,9 @@ public:
 
 	int GetCanMaxSelectNum() { return min(screenShotHandle.size(), stageNumberHandle.size()); }
 
+
+	std::shared_ptr<RenderTarget>screenShot;
+
 private:
 	std::vector<int>screenShotHandle;
 	std::vector<int> stageNumberHandle;

@@ -8,6 +8,7 @@ StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 {
 	changeScene = std::make_shared<MaskSceneTransition>();
 	stageNum = 0;
+
 }
 
 void StageSelectScene::OnInitialize()
@@ -194,6 +195,7 @@ void StageSelectScene::OnUpdate()
 		StageSelectOffsetPosDebug::Instance()->pos.x -= moveOffset;
 
 	}*/
+	screenShot.screenShot = DrawMapChipForSceneChange::Instance()->mapBuffer;
 
 }
 
