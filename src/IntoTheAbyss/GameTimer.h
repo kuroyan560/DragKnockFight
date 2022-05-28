@@ -2,11 +2,12 @@
 #include"../Common/Vec.h"
 #include<vector>
 #include"../Common/Singleton.h"
+#include<array>
 
 /// <summary>
 /// ƒQ[ƒ€‚Ì‘S‘Ì‚ÌŠÔ‚ğŒvZ‚µ‚Ü‚·
 /// </summary>
-class GameTimer:public Singleton<GameTimer>
+class GameTimer :public Singleton<GameTimer>
 {
 	bool interruput;
 public:
@@ -78,13 +79,15 @@ private:
 	float countDownEndPos;
 	Vec2<int> texSize;
 	int countDownNum;
-	
+
 	bool countDownFlag;
 	int countDownHandle[4], finishHandle;
 
 	int finishTimer;
 
 	bool counDownFinishFlag;
+
+	std::array<int, 5> countDownSE;
 
 	std::vector<int> CountNumber(int TIME);
 };

@@ -558,50 +558,6 @@ void Game::Update(const bool& Loop)
 	//スコアを常に代入
 	ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.countAllBlockNum - countBlock.countNowBlockNum);
 
-
-	/*===== 当たり判定 =====*/
-
-#pragma region 当たり判定
-
-	//左弾と右プレイヤーの判定
-	for (int index = 0; index < CharacterManager::Instance()->Left()->GetBulletMgr().bullets.size(); ++index)
-	{
-		if (!CharacterManager::Instance()->Left()->GetBulletMgr().bullets[index].isActive)continue;
-
-		std::shared_ptr<SphereCollision> bulCol = CharacterManager::Instance()->Left()->GetBulletMgr().bullets[index].bulletHitBox;
-		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bulCol, CharacterManager::Instance()->Right()->GetBulletHitSphere());
-
-		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
-		if (hitFlag)
-		{
-			//SuperiorityGauge::Instance()->AddGauge(LEFT_TEAM, DebugParameter::Instance()->gaugeData->playerBulletAddGuaugeValue);
-			CharacterManager::Instance()->Left()->GetBulletMgr().bullets[index].Init();
-			CharacterManager::Instance()->Right()->Damage();
-		}
-	}
-
-	//右弾と左プレイヤーの判定
-	static int DAMAGED_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/damaged.wav", 0.7f);
-	for (int index = 0; index < CharacterManager::Instance()->Right()->GetBulletMgr().bullets.size(); ++index)
-	{
-		if (!CharacterManager::Instance()->Right()->GetBulletMgr().bullets[index].isActive)continue;
-
-		std::shared_ptr<SphereCollision> bulCol = CharacterManager::Instance()->Right()->GetBulletMgr().bullets[index].bulletHitBox;
-		bool hitFlag = BulletCollision::Instance()->CheckSphereAndSphere(*bulCol, CharacterManager::Instance()->Left()->GetBulletHitSphere());
-
-		//初期化されている&&プレイヤーと判定を取ったら優勢ゲージの偏りが変わり、弾は初期化される
-		if (hitFlag)
-		{
-			//SuperiorityGauge::Instance()->AddGauge(RIGHT_TEAM, DebugParameter::Instance()->gaugeData->enemyBulletAddGuaugeValue);
-			CharacterManager::Instance()->Right()->GetBulletMgr().bullets[index].Init();
-			CharacterManager::Instance()->Left()->Damage();
-			//AudioApp::Instance()->PlayWave(DAMAGED_SE);
-		}
-	}
-
-#pragma endregion
-
-
 	// 中心点を計算。
 	CalCenterPos();
 

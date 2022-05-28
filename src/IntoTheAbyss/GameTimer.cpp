@@ -4,6 +4,7 @@
 #include"../Engine/ImguiApp.h"
 #include"../Common/KuroMath.h"
 #include"WinApp.h"
+#include"AudioApp.h"
 
 GameTimer::GameTimer()
 {
@@ -18,6 +19,13 @@ GameTimer::GameTimer()
 	//スコア無効、タイマーを中心に描画
 	timerPos.x = texSize.x * 2.0f - 42;
 	timerPos.y = 46.0f;
+
+	countDownSE[0] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_1.wav", 0.2f);
+	countDownSE[1] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_2.wav", 0.2f);
+	countDownSE[2] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_3.wav", 0.2f);
+	countDownSE[3] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_4.wav", 0.2f);
+	countDownSE[4] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_5.wav", 0.2f);
+
 }
 
 void GameTimer::Init(int TIME)
@@ -98,6 +106,14 @@ void GameTimer::Update()
 		{
 			timer--;
 			flame = 59;
+
+			// タイマーが5以下だったらサウンドを鳴らす。
+			if (timer <= 5 && timer != 0) {
+
+				AudioApp::Instance()->PlayWave(countDownSE[timer - 1]);
+
+			}
+
 		}
 
 		//時間切れ
