@@ -90,5 +90,11 @@ private:
 	std::array<int, 5> countDownSE;
 
 	std::vector<int> CountNumber(int TIME);
+
+	// UIのサイズのオフセット
+	const float OFFSET_SIZE = 0.98;
+	float size;
+	int alpha;
+
 };
 
