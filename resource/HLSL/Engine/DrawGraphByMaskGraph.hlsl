@@ -43,6 +43,8 @@ void GSmain(
 {
     uint2 maskTexSize;
     maskTex.GetDimensions(maskTexSize.x, maskTexSize.y);
+    uint2 texSize;
+    tex.GetDimensions(texSize.x, texSize.y);
     
     float width_h = maskTexSize.x / 2.0f * input[0].maskExp.x;
     float height_h = maskTexSize.y / 2.0f * input[0].maskExp.y;
@@ -58,6 +60,7 @@ void GSmain(
     float2 leftBottomUV = float2(0.0f + input[0].mirror.x, 1.0f - input[0].mirror.y);
     element.maskUv = leftBottomUV - uvOffset;
     element.texUv = leftBottomUV + uvOffset;
+    element.texUv *= texSize / (maskTexSize * input[0].maskExp);
     output.Append(element);
     
     //ç∂è„
@@ -68,6 +71,7 @@ void GSmain(
     float2 leftUpUV = float2(0.0f + input[0].mirror.x, 0.0f + input[0].mirror.y);
     element.maskUv = leftUpUV - uvOffset;
     element.texUv = leftUpUV + uvOffset;
+    element.texUv *= texSize / (maskTexSize * input[0].maskExp);
     output.Append(element);
     
      //âEâ∫
@@ -78,6 +82,7 @@ void GSmain(
     float2 rightBottomUV = float2(1.0f - input[0].mirror.x, 1.0f - input[0].mirror.y);
     element.maskUv = rightBottomUV - uvOffset;
     element.texUv = rightBottomUV + uvOffset;
+    element.texUv *= texSize / (maskTexSize * input[0].maskExp);
     output.Append(element);
     
     //âEè„
@@ -88,6 +93,7 @@ void GSmain(
     float2 rightUpUV = float2(1.0f - input[0].mirror.x, 0.0f + input[0].mirror.y);
     element.maskUv = rightUpUV - uvOffset;
     element.texUv = rightUpUV + uvOffset;
+    element.texUv *= texSize / (maskTexSize * input[0].maskExp);
     output.Append(element);
 }
 
