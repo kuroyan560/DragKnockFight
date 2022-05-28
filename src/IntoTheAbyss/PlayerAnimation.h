@@ -29,12 +29,20 @@ public:
 
 	void Update();
 
-	void ChangeAnim(const int& AnimStatus)
+	void ChangeAnim(const int& AnimStatus, const bool& AnimReset = false)
 	{
-		if (status == AnimStatus)return;
-		status = AnimStatus;
+		if (status == AnimStatus)
+		{
+			if (AnimReset)
+			{
+				timer = 0;
+				idx = 0;
+			}
+			return;
+		}
 		timer = 0;
 		idx = 0;
+		status = AnimStatus;
 	}
 
 	const int& GetGraphHandle()
@@ -48,5 +56,7 @@ public:
 
 	//‚Ç‚ê‚©‚Ð‚Æ‚Â‚Å‚à“–‚Ä‚Í‚Ü‚Á‚½‚çtrue‚ð•Ô‚·
 	bool Compare(const std::vector<int>& Status);
+
+	const bool& FinishNowAnim() { return animations[status].graph.size() - 1 == idx; }
 };
 

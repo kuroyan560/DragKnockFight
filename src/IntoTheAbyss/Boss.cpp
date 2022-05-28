@@ -33,10 +33,10 @@ Boss::Boss() :CharacterInterFace(SCALE)
 	animations.resize(ANIMAHANDLE_MAX);
 
 	//DEFAULT
-	static const int DEFAULT_NUM = 1;
+	static const int DEFAULT_NUM = 4;
 	animations[DEFAULT].graph.resize(DEFAULT_NUM);
-	animations[DEFAULT].graph[0] = TexHandleMgr::LoadGraph(IronBallRelative + "default.png");
-	animations[DEFAULT].interval = 0;
+	TexHandleMgr::LoadDivGraph(IronBallRelative + "default.png", DEFAULT_NUM, Vec2<int>(DEFAULT_NUM, 1), animations[DEFAULT].graph.data());
+	animations[DEFAULT].interval = 10;
 	animations[DEFAULT].loop = true;
 
 	//EXPLOSION_OPEN
@@ -52,6 +52,13 @@ Boss::Boss() :CharacterInterFace(SCALE)
 	TexHandleMgr::LoadDivGraph(IronBallRelative + "explosion_close.png", EXPLOSION_CLOSE_NUM, Vec2<int>(EXPLOSION_CLOSE_NUM, 1), animations[EXPLOSION_CLOSE].graph.data());
 	animations[EXPLOSION_CLOSE].interval = 5;
 	animations[EXPLOSION_CLOSE].loop = false;
+
+	//CRASH
+	static const int CRASH_NUM = 7;
+	animations[CRASH].graph.resize(CRASH_NUM);
+	TexHandleMgr::LoadDivGraph(IronBallRelative + "crash.png", CRASH_NUM, Vec2<int>(CRASH_NUM, 1), animations[CRASH].graph.data());
+	animations[CRASH].interval = 5;
+	animations[CRASH].loop = false;
 
 	anim = std::make_shared<PlayerAnimation>(animations);
 
@@ -303,6 +310,11 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 #include"D3D12App.h"
 void Boss::OnDraw(const bool& isRoundStartEffect)
 {
+	if (anim->GetNowAnim() == CRASH && anim->FinishNowAnim())
+	{
+		anim->ChangeAnim(DEFAULT);
+	}
+
 	/*===== •`‰æˆ— =====*/
 	//DrawFunc::DrawBox2D(pos - scale - scrollShakeAmount, pos + scale - scrollShakeAmount, Color(230, 38, 113, 255), DXGI_FORMAT_R8G8B8A8_UNORM, true);
 	auto drawPos = pos + stagingDevice.GetShake();
@@ -354,6 +366,11 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 	bossGraph.transform.SetRotate(lAngle);
 	bossGraph.Draw();*/
 
+}
+
+void Boss::OnCrash()
+{
+	anim->ChangeAnim(CRASH, true);
 }
 
 void Boss::Shot(const Vec2<float>& generatePos, const float& forwardAngle, const float& speed)

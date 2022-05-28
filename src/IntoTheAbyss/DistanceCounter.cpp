@@ -83,6 +83,8 @@ void DistanceCounter::Draw()
 {
 
 	/*===== 描画処理 =====*/
+	static const int BLUE_METER = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/meter_blue.png");
+	static const int RED_METER = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/meter_red.png");
 
 	// インデックスごとにずらす量
 	const float INDEX_OFFSET = 62.0f;
@@ -96,6 +98,8 @@ void DistanceCounter::Draw()
 	float rate = 1.0f - (distance / (MAX_SHAKE_DISTANCE * 2.0f));
 	if (rate < 0) rate = 0;
 	rate = KuroMath::Ease(InOut, Exp, rate, 0.0f, 1.0f);
+	float zoom = ScrollMgr::Instance()->zoom;
+	zoom = 1.0f - zoom;
 	for (int index = 0; index < distanceDisitCount; ++index) {
 
 		// 描画する数字。
@@ -103,12 +107,11 @@ void DistanceCounter::Draw()
 
 		if (drawDisit < 0 || 9 < drawDisit) continue;
 
-		float zoom = ScrollMgr::Instance()->zoom;
-		zoom = 1.0f - zoom;
-
 		// 描画する。
-		DrawFunc_FillTex::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * index + OFFSET_X * zoom, 0), Vec2<float>(zoom * exp, zoom * exp), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]), TexHandleMgr::GetTexBuffer(redFontGraph[drawDisit]), rate);
-
+		DrawFunc_FillTex::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * index + OFFSET_X * zoom, 0), 
+			Vec2<float>(zoom * exp, zoom * exp), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]), TexHandleMgr::GetTexBuffer(redFontGraph[drawDisit]), rate);
 	}
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * -1 + OFFSET_X * zoom, -8),
+		Vec2<float>(zoom * exp, zoom * exp), 0, TexHandleMgr::GetTexBuffer(BLUE_METER), TexHandleMgr::GetTexBuffer(RED_METER), rate);
 
 }
