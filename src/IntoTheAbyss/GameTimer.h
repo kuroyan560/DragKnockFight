@@ -93,8 +93,14 @@ private:
 
 	// UIのサイズのオフセット
 	const float OFFSET_SIZE = 0.98;
-	float size;
-	int alpha;
+	float timerSize;
+	int timerAlpha;
+
+	bool isLessThan5SecondsLeft;	// 残り五秒だよフラグ
+
+	// 残り五秒以下のときに真ん中に出すカウントダウン用の変数
+	float centerCountDownSize;
+	int centerCoundDownAlpha;
 
 };
 

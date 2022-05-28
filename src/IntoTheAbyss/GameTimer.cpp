@@ -11,8 +11,11 @@ GameTimer::GameTimer()
 	startFlag = false;
 	timer = -1;
 	flame = -1;
-	size = OFFSET_SIZE;
-	alpha = 255;
+	timerSize = OFFSET_SIZE;
+	timerAlpha = 255;
+	isLessThan5SecondsLeft = false;
+	centerCountDownSize = 0;
+	centerCoundDownAlpha = 0;
 
 	number.resize(12);
 	texSize = { 64,44 };
@@ -34,10 +37,13 @@ void GameTimer::Init(int TIME)
 {
 	startFlag = false;
 	timeUpFlag = false;
+	isLessThan5SecondsLeft = false;
 	timer = TIME;
 	flame = 0;
-	size = OFFSET_SIZE;
-	alpha = 255;
+	timerSize = OFFSET_SIZE;
+	timerAlpha = 255;
+	centerCountDownSize = 0;
+	centerCoundDownAlpha = 0;
 
 
 	countDownNum = 3;
@@ -122,6 +128,11 @@ void GameTimer::Update()
 			if (timer <= 5 && timer != 0) {
 
 				AudioApp::Instance()->PlayWave(countDownSE[timer - 1]);
+				isLessThan5SecondsLeft = true;
+
+				centerCoundDownAlpha = 0;
+				centerCountDownSize = 10.0f;
+
 
 			}
 
@@ -132,8 +143,13 @@ void GameTimer::Update()
 				float rate = (timer - 5.0f) / 5.0f;
 				rate = 1.0f - rate + 0.5f;
 
-				size = 5.0f * rate;
-				alpha = 0;
+				timerSize = 5.0f * rate;
+				timerAlpha = 0;
+
+			}
+			else {
+
+				timerSize = 1.8f;
 
 			}
 
@@ -166,37 +182,84 @@ void GameTimer::Update()
 		}
 	}
 
-	// UIのサイズをデフォルトに近づける。
-	size += (OFFSET_SIZE - size) / 5.0f;
+	// 残り五秒以下だったら
+	if (isLessThan5SecondsLeft) {
 
-	// UIのアルファ値を255に近づける。
-	alpha += (255 - alpha) / 5.0f;
+		// UIのサイズを0に近づける。
+		timerSize += (-timerSize) / 5.0f;
+
+		// UIのアルファ値を0に近づける。
+		timerAlpha += (-timerAlpha) / 5.0f;
+
+		// 残りの時間に応じてサイズに加算する量を足す。
+		float rate = 1.0f - (timer / 5.0f);
+
+		rate *= 1.0f;
+
+		// タイマーが0だったらサイズなどなどを0に近づける
+		if (timer == 0) {
+
+			centerCountDownSize -= centerCountDownSize / 5.0f;
+
+		}
+		else {
+
+			centerCountDownSize += (1.3f + rate - centerCountDownSize) / 5.0f;
+			centerCoundDownAlpha += (255 - centerCoundDownAlpha) / 5.0f;
+
+		}
+
+	}
+	else {
+
+		// UIのサイズをデフォルトに近づける。
+		timerSize += (OFFSET_SIZE - timerSize) / 5.0f;
+
+		// UIのアルファ値を255に近づける。
+		timerAlpha += (255 - timerAlpha) / 5.0f;
+
+	}
 
 }
 
 void GameTimer::Draw()
 {
-	Vec2<float>centralPos;
-	int offset = 0;
-	int offsetY = 15;
-	//分
-	for (int i = 0; i < minitueHandle.size(); i++)
-	{
-		offset = i;
-		centralPos = { timerPos.x + i * texSize.x, timerPos.y + offsetY };
-		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[minitueHandle[i]]), Color(255, 255, 255, alpha));
+
+	// 五秒以下だったら
+	if (isLessThan5SecondsLeft) {
+
+		int num = timer;
+
+		if (num == 0) num = 1;
+
+		DrawFunc::DrawRotaGraph2D(WinApp::Instance()->GetExpandWinCenter(), Vec2<float>(centerCountDownSize, centerCountDownSize), 0, TexHandleMgr::GetTexBuffer(number[num]), Color(255, 255, 255, centerCoundDownAlpha));
+
 	}
+	else {
 
-	++offset;
-	centralPos = { timerPos.x + offset * texSize.x,timerPos.y + offsetY };
-	DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[10]), Color(255, 255, 255, alpha));
-	++offset;
+		Vec2<float>centralPos;
+		int offset = 0;
+		int offsetY = 15;
+		//分
+		for (int i = 0; i < minitueHandle.size(); i++)
+		{
+			offset = i;
+			centralPos = { timerPos.x + i * texSize.x, timerPos.y + offsetY };
+			DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(timerSize, timerSize), 0.0f, TexHandleMgr::GetTexBuffer(number[minitueHandle[i]]), Color(255, 255, 255, timerAlpha));
+		}
 
-	//秒
-	for (int i = 0; i < timeHandle.size(); i++)
-	{
-		centralPos = { timerPos.x + (offset + i) * texSize.x, timerPos.y + offsetY };
-		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[timeHandle[i]]), Color(255, 255, 255, alpha));
+		++offset;
+		centralPos = { timerPos.x + offset * texSize.x,timerPos.y + offsetY };
+		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(timerSize, timerSize), 0.0f, TexHandleMgr::GetTexBuffer(number[10]), Color(255, 255, 255, timerAlpha));
+		++offset;
+
+		//秒
+		for (int i = 0; i < timeHandle.size(); i++)
+		{
+			centralPos = { timerPos.x + (offset + i) * texSize.x, timerPos.y + offsetY };
+			DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(timerSize, timerSize), 0.0f, TexHandleMgr::GetTexBuffer(number[timeHandle[i]]), Color(255, 255, 255, timerAlpha));
+		}
+
 	}
 
 	//float colonPos = timerPos.x + 2 * tex.GetNumTexSize().x;
