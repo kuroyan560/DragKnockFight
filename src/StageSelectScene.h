@@ -38,6 +38,6 @@ public:
 	std::shared_ptr<MaskSceneTransition>changeScene;
 
 	// ステージ番号
-	int stageNum;
+	int stageNum,prevStageNum;
 };
 

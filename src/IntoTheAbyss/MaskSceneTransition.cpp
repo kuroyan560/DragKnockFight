@@ -45,8 +45,8 @@ bool MaskSceneTransition::OnUpdate()
 
 	// âÊëúÇ0Ç…ãﬂÇ√ÇØÇÈÅB
 	expRate = KuroMath::Ease(In, Cubic, t, 0.0f, 1.0f) * 30.0f;
-	//pos.y = initPos.y + KuroMath::Ease(In, Cubic, t, 0.0f, 1.0f) * 40.0f;
-	pos = initPos;
+	pos.x = initPos.x + KuroMath::Ease(In, Cubic, t, 0.0f, 1.0f) * 1050.0f;
+	pos.y = initPos.y + KuroMath::Ease(In, Cubic, t, 0.0f, 1.0f) * 50.0f;
 
 	if (30 <= expRate)
 	{
@@ -62,7 +62,7 @@ void MaskSceneTransition::OnDraw()
 {
 	if (startFlag)
 	{
-		//DrawFunc::DrawRotaGraph2D(windowCenter, Vec2<float>(expRate, expRate), angle, TexHandleMgr::GetTexBuffer(maskHandle));
-		DrawFunc_Mask::DrawGraphByMaskGraph(pos, DrawMapChipForSceneChange::Instance()->mapBuffer, pos, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<float>(expRate, expRate));
+		Vec2<float>initPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
+		DrawFunc_Mask::DrawGraphByMaskGraph(pos, DrawMapChipForSceneChange::Instance()->mapBuffer, initPos, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<float>(expRate, expRate));
 	}
 }

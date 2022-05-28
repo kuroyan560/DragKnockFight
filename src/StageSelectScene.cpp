@@ -31,6 +31,7 @@ void StageSelectScene::OnInitialize()
 	isPrevInputSticlLeft = false;
 
 	DrawMapChipForSceneChange::Instance()->Init(0);
+	prevStageNum = -1;
 }
 
 void StageSelectScene::OnUpdate()
@@ -80,7 +81,6 @@ void StageSelectScene::OnUpdate()
 
 			// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
 			screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
-
 		}
 	}
 	else
@@ -156,11 +156,17 @@ void StageSelectScene::OnUpdate()
 		SelectStage::Instance()->SelectStageNum(stageNum);
 	}
 
+	if (stageNum != prevStageNum)
+	{
+		DrawMapChipForSceneChange::Instance()->Init(stageNum);
+	}
+	prevStageNum = stageNum;
 
 	screenShot.Update();
 	stageSelect.Update();
 	rightArrow.Update(false);
 	leftArrow.Update(true);
+	DrawMapChipForSceneChange::Instance()->Update();
 
 	// 背景のキャラカードの更新処理
 	leftChara.Update();

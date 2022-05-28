@@ -20,6 +20,7 @@ void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, con
 	scrollAmount = honraiScrollAmount;
 
 	resetAmount = scrollAmount;
+	//zoom = INIT_SCROLL;
 	warpFlag = false;
 }
 

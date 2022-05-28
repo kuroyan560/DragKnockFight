@@ -6,7 +6,8 @@
 DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 {
 	auto backBuff = D3D12App::Instance()->GetBackBuffRenderTarget();
-	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), backBuff->GetGraphSize(), L"SceneChangeMapSS");
+	Vec2<int>s(WinApp::Instance()->GetExpandWinSize().x, WinApp::Instance()->GetExpandWinSize().y);
+	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), s, L"SceneChangeMapSS");
 }
 
 void DrawMapChipForSceneChange::Init(int STAGE_NUM)
@@ -16,14 +17,61 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM)
 	stageNum = STAGE_NUM;
 	isSS = true;
 
-	//RoomMapChipArray tmp = *StageMgr::Instance()->GetLocalMap();
-	//Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
-	//ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), { 0.0f,-40.0f });
+	playerPos = StageMgr::Instance()->GetPlayerResponePos(STAGE_NUM, 0);
+	bossPos = StageMgr::Instance()->GetBossResponePos(STAGE_NUM, 0);
+
+	RoomMapChipArray tmp = *StageMgr::Instance()->GetLocalMap();
+	Vec2<float>distance = (bossPos - playerPos) / 2.0f;
+	centralPos = playerPos + distance;
+
+	Vec2<float>mapSize(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE);
+	Vec2<float>adj = { 0.0f,-40.0f };
+
+	ScrollMgr::Instance()->Init(centralPos, mapSize, adj);
 }
 
 void DrawMapChipForSceneChange::Finalize()
 {
 	isSS = false;
+}
+
+void DrawMapChipForSceneChange::Update()
+{
+	//互いの距離でカメラのズーム率を変える。
+	float distance = playerPos.Distance(bossPos);
+
+	//最大距離
+	const float MAX_ADD_ZOOM = 3500.0f;
+
+	float zoomRate = 1.0f;
+	float deadLine = 1200.0f;//この距離以下はズームしない
+
+	// 限界より伸びていたら。
+	if (MAX_ADD_ZOOM < distance)
+	{
+		zoomRate = 1.0f;
+	}
+	else if (deadLine <= distance)
+	{
+		zoomRate = (distance - deadLine) / MAX_ADD_ZOOM;
+	}
+	else
+	{
+		zoomRate = 0.0f;
+	}
+	static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
+	Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
+
+	// カメラのズームが0.27f未満にならないようにする。
+	float minZoomValue = 0.20f;
+	if (Camera::Instance()->zoom < minZoomValue)
+	{
+		Camera::Instance()->zoom = minZoomValue;
+	}
+
+
+	Camera::Instance()->Update();
+	ScrollMgr::Instance()->Update(centralPos);
 }
 
 void DrawMapChipForSceneChange::Draw()
@@ -41,7 +89,7 @@ void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipDa
 	std::map<int, std::vector<ChipData>>datas;
 
 	// 描画するチップのサイズ
-	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * 1.0f;
+	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
 	SizeData wallChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
 
