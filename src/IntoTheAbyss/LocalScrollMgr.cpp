@@ -48,13 +48,7 @@ void LocalScrollMgr::Update(const Vec2<float> &LineCenterPos)
 	Vec2<float> lineCenterOffsetBuff = Vec2<float>((float)windowCenter.x, (float)windowCenter.y) - lineCenterPos;
 
 	// •âŠ®‚ð‚©‚¯‚éB
-	if (camera->active) {
-		lineCenterOffset = lineCenterOffsetBuff;
-	}
-	else {
-		lineCenterOffset += (lineCenterOffsetBuff - lineCenterOffset) / 5.0f;
-	}
-
+	lineCenterOffset = { 512.0f,272.0f };
 }
 
 void LocalScrollMgr::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS)
@@ -99,12 +93,13 @@ void LocalScrollMgr::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> 
 	warpFlag = false;
 }
 
-Vec2<float> LocalScrollMgr::Affect(const Vec2<float> &Pos)
+Vec2<float> LocalScrollMgr::Affect(const Vec2<float> &Pos, const Vec2<float> &AFFECT)
 {
 	Vec2<float> scrollShakeZoom = scrollAmount + ShakeMgr::Instance()->shakeAmount;
 	scrollShakeZoom.x *= zoom;
 	scrollShakeZoom.y *= zoom;
-	return Pos * zoom - scrollShakeZoom + lineCenterOffset + Camera::Instance()->scrollAffect;
+	return Pos * zoom - scrollShakeZoom + lineCenterOffset + AFFECT;
+	//return Pos * zoom - scrollShakeZoom + lineCenterOffset;
 }
 
 void LocalScrollMgr::Warp(const Vec2<float> POS)

@@ -179,6 +179,7 @@ void StageSelectScene::OnUpdate()
 	stageSelect.Update();
 	rightArrow.Update(false);
 	leftArrow.Update(true);
+
 	mapScreenShot[stageNum][STAGE_SELECT].Update();
 	mapScreenShot[stageNum][SCENE_CHANGE].Update();
 

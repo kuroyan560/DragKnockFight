@@ -3,8 +3,8 @@
 #include<vector>
 #include<array>
 #include"ShakeMgr.h"
-#include"LocalCamera.h"
 #include"KuroMath.h"
+//#include"LocalCamera.h"
 
 class LocalScrollMgr
 {
@@ -15,7 +15,7 @@ public:
 	void Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, const Vec2<float> &ADJ);
 	void Update(const Vec2<float> &LineCenterPos);
 	void CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS);
-	Vec2<float>Affect(const Vec2<float> &Pos);//スクロールとズームを適用させるk
+	Vec2<float>Affect(const Vec2<float> &Pos, const Vec2<float> &AFFECT);//スクロールとズームを適用させるk
 
 	void Warp(const Vec2<float> POS);
 	void Reset();
@@ -26,7 +26,7 @@ public:
 
 	Vec2<float> lineCenterOffset;	// 紐の中心を画面の中心に持ってくるためのオフセット 中心からずれていたらこの値を使って中心に持ってくる。
 
-	std::shared_ptr<LocalCamera> camera;
+	//std::shared_ptr<LocalCamera> camera;
 private:
 
 	Vec2<int>windowSize;

@@ -9,8 +9,10 @@ DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 	Vec2<int>s(WinApp::Instance()->GetExpandWinSize().x, WinApp::Instance()->GetExpandWinSize().y);
 	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), backBuff->GetGraphSize(), L"SceneChangeMapSS");
 
-	camera = std::make_shared<LocalCamera>();
-	scroll.camera = camera;
+	//scroll.camera = camera;
+	//camera->scroll = scroll;
+
+	scroll = std::make_shared<LocalScrollMgr>();
 
 	sceneChageFlag = false;
 }
@@ -52,14 +54,12 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG)
 		bossPos.x = tmp[0].size() * MAP_CHIP_SIZE;
 	}
 
-	scroll.Init(centralPos, mapSize, adj);
+	scroll->Init(centralPos, mapSize, adj);
+	camera.Init();
+	camera.Zoom(playerPos, bossPos);
 
-	camera->Init();
-	camera->Zoom(playerPos, bossPos);
 
-
-	scroll.zoom = camera->zoom;
-
+	scroll->zoom = camera.zoom;
 }
 
 void DrawMapChipForSceneChange::Finalize()
@@ -69,8 +69,8 @@ void DrawMapChipForSceneChange::Finalize()
 
 void DrawMapChipForSceneChange::Update()
 {
-	camera->Update();
-	scroll.Update(centralPos);
+	camera.Update(scroll);
+	scroll->Update(centralPos);
 	if (sceneChageFlag)
 	{
 		ScrollMgr::Instance()->Update(centralPos);
@@ -93,7 +93,7 @@ void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipDa
 	std::map<int, std::vector<ChipData>>datas;
 
 	// 描画するチップのサイズ
-	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * scroll.zoom;
+	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * scroll->zoom;
 	SizeData wallChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
 
@@ -113,7 +113,7 @@ void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipDa
 			if (blockFlag)
 			{
 				// スクロール量から描画する位置を求める。
-				const Vec2<float> drawPos = scroll.Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE });
+				const Vec2<float> drawPos = scroll->Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE }, camera.scrollAffect);
 
 				// 画面外だったら描画しない。
 				if (drawPos.x < -DRAW_MAP_CHIP_SIZE || drawPos.x > WinApp::Instance()->GetWinSize().x + DRAW_MAP_CHIP_SIZE) continue;

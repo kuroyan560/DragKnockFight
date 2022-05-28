@@ -12,15 +12,14 @@ void LocalCamera::Init()
 #include"ShakeMgr.h"
 #include"KuroMath.h"
 #include"WinApp.h"
-void LocalCamera::Update()
+void LocalCamera::Update(std::shared_ptr<LocalScrollMgr> SCROLL)
 {
-
-	ScrollMgr::Instance()->zoom = KuroMath::Lerp(ScrollMgr::Instance()->zoom, zoom, lerpAmount);
+	SCROLL->zoom = KuroMath::Lerp(SCROLL->zoom, zoom, lerpAmount);
 
 	if (active)
 	{
 		//描画上の位置を求める
-		const auto targetondraw = ScrollMgr::Instance()->Affect(target);
+		const auto targetondraw = SCROLL->Affect(target, scrollAffect);
 		//画面中央との差分を求める
 		const auto differ = targetondraw - WinApp::Instance()->GetExpandWinCenter() - scrollAffect;
 
@@ -73,12 +72,12 @@ void LocalCamera::Zoom(const Vec2<float> &PLAYER_POS, const Vec2<float> &BOSS_PO
 		zoomRate = 0.0f;
 	}
 	static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
-	Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
+	zoom = 0.5f - zoomRate + ZOOM_OFFSET;
 
 	// カメラのズームが0.20f未満にならないようにする。
 	float minZoomValue = MIN_ZOOM_SIZE;
-	if (Camera::Instance()->zoom < minZoomValue)
+	if (zoom < minZoomValue)
 	{
-		Camera::Instance()->zoom = minZoomValue;
+		zoom = minZoomValue;
 	}
 }
