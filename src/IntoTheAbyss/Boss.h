@@ -35,10 +35,13 @@ public:
 	//‰æ‘œ
 	static const enum AnimHandle
 	{
-		FRONT,
-		BACK,
-		DAMAGE,
-		SWING,
+		//FRONT,
+		//BACK,
+		//DAMAGE,
+		//SWING,
+		DEFAULT,
+		EXPLOSION_OPEN,
+		EXPLOSION_CLOSE,
 		ANIMAHANDLE_MAX
 	};
 	int afterImgageTimer;
