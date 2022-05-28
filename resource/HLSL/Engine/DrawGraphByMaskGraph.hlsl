@@ -48,7 +48,7 @@ void GSmain(
     
     float width_h = maskTexSize.x / 2.0f * input[0].maskExp.x;
     float height_h = maskTexSize.y / 2.0f * input[0].maskExp.y;
-    float2 uvOffset = (input[0].center.xy - input[0].maskCenter.xy) / -maskTexSize;
+    float2 uvOffset = (input[0].center.xy - input[0].maskCenter.xy) / -(maskTexSize * input[0].maskExp);
     
     GSOutput element;
     
@@ -60,7 +60,9 @@ void GSmain(
     float2 leftBottomUV = float2(0.0f + input[0].mirror.x, 1.0f - input[0].mirror.y);
     element.maskUv = leftBottomUV - uvOffset;
     element.texUv = leftBottomUV + uvOffset;
-    element.texUv *= texSize / (maskTexSize * input[0].maskExp);
+    float differRate = (maskTexSize * input[0].maskExp - maskTexSize) / maskTexSize;
+    element.texUv.x += (1.0f - input[0].maskExp) * 0.5f;
+    element.texUv.y -= (1.0f - input[0].maskExp) * 0.5f;
     output.Append(element);
     
     //ç∂è„
@@ -71,7 +73,8 @@ void GSmain(
     float2 leftUpUV = float2(0.0f + input[0].mirror.x, 0.0f + input[0].mirror.y);
     element.maskUv = leftUpUV - uvOffset;
     element.texUv = leftUpUV + uvOffset;
-    element.texUv *= texSize / (maskTexSize * input[0].maskExp);
+    element.texUv.x +=(1.0f - input[0].maskExp) * 0.5f;
+    element.texUv.y += (1.0f - input[0].maskExp) * 0.5f;
     output.Append(element);
     
      //âEâ∫
@@ -82,7 +85,8 @@ void GSmain(
     float2 rightBottomUV = float2(1.0f - input[0].mirror.x, 1.0f - input[0].mirror.y);
     element.maskUv = rightBottomUV - uvOffset;
     element.texUv = rightBottomUV + uvOffset;
-    element.texUv *= texSize / (maskTexSize * input[0].maskExp);
+    element.texUv.x -= (1.0f - input[0].maskExp) * 0.5f;
+    element.texUv.y -= (1.0f - input[0].maskExp) * 0.5f;
     output.Append(element);
     
     //âEè„
@@ -93,7 +97,8 @@ void GSmain(
     float2 rightUpUV = float2(1.0f - input[0].mirror.x, 0.0f + input[0].mirror.y);
     element.maskUv = rightUpUV - uvOffset;
     element.texUv = rightUpUV + uvOffset;
-    element.texUv *= texSize / (maskTexSize * input[0].maskExp);
+    element.texUv.x -= (1.0f - input[0].maskExp) * 0.5f;
+    element.texUv.y += (1.0f - input[0].maskExp) * 0.5f;
     output.Append(element);
 }
 
