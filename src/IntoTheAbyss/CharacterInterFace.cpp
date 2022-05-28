@@ -1109,62 +1109,6 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 			}
 		}
 
-		// ラウンド終了時のフラグが立っていたらすべてのブロックを破壊する状態にする。
-		if (isRoundFinish) {
-
-			const int HITCHIP_INDEX = hitChipIndex.size();
-
-			for (int index = 0; index < HITCHIP_INDEX; ++index) {
-
-				// ブロックを破壊する。
-				if (0 < hitChipIndex[index].x && hitChipIndex[index].x < MapData[0].size() - 1 && 0 < hitChipIndex[index].y && hitChipIndex[index].y < MapData.size() - 1) {
-
-					StageMgr::Instance()->WriteMapChipData(hitChipIndex[index], 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
-
-					// クラッシュさせる。
-					Crash(Vec2<float>(0, 0), 0);
-
-					// 左があるか？
-					if (0 < hitChipIndex[index].x - 1)
-					{
-						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, 0), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
-
-						// クラッシュさせる。
-						Crash(Vec2<float>(0, 0), 0);
-					}
-					// 右があるか？
-					if (hitChipIndex[index].x + 1 < MapData[0].size() - 1)
-					{
-						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, 0), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
-
-						// クラッシュさせる。
-						Crash(Vec2<float>(0, 0), 0);
-					}
-					// 上があるか？
-					if (0 < hitChipIndex[index].y - 1)
-					{
-						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, -1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
-
-						// クラッシュさせる。
-						Crash(Vec2<float>(0, 0), 0);
-					}
-					// 下があるか？
-					if (hitChipIndex[index].y + 1 < MapData.size() - 1)
-					{
-						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, 1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
-
-						// クラッシュさせる。
-						Crash(Vec2<float>(0, 0), 0);
-					}
-
-				}
-
-			}
-
-		}
-
-
-
 		const int HITCHIP_INDEX = hitChipIndex.size();
 
 		if (team == WHICH_TEAM::RIGHT_TEAM) {
@@ -1205,6 +1149,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 				}
 
+				// 壊れないブロックに触れたらスイングを終える。
 				if (!unBlockFlag) {
 					partner.lock()->FinishSwing();
 				}

@@ -36,7 +36,7 @@ void RoundCount::Generate(const Vec2<float>& Pos)
 	isActive = true;
 	isFill = false;
 	angle = 0;
-	exp = { 10,10 };
+	exp = { 20,20 };
 	alpha = 0;
 
 }
