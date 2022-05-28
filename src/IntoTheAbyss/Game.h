@@ -136,6 +136,7 @@ class Game
 	std::unique_ptr<BossHandMgr> playerHandMgr;
 
 	std::shared_ptr<MapChipGenerator_ChangeMap>mapChipGenerator;
+	std::shared_ptr<MapChipGenerator_SplineOrbit>mapChipGeneratorOrbit;
 
 	BlockCount countBlock;
 

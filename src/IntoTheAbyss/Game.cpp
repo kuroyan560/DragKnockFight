@@ -412,6 +412,7 @@ Game::Game()
 	}
 
 	mapChipGenerator = std::make_shared<MapChipGenerator_ChangeMap>();
+	mapChipGeneratorOrbit = std::make_shared<MapChipGenerator_SplineOrbit>();
 
 }
 
@@ -440,7 +441,7 @@ void Game::Init(const bool& PracticeMode)
 
 	DistanceCounter::Instance()->Init();
 	RoundCountMgr::Instance()->Init(SelectStage::Instance()->GetRoomNum());
-
+	mapChipGeneratorOrbit->Init();
 }
 
 void Game::Update(const bool& Loop)
@@ -519,6 +520,10 @@ void Game::Update(const bool& Loop)
 	{
 		DebugParameter::Instance()->timer++;
 		mapChipGenerator->Update();
+		if (DebugParameter::Instance()->orbitGenerator)
+		{
+			mapChipGeneratorOrbit->Update();
+		}
 	}
 
 
@@ -691,6 +696,10 @@ void Game::Draw()
 	if (roundChangeEffect.initGameFlag)
 	{
 		mapChipGenerator->Draw();
+		if (DebugParameter::Instance()->orbitGenerator)
+		{
+			mapChipGeneratorOrbit->Draw();
+		}
 
 		// 左のキャラ ~ 右のキャラ間に線を描画
 		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);
@@ -725,11 +734,41 @@ void Game::Draw()
 
 	//screenEdgeEffect.Draw();
 
+		//右スティックチュートリアル
+	static bool TUTORIAL_GRAPH_LOAD = false;
+	static int TUTORIAL_FRAME;
+	static std::array<int, 3> R_STICK_TUTORIAL;
+	static Anim R_STICK_ANIM_MEM;
+	if (!TUTORIAL_GRAPH_LOAD)
+	{
+		TUTORIAL_FRAME = TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/icon_frame.png");
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/tutorial/r_stick.png", 3, { 3,1 }, R_STICK_TUTORIAL.data());
+		for (int i = 0; i < R_STICK_TUTORIAL.size(); ++i)
+		{
+			R_STICK_ANIM_MEM.graph.emplace_back(R_STICK_TUTORIAL[i]);
+		}
+		R_STICK_ANIM_MEM.interval = 15;
+		R_STICK_ANIM_MEM.loop = true;
+		TUTORIAL_GRAPH_LOAD = true;
+	}
+	static PlayerAnimation R_STICK_ANIM({ R_STICK_ANIM_MEM });
+
 	if (roundChangeEffect.initGameFlag && !roundFinishFlag)
 	{
 		CharacterManager::Instance()->Left()->DrawUI();
 		CharacterManager::Instance()->Right()->DrawUI();
+
+		if (stageNum == 0)
+		{
+			R_STICK_ANIM.Update();
+			Vec2<float>drawPos = CharacterManager::Instance()->Right()->pos + Vec2<float>(0, -160);
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + Vec2<float>(3, -12.5f)),
+				{ 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(R_STICK_ANIM.GetGraphHandle()));
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos),
+				{ 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(TUTORIAL_FRAME));
+		}
 	}
+
 
 	GameTimer::Instance()->Draw();
 	ScoreManager::Instance()->Draw();
@@ -1259,7 +1298,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 				gameTimer = StageMgr::Instance()->GetMaxTime(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 				GameTimer::Instance()->Init(gameTimer);
 				GameTimer::Instance()->Start();
-			
+				mapChipGeneratorOrbit->Init();
 			}
 
 			drawCharaFlag = true;
