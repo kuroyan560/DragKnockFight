@@ -245,8 +245,8 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 
 		}
 
-
 		INIT = true;
+
 	};
 
 	const int generateNum = KuroFunc::GetRand(GENERATE_NUM_MIN, GENERATE_NUM_MAX);

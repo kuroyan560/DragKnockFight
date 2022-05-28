@@ -113,7 +113,7 @@ void BlockCount::Draw()
 std::vector<int> BlockCount::CountNumber(int TIME)
 {
 	float score = TIME;
-	std::vector<int> Number(KuroFunc::GetDigit(countAllBlockNum));
+	std::vector<int> Number(KuroFunc::GetDigit(TIME));
 
 	int tmp = score;
 	//�X�R�A�v�Z
