@@ -209,6 +209,7 @@ void StageSelectScene::OnDraw()
 	rightChara.Draw();
 
 	DrawMapChipForSceneChange::Instance()->Draw();
+
 }
 
 void StageSelectScene::OnImguiDebug()

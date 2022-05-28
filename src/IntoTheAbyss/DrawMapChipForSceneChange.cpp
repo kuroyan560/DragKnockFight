@@ -7,7 +7,7 @@ DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 {
 	auto backBuff = D3D12App::Instance()->GetBackBuffRenderTarget();
 	Vec2<int>s(WinApp::Instance()->GetExpandWinSize().x, WinApp::Instance()->GetExpandWinSize().y);
-	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), s, L"SceneChangeMapSS");
+	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), backBuff->GetGraphSize(), L"SceneChangeMapSS");
 }
 
 void DrawMapChipForSceneChange::Init(int STAGE_NUM)
@@ -26,8 +26,12 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM)
 
 	Vec2<float>mapSize(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE);
 	Vec2<float>adj = { 0.0f,-40.0f };
-
 	ScrollMgr::Instance()->Init(centralPos, mapSize, adj);
+
+	Camera::Instance()->Init();
+	Camera::Instance()->Zoom(playerPos, bossPos);
+
+	ScrollMgr::Instance()->zoom = Camera::Instance()->zoom;
 }
 
 void DrawMapChipForSceneChange::Finalize()
@@ -37,41 +41,9 @@ void DrawMapChipForSceneChange::Finalize()
 
 void DrawMapChipForSceneChange::Update()
 {
-	//互いの距離でカメラのズーム率を変える。
-	float distance = playerPos.Distance(bossPos);
-
-	//最大距離
-	const float MAX_ADD_ZOOM = 3500.0f;
-
-	float zoomRate = 1.0f;
-	float deadLine = 1200.0f;//この距離以下はズームしない
-
-	// 限界より伸びていたら。
-	if (MAX_ADD_ZOOM < distance)
-	{
-		zoomRate = 1.0f;
-	}
-	else if (deadLine <= distance)
-	{
-		zoomRate = (distance - deadLine) / MAX_ADD_ZOOM;
-	}
-	else
-	{
-		zoomRate = 0.0f;
-	}
-	static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
-	Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
-
-	// カメラのズームが0.27f未満にならないようにする。
-	float minZoomValue = 0.20f;
-	if (Camera::Instance()->zoom < minZoomValue)
-	{
-		Camera::Instance()->zoom = minZoomValue;
-	}
-
-
 	Camera::Instance()->Update();
 	ScrollMgr::Instance()->Update(centralPos);
+	//ScrollMgr::Instance()->Update(Vec2<float>(1575.0f, 225.0f));
 }
 
 void DrawMapChipForSceneChange::Draw()
@@ -81,6 +53,7 @@ void DrawMapChipForSceneChange::Draw()
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		KuroEngine::Instance().Graphics().ClearRenderTarget({ mapBuffer });
 		DrawMapChip(*StageMgr::Instance()->GetLocalMap(), *StageMgr::Instance()->GetLocalDrawMap(), stageNum, 0);
+		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	}
 }
 

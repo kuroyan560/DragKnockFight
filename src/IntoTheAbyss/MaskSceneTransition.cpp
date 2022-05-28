@@ -31,7 +31,7 @@ void MaskSceneTransition::OnStart()
 
 bool MaskSceneTransition::OnUpdate()
 {
-	Vec2<float>initPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
+	Vec2<float>initPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x - 35.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y-2.0f));
 
 
 	if (t <= 1.0f)
@@ -48,6 +48,10 @@ bool MaskSceneTransition::OnUpdate()
 	pos.x = initPos.x + KuroMath::Ease(In, Cubic, t, 0.0f, 1.0f) * 1050.0f;
 	pos.y = initPos.y + KuroMath::Ease(In, Cubic, t, 0.0f, 1.0f) * 50.0f;
 
+	backGroundPos.x = initPos.x;
+	backGroundPos.y = initPos.y;
+
+
 	if (30 <= expRate)
 	{
 		expRate = 0;
@@ -62,7 +66,6 @@ void MaskSceneTransition::OnDraw()
 {
 	if (startFlag)
 	{
-		Vec2<float>initPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
-		DrawFunc_Mask::DrawGraphByMaskGraph(pos, DrawMapChipForSceneChange::Instance()->mapBuffer, initPos, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<float>(expRate, expRate));
+		DrawFunc_Mask::DrawGraphByMaskGraph(pos, DrawMapChipForSceneChange::Instance()->mapBuffer, backGroundPos, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<float>(expRate, expRate));
 	}
 }

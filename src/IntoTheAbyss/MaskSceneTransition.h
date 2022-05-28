@@ -16,5 +16,5 @@ class MaskSceneTransition : public SceneTransition{
 	float t;
 	bool startFlag;
 
-	Vec2<float>pos;
+	Vec2<float>pos, backGroundPos;
 };

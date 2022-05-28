@@ -47,3 +47,38 @@ void Camera::Focus(const Vec2<float>& TargetPos, const float& Zoom, const float&
 	active = 1;
 	lerpAmount = LerpAmount;
 }
+
+void Camera::Zoom(const Vec2<float> &PLAYER_POS, const Vec2<float> BOSS_POS)
+{
+	//互いの距離でカメラのズーム率を変える。
+	float distance = PLAYER_POS.Distance(BOSS_POS);
+
+	//最大距離
+	const float MAX_ADD_ZOOM = 3500.0f;
+
+	float zoomRate = 1.0f;
+	float deadLine = 1200.0f;//この距離以下はズームしない
+
+	// 限界より伸びていたら。
+	if (MAX_ADD_ZOOM < distance)
+	{
+		zoomRate = 1.0f;
+	}
+	else if (deadLine <= distance)
+	{
+		zoomRate = (distance - deadLine) / MAX_ADD_ZOOM;
+	}
+	else
+	{
+		zoomRate = 0.0f;
+	}
+	static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
+	Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
+
+	// カメラのズームが0.27f未満にならないようにする。
+	float minZoomValue = 0.20f;
+	if (Camera::Instance()->zoom < minZoomValue)
+	{
+		Camera::Instance()->zoom = minZoomValue;
+	}
+}

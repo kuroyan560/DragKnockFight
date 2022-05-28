@@ -308,12 +308,15 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	// 紐を伸ばす。
 	CharacterManager::Instance()->Right()->addLineLength = addLength;
 
-
-	Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
+	Camera::Instance()->Init();
+	Vec2<float>distance = (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos) / 2.0f;
 	ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
 
+	Camera::Instance()->Zoom(CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Right()->pos);
+	ScrollMgr::Instance()->zoom = Camera::Instance()->zoom;
+
 	gameTimer = StageMgr::Instance()->GetMaxTime(stageNum, roomNum);
-	Camera::Instance()->Init();
+
 	ScoreManager::Instance()->Init();
 	GameTimer::Instance()->Init(gameTimer);
 	GameTimer::Instance()->Start();
@@ -608,8 +611,8 @@ void Game::Update(const bool& Loop)
 	// スクロール量の更新処理
 	//ScrollManager::Instance()->Update();
 	Camera::Instance()->Update();
-	Vec2<float> distance = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos;
-	Vec2<float>cPos = CharacterManager::Instance()->Left()->pos - distance / 2.0f;
+	Vec2<float> distance = CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos;
+	Vec2<float>cPos = CharacterManager::Instance()->Left()->pos + distance / 2.0f;
 	ScrollMgr::Instance()->Update(cPos);
 
 	//パーティクル更新
@@ -644,39 +647,9 @@ void Game::Update(const bool& Loop)
 	CharacterManager::Instance()->Right()->HealStamina(healAmount);
 
 
-	if (!Camera::Instance()->Active()) {
-
-		//互いの距離でカメラのズーム率を変える。
-		float distance = CharacterManager::Instance()->Left()->pos.Distance(CharacterManager::Instance()->Right()->pos);
-
-		//最大距離
-		const float MAX_ADD_ZOOM = 3500.0f;
-
-		float zoomRate = 1.0f;
-		float deadLine = 1200.0f;//この距離以下はズームしない
-
-		// 限界より伸びていたら。
-		if (MAX_ADD_ZOOM < distance)
-		{
-			zoomRate = 1.0f;
-		}
-		else if (deadLine <= distance)
-		{
-			zoomRate = (distance - deadLine) / MAX_ADD_ZOOM;
-		}
-		else
-		{
-			zoomRate = 0.0f;
-		}
-		static const float ZOOM_OFFSET = -0.01f;		// デフォルトで少しだけカメラを引き気味にする。
-		Camera::Instance()->zoom = 0.5f - zoomRate + ZOOM_OFFSET;
-
-		// カメラのズームが0.27f未満にならないようにする。
-		float minZoomValue = 0.20f;
-		if (Camera::Instance()->zoom < minZoomValue)
-		{
-			Camera::Instance()->zoom = minZoomValue;
-		}
+	if (!Camera::Instance()->Active())
+	{
+		Camera::Instance()->Zoom(CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Right()->pos);
 	}
 	//else {
 
