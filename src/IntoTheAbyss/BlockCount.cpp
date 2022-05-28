@@ -22,6 +22,8 @@ void BlockCount::Update()
 {
 	countNowBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
 	nowNumber = CountNumber(countNowBlockNum);
+	countAllBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
+	maxNumber = CountNumber(countAllBlockNum);
 
 	basePos = { 1280.0f / 2.0f,90.0f };
 }

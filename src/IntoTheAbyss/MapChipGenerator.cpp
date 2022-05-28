@@ -227,7 +227,7 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 		}
 
 		// …•½‚’¼‚È‚â‚Â‚Å‚Ç‚±‚Ü‚ÅL‚Î‚·‚©‚Ì’l
-		static const int HORI_VERT_LENGTH = 30;
+		static const int HORI_VERT_LENGTH = 60;
 
 		// …•½‚È‚â‚Â
 		for (int index = -HORI_VERT_LENGTH; index < HORI_VERT_LENGTH; ++index) {
