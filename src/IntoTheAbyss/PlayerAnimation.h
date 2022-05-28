@@ -11,12 +11,12 @@ struct Anim
 
 class PlayerAnimation
 {
-	int status;
+	int status = 0;
 
 	std::vector<Anim>animations;
 
-	int idx;	//画像インデックス
-	float timer;	//時間計測
+	int idx = 0;	//画像インデックス
+	float timer = 0;	//時間計測
 
 public:
 	PlayerAnimation(const std::vector<Anim>& Anims);

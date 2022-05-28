@@ -144,5 +144,7 @@ public:
 
 	float canDestroyBounceVel;
 	float addLineLengthSubAmount;
+
+	bool orbitGenerator;
 };
 

@@ -50,6 +50,8 @@ DebugParameter::DebugParameter()
 
 	canDestroyBounceVel = 2.0f;
 	addLineLengthSubAmount = 5.0f;
+
+	orbitGenerator = false;
 }
 
 void DebugParameter::Update()
@@ -112,14 +114,7 @@ void DebugParameter::DrawImGui()
 	{
 		ImGui::Begin("Paramters");
 
-		int sec = timer / 60;
-		int min = sec / 60;
-		sec -= min * 60;
-		ImGui::Text("Timer %d : %d", min, sec);
-		ImGui::Text("TotalCombo %d", totalCombo);
-
-		ImGui::Separator();
-
+		ImGui::Checkbox("OrbitGenerator", &orbitGenerator);
 		ImGui::Checkbox("PlayerCheckHit", &hitPlayer);
 
 		ImGui::Separator();
