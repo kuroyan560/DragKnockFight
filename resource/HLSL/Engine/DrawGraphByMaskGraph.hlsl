@@ -60,7 +60,9 @@ void GSmain(
     float2 leftBottomUV = float2(0.0f + input[0].mirror.x, 1.0f - input[0].mirror.y);
     element.maskUv = leftBottomUV - uvOffset;
     element.texUv = leftBottomUV + uvOffset;
-    element.texUv *= texSize / (maskTexSize * (1.0f - input[0].maskExp));
+    float differRate = (maskTexSize * input[0].maskExp - maskTexSize) / maskTexSize;
+    element.texUv.x += (1.0f - input[0].maskExp) * 0.5f;
+    element.texUv.y -= (1.0f - input[0].maskExp) * 0.5f;
     output.Append(element);
     
     //ç∂è„
@@ -71,7 +73,8 @@ void GSmain(
     float2 leftUpUV = float2(0.0f + input[0].mirror.x, 0.0f + input[0].mirror.y);
     element.maskUv = leftUpUV - uvOffset;
     element.texUv = leftUpUV + uvOffset;
-    element.texUv *= texSize / (maskTexSize * (1.0f - input[0].maskExp));
+    element.texUv.x +=(1.0f - input[0].maskExp) * 0.5f;
+    element.texUv.y += (1.0f - input[0].maskExp) * 0.5f;
     output.Append(element);
     
      //âEâ∫
@@ -82,7 +85,8 @@ void GSmain(
     float2 rightBottomUV = float2(1.0f - input[0].mirror.x, 1.0f - input[0].mirror.y);
     element.maskUv = rightBottomUV - uvOffset;
     element.texUv = rightBottomUV + uvOffset;
-    element.texUv *= texSize / (maskTexSize * (1.0f - input[0].maskExp));
+    element.texUv.x -= (1.0f - input[0].maskExp) * 0.5f;
+    element.texUv.y -= (1.0f - input[0].maskExp) * 0.5f;
     output.Append(element);
     
     //âEè„
@@ -93,7 +97,8 @@ void GSmain(
     float2 rightUpUV = float2(1.0f - input[0].mirror.x, 0.0f + input[0].mirror.y);
     element.maskUv = rightUpUV - uvOffset;
     element.texUv = rightUpUV + uvOffset;
-    element.texUv *= texSize / (maskTexSize * (1.0f - input[0].maskExp));
+    element.texUv.x -= (1.0f - input[0].maskExp) * 0.5f;
+    element.texUv.y += (1.0f - input[0].maskExp) * 0.5f;
     output.Append(element);
 }
 
@@ -103,6 +108,11 @@ float4 PSmain(GSOutput input) : SV_TARGET
     clip(step(input.pos.x, 1.0f));
     clip(step(0.0f, input.pos.y));
     clip(step(input.pos.y, 1.0f));
+    
+    clip(input.texUv.x < 0.0f);
+    clip(1.0f < input.texUv.x);
+    clip(input.texUv.y < 0.0f);
+    clip(1.0f < input.texUv.y);
     
     float4 maskCol = maskTex.Sample(smp, input.maskUv);
     float4 texCol = tex.Sample(smp, input.texUv);
