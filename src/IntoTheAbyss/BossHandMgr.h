@@ -27,6 +27,7 @@ public:
 	HandData leftHandData, rightHandData;
 	bool holdFlag;
 	bool lockOnFlag;
+	bool drawHandFlag;
 
 	Vec2<float>centralPos, targetPos, nowSwingVec;
 

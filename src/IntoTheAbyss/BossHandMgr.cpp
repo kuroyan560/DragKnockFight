@@ -7,6 +7,7 @@
 BossHandMgr::BossHandMgr(int L_DEFAULT_HANDLE, int R_DEFAULT_HANDLE, int L_HOLD_HANDLE, int R_HOLD_HANDLE, bool SHAKE_FLAG) :
 	leftHand(std::make_unique<BossHand>(L_DEFAULT_HANDLE, L_HOLD_HANDLE, SHAKE_FLAG)), rightHand(std::make_unique<BossHand>(R_DEFAULT_HANDLE, R_HOLD_HANDLE, SHAKE_FLAG))
 {
+	drawHandFlag = SHAKE_FLAG;
 }
 
 void BossHandMgr::Init(bool DEBUG)
@@ -172,6 +173,11 @@ void BossHandMgr::Update(const Vec2<float> &POS)
 
 void BossHandMgr::Draw()
 {
+	if (drawHandFlag)
+	{
+		return;
+	}
+
 	if (debugFlag)
 	{
 		leftHand->Draw(false);
