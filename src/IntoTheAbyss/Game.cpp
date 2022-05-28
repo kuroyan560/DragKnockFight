@@ -52,6 +52,7 @@
 #include "DistanceCounter.h"
 
 #include"ScoreKeep.h"
+#include "RoundCountMgr.h"
 
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
@@ -435,6 +436,8 @@ void Game::Init(const bool& PracticeMode)
 	stageRap.Init(StageMgr::Instance()->GetMaxLap(SelectStage::Instance()->GetStageNum()));
 
 	DistanceCounter::Instance()->Init();
+	RoundCountMgr::Instance()->Init(SelectStage::Instance()->GetRoomNum());
+
 }
 
 void Game::Update(const bool& Loop)
@@ -712,6 +715,9 @@ void Game::Update(const bool& Loop)
 	// 紐の距離を計算するクラスを更新する。
 	DistanceCounter::Instance()->Update();
 
+	// ラウンド数のUIを更新。
+	RoundCountMgr::Instance()->Update();
+
 }
 
 void Game::Draw()
@@ -826,6 +832,9 @@ void Game::Draw()
 
 	// ラウンド終了時の演出を描画。
 	RoundFinishEffect::Instance()->Draw();
+
+	// ラウンド数のUIを描画
+	RoundCountMgr::Instance()->Draw();
 
 }
 
@@ -1321,6 +1330,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 				gameTimer = StageMgr::Instance()->GetMaxTime(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 				GameTimer::Instance()->Init(gameTimer);
 				GameTimer::Instance()->Start();
+			
 			}
 
 			drawCharaFlag = true;

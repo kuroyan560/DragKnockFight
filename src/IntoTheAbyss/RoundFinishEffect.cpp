@@ -10,6 +10,7 @@
 #include"SelectStage.h"
 #include"EavaluationDataMgr.h"
 #include <IntoTheAbyss/Boss.h>
+#include "RoundCountMgr.h"
 
 RoundFinishEffect::RoundFinishEffect()
 {
@@ -183,6 +184,9 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			ScoreManager::Instance()->AddDestroyPoint();
 			UsersInput::Instance()->ShakeController(0, 0.5f, 12);
+
+			// ラウンド数のUIを更新。
+			RoundCountMgr::Instance()->RoundIncrement();
 
 		}
 		else if (timer < NUM3_ENEMY_EXP_TIMER / 2.0f) {
