@@ -11,7 +11,7 @@ GameTimer::GameTimer()
 	startFlag = false;
 	timer = -1;
 	flame = -1;
-	timerSize = OFFSET_SIZE;
+	timerSize = 0;
 	timerAlpha = 255;
 	isLessThan5SecondsLeft = false;
 	centerCountDownSize = 0;
@@ -40,7 +40,7 @@ void GameTimer::Init(int TIME)
 	isLessThan5SecondsLeft = false;
 	timer = TIME;
 	flame = 0;
-	timerSize = OFFSET_SIZE;
+	timerSize = 0;
 	timerAlpha = 255;
 	centerCountDownSize = 0;
 	centerCoundDownAlpha = 0;
@@ -102,7 +102,22 @@ void GameTimer::Finalize()
 
 void GameTimer::Update()
 {
-	if (interruput)return;
+	if (interruput) {
+
+		// タイマーが計測していない間はサイズを0に近づける。
+		
+		// UIのサイズを0に近づける。
+		timerSize += ( - timerSize) / 5.0f;
+
+		// UIのアルファ値を0に近づける。
+		timerAlpha += ( - timerAlpha) / 5.0f;
+
+		centerCountDownSize -= centerCountDownSize / 5.0f;
+		centerCoundDownAlpha -= centerCoundDownAlpha / 5.0f;
+
+		return;
+
+	}
 
 	startFlag = countDownFlag;
 	if (startFlag && !timeUpFlag)

@@ -1208,7 +1208,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 		CharacterManager::Instance()->Right()->SetHitCheck(false);
 
 		//時間計測ストップ
-		//GameTimer::Instance()->SetInterruput(true);
+		GameTimer::Instance()->SetInterruput(true);
 
 		RoundFinishEffect::Instance()->Update(DistanceCounter::Instance()->lineCenterPos);
 
