@@ -7,6 +7,7 @@
 #include<memory>
 #include"LocalScrollMgr.h"
 #include"LocalCamera.h"
+#include"CRT.h"
 
 class DrawMapChipForSceneChange
 {
@@ -37,4 +38,5 @@ private:
 	RoomMapChipArray mapChip;
 	RoomMapChipDrawArray mapChipDraw;
 
+	CRT crt;
 };

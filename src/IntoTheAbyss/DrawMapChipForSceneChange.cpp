@@ -86,6 +86,9 @@ void DrawMapChipForSceneChange::Draw()
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		KuroEngine::Instance().Graphics().ClearRenderTarget({ mapBuffer });
 		DrawMapChip(mapChip, mapChipDraw, stageNum, 0);
+		//crt.Register(mapBuffer);
+		//KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
+		//crt.DrawResult(AlphaBlendMode_None);
 		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	}
 }
