@@ -160,6 +160,15 @@ void MapChipGenerator_SplineOrbit::Draw()
 	{
 		DrawFunc::DrawCircle2D(drawPos, drawRadius, Color(47, 255, 139, 255), false, 3);
 	}
+
+	Color color(255, 255, 255, 255);
+
+	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(targetPos[1]), ScrollMgr::Instance()->Affect(targetPos[2]), color);
+	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(targetPos[2]), ScrollMgr::Instance()->Affect(targetPos[3]), color);
+	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(targetPos[1]), drawRadius, color);
+	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(targetPos[2]), drawRadius, color);
+	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(targetPos[3]), drawRadius, color);
+
 }
 
 int MapChipGenerator_RandPattern::GetRandSpan()
