@@ -150,7 +150,7 @@ void BackGroundParticle::Draw()
 
 	/*===== 描画処理 =====*/
 
-	static const int STAR_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/star.png");
+	static const int STAR_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/back_star.png");
 
 	// 描画するリサージュ曲線のいちを求める。
 	float lissajousMove = 50.0f;
