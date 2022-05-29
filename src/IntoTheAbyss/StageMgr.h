@@ -147,7 +147,7 @@ public:
 	/// <param name="ROOM_NUMBER">小部屋番号</param>
 	/// <param name="DOOR_NUMBER">ドア番号</param>
 	/// <returns>次に向かう小部屋番号</returns>
-	const int &GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER);
+	//const int &GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER);
 
 	/// <summary>
 	/// マップチップ領域の情報を返します
@@ -165,7 +165,7 @@ public:
 	/// <returns>チップ番号</returns>
 	inline const int &GetMapChipBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const Vec2<float> &MAPCHIP_POS)
 	{
-		RoomMapChipArray tmp = allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
+		RoomMapChipArray tmp = stageInfos[STAGE_NUMBER][ROOM_NUMBER].mapChipData;
 
 		Vec2<int>mapChipPos;
 		mapChipPos.x = MAPCHIP_POS.x;
@@ -195,7 +195,7 @@ public:
 
 	inline const bool &IsItWallIn(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_POS)
 	{
-		if (allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_POS.y][MAPCHIP_POS.x].handle == mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN])
+		if (stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_POS.y][MAPCHIP_POS.x].handle == mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN])
 		{
 			return true;
 		}
@@ -212,7 +212,7 @@ public:
 	/// <returns>小部屋の数</returns>
 	inline const int &GetMaxRoomNumber(const int &STAGE_NUMBER)
 	{
-		return allMapChipData[STAGE_NUMBER].size();
+		return stageInfos[STAGE_NUMBER].size();
 	}
 
 	/// <summary>
@@ -221,7 +221,7 @@ public:
 	/// <returns></returns>
 	inline const int &GetMaxStageNumber()
 	{
-		return allMapChipData.size();
+		return stageInfos.size();
 	}
 
 	std::vector<std::shared_ptr<MapChipAnimationData>> animationData;//マップチップのアニメーション情報の一覧
@@ -288,11 +288,8 @@ private:
 	[2]...Y軸
 	[3]...X軸
 	*/
-	std::vector<StageMapChipData> allMapChipData;	//ゲーム内にある全てのステージのマップチップデータ
-	std::vector<StageRelationData> relationRoomData;//ゲーム内にある全てのステージの小部屋同士のリンク付け
 	std::array<SizeData, MAPCHIP_TYPE_MAX> mapChipMemoryData;//マップチップ番号の領域
 
-	std::vector<StageMapChipDrawData> allMapChipDrawData;//マップチップの描画情報
 	static const int SECRET_DOOR_NUMBER = 5;
 
 	RoomMapChipArray localRoomMapChipArray;
@@ -305,9 +302,14 @@ private:
 	array<int, 3> gimmcikGraphHandle;
 	array<int, 12> sparkGraphHandle;
 
-
-	std::vector<std::vector<int>> swingCount;
-	std::vector<std::vector<int>> gameMaxTimer;
+	struct StageInfo
+	{
+		RoomMapChipArray mapChipData;
+		RoomMapChipDrawArray mapChipDrawData;
+		int swingCount = 0;
+		int gameMaxTimer = 60;
+	};
+	std::vector<std::vector<StageInfo>>stageInfos;
 
 	enum MapChipDrawEnum
 	{
@@ -408,7 +410,7 @@ public:
 	//マップのインデックスのサイズを取得
 	Vec2<int>GetMapIdxSize(const int& StageNum, const int& RoomNum)
 	{
-		return Vec2<int>(allMapChipData[StageNum][RoomNum][0].size(), allMapChipData[StageNum][RoomNum].size());
+		return Vec2<int>(stageInfos[StageNum][RoomNum].mapChipData[0].size(), stageInfos[StageNum][RoomNum].mapChipData.size());
 	}
 
 	Vec2<int>GetLocalMapIdxSize()
@@ -432,17 +434,17 @@ public:
 
 	const bool HaveMap(const int& StageNum, const int& RoomNum)
 	{
-		if (allMapChipData.size() <= StageNum)return false;
-		if (allMapChipData[StageNum].size() <= RoomNum)return false;
+		if (stageInfos.size() <= StageNum)return false;
+		if (stageInfos[StageNum].size() <= RoomNum)return false;
 		return true;
 	}
 	const int GetMaxLap(const int& StageNum)
 	{
-		return allMapChipData[StageNum].size();
+		return stageInfos[StageNum].size();
 	}
 	const RoomMapChipArray& GetMap(const int& StageNum, const int& RoomNum)
 	{
-		return allMapChipData[StageNum][RoomNum];
+		return stageInfos[StageNum][RoomNum].mapChipData;
 	}
 
 private:
