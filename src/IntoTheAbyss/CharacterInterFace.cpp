@@ -1670,6 +1670,7 @@ void CharacterInterFace::FinishSwing()
 	addSwingAngle = 0;
 	swingTimer = 0;
 	allSwingAngle = 0;
+	isDestroyMode = false;
 	//partner.lock()->swingDestroyCounter.Init();
 	//swingDestroyCounter.Init();
 

@@ -173,6 +173,12 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 		break;
 	}
 
+	if(partner.lock()->isDestroyMode){
+	
+		starParticleMgr.ParticleLevel(20, 100);
+	
+	}
+
 
 	starParticleMgr.Update();
 
@@ -297,9 +303,9 @@ void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
 	//壊したブロックの数によって段階を分ける----------------------------------------------
 
 	//フラッシュする----------------------------------------------
-	if (bossCrashModel != NONE_LEVEL && flashMaxTimer[bossCrashModel] <= flashTimer)
+	if (partner.lock()->isDestroyMode && flashMaxTimer[SECOND_LEVEL] <= flashTimer)
 	{
-		stagingDevice.Flash(flashMaxTimer[bossCrashModel], 0.7f);
+		stagingDevice.Flash(flashMaxTimer[SECOND_LEVEL], 0.7f);
 		flashTimer = 0;
 	}
 	++flashTimer;
