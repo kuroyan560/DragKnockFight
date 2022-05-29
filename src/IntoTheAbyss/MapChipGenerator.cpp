@@ -172,9 +172,6 @@ void MapChipGenerator_RandPattern::DesideNextIndices(const PATTERN_TYPE& Pattern
 	chipIdxMax.x = (*mapData)[0].size();
 	chipIdxMax.y = (*mapData).size();
 
-	static const int GENERATE_NUM_MAX = 5;
-	static const int GENERATE_NUM_MIN = 2;
-
 	static bool INIT = false;
 	static OffsetPattern PATTERN[NUM];
 	if (!INIT)
@@ -241,24 +238,20 @@ void MapChipGenerator_RandPattern::DesideNextIndices(const PATTERN_TYPE& Pattern
 		PATTERN[VERT].emplace_back(Vec2<int>(0, index));
 	}
 
-	const int generateNum = KuroFunc::GetRand(GENERATE_NUM_MIN, GENERATE_NUM_MAX);
-	for (int i = 0; i < generateNum; ++i)
+	const auto patternType = PATTERN[PatternType];
+	for (auto& offsetIdx : patternType)
 	{
-		const auto patternType = PATTERN[PatternType];
-		for (auto& offsetIdx : patternType)
-		{
-			Vec2<int> idx = offsetIdx + GenerateIdx;
-			if (idx.x < 0)continue;
-			if (chipIdxMax.x <= idx.x)continue;
-			if (idx.y < 0)continue;
-			if (chipIdxMax.y <= idx.y)continue;
+		Vec2<int> idx = offsetIdx + GenerateIdx;
+		if (idx.x < 0)continue;
+		if (chipIdxMax.x <= idx.x)continue;
+		if (idx.y < 0)continue;
+		if (chipIdxMax.y <= idx.y)continue;
 
-			if (!CanChange(idx))continue;
+		if (!CanChange(idx))continue;
 
-			predictionIdxArray.emplace_back();
-			predictionIdxArray.back().idx = idx;
-			predictionIdxArray.back().type = GetRandChipType();
-		}
+		predictionIdxArray.emplace_back();
+		predictionIdxArray.back().idx = idx;
+		predictionIdxArray.back().type = GetRandChipType();
 	}
 }
 
