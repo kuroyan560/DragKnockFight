@@ -348,7 +348,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
-	mapChipGeneratorChangeMap->Init();
+	mapChipGeneratorChangeMap.reset();
+	mapChipGeneratorChangeMap = std::make_shared<MapChipGenerator_ChangeMap>();
 
 
 	countBlock.Init();
@@ -359,9 +360,37 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	// 背景パーティクルを更新
 	BackGroundParticleMgr::Instance()->Init();
-	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetLocalMap()->size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetLocalMap()[0].size() * MAP_CHIP_SIZE));
+	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetMap(stageNum, roomNum)[0].size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetMap(stageNum, roomNum).size() * MAP_CHIP_SIZE));
 
 
+}
+
+void Game::GeneratorInit()
+{
+	mapChipGenerator.reset();
+	auto localStageInfo = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	MAP_CHIP_GENERATOR localGeneratorType = localStageInfo.generatorType;
+	if (localGeneratorType == NON_GENERATE)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
+	}
+	else if (localGeneratorType == SPLINE_ORBIT)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
+	}
+	else if (localGeneratorType == RAND_PATTERN)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>(localStageInfo.generatorSpan);
+	}
+	else if (localGeneratorType == CLOSSING)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>(localStageInfo.generatorSpan);
+	}
+	else if (RISE_UP_L_TO_R <= localGeneratorType && localGeneratorType <= RISE_UP_BOTTOM_TO_TOP)
+	{
+		int idxDir = localGeneratorType - CLOSSING - 1;
+		mapChipGenerator = std::make_shared<MapChipGenerator_RiseUp>(localStageInfo.generatorSpan, (RISE_UP_GENERATOR_DIRECTION)idxDir);
+	}
 }
 
 Game::Game()
@@ -452,29 +481,11 @@ void Game::Init(const bool& PracticeMode)
 	DistanceCounter::Instance()->Init();
 	RoundCountMgr::Instance()->Init(SelectStage::Instance()->GetRoomNum());
 
-	mapChipGenerator.reset();
-	MAP_CHIP_GENERATOR localGeneratorType = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-	if (localGeneratorType == NON_GENERATE)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
-	}
-	else if (localGeneratorType == SPLINE_ORBIT)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
-	}
-	else if (localGeneratorType == RAND_PATTERN)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>();
-	}
-	else if (localGeneratorType == CLOSSING)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>();
-	}
-	mapChipGenerator->Init();
+	GeneratorInit();
 
 	// 背景パーティクルを更新
 	BackGroundParticleMgr::Instance()->Init();
-	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetLocalMap()->size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetLocalMap()[0].size() * MAP_CHIP_SIZE));
+	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetLocalMap()[0].size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetLocalMap()->size() * MAP_CHIP_SIZE));
 
 }
 
@@ -1334,25 +1345,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 				GameTimer::Instance()->Init(gameTimer);
 				GameTimer::Instance()->Start();
 
-				mapChipGenerator.reset();
-				MAP_CHIP_GENERATOR localGeneratorType = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-				if (localGeneratorType == NON_GENERATE)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
-				}
-				else if (localGeneratorType == SPLINE_ORBIT)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
-				}
-				else if (localGeneratorType == RAND_PATTERN)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>();
-				}
-				else if (localGeneratorType == CLOSSING)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>();
-				}
-				mapChipGenerator->Init();
+				GeneratorInit();
 
 				rStickNoInputTimer = 0;
 			}

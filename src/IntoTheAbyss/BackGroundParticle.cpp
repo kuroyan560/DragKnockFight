@@ -93,7 +93,7 @@ void BackGroundParticle::Update()
 		if (defDesTimer < desTimer) {
 
 			Vec2<float> generatePos = {};
-			generatePos.x = KuroFunc::GetRand(-stageSize.x, stageSize.x * 2.0f);
+			generatePos.x = KuroFunc::GetRand(-stageSize.x, stageSize.x * 4.0f);
 			generatePos.y = KuroFunc::GetRand(-stageSize.y, stageSize.y * 2.0f);
 
 			Generate(generatePos, STATUS::STAY, stageSize);
@@ -210,7 +210,7 @@ void BackGroundParticleMgr::StageStartGenerate(const Vec2<float>& StageSize)
 		if (index.isActive) continue;
 
 		Vec2<float> generatePos;
-		generatePos.x = KuroFunc::GetRand(-stageSize.x, stageSize.x * 2.0f);
+		generatePos.x = KuroFunc::GetRand(-stageSize.x, stageSize.x * 4.0f);
 		generatePos.y = KuroFunc::GetRand(-stageSize.y, stageSize.y * 2.0f);
 
 		index.Generate(generatePos, BackGroundParticle::STATUS::STAY, StageSize);
@@ -249,7 +249,7 @@ void BackGroundParticleMgr::Update()
 			if (index.isActive) continue;
 
 			Vec2<float> generatePos;
-			generatePos.x = KuroFunc::GetRand(-stageSize.x, stageSize.x * 2.0f) + stageSize.x;
+			generatePos.x = KuroFunc::GetRand(-stageSize.x, stageSize.x * 4.0f) + stageSize.x;
 			generatePos.y = KuroFunc::GetRand(-stageSize.y, stageSize.y * 2.0f) - stageSize.y;
 
 			index.Generate(generatePos, BackGroundParticle::STATUS::SHOOTING_STAR, stageSize);

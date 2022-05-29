@@ -43,7 +43,7 @@ public:
 		STAGE_SELECT,
 		SCENE_CHANGE
 	};
-	std::array<std::array<DrawMapChipForSceneChange, 2>, 15>mapScreenShot;
+	std::vector<std::array<DrawMapChipForSceneChange, 2>>mapScreenShot;
 
 	// ステージ番号
 	int stageNum,prevStageNum;

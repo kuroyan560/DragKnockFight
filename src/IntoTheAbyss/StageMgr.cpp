@@ -160,7 +160,14 @@ StageMgr::StageMgr()
 				if (key == genekey)
 				{
 					line_stream >> num;
-					stageInfos[stageNum][roomCount].generatorType = (MAP_CHIP_GENERATOR)num;
+					MAP_CHIP_GENERATOR type = (MAP_CHIP_GENERATOR)num;
+					stageInfos[stageNum][roomCount].generatorType = type;
+
+					if (HaveGenerateTimeParameter(type))
+					{
+						line_stream >> num;
+						stageInfos[stageNum][roomCount].generatorSpan = num;
+					}
 				}
 			}
 		}
@@ -272,7 +279,7 @@ const bool &StageMgr::CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMB
 	return false;
 }
 
-void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM, const Vec2<float> &LeftCharaPos, const float &LeftCharaSize, const Vec2<float> &RightCharaPos, const float &RightCharaSize)
+void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM, const Vec2<float>& LeftCharaPos, const float& LeftCharaSize, const Vec2<float>& RightCharaPos, const float& RightCharaSize, const bool& CharaCheck)
 {
 	//配列外参照
 	if (MAPCHIP_NUM.y < 0 || localRoomMapChipArray.size() <= MAPCHIP_NUM.y || MAPCHIP_NUM.x < 0 || localRoomMapChipArray[MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
@@ -288,13 +295,14 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM,
 	}
 
 	// 削る場合は通さない。
-	if (CHIPNUM != 0) {
+	if (CHIPNUM != 0 && CharaCheck) {
+
+		Vec2<float> mapChipPos = Vec2<float>(MAPCHIP_NUM.x * MAP_CHIP_SIZE + MAP_CHIP_HALF_SIZE, MAPCHIP_NUM.y * MAP_CHIP_SIZE + MAP_CHIP_HALF_SIZE);
 
 		// 左側のキャラと円形の当たり判定を行って、当たっていたらブロックを生成しない。
-		Vec2<float> mapChipPos = Vec2<float>(MAPCHIP_NUM.x * MAP_CHIP_SIZE + MAP_CHIP_HALF_SIZE, MAPCHIP_NUM.y * MAP_CHIP_SIZE + MAP_CHIP_HALF_SIZE);
-		if (Vec2<float>(mapChipPos - LeftCharaPos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + LeftCharaSize) {
-			return;
-		}
+		//if (Vec2<float>(mapChipPos - LeftCharaPos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + LeftCharaSize) {
+		//	return;
+		//}
 
 		// 右側のキャラと円形の当たり判定を行って、当たっていたらブロックを生成しない。
 		if (Vec2<float>(mapChipPos - RightCharaPos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + RightCharaSize) {

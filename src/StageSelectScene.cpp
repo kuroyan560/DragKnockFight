@@ -9,6 +9,11 @@ StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 	maskSceneChange = std::make_shared<MaskSceneTransition>();
 	sceneChange = std::make_shared<SceneTransition>();
 	stageNum = 0;
+
+
+	mapScreenShot.reserve(StageMgr::Instance()->GetMaxStageNumber());
+	mapScreenShot.resize(StageMgr::Instance()->GetMaxStageNumber());
+
 }
 
 void StageSelectScene::OnInitialize()
