@@ -138,6 +138,7 @@ class Game
 	std::shared_ptr<MapChipGenerator_ChangeMap>mapChipGeneratorChangeMap;
 	std::shared_ptr<MapChipGenerator>mapChipGenerator;
 
+	const int COUNT_BLOCK_MAX = 5000;
 	BlockCount countBlock;
 
 	StageRap stageRap;

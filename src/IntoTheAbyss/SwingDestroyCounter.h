@@ -88,6 +88,7 @@ private:
 
 
 public:
+	int totalCounter;
 
 	/*===== ƒƒ“ƒo•Ï” =====*/
 

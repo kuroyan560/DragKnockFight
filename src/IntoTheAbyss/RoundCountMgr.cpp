@@ -87,13 +87,21 @@ RoundCountMgr::RoundCountMgr()
 
 }
 
-void RoundCountMgr::Init(const int& MaxRound)
+void RoundCountMgr::Init(int MaxRound)
 {
 
 	/*===== èâä˙âªèàóù =====*/
 
-	Vec2<float> UI_OFFSET_POS = Vec2<float>(1140, 100);
+	int num = (2 - (MaxRound - 1));
+	if (num <= 0)
+	{
+		num = 0;
+	}
+
 	const float UI_OFFSET_SIZE = 45.0f;
+	Vec2<float> UI_OFFSET_POS = Vec2<float>(1140 + UI_OFFSET_SIZE * num, 100);
+
+	startPos = UI_OFFSET_POS;
 
 	int indexCounter = 0;
 
@@ -108,11 +116,10 @@ void RoundCountMgr::Init(const int& MaxRound)
 		index.Generate(generatePos);
 
 		++indexCounter;
-
 	}
 
 	nowRound = 0;
-	maxRound = 3;
+	maxRound = MaxRound;
 
 }
 
@@ -120,31 +127,10 @@ void RoundCountMgr::Update()
 {
 
 	/*===== çXêVèàóù =====*/
-	int stageNum = SelectStage::Instance()->GetStageNum();
-	int roomNum = SelectStage::Instance()->GetRoomNum();
-	bool moveUiFlag = StageMgr::Instance()->GetGeneratorType(stageNum, roomNum) != NON_GENERATE;
-
-
-	Vec2<float> UI_OFFSET_POS = Vec2<float>(1140, 100);
-	const float UI_OFFSET_SIZE = 45.0f;
-
-	int indexCounter = 0;
-	for (auto& index : counter) {
-
-		Vec2<float> generatePos = UI_OFFSET_POS + Vec2<float>(indexCounter * UI_OFFSET_SIZE, 0);
-
-		if (moveUiFlag)
-		{
-			index.pos = generatePos;
-			index.pos.y /= 2.0f;
-		}
-		else
-		{
-			index.pos = generatePos;
-		}
-		++indexCounter;
+	for (auto &index : counter) {
 
 		index.Update();
+
 	}
 
 }
@@ -154,22 +140,12 @@ void RoundCountMgr::Draw()
 
 	/*===== ï`âÊèàóù =====*/
 
-	Vec2<float> UI_OFFSET_POS = Vec2<float>(1024, 102);
-
-	int stageNum = SelectStage::Instance()->GetStageNum();
-	int roomNum = SelectStage::Instance()->GetRoomNum();
-	bool moveUiFlag = StageMgr::Instance()->GetGeneratorType(stageNum, roomNum) != NON_GENERATE;
-	if (moveUiFlag)
-	{
-		UI_OFFSET_POS.y /= 2.0f;
-	}
-
+	Vec2<float> UI_OFFSET_POS = Vec2<float>(startPos.x - 116.0f, 102);
 	DrawFunc::DrawRotaGraph2D(UI_OFFSET_POS, Vec2<float>(1, 1), 0, TexHandleMgr::GetTexBuffer(roundGraph));
 
-	for (auto& index : counter) {
-
-		index.Draw(frameGraph, innerGraph);
-
+	for (int i = 0; i < maxRound; ++i)
+	{
+		counter[i].Draw(frameGraph, innerGraph);
 	}
 
 }

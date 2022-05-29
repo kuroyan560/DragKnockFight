@@ -35,6 +35,7 @@ void SwingDestroyCounter::Init()
 	}
 
 	nowCounter = 0;
+	totalCounter = 0;
 
 }
 
@@ -115,6 +116,7 @@ void SwingDestroyCounter::Increment(int INCRE_NUM)
 
 	// 加算。
 	nowCounter += INCRE_NUM;
+	totalCounter += INCRE_NUM;
 
 	// どこが前フレームと変わっているかを調べる。
 	const int NOW_DISIT = KuroFunc::GetDigit(nowCounter);
