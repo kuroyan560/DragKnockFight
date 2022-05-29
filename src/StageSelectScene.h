@@ -35,7 +35,8 @@ public:
 	void OnFinalize()override;
 
 	// シーンチェンジに使用する。
-	std::shared_ptr<MaskSceneTransition>changeScene;
+	std::shared_ptr<MaskSceneTransition>maskSceneChange;
+	std::shared_ptr< SceneTransition>sceneChange;
 
 	// ステージ番号
 	int stageNum,prevStageNum;

@@ -6,7 +6,8 @@
 
 StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 {
-	changeScene = std::make_shared<MaskSceneTransition>();
+	maskSceneChange = std::make_shared<MaskSceneTransition>();
+	sceneChange = std:::make_shared<SceneTransition>();
 	stageNum = 0;
 }
 
@@ -36,10 +37,11 @@ void StageSelectScene::OnInitialize()
 
 void StageSelectScene::OnUpdate()
 {
+	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/select.wav");
 
 	if (isSkip)
 	{
-		KuroEngine::Instance().ChangeScene(2, changeScene);
+		KuroEngine::Instance().ChangeScene(2, maskSceneChange);
 		SelectStage::Instance()->resetStageFlag = true;
 	}
 
@@ -47,7 +49,7 @@ void StageSelectScene::OnUpdate()
 	{
 		//時短デバッグ用　キャラ選択飛ばす
 		{
-			KuroEngine::Instance().ChangeScene(2, changeScene);
+			KuroEngine::Instance().ChangeScene(2, maskSceneChange);
 			SelectStage::Instance()->resetStageFlag = true;
 		}
 
@@ -57,8 +59,9 @@ void StageSelectScene::OnUpdate()
 		//ゲームシーンに移動する
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A) && 1.0f <= stageSelect.GetLerpData().timer)
 		{
-			KuroEngine::Instance().ChangeScene(2, changeScene);
+			KuroEngine::Instance().ChangeScene(2, maskSceneChange);
 			SelectStage::Instance()->resetStageFlag = true;
+			AudioApp::Instance()->PlayWave(SE);
 		}
 		//ステージ選択へ戻る
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B) && 1.0f <= stageSelect.GetLerpData().timer)
@@ -81,6 +84,7 @@ void StageSelectScene::OnUpdate()
 
 			// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
 			screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
+			AudioApp::Instance()->PlayWave(SE);
 		}
 	}
 	else
@@ -108,12 +112,14 @@ void StageSelectScene::OnUpdate()
 			//screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
 
 			DrawMapChipForSceneChange::Instance()->Finalize();
+			AudioApp::Instance()->PlayWave(SE);
 
 		}
 		//タイトルシーンに移動する
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
 		{
-			KuroEngine::Instance().ChangeScene(0, changeScene);
+			KuroEngine::Instance().ChangeScene(0, sceneChange);
+			AudioApp::Instance()->PlayWave(SE);
 		}
 
 		// 入力の更新処理
@@ -130,6 +136,7 @@ void StageSelectScene::OnUpdate()
 			screenShot.SetExp(Vec2<float>(0, 0), Vec2<float>(0.1f, 0.1f));
 			rightArrow.SetExpSize(Vec2<float>(0.5f, 0.5f));
 			leftArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
+			AudioApp::Instance()->PlayWave(SE);
 		}
 		//ステージ番号を減らす
 		if (!isPrevInputSticlLeft && isInputLeft)
@@ -139,6 +146,7 @@ void StageSelectScene::OnUpdate()
 			screenShot.SetExp(Vec2<float>(0, 0), Vec2<float>(0.1f, 0.12f));
 			leftArrow.SetExpSize(Vec2<float>(0.5f, 0.5f));
 			rightArrow.SetExpSize(Vec2<float>(-0.1f, -0.1f));
+			AudioApp::Instance()->PlayWave(SE);
 		}
 
 		isPrevInputStickRight = isInputRight;
