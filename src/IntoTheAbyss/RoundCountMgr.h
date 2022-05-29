@@ -57,6 +57,7 @@ public:
 	int innerGraph;
 	int roundGraph;
 
+	Vec2<float>startPos;
 public:
 
 	/*===== ƒƒ“ƒoŠÖ” =====*/
@@ -65,7 +66,7 @@ public:
 	RoundCountMgr();
 
 	// ‰Šú‰»ˆ—
-	void Init(const int& MaxRound);
+	void Init(int MaxRound);
 
 	// XVˆ—
 	void Update();

@@ -118,6 +118,7 @@ protected:
 
 public:
 	
+	bool isPrevDestroyMode;
 	bool isDestroyMode;				// 壁を一気に破壊するモード
 	static bool isDebugModeStrongSwing;		// デバッグ用で壁に当たるまでスイング
 	Vec2<float>size;	//サイズ

@@ -493,7 +493,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	staminaGauge->SetColor(innerColor, outerColor);
 
 	prevSwingFlag = false;
-
+	isPrevDestroyMode = false;
 
 	bulletMgr.Init();
 	barrage->Init();
@@ -518,6 +518,12 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 		CCWSwingSegmentMgr.Init();
 		FinishSwing();
 
+	}
+
+	if (!isPrevDestroyMode && isDestroyMode)
+	{
+		static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/superCrash.wav");
+		AudioApp::Instance()->PlayWave(SE);
 	}
 
 	float dist = partner.lock()->pos.Distance(this->pos);
