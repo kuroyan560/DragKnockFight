@@ -493,7 +493,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 	staminaGauge->SetColor(innerColor, outerColor);
 
 	prevSwingFlag = false;
-
+	isPrevDestroyMode = false;
 
 	bulletMgr.Init();
 	barrage->Init();
