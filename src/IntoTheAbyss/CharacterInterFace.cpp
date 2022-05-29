@@ -520,6 +520,12 @@ void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, co
 
 	}
 
+	if (!isPrevDestroyMode && isDestroyMode)
+	{
+		static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/superCrash.wav");
+		AudioApp::Instance()->PlayWave(SE);
+	}
+
 	float dist = partner.lock()->pos.Distance(this->pos);
 	if (!swingDestroyCounter.IsZero() && dist <= DebugParameter::Instance()->comboResetDist)
 	{
