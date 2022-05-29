@@ -31,33 +31,14 @@ void CharacterInterFace::SwingUpdate()
 
 	/*===== 振り回し中に呼ばれる処理 =====*/
 
+	// 振り回しの1Fの間に動いてほしい値。
+	const float frameMove = 80.0f;
 
 	// 角度に加算する量の割合を決める。
 	float partnerDistance = (pos - partner.lock()->pos).Length();
 
-	const float MAX_LENGTH = 2000.0f;
-
-	// 割合を求める。
-	addSwingRate = 1.0f;
-
-	// 3000 ~ 7000の間だったら回転角度を減らす。
-	if (3000.0f <= partnerDistance) {
-
-		addSwingRate = (partnerDistance - 3000.0f) / 4000.0f;
-		addSwingRate = 1.0f - addSwingRate;
-
-	}
-	else if (7000.0f <= partnerDistance) {
-
-		addSwingRate = 0.1f;
-
-	}
-
-	if (addSwingRate < 0.0f) addSwingRate = 0.0f;
-	if (1.0f < addSwingRate) addSwingRate = 1.0f;
-
 	// 角度に加算する量を更新。
-	addSwingAngle = ADD_SWING_ANGLE * addSwingRate;
+	addSwingAngle = ADD_SWING_ANGLE;
 
 	// 振り回しの経過時間を設定。
 	++swingTimer;
@@ -74,12 +55,7 @@ void CharacterInterFace::SwingUpdate()
 
 	}
 
-	// 移動量が小さかったら呼ばない。
-	static const float OFFSET_SPEED = 0.5f;
-	float speedBuff = Vec2<float>(pos - prevPrevPos).Length();
-	//if (speedBuff < OFFSET_SPEED) {
-
-		// 現在の角度に角度の加算量を足す。
+	// 現在の角度に角度の加算量を足す。
 	if (isSwingClockWise) {
 
 		// 時計回りだったら
@@ -98,6 +74,41 @@ void CharacterInterFace::SwingUpdate()
 
 	//}
 
+	// この角度を現在のベクトルとして使用する。
+	nowSwingVec = { cosf(nowAngle), sinf(nowAngle) };
+
+	// 座標を更新！
+	Vec2<float> prevFramePos = partner.lock()->pos;
+	partner.lock()->pos = pos + nowSwingVec * partnerDistance;
+
+	// 移動する前の値と比べて規定の移動量以上に動いていたら。
+	float movedLength = Vec2<float>(prevFramePos - partner.lock()->pos).Length();
+	if (frameMove <= movedLength) {
+
+		// 押し戻す方向
+		Vec2<float> invMovedDir = Vec2<float>(partner.lock()->pos - prevFramePos).GetNormal();
+
+		// 押し戻す量
+		float pushBackLength = movedLength - frameMove;
+
+		// 押し戻した先の座標
+		Vec2<float> pushBackPos = partner.lock()->pos + invMovedDir * pushBackLength;
+
+		// 押し戻した角度。
+		float pushBackAngle = atan2f(partner.lock()->pos.y - pos.y, partner.lock()->pos.x - pos.x) - atan2f(pushBackPos.y - pos.y, pushBackPos.x - pos.x);
+
+		nowAngle += pushBackAngle;
+
+		// 現在のベクトルを更新。
+		nowSwingVec = { cosf(nowAngle), sinf(nowAngle) };
+
+		// 押し戻した座標を更新。
+		partner.lock()->pos = pos + nowSwingVec * partnerDistance;
+
+		allSwingAngle -= pushBackAngle;
+
+	}
+
 	// 回転した量がPIを超えたら振り回しを終了。
 	if (DirectX::XM_PI + DirectX::XM_PI / 2.0f <= allSwingAngle) {
 
@@ -105,11 +116,6 @@ void CharacterInterFace::SwingUpdate()
 		//FinishSwing();
 
 	}
-
-	// この角度を現在のベクトルとして使用する。
-	nowSwingVec = { cosf(nowAngle), sinf(nowAngle) };
-
-	partner.lock()->pos = pos + nowSwingVec * partnerDistance;
 
 	// 現在のベクトルと最終目標のベクトルで外積の左右判定を行い、通り越していたら振り回しを終える。 負の値が左(反時計回り)、正の値が右(時計回り)。
 	float crossResult = nowSwingVec.Cross(swingTargetVec);
