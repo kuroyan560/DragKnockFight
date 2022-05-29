@@ -135,10 +135,8 @@ class Game
 	std::unique_ptr<BossHandMgr> bossHandMgr;
 	std::unique_ptr<BossHandMgr> playerHandMgr;
 
-	std::shared_ptr<MapChipGenerator_ChangeMap>mapChipGenerator;
-	std::shared_ptr<MapChipGenerator_SplineOrbit>mapChipGeneratorOrbit;
-
-	std::shared_ptr<MapChipGenerator_RandPattern> testGenerater;
+	std::shared_ptr<MapChipGenerator_ChangeMap>mapChipGeneratorChangeMap;
+	std::shared_ptr<MapChipGenerator>mapChipGenerator;
 
 	BlockCount countBlock;
 

@@ -345,7 +345,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
-	mapChipGenerator->Init();
+	mapChipGeneratorChangeMap->Init();
 
 
 	countBlock.Init();
@@ -411,10 +411,8 @@ Game::Game()
 		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, false);
 	}
 
-	mapChipGenerator = std::make_shared<MapChipGenerator_ChangeMap>();
-	mapChipGeneratorOrbit = std::make_shared<MapChipGenerator_SplineOrbit>();
-
-	testGenerater = std::make_shared<MapChipGenerator_RandPattern>();
+	mapChipGeneratorChangeMap = std::make_shared<MapChipGenerator_ChangeMap>();
+	mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
 
 }
 
@@ -445,7 +443,26 @@ void Game::Init(const bool& PracticeMode)
 
 	DistanceCounter::Instance()->Init();
 	RoundCountMgr::Instance()->Init(SelectStage::Instance()->GetRoomNum());
-	mapChipGeneratorOrbit->Init();
+
+	mapChipGenerator.reset();
+	MAP_CHIP_GENERATOR localGeneratorType = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	if (localGeneratorType == NON_GENERATE)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
+	}
+	else if (localGeneratorType == SPLINE_ORBIT)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
+	}
+	else if (localGeneratorType == RAND_PATTERN)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>();
+	}
+	else if (localGeneratorType == CLOSSING)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>();
+	}
+	mapChipGenerator->Init();
 }
 
 void Game::Update(const bool& Loop)
@@ -523,14 +540,9 @@ void Game::Update(const bool& Loop)
 	if (roundChangeEffect.initGameFlag)
 	{
 		DebugParameter::Instance()->timer++;
+		mapChipGeneratorChangeMap->Update();
 		mapChipGenerator->Update();
-		if (DebugParameter::Instance()->orbitGenerator)
-		{
-			mapChipGeneratorOrbit->Update();
-		}
 	}
-
-	testGenerater->Update();
 
 	// 座標を保存。
 	CharacterManager::Instance()->Left()->SavePrevFramePos();
@@ -699,13 +711,8 @@ void Game::Draw()
 	// プレイヤーとボス間に線を描画
 	if (roundChangeEffect.initGameFlag)
 	{
+		mapChipGeneratorChangeMap->Draw();
 		mapChipGenerator->Draw();
-		if (DebugParameter::Instance()->orbitGenerator)
-		{
-			mapChipGeneratorOrbit->Draw();
-		}
-
-		testGenerater->Draw();
 
 		// 左のキャラ ~ 右のキャラ間に線を描画
 		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);
@@ -1292,7 +1299,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 				StageMgr::Instance()->SetLocalMapChipDrawBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 				mapData = StageMgr::Instance()->GetLocalMap();
 				mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
-				mapChipGenerator->RegisterMap();
+				mapChipGeneratorChangeMap->RegisterMap();
 				RoundFinishEffect::Instance()->changeMap = false;
 
 				countBlock.Init();
@@ -1307,7 +1314,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 				gameTimer = StageMgr::Instance()->GetMaxTime(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 				GameTimer::Instance()->Init(gameTimer);
 				GameTimer::Instance()->Start();
-				mapChipGeneratorOrbit->Init();
+				mapChipGenerator->Init();
 
 				rStickNoInputTimer = 0;
 			}

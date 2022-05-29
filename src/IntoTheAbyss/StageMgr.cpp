@@ -148,7 +148,6 @@ StageMgr::StageMgr()
 				{
 					line_stream >> num;
 					stageInfos[stageNum][roomCount].swingCount = num;
-					break;
 				}
 
 				std::string timerkey = "timer" + std::to_string(roomCount);
@@ -156,8 +155,13 @@ StageMgr::StageMgr()
 				{
 					line_stream >> num;
 					stageInfos[stageNum][roomCount].gameMaxTimer = num;
-					break;
+				}
 
+				std::string genekey = "gene" + std::to_string(roomCount);
+				if (key == genekey)
+				{
+					line_stream >> num;
+					stageInfos[stageNum][roomCount].generatorType = (MAP_CHIP_GENERATOR)num;
 				}
 			}
 		}
@@ -276,7 +280,7 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM,
 	{
 		return;
 	}
-	if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == CHIPNUM)return;	//ïœâªÇ»Çµ
+	//if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == CHIPNUM)return;	//ïœâªÇ»Çµ
 
 	//âÛÇÍÇ»Ç¢ÉuÉçÉbÉNÇÕîÚÇŒÇ∑
 	if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)

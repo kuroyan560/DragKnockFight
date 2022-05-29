@@ -7,7 +7,7 @@ static const enum MAP_CHIP_GENERATOR
 	NON_GENERATE,
 	SPLINE_ORBIT,
 	RAND_PATTERN,
-	CHANGE_MAP,
+	CLOSSING,
 	MAP_CHIP_GENERATOR_NUM
 };
 
@@ -54,6 +54,9 @@ public:
 //ランダムで生成これから出る位置に予測
 class MapChipGenerator_RandPattern : public MapChipGenerator
 {
+protected:
+	static const enum PATTERN_TYPE { CROSS, CUBE, CIRCLE, HORIZON, VERT, NUM };
+
 	typedef std::vector<Vec2<int>>OffsetPattern;
 	struct Prediction
 	{
@@ -63,8 +66,8 @@ class MapChipGenerator_RandPattern : public MapChipGenerator
 	std::vector<Prediction>predictionIdxArray;
 	int span;
 	int timer;
-	int GetSpan();
-	void DesideNextIndices();	//次の生成位置を決定
+	int GetRandSpan();
+	void DesideNextIndices(const PATTERN_TYPE& PatternType, const Vec2<int>& GenerateIdx);	//次の生成位置を決定
 
 public:
 	void Init()override;
@@ -90,4 +93,14 @@ public:
 private:
 	int setMapNumber;
 	int stageNumber;
+};
+
+//上下左右からマップチップが出現十字形で横切る
+class MapChipGenerator_Crossing : public MapChipGenerator_RandPattern
+{
+	Vec2<int> generateLine;	//列生成する軸
+public:
+	void Init()override;
+	void Update()override;
+	void Draw()override;
 };

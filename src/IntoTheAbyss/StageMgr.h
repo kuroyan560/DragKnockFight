@@ -11,6 +11,7 @@
 #include"Angle.h"
 #include"KuroFunc.h"
 #include"MapChipCollider.h"
+#include"MapChipGenerator.h"
 
 /// <summary>
 /// 小部屋同士の部屋のリンク付けする際に必要な情報
@@ -308,6 +309,7 @@ private:
 		RoomMapChipDrawArray mapChipDrawData;
 		int swingCount = 0;
 		int gameMaxTimer = 60;
+		MAP_CHIP_GENERATOR generatorType = NON_GENERATE;
 	};
 	std::vector<std::vector<StageInfo>>stageInfos;
 
@@ -445,6 +447,10 @@ public:
 	const RoomMapChipArray& GetMap(const int& StageNum, const int& RoomNum)
 	{
 		return stageInfos[StageNum][RoomNum].mapChipData;
+	}
+	const MAP_CHIP_GENERATOR& GetGeneratorType(const int& StageNum, const int& RoomNum)
+	{
+		return stageInfos[StageNum][RoomNum].generatorType;
 	}
 
 private:

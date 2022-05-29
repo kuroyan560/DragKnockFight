@@ -156,18 +156,17 @@ void MapChipGenerator_SplineOrbit::Draw()
 	}
 }
 
-int MapChipGenerator_RandPattern::GetSpan()
+int MapChipGenerator_RandPattern::GetRandSpan()
 {
+	return 60;
 	static const int MAX = 60 * 9;
 	static const int MIN = 60 * 5;
 	return KuroFunc::GetRand(MIN, MAX);
 	//return KuroFunc::GetRand(DebugParameter::Instance()->generatorSpanMin, DebugParameter::Instance()->generatorSpanMax);
 }
 
-void MapChipGenerator_RandPattern::DesideNextIndices()
+void MapChipGenerator_RandPattern::DesideNextIndices(const PATTERN_TYPE& PatternType, const Vec2<int>& GenerateIdx)
 {
-	predictionIdxArray.clear();
-
 	auto mapData = StageMgr::Instance()->GetLocalMap();
 	Vec2<int>chipIdxMax;
 	chipIdxMax.x = (*mapData)[0].size();
@@ -176,7 +175,6 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 	static const int GENERATE_NUM_MAX = 5;
 	static const int GENERATE_NUM_MIN = 2;
 
-	static const enum PATTERN_TYPE { CROSS, CUBE, CIRCLE, HORIZON, VERT, NUM };
 	static bool INIT = false;
 	static OffsetPattern PATTERN[NUM];
 	if (!INIT)
@@ -226,38 +224,30 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 			}
 		}
 
-		// 水平垂直なやつでどこまで伸ばすかの値
-		static const int HORI_VERT_LENGTH = 60;
-
-		// 水平なやつ
-		for (int index = -HORI_VERT_LENGTH; index < HORI_VERT_LENGTH; ++index) {
-
-
-			PATTERN[HORIZON].emplace_back(Vec2<int>(index, 0));
-
-		}
-
-		// 垂直なやつ
-		for (int index = -HORI_VERT_LENGTH; index < HORI_VERT_LENGTH; ++index) {
-
-
-			PATTERN[VERT].emplace_back(Vec2<int>(0, index));
-
-		}
-
 		INIT = true;
-
 	};
+
+	// 水平なやつ
+	PATTERN[HORIZON].clear();
+	for (int index = 0; index < chipIdxMax.x; ++index) 
+	{
+		PATTERN[HORIZON].emplace_back(Vec2<int>(index, 0));
+
+	}
+	// 垂直なやつ
+	PATTERN[VERT].clear();
+	for (int index = 0; index < chipIdxMax.y; ++index)
+	{
+		PATTERN[VERT].emplace_back(Vec2<int>(0, index));
+	}
 
 	const int generateNum = KuroFunc::GetRand(GENERATE_NUM_MIN, GENERATE_NUM_MAX);
 	for (int i = 0; i < generateNum; ++i)
 	{
-		Vec2<int>centerIdx = { KuroFunc::GetRand(chipIdxMax.x - 1),KuroFunc::GetRand(chipIdxMax.y - 1) };
-
-		const auto patternType = PATTERN[KuroFunc::GetRand(PATTERN_TYPE::NUM - 1)];
+		const auto patternType = PATTERN[PatternType];
 		for (auto& offsetIdx : patternType)
 		{
-			Vec2<int> idx = offsetIdx + centerIdx;
+			Vec2<int> idx = offsetIdx + GenerateIdx;
 			if (idx.x < 0)continue;
 			if (chipIdxMax.x <= idx.x)continue;
 			if (idx.y < 0)continue;
@@ -275,8 +265,14 @@ void MapChipGenerator_RandPattern::DesideNextIndices()
 void MapChipGenerator_RandPattern::Init()
 {
 	timer = 0;
-	span = GetSpan();
-	DesideNextIndices();
+	span = GetRandSpan();
+
+	auto mapData = StageMgr::Instance()->GetLocalMap();
+	Vec2<int>chipIdxMax;
+	chipIdxMax.x = (*mapData)[0].size();
+	chipIdxMax.y = (*mapData).size();
+
+	DesideNextIndices(PATTERN_TYPE(KuroFunc::GetRand(PATTERN_TYPE::NUM - 1)), { KuroFunc::GetRand(chipIdxMax.x - 1),KuroFunc::GetRand(chipIdxMax.y - 1) });
 }
 
 void MapChipGenerator_RandPattern::Update()
@@ -290,9 +286,15 @@ void MapChipGenerator_RandPattern::Update()
 			if (!CanChange(pre.idx))continue;
 			StageMgr::Instance()->WriteMapChipData(pre.idx, pre.type, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 		}
-		DesideNextIndices();
+
+		auto mapData = StageMgr::Instance()->GetLocalMap();
+		Vec2<int>chipIdxMax;
+		chipIdxMax.x = (*mapData)[0].size();
+		chipIdxMax.y = (*mapData).size();
+		predictionIdxArray.clear();
+		DesideNextIndices(PATTERN_TYPE(KuroFunc::GetRand(PATTERN_TYPE::NUM - 1)), Vec2<int>(KuroFunc::GetRand(1, chipIdxMax.x), KuroFunc::GetRand(1, chipIdxMax.y)));
 		timer = 0;
-		span = GetSpan();
+		span = GetRandSpan();
 	}
 }
 
@@ -302,6 +304,10 @@ void MapChipGenerator_RandPattern::Draw()
 	static DrawMap DRAW_MAP_WALL;
 	static DrawMap DRAW_MAP_RARE;
 	static DrawMap DRAW_MAP_BOUNCE;
+	static DrawMap DRAW_MAP_UNBROKEN;
+	static DrawMap DRAW_MAP_NON_SCORE;
+	static DrawMap DRAW_MAP_EMPTY;
+	static const auto EMPTY_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, 255), DXGI_FORMAT_R32G32B32A32_FLOAT, 32);
 
 	// 描画するチップのサイズ
 	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
@@ -332,14 +338,29 @@ void MapChipGenerator_RandPattern::Draw()
 		{
 			DRAW_MAP_BOUNCE.AddChip(chipData);
 		}
-		else
+		else if (pred.type == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)
+		{
+			DRAW_MAP_UNBROKEN.AddChip(chipData);
+		}
+		else if (pred.type == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)
+		{
+			DRAW_MAP_NON_SCORE.AddChip(chipData);
+		}
+		else if (pred.type == 1)
 		{
 			DRAW_MAP_WALL.AddChip(chipData);
+		}
+		else
+		{
+			DRAW_MAP_EMPTY.AddChip(chipData);
 		}
 	}
 	DRAW_MAP_WALL.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(1)));
 	DRAW_MAP_RARE.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(MAPCHIP_TYPE_STATIC_RARE_BLOCK)));
 	DRAW_MAP_BOUNCE.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)));
+	DRAW_MAP_NON_SCORE.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)));
+	DRAW_MAP_UNBROKEN.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)));
+	DRAW_MAP_EMPTY.Draw(EMPTY_TEX);
 }
 
 void MapChipGenerator_ChangeMap::RegisterMap()
@@ -439,3 +460,45 @@ void MapChipGenerator_ChangeMap::Draw()
 	DRAW_MAP_EMPTY.Draw(EMPTY_TEX);
 }
 
+void MapChipGenerator_Crossing::Init()
+{
+	timer = 0;
+	span = 60;
+
+	generateLine = { 1,1 };
+
+	DesideNextIndices(HORIZON, { 0,generateLine.y });
+	DesideNextIndices(VERT, { generateLine.x,0 });
+}
+
+void MapChipGenerator_Crossing::Update()
+{
+	timer++;
+
+	if (span <= timer)
+	{
+		for (auto& pre : predictionIdxArray)
+		{
+			if (!CanChange(pre.idx))continue;
+			StageMgr::Instance()->WriteMapChipData(pre.idx, pre.type, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+		}
+
+		auto mapData = StageMgr::Instance()->GetLocalMap();
+		Vec2<int>chipIdxMax;
+		chipIdxMax.x = (*mapData)[0].size();
+		chipIdxMax.y = (*mapData).size();
+
+		predictionIdxArray.clear();
+		DesideNextIndices(HORIZON, { 0,++generateLine.y });
+		DesideNextIndices(VERT, { ++generateLine.x,0 });
+
+		if (chipIdxMax.x - 2 <= generateLine.x)generateLine.x = 1;
+		if (chipIdxMax.y - 2 <= generateLine.y)generateLine.y = 1;
+		timer = 0;
+	}
+}
+
+void MapChipGenerator_Crossing::Draw()
+{
+	MapChipGenerator_RandPattern::Draw();
+}
