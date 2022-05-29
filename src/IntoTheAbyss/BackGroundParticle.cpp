@@ -44,7 +44,7 @@ void BackGroundParticle::Generate(const Vec2<float>& Pos, const STATUS& Status, 
 	exp = {};
 	angle = {};
 	isActive = true;
-	targetExp = { 1.0f,1.0f };
+	targetExp = { 3.0f,3.0f };
 	timer = 0;
 	desTimer = 0;
 	defDesTimer = KuroFunc::GetRand(MAX_DES_TIMER / 2, MAX_DES_TIMER);
@@ -135,7 +135,7 @@ void BackGroundParticle::Update()
 		pos += Vec2<float>(-1, 1) * speed;
 
 		// âÒì]Ç≥ÇπÇÈÅB
-		angle += 0.1f;
+		angle += 0.2f;
 
 
 		break;
