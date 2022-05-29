@@ -146,6 +146,8 @@ class Game
 
 	float addLineLengthSubAmount;
 
+	int rStickNoInputTimer = 0;
+
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
 

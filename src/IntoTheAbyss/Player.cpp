@@ -130,6 +130,8 @@ void Player::OnInit()
 	maxStrongSwingCount = StageMgr::Instance()->GetSwingCount(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	nowStrongSwingCount = 0;
 
+	strongSwingTutorialUI.Init();
+
 	//プレイヤーの向き初期化
 	//playerDir = DEFAULT;
 
@@ -455,12 +457,12 @@ void Player::OnDrawUI()
 	const auto leftButton = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::LB);
 	const auto rightButton = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RB);
 
-	//tutorial.Draw(leftStickVec, rightStickVec, leftButton, rightButton);
-
+	//LTチュートリアル
 	for (int i = 0; i < maxStrongSwingCount; ++i)
 	{
 		strongSwingUI[i].Draw(i);
 	}
+	strongSwingTutorialUI.Draw(nowStrongSwingCount < maxStrongSwingCount);
 }
 
 void Player::OnHitMapChip(const HIT_DIR& Dir)

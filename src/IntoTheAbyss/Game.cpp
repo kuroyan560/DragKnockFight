@@ -418,6 +418,8 @@ Game::Game()
 
 void Game::Init(const bool& PracticeMode)
 {
+	rStickNoInputTimer = 0;
+
 	practiceMode = PracticeMode;
 
 	WinCounter::Instance()->Reset();
@@ -734,19 +736,16 @@ void Game::Draw()
 
 	//screenEdgeEffect.Draw();
 
-		//右スティックチュートリアル
+	//右スティックチュートリアル
 	static bool TUTORIAL_GRAPH_LOAD = false;
 	static int TUTORIAL_FRAME;
-	static std::array<int, 3> R_STICK_TUTORIAL;
 	static Anim R_STICK_ANIM_MEM;
+	static const int R_STICK_NOT_INPUT_TIME = 300;
 	if (!TUTORIAL_GRAPH_LOAD)
 	{
+		R_STICK_ANIM_MEM.graph.resize(3);
 		TUTORIAL_FRAME = TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/icon_frame.png");
-		TexHandleMgr::LoadDivGraph("resource/ChainCombat/tutorial/r_stick.png", 3, { 3,1 }, R_STICK_TUTORIAL.data());
-		for (int i = 0; i < R_STICK_TUTORIAL.size(); ++i)
-		{
-			R_STICK_ANIM_MEM.graph.emplace_back(R_STICK_TUTORIAL[i]);
-		}
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/tutorial/r_stick.png", 3, { 3,1 }, R_STICK_ANIM_MEM.graph.data());
 		R_STICK_ANIM_MEM.interval = 15;
 		R_STICK_ANIM_MEM.loop = true;
 		TUTORIAL_GRAPH_LOAD = true;
@@ -758,7 +757,12 @@ void Game::Draw()
 		CharacterManager::Instance()->Left()->DrawUI();
 		CharacterManager::Instance()->Right()->DrawUI();
 
-		if (stageNum == 0)
+		if (UsersInput::Instance()->ControllerInput(0, XBOX_STICK::R_ALL, 0.1f, { 0.0f,0.0f }))
+		{
+			rStickNoInputTimer = 0;
+		}
+		rStickNoInputTimer++;
+		if (stageNum == 0 || R_STICK_NOT_INPUT_TIME <= rStickNoInputTimer)
 		{
 			R_STICK_ANIM.Update();
 			Vec2<float>drawPos = CharacterManager::Instance()->Right()->pos + Vec2<float>(0, -160);
@@ -1299,9 +1303,12 @@ void Game::RoundFinishEffect(const bool& Loop)
 				GameTimer::Instance()->Init(gameTimer);
 				GameTimer::Instance()->Start();
 				mapChipGeneratorOrbit->Init();
+
+				rStickNoInputTimer = 0;
 			}
 
 			drawCharaFlag = true;
+
 
 			// AddLineLengthを伸ばす。
 			CharacterManager::Instance()->Right()->addLineLength = CharacterManager::Instance()->Right()->pos.Distance(CharacterManager::Instance()->Left()->pos) - CharacterInterFace::LINE_LENGTH * 2.0f;

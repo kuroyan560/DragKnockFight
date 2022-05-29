@@ -100,6 +100,7 @@ public:
 	int nowStrongSwingCount;		// ¡ŠÑ’ÊU‚è‰ñ‚µ‚ğ‰½‰ñ‚µ‚Ä‚¢‚é‚©B
 	int maxStrongSwingCount;		// ‰½‰ñŠÑ’ÊU‚è‰ñ‚µ‚ª‚Å‚«‚é‚©B
 	std::vector<StrongSwingUI>strongSwingUI;
+	StrongSwingTutorialUI strongSwingTutorialUI;
 
 public:
 
