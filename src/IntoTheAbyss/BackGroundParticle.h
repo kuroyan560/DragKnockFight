@@ -54,6 +54,9 @@ public:
 	// •`‰æˆ—
 	void Draw();
 
+	// “–‚½‚è”»’è
+	void CheckHit(const Vec2<float>& Pos, const float& Size);
+
 };
 
 class BackGroundParticleMgr : public Singleton<BackGroundParticleMgr> {
@@ -88,5 +91,8 @@ public:
 
 	// •`‰æˆ—
 	void Draw();
+
+	// ƒLƒƒƒ‰‚Æ‚Ì“–‚½‚è”»’è
+	void CheckHit(const Vec2<float>& Pos, const float& Size);
 
 };

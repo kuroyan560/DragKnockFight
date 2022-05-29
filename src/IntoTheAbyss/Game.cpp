@@ -705,6 +705,9 @@ void Game::Update(const bool &Loop)
 	// 背景パーティクルを更新。
 	BackGroundParticleMgr::Instance()->Update();
 
+	BackGroundParticleMgr::Instance()->CheckHit(CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x);
+	BackGroundParticleMgr::Instance()->CheckHit(CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+
 }
 
 void Game::Draw()

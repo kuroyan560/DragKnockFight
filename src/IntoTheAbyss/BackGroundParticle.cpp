@@ -174,6 +174,30 @@ void BackGroundParticle::Draw()
 
 }
 
+void BackGroundParticle::CheckHit(const Vec2<float>& Pos, const float& Size)
+{
+
+	/*===== 当たり判定 =====*/
+
+	// 描画するリサージュ曲線のいちを求める。
+	float lissajousMove = 50.0f;
+	Vec2<float> lissajousCurve = Vec2<float>(cosf(1.0f * lissajousTimer) * lissajousMove, sinf(2.0f * lissajousTimer) * lissajousMove);
+
+	float distance = (pos + lissajousCurve - Pos).Length();
+	float charaR = Size + 70.0f;
+	if (distance <= charaR) {
+
+		// キャラから星への方向
+		Vec2<float> charaDir = (pos + lissajousCurve - Pos).GetNormal();
+
+		pos = pos + lissajousCurve + charaDir * (charaR - distance);
+
+		pos -= lissajousCurve;
+
+	}
+
+}
+
 BackGroundParticleMgr::BackGroundParticleMgr()
 {
 
@@ -277,6 +301,21 @@ void BackGroundParticleMgr::Draw()
 		if (!index.isActive) continue;
 
 		index.Draw();
+
+	}
+
+}
+
+void BackGroundParticleMgr::CheckHit(const Vec2<float>& Pos, const float& Size)
+{
+
+	/*===== 当たり判定 =====*/
+
+	for (auto& index : particles) {
+
+		if (!index.isActive) continue;
+
+		index.CheckHit(Pos, Size);
 
 	}
 

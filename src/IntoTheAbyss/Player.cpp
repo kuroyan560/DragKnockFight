@@ -568,6 +568,7 @@ void Player::Input(const vector<vector<int>>& MapData)
 	}
 
 	// 破壊モードかのフラグを保存。
+	isPrevDestroyMode = isDestroyMode;
 	if (maxStrongSwingCount && UsersInput::Instance()->ControllerOnTrigger(controllerIdx, XBOX_BUTTON::LT) && nowStrongSwingCount < maxStrongSwingCount) {
 
 		isDestroyMode = true;
