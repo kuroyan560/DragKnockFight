@@ -24,7 +24,7 @@ void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, con
 	warpFlag = false;
 }
 
-void ScrollMgr::Update(const Vec2<float>& LineCenterPos)
+void ScrollMgr::Update(const Vec2<float> &LineCenterPos, bool LOCK)
 {
 	//if (Camera::Instance()->active) {
 	//	scrollAmount.x = honraiScrollAmount.x - Camera::Instance()->scrollAffect.x;
@@ -54,6 +54,12 @@ void ScrollMgr::Update(const Vec2<float>& LineCenterPos)
 	else {
 		lineCenterOffset += (lineCenterOffsetBuff - lineCenterOffset) / 5.0f;
 	}
+
+	if (LOCK)
+	{
+		lineCenterOffset += lineCenterOffsetBuff - lineCenterOffset;
+	}
+
 
 }
 

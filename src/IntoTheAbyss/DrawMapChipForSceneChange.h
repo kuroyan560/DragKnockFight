@@ -29,8 +29,8 @@ private:
 
 
 	//‹Ö’f‚Ì‹ZA’Z‚Ìˆ×g—p
-	std::shared_ptr<LocalScrollMgr> scroll;
-	LocalCamera camera;
+	//std::shared_ptr<LocalScrollMgr> scroll;
+	//LocalCamera camera;
 
 	bool sceneChageFlag;
 

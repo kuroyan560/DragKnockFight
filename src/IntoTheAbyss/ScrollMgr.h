@@ -13,7 +13,7 @@ public:
 	ScrollMgr() :zoom(INIT_SCROLL)
 	{};
 	void Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, const Vec2<float>& ADJ);
-	void Update(const Vec2<float>& LineCenterPos);
+	void Update(const Vec2<float> &LineCenterPos, bool LOCK = false);
 	void CalucurateScroll(const Vec2<float>& VEL, const Vec2<float>& PLAYER_POS);
 	Vec2<float>Affect(const Vec2<float>& Pos);//スクロールとズームを適用させるk
 

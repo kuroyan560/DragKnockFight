@@ -3,6 +3,10 @@
 #include "StageMgr.h"
 #include "CharacterManager.h"
 
+#include"Camera.h"
+#include"ScrollMgr.h"
+
+
 DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 {
 	auto backBuff = D3D12App::Instance()->GetBackBuffRenderTarget();
@@ -12,7 +16,7 @@ DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 	//scroll.camera = camera;
 	//camera->scroll = scroll;
 
-	scroll = std::make_shared<LocalScrollMgr>();
+	//scroll = std::make_shared<LocalScrollMgr>();
 
 	sceneChageFlag = false;
 }
@@ -41,13 +45,7 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG)
 
 
 	sceneChageFlag = SCENE_CHANGE_FLAG;
-	if (sceneChageFlag)
-	{
-		Camera::Instance()->Init();
-		Camera::Instance()->Zoom(playerPos, bossPos);
-		ScrollMgr::Instance()->Init(centralPos, mapSize, adj);
-	}
-	else
+	if (!sceneChageFlag)
 	{
 		centralPos = mapSize / 2.0f;
 		playerPos.x = 0.0f;
@@ -56,11 +54,12 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG)
 		bossPos.y = centralPos.y;
 	}
 
-	scroll->Init(centralPos, mapSize, adj);
-	camera.Init();
-	camera.Zoom(playerPos, bossPos);
+	ScrollMgr::Instance()->Init(centralPos, mapSize, adj);
+	Camera::Instance()->Init();
+	Camera::Instance()->Zoom(playerPos, bossPos);
 
-	scroll->zoom = camera.zoom;
+
+	ScrollMgr::Instance()->zoom = Camera::Instance()->zoom;
 }
 
 void DrawMapChipForSceneChange::Finalize()
@@ -70,8 +69,9 @@ void DrawMapChipForSceneChange::Finalize()
 
 void DrawMapChipForSceneChange::Update()
 {
-	camera.Update(scroll);
-	scroll->Update(centralPos);
+	Camera::Instance()->Update();
+
+	ScrollMgr::Instance()->Update(centralPos, true);
 
 	if (sceneChageFlag)
 	{
@@ -95,7 +95,7 @@ void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipDa
 	std::map<int, std::vector<ChipData>>datas;
 
 	// 描画するチップのサイズ
-	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * scroll->zoom;
+	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
 	SizeData wallChipMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
 
@@ -115,7 +115,7 @@ void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipDa
 			if (blockFlag)
 			{
 				// スクロール量から描画する位置を求める。
-				const Vec2<float> drawPos = scroll->Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE }, camera.scrollAffect);
+				const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE });
 
 				// 画面外だったら描画しない。
 				if (drawPos.x < -DRAW_MAP_CHIP_SIZE || drawPos.x > WinApp::Instance()->GetWinSize().x + DRAW_MAP_CHIP_SIZE) continue;
