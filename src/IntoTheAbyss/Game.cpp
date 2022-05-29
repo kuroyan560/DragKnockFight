@@ -55,6 +55,8 @@
 #include"ScoreKeep.h"
 #include "RoundCountMgr.h"
 
+#include "BackGroundParticle.h"
+
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
@@ -354,6 +356,12 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	roundFinishFlag = false;
 
 	ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), StageMgr::Instance()->GetAllRoomWallBlocksNum(stageNum));
+
+	// 背景パーティクルを更新
+	BackGroundParticleMgr::Instance()->Init();
+	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetLocalMap()->size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetLocalMap()[0].size() * MAP_CHIP_SIZE));
+
+
 }
 
 Game::Game()
@@ -463,6 +471,11 @@ void Game::Init(const bool& PracticeMode)
 		mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>();
 	}
 	mapChipGenerator->Init();
+
+	// 背景パーティクルを更新
+	BackGroundParticleMgr::Instance()->Init();
+	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetLocalMap()->size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetLocalMap()[0].size() * MAP_CHIP_SIZE));
+
 }
 
 void Game::Update(const bool& Loop)
@@ -668,6 +681,9 @@ void Game::Update(const bool& Loop)
 	// ラウンド数のUIを更新。
 	RoundCountMgr::Instance()->Update();
 
+	// 背景パーティクルを更新。
+	BackGroundParticleMgr::Instance()->Update();
+
 }
 
 void Game::Draw()
@@ -677,6 +693,9 @@ void Game::Draw()
 
 	/*===== 描画処理 =====*/
 	//BackGround::Instance()->Draw();
+
+	// 背景パーティクルを描画。
+	BackGroundParticleMgr::Instance()->Draw();
 
 	if (stageNum != prevDrawChipStageNum || roomNum != prevDrawChipRoomNum)
 	{
@@ -1343,6 +1362,10 @@ void Game::RoundFinishEffect(const bool& Loop)
 
 			// AddLineLengthを伸ばす。
 			CharacterManager::Instance()->Right()->addLineLength = CharacterManager::Instance()->Right()->pos.Distance(CharacterManager::Instance()->Left()->pos) - CharacterInterFace::LINE_LENGTH * 2.0f;
+
+			// 背景パーティクルを更新
+			BackGroundParticleMgr::Instance()->Init();
+			BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetLocalMap()->size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetLocalMap()[0].size() * MAP_CHIP_SIZE));
 
 
 
