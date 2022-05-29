@@ -22,6 +22,8 @@ void BlockCount::Update()
 {
 	countNowBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
 	nowNumber = CountNumber(countNowBlockNum);
+	countAllBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
+	maxNumber = CountNumber(countAllBlockNum);
 
 	basePos = { 1280.0f / 2.0f,90.0f };
 }
@@ -113,7 +115,7 @@ void BlockCount::Draw()
 std::vector<int> BlockCount::CountNumber(int TIME)
 {
 	float score = TIME;
-	std::vector<int> Number(KuroFunc::GetDigit(countAllBlockNum));
+	std::vector<int> Number(KuroFunc::GetDigit(TIME));
 
 	int tmp = score;
 	//�X�R�A�v�Z

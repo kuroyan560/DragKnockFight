@@ -529,12 +529,6 @@ void Player::Input(const vector<vector<int>>& MapData)
 		++consecutiveSwingTimer;
 	}
 
-	if (UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::X)) {
-
-		int a = 0;
-
-	}
-
 	// 入力のデッドラインを設ける。
 	float inputRate = inputLeftVec.Length();
 	if (inputRate >= 0.5f) {
@@ -741,16 +735,16 @@ void Player::Input(const vector<vector<int>>& MapData)
 
 
 	// RTが押されていて相手を止める状態になっているかを保存。
-	isPrevStopPartner = isStopPartner;
+	//isPrevStopPartner = isStopPartner;
 	isStopPartner = false;
 
-	bool RTInput = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RT);
-	if (RTInput) {
+	//bool RTInput = UsersInput::Instance()->ControllerInput(controllerIdx, XBOX_BUTTON::RT);
+	//if (RTInput) {
 
 
-		isStopPartner = true;
+	//	isStopPartner = true;
 
-	}
+	//}
 
 
 }

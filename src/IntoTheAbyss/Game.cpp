@@ -414,6 +414,8 @@ Game::Game()
 	mapChipGenerator = std::make_shared<MapChipGenerator_ChangeMap>();
 	mapChipGeneratorOrbit = std::make_shared<MapChipGenerator_SplineOrbit>();
 
+	testGenerater = std::make_shared<MapChipGenerator_RandPattern>();
+
 }
 
 void Game::Init(const bool& PracticeMode)
@@ -528,7 +530,7 @@ void Game::Update(const bool& Loop)
 		}
 	}
 
-
+	testGenerater->Update();
 
 	// 座標を保存。
 	CharacterManager::Instance()->Left()->SavePrevFramePos();
@@ -702,6 +704,8 @@ void Game::Draw()
 		{
 			mapChipGeneratorOrbit->Draw();
 		}
+
+		testGenerater->Draw();
 
 		// 左のキャラ ~ 右のキャラ間に線を描画
 		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);

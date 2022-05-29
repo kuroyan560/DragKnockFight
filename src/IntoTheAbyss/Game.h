@@ -138,6 +138,8 @@ class Game
 	std::shared_ptr<MapChipGenerator_ChangeMap>mapChipGenerator;
 	std::shared_ptr<MapChipGenerator_SplineOrbit>mapChipGeneratorOrbit;
 
+	std::shared_ptr<MapChipGenerator_RandPattern> testGenerater;
+
 	BlockCount countBlock;
 
 	StageRap stageRap;
