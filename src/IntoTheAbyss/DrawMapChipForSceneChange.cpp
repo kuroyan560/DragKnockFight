@@ -7,7 +7,7 @@ DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 {
 	auto backBuff = D3D12App::Instance()->GetBackBuffRenderTarget();
 	Vec2<int>s(WinApp::Instance()->GetExpandWinSize().x, WinApp::Instance()->GetExpandWinSize().y);
-	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), backBuff->GetGraphSize(), L"SceneChangeMapSS");
+	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), s, L"SceneChangeMapSS");
 
 	//scroll.camera = camera;
 	//camera->scroll = scroll;
@@ -51,13 +51,14 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG)
 	{
 		centralPos = mapSize / 2.0f;
 		playerPos.x = 0.0f;
+		playerPos.y = centralPos.y;
 		bossPos.x = tmp[0].size() * MAP_CHIP_SIZE;
+		bossPos.y = centralPos.y;
 	}
 
 	scroll->Init(centralPos, mapSize, adj);
 	camera.Init();
 	camera.Zoom(playerPos, bossPos);
-
 
 	scroll->zoom = camera.zoom;
 }
@@ -71,6 +72,7 @@ void DrawMapChipForSceneChange::Update()
 {
 	camera.Update(scroll);
 	scroll->Update(centralPos);
+
 	if (sceneChageFlag)
 	{
 		ScrollMgr::Instance()->Update(centralPos);

@@ -36,19 +36,21 @@ void LocalScrollMgr::Update(const Vec2<float> &LineCenterPos)
 	//}
 
 	// 線の中心にスクロール量などをかける。
-	Vec2<float> scrollShakeZoom = scrollAmount + ShakeMgr::Instance()->shakeAmount;
-	scrollShakeZoom.x *= zoom;
-	scrollShakeZoom.y *= zoom;
-	Vec2<float> lineCenterPos = LineCenterPos * zoom - scrollShakeZoom;
+	//Vec2<float> scrollShakeZoom = scrollAmount;
+	//scrollShakeZoom.x *= zoom;
+	//scrollShakeZoom.y *= zoom;
+	//Vec2<float> lineCenterPos = LineCenterPos * zoom - scrollShakeZoom;
 
 	// 画面の中心を取得。
-	Vec2<int> windowCenter = WinApp::Instance()->GetWinCenter();
+	//Vec2<int> windowCenter = WinApp::Instance()->GetWinCenter();
 
 	// 線の中心と画面の中心との差分を求める。
-	Vec2<float> lineCenterOffsetBuff = Vec2<float>((float)windowCenter.x, (float)windowCenter.y) - lineCenterPos;
+	//Vec2<float> lineCenterOffsetBuff = Vec2<float>((float)windowCenter.x, (float)windowCenter.y) - lineCenterPos;
 
 	// 補完をかける。
 	lineCenterOffset = { 512.0f,272.0f };
+	//lineCenterOffset += (lineCenterOffsetBuff - lineCenterOffset) / 5.0f;
+
 }
 
 void LocalScrollMgr::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS)
@@ -56,8 +58,8 @@ void LocalScrollMgr::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> 
 	//ワープした際は前フレーム計算の影響が出ないように処理を飛ばす
 
 	//スクロールの制限
-	Vec2<float>startPos = CaluStartScrollLine(windowHalfSize - adjLine);
-	Vec2<float>endPos = CaluEndScrollLine(windowHalfSize + adjLine);
+	//Vec2<float>startPos = CaluStartScrollLine(windowHalfSize - adjLine);
+	//Vec2<float>endPos = CaluEndScrollLine(windowHalfSize + adjLine);
 
 	//プレイヤー座標よりライン外に出たらスクロール量は変化しない
 
@@ -95,7 +97,7 @@ void LocalScrollMgr::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> 
 
 Vec2<float> LocalScrollMgr::Affect(const Vec2<float> &Pos, const Vec2<float> &AFFECT)
 {
-	Vec2<float> scrollShakeZoom = scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	Vec2<float> scrollShakeZoom = scrollAmount;
 	scrollShakeZoom.x *= zoom;
 	scrollShakeZoom.y *= zoom;
 	return Pos * zoom - scrollShakeZoom + lineCenterOffset + AFFECT;
