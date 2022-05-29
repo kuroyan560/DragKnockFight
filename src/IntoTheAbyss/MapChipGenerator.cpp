@@ -45,7 +45,14 @@ int MapChipGenerator::GetRandChipType()
 	return appearType;
 }
 
-void MapChipGenerator::Generate(const Vec2<float>& GeneratePos)
+void MapChipGenerator::Generate(const Vec2<int>& GenerateIdx, const int& ChipType)
+{
+	if (!CanChange(GenerateIdx))return;
+	StageMgr::Instance()->WriteMapChipData(GenerateIdx, ChipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+}
+
+
+void MapChipGenerator::Generate(const Vec2<float>& GeneratePos, const int& ChipType)
 {
 	//生成座標を基にその場所のチップ番号取得
 	Vec2<int>centerIdx =
@@ -66,8 +73,7 @@ void MapChipGenerator::Generate(const Vec2<float>& GeneratePos)
 
 	for (auto& idx : generateIndices)
 	{
-		if (!CanChange(idx))continue;
-		StageMgr::Instance()->WriteMapChipData(idx, GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+		Generate(idx, ChipType);
 	}
 }
 
@@ -109,7 +115,7 @@ void MapChipGenerator_SplineOrbit::Update()
 	}
 
 	pos = KuroMath::GetSpline(t, 1, targetPosVector);
-	Generate(pos);
+	Generate(pos, GetRandChipType());
 
 	if (1.0f <= t)
 	{
@@ -276,8 +282,7 @@ void MapChipGenerator_RandPattern::Update()
 	{
 		for (auto& pre : predictionIdxArray)
 		{
-			if (!CanChange(pre.idx))continue;
-			StageMgr::Instance()->WriteMapChipData(pre.idx, pre.type, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+			Generate(pre.idx, pre.type);
 		}
 
 		auto mapData = StageMgr::Instance()->GetLocalMap();
@@ -472,8 +477,7 @@ void MapChipGenerator_Crossing::Update()
 	{
 		for (auto& pre : predictionIdxArray)
 		{
-			if (!CanChange(pre.idx))continue;
-			StageMgr::Instance()->WriteMapChipData(pre.idx, pre.type, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+			Generate(pre.idx, pre.type);
 		}
 
 		auto mapData = StageMgr::Instance()->GetLocalMap();

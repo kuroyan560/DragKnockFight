@@ -17,7 +17,8 @@ class MapChipGenerator
 protected:
 	bool CanChange(const Vec2<int>& Idx);
 	int GetRandChipType();
-	void Generate(const Vec2<float>& GeneratePos);
+	void Generate(const Vec2<int>& GenerateIdx, const int& ChipType);
+	void Generate(const Vec2<float>& GeneratePos, const int& ChipType);
 public:
 	virtual void Init() = 0;
 	virtual void Update() = 0;
@@ -103,4 +104,10 @@ public:
 	void Init()override;
 	void Update()override;
 	void Draw()override;
+};
+
+//‚P•Ó‚©‚ç‚¹‚èã‚ª‚Á‚Ä‚­‚é
+class MapChipGenerator_RiseUp : public MapChipGenerator
+{
+
 };
