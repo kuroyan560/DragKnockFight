@@ -761,7 +761,8 @@ void Game::Draw()
 		CharacterManager::Instance()->Left()->DrawUI();
 		CharacterManager::Instance()->Right()->DrawUI();
 
-		if (UsersInput::Instance()->ControllerInput(0, XBOX_STICK::R_ALL, 0.1f, { 0.0f,0.0f }))
+		float rStickInputRate = UsersInput::Instance()->GetRightStickVec(0, { 0.5f,0.5f }).Length();
+		if (0.5f <= rStickInputRate)
 		{
 			rStickNoInputTimer = 0;
 		}

@@ -194,29 +194,6 @@ bool UsersInput::ControllerOnTrigger(const int& ControllerIdx, XBOX_BUTTON Butto
 
 bool UsersInput::ControllerOnTrigger(const int& ControllerIdx, XBOX_STICK StickInput, const float& DeadRange, const Vec2<float>& DeadRate)
 {
-	if (StickInput == L_ALL)
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			if (ControllerOnTrigger(ControllerIdx, XBOX_STICK(L_UP + i), DeadRange, DeadRate))
-			{
-				return true;
-			}
-			return false;
-		}
-	}
-	else if (StickInput == R_ALL)
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			if (ControllerOnTrigger(ControllerIdx, XBOX_STICK(R_UP + i), DeadRange, DeadRate))
-			{
-				return true;
-			}
-			return false;
-		}
-	}
-
 	Vec2<float>oldVec;
 	Vec2<float>vec;
 	bool isLeftStick = StickInput <= L_RIGHT;
@@ -284,29 +261,6 @@ bool UsersInput::ControllerInput(const int& ControllerIdx, XBOX_BUTTON Button)
 
 bool UsersInput::ControllerInput(const int& ControllerIdx, XBOX_STICK StickInput, const float& DeadRange, const Vec2<float>& DeadRate)
 {
-	if (StickInput == L_ALL)
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			if (ControllerInput(ControllerIdx, XBOX_STICK(L_UP + i), DeadRange, DeadRate))
-			{
-				return true;
-			}
-			return false;
-		}
-	}
-	else if (StickInput == R_ALL)
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			if (ControllerInput(ControllerIdx, XBOX_STICK(R_UP + i), DeadRange, DeadRate))
-			{
-				return true;
-			}
-			return false;
-		}
-	}
-
 	Vec2<float>vec;
 	bool isLeftStick = StickInput <= L_RIGHT;
 	if (isLeftStick)
@@ -366,29 +320,6 @@ bool UsersInput::ControllerOffTrigger(const int& ControllerIdx, XBOX_BUTTON Butt
 
 bool UsersInput::ControllerOffTrigger(const int& ControllerIdx, XBOX_STICK StickInput, const float& DeadRange, const Vec2<float>& DeadRate)
 {
-	if (StickInput == L_ALL)
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			if (ControllerOffTrigger(ControllerIdx, XBOX_STICK(L_UP + i), DeadRange, DeadRate))
-			{
-				return true;
-			}
-			return false;
-		}
-	}
-	else if (StickInput == R_ALL)
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			if (ControllerOffTrigger(ControllerIdx, XBOX_STICK(R_UP + i), DeadRange, DeadRate))
-			{
-				return true;
-			}
-			return false;
-		}
-	}
-
 	Vec2<float>oldVec;
 	Vec2<float>vec;
 	bool isLeftStick = StickInput <= L_RIGHT;
