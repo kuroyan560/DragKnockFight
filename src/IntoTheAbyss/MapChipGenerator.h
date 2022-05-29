@@ -8,8 +8,23 @@ static const enum MAP_CHIP_GENERATOR
 	SPLINE_ORBIT,
 	RAND_PATTERN,
 	CLOSSING,
+	RISE_UP_L_TO_R,
+	RISE_UP_TOP_TO_BOTTOM,
+	RISE_UP_R_TO_L,
+	RISE_UP_BOTTOM_TO_TOP,
 	MAP_CHIP_GENERATOR_NUM
 };
+
+static bool HaveGenerateTimeParameter(const MAP_CHIP_GENERATOR& Type)
+{
+	if (Type == RAND_PATTERN)return true;
+	if (Type == CLOSSING)return true;
+	if (Type == RISE_UP_L_TO_R)return true;
+	if (Type == RISE_UP_TOP_TO_BOTTOM)return true;
+	if (Type == RISE_UP_R_TO_L)return true;
+	if (Type == RISE_UP_BOTTOM_TO_TOP)return true;
+	return false;
+}
 
 //マップチップを能動的に生成する機能
 class MapChipGenerator
@@ -20,7 +35,6 @@ protected:
 	void Generate(const Vec2<int>& GenerateIdx, const int& ChipType);
 	void Generate(const Vec2<float>& GeneratePos, const int& ChipType);
 public:
-	virtual void Init() = 0;
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
 };
@@ -28,7 +42,6 @@ public:
 class MapChipGenerator_Non : public MapChipGenerator
 {
 public:
-	void Init()override {};
 	void Update()override {};
 	void Draw()override {};
 };
@@ -47,7 +60,7 @@ private:
 	Vec2<float> GetRandPos();
 
 public:
-	void Init()override;
+	MapChipGenerator_SplineOrbit();
 	void Update()override;
 	void Draw()override;
 };
@@ -71,7 +84,7 @@ protected:
 	void DesideNextIndices(const PATTERN_TYPE& PatternType, const Vec2<int>& GenerateIdx);	//次の生成位置を決定
 
 public:
-	void Init()override;
+	MapChipGenerator_RandPattern(const int& Span, const bool& RandPattern = true);
 	void Update()override;
 	void Draw()override;
 };
@@ -86,7 +99,7 @@ class MapChipGenerator_ChangeMap :public MapChipGenerator
 	};
 	std::vector<Prediction>predictionIdxArray;
 public:
-	void Init()override;
+	MapChipGenerator_ChangeMap();
 	void Update()override;
 	void Draw()override;
 	void RegisterMap();
@@ -101,13 +114,29 @@ class MapChipGenerator_Crossing : public MapChipGenerator_RandPattern
 {
 	Vec2<int> generateLine;	//列生成する軸
 public:
-	void Init()override;
+	MapChipGenerator_Crossing(const int& Span);
 	void Update()override;
 	void Draw()override;
 };
 
 //１辺からせり上がってくる
+static const enum RISE_UP_GENERATOR_DIRECTION
+{
+	LEFT_TO_RIGHT,
+	UP_TO_BOTTOM,
+	RIGHT_TO_LEFT,
+	BOTTOM_TO_UP,
+	RISE_UP_GENERATOR_DIRECTION_NUM
+};
+
 class MapChipGenerator_RiseUp : public MapChipGenerator
 {
-
+	const RISE_UP_GENERATOR_DIRECTION dir;
+	int span;
+	int timer;
+	void RiseUp();
+public:
+	MapChipGenerator_RiseUp(const int& Span, const RISE_UP_GENERATOR_DIRECTION& Direction);
+	void Update()override;
+	void Draw()override;
 };

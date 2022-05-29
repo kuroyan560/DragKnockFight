@@ -55,7 +55,9 @@
 #include"ScoreKeep.h"
 #include "RoundCountMgr.h"
 
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int &CHIP_NUM)
+#include "BackGroundParticle.h"
+
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -346,10 +348,11 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
-	mapChipGeneratorChangeMap->Init();
+	mapChipGeneratorChangeMap.reset();
+	mapChipGeneratorChangeMap = std::make_shared<MapChipGenerator_ChangeMap>();
 
 
-	bool nonFlag = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()) != NON_GENERATE;
+	bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
 	if (nonFlag)
 	{
 		countBlock.Init(COUNT_BLOCK_MAX, false);
@@ -369,8 +372,39 @@ void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 	{
 		ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), StageMgr::Instance()->GetAllRoomWallBlocksNum(stageNum));
 	}
+
+	// 背景パーティクルを更新
+	BackGroundParticleMgr::Instance()->Init();
+	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetMap(stageNum, roomNum)[0].size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetMap(stageNum, roomNum).size() * MAP_CHIP_SIZE));
 }
 
+void Game::GeneratorInit()
+{
+	mapChipGenerator.reset();
+	auto localStageInfo = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	MAP_CHIP_GENERATOR localGeneratorType = localStageInfo.generatorType;
+	if (localGeneratorType == NON_GENERATE)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
+	}
+	else if (localGeneratorType == SPLINE_ORBIT)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
+	}
+	else if (localGeneratorType == RAND_PATTERN)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>(localStageInfo.generatorSpan);
+	}
+	else if (localGeneratorType == CLOSSING)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>(localStageInfo.generatorSpan);
+	}
+	else if (RISE_UP_L_TO_R <= localGeneratorType && localGeneratorType <= RISE_UP_BOTTOM_TO_TOP)
+	{
+		int idxDir = localGeneratorType - CLOSSING - 1;
+		mapChipGenerator = std::make_shared<MapChipGenerator_RiseUp>(localStageInfo.generatorSpan, (RISE_UP_GENERATOR_DIRECTION)idxDir);
+	}
+}
 
 Game::Game()
 {
@@ -459,28 +493,14 @@ void Game::Init(const bool &PracticeMode)
 
 	DistanceCounter::Instance()->Init();
 
+	GeneratorInit();
+
+	// 背景パーティクルを更新
+	BackGroundParticleMgr::Instance()->Init();
+	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetLocalMap()[0].size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetLocalMap()->size() * MAP_CHIP_SIZE));
+
 	int roomNum = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
 	RoundCountMgr::Instance()->Init(roomNum);
-
-	mapChipGenerator.reset();
-	MAP_CHIP_GENERATOR localGeneratorType = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-	if (localGeneratorType == NON_GENERATE)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
-	}
-	else if (localGeneratorType == SPLINE_ORBIT)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
-	}
-	else if (localGeneratorType == RAND_PATTERN)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>();
-	}
-	else if (localGeneratorType == CLOSSING)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>();
-	}
-	mapChipGenerator->Init();
 }
 
 void Game::Update(const bool &Loop)
@@ -656,7 +676,7 @@ void Game::Update(const bool &Loop)
 	//}
 
 
-	bool noGenerateFlag = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()) == NON_GENERATE;
+	bool noGenerateFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType == NON_GENERATE;
 	//敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
 	bool isBlockEmpty = countBlock.CheckNowNomberIsZero() && noGenerateFlag;
 	bool timeUpFlag = GameTimer::Instance()->TimeUpFlag();
@@ -682,6 +702,9 @@ void Game::Update(const bool &Loop)
 	// ラウンド数のUIを更新。
 	RoundCountMgr::Instance()->Update();
 
+	// 背景パーティクルを更新。
+	BackGroundParticleMgr::Instance()->Update();
+
 }
 
 void Game::Draw()
@@ -691,6 +714,9 @@ void Game::Draw()
 
 	/*===== 描画処理 =====*/
 	//BackGround::Instance()->Draw();
+
+	// 背景パーティクルを描画。
+	BackGroundParticleMgr::Instance()->Draw();
 
 	if (stageNum != prevDrawChipStageNum || roomNum != prevDrawChipRoomNum)
 	{
@@ -1316,7 +1342,7 @@ void Game::RoundFinishEffect(const bool &Loop)
 				mapChipGeneratorChangeMap->RegisterMap();
 				RoundFinishEffect::Instance()->changeMap = false;
 
-				bool nonFlag = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()) != NON_GENERATE;
+				bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
 				if (nonFlag)
 				{
 					countBlock.Init(COUNT_BLOCK_MAX, false);
@@ -1337,25 +1363,7 @@ void Game::RoundFinishEffect(const bool &Loop)
 				GameTimer::Instance()->Init(gameTimer);
 				GameTimer::Instance()->Start();
 
-				mapChipGenerator.reset();
-				MAP_CHIP_GENERATOR localGeneratorType = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-				if (localGeneratorType == NON_GENERATE)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
-				}
-				else if (localGeneratorType == SPLINE_ORBIT)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
-				}
-				else if (localGeneratorType == RAND_PATTERN)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>();
-				}
-				else if (localGeneratorType == CLOSSING)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>();
-				}
-				mapChipGenerator->Init();
+				GeneratorInit();
 
 				rStickNoInputTimer = 0;
 			}
@@ -1365,6 +1373,10 @@ void Game::RoundFinishEffect(const bool &Loop)
 
 			// AddLineLengthを伸ばす。
 			CharacterManager::Instance()->Right()->addLineLength = CharacterManager::Instance()->Right()->pos.Distance(CharacterManager::Instance()->Left()->pos) - CharacterInterFace::LINE_LENGTH * 2.0f;
+
+			// 背景パーティクルを更新
+			BackGroundParticleMgr::Instance()->Init();
+			BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetLocalMap()->size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetLocalMap()[0].size() * MAP_CHIP_SIZE));
 
 
 
