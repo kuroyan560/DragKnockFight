@@ -1,6 +1,7 @@
 ﻿#include "BlockCount.h"
 #include"TexHandleMgr.h"
 #include"../Engine/DrawFunc.h"
+#include"SelectStage.h"
 
 BlockCount::BlockCount()
 {
@@ -33,6 +34,14 @@ void BlockCount::Update()
 #include<algorithm>
 void BlockCount::Draw()
 {
+	bool nonFlag = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()) != NON_GENERATE;
+	if (nonFlag)
+	{
+		return;
+	}
+
+
+
 	Vec2<float>texSize(30.0f, 44.0f);
 	Vec2<float>centralPos;
 	int offset = 0;

@@ -638,18 +638,16 @@ void Game::Update(const bool& Loop)
 	//}
 
 
-
-	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
-	bool isBlockEmpty = countBlock.CheckNowNomberIsZero();
+	bool noGenerateFlag = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()) != NON_GENERATE;
+	//敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
+	bool isBlockEmpty = countBlock.CheckNowNomberIsZero() && noGenerateFlag;
 	bool timeUpFlag = GameTimer::Instance()->TimeUpFlag();
 
 	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty || timeUpFlag)
 	{
-		//if (isBlockEmpty) {
-
 		// 終了演出が行われていなかったら
-		if (!roundFinishFlag) {
-
+		if (!roundFinishFlag)
+		{
 			roundFinishFlag = true;
 
 			float nowBlockCount = countBlock.countNowBlockNum;
@@ -657,9 +655,7 @@ void Game::Update(const bool& Loop)
 			float destroyRate = nowBlockCount / maxBclokCount;
 			RoundFinishEffect::Instance()->Start(isBlockEmpty, 1.0f - destroyRate, Camera::Instance()->zoom);
 			DistanceCounter::Instance()->isExpSmall = true;
-
 		}
-
 	}
 
 	// 紐の距離を計算するクラスを更新する。

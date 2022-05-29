@@ -1,6 +1,8 @@
 #include "RoundCountMgr.h"
 #include "DrawFunc.h"
 #include "TexHandleMgr.h"
+#include"StageMgr.h"
+#include"SelectStage.h"
 
 RoundCount::RoundCount()
 {
@@ -118,11 +120,31 @@ void RoundCountMgr::Update()
 {
 
 	/*===== çXêVèàóù =====*/
+	int stageNum = SelectStage::Instance()->GetStageNum();
+	int roomNum = SelectStage::Instance()->GetRoomNum();
+	bool moveUiFlag = StageMgr::Instance()->GetGeneratorType(stageNum, roomNum) != NON_GENERATE;
 
+
+	Vec2<float> UI_OFFSET_POS = Vec2<float>(1140, 100);
+	const float UI_OFFSET_SIZE = 45.0f;
+
+	int indexCounter = 0;
 	for (auto& index : counter) {
 
-		index.Update();
+		Vec2<float> generatePos = UI_OFFSET_POS + Vec2<float>(indexCounter * UI_OFFSET_SIZE, 0);
 
+		if (moveUiFlag)
+		{
+			index.pos = generatePos;
+			index.pos.y /= 2.0f;
+		}
+		else
+		{
+			index.pos = generatePos;
+		}
+		++indexCounter;
+
+		index.Update();
 	}
 
 }
@@ -133,6 +155,15 @@ void RoundCountMgr::Draw()
 	/*===== ï`âÊèàóù =====*/
 
 	Vec2<float> UI_OFFSET_POS = Vec2<float>(1024, 102);
+
+	int stageNum = SelectStage::Instance()->GetStageNum();
+	int roomNum = SelectStage::Instance()->GetRoomNum();
+	bool moveUiFlag = StageMgr::Instance()->GetGeneratorType(stageNum, roomNum) != NON_GENERATE;
+	if (moveUiFlag)
+	{
+		UI_OFFSET_POS.y /= 2.0f;
+	}
+
 	DrawFunc::DrawRotaGraph2D(UI_OFFSET_POS, Vec2<float>(1, 1), 0, TexHandleMgr::GetTexBuffer(roundGraph));
 
 	for (auto& index : counter) {
