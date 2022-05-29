@@ -3,19 +3,35 @@
 #include "StageMgr.h"
 #include "CharacterManager.h"
 
+#include"Camera.h"
+#include"ScrollMgr.h"
+
+
 DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 {
 	auto backBuff = D3D12App::Instance()->GetBackBuffRenderTarget();
 	Vec2<int>s(WinApp::Instance()->GetExpandWinSize().x, WinApp::Instance()->GetExpandWinSize().y);
-	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), backBuff->GetGraphSize(), L"SceneChangeMapSS");
+	mapBuffer = D3D12App::Instance()->GenerateRenderTarget(backBuff->GetDesc().Format, Color(56, 22, 74, 255), s, L"SceneChangeMapSS");
+
+	//scroll.camera = camera;
+	//camera->scroll = scroll;
+
+	//scroll = std::make_shared<LocalScrollMgr>();
+
+	sceneChageFlag = false;
 }
 
-void DrawMapChipForSceneChange::Init(int STAGE_NUM)
+void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG)
 {
 	StageMgr::Instance()->SetLocalMapChipData(STAGE_NUM, 0);
 	StageMgr::Instance()->SetLocalMapChipDrawBlock(STAGE_NUM, 0);
+
+	mapChip = *StageMgr::Instance()->GetLocalMap();
+	mapChipDraw = *StageMgr::Instance()->GetLocalDrawMap();
+
 	stageNum = STAGE_NUM;
 	isSS = true;
+
 
 	playerPos = StageMgr::Instance()->GetPlayerResponePos(STAGE_NUM, 0);
 	bossPos = StageMgr::Instance()->GetBossResponePos(STAGE_NUM, 0);
@@ -26,12 +42,25 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM)
 
 	Vec2<float>mapSize(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE);
 	Vec2<float>adj = { 0.0f,-40.0f };
+
+
+	sceneChageFlag = SCENE_CHANGE_FLAG;
+	if (!sceneChageFlag)
+	{
+		centralPos = mapSize / 2.0f;
+		playerPos.x = 0.0f;
+		playerPos.y = centralPos.y;
+		bossPos.x = tmp[0].size() * MAP_CHIP_SIZE;
+		bossPos.y = centralPos.y;
+	}
+
 	ScrollMgr::Instance()->Init(centralPos, mapSize, adj);
-
 	Camera::Instance()->Init();
-	Camera::Instance()->Zoom(playerPos, bossPos);
 
-	ScrollMgr::Instance()->zoom = Camera::Instance()->zoom;
+	Camera::Instance()->Zoom(playerPos, bossPos);
+	//ScrollMgr::Instance()->zoom = ZOOM;
+	Camera::Instance()->zoom = ScrollMgr::Instance()->zoom;
+
 }
 
 void DrawMapChipForSceneChange::Finalize()
@@ -42,8 +71,12 @@ void DrawMapChipForSceneChange::Finalize()
 void DrawMapChipForSceneChange::Update()
 {
 	Camera::Instance()->Update();
-	ScrollMgr::Instance()->Update(centralPos);
-	//ScrollMgr::Instance()->Update(Vec2<float>(1575.0f, 225.0f));
+	if (sceneChageFlag)
+	{
+		Camera::Instance()->Zoom(playerPos, bossPos);
+		ScrollMgr::Instance()->zoom = Camera::Instance()->zoom;
+	}
+	ScrollMgr::Instance()->Update(centralPos, true);
 }
 
 void DrawMapChipForSceneChange::Draw()
@@ -52,7 +85,7 @@ void DrawMapChipForSceneChange::Draw()
 	{
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		KuroEngine::Instance().Graphics().ClearRenderTarget({ mapBuffer });
-		DrawMapChip(*StageMgr::Instance()->GetLocalMap(), *StageMgr::Instance()->GetLocalDrawMap(), stageNum, 0);
+		DrawMapChip(mapChip, mapChipDraw, stageNum, 0);
 		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	}
 }

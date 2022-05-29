@@ -18,14 +18,11 @@ StageMgr::StageMgr()
 	{
 		allStageNum++;
 	}
-
 	//int allStageNum = 4;
 	//int allRoomNum = 10;
 	int nowStage = 0;
 
-	allMapChipData.resize(allStageNum);
-	relationRoomData.resize(allStageNum);
-	allMapChipDrawData.resize(allStageNum);
+	stageInfos.resize(allStageNum);
 	//1~21
 	mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK] = { 1,MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS };
 
@@ -96,6 +93,8 @@ StageMgr::StageMgr()
 			allRoomNum++;
 		}
 
+		stageInfos[stageNum].resize(allRoomNum);
+
 		for (int roomNum = 0; roomNum < allRoomNum; ++roomNum)
 		{
 			RoomMapChipArray data;	//小部屋の読み込み
@@ -103,13 +102,10 @@ StageMgr::StageMgr()
 			//Stageまでのファイルパス+小部屋のファイルパス
 			loder.CSVLoad(&data, filePass);
 			//データの追加
-			allMapChipData[stageNum].push_back(data);
+			stageInfos[stageNum][roomNum].mapChipData = data;
 		}
 	}
 	//ステージ毎の小部屋読み込み-----------------------
-
-	swingCount.resize(allStageNum);
-	gameMaxTimer.resize(allStageNum);
 	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
 	{
 		//ファイルパス
@@ -118,9 +114,7 @@ StageMgr::StageMgr()
 		//ファイル名
 		std::string fileName = filePass + "StageManager.txt";
 
-		const int thisStageRoomCount = allMapChipData[stageNum].size();
-		swingCount[stageNum].resize(thisStageRoomCount, 0);	//振り回し可能回数０で埋める
-		gameMaxTimer[stageNum].resize(thisStageRoomCount, 60);	//振り回し可能回数０で埋める
+		const int thisStageRoomCount = stageInfos[stageNum].size();
 
 		//ファイルが存在しないならそもそも振り回しが出来ないステージ
 		if (!KuroFunc::ExistFile(fileName))
@@ -152,84 +146,36 @@ StageMgr::StageMgr()
 				if (key == roomkey)
 				{
 					line_stream >> num;
-					swingCount[stageNum][roomCount] = num;
-					break;
+					stageInfos[stageNum][roomCount].swingCount = num;
 				}
 
 				std::string timerkey = "timer" + std::to_string(roomCount);
 				if (key == timerkey)
 				{
 					line_stream >> num;
-					gameMaxTimer[stageNum][roomCount] = num;
-					break;
+					stageInfos[stageNum][roomCount].gameMaxTimer = num;
+				}
 
+				std::string genekey = "gene" + std::to_string(roomCount);
+				if (key == genekey)
+				{
+					line_stream >> num;
+					stageInfos[stageNum][roomCount].generatorType = (MAP_CHIP_GENERATOR)num;
 				}
 			}
 		}
 		ifs.close();
 	}
 
-
-	//小部屋同士の繋がりを読み込み-----------------------
+	//部屋ごとの描画情報を格納する-----------------------
 	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
 	{
-		std::string filePass = rootFilePass + stageFilePass + std::to_string(stageNum) + "/";	//Stageまでのファイルパス
-		// ファイルデータ
-		std::ifstream ifs;
-		// ファイルを開く。
-		ifs.open(filePass + "Relation.txt");
-		// ファイルが開けたかをチェックする。
-		if (ifs.fail())
+		for (int roomNum = 0; roomNum < stageInfos[stageNum].size(); ++roomNum)
 		{
-			//失敗
-			continue;
-			return;
-		}
-
-		//ファイルから情報を選択
-		string line;
-
-		int roomNum = 0;
-		while (getline(ifs, line))
-		{
-			//一行分の文字列をストリームに変換して解析しやすくなる
-			istringstream line_stream(line);
-
-			//半角スペース区切りで行の先頭文字列を取得
-			string key;//ここでvかf等の判断をする
-			getline(line_stream, key, ' ');
-
-
-			if (key == "roomNum")
+			stageInfos[stageNum][roomNum].mapChipDrawData.resize(stageInfos[stageNum][roomNum].mapChipData.size());
+			for (int y = 0; y < stageInfos[stageNum][roomNum].mapChipData.size(); ++y)
 			{
-				relationRoomData[stageNum].push_back({});
-				++roomNum;
-			}
-			if (key == "link")
-			{
-				RelationData tmp;
-				line_stream >> tmp.doorNumber;
-				line_stream >> tmp.nextRoomNumber;
-				relationRoomData[stageNum][roomNum - 1].push_back(tmp);
-			}
-		}
-		ifs.close();
-	}
-	//小部屋同士の繋がりを読み込み-----------------------
-
-
-
-
-	//部屋ごとの描画情報を格納する-----------------------
-	for (int stageNum = 0; stageNum < allMapChipData.size(); ++stageNum)
-	{
-		allMapChipDrawData[stageNum].resize(allMapChipData[stageNum].size());
-		for (int roomNum = 0; roomNum < allMapChipData[stageNum].size(); ++roomNum)
-		{
-			allMapChipDrawData[stageNum][roomNum].resize(allMapChipData[stageNum][roomNum].size());
-			for (int y = 0; y < allMapChipData[stageNum][roomNum].size(); ++y)
-			{
-				allMapChipDrawData[stageNum][roomNum][y].resize(allMapChipData[stageNum][roomNum][y].size());
+				stageInfos[stageNum][roomNum].mapChipDrawData[y].resize(stageInfos[stageNum][roomNum].mapChipData[y].size());
 			}
 		}
 	}
@@ -240,20 +186,22 @@ StageMgr::StageMgr()
 	array<int, 10>doorCallCount = {};//それぞれのドア番号で何回呼び出されたか
 	array<bool, 10>doorSideCheckFlags = {};//それぞれのドアがどの方向に向いているか
 
-	for (int stageNum = 0; stageNum < allMapChipDrawData.size(); ++stageNum)
+	for (int stageNum = 0; stageNum < stageInfos.size(); ++stageNum)
 	{
-		for (int roomNum = 0; roomNum < allMapChipDrawData[stageNum].size(); ++roomNum)
+		for (int roomNum = 0; roomNum < stageInfos[stageNum].size(); ++roomNum)
 		{
-			for (int y = 0; y < allMapChipDrawData[stageNum][roomNum].size(); ++y)
+			for (int y = 0; y < stageInfos[stageNum][roomNum].mapChipDrawData.size(); ++y)
 			{
-				for (int x = 0; x < allMapChipDrawData[stageNum][roomNum][y].size(); ++x)
+				for (int x = 0; x < stageInfos[stageNum][roomNum].mapChipDrawData[y].size(); ++x)
 				{
-					if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[stageNum][roomNum][y][x] && allMapChipData[stageNum][roomNum][y][x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - 5)
+					if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= stageInfos[stageNum][roomNum].mapChipData[y][x] 
+						&& stageInfos[stageNum][roomNum].mapChipData[y][x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - 5)
 					{
-						MapChipDrawEnum now = static_cast<MapChipDrawEnum>(allMapChipData[stageNum][roomNum][y][x] - 1);
-						allMapChipDrawData[stageNum][roomNum][y][x].handle = mapChipGraphHandle[now];
+						MapChipDrawEnum now = static_cast<MapChipDrawEnum>( stageInfos[stageNum][roomNum].mapChipData[y][x] - 1);
+						stageInfos[stageNum][roomNum].mapChipDrawData[y][x].handle = mapChipGraphHandle[now];
 					}
-					else if (MAPCHIP_TYPE_STATIC_CHANGE_AREA <= allMapChipData[stageNum][roomNum][y][x] && allMapChipData[stageNum][roomNum][y][x] <= MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+					else if (MAPCHIP_TYPE_STATIC_CHANGE_AREA <= stageInfos[stageNum][roomNum].mapChipData[y][x] 
+						&& stageInfos[stageNum][roomNum].mapChipData[y][x] <= MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
 					{
 						SetGimmickGraphHandle(stageNum, roomNum, Vec2<int>(x, y));
 					}
@@ -269,20 +217,20 @@ StageMgr::StageMgr()
 
 void StageMgr::SetLocalMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
-	localRoomMapChipArray = allMapChipData[STAGE_NUMBER][ROOM_NUMBER];
+	localRoomMapChipArray = stageInfos[STAGE_NUMBER][ROOM_NUMBER].mapChipData;
 }
 
-const int &StageMgr::GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER)
-{
-	for (int doorIndex = 0; doorIndex < relationRoomData[STAGE_NUMBER][ROOM_NUMBER].size(); ++doorIndex)
-	{
-		//どの扉なのか探索して、どの小部屋に行くかを返す
-		if (relationRoomData[STAGE_NUMBER][ROOM_NUMBER][doorIndex].doorNumber == DOOR_NUMBER)
-		{
-			return relationRoomData[STAGE_NUMBER][ROOM_NUMBER][doorIndex].nextRoomNumber;
-		}
-	}
-}
+//const int &StageMgr::GetRelationData(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const int &DOOR_NUMBER)
+//{
+//	for (int doorIndex = 0; doorIndex < relationRoomData[STAGE_NUMBER][ROOM_NUMBER].size(); ++doorIndex)
+//	{
+//		//どの扉なのか探索して、どの小部屋に行くかを返す
+//		if (relationRoomData[STAGE_NUMBER][ROOM_NUMBER][doorIndex].doorNumber == DOOR_NUMBER)
+//		{
+//			return relationRoomData[STAGE_NUMBER][ROOM_NUMBER][doorIndex].nextRoomNumber;
+//		}
+//	}
+//}
 
 const SizeData StageMgr::GetMapChipSizeData(MapChipData TYPE)
 {
@@ -292,12 +240,12 @@ const SizeData StageMgr::GetMapChipSizeData(MapChipData TYPE)
 
 void StageMgr::SetLocalMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
-	localRoomMapChipDrawArray = allMapChipDrawData[STAGE_NUMBER][ROOM_NUMBER];
+	localRoomMapChipDrawArray = stageInfos[STAGE_NUMBER][ROOM_NUMBER].mapChipDrawData;
 }
 
 const bool &StageMgr::CheckStageNum(const int &STAGE_NUMBER)
 {
-	if (0 <= STAGE_NUMBER && STAGE_NUMBER < allMapChipDrawData.size())
+	if (0 <= STAGE_NUMBER && STAGE_NUMBER < stageInfos.size())
 	{
 		return true;
 	}
@@ -309,12 +257,12 @@ const bool &StageMgr::CheckStageNum(const int &STAGE_NUMBER)
 
 const bool &StageMgr::CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
 {
-	bool checkStageFlag = 0 <= STAGE_NUMBER && STAGE_NUMBER < allMapChipDrawData.size();//ステージ番号が配列内にあるか確認
+	bool checkStageFlag = 0 <= STAGE_NUMBER && STAGE_NUMBER < stageInfos.size();//ステージ番号が配列内にあるか確認
 
 	if (checkStageFlag)
 	{
-		bool checkRoomFlag = 0 <= ROOM_NUMBER && ROOM_NUMBER < allMapChipDrawData[STAGE_NUMBER].size();//部屋番号が配列内にあるか確認
-		bool checkRoomHaveMapChipFlag = allMapChipDrawData[STAGE_NUMBER][ROOM_NUMBER].size() != 0;				   //部屋にマップチップがあるかどうか確認
+		bool checkRoomFlag = 0 <= ROOM_NUMBER && ROOM_NUMBER < stageInfos[STAGE_NUMBER].size();//部屋番号が配列内にあるか確認
+		bool checkRoomHaveMapChipFlag = stageInfos[STAGE_NUMBER][ROOM_NUMBER].mapChipDrawData.size() != 0;				   //部屋にマップチップがあるかどうか確認
 		if (checkRoomFlag && checkRoomHaveMapChipFlag)
 		{
 			return true;
@@ -331,7 +279,7 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM,
 	{
 		return;
 	}
-	if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == CHIPNUM)return;	//変化なし
+	//if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == CHIPNUM)return;	//変化なし
 
 	//壊れないブロックは飛ばす
 	if (localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)
@@ -368,43 +316,44 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int &CHIPNUM,
 
 MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM)
 {
-	if (allMapChipData[STAGE_NUM][ROOM_NUM].size() <= MAPCHIP_NUM.y && allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
+	if (stageInfos[STAGE_NUM][ROOM_NUM].mapChipData.size() <= MAPCHIP_NUM.y 
+		&& stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
 	{
 		return MAPCHIP_BLOCK_NONE;
 	}
 
 	int otherBlockNum = 6;
 	int spaceNum = 0;
-	if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] &&
-		allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - otherBlockNum)
+	if (mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[MAPCHIP_NUM.y][MAPCHIP_NUM.x] &&
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[MAPCHIP_NUM.y][MAPCHIP_NUM.x] <= mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].max - otherBlockNum)
 	{
 		return MAPCHIP_BLOCK_WALL;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)
+	else if (stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)
 	{
 		return MAPCHIP_BLOCK_ELEC_ON;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)
+	else if (stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)
 	{
 		return MAPCHIP_BLOCK_ELEC_OFF;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)
+	else if (stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)
 	{
 		return MAPCHIP_BLOCK_COLOR_LEFT;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_RARE_BLOCK)
+	else if (stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_RARE_BLOCK)
 	{
 		return MAPCHIP_BLOCK_COLOR_RIGHT;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
+	else if (stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
 	{
 		return MAPCHIP_BLOCK_ELEC_ON_ALLWAYS;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == spaceNum)
+	else if (stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == spaceNum)
 	{
 		return MAPCHIP_BLOCK_SPACE;
 	}
-	else if (allMapChipData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_CHANGE_AREA)
+	else if (stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[MAPCHIP_NUM.y][MAPCHIP_NUM.x] == MAPCHIP_TYPE_STATIC_CHANGE_AREA)
 	{
 		return MAPCHIP_BLOCK_CHANGE_AREA;
 	}
@@ -502,17 +451,19 @@ int StageMgr::GetAllRoomWallBlocksNum(int STAGE_NUM, int RARE_BLOCK_COUNT)
 {
 	int count = 0;
 
-	for (int roomNum = 0; roomNum < allMapChipData[STAGE_NUM].size(); ++roomNum)
+	for (int roomNum = 0; roomNum < stageInfos[STAGE_NUM].size(); ++roomNum)
 	{
-		for (int y = 0; y < allMapChipData[STAGE_NUM][roomNum].size(); ++y)
+		for (int y = 0; y < stageInfos[STAGE_NUM][roomNum].mapChipData.size(); ++y)
 		{
-			for (int x = 0; x < allMapChipData[STAGE_NUM][roomNum][y].size(); ++x)
+			for (int x = 0; x < stageInfos[STAGE_NUM][roomNum].mapChipData[y].size(); ++x)
 			{
-				if (allMapChipData[STAGE_NUM][roomNum][y][x] == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)continue;
+				if (stageInfos[STAGE_NUM][roomNum].mapChipData[y][x] == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)continue;
 
-				bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[STAGE_NUM][roomNum][y][x] && allMapChipData[STAGE_NUM][roomNum][y][x] <= MAPCHIP_TYPE_STATIC_CHANGE_AREA - 1;
-				bool isOutSideWall = y == 0 || x == 0 || y == allMapChipData[STAGE_NUM][roomNum].size() - 1 || x == allMapChipData[STAGE_NUM][roomNum][y].size() - 1;
-				bool isRareFlag = allMapChipData[STAGE_NUM][roomNum][y][x] == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
+				bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= stageInfos[STAGE_NUM][roomNum].mapChipData[y][x] 
+					&& stageInfos[STAGE_NUM][roomNum].mapChipData[y][x] <= MAPCHIP_TYPE_STATIC_CHANGE_AREA - 1;
+				bool isOutSideWall = y == 0 || x == 0 || y == stageInfos[STAGE_NUM][roomNum].mapChipData.size() - 1
+					|| x == stageInfos[STAGE_NUM][roomNum].mapChipData[y].size() - 1;
+				bool isRareFlag = stageInfos[STAGE_NUM][roomNum].mapChipData[y][x] == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 
 				if (isWallFlag && !isOutSideWall)
 				{
@@ -533,12 +484,14 @@ int StageMgr::GetAllRoomWallBlocksNum(int STAGE_NUM, int RARE_BLOCK_COUNT)
 int StageMgr::GetAllWallBlocksNum(int STAGE_NUM, int ROOM_NUM)
 {
 	int count = 0;
-	for (int y = 0; y < allMapChipData.size(); ++y)
+	for (int y = 0; y < stageInfos[STAGE_NUM][ROOM_NUM].mapChipData.size(); ++y)
 	{
-		for (int x = 0; x < allMapChipData[y].size(); ++x)
+		for (int x = 0; x < stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[y].size(); ++x)
 		{
-			bool isOutSideWall = y == 0 || x == 0 || y == allMapChipData[STAGE_NUM][ROOM_NUM].size() - 1 || x == allMapChipData[STAGE_NUM][ROOM_NUM][y].size() - 1;
-			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= allMapChipData[STAGE_NUM][ROOM_NUM][y][x] && allMapChipData[STAGE_NUM][ROOM_NUM][y][x] <= MAPCHIP_TYPE_STATIC_CHANGE_AREA - 1;
+			bool isOutSideWall = y == 0 || x == 0 || y == stageInfos[STAGE_NUM][ROOM_NUM].mapChipData.size() - 1
+				|| x == stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[y].size() - 1;
+			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[y][x] 
+				&& stageInfos[STAGE_NUM][ROOM_NUM].mapChipData[y][x] <= MAPCHIP_TYPE_STATIC_CHANGE_AREA - 1;
 
 			if (isWallFlag && !isOutSideWall)
 			{
@@ -558,9 +511,9 @@ int StageMgr::GetMaxMapChipNum()
 int StageMgr::GetEnableToUseRoomNumber(int STAGE_NUMBER)
 {
 	int count = 0;
-	for (int i = 0; i < allMapChipData[STAGE_NUMBER].size(); ++i)
+	for (int i = 0; i < stageInfos[STAGE_NUMBER].size(); ++i)
 	{
-		if (allMapChipData[STAGE_NUMBER][i].size() != 0)
+		if (stageInfos[STAGE_NUMBER][i].mapChipData.size() != 0)
 		{
 			++count;
 		}
@@ -571,9 +524,9 @@ int StageMgr::GetEnableToUseRoomNumber(int STAGE_NUMBER)
 int StageMgr::GetEnableToUseStageNumber()
 {
 	int count = 0;
-	for (int i = 0; i < allMapChipData.size(); ++i)
+	for (int i = 0; i < stageInfos.size(); ++i)
 	{
-		if (allMapChipData[i].size() != 0)
+		if (stageInfos[i].size() != 0)
 		{
 			++count;
 		}
@@ -583,11 +536,11 @@ int StageMgr::GetEnableToUseStageNumber()
 
 Vec2<float>StageMgr::GetPlayerResponePos(const int &StageNum, const int &RoomNum)
 {
-	for (int y = 0; y < allMapChipData[StageNum][RoomNum].size(); ++y)
+	for (int y = 0; y < stageInfos[StageNum][RoomNum].mapChipData.size(); ++y)
 	{
-		for (int x = 0; x < allMapChipData[StageNum][RoomNum][y].size(); ++x)
+		for (int x = 0; x < stageInfos[StageNum][RoomNum].mapChipData[y].size(); ++x)
 		{
-			if (allMapChipData[StageNum][RoomNum][y][x] == MAPCHIP_TYPE_STATIC_RESPONE_PLAYER)
+			if (stageInfos[StageNum][RoomNum].mapChipData[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_PLAYER)
 			{
 				return Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 			}
@@ -598,11 +551,11 @@ Vec2<float>StageMgr::GetPlayerResponePos(const int &StageNum, const int &RoomNum
 
 Vec2<float>StageMgr::GetBossResponePos(const int &StageNum, const int &RoomNum)
 {
-	for (int y = 0; y < allMapChipData[StageNum][RoomNum].size(); ++y)
+	for (int y = 0; y < stageInfos[StageNum][RoomNum].mapChipData.size(); ++y)
 	{
-		for (int x = 0; x < allMapChipData[StageNum][RoomNum][y].size(); ++x)
+		for (int x = 0; x < stageInfos[StageNum][RoomNum].mapChipData[y].size(); ++x)
 		{
-			if (allMapChipData[StageNum][RoomNum][y][x] == MAPCHIP_TYPE_STATIC_RESPONE_BOSS)
+			if (stageInfos[StageNum][RoomNum].mapChipData[y][x] == MAPCHIP_TYPE_STATIC_RESPONE_BOSS)
 			{
 				return Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 			}
@@ -613,12 +566,12 @@ Vec2<float>StageMgr::GetBossResponePos(const int &StageNum, const int &RoomNum)
 
 int StageMgr::GetSwingCount(int STAGE_NUM, int ROOM_NUM)
 {
-	return swingCount[STAGE_NUM][ROOM_NUM];
+	return stageInfos[STAGE_NUM][ROOM_NUM].swingCount;
 }
 
 int StageMgr::GetMaxTime(int STAGE_NUM, int ROOM_NUM)
 {
-	return gameMaxTimer[STAGE_NUM][ROOM_NUM];
+	return stageInfos[STAGE_NUM][ROOM_NUM].gameMaxTimer;
 }
 
 bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
@@ -688,30 +641,30 @@ void StageMgr::SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, 
 	//描画の書き換え
 	if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_COLOR_RIGHT)
 	{
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_RED];
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_RED];
 	}
 	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_COLOR_LEFT)
 	{
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_GREEN];
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_GREEN];
 	}
 	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_ELEC_ON)
 	{
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
 	}
 	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_ELEC_OFF)
 	{
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_ELEC_OFF];
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_ELEC_OFF];
 	}
 	else if (GetMapChipType(STAGE_NUM, ROOM_NUM, MAPCHIP_NUM) == MAPCHIP_BLOCK_ELEC_ON_ALLWAYS)
 	{
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
 	}
 	else
 	{
-		allMapChipDrawData[STAGE_NUM][ROOM_NUM][MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+		stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
 	}
 }

@@ -31,8 +31,15 @@ void StageSelectScene::OnInitialize()
 	isPrevInputStickRight = false;
 	isPrevInputSticlLeft = false;
 
-	DrawMapChipForSceneChange::Instance()->Init(0);
 	prevStageNum = -1;
+
+	for (int i = 0; i < mapScreenShot.size(); ++i)
+	{
+		//ステージ選択画面用
+		mapScreenShot[i][STAGE_SELECT].Init(i, false);
+		//シーン遷移用
+		mapScreenShot[i][SCENE_CHANGE].Init(i, true);
+	}
 }
 
 void StageSelectScene::OnUpdate()
@@ -111,8 +118,13 @@ void StageSelectScene::OnUpdate()
 			// 画面のズームアウトの判定をスクショのズームアウトの判定にも適応させる。
 			//screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
 
-			DrawMapChipForSceneChange::Instance()->Finalize();
 			AudioApp::Instance()->PlayWave(SE);
+
+			mapScreenShot[stageNum][SCENE_CHANGE].Init(stageNum, true);
+
+			mapScreenShot[stageNum][STAGE_SELECT].Finalize();
+			mapScreenShot[stageNum][SCENE_CHANGE].Finalize();
+
 
 		}
 		//タイトルシーンに移動する
@@ -164,17 +176,19 @@ void StageSelectScene::OnUpdate()
 		SelectStage::Instance()->SelectStageNum(stageNum);
 	}
 
-	if (stageNum != prevStageNum)
-	{
-		DrawMapChipForSceneChange::Instance()->Init(stageNum);
-	}
+	//if (stageNum != prevStageNum)
+	//{
+	//mapScreenShot[stageNum][0].Init(stageNum, false);
+	//}
 	prevStageNum = stageNum;
 
 	screenShot.Update();
 	stageSelect.Update();
 	rightArrow.Update(false);
 	leftArrow.Update(true);
-	DrawMapChipForSceneChange::Instance()->Update();
+
+	mapScreenShot[stageNum][STAGE_SELECT].Update();
+	mapScreenShot[stageNum][SCENE_CHANGE].Update();
 
 	// 背景のキャラカードの更新処理
 	leftChara.Update();
@@ -203,6 +217,8 @@ void StageSelectScene::OnUpdate()
 
 	}*/
 
+	maskSceneChange->backGroundTex = mapScreenShot[stageNum][SCENE_CHANGE].mapBuffer;
+	screenShot.screenShot = mapScreenShot[stageNum][STAGE_SELECT].mapBuffer;
 }
 
 void StageSelectScene::OnDraw()
@@ -216,7 +232,8 @@ void StageSelectScene::OnDraw()
 	leftChara.Draw();
 	rightChara.Draw();
 
-	DrawMapChipForSceneChange::Instance()->Draw();
+	mapScreenShot[stageNum][STAGE_SELECT].Draw();
+	mapScreenShot[stageNum][SCENE_CHANGE].Draw();
 
 }
 

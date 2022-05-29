@@ -1,9 +1,9 @@
-#include "ScrollMgr.h"
+#include "LocalScrollMgr.h"
 #include"../Engine/WinApp.h"
 
-const float ScrollMgr::INIT_SCROLL = 0.4f;
+const float LocalScrollMgr::INIT_SCROLL = 0.4f;
 
-void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, const Vec2<float>& ADJ)
+void LocalScrollMgr::Init(const Vec2<float> POS, const Vec2<float> &MAP_MAX_SIZE, const Vec2<float> &ADJ)
 {
 	mapSize = MAP_MAX_SIZE;
 	adjLine = ADJ;
@@ -24,52 +24,40 @@ void ScrollMgr::Init(const Vec2<float> POS, const Vec2<float>& MAP_MAX_SIZE, con
 	warpFlag = false;
 }
 
-void ScrollMgr::Update(const Vec2<float> &LineCenterPos, bool LOCK)
+void LocalScrollMgr::Update(const Vec2<float> &LineCenterPos)
 {
 	//if (Camera::Instance()->active) {
 	//	scrollAmount.x = honraiScrollAmount.x - Camera::Instance()->scrollAffect.x;
 	//	scrollAmount.y = honraiScrollAmount.y - Camera::Instance()->scrollAffect.y;
 	//}
 	//else {
-		scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x) / 5.0f;
-		scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y) / 5.0f;
+	scrollAmount.x += (honraiScrollAmount.x - scrollAmount.x) / 5.0f;
+	scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y) / 5.0f;
 	//}
 
-	// 線の中心にスクロール量などをかける。
-	Vec2<float> scrollShakeZoom = scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	//線の中心にスクロール量などをかける。
+	Vec2<float> scrollShakeZoom = scrollAmount;
 	scrollShakeZoom.x *= zoom;
 	scrollShakeZoom.y *= zoom;
 	Vec2<float> lineCenterPos = LineCenterPos * zoom - scrollShakeZoom;
 
-	// 画面の中心を取得。
+	//画面の中心を取得。
 	Vec2<int> windowCenter = WinApp::Instance()->GetWinCenter();
 
-	// 線の中心と画面の中心との差分を求める。
+	//線の中心と画面の中心との差分を求める。
 	Vec2<float> lineCenterOffsetBuff = Vec2<float>((float)windowCenter.x, (float)windowCenter.y) - lineCenterPos;
 
-	// 補完をかける。
-	if (Camera::Instance()->active) {
-		lineCenterOffset = lineCenterOffsetBuff;
-	}
-	else {
-		lineCenterOffset += (lineCenterOffsetBuff - lineCenterOffset) / 5.0f;
-	}
-
-	if (LOCK)
-	{
-		lineCenterOffset += lineCenterOffsetBuff - lineCenterOffset;
-	}
-
-
+	//補完をかける。
+	lineCenterOffset += lineCenterOffsetBuff - lineCenterOffset;
 }
 
-void ScrollMgr::CalucurateScroll(const Vec2<float>& VEL, const Vec2<float>& PLAYER_POS)
+void LocalScrollMgr::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS)
 {
 	//ワープした際は前フレーム計算の影響が出ないように処理を飛ばす
 
 	//スクロールの制限
-	Vec2<float>startPos = CaluStartScrollLine(windowHalfSize - adjLine);
-	Vec2<float>endPos = CaluEndScrollLine(windowHalfSize + adjLine);
+	//Vec2<float>startPos = CaluStartScrollLine(windowHalfSize - adjLine);
+	//Vec2<float>endPos = CaluEndScrollLine(windowHalfSize + adjLine);
 
 	//プレイヤー座標よりライン外に出たらスクロール量は変化しない
 
@@ -105,15 +93,16 @@ void ScrollMgr::CalucurateScroll(const Vec2<float>& VEL, const Vec2<float>& PLAY
 	warpFlag = false;
 }
 
-Vec2<float> ScrollMgr::Affect(const Vec2<float>& Pos)
+Vec2<float> LocalScrollMgr::Affect(const Vec2<float> &Pos, const Vec2<float> &AFFECT)
 {
-	Vec2<float> scrollShakeZoom = scrollAmount + ShakeMgr::Instance()->shakeAmount;
+	Vec2<float> scrollShakeZoom = scrollAmount;
 	scrollShakeZoom.x *= zoom;
 	scrollShakeZoom.y *= zoom;
-	return Pos * zoom - scrollShakeZoom + lineCenterOffset + Camera::Instance()->scrollAffect;
+	return Pos * zoom - scrollShakeZoom + lineCenterOffset + AFFECT;
+	//return Pos * zoom - scrollShakeZoom + lineCenterOffset;
 }
 
-void ScrollMgr::Warp(const Vec2<float> POS)
+void LocalScrollMgr::Warp(const Vec2<float> POS)
 {
 	//warpFlag = true;
 	//honraiScrollAmount = { 0.0f,0.0f };
@@ -121,7 +110,7 @@ void ScrollMgr::Warp(const Vec2<float> POS)
 	//honraiScrollAmount = (POS + adjLine) - startPos;
 }
 
-void ScrollMgr::Reset()
+void LocalScrollMgr::Reset()
 {
 	honraiScrollAmount = resetAmount;
 	scrollAmount = resetAmount;
