@@ -5,13 +5,15 @@
 #include"DrawMap.h"
 #include<vector>
 #include<memory>
+#include"LocalScrollMgr.h"
+#include"LocalCamera.h"
 
-class DrawMapChipForSceneChange :public Singleton<DrawMapChipForSceneChange>
+class DrawMapChipForSceneChange
 {
 public:
 	DrawMapChipForSceneChange();
 
-	void Init(int STAGE_NUM);
+	void Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG);
 	void Finalize();
 	void Update();
 	void Draw();
@@ -24,4 +26,15 @@ private:
 	std::vector<DrawMap>drawMap;
 	bool isSS;
 	Vec2<float>centralPos,playerPos,bossPos;
+
+
+	//ã÷ífÇÃãZÅAéûíZÇÃà◊égóp
+	//std::shared_ptr<LocalScrollMgr> scroll;
+	//LocalCamera camera;
+
+	bool sceneChageFlag;
+
+	RoomMapChipArray mapChip;
+	RoomMapChipDrawArray mapChipDraw;
+
 };

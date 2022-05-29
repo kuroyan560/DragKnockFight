@@ -18,7 +18,6 @@ StageMgr::StageMgr()
 	{
 		allStageNum++;
 	}
-
 	//int allStageNum = 4;
 	//int allRoomNum = 10;
 	int nowStage = 0;

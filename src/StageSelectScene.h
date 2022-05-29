@@ -38,6 +38,13 @@ public:
 	std::shared_ptr<MaskSceneTransition>maskSceneChange;
 	std::shared_ptr< SceneTransition>sceneChange;
 
+	enum
+	{
+		STAGE_SELECT,
+		SCENE_CHANGE
+	};
+	std::vector<std::array<DrawMapChipForSceneChange, 2>>mapScreenShot;
+
 	// ステージ番号
 	int stageNum,prevStageNum;
 };
