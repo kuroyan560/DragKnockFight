@@ -1,6 +1,9 @@
 ﻿#include "BlockCount.h"
 #include"TexHandleMgr.h"
 #include"../Engine/DrawFunc.h"
+#include"SelectStage.h"
+#include"ScoreManager.h"
+#include"CharacterManager.h"
 
 BlockCount::BlockCount()
 {
@@ -10,20 +13,46 @@ BlockCount::BlockCount()
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, number.data());
 }
 
-void BlockCount::Init()
+void BlockCount::Init(int COUNT_MAX, bool MODE)
 {
-	countAllBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
-	maxNumber = CountNumber(countAllBlockNum);
-	countNowBlockNum = countAllBlockNum;
+	countBlockModeFlag = MODE;
+	//ブロックを全部壊すモード
+	if (MODE)
+	{
+		countAllBlockNum = COUNT_MAX;
+		maxNumber = CountNumber(countAllBlockNum);
+		countNowBlockNum = countAllBlockNum;
+		nowNumber = CountNumber(countNowBlockNum);
+	}
+	//一定数破壊するモード
+	else
+	{
+		countAllBlockNum = COUNT_MAX;
+		maxNumber = CountNumber(countAllBlockNum);
+		countNowBlockNum = 0;
+		nowNumber = CountNumber(countNowBlockNum);
+	}
+
+
+	nowScoreNum = ScoreManager::Instance()->GetScore();
 }
 
 
 void BlockCount::Update()
 {
-	countNowBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
-	nowNumber = CountNumber(countNowBlockNum);
-	countAllBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
-	maxNumber = CountNumber(countAllBlockNum);
+	if (countBlockModeFlag)
+	{
+		countNowBlockNum = StageMgr::Instance()->GetAllLocalWallBlocksNum();
+		nowNumber = CountNumber(countNowBlockNum);
+		maxNumber = CountNumber(countAllBlockNum);
+	}
+	else
+	{
+		countNowBlockNum = CharacterManager::Instance()->Left()->swingDestroyCounter.totalCounter;
+		nowNumber = CountNumber(countNowBlockNum);
+		maxNumber = CountNumber(countAllBlockNum);
+	}
+
 
 	basePos = { 1280.0f / 2.0f,90.0f };
 }
@@ -66,7 +95,15 @@ void BlockCount::Draw()
 	static const int GREAT_GAUGE = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/greatGauge.png");
 	static const int EXCELLENT_GAUGE = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellentGauge.png");
 	static const int PERFECT_GAUGE = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/perfectGauge.png");
-	float totalGetRate = (float)(countAllBlockNum - countNowBlockNum) / countAllBlockNum;
+	float totalGetRate = 0.0f;
+	if (countBlockModeFlag)
+	{
+		totalGetRate = static_cast<float>((countAllBlockNum - countNowBlockNum)) / static_cast<float>(countAllBlockNum);
+	}
+	else
+	{
+		totalGetRate = 1.0f - static_cast<float>((countAllBlockNum - countNowBlockNum)) / static_cast<float>(countAllBlockNum);
+	}
 
 	const Vec2<float>POS = { 430,22 };
 	//const Vec2<float>POS = { 430,650 };
@@ -115,7 +152,7 @@ void BlockCount::Draw()
 std::vector<int> BlockCount::CountNumber(int TIME)
 {
 	float score = TIME;
-	std::vector<int> Number(KuroFunc::GetDigit(TIME));
+	std::vector<int> Number(KuroFunc::GetDigit(countAllBlockNum));
 
 	int tmp = score;
 	//�X�R�A�v�Z

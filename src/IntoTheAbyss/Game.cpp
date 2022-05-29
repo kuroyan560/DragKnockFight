@@ -83,7 +83,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -178,7 +178,7 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 	}
 }
 
-const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS)
+const int &Game::GetChipNum(const vector<vector<int>> &MAPCHIP_DATA, const int &MAPCHIP_NUM, int *COUNT_CHIP_NUM, Vec2<float> *POS)
 {
 	int chipNum = 0;
 	for (int y = 0; y < MAPCHIP_DATA.size(); ++y)
@@ -196,7 +196,7 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 }
 
 #include"PlayerHand.h"
-void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
+void Game::InitGame(const int &STAGE_NUM, const int &ROOM_NUM)
 {
 	DebugParameter::Instance()->totalCombo = 0;
 	DebugParameter::Instance()->timer = 0;
@@ -352,17 +352,30 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	mapChipGeneratorChangeMap = std::make_shared<MapChipGenerator_ChangeMap>();
 
 
-	countBlock.Init();
+	bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
+	if (nonFlag)
+	{
+		countBlock.Init(COUNT_BLOCK_MAX, false);
+	}
+	else
+	{
+		countBlock.Init(StageMgr::Instance()->GetAllLocalWallBlocksNum(), true);
+	}
 	ScoreManager::Instance()->Init();
 	roundFinishFlag = false;
 
-	ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), StageMgr::Instance()->GetAllRoomWallBlocksNum(stageNum));
+	if (nonFlag)
+	{
+		ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), COUNT_BLOCK_MAX);
+	}
+	else
+	{
+		ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), StageMgr::Instance()->GetAllRoomWallBlocksNum(stageNum));
+	}
 
 	// 背景パーティクルを更新
 	BackGroundParticleMgr::Instance()->Init();
 	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetMap(stageNum, roomNum)[0].size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetMap(stageNum, roomNum).size() * MAP_CHIP_SIZE));
-
-
 }
 
 void Game::GeneratorInit()
@@ -453,7 +466,7 @@ Game::Game()
 
 }
 
-void Game::Init(const bool& PracticeMode)
+void Game::Init(const bool &PracticeMode)
 {
 	rStickNoInputTimer = 0;
 
@@ -479,7 +492,6 @@ void Game::Init(const bool& PracticeMode)
 	stageRap.Init(StageMgr::Instance()->GetMaxLap(SelectStage::Instance()->GetStageNum()));
 
 	DistanceCounter::Instance()->Init();
-	RoundCountMgr::Instance()->Init(SelectStage::Instance()->GetRoomNum());
 
 	GeneratorInit();
 
@@ -487,9 +499,11 @@ void Game::Init(const bool& PracticeMode)
 	BackGroundParticleMgr::Instance()->Init();
 	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetLocalMap()[0].size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetLocalMap()->size() * MAP_CHIP_SIZE));
 
+	int roomNum = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
+	RoundCountMgr::Instance()->Init(roomNum);
 }
 
-void Game::Update(const bool& Loop)
+void Game::Update(const bool &Loop)
 {
 	if (UsersInput::Instance()->KeyOnTrigger(DIK_R))
 	{
@@ -662,18 +676,16 @@ void Game::Update(const bool& Loop)
 	//}
 
 
-
-	// 敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
-	bool isBlockEmpty = countBlock.CheckNowNomberIsZero();
+	bool noGenerateFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType == NON_GENERATE;
+	//敵キャラがプレイヤーにある程度近付いたら反対側に吹っ飛ばす機能。
+	bool isBlockEmpty = countBlock.CheckNowNomberIsZero() && noGenerateFlag;
 	bool timeUpFlag = GameTimer::Instance()->TimeUpFlag();
 
 	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty || timeUpFlag)
 	{
-		//if (isBlockEmpty) {
-
 		// 終了演出が行われていなかったら
-		if (!roundFinishFlag) {
-
+		if (!roundFinishFlag)
+		{
 			roundFinishFlag = true;
 
 			float nowBlockCount = countBlock.countNowBlockNum;
@@ -681,9 +693,7 @@ void Game::Update(const bool& Loop)
 			float destroyRate = nowBlockCount / maxBclokCount;
 			RoundFinishEffect::Instance()->Start(isBlockEmpty, 1.0f - destroyRate, Camera::Instance()->zoom);
 			DistanceCounter::Instance()->isExpSmall = true;
-
 		}
-
 	}
 
 	// 紐の距離を計算するクラスを更新する。
@@ -1038,8 +1048,8 @@ void Game::CalCenterPos()
 
 	// 本当はScrambleの一番うしろに入れていた処理なんですが、押し戻しをした後に呼ぶ必要が出てきたので関数で分けました。
 
-	auto& left = CharacterManager::Instance()->Left();
-	auto& right = CharacterManager::Instance()->Right();
+	auto &left = CharacterManager::Instance()->Left();
+	auto &right = CharacterManager::Instance()->Right();
 
 	// 移動量に応じて本来あるべき長さにする。
 	Vec2<float> prevSubPos = CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Left()->prevPos;
@@ -1105,8 +1115,8 @@ void Game::CalCenterPos()
 		//else {
 			// 規定値以上だったら普通に場所を求める。
 
-		auto& right = CharacterManager::Instance()->Right();
-		auto& left = CharacterManager::Instance()->Left();
+		auto &right = CharacterManager::Instance()->Right();
+		auto &left = CharacterManager::Instance()->Left();
 
 		Vec2<float> rightPos = right->pos;
 		rightPos += (left->pos - right->pos).GetNormal() * right->addLineLength;
@@ -1227,7 +1237,7 @@ void Game::DeterminationOfThePosition()
 
 }
 
-void Game::RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData)
+void Game::RoundStartEffect(const bool &Loop, const RoomMapChipArray &tmpMapData)
 {
 
 	//ラウンド開始時の演出開始
@@ -1283,7 +1293,7 @@ void Game::RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData
 
 }
 
-void Game::RoundFinishEffect(const bool& Loop)
+void Game::RoundFinishEffect(const bool &Loop)
 {
 
 	//ラウンド終了演出開始
@@ -1335,7 +1345,15 @@ void Game::RoundFinishEffect(const bool& Loop)
 				mapChipGeneratorChangeMap->RegisterMap();
 				RoundFinishEffect::Instance()->changeMap = false;
 
-				countBlock.Init();
+				bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
+				if (nonFlag)
+				{
+					countBlock.Init(COUNT_BLOCK_MAX, false);
+				}
+				else
+				{
+					countBlock.Init(StageMgr::Instance()->GetAllLocalWallBlocksNum(), true);
+				}
 				stageRap.Increment();
 				DistanceCounter::Instance()->isExpSmall = false;
 
