@@ -413,7 +413,6 @@ Game::Game()
 	}
 
 	mapChipGeneratorChangeMap = std::make_shared<MapChipGenerator_ChangeMap>();
-	mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
 
 }
 
@@ -1315,6 +1314,25 @@ void Game::RoundFinishEffect(const bool& Loop)
 				gameTimer = StageMgr::Instance()->GetMaxTime(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 				GameTimer::Instance()->Init(gameTimer);
 				GameTimer::Instance()->Start();
+
+				mapChipGenerator.reset();
+				MAP_CHIP_GENERATOR localGeneratorType = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+				if (localGeneratorType == NON_GENERATE)
+				{
+					mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
+				}
+				else if (localGeneratorType == SPLINE_ORBIT)
+				{
+					mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
+				}
+				else if (localGeneratorType == RAND_PATTERN)
+				{
+					mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>();
+				}
+				else if (localGeneratorType == CLOSSING)
+				{
+					mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>();
+				}
 				mapChipGenerator->Init();
 
 				rStickNoInputTimer = 0;
