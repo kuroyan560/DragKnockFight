@@ -84,7 +84,7 @@ protected:
 	void DesideNextIndices(const PATTERN_TYPE& PatternType, const Vec2<int>& GenerateIdx);	//Ÿ‚Ì¶¬ˆÊ’u‚ğŒˆ’è
 
 public:
-	MapChipGenerator_RandPattern(const int& Span);
+	MapChipGenerator_RandPattern(const int& Span, const bool& RandPattern = true);
 	void Update()override;
 	void Draw()override;
 };

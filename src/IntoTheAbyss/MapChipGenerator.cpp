@@ -270,18 +270,21 @@ void MapChipGenerator_RandPattern::DesideNextIndices(const PATTERN_TYPE& Pattern
 	}
 }
 
-MapChipGenerator_RandPattern::MapChipGenerator_RandPattern(const int& Span)
+MapChipGenerator_RandPattern::MapChipGenerator_RandPattern(const int& Span, const bool& RandPattern)
 {
 	span = Span;
 
 	timer = 0;
 
-	auto mapData = StageMgr::Instance()->GetLocalMap();
-	Vec2<int>chipIdxMax;
-	chipIdxMax.x = (*mapData)[0].size();
-	chipIdxMax.y = (*mapData).size();
+	if (RandPattern)
+	{
+		auto mapData = StageMgr::Instance()->GetLocalMap();
+		Vec2<int>chipIdxMax;
+		chipIdxMax.x = (*mapData)[0].size();
+		chipIdxMax.y = (*mapData).size();
 
-	DesideNextIndices(PATTERN_TYPE(KuroFunc::GetRand(PATTERN_TYPE::NUM - 1)), { KuroFunc::GetRand(chipIdxMax.x - 1),KuroFunc::GetRand(chipIdxMax.y - 1) });
+		DesideNextIndices(PATTERN_TYPE(KuroFunc::GetRand(PATTERN_TYPE::NUM - 1)), { KuroFunc::GetRand(chipIdxMax.x - 1),KuroFunc::GetRand(chipIdxMax.y - 1) });
+	}
 }
 
 void MapChipGenerator_RandPattern::Update()
@@ -467,7 +470,7 @@ void MapChipGenerator_ChangeMap::Draw()
 	DRAW_MAP_EMPTY.Draw(EMPTY_TEX);
 }
 
-MapChipGenerator_Crossing::MapChipGenerator_Crossing(const int& Span) : MapChipGenerator_RandPattern(Span)
+MapChipGenerator_Crossing::MapChipGenerator_Crossing(const int& Span) : MapChipGenerator_RandPattern(Span, false)
 {
 	timer = 0;
 
