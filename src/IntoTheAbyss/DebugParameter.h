@@ -134,8 +134,6 @@ public:
 	float swingMax;
 	bool useFinishSwingFlag;
 	float comboResetDist;
-	float emitRare;
-	float emitBounce;
 
 	int timer;
 	int totalCombo;

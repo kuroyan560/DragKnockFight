@@ -148,6 +148,8 @@ class Game
 
 	int rStickNoInputTimer = 0;
 
+	void GeneratorInit();
+
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
 

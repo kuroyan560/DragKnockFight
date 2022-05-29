@@ -345,7 +345,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		roundChangeEffect.drawFightFlag = true;
 	}
 
-	mapChipGeneratorChangeMap->Init();
+	mapChipGeneratorChangeMap.reset();
+	mapChipGeneratorChangeMap = std::make_shared<MapChipGenerator_ChangeMap>();
 
 
 	countBlock.Init();
@@ -353,6 +354,34 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	roundFinishFlag = false;
 
 	ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), StageMgr::Instance()->GetAllRoomWallBlocksNum(stageNum));
+}
+
+void Game::GeneratorInit()
+{
+	mapChipGenerator.reset();
+	auto localStageInfo = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	MAP_CHIP_GENERATOR localGeneratorType = localStageInfo.generatorType;
+	if (localGeneratorType == NON_GENERATE)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
+	}
+	else if (localGeneratorType == SPLINE_ORBIT)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
+	}
+	else if (localGeneratorType == RAND_PATTERN)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>(localStageInfo.generatorSpan);
+	}
+	else if (localGeneratorType == CLOSSING)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>(localStageInfo.generatorSpan);
+	}
+	else if (RISE_UP_L_TO_R <= localGeneratorType && localGeneratorType <= RISE_UP_BOTTOM_TO_TOP)
+	{
+		int idxDir = localGeneratorType - CLOSSING - 1;
+		mapChipGenerator = std::make_shared<MapChipGenerator_RiseUp>(localStageInfo.generatorSpan, (RISE_UP_GENERATOR_DIRECTION)idxDir);
+	}
 }
 
 Game::Game()
@@ -443,25 +472,7 @@ void Game::Init(const bool& PracticeMode)
 	DistanceCounter::Instance()->Init();
 	RoundCountMgr::Instance()->Init(SelectStage::Instance()->GetRoomNum());
 
-	mapChipGenerator.reset();
-	MAP_CHIP_GENERATOR localGeneratorType = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-	if (localGeneratorType == NON_GENERATE)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
-	}
-	else if (localGeneratorType == SPLINE_ORBIT)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
-	}
-	else if (localGeneratorType == RAND_PATTERN)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>();
-	}
-	else if (localGeneratorType == CLOSSING)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>();
-	}
-	mapChipGenerator->Init();
+	GeneratorInit();
 }
 
 void Game::Update(const bool& Loop)
@@ -1314,25 +1325,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 				GameTimer::Instance()->Init(gameTimer);
 				GameTimer::Instance()->Start();
 
-				mapChipGenerator.reset();
-				MAP_CHIP_GENERATOR localGeneratorType = StageMgr::Instance()->GetGeneratorType(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-				if (localGeneratorType == NON_GENERATE)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
-				}
-				else if (localGeneratorType == SPLINE_ORBIT)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
-				}
-				else if (localGeneratorType == RAND_PATTERN)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>();
-				}
-				else if (localGeneratorType == CLOSSING)
-				{
-					mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>();
-				}
-				mapChipGenerator->Init();
+				GeneratorInit();
 
 				rStickNoInputTimer = 0;
 			}

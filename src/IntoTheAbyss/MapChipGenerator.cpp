@@ -28,19 +28,19 @@ bool MapChipGenerator::CanChange(const Vec2<int>& Idx)
 int MapChipGenerator::GetRandChipType()
 {
 	//出現確率
-	const int RARE = DebugParameter::Instance()->emitRare;
-	const int BOUNCE = DebugParameter::Instance()->emitBounce;
+	const float RARE = 1.0f;
+	const float BOUNCE = 0.5f;
 
 	int appearType = 1;
 
 	float rate = KuroFunc::GetRand(99.0f);
-	if (rate < (RARE < BOUNCE ? RARE : BOUNCE))
+	if (rate < (BOUNCE < RARE ? BOUNCE : RARE))
 	{
-		appearType = MAPCHIP_TYPE_STATIC_RARE_BLOCK;
+		appearType = MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK;
 	}
 	else if (rate < RARE + BOUNCE)
 	{
-		appearType = MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK;
+		appearType = MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 	}
 	return appearType;
 }
@@ -92,7 +92,7 @@ Vec2<float> MapChipGenerator_SplineOrbit::GetRandPos()
 	return Vec2<float>(RADIUS + KuroFunc::GetRand(range.x), RADIUS + KuroFunc::GetRand(range.y));
 }
 
-void MapChipGenerator_SplineOrbit::Init()
+MapChipGenerator_SplineOrbit::MapChipGenerator_SplineOrbit()
 {
 	Vec2<float>mapSize = StageMgr::Instance()->GetLocalMapGrobalSize();
 
@@ -261,10 +261,11 @@ void MapChipGenerator_RandPattern::DesideNextIndices(const PATTERN_TYPE& Pattern
 	}
 }
 
-void MapChipGenerator_RandPattern::Init()
+MapChipGenerator_RandPattern::MapChipGenerator_RandPattern(const int& Span)
 {
+	span = Span;
+
 	timer = 0;
-	span = GetRandSpan();
 
 	auto mapData = StageMgr::Instance()->GetLocalMap();
 	Vec2<int>chipIdxMax;
@@ -292,7 +293,6 @@ void MapChipGenerator_RandPattern::Update()
 		predictionIdxArray.clear();
 		DesideNextIndices(PATTERN_TYPE(KuroFunc::GetRand(PATTERN_TYPE::NUM - 1)), Vec2<int>(KuroFunc::GetRand(1, chipIdxMax.x), KuroFunc::GetRand(1, chipIdxMax.y)));
 		timer = 0;
-		span = GetRandSpan();
 	}
 }
 
@@ -380,14 +380,14 @@ void MapChipGenerator_ChangeMap::RegisterMap()
 	setMapNumber++;
 }
 
-void MapChipGenerator_ChangeMap::Init()
+#include"RoundFinishEffect.h"
+MapChipGenerator_ChangeMap::MapChipGenerator_ChangeMap()
 {
 	stageNumber = SelectStage::Instance()->GetStageNum();
 	setMapNumber = 1;
 	RegisterMap();
 }
 
-#include"RoundFinishEffect.h"
 void MapChipGenerator_ChangeMap::Update()
 {
 }
@@ -458,10 +458,9 @@ void MapChipGenerator_ChangeMap::Draw()
 	DRAW_MAP_EMPTY.Draw(EMPTY_TEX);
 }
 
-void MapChipGenerator_Crossing::Init()
+MapChipGenerator_Crossing::MapChipGenerator_Crossing(const int& Span) : MapChipGenerator_RandPattern(Span)
 {
 	timer = 0;
-	span = 60;
 
 	generateLine = { 1,1 };
 
@@ -498,4 +497,153 @@ void MapChipGenerator_Crossing::Update()
 void MapChipGenerator_Crossing::Draw()
 {
 	MapChipGenerator_RandPattern::Draw();
+}
+
+
+void MapChipGenerator_RiseUp::RiseUp()
+{
+	auto mapData = StageMgr::Instance()->GetLocalMap();
+	auto mapIdxSize = StageMgr::Instance()->GetMapIdxSize(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+
+	static const int SPACE_LINE = 6;
+
+	if (dir == LEFT_TO_RIGHT)
+	{
+		//右列から処理
+		for (int x = mapIdxSize.x - 1 - 1 - SPACE_LINE; 1 <= x; --x)
+		{
+			for (int y = 0; y < mapIdxSize.y; ++y)
+			{
+				//自身の右が空でないならスルー
+				if ((*mapData)[y][x + 1] != 0)continue;
+
+				//自身のタイプを右チップに移す
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x + 1, y), (*mapData)[y][x], CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				//自身は空にする
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+			}
+		}
+
+		//一番左の列はランダム生成
+		int x = 1;
+		for (int y = 0; y < mapIdxSize.y; ++y)
+		{
+			//自身が空でないならスルー
+			if ((*mapData)[y][x] != 0)continue;
+
+			//ランダム生成
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x,false);
+		}
+	}
+	else if (dir == UP_TO_BOTTOM)
+	{
+		//下列から処理
+		for (int y = mapIdxSize.y - 1 - 1 - SPACE_LINE; 1 <= y; --y)
+		{
+			for (int x = 0; x < mapIdxSize.x; ++x)
+			{
+				//自身の下が空でないならスルー
+				if ((*mapData)[y + 1][x] != 0)continue;
+
+				//自身のタイプを下チップに移す
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y + 1), (*mapData)[y][x], CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				//自身は空にする
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+			}
+		}
+
+		//一番上の列はランダム生成
+		int y = 1;
+		for (int x = 0; x < mapIdxSize.x; ++x)
+		{
+			//自身が空でないならスルー
+			if ((*mapData)[y][x] != 0)continue;
+
+			//ランダム生成
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+		}
+	}
+	else if (dir == RIGHT_TO_LEFT)
+	{
+		//左列から処理
+		for (int x = 1 + SPACE_LINE; x <= mapIdxSize.x - 1 - 1; x++)
+		{
+			for (int y = 0; y < mapIdxSize.y; ++y)
+			{
+				//自身の左が空でないならスルー
+				if ((*mapData)[y][x - 1] != 0)continue;
+
+				//自身のタイプを左チップに移す
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x - 1, y), (*mapData)[y][x], CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				//自身は空にする
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+			}
+		}
+
+		//一番右の列はランダム生成
+		int x = mapIdxSize.x - 1 - 1;
+		for (int y = 0; y < mapIdxSize.y; ++y)
+		{
+			//自身が空でないならスルー
+			if ((*mapData)[y][x] != 0)continue;
+
+			//ランダム生成
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+		}
+	}
+	else if (dir == BOTTOM_TO_UP)
+	{
+		//下列から処理
+		for (int y = 1 + SPACE_LINE; y <= mapIdxSize.y - 1 - 1; y++)
+		{
+			for (int x = 0; x < mapIdxSize.x; ++x)
+			{
+				//自身の上が空でないならスルー
+				if ((*mapData)[y - 1][x] != 0)continue;
+
+				//自身のタイプを上チップに移す
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y - 1), (*mapData)[y][x], CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				//自身は空にする
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+			}
+		}
+
+		//一番下の列はランダム生成
+		int y = mapIdxSize.y - 1 - 1;
+		for (int x = 0; x < mapIdxSize.x; ++x)
+		{
+			//自身が空でないならスルー
+			if ((*mapData)[y][x] != 0)continue;
+
+			//ランダム生成
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+		}
+	}
+}
+
+MapChipGenerator_RiseUp::MapChipGenerator_RiseUp(const int& Span, const RISE_UP_GENERATOR_DIRECTION& Direction) : span(Span), dir(Direction)
+{
+	timer = 0;
+}
+
+void MapChipGenerator_RiseUp::Update()
+{
+	timer++;
+	if (span <= timer)
+	{
+		RiseUp();
+		timer = 0;
+	}
+}
+
+void MapChipGenerator_RiseUp::Draw()
+{
+	Color col = Color(8, 217, 255, 255);
+	const Vec2<float>leftUpPos = { 30,600 };
+	const Vec2<float>size = { 500,64 };
+
+	//ゲージ
+	DrawFunc::DrawBox2D(leftUpPos, leftUpPos + size * Vec2<float>((float)timer / span, 1.0f), col, true);
+	//フレーム
+	DrawFunc::DrawBox2D(leftUpPos, leftUpPos + size, col);
 }

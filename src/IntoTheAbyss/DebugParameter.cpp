@@ -43,8 +43,6 @@ DebugParameter::DebugParameter()
 	swingMax = 0.11f;
 	useFinishSwingFlag = true;
 	comboResetDist = 300.0f;
-	emitRare = 1.0f;
-	emitBounce = 2.0f;
 
 	hitPlayer = false;
 
