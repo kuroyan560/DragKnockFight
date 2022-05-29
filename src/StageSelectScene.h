@@ -42,7 +42,8 @@ public:
 		STAGE_SELECT,
 		SCENE_CHANGE
 	};
-	std::array<std::array<DrawMapChipForSceneChange, 2>, 7>mapScreenShot;
+	std::array<std::array<DrawMapChipForSceneChange, 2>, 15>mapScreenShot;
+	std::array<std::array<float, 2>, 15>zoomValue;
 
 	// ステージ番号
 	int stageNum,prevStageNum;

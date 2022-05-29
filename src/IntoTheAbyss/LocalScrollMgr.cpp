@@ -35,22 +35,20 @@ void LocalScrollMgr::Update(const Vec2<float> &LineCenterPos)
 	scrollAmount.y += (honraiScrollAmount.y - scrollAmount.y) / 5.0f;
 	//}
 
-	// 線の中心にスクロール量などをかける。
-	//Vec2<float> scrollShakeZoom = scrollAmount;
-	//scrollShakeZoom.x *= zoom;
-	//scrollShakeZoom.y *= zoom;
-	//Vec2<float> lineCenterPos = LineCenterPos * zoom - scrollShakeZoom;
+	//線の中心にスクロール量などをかける。
+	Vec2<float> scrollShakeZoom = scrollAmount;
+	scrollShakeZoom.x *= zoom;
+	scrollShakeZoom.y *= zoom;
+	Vec2<float> lineCenterPos = LineCenterPos * zoom - scrollShakeZoom;
 
-	// 画面の中心を取得。
-	//Vec2<int> windowCenter = WinApp::Instance()->GetWinCenter();
+	//画面の中心を取得。
+	Vec2<int> windowCenter = WinApp::Instance()->GetWinCenter();
 
-	// 線の中心と画面の中心との差分を求める。
-	//Vec2<float> lineCenterOffsetBuff = Vec2<float>((float)windowCenter.x, (float)windowCenter.y) - lineCenterPos;
+	//線の中心と画面の中心との差分を求める。
+	Vec2<float> lineCenterOffsetBuff = Vec2<float>((float)windowCenter.x, (float)windowCenter.y) - lineCenterPos;
 
-	// 補完をかける。
-	lineCenterOffset = { 512.0f,272.0f };
-	//lineCenterOffset += (lineCenterOffsetBuff - lineCenterOffset) / 5.0f;
-
+	//補完をかける。
+	lineCenterOffset += lineCenterOffsetBuff - lineCenterOffset;
 }
 
 void LocalScrollMgr::CalucurateScroll(const Vec2<float> &VEL, const Vec2<float> &PLAYER_POS)

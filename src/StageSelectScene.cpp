@@ -8,12 +8,58 @@ StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 {
 	changeScene = std::make_shared<MaskSceneTransition>();
 	stageNum = 0;
-
-
 }
 
 void StageSelectScene::OnInitialize()
 {
+	zoomValue[0][STAGE_SELECT] = 0.2f;
+	zoomValue[0][SCENE_CHANGE] = 0.2f;
+
+	zoomValue[1][STAGE_SELECT] = 0.3f;
+	zoomValue[1][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[2][STAGE_SELECT] = 0.3f;
+	zoomValue[2][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[3][STAGE_SELECT] = 0.3f;
+	zoomValue[3][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[4][STAGE_SELECT] = 0.3f;
+	zoomValue[4][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[5][STAGE_SELECT] = 0.3f;
+	zoomValue[5][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[6][STAGE_SELECT] = 0.3f;
+	zoomValue[6][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[7][STAGE_SELECT] = 0.3f;
+	zoomValue[7][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[8][STAGE_SELECT] = 0.3f;
+	zoomValue[8][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[9][STAGE_SELECT] = 0.3f;
+	zoomValue[9][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[10][STAGE_SELECT] = 0.3f;
+	zoomValue[10][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[11][STAGE_SELECT] = 0.3f;
+	zoomValue[11][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[12][STAGE_SELECT] = 0.3f;
+	zoomValue[12][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[13][STAGE_SELECT] = 0.3f;
+	zoomValue[13][SCENE_CHANGE] = 0.4f;
+
+	zoomValue[14][STAGE_SELECT] = 0.3f;
+	zoomValue[14][SCENE_CHANGE] = 0.4f;
+
+
+
+
 	charactersSelect = false;
 	CharacterManager::Instance()->CharactersSelectInit();
 	// ステージセレクト画面の更新処理用クラスを初期化。
@@ -37,9 +83,9 @@ void StageSelectScene::OnInitialize()
 	for (int i = 0; i < mapScreenShot.size(); ++i)
 	{
 		//ステージ選択画面用
-		mapScreenShot[i][STAGE_SELECT].Init(i, false);
+		mapScreenShot[i][STAGE_SELECT].Init(i, false, zoomValue[i][STAGE_SELECT]);
 		//シーン遷移用
-		mapScreenShot[i][SCENE_CHANGE].Init(i, true);
+		mapScreenShot[i][SCENE_CHANGE].Init(i, true, zoomValue[i][SCENE_CHANGE]);
 	}
 }
 
@@ -116,7 +162,7 @@ void StageSelectScene::OnUpdate()
 			//screenShot.SetZoomFlag(stageSelect.GetZoomOutFlag());
 
 
-			mapScreenShot[stageNum][SCENE_CHANGE].Init(stageNum, true);
+			mapScreenShot[stageNum][SCENE_CHANGE].Init(stageNum, true, zoomValue[stageNum][SCENE_CHANGE]);
 
 			mapScreenShot[stageNum][STAGE_SELECT].Finalize();
 			mapScreenShot[stageNum][SCENE_CHANGE].Finalize();

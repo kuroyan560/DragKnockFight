@@ -13,7 +13,7 @@ class DrawMapChipForSceneChange
 public:
 	DrawMapChipForSceneChange();
 
-	void Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG);
+	void Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG, float ZOOM);
 	void Finalize();
 	void Update();
 	void Draw();

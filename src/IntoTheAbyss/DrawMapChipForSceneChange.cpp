@@ -21,7 +21,7 @@ DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 	sceneChageFlag = false;
 }
 
-void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG)
+void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG, float ZOOM)
 {
 	StageMgr::Instance()->SetLocalMapChipData(STAGE_NUM, 0);
 	StageMgr::Instance()->SetLocalMapChipDrawBlock(STAGE_NUM, 0);
@@ -56,10 +56,11 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG)
 
 	ScrollMgr::Instance()->Init(centralPos, mapSize, adj);
 	Camera::Instance()->Init();
+
 	Camera::Instance()->Zoom(playerPos, bossPos);
+	//ScrollMgr::Instance()->zoom = ZOOM;
+	Camera::Instance()->zoom = ScrollMgr::Instance()->zoom;
 
-
-	ScrollMgr::Instance()->zoom = Camera::Instance()->zoom;
 }
 
 void DrawMapChipForSceneChange::Finalize()
@@ -70,13 +71,12 @@ void DrawMapChipForSceneChange::Finalize()
 void DrawMapChipForSceneChange::Update()
 {
 	Camera::Instance()->Update();
-
-	ScrollMgr::Instance()->Update(centralPos, true);
-
 	if (sceneChageFlag)
 	{
-		ScrollMgr::Instance()->Update(centralPos);
+		Camera::Instance()->Zoom(playerPos, bossPos);
+		ScrollMgr::Instance()->zoom = Camera::Instance()->zoom;
 	}
+	ScrollMgr::Instance()->Update(centralPos, true);
 }
 
 void DrawMapChipForSceneChange::Draw()
