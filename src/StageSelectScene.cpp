@@ -7,7 +7,7 @@
 StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 {
 	maskSceneChange = std::make_shared<MaskSceneTransition>();
-	sceneChange = std:::make_shared<SceneTransition>();
+	sceneChange = std::make_shared<SceneTransition>();
 	stageNum = 0;
 }
 
