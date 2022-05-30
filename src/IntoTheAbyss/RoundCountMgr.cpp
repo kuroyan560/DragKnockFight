@@ -33,14 +33,17 @@ void RoundCount::Generate(const Vec2<float>& Pos)
 {
 
 	/*===== ê∂ê¨èàóù =====*/
+	initPos = Pos + Vec2<float>(150.0f, 0.0f);
+	pos = initPos;
+	vel = Pos - initPos;
 
-	pos = Pos;
 	isActive = true;
 	isFill = false;
 	angle = 0;
 	exp = { 20,20 };
 	alpha = 0;
-
+	t = 0.0f;
+	appearFlag = false;
 }
 
 void RoundCount::Update()
@@ -55,6 +58,20 @@ void RoundCount::Update()
 		exp.x += (1.0f - exp.x) / 5.0f;
 		exp.y += (1.0f - exp.y) / 5.0f;
 
+	}
+
+	if (appearFlag)
+	{
+		if (t < 1.0f)
+		{
+			t += 1.0f / 60.0f;
+		}
+		if (1.0f <= t)
+		{
+			t = 1.0f;
+		}
+
+		pos.x = initPos.x + KuroMath::Ease(Out, Cubic, t, 0.0f, 1.0f) * vel.x;
 	}
 
 }
@@ -72,6 +89,11 @@ void RoundCount::Draw(const int& FrameGraph, const int& InnerGraph)
 		DrawFunc::DrawRotaGraph2D(pos, exp, 0, TexHandleMgr::GetTexBuffer(InnerGraph), Color(255, 255, 255, alpha));
 	}
 
+}
+
+void RoundCount::Appear()
+{
+	appearFlag = true;
 }
 
 RoundCountMgr::RoundCountMgr()
@@ -160,5 +182,13 @@ void RoundCountMgr::RoundIncrement()
 	if (maxRound <= nowRound) nowRound = maxRound;
 
 	counter[nowRound - 1].SetFill();
+}
 
+void RoundCountMgr::Appear()
+{
+	for (auto &index : counter) {
+
+		index.Appear();
+
+	}
 }
