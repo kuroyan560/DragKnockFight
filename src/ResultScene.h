@@ -31,7 +31,7 @@ class ResultScene : public BaseScene
 	std::array<int, 12> blueNumberHandle;// 青の数字の画像ハンドル
 
 	//スコア
-	float baseBreakCount, breakCount;
+	float baseBreakCount, breakCount, prevBreakCount;
 
 	// 背景で飛ばすキャラクターのアニメーションタイマー
 	int backGroundCharaAnimTimer;
@@ -81,8 +81,11 @@ class ResultScene : public BaseScene
 
 	CRT crt;
 	bool endFlg = false;
+	bool initSoundFlag;
 
 	int ssIntervalTimer;
+
+	std::array<int, 4>soundSe;
 public:
 
 	const Vec2<int> WINDOW_CENTER = WinApp::Instance()->GetWinCenter();

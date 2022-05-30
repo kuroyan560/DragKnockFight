@@ -43,6 +43,10 @@ ResultScene::ResultScene()
 	winnerGraph[PLAYABLE_LACY] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
 	winnerGraph[PLAYABLE_BOSS_0] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
 
+	soundSe[SOUND_GOOD] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_good.wav", 0.13f);
+	soundSe[SOUND_GREAT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_great.wav", 0.13f);
+	soundSe[SOUND_EXCELLENT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_excellent.wav", 0.13f);
+	soundSe[SOUND_PERFECT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_perfect.wav", 0.13f);
 }
 
 void ResultScene::OnInitialize()
@@ -90,6 +94,8 @@ void ResultScene::OnInitialize()
 	backGroundCharaAngle = 0;
 
 	ssIntervalTimer = 0;
+
+	initSoundFlag = false;
 }
 
 void ResultScene::OnUpdate()
@@ -124,6 +130,7 @@ void ResultScene::OnUpdate()
 
 		perfectInterval = 0;
 		perfectIndex = 0;
+		initSoundFlag = false;
 	}
 
 
@@ -146,14 +153,14 @@ void ResultScene::OnUpdate()
 		if (resultUITimer < RESULT_UI_TIMER) {
 			// タイマーが0だったら
 			if (resultUITimer == 0) {
-				AudioApp::Instance()->PlayWave(SE);
+				//AudioApp::Instance()->PlayWave(SE);
 			}
 			++resultUITimer;
 			// タイマーが規定値に達したら。
 			if (RESULT_UI_TIMER <= resultUITimer) {
 				delayTimer = DELAY_TIMER;
 				isSkip = true;
-				AudioApp::Instance()->PlayWave(SE);
+				//AudioApp::Instance()->PlayWave(SE);
 			}
 		}
 		// [BREAK]敵の画像 タイマーが規定値以下だったら。
@@ -165,7 +172,6 @@ void ResultScene::OnUpdate()
 
 				delayTimer = DELAY_TIMER;
 				isSkip = true;
-				AudioApp::Instance()->PlayWave(SE);
 			}
 		}
 
@@ -232,7 +238,16 @@ void ResultScene::OnUpdate()
 			scoreSize[index] = defaultSize + 1.7f;
 		}
 		bigFontFlag = true;
+
 	}
+
+	if (breakCount != prevBreakCount)
+	{
+		static const int SCORE_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/score.wav", 0.13f);
+		AudioApp::Instance()->PlayWave(SCORE_SE);
+	}
+	prevBreakCount = breakCount;
+
 
 	breakCount = KuroMath::Ease(In, Cubic, static_cast<float>(scoreEffectTimer) / static_cast<float>(SCORE_EFFECT_TIMER), 0.0f, 1.0f) * baseBreakCount;
 
@@ -254,34 +269,46 @@ void ResultScene::OnUpdate()
 	}
 	timeUpFlag = 35 <= intervalTimer;
 
+
+	Sound soundType = SOUND_GOOD;
+	if (rate <= GOOD_RATE)
+	{
+		soundType = SOUND_GOOD;
+		evaluationNowHandle = goodHandle;
+	}
+	else if (rate <= GREAT_RATE)
+	{
+		soundType = SOUND_GREAT;
+		evaluationNowHandle = greatHandle;
+	}
+	else if (rate <= EXCELLENT_RATE)
+	{
+		soundType = SOUND_EXCELLENT;
+		evaluationNowHandle = excellentHandle;
+	}
+	else if (PERFECR_RATE <= rate)
+	{
+		soundType = SOUND_PERFECT;
+		evaluationFlag = true;
+	}
+
+
 	if (bigFontFlag && evaluationEasingTimer < EVALUATION_EFFECT_TIMER && timeUpFlag)
 	{
 		++evaluationEasingTimer;
 		easeEvaluationPosY = -KuroMath::Ease(Out, Back, static_cast<float>(evaluationEasingTimer) / static_cast<float>(EVALUATION_EFFECT_TIMER), 0.0f, 1.0f) * 30.0f;
+
+		if (!initSoundFlag)
+		{
+			AudioApp::Instance()->PlayWave(soundSe[soundType]);
+			initSoundFlag = true;
+		}
 	}
 
 	if (EVALUATION_EFFECT_TIMER <= evaluationEasingTimer)
 	{
 		endFlg = true;
 	}
-
-	if (rate <= GOOD_RATE)
-	{
-		evaluationNowHandle = goodHandle;
-	}
-	else if (rate <= GREAT_RATE)
-	{
-		evaluationNowHandle = greatHandle;
-	}
-	else if (rate <= EXCELLENT_RATE)
-	{
-		evaluationNowHandle = excellentHandle;
-	}
-	else if (PERFECR_RATE <= rate)
-	{
-		evaluationFlag = true;
-	}
-
 
 	if (evaluationFlag)
 	{
@@ -332,12 +359,14 @@ void ResultScene::OnUpdate()
 		backGroundCharaVel = Vec2<float>(windowSize / 2.0f - backGroundCharaPos).GetNormal() * 10.0f;
 
 		// 使用する画像をランダムで決める。
-		int randomhandle = KuroFunc::GetRand(0,2);
-		if(randomhandle == 0){
+		int randomhandle = KuroFunc::GetRand(0, 2);
+		if (randomhandle == 0) {
 			useHandle = redCharaHandle;
-		}else if(randomhandle == 1){
+		}
+		else if (randomhandle == 1) {
 			useHandle = greenCharaHandle;
-		}else{
+		}
+		else {
 			useHandle = ironBallhandle;
 		}
 
@@ -418,10 +447,11 @@ void ResultScene::OnDraw()
 	auto &nowContainer = ClearInfoContainerMgr::Instance()->GetContainer(SelectStage::Instance()->GetStageNum());
 	if (endFlg && nowContainer.maxBreakCount < breakCount && SCREEN_SHOT_TIME <= ssIntervalTimer)
 	{
+		KuroEngine::Instance().Graphics().ClearRenderTarget(nowContainer.clearInfoRenderTarget);
 		KuroEngine::Instance().Graphics().SetRenderTargets({ nowContainer.clearInfoRenderTarget });
 
 		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
-		DrawFunc::DrawGraph(lissajousCurve + Vec2<float>(580.0f , windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
+		DrawFunc::DrawGraph(lissajousCurve + Vec2<float>(580.0f, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
 
 		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum(), OFFSET_X, lissajousCurve);
 
@@ -467,7 +497,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 	//現在
 	{
 		nowSize = breakSize;
-		for (int i = 0; i < KuroFunc::GetDigit(BREAK_NOW_COUNT) - 1; ++i)
+		for (int i = 0; i < KuroFunc::GetDigit(BREAK_MAX_COUNT) - 1; ++i)
 		{
 			drawPos.x -= FONT_SIZE * nowSize.x;
 		}

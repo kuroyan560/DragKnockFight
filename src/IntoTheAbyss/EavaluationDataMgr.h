@@ -2,6 +2,14 @@
 #include"../Common/Singleton.h"
 #include<vector>
 
+enum Sound
+{
+	SOUND_GOOD,
+	SOUND_GREAT,
+	SOUND_EXCELLENT,
+	SOUND_PERFECT
+};
+
 struct StageEvaluationData
 {
 	float goodRate;

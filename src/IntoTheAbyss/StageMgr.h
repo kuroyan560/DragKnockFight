@@ -418,6 +418,7 @@ public:
 	{
 		return stageInfos[StageNum][RoomNum];
 	}
+	int GetRandNormalWallGraphHandle();
 
 private:
 	const int &GetGimmickNumber(const int &NUMBER)
