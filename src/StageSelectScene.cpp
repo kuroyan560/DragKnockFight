@@ -222,6 +222,8 @@ void StageSelectScene::OnUpdate()
 
 	}*/
 
+	screenShot.stageNum = stageNum;
+
 	maskSceneChange->backGroundTex = mapScreenShot[stageNum][SCENE_CHANGE].mapBuffer;
 	screenShot.screenShot = mapScreenShot[stageNum][STAGE_SELECT].mapBuffer;
 }

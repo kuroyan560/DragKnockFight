@@ -21,13 +21,15 @@ StageSelectScreenShot::StageSelectScreenShot(int* SelectNum) : selectNumPtr(Sele
 	{
 		stageTagNum++;
 	}
-	stageNumberHandle.resize(stageTagNum);
-	for (int i = 0; i < stageTagNum; ++i)
+	stageNumberHandle.resize(10);
+	/*for (int i = 0; i < stageTagNum; ++i)
 	{
 		stageNumberHandle[i] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/" + std::to_string(i) + ".png");
-	}
-
+	}*/
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/select_scene/stage_tag/num.png", 10, Vec2<int>(10, 1), stageNumberHandle.data());
 	stageTagHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/tag.png");
+
+
 }
 
 void StageSelectScreenShot::Init()
@@ -112,8 +114,19 @@ void StageSelectScreenShot::Draw()
 
 
 	//DrawFunc::DrawRotaGraph2D(stageNumberData.pos + stageNumberExpData.pos + debugPos + lissajousCurve, stageNumberData.size + stageNumberExpData.size, 0.0f, TexHandleMgr::GetTexBuffer(stageNumberHandle[*selectNumPtr]));
-	DrawFunc::DrawRotaGraph2D(stageNumberData.pos + stageNumberExpData.pos + debugPos + lissajousCurve, stageNumberData.size + stageNumberExpData.size, 0.0f, TexHandleMgr::GetTexBuffer(stageTagHandle));
 
+	Vec2<float> tagPos = stageNumberData.pos + stageNumberExpData.pos + debugPos + lissajousCurve + Vec2<float>(-130.0f, 0.0f);
+	DrawFunc::DrawRotaGraph2D(tagPos, stageNumberData.size + stageNumberExpData.size, 0.0f, TexHandleMgr::GetTexBuffer(stageTagHandle));
+
+	Vec2<float>numPos = tagPos;
+	numPos.x += 552.0f / 2.0f - 40.0f;
+	std::vector<int>handle = KazHelper::CountNumber(stageNum + 1, 2);
+
+	for (int i = 0; i < handle.size(); ++i)
+	{
+		numPos.x += 107.0f;
+		DrawFunc::DrawRotaGraph2D(numPos, stageNumberData.size + stageNumberExpData.size, 0.0f, TexHandleMgr::GetTexBuffer(stageNumberHandle[handle[i]]));
+	}
 }
 
 void StageSelectScreenShot::ImGuiDraw()
