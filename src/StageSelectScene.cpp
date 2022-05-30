@@ -138,7 +138,7 @@ void StageSelectScene::OnUpdate()
 			mapScreenShot[stageNum][SCENE_CHANGE].Finalize();
 
 
-			PLAYABLE_CHARACTER_NAME charaName = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).characterName;
+			PLAYABLE_CHARACTER_NAME charaName = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), 0).characterName;
 			CharacterManager::Instance()->CharactersSelectInit(charaName);
 		}
 		//タイトルシーンに移動する
