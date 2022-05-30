@@ -58,6 +58,8 @@ bool MaskSceneTransition::OnUpdate()
 	{
 		expRate = 0;
 		startFlag = false;
+		t = 0.0f;
+		nowTrans = false;
 		return true;
 	}
 

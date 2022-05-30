@@ -17,7 +17,7 @@ public:
 	void Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG);
 	void Finalize();
 	void Update();
-	void Draw();
+	void Draw(const float& ChangeRate);
 
 	std::shared_ptr<RenderTarget> mapBuffer;
 private:
