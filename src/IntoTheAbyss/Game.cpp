@@ -208,9 +208,6 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	SuperiorityGauge::Instance()->Init();
 
-	bossHandMgr->Init(false);
-	playerHandMgr->Init(false);
-
 	FaceIcon::Instance()->Init(CharacterManager::Instance()->Left()->GetCharacterName(), CharacterManager::Instance()->Right()->GetCharacterName());
 
 
@@ -372,70 +369,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	// 背景パーティクルを更新
 	BackGroundParticleMgr::Instance()->Init();
 	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetMapIdxSize(stageNum, roomNum).x * MAP_CHIP_SIZE, StageMgr::Instance()->GetMapIdxSize(stageNum, roomNum).y * MAP_CHIP_SIZE));
-}
-
-void Game::GeneratorInit()
-{
-	mapChipGenerator.reset();
-	auto localStageInfo = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-	MAP_CHIP_GENERATOR localGeneratorType = localStageInfo.generatorType;
-	if (localGeneratorType == NON_GENERATE)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
-	}
-	else if (localGeneratorType == SPLINE_ORBIT)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
-	}
-	else if (localGeneratorType == RAND_PATTERN)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>(localStageInfo.generatorSpan);
-	}
-	else if (localGeneratorType == CLOSSING)
-	{
-		mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>(localStageInfo.generatorSpan);
-	}
-	else if (RISE_UP_L_TO_R <= localGeneratorType && localGeneratorType <= RISE_UP_BOTTOM_TO_TOP)
-	{
-		int idxDir = localGeneratorType - CLOSSING - 1;
-		mapChipGenerator = std::make_shared<MapChipGenerator_RiseUp>(localStageInfo.generatorSpan, (RISE_UP_GENERATOR_DIRECTION)idxDir);
-	}
-}
-
-Game::Game()
-{
-	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
-
-	addLineLengthSubAmount = 1.0f;
-
-	playerHomeBase.Init({ 0.0f,0.0f }, { 0.0f,0.0f }, true);
-	enemyHomeBase.Init({ 0.0f,0.0f }, { 800.0f,1000.0f }, false);
-	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
-
-	cameraBasePos = { 0.0f,-40.0f };
-
-	roundChangeEffect.Init();
-	StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-	mapData = StageMgr::Instance()->GetLocalMap();
-	MapChipArray tmp = *mapData;
 
 
-	Vec2<float> responePos((tmp[0].size() * MAP_CHIP_SIZE) * 0.5f, (tmp.size() * MAP_CHIP_SIZE) * 0.5f);
-	//スクロールを上にずらす用
-	responePos.x -= 25;
-	responePos.y += 50;
-	responeScrollPos = responePos;
-
-
-	//Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
-	//ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
-
-	Camera::Instance()->Init();
-	SuperiorityGauge::Instance()->Init();
-
-	readyToStartRoundFlag = true;
-	//背景に星
-	//BackGround::Instance()->Init(GetStageSize());
 
 
 	{
@@ -481,6 +416,74 @@ Game::Game()
 		}
 		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, false);
 	}
+
+	bossHandMgr->Init(false);
+	playerHandMgr->Init(false);
+}
+
+void Game::GeneratorInit()
+{
+	mapChipGenerator.reset();
+	auto localStageInfo = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	MAP_CHIP_GENERATOR localGeneratorType = localStageInfo.generatorType;
+	if (localGeneratorType == NON_GENERATE)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_Non>();
+	}
+	else if (localGeneratorType == SPLINE_ORBIT)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_SplineOrbit>();
+	}
+	else if (localGeneratorType == RAND_PATTERN)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_RandPattern>(localStageInfo.generatorSpan);
+	}
+	else if (localGeneratorType == CLOSSING)
+	{
+		mapChipGenerator = std::make_shared<MapChipGenerator_Crossing>(localStageInfo.generatorSpan);
+	}
+	else if (RISE_UP_L_TO_R <= localGeneratorType && localGeneratorType <= RISE_UP_BOTTOM_TO_TOP)
+	{
+		int idxDir = localGeneratorType - CLOSSING - 1;
+		mapChipGenerator = std::make_shared<MapChipGenerator_RiseUp>(localStageInfo.generatorSpan, (RISE_UP_GENERATOR_DIRECTION)idxDir);
+	}
+
+}
+
+Game::Game()
+{
+	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
+
+	addLineLengthSubAmount = 1.0f;
+
+	playerHomeBase.Init({ 0.0f,0.0f }, { 0.0f,0.0f }, true);
+	enemyHomeBase.Init({ 0.0f,0.0f }, { 800.0f,1000.0f }, false);
+	//enemyHomeBase->Init({ 0.0f,0.0f }, { 0.0f,0.0f });
+
+	cameraBasePos = { 0.0f,-40.0f };
+
+	roundChangeEffect.Init();
+	StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	mapData = StageMgr::Instance()->GetLocalMap();
+	MapChipArray tmp = *mapData;
+
+
+	Vec2<float> responePos((tmp[0].size() * MAP_CHIP_SIZE) * 0.5f, (tmp.size() * MAP_CHIP_SIZE) * 0.5f);
+	//スクロールを上にずらす用
+	responePos.x -= 25;
+	responePos.y += 50;
+	responeScrollPos = responePos;
+
+
+	//Vec2<float>distance = (CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos) / 2.0f;
+	//ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
+
+	Camera::Instance()->Init();
+	SuperiorityGauge::Instance()->Init();
+
+	readyToStartRoundFlag = true;
+	//背景に星
+	//BackGround::Instance()->Init(GetStageSize());
 
 	mapChipGeneratorChangeMap = std::make_shared<MapChipGenerator_ChangeMap>();
 
