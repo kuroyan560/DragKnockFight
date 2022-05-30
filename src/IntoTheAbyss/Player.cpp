@@ -662,9 +662,9 @@ void Player::Input(const MapChipArray& MapData)
 		}
 
 		//煙
-		ParticleMgr::Instance()->Generate(pos, -inputLeftVec, BULLET);
+		//ParticleMgr::Instance()->Generate(pos, -inputLeftVec, BULLET);
 		//残像
-		dashAftImgTimer = 10;
+		//dashAftImgTimer = 10;
 
 		// スタミナを消費
 		//staminaGauge->ConsumesStamina(DASH_STAMINA);
