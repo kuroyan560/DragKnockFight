@@ -389,7 +389,7 @@ void Player::OnDraw(const bool& isRoundStartEffect)
 	afImg.Draw();
 
 
-	swingGauge.Draw();
+	//swingGauge.Draw();
 
 	//muffler.Draw(LigManager);
 
