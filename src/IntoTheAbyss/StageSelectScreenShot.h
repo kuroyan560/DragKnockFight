@@ -40,5 +40,8 @@ private:
 	float timer;		// リサージュ曲線に使用するタイマー
 
 	int* selectNumPtr;
+
+	int stageTagHandle;
+	int stageNumHandle;
 };
 

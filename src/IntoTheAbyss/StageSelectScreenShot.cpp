@@ -26,6 +26,8 @@ StageSelectScreenShot::StageSelectScreenShot(int* SelectNum) : selectNumPtr(Sele
 	{
 		stageNumberHandle[i] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/" + std::to_string(i) + ".png");
 	}
+
+	stageTagHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/tag.png");
 }
 
 void StageSelectScreenShot::Init()
@@ -107,7 +109,11 @@ void StageSelectScreenShot::Draw()
 
 	Vec2<float> debugPos = StageSelectOffsetPosDebug::Instance()->pos;
 	DrawFunc::DrawRotaGraph2D(screenShotLerpData.pos + expData.pos + debugPos, Vec2<float>(0.74f, 0.87f) + expData.size, 0.0f, screenShot);
-	DrawFunc::DrawRotaGraph2D(stageNumberData.pos + stageNumberExpData.pos + debugPos + lissajousCurve, stageNumberData.size + stageNumberExpData.size, 0.0f, TexHandleMgr::GetTexBuffer(stageNumberHandle[*selectNumPtr]));
+
+
+	//DrawFunc::DrawRotaGraph2D(stageNumberData.pos + stageNumberExpData.pos + debugPos + lissajousCurve, stageNumberData.size + stageNumberExpData.size, 0.0f, TexHandleMgr::GetTexBuffer(stageNumberHandle[*selectNumPtr]));
+	DrawFunc::DrawRotaGraph2D(stageNumberData.pos + stageNumberExpData.pos + debugPos + lissajousCurve, stageNumberData.size + stageNumberExpData.size, 0.0f, TexHandleMgr::GetTexBuffer(stageTagHandle));
+
 }
 
 void StageSelectScreenShot::ImGuiDraw()
