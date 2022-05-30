@@ -82,6 +82,7 @@ class ResultScene : public BaseScene
 	CRT crt;
 	bool endFlg = false;
 
+	int ssIntervalTimer;
 public:
 
 	const Vec2<int> WINDOW_CENTER = WinApp::Instance()->GetWinCenter();

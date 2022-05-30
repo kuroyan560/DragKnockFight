@@ -18,6 +18,20 @@ DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 
 	//scroll = std::make_shared<LocalScrollMgr>();
 
+	int stageNum = 0;
+	while (KuroFunc::ExistFile("resource/ChainCombat/select_scene/stage_tag/" + std::to_string(stageNum) + ".png"))
+	{
+		stageNum++;
+	}
+	stageComment.resize(stageNum);
+	for (int i = 0; i < stageNum; ++i)
+	{
+		stageComment[i] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/" + std::to_string(i) + ".png");
+	}
+
+	commentSprite = std::make_shared<Sprite>(nullptr, "StageCommentSprite");
+
+
 	sceneChageFlag = false;
 }
 
@@ -83,7 +97,8 @@ void DrawMapChipForSceneChange::Update()
 #include"DrawFunc.h"
 void DrawMapChipForSceneChange::Draw(const float& ChangeRate)
 {
-	static auto BLACK = D3D12App::Instance()->GenerateTextureBuffer(Color(0.0f, 0.0f, 0.0f, 0.3f));
+	static auto BLACK = D3D12App::Instance()->GenerateTextureBuffer(Color(0.0f, 0.0f, 0.0f, 0.15f));
+	static const int NON_COMMENT = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/non.png");
 
 	//if (isSS)
 	//{
@@ -92,11 +107,40 @@ void DrawMapChipForSceneChange::Draw(const float& ChangeRate)
 		DrawMapChip(mapChip, mapChipDraw, stageNum, 0);
 		DrawFunc::DrawExtendGraph2D({ 0,0 }, mapBuffer->GetGraphSize().Float(), BLACK, Color(1.0f, 1.0f, 1.0f, (1.0f - ChangeRate)));
 
+		//クリア情報
 		auto& clearInfoContainer = ClearInfoContainerMgr::Instance()->GetContainer(stageNum);
 		if (clearInfoContainer.clear)
 		{
-			DrawFunc::DrawGraph({ 0,0 }, clearInfoContainer.clearInfoRenderTarget);
+			DrawFunc::DrawGraph({ 0,0 }, clearInfoContainer.clearInfoRenderTarget, Color(1.0f, 1.0f, 1.0f, (1.0f - ChangeRate)));
 		}
+
+		//ステージコメント
+		static int OLD_STAGE_NUM = -1;
+		static int COMMENT_MOVE_WAIT_TIMER = 0;
+		static const int COMMENT_MOVE_WAIT_TOTAL_TIME = 45;
+		if (OLD_STAGE_NUM != stageNum)
+		{
+			int commentGraph = NON_COMMENT;
+			if (stageNum < stageComment.size())
+			{
+				commentGraph = stageComment[stageNum];
+			}
+			commentSprite->SetTexture(TexHandleMgr::GetTexBuffer(commentGraph));
+			commentSprite->mesh.SetUv(0.0f, 1.0f, 0.0f, 1.0f);
+			commentSprite->mesh.SetSize(TexHandleMgr::GetTexBuffer(commentGraph)->GetGraphSize().Float());
+			commentSprite->mesh.SetAnchorPoint({ 1.0f,0.0f });
+			COMMENT_MOVE_WAIT_TIMER = 0;
+			OLD_STAGE_NUM = stageNum;
+		}
+		COMMENT_MOVE_WAIT_TIMER++;
+		if (COMMENT_MOVE_WAIT_TOTAL_TIME <= COMMENT_MOVE_WAIT_TIMER)
+		{
+			const float SCROLL = 0.001f;
+			commentSprite->mesh.AddUv({ SCROLL,0.0f }, { SCROLL,0.0f }, { SCROLL,0.0f }, { SCROLL,0.0f });
+		}
+		commentSprite->transform.SetPos({ WinApp::Instance()->GetExpandWinSize().x,KuroMath::Lerp(0.0f,-128.0f,ChangeRate) });
+		commentSprite->Draw();
+
 		crt.Excute(D3D12App::Instance()->GetCmdList(), mapBuffer);
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		crt.DrawResult(AlphaBlendMode_None);

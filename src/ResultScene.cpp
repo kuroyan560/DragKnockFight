@@ -12,6 +12,7 @@
 #include"IntoTheAbyss/DebugKeyManager.h"
 #include"IntoTheAbyss/ScoreManager.h"
 #include"IntoTheAbyss/BackGroundParticle.h"
+#include"IntoTheAbyss/KazHelper.h"
 
 ResultScene::ResultScene()
 {
@@ -88,6 +89,7 @@ void ResultScene::OnInitialize()
 	backGroundCharaVel = {};
 	backGroundCharaAngle = 0;
 
+	ssIntervalTimer = 0;
 }
 
 void ResultScene::OnUpdate()
@@ -197,8 +199,20 @@ void ResultScene::OnUpdate()
 		else
 		{
 			//演出とばし
-
+			resultUITimer = RESULT_UI_TIMER;
+			breakEnemyUITimer = BREAK_COUNTUI_TIMER;
+			scoreEffectTimer = SCORE_EFFECT_TIMER;
+			evaluationEasingTimer = EVALUATION_EFFECT_TIMER - 1;
+			intervalTimer = 35;
 			endFlg = true;
+			bigFontFlag = true;
+			ssIntervalTimer = 0;
+			baseBreakCount = ScoreManager::Instance()->GetScore();
+
+			for (int index = 0; index < 10; ++index)
+			{
+				scoreSize[index] = defaultSize;
+			}
 		}
 	}
 
@@ -391,9 +405,15 @@ void ResultScene::OnDraw()
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	crt.DrawResult(AlphaBlendMode_None);
 
+
+	if (endFlg)
+	{
+		++ssIntervalTimer;
+	}
+
 	//クリア情報のスクショ
-	auto& nowContainer = ClearInfoContainerMgr::Instance()->GetContainer(SelectStage::Instance()->GetStageNum());
-	if (endFlg && nowContainer.maxBreakCount < breakCount)
+	auto &nowContainer = ClearInfoContainerMgr::Instance()->GetContainer(SelectStage::Instance()->GetStageNum());
+	if (endFlg && nowContainer.maxBreakCount < breakCount && 2 <= ssIntervalTimer)
 	{
 		KuroEngine::Instance().Graphics().SetRenderTargets({ nowContainer.clearInfoRenderTarget });
 
@@ -451,7 +471,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 		leftX = drawPos.x;
 
 
-		std::vector<int>number = CountNumber(BREAK_NOW_COUNT);
+		std::vector<int>number = KazHelper::CountNumber(BREAK_NOW_COUNT, KuroFunc::GetDigit(BREAK_MAX_COUNT));
 		for (int i = 0; i < number.size(); ++i)
 		{
 			// 数字を求めて描画する。
@@ -483,7 +503,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 		drawPos.x += FONT_SIZE * (nowSize.x / 2.0f);
 		drawPos.y += 25.0f;
 		nowSize = maxSize;
-		std::vector<int>number = CountNumber(BREAK_MAX_COUNT);
+		std::vector<int>number = KazHelper::CountNumber(BREAK_MAX_COUNT);
 		for (int i = 0; i < number.size(); ++i)
 		{
 			DrawFunc::DrawRotaGraph2D(LISSAJOUS + drawPos + Vec2<float>(OFFSET_X, 0), nowSize, 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));

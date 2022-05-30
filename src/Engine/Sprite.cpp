@@ -74,11 +74,8 @@ void Sprite::Draw(const AlphaBlendMode& BlendMode)
 {
 	KuroEngine::Instance().Graphics().SetPipeline(PIPELINE[(int)BlendMode]);
 
-	if (transform.GetDirty())
-	{
-		constData.mat = *transform.GetMat();
-		constBuff->Mapping(&constData);
-	}
+	constData.mat = *transform.GetMat();
+	constBuff->Mapping(&constData);
 
 	mesh.Render({
 		KuroEngine::Instance().GetParallelMatProjBuff(),	//•½s“Š‰es—ñ

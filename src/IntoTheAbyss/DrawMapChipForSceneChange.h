@@ -9,6 +9,8 @@
 #include"LocalCamera.h"
 #include"CRT.h"
 
+class Sprite;
+
 class DrawMapChipForSceneChange
 {
 public:
@@ -39,4 +41,7 @@ private:
 	RoomMapChipDrawArray mapChipDraw;
 
 	CRT crt;
+
+	std::vector<int>stageComment;
+	std::shared_ptr<Sprite>commentSprite;
 };
