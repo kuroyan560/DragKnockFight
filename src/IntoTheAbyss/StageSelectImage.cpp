@@ -24,15 +24,15 @@ void StageSelectImage::Update()
 
 	if (zoomOutFlag)
 	{
-		backGroundLerpData.lerpPos = { 1280.0f / 2.0f,720.0f / 2.0f };
-		backGroundLerpData.lerpSize = { 1.0f,1.0f };
+		backGroundLerpData.lerpPos = { 1280.0f / 2.0f,1000.0f };
+		backGroundLerpData.lerpSize = { 3.8f,3.0f };
 		backGroundLerpData.startPos = { 640,900 };
 		backGroundLerpData.startSize = { 2.8f,2.5f };
 	}
 	else
 	{
 		backGroundLerpData.startPos = { 1280.0f / 2.0f,720.0f / 2.0f };
-		backGroundLerpData.startSize = { 1.0f,1.0f };
+		backGroundLerpData.startSize = { 2.8f,2.5f };
 		backGroundLerpData.lerpPos = { 640,900 };
 		backGroundLerpData.lerpSize = { 2.8f,2.5f };
 	}
@@ -53,8 +53,8 @@ void StageSelectImage::Draw()
 void StageSelectImage::ImGuiDraw()
 {
 	ImGui::Begin("StageSelectImage2");
-	ImGui::InputFloat("PosX", &backGroundLerpData.lerpPos.x);
-	ImGui::InputFloat("PosY", &backGroundLerpData.lerpPos.y);
+	ImGui::InputFloat("PosX", &backGroundLerpData.pos.x);
+	ImGui::InputFloat("PosY", &backGroundLerpData.pos.y);
 	ImGui::InputFloat("SizeX", &backGroundLerpData.size.x);
 	ImGui::InputFloat("SizeY", &backGroundLerpData.size.y);
 	ImGui::Checkbox("ZoomOut", &zoomOutFlag);
