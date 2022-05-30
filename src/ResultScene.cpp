@@ -381,13 +381,13 @@ void ResultScene::OnDraw()
 	}
 
 	// 左側にキャラを表示するにあたって全体的に右側に描画をずらす用の値。
-	const float OFFSET_X = 100.0f;
+	static const float OFFSET_X = -30.0f;
 
 	Vec2<float> windowSize = { static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y) };
 
 	{
 		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
-		DrawFunc::DrawGraph(lissajousCurve + Vec2<float>(440.0f + OFFSET_X, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
+		DrawFunc::DrawGraph(lissajousCurve + Vec2<float>(580.0f + OFFSET_X, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
 
 		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum(), OFFSET_X, lissajousCurve);
 	}
@@ -421,7 +421,7 @@ void ResultScene::OnDraw()
 		KuroEngine::Instance().Graphics().SetRenderTargets({ nowContainer.clearInfoRenderTarget });
 
 		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
-		DrawFunc::DrawGraph(lissajousCurve + Vec2<float>(440.0f, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
+		DrawFunc::DrawGraph(lissajousCurve + Vec2<float>(580.0f , windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
 
 		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum(), OFFSET_X, lissajousCurve);
 
