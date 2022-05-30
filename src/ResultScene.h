@@ -18,17 +18,31 @@ class ResultScene : public BaseScene
 	int resultHandle;			// リザルトの画像ハンドル
 	int breakEnemyHandle;		// BREAKの画像ハンドル 敵
 	int roundHandle;			// ROUNDの描画
+	int lunaHandle;
+	int lacyHandle;
 	int slashHandle;			//スラッシュ
 	int goodHandle;				//Goodの画像ハンドル
 	int greatHandle;			//Greatの画像ハンドル
 	int excellentHandle;		//Excellentの画像ハンドル
 	int evaluationNowHandle;	
 	bool evaluationFlag;		
+	float lissajousTimer;
 	std::array<int, 3> perfectHandle; //スラッシュ
 	std::array<int, 12> blueNumberHandle;// 青の数字の画像ハンドル
 
 	//スコア
 	float baseBreakCount, breakCount;
+
+	// 背景で飛ばすキャラクターのアニメーションタイマー
+	int backGroundCharaAnimTimer;
+	int backGroundCharaAnimHandle;
+	float backGroundCharaAngle;
+	Vec2<float> backGroundCharaPos;
+	Vec2<float> backGroundCharaVel;
+	std::array<int, 3> useHandle;
+	std::array<int, 3> redCharaHandle;
+	std::array<int, 3> greenCharaHandle;
+	std::array<int, 3> ironBallhandle;
 
 
 	// スコア
@@ -104,5 +118,35 @@ private:
 		return (disits % (int)pow(10, disit + 1)) / pow(10, disit);
 	}
 
-	void DrawBreakCount(float scoreEasingAmount,int BREAK_NOW_COUNT, int BREAK_MAX_COUNT);
+
+	std::vector<int> CountNumber(int TIME)
+	{
+		float score = TIME;
+		std::vector<int> Number(KuroFunc::GetDigit(TIME));
+		for (int i = 0; i < Number.size(); ++i)
+		{
+			Number[i] = -1;
+		}
+
+		int tmp = score;
+		//スコア計算
+		for (int i = 0; tmp > 0; ++i)
+		{
+			float result = tmp % 10;
+			//Number.push_back(result);
+			Number[i] = result;
+			tmp /= 10.0f;
+		}
+		//0埋め
+		for (int i = 0; i < Number.size(); ++i)
+		{
+			if (Number[i] == -1)
+			{
+				Number[i] = 0;
+			}
+		}
+		std::reverse(Number.begin(), Number.end());
+		return Number;
+	}
+	void DrawBreakCount(float scoreEasingAmount,int BREAK_NOW_COUNT, int BREAK_MAX_COUNT, float OFFSET_X, Vec2<float> LISSAJOUS);
 };
