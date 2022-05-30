@@ -260,7 +260,10 @@ void ResultScene::OnUpdate()
 		easeEvaluationPosY = -KuroMath::Ease(Out, Back, static_cast<float>(evaluationEasingTimer) / static_cast<float>(EVALUATION_EFFECT_TIMER), 0.0f, 1.0f) * 30.0f;
 	}
 
-	if (EVALUATION_EFFECT_TIMER <= evaluationEasingTimer)endFlg = true;
+	if (EVALUATION_EFFECT_TIMER <= evaluationEasingTimer)
+	{
+		endFlg = true;
+	}
 
 	if (rate <= GOOD_RATE)
 	{
@@ -405,15 +408,15 @@ void ResultScene::OnDraw()
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	crt.DrawResult(AlphaBlendMode_None);
 
-
+	//スクリーンショットを取るまでの間隔をあける
 	if (endFlg)
 	{
 		++ssIntervalTimer;
 	}
-
+	const int SCREEN_SHOT_TIME = 2;
 	//クリア情報のスクショ
 	auto &nowContainer = ClearInfoContainerMgr::Instance()->GetContainer(SelectStage::Instance()->GetStageNum());
-	if (endFlg && nowContainer.maxBreakCount < breakCount && 2 <= ssIntervalTimer)
+	if (endFlg && nowContainer.maxBreakCount < breakCount && SCREEN_SHOT_TIME <= ssIntervalTimer)
 	{
 		KuroEngine::Instance().Graphics().SetRenderTargets({ nowContainer.clearInfoRenderTarget });
 
