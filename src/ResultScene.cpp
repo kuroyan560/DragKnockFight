@@ -269,24 +269,30 @@ void ResultScene::OnDraw()
 
 	ResultTransfer::Instance()->Draw();
 
+	// 勝者のフレームを取得する。
+	DrawFunc::DrawRotaGraph2D(WinApp::Instance()->GetExpandWinCenter() + Vec2<float>(-280.0f, 0.0f), Vec2<float>(1.0f, 1.0f), 0, TexHandleMgr::GetTexBuffer(winnerFrameHandle));
+
+	// 左側にキャラを表示するにあたって全体的に右側に描画をずらす用の値。
+	const float OFFSET_X = 100.0f;
+
 	Vec2<float> windowSize = { static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y) };
 
 	{
 		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
-		DrawFunc::DrawGraph(Vec2<float>(440.0f, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
+		DrawFunc::DrawGraph(Vec2<float>(440.0f + OFFSET_X, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
 
-		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum());
+		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum(), OFFSET_X);
 	}
 
 	if (bigFontFlag && timeUpFlag)
 	{
 		if (evaluationFlag)
 		{
-			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(perfectHandle[perfectIndex]));
+			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX + OFFSET_X, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(perfectHandle[perfectIndex]));
 		}
 		else
 		{
-			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX - 30, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
+			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX - 30 + OFFSET_X, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
 		}
 	}
 
@@ -303,7 +309,7 @@ void ResultScene::OnDraw()
 		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
 		DrawFunc::DrawGraph(Vec2<float>(440.0f, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
 
-		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum());
+		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum(), OFFSET_X);
 
 		if (bigFontFlag && timeUpFlag)
 		{
@@ -332,7 +338,7 @@ void ResultScene::OnFinalize()
 	AudioApp::Instance()->StopWave(BGM);
 }
 
-void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, int BREAK_MAX_COUNT)
+void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, int BREAK_MAX_COUNT, float OFFSET_X)
 {
 	Vec2<float> windowSize = { static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y) };
 
@@ -366,7 +372,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 				if (prevScore[i] != disit) scoreSize[i] = defaultSize + 0.5f;
 			}
 
-			DrawFunc::DrawRotaGraph2D(drawPos, Vec2<float>(scoreSize[i], scoreSize[i]), 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
+			DrawFunc::DrawRotaGraph2D(drawPos + Vec2<float>(OFFSET_X, 0), Vec2<float>(scoreSize[i], scoreSize[i]), 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
 			// フォントサイズ分移動させる。
 			drawPos.x += FONT_SIZE * nowSize.x;
 
@@ -379,7 +385,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 	evaluationPosX -= 20.0f;
 
 	//スラッシュ
-	DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));
+	DrawFunc::DrawRotaGraph2D(drawPos + Vec2<float>(OFFSET_X, 0), nowSize, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));
 
 	//最大
 	{
@@ -389,7 +395,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 		std::vector<int>number = CountNumber(BREAK_MAX_COUNT);
 		for (int i = 0; i < number.size(); ++i)
 		{
-			DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
+			DrawFunc::DrawRotaGraph2D(drawPos + Vec2<float>(OFFSET_X, 0), nowSize, 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
 			// フォントサイズ分移動させる。
 			drawPos.x += FONT_SIZE * nowSize.x;
 		}

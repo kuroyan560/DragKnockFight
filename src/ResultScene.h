@@ -133,5 +133,5 @@ private:
 		std::reverse(Number.begin(), Number.end());
 		return Number;
 	}
-	void DrawBreakCount(float scoreEasingAmount,int BREAK_NOW_COUNT, int BREAK_MAX_COUNT);
+	void DrawBreakCount(float scoreEasingAmount,int BREAK_NOW_COUNT, int BREAK_MAX_COUNT, float OFFSET_X);
 };
