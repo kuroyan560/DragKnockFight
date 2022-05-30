@@ -654,12 +654,12 @@ void MapChipGenerator_RiseUp::Update()
 
 void MapChipGenerator_RiseUp::Draw()
 {
-	Color col = Color(8, 217, 255, 255);
-	const Vec2<float>leftUpPos = { 30,600 };
-	const Vec2<float>size = { 500,64 };
+	//Color col = Color(8, 217, 255, 255);
+	//const Vec2<float>leftUpPos = { 30,600 };
+	//const Vec2<float>size = { 500,64 };
 
-	//ゲージ
-	DrawFunc::DrawBox2D(leftUpPos, leftUpPos + size * Vec2<float>((float)timer / span, 1.0f), col, true);
-	//フレーム
-	DrawFunc::DrawBox2D(leftUpPos, leftUpPos + size, col);
+	////ゲージ
+	//DrawFunc::DrawBox2D(leftUpPos, leftUpPos + size * Vec2<float>((float)timer / span, 1.0f), col, true);
+	////フレーム
+	//DrawFunc::DrawBox2D(leftUpPos, leftUpPos + size, col);
 }
