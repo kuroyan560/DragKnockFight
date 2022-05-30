@@ -142,7 +142,7 @@ protected:
 
 	//[キャラごとに違う関数]
 	virtual void OnInit() = 0;
-	virtual void OnUpdate(const std::vector<std::vector<int>>& MapData) = 0;
+	virtual void OnUpdate(const MapChipArray& MapData) = 0;
 	virtual void OnUpdateNoRelatedSwing() = 0;	//スウィング中でも通る処理
 	virtual void OnDraw(const bool& isRoundStartEffect) = 0;
 	virtual void OnDrawUI() = 0;
@@ -232,12 +232,12 @@ public:
 		characterName = Name;
 	}
 	void Init(const Vec2<float>& GeneratePos, const bool& Appear);	//ラウンド開始時に呼び出される
-	void Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect, const bool& isRoundFinishEffect, const int& NowStageNum, const int& NowRoomNum);
+	void Update(const MapChipArray& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect, const bool& isRoundFinishEffect, const int& NowStageNum, const int& NowRoomNum);
 	void Draw(const bool& isRoundStartEffect);
 	void DrawUI();
 	//当たり判定
-	void CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundFinish);
-	void CheckHitStuck(const std::vector<std::vector<int>>& MapData);
+	void CheckHit(const MapChipArray& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundFinish);
+	void CheckHitStuck(const MapChipArray& MapData);
 
 	//スタン
 	void Break();

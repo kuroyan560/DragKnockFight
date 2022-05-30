@@ -3,6 +3,7 @@
 #include <vector>
 #include"CharacterInfo.h"
 #include"Angle.h"
+#include"StageMgr.h"
 
 // 振り回し領域可視化のための線分単体
 class SwingLineSegment {
@@ -109,7 +110,7 @@ public:
 	/// <param name="Distance"> 振り回し対象までの距離 </param>
 	/// <param name="IsSwing"> 振り回しをしているか </param>
 	/// <param name="NoMove"> 線分の更新をしないか </param>
-	void Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const std::vector<std::vector<int>>& MapData, const bool& IsUseFinishSwing);
+	void Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const MapChipArray& MapData, const bool& IsUseFinishSwing);
 
 	void SetCharaStartPos(const Vec2<float>& CharaPos);	// 振り回し開始時に振り回すキャラの座標を保存する関数を呼ぶ。
 	void UpdateSwing(const Vec2<float>& CharaPos);		// 振り回し中に呼ぶ更新処理

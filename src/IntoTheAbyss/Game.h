@@ -52,8 +52,8 @@ struct MassChipData
 //元ソリューションのmain処理をまとめたもの
 class Game
 {
-	std::vector<std::unique_ptr<MassChipData>> AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM);
-	void DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum);
+	std::vector<std::unique_ptr<MassChipData>> AddData(MapChipArray MAPCHIP_DATA, const int& CHIP_NUM);
+	void DrawMapChip(MapChipArray& mapChipData, const int& stageNum, const int& roomNum);
 	const int& GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& MAPCHIP_NUM, int* COUNT_CHIP_NUM, Vec2<float>* POS);
 
 	// ボスorプレイヤーが引っかかっているかのフラグ
@@ -65,12 +65,11 @@ class Game
 	Vec2<float> prevLineCenterPos;		// 前フレームの紐の中心点
 
 	// マップチップのデータ
-	vector<vector<int>>* mapData;
+	MapChipArray* mapData;
 
 	int oldStageNum = -1;
 	int oldRoomNum = -1;
 
-	vector<vector<MapChipDrawData>>* mapChipDrawData;
 	int prevDrawChipStageNum;
 	int prevDrawChipRoomNum;
 
@@ -175,7 +174,7 @@ public:
 	void DeterminationOfThePosition();
 
 	// ラウンド開始時演出
-	void RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData);
+	void RoundStartEffect(const bool& Loop, const MapChipArray& tmpMapData);
 
 	// ラウンド終了時演出
 	void RoundFinishEffect(const bool& Loop);

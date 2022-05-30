@@ -101,7 +101,7 @@ public:
 	/// ポイントの生成
 	/// </summary>
 	/// <param name="MAP_DATA">ステージのCSV</param>
-	void Init(const RoomMapChipArray &MAP_DATA);
+	void Init(const MapChipArray &MAP_DATA);
 
 	void Update(const Vec2<float> &POS);
 
@@ -182,76 +182,76 @@ private:
 	bool CheckMapChipWallAndRay(const Vec2<float> &START_POS, const Vec2<float> &END_POS)
 	{
 
-		// マップチップの情報。
-		RoomMapChipArray mapData = *StageMgr::Instance()->GetLocalMap();					//マップ
+		//// マップチップの情報。
+		//RoomMapChipArray mapData = *StageMgr::Instance()->GetLocalMap();					//マップ
 
-		// マップチップの識別用データ
-		SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
+		//// マップチップの識別用データ
+		//SizeData mapChipSizeData = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);
 
-		// 次にマップチップとの最短距離を求める。
-		const int MAP_Y = mapData.size();
-		for (int height = 0; height < MAP_Y; ++height) {
+		//// 次にマップチップとの最短距離を求める。
+		//const int MAP_Y = mapData.size();
+		//for (int height = 0; height < MAP_Y; ++height) {
 
-			const int MAP_X = mapData[height].size();
-			for (int width = 0; width < MAP_X; ++width) {
+		//	const int MAP_X = mapData[height].size();
+		//	for (int width = 0; width < MAP_X; ++width) {
 
-				// このマップチップが1~9以外だったら判定を飛ばす。
-				if (!(mapChipSizeData.min <= mapData[height][width] && mapData[height][width] <= mapChipSizeData.max)) continue;
+		//		// このマップチップが1~9以外だったら判定を飛ばす。
+		//		if (!(mapChipSizeData.min <= mapData[height][width] && mapData[height][width] <= mapChipSizeData.max)) continue;
 
-				// このインデックスのブロックの座標を取得。
-				const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);
+		//		// このインデックスのブロックの座標を取得。
+		//		const Vec2<float> BLOCK_POS = Vec2<float>(width * MAP_CHIP_SIZE, height * MAP_CHIP_SIZE);
 
-				Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
+		//		Vec2<int> windowSize = WinApp::Instance()->GetWinCenter();
 
-				// 一定範囲以外だったら処理を飛ばす。
-				bool checkInsideTop = BLOCK_POS.y < START_POS.y - windowSize.y;
-				bool checkInsideBottom = START_POS.y + windowSize.y > BLOCK_POS.y;
-				bool checkInsideLeft = BLOCK_POS.x < START_POS.x + windowSize.x;
-				bool checkInsideRight = START_POS.x + windowSize.x > BLOCK_POS.x;
-				if (checkInsideTop && checkInsideBottom && checkInsideLeft && checkInsideRight) {
-					continue;
-				}
+		//		// 一定範囲以外だったら処理を飛ばす。
+		//		bool checkInsideTop = BLOCK_POS.y < START_POS.y - windowSize.y;
+		//		bool checkInsideBottom = START_POS.y + windowSize.y > BLOCK_POS.y;
+		//		bool checkInsideLeft = BLOCK_POS.x < START_POS.x + windowSize.x;
+		//		bool checkInsideRight = START_POS.x + windowSize.x > BLOCK_POS.x;
+		//		if (checkInsideTop && checkInsideBottom && checkInsideLeft && checkInsideRight) {
+		//			continue;
+		//		}
 
-				// そのブロックが内包されているブロックだったら処理を飛ばす。
-				Vec2<int> mapChipIndex = { width, height };
-				if (StageMgr::Instance()->IsItWallIn(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), mapChipIndex)) {
-					continue;
-				}
+		//		// そのブロックが内包されているブロックだったら処理を飛ばす。
+		//		Vec2<int> mapChipIndex = { width, height };
+		//		if (StageMgr::Instance()->IsItWallIn(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum(), mapChipIndex)) {
+		//			continue;
+		//		}
 
-				// 四辺分交点を求める。
+		//		// 四辺分交点を求める。
 
-				// 上方向
-				if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE))) {
+		//		// 上方向
+		//		if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE))) {
 
-					// 当たった判定
-					return true;
+		//			// 当たった判定
+		//			return true;
 
-				}
-				// 右方向
-				if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+		//		}
+		//		// 右方向
+		//		if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
 
-					// 当たった判定
-					return true;
+		//			// 当たった判定
+		//			return true;
 
-				}
-				// 下方向
-				if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+		//		}
+		//		// 下方向
+		//		if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x + MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
 
-					// 当たった判定
-					return true;
+		//			// 当たった判定
+		//			return true;
 
-				}
-				// 左方向
-				if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
+		//		}
+		//		// 左方向
+		//		if (Collider::Instance()->IsIntersected(START_POS, END_POS, Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y - MAP_CHIP_HALF_SIZE), Vec2<float>(BLOCK_POS.x - MAP_CHIP_HALF_SIZE, BLOCK_POS.y + MAP_CHIP_HALF_SIZE))) {
 
-					// 当たった判定
-					return true;
+		//			// 当たった判定
+		//			return true;
 
-				}
+		//		}
 
-			}
+		//	}
 
-		}
+		//}
 
 		return false;
 

@@ -314,9 +314,9 @@ void CharacterInterFace::SetPilotDetachedFlg(const bool& Flg)
 
 void CharacterInterFace::SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, vector<Vec2<int>>& hitChipIndex, const Vec2<int>& hitChipIndexBuff, const bool& isCheckHitSize)
 {
-	auto mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
+	auto mapChipDrawData = StageMgr::Instance()->GetLocalMap();
 	if (hitChipIndexBuff.x == -1 || hitChipIndexBuff.y == -1) return;
-	(*mapChipDrawData)[hitChipIndexBuff.y][hitChipIndexBuff.x].shocked = 1.0f;
+	(*mapChipDrawData)[hitChipIndexBuff.y][hitChipIndexBuff.x].drawData.shocked = 1.0f;
 
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_TOP)isHitTop = true;
 	if (intersectedLine == INTERSECTED_LINE::INTERSECTED_BOTTOM) isHitBottom = true;
@@ -526,7 +526,7 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 }
 
 #include "SlowMgr.h"
-void CharacterInterFace::Update(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect, const bool& isRoundFinishEffect, const int& NowStageNum, const int& NowRoomNum)
+void CharacterInterFace::Update(const MapChipArray& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundStartEffect, const bool& isRoundFinishEffect, const int& NowStageNum, const int& NowRoomNum)
 {
 	if (isRoundFinishEffect) {
 
@@ -891,7 +891,7 @@ void CharacterInterFace::Damage()
 #include"MapChipCollider.h"
 #include "StaminaItemMgr.h"
 #include <IntoTheAbyss/StageMgr.h>
-void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundFinish)
+void CharacterInterFace::CheckHit(const MapChipArray& MapData, const Vec2<float>& LineCenterPos, const bool& isRoundFinish)
 {
 	static const int BOUND_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/dash.wav");
 	/*===== 当たり判定 =====*/
@@ -1176,7 +1176,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 			for (int index = 0; index < HITCHIP_INDEX; ++index) {
 				// 壊れないブロックに当たったらバウンス移動量を初期化する。
-				if (MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 18) {
+				if (MapData[hitChipIndex[index].y][hitChipIndex[index].x].chipType == 18) {
 
 					//bounceVel = {};
 
@@ -1196,8 +1196,8 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 			for (int index = 0; index < HITCHIP_INDEX; ++index) {
 
-				bool unBlockFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] != 18;
-				bool bounceBlockFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 20;
+				bool unBlockFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x].chipType != 18;
+				bool bounceBlockFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x].chipType == 20;
 
 				// デバッグで[マップ端のブロックか壊れないブロックに当たるまで振り回しをやめない]機能のために書いた処理
 				if (isDebugModeStrongSwing) {
@@ -1286,7 +1286,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index], 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 						for (int i = 0; i < rare[C].GetNum(); ++i)
 						{
-							if (rare[C].nonScoreFlg || MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 20) continue;
+							if (rare[C].nonScoreFlg || MapData[hitChipIndex[index].y][hitChipIndex[index].x].chipType == 20) continue;
 							partner.lock()->swingDestroyCounter.Increment();
 						}
 						partner.lock()->destroyTimer = DESTROY_TIMER;
@@ -1298,12 +1298,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, 0), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 						// 吹っ飛ぶブロックかどうかをチェック。
-						bounceBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x - 1] == 20;
+						bounceBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x - 1].chipType == 20;
 
 						// 壊れないブロックかどうかをチェック。
-						unBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x - 1] == 18;
+						unBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x - 1].chipType == 18;
 
-						if (!rare[L].nonScoreFlg && MapData[hitChipIndex[index].y][hitChipIndex[index].x - 1] != 20)
+						if (!rare[L].nonScoreFlg && MapData[hitChipIndex[index].y][hitChipIndex[index].x - 1].chipType != 20)
 						{
 							for (int i = 0; i < rare[L].GetNum(); ++i)
 							{
@@ -1317,12 +1317,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, 0), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 						// 吹っ飛ぶブロックかどうかをチェック。
-						bounceBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x + 1] == 20;
+						bounceBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x + 1].chipType == 20;
 
 						// 壊れないブロックかどうかをチェック。
-						unBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x + 1] == 18;
+						unBlockFlag |= MapData[hitChipIndex[index].y][hitChipIndex[index].x + 1].chipType == 18;
 
-						if (!rare[R].nonScoreFlg && MapData[hitChipIndex[index].y][hitChipIndex[index].x + 1] != 20)
+						if (!rare[R].nonScoreFlg && MapData[hitChipIndex[index].y][hitChipIndex[index].x + 1].chipType != 20)
 						{
 							for (int i = 0; i < rare[R].GetNum(); ++i)
 							{
@@ -1336,12 +1336,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, -1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 						// 吹っ飛ぶブロックかどうかをチェック。
-						bounceBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x] == 20;
+						bounceBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x].chipType == 20;
 
 						// 壊れないブロックかどうかをチェック。
-						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x] == 18;
+						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x].chipType == 18;
 
-						if (!rare[T].nonScoreFlg && MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x] != 20)
+						if (!rare[T].nonScoreFlg && MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x].chipType != 20)
 						{
 							for (int i = 0; i < rare[T].GetNum(); ++i)
 							{
@@ -1355,12 +1355,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(0, 1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 						// 吹っ飛ぶブロックかどうかをチェック。
-						bounceBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x] == 20;
+						bounceBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x].chipType == 20;
 
 						// 壊れないブロックかどうかをチェック。
-						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x] == 18;
+						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x].chipType == 18;
 
-						if (!rare[B].nonScoreFlg && MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x] != 20)
+						if (!rare[B].nonScoreFlg && MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x].chipType != 20)
 						{
 							for (int i = 0; i < rare[B].GetNum(); ++i)
 							{
@@ -1374,12 +1374,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, -1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 						// 吹っ飛ぶブロックかどうかをチェック。
-						bounceBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x - 1] == 20;
+						bounceBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x - 1].chipType == 20;
 
 						// 壊れないブロックかどうかをチェック。
-						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x - 1] == 18;
+						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x - 1].chipType == 18;
 
-						if (!rare[LT].nonScoreFlg && MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x - 1] != 20)
+						if (!rare[LT].nonScoreFlg && MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x - 1].chipType != 20)
 						{
 							for (int i = 0; i < rare[LT].GetNum(); ++i)
 							{
@@ -1393,12 +1393,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(-1, 1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 						// 吹っ飛ぶブロックかどうかをチェック。
-						bounceBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x - 1] == 20;
+						bounceBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x - 1].chipType == 20;
 
 						// 壊れないブロックかどうかをチェック。
-						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x - 1] == 18;
+						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x - 1].chipType == 18;
 
-						if (!rare[LB].nonScoreFlg && MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x - 1] != 20)
+						if (!rare[LB].nonScoreFlg && MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x - 1].chipType != 20)
 						{
 							for (int i = 0; i < rare[LB].GetNum(); ++i)
 							{
@@ -1412,12 +1412,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, 1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 						// 吹っ飛ぶブロックかどうかをチェック。
-						bounceBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x + 1] == 20;
+						bounceBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x + 1].chipType == 20;
 
 						// 壊れないブロックかどうかをチェック。
-						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x + 1] == 18;
+						unBlockFlag |= MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x + 1].chipType == 18;
 
-						if (!rare[RB].nonScoreFlg && MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x + 1] != 20)
+						if (!rare[RB].nonScoreFlg && MapData[hitChipIndex[index].y + 1][hitChipIndex[index].x + 1].chipType != 20)
 						{
 							for (int i = 0; i < rare[RB].GetNum(); ++i)
 							{
@@ -1431,12 +1431,12 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 						StageMgr::Instance()->WriteMapChipData(hitChipIndex[index] + Vec2<int>(1, -1), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
 
 						// 吹っ飛ぶブロックかどうかをチェック。
-						bounceBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x + 1] == 20;
+						bounceBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x + 1].chipType == 20;
 
 						// 壊れないブロックかどうかをチェック。
-						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x + 1] == 18;
+						unBlockFlag |= MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x + 1].chipType == 18;
 
-						if (!rare[RT].nonScoreFlg && MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x + 1] != 20)
+						if (!rare[RT].nonScoreFlg && MapData[hitChipIndex[index].y - 1][hitChipIndex[index].x + 1].chipType != 20)
 						{
 							for (int i = 0; i < rare[RT].GetNum(); ++i)
 							{
@@ -1488,7 +1488,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 					// 画面端のブロックだったら判定を通さない。
 					if ((0 < hitChipIndex[index].x && hitChipIndex[index].x < MapData[0].size() - 1 && 0 < hitChipIndex[index].y && hitChipIndex[index].y < MapData.size() - 1))
 					{
-						bool dontBrokeFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x] == 18;
+						bool dontBrokeFlag = MapData[hitChipIndex[index].y][hitChipIndex[index].x].chipType == 18;
 						// 一気に破壊する状態だったらFinishを呼ばない。
 						if (!partner.lock()->isDestroyMode || dontBrokeFlag)
 						{
@@ -1555,7 +1555,7 @@ void CharacterInterFace::CheckHit(const std::vector<std::vector<int>>& MapData, 
 
 }
 
-void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>>& MapData)
+void CharacterInterFace::CheckHitStuck(const MapChipArray& MapData)
 {
 
 	/*===== 引っかかり判定の更新処理 =====*/
@@ -1583,7 +1583,7 @@ void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>>& MapD
 	if (!(searchChipIndex.x < 0 || MAX_X < searchChipIndex.x || searchChipIndex.y < 0 || MAX_Y < searchChipIndex.y)) {
 
 		// そのマップチップの番号がブロックかどうかをチェック。
-		isHitTop = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x] && MapData[searchChipIndex.y][searchChipIndex.x] <= mapChipSizeData.max;
+		isHitTop = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x].chipType && MapData[searchChipIndex.y][searchChipIndex.x].chipType <= mapChipSizeData.max;
 
 	}
 
@@ -1600,7 +1600,7 @@ void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>>& MapD
 	if (!(searchChipIndex.x < 0 || MAX_X < searchChipIndex.x || searchChipIndex.y < 0 || MAX_Y < searchChipIndex.y)) {
 
 		// そのマップチップの番号がブロックかどうかをチェック。
-		isHitBottom = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x] && MapData[searchChipIndex.y][searchChipIndex.x] <= mapChipSizeData.max;
+		isHitBottom = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x].chipType && MapData[searchChipIndex.y][searchChipIndex.x].chipType <= mapChipSizeData.max;
 
 	}
 
@@ -1618,7 +1618,7 @@ void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>>& MapD
 	if (!(searchChipIndex.x < 0 || MAX_X < searchChipIndex.x || searchChipIndex.y < 0 || MAX_Y < searchChipIndex.y)) {
 
 		// そのマップチップの番号がブロックかどうかをチェック。
-		isHitRight = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x] && MapData[searchChipIndex.y][searchChipIndex.x] <= mapChipSizeData.max;
+		isHitRight = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x].chipType && MapData[searchChipIndex.y][searchChipIndex.x].chipType <= mapChipSizeData.max;
 
 	}
 
@@ -1635,7 +1635,7 @@ void CharacterInterFace::CheckHitStuck(const std::vector<std::vector<int>>& MapD
 	if (!(searchChipIndex.x < 0 || MAX_X < searchChipIndex.x || searchChipIndex.y < 0 || MAX_Y < searchChipIndex.y)) {
 
 		// そのマップチップの番号がブロックかどうかをチェック。
-		isHitLeft = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x] && MapData[searchChipIndex.y][searchChipIndex.x] <= mapChipSizeData.max;
+		isHitLeft = mapChipSizeData.min <= MapData[searchChipIndex.y][searchChipIndex.x].chipType && MapData[searchChipIndex.y][searchChipIndex.x].chipType <= mapChipSizeData.max;
 
 	}
 

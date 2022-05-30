@@ -120,7 +120,7 @@ void SwingLineSegmentMgr::Init()
 
 }
 
-void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const vector<vector<int>>& MapData, const bool& IsUseFinishSwing)
+void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& TargetVec, const float& Distance, const MapChipArray& MapData, const bool& IsUseFinishSwing)
 {
 
 	/*===== 更新処理 =====*/
@@ -331,7 +331,7 @@ Vec2<float> SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, co
 	Vec2<float>handSegmentDir(EndPos - StartPos);					//線分の方向
 	Vec2<float>handPos(StartPos);									//線分の始点
 	Vec2<float>sightPos;						//求められた交点の中の最短距離
-	RoomMapChipArray mapData = *StageMgr::Instance()->GetLocalMap();					//マップ
+	MapChipArray mapData = *StageMgr::Instance()->GetLocalMap();					//マップ
 	//どうやって使うか
 
 
@@ -352,8 +352,8 @@ Vec2<float> SwingLineSegmentMgr::CheckHitMapChip(const Vec2<float>& StartPos, co
 		for (int width = 0; width < MAP_X; ++width) {
 
 			// このマップチップが1~9以外だったら判定を飛ばす。
-			if (mapData[height][width] < mapChipSizeData.min ||
-				mapChipSizeData.max < mapData[height][width])
+			if (mapData[height][width].chipType < mapChipSizeData.min ||
+				mapChipSizeData.max < mapData[height][width].chipType)
 			{
 				continue;
 			}
