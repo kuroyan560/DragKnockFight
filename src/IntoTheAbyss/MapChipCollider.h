@@ -4,6 +4,7 @@
 #include "ScrollMgr.h"
 #include "Intersected.h"
 #include <vector>
+#include"MapChipInfo.h"
 
 using namespace std;
 
@@ -42,10 +43,10 @@ private:
 
 public:
 	// マップチップとプレイヤーの当たり判定 絶対に貫通させないバージョン
-	INTERSECTED_LINE CheckHitMapChipBasedOnTheVel(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& vel, const Vec2<float>& size, const vector<vector<int>>& mapChipData, Vec2<int>& hitChipIndex, bool OnlyUnBrokenBlock);
+	INTERSECTED_LINE CheckHitMapChipBasedOnTheVel(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& vel, const Vec2<float>& size, const MapChipArray& mapChipData, Vec2<int>& hitChipIndex, bool OnlyUnBrokenBlock);
 
 	// マップチップとプレイヤーの当たり判定 絶対にめり込ませないバージョン
-	INTERSECTED_LINE CheckHitMapChipBasedOnTheScale(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& size, const vector<vector<int>>& mapChipData, const INTERSECTED_LINE& direction, Vec2<int>& hitChipIndex, bool OnlyUnBrokenBlock);
+	INTERSECTED_LINE CheckHitMapChipBasedOnTheScale(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& size, const MapChipArray& mapChipData, const INTERSECTED_LINE& direction, Vec2<int>& hitChipIndex, bool OnlyUnBrokenBlock);
 
 
 };

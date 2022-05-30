@@ -2,6 +2,7 @@
 #include"Vec.h"
 #include<array>
 #include<vector>
+
 static const enum MAP_CHIP_GENERATOR 
 {
 	NON_GENERATE,

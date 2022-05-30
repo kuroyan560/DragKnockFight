@@ -23,7 +23,7 @@ public:
 
 	std::shared_ptr<RenderTarget> mapBuffer;
 private:
-	void DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum);
+	void DrawMapChip(const MapChipArray &mapChipData, const int &stageNum, const int &roomNum);
 
 	int stageNum;
 	std::vector<DrawMap>drawMap;
@@ -37,8 +37,7 @@ private:
 
 	bool sceneChageFlag;
 
-	RoomMapChipArray mapChip;
-	RoomMapChipDrawArray mapChipDraw;
+	MapChipArray mapChip;
 
 	CRT crt;
 

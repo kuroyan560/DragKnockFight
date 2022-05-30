@@ -38,10 +38,8 @@ DrawMapChipForSceneChange::DrawMapChipForSceneChange()
 void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG)
 {
 	StageMgr::Instance()->SetLocalMapChipData(STAGE_NUM, 0);
-	StageMgr::Instance()->SetLocalMapChipDrawBlock(STAGE_NUM, 0);
 
 	mapChip = *StageMgr::Instance()->GetLocalMap();
-	mapChipDraw = *StageMgr::Instance()->GetLocalDrawMap();
 
 	stageNum = STAGE_NUM;
 	isSS = true;
@@ -50,7 +48,7 @@ void DrawMapChipForSceneChange::Init(int STAGE_NUM, bool SCENE_CHANGE_FLAG)
 	playerPos = StageMgr::Instance()->GetPlayerResponePos(STAGE_NUM, 0);
 	bossPos = StageMgr::Instance()->GetBossResponePos(STAGE_NUM, 0);
 
-	RoomMapChipArray tmp = *StageMgr::Instance()->GetLocalMap();
+	MapChipArray tmp = *StageMgr::Instance()->GetLocalMap();
 	Vec2<float>distance = (bossPos - playerPos) / 2.0f;
 	centralPos = playerPos + distance;
 
@@ -104,7 +102,7 @@ void DrawMapChipForSceneChange::Draw(const float& ChangeRate)
 	//{
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		KuroEngine::Instance().Graphics().ClearRenderTarget({ mapBuffer });
-		DrawMapChip(mapChip, mapChipDraw, stageNum, 0);
+		DrawMapChip(mapChip, stageNum, 0);
 		DrawFunc::DrawExtendGraph2D({ 0,0 }, mapBuffer->GetGraphSize().Float(), BLACK, Color(1.0f, 1.0f, 1.0f, (1.0f - ChangeRate)));
 
 		//クリア情報
@@ -139,6 +137,7 @@ void DrawMapChipForSceneChange::Draw(const float& ChangeRate)
 			commentSprite->mesh.AddUv({ SCROLL,0.0f }, { SCROLL,0.0f }, { SCROLL,0.0f }, { SCROLL,0.0f });
 		}
 		commentSprite->transform.SetPos({ WinApp::Instance()->GetExpandWinSize().x,KuroMath::Lerp(0.0f,-128.0f,ChangeRate) });
+		DrawFunc::DrawBox2D({ 0,0 }, commentSprite->mesh.GetSize() * Vec2<float>(1.0f, 1.3f), Color(0.0f, 0.0f, 0.0f, 0.7f), true, AlphaBlendMode_Trans);
 		commentSprite->Draw();
 
 		crt.Excute(D3D12App::Instance()->GetCmdList(), mapBuffer);
@@ -148,7 +147,7 @@ void DrawMapChipForSceneChange::Draw(const float& ChangeRate)
 	//}
 }
 
-void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
+void DrawMapChipForSceneChange::DrawMapChip(const MapChipArray &mapChipData, const int &stageNum, const int &roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -165,11 +164,11 @@ void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipDa
 		const int WIDTH = mapChipData[height].size();
 		for (int width = 0; width < WIDTH; ++width) {
 
-			if (mapChipDrawData[height][width].shocked)mapChipDrawData[height][width].shocked -= 0.02f;
-			if (mapChipDrawData[height][width].expEaseRate < 1.0f)mapChipDrawData[height][width].expEaseRate += 0.005f;
+			if (mapChip[height][width].drawData.shocked)mapChip[height][width].drawData.shocked -= 0.02f;
+			if (mapChip[height][width].drawData.expEaseRate < 1.0f)mapChip[height][width].drawData.expEaseRate += 0.005f;
 
 			// ブロック以外だったら処理を飛ばす。
-			bool blockFlag = (mapChipData[height][width] >= wallChipMemorySize.min && mapChipData[height][width] <= wallChipMemorySize.max);
+			bool blockFlag = (mapChipData[height][width].chipType >= wallChipMemorySize.min && mapChipData[height][width].chipType <= wallChipMemorySize.max);
 			if (blockFlag)
 			{
 				// スクロール量から描画する位置を求める。
@@ -182,43 +181,43 @@ void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipDa
 
 				vector<std::shared_ptr<MapChipAnimationData>>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
-				if (height < 0 || mapChipDrawData.size() <= height) continue;
-				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
+				if (height < 0 || mapChip.size() <= height) continue;
+				if (width < 0 || mapChip[height].size() <= width) continue;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
-				if (mapChipDrawData[height][width].animationFlag)
+				if (mapChip[height][width].drawData.animationFlag)
 				{
-					int arrayHandle = mapChipDrawData[height][width].handle;
-					++mapChipDrawData[height][width].interval;
+					int arrayHandle = mapChip[height][width].drawData.handle;
+					++mapChip[height][width].drawData.interval;
 					//アニメーションの間隔
-					if (mapChipDrawData[height][width].interval % tmpAnimation[arrayHandle]->maxInterval == 0)
+					if (mapChip[height][width].drawData.interval % tmpAnimation[arrayHandle]->maxInterval == 0)
 					{
-						++mapChipDrawData[height][width].animationNum;
-						mapChipDrawData[height][width].interval = 0;
+						++mapChip[height][width].drawData.animationNum;
+						mapChip[height][width].drawData.interval = 0;
 					}
 					//アニメーション画像の総数に達したら最初に戻る
-					if (tmpAnimation[arrayHandle]->handle.size() <= mapChipDrawData[height][width].animationNum)
+					if (tmpAnimation[arrayHandle]->handle.size() <= mapChip[height][width].drawData.animationNum)
 					{
-						mapChipDrawData[height][width].animationNum = 0;
+						mapChip[height][width].drawData.animationNum = 0;
 					}
 					//分割したアニメーションの画像から渡す
-					handle = tmpAnimation[arrayHandle]->handle[mapChipDrawData[height][width].animationNum];
+					handle = tmpAnimation[arrayHandle]->handle[mapChip[height][width].drawData.animationNum];
 				}
 				else
 				{
-					handle = mapChipDrawData[height][width].handle;
+					handle = mapChip[height][width].drawData.handle;
 				}
 
 				//mapChipDrawData[height][width].shocked = KuroMath::Lerp(mapChipDrawData[height][width].shocked, 0.0f, 0.8f);
 
 				Vec2<float> pos = drawPos;
-				pos += mapChipDrawData[height][width].offset;
+				pos += mapChip[height][width].drawData.offset;
 				if (0 <= handle)
 				{
 					ChipData chipData;
 					chipData.pos = pos;
-					chipData.radian = mapChipDrawData[height][width].radian;
-					chipData.shocked = mapChipDrawData[height][width].shocked;
-					chipData.expEaseRate = mapChipDrawData[height][width].expEaseRate;
+					chipData.radian = mapChip[height][width].drawData.radian;
+					chipData.shocked = mapChip[height][width].drawData.shocked;
+					chipData.expEaseRate = mapChip[height][width].drawData.expEaseRate;
 					datas[handle].emplace_back(chipData);
 					//DrawFunc::DrawRotaGraph2D({ pos.x, pos.y }, 1.6f * ScrollMgr::Instance()->zoom, mapChipDrawData[height][width].radian, TexHandleMgr::GetTexBuffer(handle));
 				}

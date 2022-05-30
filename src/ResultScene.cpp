@@ -447,6 +447,7 @@ void ResultScene::OnDraw()
 	auto &nowContainer = ClearInfoContainerMgr::Instance()->GetContainer(SelectStage::Instance()->GetStageNum());
 	if (endFlg && nowContainer.maxBreakCount < breakCount && SCREEN_SHOT_TIME <= ssIntervalTimer)
 	{
+		KuroEngine::Instance().Graphics().ClearRenderTarget(nowContainer.clearInfoRenderTarget);
 		KuroEngine::Instance().Graphics().SetRenderTargets({ nowContainer.clearInfoRenderTarget });
 
 		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);

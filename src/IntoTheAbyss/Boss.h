@@ -112,7 +112,7 @@ private:
 	void OnInit()override;
 
 	// 更新処理
-	void OnUpdate(const std::vector<std::vector<int>> &MapData)override;
+	void OnUpdate(const MapChipArray &MapData)override;
 
 	//スウィング中も呼び出される更新処理
 	void OnUpdateNoRelatedSwing()override {}

@@ -11,6 +11,7 @@
 #include"Angle.h"
 #include"KuroFunc.h"
 #include"MapChipCollider.h"
+#include"MapChipInfo.h"
 #include"MapChipGenerator.h"
 #include"CharacterInfo.h"
 
@@ -72,36 +73,6 @@ enum MapChipType
 	MAPCHIP_BLOCK_ELEC_ON_ALLWAYS,
 };
 
-struct MapChipDrawData
-{
-	int handle = -1;	//画像ハンドル
-	float radian;//画像の角度
-	bool animationFlag;//アニメーションを有効にするフラグ
-	int interval;		//アニメーションの間隔
-	int animationNum;//現在参照しているアニメーションの画像
-	Vec2<float> offset;	//32*32の画像じゃない場合の画像位置調整
-	Vec2<float> offsetInterval;//上下左右の画像の間隔を空ける
-	float shocked = 0.0f;	//衝撃率
-	float expEaseRate = 1.0f;	//伸縮
-
-	void Reset()
-	{
-		handle = -1;	//画像ハンドル
-		radian = 0.0f;//画像の角度
-		animationFlag = false;//アニメーションを有効にするフラグ
-		interval = 0;		//アニメーションの間隔
-		animationNum = 0;//現在参照しているアニメーションの画像
-		offset = {};	//32*32の画像じゃない場合の画像位置調整
-		offsetInterval = {};//上下左右の画像の間隔を空ける
-		shocked = 0.0f;
-		expEaseRate = 1.0f;
-	};
-
-	//MapChipDrawData() : handle(-1), radian(0.0f), animationFlag(false), interval(0), animationNum(0), offset(Vec2<float>(0.0f, 0.0f))
-	MapChipDrawData() : radian(0.0f), animationFlag(false), interval(0), animationNum(0), offset(Vec2<float>(0.0f, 0.0f))
-	{
-	};
-};
 
 struct MapChipAnimationData
 {
@@ -120,19 +91,13 @@ enum GimickHandle
 	GMMICK_ELEC_OFF
 };
 
-typedef std::vector<std::vector<int>> RoomMapChipArray;
-typedef std::vector<RoomMapChipArray> StageMapChipData;
 
 typedef std::vector<RelationData> RoomRelationData;
 typedef std::vector<RoomRelationData> StageRelationData;
 
-typedef std::vector<std::vector<MapChipDrawData>> RoomMapChipDrawArray;
-typedef std::vector<RoomMapChipDrawArray> StageMapChipDrawData;
-
 struct StageInfo
 {
-	RoomMapChipArray mapChipData;
-	RoomMapChipDrawArray mapChipDrawData;
+	MapChipArray mapChips;
 	int swingCount = 0;
 	int gameMaxTimer = 60;
 	MAP_CHIP_GENERATOR generatorType = NON_GENERATE;
@@ -178,7 +143,7 @@ public:
 	/// <returns>チップ番号</returns>
 	inline const int &GetMapChipBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER, const Vec2<float> &MAPCHIP_POS)
 	{
-		RoomMapChipArray tmp = stageInfos[STAGE_NUMBER][ROOM_NUMBER].mapChipData;
+		auto& tmp = stageInfos[STAGE_NUMBER][ROOM_NUMBER].mapChips;
 
 		Vec2<int>mapChipPos;
 		mapChipPos.x = MAPCHIP_POS.x;
@@ -194,12 +159,10 @@ public:
 		{
 			return -1;
 		}
-		int result = tmp[mapChipPos.y][mapChipPos.x];
+		int result = tmp[mapChipPos.y][mapChipPos.x].chipType;
 		//指定した場所のマップチップ番号を返す
 		return result;
 	};
-
-	void SetLocalMapChipDrawBlock(const int &STAGE_NUMBER, const int &ROOM_NUMBER);
 
 
 	const bool &CheckStageNum(const int &STAGE_NUMBER);
@@ -208,7 +171,7 @@ public:
 
 	inline const bool &IsItWallIn(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_POS)
 	{
-		if (stageInfos[STAGE_NUM][ROOM_NUM].mapChipDrawData[MAPCHIP_POS.y][MAPCHIP_POS.x].handle == mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN])
+		if (stageInfos[STAGE_NUM][ROOM_NUM].mapChips[MAPCHIP_POS.y][MAPCHIP_POS.x].drawData.handle == mapChipGraphHandle[MAPCHIP_DRAW_WALL_IN])
 		{
 			return true;
 		}
@@ -248,7 +211,7 @@ public:
 
 	inline const int &GetLocalMapChipBlock(const Vec2<int> &MAPCHIP_POS)
 	{
-		RoomMapChipArray tmp = localRoomMapChipArray;
+		auto& tmp = localRoomMapChipArray;
 
 		Vec2<int>mapChipPos;
 		mapChipPos.x = MAPCHIP_POS.x;
@@ -264,14 +227,13 @@ public:
 		{
 			return -1;
 		}
-		int result = tmp[mapChipPos.y][mapChipPos.x];
+		int result = tmp[mapChipPos.y][mapChipPos.x].chipType;
 		//指定した場所のマップチップ番号を返す
 		return result;
 	};
 
 
-	RoomMapChipArray *GetLocalMap();
-	RoomMapChipDrawArray *GetLocalDrawMap();
+	MapChipArray* GetLocalMap() { return &localRoomMapChipArray; }
 
 	int GetAllLocalWallBlocksNum(int RARE_BLOCK_COUNT = 10);
 	int GetAllRoomWallBlocksNum(int STAGE_NUM, int RARE_BLOCK_COUNT = 10);
@@ -305,8 +267,7 @@ private:
 
 	static const int SECRET_DOOR_NUMBER = 5;
 
-	RoomMapChipArray localRoomMapChipArray;
-	RoomMapChipDrawArray localRoomMapChipDrawArray;
+	MapChipArray localRoomMapChipArray;
 
 	int thowGraphHandle;
 	std::array<int, 12> eventChipHandle;
@@ -416,7 +377,7 @@ public:
 	//マップのインデックスのサイズを取得
 	Vec2<int>GetMapIdxSize(const int& StageNum, const int& RoomNum)
 	{
-		return Vec2<int>(stageInfos[StageNum][RoomNum].mapChipData[0].size(), stageInfos[StageNum][RoomNum].mapChipData.size());
+		return Vec2<int>(stageInfos[StageNum][RoomNum].mapChips[0].size(), stageInfos[StageNum][RoomNum].mapChips.size());
 	}
 
 	Vec2<int>GetLocalMapIdxSize()
@@ -448,9 +409,9 @@ public:
 	{
 		return stageInfos[StageNum].size();
 	}
-	const RoomMapChipArray& GetMap(const int& StageNum, const int& RoomNum)
+	const MapChipArray& GetMap(const int& StageNum, const int& RoomNum)
 	{
-		return stageInfos[StageNum][RoomNum].mapChipData;
+		return stageInfos[StageNum][RoomNum].mapChips;
 	}
 	const StageInfo& GetStageInfo(const int& StageNum, const int& RoomNum)
 	{
@@ -475,39 +436,32 @@ private:
 
 	void SetLocalGimmickGraphHandle(const Vec2<int> &MAPCHIP_NUM, const int &CHIP_NUM)
 	{
+		localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].drawData.Reset();
+
 		//描画の書き換え
 		if (CHIP_NUM == MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)
 		{
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_GREEN];
+			localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].drawData.handle = gimmcikGraphHandle[GMMICK_GREEN];
 		}
 		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_RARE_BLOCK)
 		{
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_RED];
+			localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].drawData.handle = gimmcikGraphHandle[GMMICK_RED];
 		}
 		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)
 		{
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
+			localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].drawData.handle = 0;
+			localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].drawData.animationFlag = true;
+			localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].drawData.interval = 5;
 		}
 		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)
 		{
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = gimmcikGraphHandle[GMMICK_ELEC_OFF];
+			localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].drawData.handle = gimmcikGraphHandle[GMMICK_ELEC_OFF];
 		}
 		else if (CHIP_NUM == MAPCHIP_TYPE_STATIC_ELEC_ON_ALLWAYS)
 		{
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].handle = 0;
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].animationFlag = true;
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].interval = 5;
-		}
-		else
-		{
-			localRoomMapChipDrawArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].Reset();
+			localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].drawData.handle = 0;
+			localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].drawData.animationFlag = true;
+			localRoomMapChipArray[MAPCHIP_NUM.y][MAPCHIP_NUM.x].drawData.interval = 5;
 		}
 	}
 

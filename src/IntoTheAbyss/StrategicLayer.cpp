@@ -26,7 +26,7 @@ IStrategicLayer::SearchData IStrategicLayer::SearchItem(const SphereCollision &D
 {
 	std::array<StaminaItem, 300>item = StaminaItemMgr::Instance()->GetItemArray();
 
-	RoomMapChipArray *mapData = StageMgr::Instance()->GetLocalMap();
+	MapChipArray *mapData = StageMgr::Instance()->GetLocalMap();
 
 	float mapX = mapData[0].size() * 50.0f;
 	float position = CharacterManager::Instance()->Right()->pos.x / mapX;
@@ -189,7 +189,7 @@ void RestoreStamina::Update()
 
 void RestoreStamina::Draw()
 {
-	RoomMapChipArray mapData = *StageMgr::Instance()->GetLocalMap();
+	MapChipArray mapData = *StageMgr::Instance()->GetLocalMap();
 	float mapX = mapData[0].size() * 50.0f;
 
 	float position = CharacterManager::Instance()->Right()->pos.x / mapX;
