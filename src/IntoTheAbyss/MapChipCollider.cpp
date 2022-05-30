@@ -58,7 +58,7 @@ Vec2<float> MapChipCollider::CalIntersectPoint(Vec2<float> posA1, Vec2<float> po
 	return Vec2<float>(posA1.x + (posA2.x - posA1.x) * t, posA1.y + (posA2.y - posA1.y) * t);
 }
 
-INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& vel, const Vec2<float>& size, const vector<vector<int>>& mapChipData, Vec2<int>& hitChipIndex, bool OnlyUnBrokenBlock)
+INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& vel, const Vec2<float>& size, const MapChipArray& mapChipData, Vec2<int>& hitChipIndex, bool OnlyUnBrokenBlock)
 {
 	/*===== マップチップとプレイヤーの当たり判定 =====*/
 
@@ -80,11 +80,11 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 			//壊れないブロックとのみ当たり判定を取る
 			if (OnlyUnBrokenBlock)
 			{
-				if (mapChipData[height][width] != MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)continue;
+				if (mapChipData[height][width].chipType != MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)continue;
 			}
 
 			// マップIDが0だったら処理を飛ばす。
-			if (!(mapChipSizeData.min <= mapChipData[height][width] && mapChipData[height][width] <= mapChipSizeData.max)) continue;
+			if (!(mapChipSizeData.min <= mapChipData[height][width].chipType && mapChipData[height][width].chipType <= mapChipSizeData.max)) continue;
 
 			// このマップの中心座標を求める。
 			const float centerX = width * MAP_CHIP_SIZE;
@@ -226,7 +226,7 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheVel(Vec2<float>& pos,
 	return INTERSECTED_NONE;
 }
 
-INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& size, const vector<vector<int>>& mapChipData, const INTERSECTED_LINE& direction, Vec2<int>& hitChipIndex, bool OnlyUnBrokenBlock)
+INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& pos, const Vec2<float>& prevFramePos, const Vec2<float>& size, const MapChipArray& mapChipData, const INTERSECTED_LINE& direction, Vec2<int>& hitChipIndex, bool OnlyUnBrokenBlock)
 {
 	/*===== マップチップとプレイヤーの当たり判定 =====*/
 
@@ -289,11 +289,11 @@ INTERSECTED_LINE MapChipCollider::CheckHitMapChipBasedOnTheScale(Vec2<float>& po
 			//壊れないブロックとのみ当たり判定を取る
 			if (OnlyUnBrokenBlock)
 			{
-				if (mapChipData[height][width] != MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)continue;
+				if (mapChipData[height][width].chipType != MAPCHIP_TYPE_STATIC_UNBROKEN_BLOCK)continue;
 			}
 
 			// マップIDが0だったら処理を飛ばす。
-			if (!(mapChipSizeData.min <= mapChipData[height][width] && mapChipData[height][width] <= mapChipSizeData.max)) continue;
+			if (!(mapChipSizeData.min <= mapChipData[height][width].chipType && mapChipData[height][width].chipType <= mapChipSizeData.max)) continue;
 
 			// このマップの中心座標を求める。
 			const float centerX = width * MAP_CHIP_SIZE;

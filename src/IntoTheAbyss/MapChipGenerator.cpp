@@ -18,7 +18,7 @@ bool MapChipGenerator::CanChange(const Vec2<int>& Idx)
 	if (Idx.y <= 0)return false;
 	else if (idxSize.y - 1 <= Idx.y)return false;
 
-	auto type = (*mapData)[Idx.y][Idx.x];
+	auto type = (*mapData)[Idx.y][Idx.x].chipType;
 	if (type == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)return false;
 	if (type == MAPCHIP_TYPE_STATIC_RARE_BLOCK)return false;
 	if (type == 1)return false;
@@ -386,7 +386,7 @@ void MapChipGenerator_ChangeMap::RegisterMap()
 		{
 			predictionIdxArray.emplace_back();
 			predictionIdxArray.back().idx = { x,y };
-			predictionIdxArray.back().type = StageMgr::Instance()->GetMap(stageNumber, setMapNumber)[y][x];
+			predictionIdxArray.back().type = StageMgr::Instance()->GetMap(stageNumber, setMapNumber)[y][x].chipType;
 		}
 	}
 	setMapNumber++;
@@ -527,10 +527,10 @@ void MapChipGenerator_RiseUp::RiseUp()
 			for (int y = 0; y < mapIdxSize.y; ++y)
 			{
 				//自身の右が空でないならスルー
-				if ((*mapData)[y][x + 1] != 0)continue;
+				if ((*mapData)[y][x + 1].chipType != 0)continue;
 
 				//自身のタイプを右チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x + 1, y), (*mapData)[y][x], CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x + 1, y), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
 				//自身は空にする
 				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
 			}
@@ -541,7 +541,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 		for (int y = 0; y < mapIdxSize.y; ++y)
 		{
 			//自身が空でないならスルー
-			if ((*mapData)[y][x] != 0)continue;
+			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
 			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x,false);
@@ -555,10 +555,10 @@ void MapChipGenerator_RiseUp::RiseUp()
 			for (int x = 0; x < mapIdxSize.x; ++x)
 			{
 				//自身の下が空でないならスルー
-				if ((*mapData)[y + 1][x] != 0)continue;
+				if ((*mapData)[y + 1][x].chipType != 0)continue;
 
 				//自身のタイプを下チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y + 1), (*mapData)[y][x], CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y + 1), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
 				//自身は空にする
 				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
 			}
@@ -569,7 +569,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 		for (int x = 0; x < mapIdxSize.x; ++x)
 		{
 			//自身が空でないならスルー
-			if ((*mapData)[y][x] != 0)continue;
+			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
 			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
@@ -583,10 +583,10 @@ void MapChipGenerator_RiseUp::RiseUp()
 			for (int y = 0; y < mapIdxSize.y; ++y)
 			{
 				//自身の左が空でないならスルー
-				if ((*mapData)[y][x - 1] != 0)continue;
+				if ((*mapData)[y][x - 1].chipType != 0)continue;
 
 				//自身のタイプを左チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x - 1, y), (*mapData)[y][x], CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x - 1, y), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
 				//自身は空にする
 				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
 			}
@@ -597,7 +597,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 		for (int y = 0; y < mapIdxSize.y; ++y)
 		{
 			//自身が空でないならスルー
-			if ((*mapData)[y][x] != 0)continue;
+			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
 			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
@@ -611,10 +611,10 @@ void MapChipGenerator_RiseUp::RiseUp()
 			for (int x = 0; x < mapIdxSize.x; ++x)
 			{
 				//自身の上が空でないならスルー
-				if ((*mapData)[y - 1][x] != 0)continue;
+				if ((*mapData)[y - 1][x].chipType != 0)continue;
 
 				//自身のタイプを上チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y - 1), (*mapData)[y][x], CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y - 1), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
 				//自身は空にする
 				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
 			}
@@ -625,7 +625,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 		for (int x = 0; x < mapIdxSize.x; ++x)
 		{
 			//自身が空でないならスルー
-			if ((*mapData)[y][x] != 0)continue;
+			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
 			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);

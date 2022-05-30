@@ -194,7 +194,7 @@ void Player::OnInit()
 	strongSwingUI.resize(maxStrongSwingCount);
 }
 
-void Player::OnUpdate(const vector<vector<int>>& MapData)
+void Player::OnUpdate(const MapChipArray& MapData)
 {
 	//デバック用の値変更
 	std::shared_ptr<PlayerDebugParameterData> data = DebugParameter::Instance()->nowData;
@@ -491,7 +491,7 @@ void Player::OnPilotControl()
 	if (0 < rightStickVec.y)pilotGraph = playerPilotGraph[0];	//前向き
 }
 
-void Player::Input(const vector<vector<int>>& MapData)
+void Player::Input(const MapChipArray& MapData)
 {
 	/*===== 入力処理 =====*/
 
@@ -1074,7 +1074,7 @@ bool Player::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& End
 	Vec2<float>handSegmentDir(EndPos - StartPos);					//線分の方向
 	Vec2<float>handPos(StartPos);									//線分の始点
 	Vec2<float>sightPos;						//求められた交点の中の最短距離
-	RoomMapChipArray mapData = *StageMgr::Instance()->GetLocalMap();					//マップ
+	MapChipArray mapData = *StageMgr::Instance()->GetLocalMap();					//マップ
 	//どうやって使うか
 
 
@@ -1095,8 +1095,8 @@ bool Player::CheckHitMapChip(const Vec2<float>& StartPos, const Vec2<float>& End
 		for (int width = 0; width < MAP_X; ++width) {
 
 			// このマップチップが1~9以外だったら判定を飛ばす。
-			if (mapData[height][width] < mapChipSizeData.min ||
-				mapChipSizeData.max < mapData[height][width])
+			if (mapData[height][width].chipType < mapChipSizeData.min ||
+				mapChipSizeData.max < mapData[height][width].chipType)
 			{
 				continue;
 			}

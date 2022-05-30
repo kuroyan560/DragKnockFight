@@ -104,7 +104,7 @@ void Boss::OnInit()
 }
 
 #include"Camera.h"
-void Boss::OnUpdate(const std::vector<std::vector<int>>& MapData)
+void Boss::OnUpdate(const MapChipArray& MapData)
 {
 	/*===== XVˆ— =====*/
 

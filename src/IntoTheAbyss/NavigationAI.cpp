@@ -21,7 +21,7 @@ NavigationAI::NavigationAI()
 
 static const float BOSS_SIZE = 160.0f;
 
-void NavigationAI::Init(const RoomMapChipArray& MAP_DATA)
+void NavigationAI::Init(const MapChipArray& MAP_DATA)
 {
 
 	SizeData wallMemorySize = StageMgr::Instance()->GetMapChipSizeData(MAPCHIP_TYPE_STATIC_BLOCK);

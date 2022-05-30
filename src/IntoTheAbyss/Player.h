@@ -20,6 +20,7 @@ class LightManager;
 #include"RunOutOfStaminaEffect.h"
 #include"Gauge.h"
 #include"StrongSwingUI.h"
+#include"MapChipInfo.h"
 
 static const enum PLAYER_ANIM
 {
@@ -158,7 +159,7 @@ private:
 	void OnInit()override;
 
 	// 更新処理
-	void OnUpdate(const vector<vector<int>>& MapData)override;
+	void OnUpdate(const MapChipArray& MapData)override;
 
 	//スウィング中も呼び出される更新処理
 	void OnUpdateNoRelatedSwing()override;
@@ -214,7 +215,7 @@ private:
 	/*-- クラス内で使用する関数 --*/
 
 	// 入力処理
-	void Input(const vector<vector<int>>& MapData);
+	void Input(const MapChipArray& MapData);
 
 	// 移動処理
 	void Move();

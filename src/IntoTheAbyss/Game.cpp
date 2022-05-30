@@ -57,7 +57,7 @@
 
 #include "BackGroundParticle.h"
 
-std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
+std::vector<std::unique_ptr<MassChipData>> Game::AddData(MapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
 	MassChip checkData;
 	std::vector<std::unique_ptr<MassChipData>> data;
@@ -66,7 +66,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	{
 		for (int x = 0; x < MAPCHIP_DATA[y].size(); ++x)
 		{
-			if (MAPCHIP_DATA[y][x] == CHIP_NUM)
+			if (MAPCHIP_DATA[y][x].chipType == CHIP_NUM)
 			{
 				bool sucseedFlag = checkData.Check(Vec2<int>(x, y), CHIP_NUM);
 				if (!sucseedFlag)
@@ -83,7 +83,7 @@ std::vector<std::unique_ptr<MassChipData>> Game::AddData(RoomMapChipArray MAPCHI
 	return data;
 }
 
-void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<MapChipDrawData>>& mapChipDrawData, const int& stageNum, const int& roomNum)
+void Game::DrawMapChip(MapChipArray& mapChipData, const int& stageNum, const int& roomNum)
 {
 	std::map<int, std::vector<ChipData>>datas;
 
@@ -100,11 +100,11 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 		const int WIDTH = mapChipData[height].size();
 		for (int width = 0; width < WIDTH; ++width) {
 
-			if (mapChipDrawData[height][width].shocked)mapChipDrawData[height][width].shocked -= 0.02f;
-			if (mapChipDrawData[height][width].expEaseRate < 1.0f)mapChipDrawData[height][width].expEaseRate += 0.005f;
+			if (mapChipData[height][width].drawData.shocked)mapChipData[height][width].drawData.shocked -= 0.02f;
+			if (mapChipData[height][width].drawData.expEaseRate < 1.0f)mapChipData[height][width].drawData.expEaseRate += 0.005f;
 
 			// ブロック以外だったら処理を飛ばす。
-			bool blockFlag = (mapChipData[height][width] >= wallChipMemorySize.min && mapChipData[height][width] <= wallChipMemorySize.max);
+			bool blockFlag = (mapChipData[height][width].chipType >= wallChipMemorySize.min && mapChipData[height][width].chipType <= wallChipMemorySize.max);
 			if (blockFlag)
 			{
 				// スクロール量から描画する位置を求める。
@@ -117,43 +117,43 @@ void Game::DrawMapChip(const vector<vector<int>>& mapChipData, vector<vector<Map
 
 				vector<std::shared_ptr<MapChipAnimationData>>tmpAnimation = StageMgr::Instance()->animationData;
 				int handle = -1;
-				if (height < 0 || mapChipDrawData.size() <= height) continue;
-				if (width < 0 || mapChipDrawData[height].size() <= width) continue;
+				if (height < 0 || mapChipData.size() <= height) continue;
+				if (width < 0 || mapChipData[height].size() <= width) continue;
 				//アニメーションフラグが有効ならアニメーション用の情報を行う
-				if (mapChipDrawData[height][width].animationFlag)
+				if (mapChipData[height][width].drawData.animationFlag)
 				{
-					int arrayHandle = mapChipDrawData[height][width].handle;
-					++mapChipDrawData[height][width].interval;
+					int arrayHandle = mapChipData[height][width].drawData.handle;
+					++mapChipData[height][width].drawData.interval;
 					//アニメーションの間隔
-					if (mapChipDrawData[height][width].interval % tmpAnimation[arrayHandle]->maxInterval == 0)
+					if (mapChipData[height][width].drawData.interval % tmpAnimation[arrayHandle]->maxInterval == 0)
 					{
-						++mapChipDrawData[height][width].animationNum;
-						mapChipDrawData[height][width].interval = 0;
+						++mapChipData[height][width].drawData.animationNum;
+						mapChipData[height][width].drawData.interval = 0;
 					}
 					//アニメーション画像の総数に達したら最初に戻る
-					if (tmpAnimation[arrayHandle]->handle.size() <= mapChipDrawData[height][width].animationNum)
+					if (tmpAnimation[arrayHandle]->handle.size() <= mapChipData[height][width].drawData.animationNum)
 					{
-						mapChipDrawData[height][width].animationNum = 0;
+						mapChipData[height][width].drawData.animationNum = 0;
 					}
 					//分割したアニメーションの画像から渡す
-					handle = tmpAnimation[arrayHandle]->handle[mapChipDrawData[height][width].animationNum];
+					handle = tmpAnimation[arrayHandle]->handle[mapChipData[height][width].drawData.animationNum];
 				}
 				else
 				{
-					handle = mapChipDrawData[height][width].handle;
+					handle = mapChipData[height][width].drawData.handle;
 				}
 
 				//mapChipDrawData[height][width].shocked = KuroMath::Lerp(mapChipDrawData[height][width].shocked, 0.0f, 0.8f);
 
 				Vec2<float> pos = drawPos;
-				pos += mapChipDrawData[height][width].offset;
+				pos += mapChipData[height][width].drawData.offset;
 				if (0 <= handle)
 				{
 					ChipData chipData;
 					chipData.pos = pos;
-					chipData.radian = mapChipDrawData[height][width].radian;
-					chipData.shocked = mapChipDrawData[height][width].shocked;
-					chipData.expEaseRate = mapChipDrawData[height][width].expEaseRate;
+					chipData.radian = mapChipData[height][width].drawData.radian;
+					chipData.shocked = mapChipData[height][width].drawData.shocked;
+					chipData.expEaseRate = mapChipData[height][width].drawData.expEaseRate;
 					datas[handle].emplace_back(chipData);
 					//DrawFunc::DrawRotaGraph2D({ pos.x, pos.y }, 1.6f * ScrollMgr::Instance()->zoom, mapChipDrawData[height][width].radian, TexHandleMgr::GetTexBuffer(handle));
 				}
@@ -215,11 +215,9 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 
 	StageMgr::Instance()->SetLocalMapChipData(stageNum, roomNum);
-	StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNum, roomNum);
 	mapData = StageMgr::Instance()->GetLocalMap();
-	mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 
-	RoomMapChipArray tmp = *mapData;
+	MapChipArray tmp = *mapData;
 
 	// シェイク量を設定。
 	ShakeMgr::Instance()->Init();
@@ -253,19 +251,19 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 		{
 			for (int x = 0; x < tmp[y].size(); ++x)
 			{
-				if (tmp[y][x] == 33)
+				if (tmp[y][x].chipType == 33)
 				{
 					playerLeftUpPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 				}
-				if (tmp[y][x] == 34)
+				if (tmp[y][x].chipType == 34)
 				{
 					playerRightDownPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 				}
-				if (tmp[y][x] == 35)
+				if (tmp[y][x].chipType == 35)
 				{
 					enemyLeftUpPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 				}
-				if (tmp[y][x] == 36)
+				if (tmp[y][x].chipType == 36)
 				{
 					enemyRightDownPos = Vec2<float>(x * MAP_CHIP_SIZE, y * MAP_CHIP_SIZE);
 				}
@@ -420,11 +418,9 @@ Game::Game()
 
 	roundChangeEffect.Init();
 	StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-	StageMgr::Instance()->SetLocalMapChipDrawBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	mapData = StageMgr::Instance()->GetLocalMap();
-	RoomMapChipArray tmp = *mapData;
+	MapChipArray tmp = *mapData;
 
-	mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 
 	Vec2<float> responePos((tmp[0].size() * MAP_CHIP_SIZE) * 0.5f, (tmp.size() * MAP_CHIP_SIZE) * 0.5f);
 	//スクロールを上にずらす用
@@ -536,11 +532,10 @@ void Game::Update(const bool& Loop)
 		int stageNum = SelectStage::Instance()->GetStageNum();
 		int roomNum = SelectStage::Instance()->GetRoomNum();
 		StageMgr::Instance()->SetLocalMapChipData(stageNum, roomNum);
-		StageMgr::Instance()->SetLocalMapChipDrawBlock(stageNum, roomNum);
 	}
 
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
-	RoomMapChipArray tmpMapData = *mapData;
+	MapChipArray tmpMapData = *mapData;
 
 	// ステージの切り替え
 	SwitchingStage();
@@ -751,10 +746,9 @@ void Game::Draw()
 	{
 	}
 
-	mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 	prevDrawChipStageNum = stageNum;
 	prevDrawChipRoomNum = roomNum;
-	DrawMapChip(*mapData, *mapChipDrawData, stageNum, roomNum);
+	DrawMapChip(*mapData, stageNum, roomNum);
 
 
 	// ラウンド終了時のパーティクルを描画
@@ -1263,7 +1257,7 @@ void Game::DeterminationOfThePosition()
 
 }
 
-void Game::RoundStartEffect(const bool& Loop, const RoomMapChipArray& tmpMapData)
+void Game::RoundStartEffect(const bool& Loop, const MapChipArray& tmpMapData)
 {
 
 	//ラウンド開始時の演出開始
@@ -1365,9 +1359,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 
 				SelectStage::Instance()->SelectRoomNum(nowRoomNum + 1);
 				StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-				StageMgr::Instance()->SetLocalMapChipDrawBlock(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 				mapData = StageMgr::Instance()->GetLocalMap();
-				mapChipDrawData = StageMgr::Instance()->GetLocalDrawMap();
 				mapChipGeneratorChangeMap->RegisterMap();
 				RoundFinishEffect::Instance()->changeMap = false;
 
