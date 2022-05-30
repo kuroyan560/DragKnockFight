@@ -5,21 +5,31 @@
 #include "KuroMath.h"
 #include "UsersInput.h"
 #include "IntoTheAbyss/ResultTransfer.h"
+#include "IntoTheAbyss/CharacterManager.h"
+#include "IntoTheAbyss/CharacterInfo.h"
 #include"IntoTheAbyss/ScoreKeep.h"
 #include"IntoTheAbyss/EavaluationDataMgr.h"
 #include"IntoTheAbyss/DebugKeyManager.h"
 #include"IntoTheAbyss/ScoreManager.h"
+#include"IntoTheAbyss/BackGroundParticle.h"
 #include"IntoTheAbyss/KazHelper.h"
 
 ResultScene::ResultScene()
 {
 	backGroundHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/title_scene/star.png");
 	winnerFrameHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/winnerFrame.png");
+	lunaHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/luna.png");
+	lacyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
 	resultHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/result.png");
 	breakEnemyHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/break_enemy.png");
 	roundHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/round.png");
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, blueNumberHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/player/lacy/pull_front.png", 3, { 3, 1 }, redCharaHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/player/luna/pull_front.png", 3, { 3, 1 }, greenCharaHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/ironBall/explosion_open.png", 3, { 3, 1 }, ironBallhandle.data());
+	useHandle = ironBallhandle;
 	slashHandle = blueNumberHandle[11];
+	lissajousTimer = 0;
 
 	goodHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
 	greatHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/great.png");
@@ -74,6 +84,15 @@ void ResultScene::OnInitialize()
 	perfectIndex = 0;
 
 	endFlg = false;
+
+	lissajousTimer = 0;
+
+	backGroundCharaAnimHandle = 0;
+	backGroundCharaAnimTimer = 0;
+	backGroundCharaPos = { -10000,-10000 };
+	backGroundCharaVel = {};
+	backGroundCharaAngle = 0;
+
 	ssIntervalTimer = 0;
 
 	initSoundFlag = false;
@@ -297,6 +316,51 @@ void ResultScene::OnUpdate()
 		}
 	}
 
+	lissajousTimer += 0.01f;
+
+	// 背景の星を描画
+	BackGroundParticleMgr::Instance()->Update();
+
+	backGroundCharaAngle += 0.1f;
+
+	// 背景のキャラにアニメーションを更新
+	++backGroundCharaAnimTimer;
+	static const int BACKGROUND_CHARA_TIMER = 10;
+	if (BACKGROUND_CHARA_TIMER < backGroundCharaAnimTimer) {
+
+		++backGroundCharaAnimHandle;
+		if (3 <= backGroundCharaAnimHandle) {
+
+			backGroundCharaAnimHandle = 0;
+
+		}
+
+		backGroundCharaAnimTimer = 0;
+
+	}
+
+	// 超極稀にキャラクターを左上の方に飛ばす。
+	int random = KuroFunc::GetRand(0, 1000);
+	if (random == 50 && !((0 < backGroundCharaPos.x && backGroundCharaPos.x < windowSize.x) && (0 < backGroundCharaPos.y || backGroundCharaPos.y < windowSize.y))) {
+
+		backGroundCharaPos = { 2000,-1000 };
+		backGroundCharaVel = Vec2<float>(windowSize / 2.0f - backGroundCharaPos).GetNormal() * 10.0f;
+
+		// 使用する画像をランダムで決める。
+		int randomhandle = KuroFunc::GetRand(0,2);
+		if(randomhandle == 0){
+			useHandle = redCharaHandle;
+		}else if(randomhandle == 1){
+			useHandle = greenCharaHandle;
+		}else{
+			useHandle = ironBallhandle;
+		}
+
+	}
+
+	// 背景のキャラを動かす。
+	backGroundCharaPos += backGroundCharaVel;
+
 }
 
 #include"IntoTheAbyss/ClearInfoContainer.h"
@@ -304,26 +368,54 @@ void ResultScene::OnDraw()
 {
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 
-	ResultTransfer::Instance()->Draw();
+	//ResultTransfer::Instance()->Draw();
+
+	// 背景の星を描画
+	BackGroundParticleMgr::Instance()->Draw();
+
+	// 背景にキャラクターを描画。
+	DrawFunc::DrawRotaGraph2D(backGroundCharaPos, Vec2<float>(0.5f, 0.5f), backGroundCharaAngle, TexHandleMgr::GetTexBuffer(useHandle[backGroundCharaAnimHandle]));
+
+	// リサージュ曲線の動きを取得。
+	float lissajousMove = 10.0f;
+	Vec2<float> lissajousCurve = Vec2<float>(cosf(1.0f * lissajousTimer) * lissajousMove, sinf(2.0f * lissajousTimer) * lissajousMove);
+
+	// 勝者のフレームを取得する。
+	DrawFunc::DrawRotaGraph2D(lissajousCurve + WinApp::Instance()->GetExpandWinCenter() + Vec2<float>(-280.0f, 0.0f), Vec2<float>(1.0f, 1.0f), 0, TexHandleMgr::GetTexBuffer(winnerFrameHandle));
+
+	// 勝者を描画する。
+	if (CharacterManager::Instance()->Left()->GetCharacterName() == PLAYABLE_CHARACTER_NAME::PLAYABLE_LACY) {
+
+		DrawFunc::DrawRotaGraph2D(lissajousCurve + WinApp::Instance()->GetExpandWinCenter() + Vec2<float>(-280.0f, 0.0f), Vec2<float>(1.0f, 1.0f), 0, TexHandleMgr::GetTexBuffer(lacyHandle));
+
+	}
+	else if (CharacterManager::Instance()->Left()->GetCharacterName() == PLAYABLE_CHARACTER_NAME::PLAYABLE_LUNA) {
+
+		DrawFunc::DrawRotaGraph2D(lissajousCurve + WinApp::Instance()->GetExpandWinCenter() + Vec2<float>(-280.0f, 0.0f), Vec2<float>(1.0f, 1.0f), 0, TexHandleMgr::GetTexBuffer(lunaHandle));
+
+	}
+
+	// 左側にキャラを表示するにあたって全体的に右側に描画をずらす用の値。
+	static const float OFFSET_X = -30.0f;
 
 	Vec2<float> windowSize = { static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y) };
 
 	{
 		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
-		DrawFunc::DrawGraph(Vec2<float>(440.0f, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
+		DrawFunc::DrawGraph(lissajousCurve + Vec2<float>(580.0f + OFFSET_X, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
 
-		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum());
+		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum(), OFFSET_X, lissajousCurve);
 	}
 
 	if (bigFontFlag && timeUpFlag)
 	{
 		if (evaluationFlag)
 		{
-			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(perfectHandle[perfectIndex]));
+			DrawFunc::DrawRotaGraph2D(lissajousCurve + Vec2<float>(evaluationPosX + OFFSET_X, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(perfectHandle[perfectIndex]));
 		}
 		else
 		{
-			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX - 30, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
+			DrawFunc::DrawRotaGraph2D(lissajousCurve + Vec2<float>(evaluationPosX - 30 + OFFSET_X, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
 		}
 	}
 
@@ -344,19 +436,19 @@ void ResultScene::OnDraw()
 		KuroEngine::Instance().Graphics().SetRenderTargets({ nowContainer.clearInfoRenderTarget });
 
 		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
-		DrawFunc::DrawGraph(Vec2<float>(440.0f, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
+		DrawFunc::DrawGraph(lissajousCurve + Vec2<float>(580.0f , windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
 
-		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum());
+		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum(), OFFSET_X, lissajousCurve);
 
 		if (bigFontFlag && timeUpFlag)
 		{
 			if (evaluationFlag)
 			{
-				DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(perfectHandle[perfectIndex]));
+				DrawFunc::DrawRotaGraph2D(lissajousCurve + Vec2<float>(evaluationPosX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(perfectHandle[perfectIndex]));
 			}
 			else
 			{
-				DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX - 30, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
+				DrawFunc::DrawRotaGraph2D(lissajousCurve + Vec2<float>(evaluationPosX - 30, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
 			}
 		}
 
@@ -375,7 +467,7 @@ void ResultScene::OnFinalize()
 	AudioApp::Instance()->StopWave(BGM);
 }
 
-void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, int BREAK_MAX_COUNT)
+void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, int BREAK_MAX_COUNT, float OFFSET_X, Vec2<float> LISSAJOUS)
 {
 	Vec2<float> windowSize = { static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y) };
 
@@ -409,7 +501,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 				if (prevScore[i] != disit) scoreSize[i] = defaultSize + 0.5f;
 			}
 
-			DrawFunc::DrawRotaGraph2D(drawPos, Vec2<float>(scoreSize[i], scoreSize[i]), 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
+			DrawFunc::DrawRotaGraph2D(LISSAJOUS + drawPos + Vec2<float>(OFFSET_X, 0), Vec2<float>(scoreSize[i], scoreSize[i]), 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
 			// フォントサイズ分移動させる。
 			drawPos.x += FONT_SIZE * nowSize.x;
 
@@ -422,7 +514,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 	evaluationPosX -= 20.0f;
 
 	//スラッシュ
-	DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));
+	DrawFunc::DrawRotaGraph2D(LISSAJOUS + drawPos + Vec2<float>(OFFSET_X, 0), nowSize, 0.0f, TexHandleMgr::GetTexBuffer(slashHandle));
 
 	//最大
 	{
@@ -432,7 +524,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 		std::vector<int>number = KazHelper::CountNumber(BREAK_MAX_COUNT);
 		for (int i = 0; i < number.size(); ++i)
 		{
-			DrawFunc::DrawRotaGraph2D(drawPos, nowSize, 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
+			DrawFunc::DrawRotaGraph2D(LISSAJOUS + drawPos + Vec2<float>(OFFSET_X, 0), nowSize, 0.0f, TexHandleMgr::GetTexBuffer(blueNumberHandle[number[i]]));
 			// フォントサイズ分移動させる。
 			drawPos.x += FONT_SIZE * nowSize.x;
 		}

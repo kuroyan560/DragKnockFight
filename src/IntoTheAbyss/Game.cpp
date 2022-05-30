@@ -1397,10 +1397,10 @@ void Game::RoundFinishEffect(const bool& Loop)
 				rStickNoInputTimer = 0;
 
 				// 背景パーティクルを更新
-				BackGroundParticleMgr::Instance()->Init();
-				int stageNum = SelectStage::Instance()->GetStageNum();
-				int roomNum = SelectStage::Instance()->GetRoomNum();
-				BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetMapIdxSize(stageNum, roomNum).x * MAP_CHIP_SIZE, StageMgr::Instance()->GetMapIdxSize(stageNum, roomNum).y * MAP_CHIP_SIZE));
+				//BackGroundParticleMgr::Instance()->Init();
+				//int stageNum = SelectStage::Instance()->GetStageNum();
+				//int roomNum = SelectStage::Instance()->GetRoomNum();
+				//BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetMapIdxSize(stageNum, roomNum).x * MAP_CHIP_SIZE, StageMgr::Instance()->GetMapIdxSize(stageNum, roomNum).y * MAP_CHIP_SIZE));
 			}
 
 			drawCharaFlag = true;
