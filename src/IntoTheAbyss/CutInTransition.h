@@ -10,6 +10,8 @@ public:
 	bool OnUpdate()override;
 	void OnDraw()override;
 
+	inline bool GetNowTransition() { return isNowTransition; }
+
 	std::shared_ptr<RenderTarget>backGroundTex;
 private:
 
@@ -21,6 +23,7 @@ private:
 	int knockOutTimer;
 	bool isEnd;
 	bool isLeftChara;
+	bool isNowTransition;
 	int backAlpha;		// 後ろに描画する黒のアルファ値
 
 	// ノックアウト時のステータス

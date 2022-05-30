@@ -67,6 +67,8 @@ void ResultScene::OnInitialize()
 
 	perfectInterval = 0;
 	perfectIndex = 0;
+
+	endFlg = false;
 }
 
 void ResultScene::OnUpdate()
@@ -165,12 +167,20 @@ void ResultScene::OnUpdate()
 	breakCountEasingAmount = KuroMath::Ease(Out, Cubic, static_cast<float>(breakEnemyUITimer) / static_cast<float>(BREAK_COUNTUI_TIMER), 0.0f, 1.0f);
 
 
-
-	// リザルト画面へ飛ばす
 	if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A)) {
-		static int bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
-		AudioApp::Instance()->StopWave(bgm);
-		KuroEngine::Instance().ChangeScene(1, changeScene);
+
+		if (endFlg)
+		{
+			static int bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
+			AudioApp::Instance()->StopWave(bgm);
+			KuroEngine::Instance().ChangeScene(1, changeScene);
+		}
+		else
+		{
+			//演出とばし
+
+			endFlg = true;
+		}
 	}
 
 
@@ -217,6 +227,8 @@ void ResultScene::OnUpdate()
 		easeEvaluationPosY = -KuroMath::Ease(Out, Back, static_cast<float>(evaluationEasingTimer) / static_cast<float>(EVALUATION_EFFECT_TIMER), 0.0f, 1.0f) * 30.0f;
 	}
 
+	if (EVALUATION_EFFECT_TIMER <= evaluationEasingTimer)endFlg = true;
+
 	if (rate <= GOOD_RATE)
 	{
 		evaluationNowHandle = goodHandle;
@@ -255,16 +267,12 @@ void ResultScene::OnUpdate()
 
 }
 
+#include"IntoTheAbyss/ClearInfoContainer.h"
 void ResultScene::OnDraw()
 {
-
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 
 	ResultTransfer::Instance()->Draw();
-
-	crt.Excute(D3D12App::Instance()->GetCmdList(), D3D12App::Instance()->GetBackBuffRenderTarget());
-	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
-	crt.DrawResult(AlphaBlendMode_None);
 
 	Vec2<float> windowSize = { static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y) };
 
@@ -285,6 +293,37 @@ void ResultScene::OnDraw()
 		{
 			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX - 30, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
 		}
+	}
+
+	crt.Excute(D3D12App::Instance()->GetCmdList(), D3D12App::Instance()->GetBackBuffRenderTarget());
+	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
+	crt.DrawResult(AlphaBlendMode_None);
+
+	//クリア情報のスクショ
+	auto& nowContainer = ClearInfoContainerMgr::Instance()->GetContainer(SelectStage::Instance()->GetStageNum());
+	if (endFlg && nowContainer.maxBreakCount < breakCount)
+	{
+		KuroEngine::Instance().Graphics().SetRenderTargets({ nowContainer.clearInfoRenderTarget });
+
+		float easingPosY = resultEasingAmount * (windowSize.y - RESULT_POS.y);
+		DrawFunc::DrawGraph(Vec2<float>(440.0f, windowSize.y - easingPosY), TexHandleMgr::GetTexBuffer(resultHandle));
+
+		DrawBreakCount(breakCountEasingAmount, ceil(breakCount), ScoreKeep::Instance()->GetMaxNum());
+
+		if (bigFontFlag && timeUpFlag)
+		{
+			if (evaluationFlag)
+			{
+				DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(perfectHandle[perfectIndex]));
+			}
+			else
+			{
+				DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX - 30, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
+			}
+		}
+
+		nowContainer.clear = true;
+		nowContainer.maxBreakCount = breakCount;
 	}
 }
 
