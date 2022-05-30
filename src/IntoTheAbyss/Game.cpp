@@ -454,11 +454,37 @@ Game::Game()
 	}
 
 	{
-		std::string bossFilePass = "resource/ChainCombat/player/luna/arm/";
-		int dL = TexHandleMgr::LoadGraph(bossFilePass + "default/L.png");
-		int dR = TexHandleMgr::LoadGraph(bossFilePass + "default/R.png");
-		int hL = TexHandleMgr::LoadGraph(bossFilePass + "hold/L.png");
-		int hR = TexHandleMgr::LoadGraph(bossFilePass + "hold/R.png");
+		PLAYABLE_CHARACTER_NAME charaName = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).characterName;
+
+		std::string bossFilePass = {};
+		int dL = 0;
+		int dR = 0;
+		int hL = 0;
+		int hR = 0;
+
+		switch (charaName)
+		{
+		case PLAYABLE_LUNA:
+			bossFilePass = "resource/ChainCombat/player/luna/arm/";
+			dL = TexHandleMgr::LoadGraph(bossFilePass + "default/L.png");
+			dR = TexHandleMgr::LoadGraph(bossFilePass + "default/R.png");
+			hL = TexHandleMgr::LoadGraph(bossFilePass + "hold/L.png");
+			hR = TexHandleMgr::LoadGraph(bossFilePass + "hold/R.png");
+			break;
+		case PLAYABLE_LACY:
+			bossFilePass = "resource/ChainCombat/player/lacy/arm/";
+			dL = TexHandleMgr::LoadGraph(bossFilePass + "default/L.png");
+			dR = TexHandleMgr::LoadGraph(bossFilePass + "default/R.png");
+			hL = TexHandleMgr::LoadGraph(bossFilePass + "hold/L.png");
+			hR = TexHandleMgr::LoadGraph(bossFilePass + "hold/R.png");
+			break;
+		case PLAYABLE_BOSS_0:
+			break;
+		case PLAYABLE_CHARACTER_NUM:
+			break;
+		default:
+			break;
+		}
 		playerHandMgr = std::make_unique<BossHandMgr>(dL, dR, hL, hR, false);
 	}
 

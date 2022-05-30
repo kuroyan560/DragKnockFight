@@ -19,7 +19,7 @@ StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 void StageSelectScene::OnInitialize()
 {
 	charactersSelect = false;
-	CharacterManager::Instance()->CharactersSelectInit();
+	//CharacterManager::Instance()->CharactersSelectInit();
 	// ステージセレクト画面の更新処理用クラスを初期化。
 	stageSelect.Init();
 	// マップのスクショを初期化。
@@ -131,6 +131,8 @@ void StageSelectScene::OnUpdate()
 			mapScreenShot[stageNum][SCENE_CHANGE].Finalize();
 
 
+			PLAYABLE_CHARACTER_NAME charaName = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).characterName;
+			CharacterManager::Instance()->CharactersSelectInit(charaName);
 		}
 		//タイトルシーンに移動する
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
