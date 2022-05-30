@@ -19,9 +19,7 @@ bool MapChipGenerator::CanChange(const Vec2<int>& Idx)
 	else if (idxSize.y - 1 <= Idx.y)return false;
 
 	auto type = (*mapData)[Idx.y][Idx.x].chipType;
-	if (type == MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)return false;
-	if (type == MAPCHIP_TYPE_STATIC_RARE_BLOCK)return false;
-	if (type == 1)return false;
+	if (type != 0)return false;
 	return true;
 }
 
@@ -45,14 +43,14 @@ int MapChipGenerator::GetRandChipType()
 	return appearType;
 }
 
-void MapChipGenerator::Generate(const Vec2<int>& GenerateIdx, const int& ChipType)
+void MapChipGenerator::Generate(const Vec2<int>& GenerateIdx, const int& ChipType,const int& WallGraph)
 {
 	if (!CanChange(GenerateIdx))return;
-	StageMgr::Instance()->WriteMapChipData(GenerateIdx, ChipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x);
+	StageMgr::Instance()->WriteMapChipData(GenerateIdx, ChipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, true, WallGraph);
 }
 
 
-void MapChipGenerator::Generate(const Vec2<float>& GeneratePos, const int& ChipType)
+void MapChipGenerator::Generate(const Vec2<float>& GeneratePos, const int& ChipType,const int& WallGraph)
 {
 	//生成座標を基にその場所のチップ番号取得
 	Vec2<int>centerIdx =
@@ -73,7 +71,7 @@ void MapChipGenerator::Generate(const Vec2<float>& GeneratePos, const int& ChipT
 
 	for (auto& idx : generateIndices)
 	{
-		Generate(idx, ChipType);
+		Generate(idx, ChipType,WallGraph);
 	}
 }
 
@@ -267,6 +265,7 @@ void MapChipGenerator_RandPattern::DesideNextIndices(const PATTERN_TYPE& Pattern
 		predictionIdxArray.emplace_back();
 		predictionIdxArray.back().idx = idx;
 		predictionIdxArray.back().type = GetRandChipType();
+		if (predictionIdxArray.back().type == 1)predictionIdxArray.back().wallGraph = StageMgr::Instance()->GetRandNormalWallGraphHandle();
 	}
 }
 
@@ -295,7 +294,7 @@ void MapChipGenerator_RandPattern::Update()
 	{
 		for (auto& pre : predictionIdxArray)
 		{
-			Generate(pre.idx, pre.type);
+			Generate(pre.idx, pre.type, pre.wallGraph);
 		}
 
 		auto mapData = StageMgr::Instance()->GetLocalMap();
@@ -309,9 +308,10 @@ void MapChipGenerator_RandPattern::Update()
 }
 
 #include"DrawMap.h"
+#include<map>
 void MapChipGenerator_RandPattern::Draw()
 {
-	static DrawMap DRAW_MAP_WALL;
+	static std::map<int, DrawMap>DRAW_MAP_WALL;
 	static DrawMap DRAW_MAP_RARE;
 	static DrawMap DRAW_MAP_BOUNCE;
 	static DrawMap DRAW_MAP_UNBROKEN;
@@ -336,6 +336,7 @@ void MapChipGenerator_RandPattern::Draw()
 		// 画面外だったら描画しない。
 		if (drawPos.x < -DRAW_MAP_CHIP_SIZE || drawPos.x > WinApp::Instance()->GetWinSize().x + DRAW_MAP_CHIP_SIZE) continue;
 		if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
+		if (!CanChange(pred.idx))continue;
 
 		chipData.pos = drawPos;
 		chipData.alpha = predictionRate;
@@ -358,14 +359,17 @@ void MapChipGenerator_RandPattern::Draw()
 		}
 		else if (pred.type == 1)
 		{
-			DRAW_MAP_WALL.AddChip(chipData);
+			DRAW_MAP_WALL[pred.wallGraph].AddChip(chipData);
 		}
 		else
 		{
 			DRAW_MAP_EMPTY.AddChip(chipData);
 		}
 	}
-	DRAW_MAP_WALL.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(1)));
+	for (auto& drawMap : DRAW_MAP_WALL)
+	{
+		drawMap.second.Draw(TexHandleMgr::GetTexBuffer(drawMap.first));
+	}
 	DRAW_MAP_RARE.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(MAPCHIP_TYPE_STATIC_RARE_BLOCK)));
 	DRAW_MAP_BOUNCE.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(MAPCHIP_TYPE_STATIC_BOUNCE_BLOCK)));
 	DRAW_MAP_NON_SCORE.Draw(TexHandleMgr::GetTexBuffer(StageMgr::Instance()->GetChipGraoh(MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)));
@@ -488,7 +492,7 @@ void MapChipGenerator_Crossing::Update()
 	{
 		for (auto& pre : predictionIdxArray)
 		{
-			Generate(pre.idx, pre.type);
+			Generate(pre.idx, pre.type, pre.wallGraph);
 		}
 
 		auto mapData = StageMgr::Instance()->GetLocalMap();
@@ -517,7 +521,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 	auto mapData = StageMgr::Instance()->GetLocalMap();
 	auto mapIdxSize = StageMgr::Instance()->GetMapIdxSize(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 
-	static const int SPACE_LINE = 6;
+	static const int SPACE_LINE = 0;
 
 	if (dir == LEFT_TO_RIGHT)
 	{
