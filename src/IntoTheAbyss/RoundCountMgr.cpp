@@ -33,14 +33,17 @@ void RoundCount::Generate(const Vec2<float>& Pos)
 {
 
 	/*===== ê∂ê¨èàóù =====*/
+	initPos = Pos + Vec2<float>(250.0f, 0.0f);
+	pos = initPos;
+	vel = Pos - initPos;
 
-	pos = Pos;
 	isActive = true;
 	isFill = false;
 	angle = 0;
 	exp = { 20,20 };
 	alpha = 0;
-
+	t = 0.0f;
+	appearFlag = false;
 }
 
 void RoundCount::Update()
@@ -55,6 +58,20 @@ void RoundCount::Update()
 		exp.x += (1.0f - exp.x) / 5.0f;
 		exp.y += (1.0f - exp.y) / 5.0f;
 
+	}
+
+	if (appearFlag)
+	{
+		if (t < 1.0f)
+		{
+			t += 1.0f / 60.0f;
+		}
+		if (1.0f <= t)
+		{
+			t = 1.0f;
+		}
+
+		pos.x = initPos.x + KuroMath::Ease(Out, Cubic, t, 0.0f, 1.0f) * vel.x;
 	}
 
 }
@@ -72,6 +89,11 @@ void RoundCount::Draw(const int& FrameGraph, const int& InnerGraph)
 		DrawFunc::DrawRotaGraph2D(pos, exp, 0, TexHandleMgr::GetTexBuffer(InnerGraph), Color(255, 255, 255, alpha));
 	}
 
+}
+
+void RoundCount::Appear()
+{
+	appearFlag = true;
 }
 
 RoundCountMgr::RoundCountMgr()
@@ -101,7 +123,7 @@ void RoundCountMgr::Init(int MaxRound)
 	const float UI_OFFSET_SIZE = 45.0f;
 	Vec2<float> UI_OFFSET_POS = Vec2<float>(1140 + UI_OFFSET_SIZE * num, 100);
 
-	startPos = UI_OFFSET_POS;
+	initPos = UI_OFFSET_POS;
 
 	int indexCounter = 0;
 
@@ -120,7 +142,8 @@ void RoundCountMgr::Init(int MaxRound)
 
 	nowRound = 0;
 	maxRound = MaxRound;
-
+	appearFlag = false;
+	t = 0.0f;
 }
 
 void RoundCountMgr::Update()
@@ -133,6 +156,17 @@ void RoundCountMgr::Update()
 
 	}
 
+	if (appearFlag)
+	{
+		if (t <= 1.0f)
+		{
+			t += 1.0f / 60.0f;
+		}
+		if (1.0f <= t)
+		{
+			t = 1.0f;
+		}
+	}
 }
 
 void RoundCountMgr::Draw()
@@ -141,7 +175,12 @@ void RoundCountMgr::Draw()
 	/*===== ï`âÊèàóù =====*/
 
 	Vec2<float> UI_OFFSET_POS = Vec2<float>(startPos.x - 116.0f, 102);
+
+	startPos.x = initPos.x + 350.0f + KuroMath::Ease(Out, Cubic, t, 0.0f, 1.0f) * -350.0f;
+	startPos.y = initPos.y;
+
 	DrawFunc::DrawRotaGraph2D(UI_OFFSET_POS, Vec2<float>(1, 1), 0, TexHandleMgr::GetTexBuffer(roundGraph));
+
 
 	for (int i = 0; i < maxRound; ++i)
 	{
@@ -160,5 +199,14 @@ void RoundCountMgr::RoundIncrement()
 	if (maxRound <= nowRound) nowRound = maxRound;
 
 	counter[nowRound - 1].SetFill();
+}
 
+void RoundCountMgr::Appear()
+{
+	for (auto &index : counter) {
+
+		index.Appear();
+
+	}
+	appearFlag = true;
 }

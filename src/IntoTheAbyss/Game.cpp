@@ -584,6 +584,8 @@ void Game::Update(const bool& Loop)
 			playerHandMgr->Hold(-sub.GetNormal(), true);
 			playerHandMgr->Update(CharacterManager::Instance()->Left()->pos);
 		}
+
+		RoundCountMgr::Instance()->Appear();
 	}
 	// プレイヤーの更新処理
 	//if (!roundFinishFlag)
@@ -753,6 +755,7 @@ void Game::Draw()
 	{
 		bossHandMgr->Draw();
 		playerHandMgr->Draw();
+		countBlock.Appear();
 	}
 
 	//playerHomeBase.Draw();
