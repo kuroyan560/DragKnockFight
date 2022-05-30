@@ -14,6 +14,7 @@
 #include"MapChipInfo.h"
 #include"MapChipGenerator.h"
 #include"CharacterInfo.h"
+#include"Intersected.h"
 
 /// <summary>
 /// 小部屋同士の部屋のリンク付けする際に必要な情報
@@ -203,7 +204,7 @@ public:
 	std::vector<std::shared_ptr<MapChipAnimationData>> animationData;//マップチップのアニメーション情報の一覧
 
 
-	void WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM, const Vec2<float>& LeftCharaPos, const float& LeftCharaSize, const Vec2<float>& RightCharaPos, const float& RightCharaSize, const bool& CharaCheck = true);
+	void WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM, const Vec2<float>& LeftCharaPos, const float& LeftCharaSize, const Vec2<float>& RightCharaPos, const float& RightCharaSize, const INTERSECTED_LINE& MoveDir = INTERSECTED_NONE, const bool& CharaCheck = true, const int& ChipGraph = -1);
 
 	MapChipType GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM);
 
@@ -417,6 +418,7 @@ public:
 	{
 		return stageInfos[StageNum][RoomNum];
 	}
+	int GetRandNormalWallGraphHandle();
 
 private:
 	const int &GetGimmickNumber(const int &NUMBER)

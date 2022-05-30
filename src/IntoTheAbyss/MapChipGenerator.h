@@ -33,8 +33,8 @@ class MapChipGenerator
 protected:
 	bool CanChange(const Vec2<int>& Idx);
 	int GetRandChipType();
-	void Generate(const Vec2<int>& GenerateIdx, const int& ChipType);
-	void Generate(const Vec2<float>& GeneratePos, const int& ChipType);
+	void Generate(const Vec2<int>& GenerateIdx, const int& ChipType,const int& WallGraph = -1);
+	void Generate(const Vec2<float>& GeneratePos, const int& ChipType,const int& WallGraph = -1);
 public:
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
@@ -77,6 +77,7 @@ protected:
 	{
 		Vec2<int>idx;
 		int type;
+		int wallGraph;
 	};
 	std::vector<Prediction>predictionIdxArray;
 	int span;

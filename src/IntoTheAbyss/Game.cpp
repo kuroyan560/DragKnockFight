@@ -691,7 +691,9 @@ void Game::Update(const bool& Loop)
 	bool isBlockEmpty = countBlock.CheckNowNomberIsZero() && noGenerateFlag;
 	bool timeUpFlag = GameTimer::Instance()->TimeUpFlag();
 
-	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty || timeUpFlag)
+	bool isStuckDead = CharacterManager::Instance()->Left()->isStuckDead || CharacterManager::Instance()->Right()->isStuckDead;
+
+	if (Vec2<float>(CharacterManager::Instance()->Left()->pos - CharacterManager::Instance()->Right()->pos).Length() <= DistanceCounter::Instance()->DEAD_LINE || isBlockEmpty || timeUpFlag || isStuckDead)
 	{
 		// I—¹‰‰o‚ªs‚í‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
 		if (!roundFinishFlag)

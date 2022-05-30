@@ -60,8 +60,8 @@ bool CutInTransition::OnUpdate()
 
 	// タイトルロゴのオフセットポス
 	Vec2<float> titleOffset = Vec2<float>(0, 170);
-	const float TITLE_OFFSET_X = 200.0f;
-	const float CHARA_OFFSET_X = 200.0f;
+	const float TITLE_OFFSET_X = 250.0f;
+	const float CHARA_OFFSET_X = 100.0f;
 	Vec2<float> titlePosBuff = {};
 	Vec2<float> charaPosBuff = {};
 
@@ -240,12 +240,12 @@ void CutInTransition::OnDraw()
 	if (isLeftChara) {
 		// マスクの枠を描画。
 		DrawFunc::DrawRotaGraph2D(charaPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]));
-		DrawFunc::DrawRotaGraph2D(titlePos, Vec2<float>(0.8f, 0.8f), 0.0f, TexHandleMgr::GetTexBuffer(TITLE_GRAPH));
+		DrawFunc::DrawRotaGraph2D(titlePos, Vec2<float>(0.6f, 0.6f), 0.0f, TexHandleMgr::GetTexBuffer(TITLE_GRAPH));
 	}
 	else {
 		// マスクの枠を描画。
 		DrawFunc::DrawRotaGraph2D(charaPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(lacyHandle[lunaAnimHandle]), Color(), Vec2<float>(0.5f, 0.5f), Vec2<bool>(true, false));
-		DrawFunc::DrawRotaGraph2D(titlePos, Vec2<float>(0.8f, 0.8f), 0.0f, TexHandleMgr::GetTexBuffer(TITLE_GRAPH));
+		DrawFunc::DrawRotaGraph2D(titlePos, Vec2<float>(0.6f, 0.6f), 0.0f, TexHandleMgr::GetTexBuffer(TITLE_GRAPH));
 	}
 
 
