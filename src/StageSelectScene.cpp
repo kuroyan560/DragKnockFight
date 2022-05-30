@@ -176,7 +176,7 @@ void StageSelectScene::OnUpdate()
 		isPrevInputStickRight = isInputRight;
 		isPrevInputSticlLeft = isInputLeft;
 
-		int maxSelectNum = min(screenShot.GetCanMaxSelectNum(), StageMgr::Instance()->GetMaxStageNumber());
+		int maxSelectNum = StageMgr::Instance()->GetMaxStageNumber();
 		if (maxSelectNum <= stageNum)
 		{
 			stageNum = 0;
