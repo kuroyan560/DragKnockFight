@@ -120,6 +120,7 @@ public:
 	
 	bool isPrevDestroyMode;
 	bool isDestroyMode;				// 壁を一気に破壊するモード
+	bool isStuckDead;				// 壁に挟まって死んだ状態
 	static bool isDebugModeStrongSwing;		// デバッグ用で壁に当たるまでスイング
 	Vec2<float>size;	//サイズ
 	Vec2<float> bounceVel;	// バウンドで紐が伸びるやつの移動量 velをそのまま使うと色々バグりそうなので新設しました。
@@ -174,7 +175,7 @@ protected:
 	bool IsPilotOutSide() { return isPilotDetached || pilotReturnTimer < pilotReturnTotalTime; }
 
 	// 当たり判定情報保存。
-	void SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, vector<Vec2<int>>& hitChipIndex, const Vec2<int>& hitChipIndexBuff);
+	void SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, vector<Vec2<int>>& hitChipIndex, const Vec2<int>& hitChipIndexBuff, const bool& isCheckHitSize = false);
 
 public:
 	//登場演出が完了したか
