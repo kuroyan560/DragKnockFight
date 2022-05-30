@@ -100,8 +100,8 @@ void BackGroundParticle::Update()
 		if (defDesTimer < desTimer) {
 
 			Vec2<float> generatePos = {};
-			generatePos.x = KuroFunc::GetRand(-stageSize.x, stageSize.x * 4.0f);
-			generatePos.y = KuroFunc::GetRand(-stageSize.y, stageSize.y * 2.0f);
+			generatePos.x = KuroFunc::GetRand(-stageSize.x * 2.0f, stageSize.x * 2.0f + stageSize.x);
+			generatePos.y = KuroFunc::GetRand(-stageSize.y * 2.0f, stageSize.y * 2.0f + stageSize.y);
 
 			Generate(generatePos, STATUS::STAY, stageSize);
 
@@ -231,18 +231,22 @@ void BackGroundParticleMgr::StageStartGenerate(const Vec2<float>& StageSize)
 
 	/*===== 生成処理 =====*/
 
-	int generateCount = 150;
 	int counter = 0;
 
 	stageSize = StageSize;
+
+	float mixStageSize = stageSize.x + stageSize.y;
+
+	// ステージサイズから生成する星の数を決める。
+	int generateCount = mixStageSize / 100.0f;
 
 	for (auto& index : particles) {
 
 		if (index.isActive) continue;
 
 		Vec2<float> generatePos;
-		generatePos.x = KuroFunc::GetRand(-stageSize.x, stageSize.x * 4.0f);
-		generatePos.y = KuroFunc::GetRand(-stageSize.y, stageSize.y * 2.0f);
+		generatePos.x = KuroFunc::GetRand(-stageSize.x * 2.0f, stageSize.x * 2.0f + stageSize.x);
+		generatePos.y = KuroFunc::GetRand(-stageSize.y * 2.0f, stageSize.y * 2.0f + stageSize.y);
 
 		index.Generate(generatePos, BackGroundParticle::STATUS::STAY, StageSize);
 
@@ -280,8 +284,8 @@ void BackGroundParticleMgr::Update()
 			if (index.isActive) continue;
 
 			Vec2<float> generatePos;
-			generatePos.x = KuroFunc::GetRand(-stageSize.x, stageSize.x * 4.0f) + stageSize.x;
-			generatePos.y = KuroFunc::GetRand(-stageSize.y, stageSize.y * 2.0f) - stageSize.y;
+			generatePos.x = KuroFunc::GetRand(-stageSize.x * 2.0f, stageSize.x * 2.0f + stageSize.x);
+			generatePos.y = KuroFunc::GetRand(-stageSize.y * 2.0f, stageSize.y * 2.0f + stageSize.y);
 
 			index.Generate(generatePos, BackGroundParticle::STATUS::SHOOTING_STAR, stageSize);
 
