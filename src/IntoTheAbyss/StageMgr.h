@@ -12,6 +12,7 @@
 #include"KuroFunc.h"
 #include"MapChipCollider.h"
 #include"MapChipGenerator.h"
+#include"CharacterInfo.h"
 
 /// <summary>
 /// 小部屋同士の部屋のリンク付けする際に必要な情報
@@ -136,6 +137,7 @@ struct StageInfo
 	int gameMaxTimer = 60;
 	MAP_CHIP_GENERATOR generatorType = NON_GENERATE;
 	int generatorSpan = 60;
+	PLAYABLE_CHARACTER_NAME characterName = PLAYABLE_LUNA;
 };
 
 //全てのステージのマップチップデータを管理するクラス

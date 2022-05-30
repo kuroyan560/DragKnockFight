@@ -1,5 +1,6 @@
 #pragma once
 #include"IStageSelectImage.h"
+#include"KazHelper.h"
 #include<array>
 
 class StageSelectScreenShot
@@ -20,11 +21,16 @@ public:
 		expData.size = expRate;
 	};
 
-	int GetCanMaxSelectNum() { return min(screenShotHandle.size(), stageNumberHandle.size()); }
+	int GetCanMaxSelectNum() 
+	{
+		//return min(screenShotHandle.size(), stageNumberHandle.size()); 
+		return screenShotHandle.size();
+	}
 
 
 	std::shared_ptr<RenderTarget>screenShot;
 
+	int stageNum;
 private:
 	std::vector<int>screenShotHandle;
 	std::vector<int> stageNumberHandle;
@@ -40,5 +46,10 @@ private:
 	float timer;		// リサージュ曲線に使用するタイマー
 
 	int* selectNumPtr;
+
+	int stageTagHandle;
+	int stageNumHandle;
+
+
 };
 
