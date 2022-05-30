@@ -16,6 +16,7 @@ CutInTransition::CutInTransition()
 	knockOutTimer = 0;
 	knockOutPhase = KNOCK_OUT_PHASE::START_PHASE;
 	isEnd = false;
+	isNowTransition = false;
 
 }
 
@@ -29,6 +30,7 @@ void CutInTransition::OnStart()
 	/*===== 開始処理 =====*/
 
 	backAlpha = 0;
+	isNowTransition = true;
 	lunaAnimHandle = 0;
 	knockOutTimer = 0;
 	knockOutPhase = KNOCK_OUT_PHASE::START_PHASE;
@@ -58,6 +60,10 @@ bool CutInTransition::OnUpdate()
 
 	// タイトルロゴのオフセットポス
 	Vec2<float> titleOffset = Vec2<float>(0, 170);
+	const float TITLE_OFFSET_X = 200.0f;
+	const float CHARA_OFFSET_X = 200.0f;
+	Vec2<float> titlePosBuff = {};
+	Vec2<float> charaPosBuff = {};
 
 	// 勝者によってマスクやキャラアイコンの移動を変えるための変数。
 	Vec2<float> charaStartPos = { WindowSize.x + WindowHalfSize.x, WindowHalfSize.y };
@@ -83,9 +89,27 @@ bool CutInTransition::OnUpdate()
 
 		// 開始フェーズ
 
+		// タイトルロゴの描画場所を決める。
+		titlePosBuff = MASK_POS + titleOffset;
+		if (!isLeftChara) {
+			titlePosBuff.x += TITLE_OFFSET_X;
+		}
+		else {
+			titlePosBuff.x -= TITLE_OFFSET_X;
+		}
+
+		// キャラの描画場所を決める。
+		charaPosBuff = MASK_POS;
+		if (!isLeftChara) {
+			charaPosBuff.x -= CHARA_OFFSET_X;
+		}
+		else {
+			charaPosBuff.x += CHARA_OFFSET_X;
+		}
+
 		// マスクの内側のキャラクターを動かす。
-		charaPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, charaStartPos, MASK_POS);
-		titlePos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, titleStartPos, MASK_POS + titleOffset);
+		charaPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, charaStartPos, charaPosBuff);
+		titlePos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, titleStartPos, titlePosBuff);
 
 		// キャラクターをアニメーションさせる。
 		if (knockOutTimer % CHARA_ANIM_FRAME == 0) {
@@ -105,10 +129,6 @@ bool CutInTransition::OnUpdate()
 			knockOutPhase = KNOCK_OUT_PHASE::STOP_PHASE;
 
 		}
-
-		// 後ろに描画する黒のアルファ値を255に近づける。
-		backAlpha += (255 - backAlpha) / 10.0f;
-		if (250 < backAlpha) backAlpha = 255;
 
 		break;
 	case KNOCK_OUT_PHASE::STOP_PHASE:
@@ -150,9 +170,27 @@ bool CutInTransition::OnUpdate()
 
 		}
 
+		// タイトルロゴの描画場所を決める。
+		titlePosBuff = MASK_POS + titleOffset;
+		if (!isLeftChara) {
+			titlePosBuff.x += TITLE_OFFSET_X;
+		}
+		else {
+			titlePosBuff.x -= TITLE_OFFSET_X;
+		}
+
+		// キャラの描画場所を決める。
+		charaPosBuff = MASK_POS;
+		if (!isLeftChara) {
+			charaPosBuff.x -= CHARA_OFFSET_X;
+		}
+		else {
+			charaPosBuff.x += CHARA_OFFSET_X;
+		}
+
 		// マスクの内側のキャラクターを動かす。
-		charaPos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME, MASK_POS, charaEndPos);
-		titlePos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME, MASK_POS + titleOffset, titleEndPos);
+		charaPos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME, charaPosBuff, charaEndPos);
+		titlePos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME, titlePosBuff, titleEndPos);
 
 
 		// タイマーが規定値に達したら、次のフェーズへ移行する。
@@ -162,6 +200,7 @@ bool CutInTransition::OnUpdate()
 			knockOutPhase = KNOCK_OUT_PHASE::START_PHASE;
 			// 終わり
 			isEnd = true;
+			isNowTransition = false;
 
 		}
 
@@ -171,9 +210,16 @@ bool CutInTransition::OnUpdate()
 		break;
 	}
 
+	// 後ろに描画する黒のアルファ値を255に近づける。
+	backAlpha += (255 - backAlpha) / 10.0f;
+	if (240 < backAlpha) {
+		backAlpha = 255;
+	}
+
 	knockOutTimer += 2;
 
 	return isEnd;
+
 }
 
 void CutInTransition::OnDraw()
