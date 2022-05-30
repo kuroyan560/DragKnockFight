@@ -362,7 +362,7 @@ const bool& StageMgr::CheckRoomNum(const int& STAGE_NUMBER, const int& ROOM_NUMB
 	return false;
 }
 
-void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM, const Vec2<float>& LeftCharaPos, const float& LeftCharaSize, const Vec2<float>& RightCharaPos, const float& RightCharaSize, const bool& CharaCheck, const int& ChipGraph)
+void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM, const Vec2<float>& LeftCharaPos, const float& LeftCharaSize, const Vec2<float>& RightCharaPos, const float& RightCharaSize, const INTERSECTED_LINE& MoveDir, const bool& CharaCheck, const int& ChipGraph)
 {
 	//îzóÒäOéQè∆
 	if (MAPCHIP_NUM.y < 0 || localRoomMapChipArray.size() <= MAPCHIP_NUM.y || MAPCHIP_NUM.x < 0 || localRoomMapChipArray[MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)

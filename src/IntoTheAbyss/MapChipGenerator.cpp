@@ -46,7 +46,7 @@ int MapChipGenerator::GetRandChipType()
 void MapChipGenerator::Generate(const Vec2<int>& GenerateIdx, const int& ChipType,const int& WallGraph)
 {
 	if (!CanChange(GenerateIdx))return;
-	StageMgr::Instance()->WriteMapChipData(GenerateIdx, ChipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, true, WallGraph);
+	StageMgr::Instance()->WriteMapChipData(GenerateIdx, ChipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_NONE, true, WallGraph);
 }
 
 
