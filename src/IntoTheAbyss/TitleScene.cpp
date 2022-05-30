@@ -8,7 +8,7 @@
 
 TitleScene::TitleScene()
 {
-	changeScene = std::make_shared<SceneCange>();
+	changeScene = std::make_shared<CutInTransition>();
 	StageMgr::Instance();
 
 	// 各画像をロード
@@ -56,8 +56,8 @@ void TitleScene::OnUpdate()
 	{
 		//デバッグ時短用
 		{
-			KuroEngine::Instance().ChangeScene(1, changeScene);
-			AudioApp::Instance()->PlayWave(SE);
+			//KuroEngine::Instance().ChangeScene(1, changeScene);
+			//AudioApp::Instance()->PlayWave(SE);
 		}
 
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_STICK::L_LEFT, 0.0f))

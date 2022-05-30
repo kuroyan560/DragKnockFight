@@ -39,22 +39,29 @@ void BackGroundParticle::Generate(const Vec2<float>& Pos, const STATUS& Status, 
 
 	/*===== 初期化処理 =====*/
 
+	// 各変数を初期化。
 	pos = Pos;
 	stageSize = StageSize;
 	exp = {};
 	angle = {};
 	isActive = true;
-	targetExp = { 3.0f,3.0f };
 	timer = 0;
 	desTimer = 0;
-	defDesTimer = KuroFunc::GetRand(MAX_DES_TIMER / 2, MAX_DES_TIMER);
 	status = Status;
+	// 消滅するまでのタイマーを星ごとにランダムに設定。
+	defDesTimer = KuroFunc::GetRand(MAX_DES_TIMER / 2, MAX_DES_TIMER);
+	// デフォルトのサイズを設定。
+	targetExp = { 3.0f,3.0f };
 
 	// ステータスが流れ星だったら。
 	if (status == STATUS::SHOOTING_STAR) {
 
+		// 流れ星の場合は消滅するまでのタイマーを改めて設定する。
 		defDesTimer = KuroFunc::GetRand(MAX_DES_TIMER / 4, MAX_DES_TIMER);
+		// 移動速度をランダムに設定。
 		speed = KuroFunc::GetRand(MIN_SPEED, MAX_SPEED);
+		// 流れ星の場合はデフォルトのサイズを固定する。
+		targetExp = { 3.0f,3.0f };
 
 	}
 

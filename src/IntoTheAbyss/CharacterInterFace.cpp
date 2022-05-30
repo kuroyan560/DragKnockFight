@@ -32,7 +32,7 @@ void CharacterInterFace::SwingUpdate()
 	/*===== U‚è‰ñ‚µ’†‚ÉŒÄ‚Î‚ê‚éˆ— =====*/
 
 	// U‚è‰ñ‚µ‚Ì1F‚ÌŠÔ‚É“®‚¢‚Ä‚Ù‚µ‚¢’lB
-	const float frameMove = 80.0f;
+	const float frameMove = 100.0f;
 
 	// Šp“x‚É‰ÁŽZ‚·‚é—Ê‚ÌŠ„‡‚ðŒˆ‚ß‚éB
 	float partnerDistance = (pos - partner.lock()->pos).Length();

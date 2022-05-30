@@ -18,7 +18,7 @@ class WinCounter : public Singleton<WinCounter>
 	std::array<int, 3> lunaHandle;			// ノックアウト時のLuna(左側のキャラ)の画像ハンドル アニメーション
 	std::array<int, 3> lacyHandle;			// ノックアウト時のLuna(左側のキャラ)の画像ハンドル アニメーション
 	std::array<int, 5> maskHandle;			// ノックアウト時にマスクとして使用する画像のハンドル アニメーション
-	std::array<int, 5> maskFrameHandle;	// ノックアウト時に使用するマスクのフレーム アニメーション
+	std::array<int, 5> maskFrameHandle;		// ノックアウト時に使用するマスクのフレーム アニメーション
 	int maskAnimHandle;
 	int lunaAnimHandle;
 
