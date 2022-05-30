@@ -33,7 +33,7 @@ void RoundCount::Generate(const Vec2<float>& Pos)
 {
 
 	/*===== ê∂ê¨èàóù =====*/
-	initPos = Pos + Vec2<float>(150.0f, 0.0f);
+	initPos = Pos + Vec2<float>(250.0f, 0.0f);
 	pos = initPos;
 	vel = Pos - initPos;
 
@@ -123,7 +123,7 @@ void RoundCountMgr::Init(int MaxRound)
 	const float UI_OFFSET_SIZE = 45.0f;
 	Vec2<float> UI_OFFSET_POS = Vec2<float>(1140 + UI_OFFSET_SIZE * num, 100);
 
-	startPos = UI_OFFSET_POS;
+	initPos = UI_OFFSET_POS;
 
 	int indexCounter = 0;
 
@@ -142,7 +142,8 @@ void RoundCountMgr::Init(int MaxRound)
 
 	nowRound = 0;
 	maxRound = MaxRound;
-
+	appearFlag = false;
+	t = 0.0f;
 }
 
 void RoundCountMgr::Update()
@@ -155,6 +156,17 @@ void RoundCountMgr::Update()
 
 	}
 
+	if (appearFlag)
+	{
+		if (t <= 1.0f)
+		{
+			t += 1.0f / 60.0f;
+		}
+		if (1.0f <= t)
+		{
+			t = 1.0f;
+		}
+	}
 }
 
 void RoundCountMgr::Draw()
@@ -163,7 +175,12 @@ void RoundCountMgr::Draw()
 	/*===== ï`âÊèàóù =====*/
 
 	Vec2<float> UI_OFFSET_POS = Vec2<float>(startPos.x - 116.0f, 102);
+
+	startPos.x = initPos.x + 350.0f + KuroMath::Ease(Out, Cubic, t, 0.0f, 1.0f) * -350.0f;
+	startPos.y = initPos.y;
+
 	DrawFunc::DrawRotaGraph2D(UI_OFFSET_POS, Vec2<float>(1, 1), 0, TexHandleMgr::GetTexBuffer(roundGraph));
+
 
 	for (int i = 0; i < maxRound; ++i)
 	{
@@ -191,4 +208,5 @@ void RoundCountMgr::Appear()
 		index.Appear();
 
 	}
+	appearFlag = true;
 }

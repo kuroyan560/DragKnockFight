@@ -61,7 +61,9 @@ public:
 	int innerGraph;
 	int roundGraph;
 
-	Vec2<float>startPos;
+	Vec2<float>startPos, initPos;
+	float t;
+	bool appearFlag;
 public:
 
 	/*===== ƒƒ“ƒoŠÖ” =====*/
