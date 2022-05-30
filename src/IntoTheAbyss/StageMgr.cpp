@@ -293,6 +293,11 @@ StageMgr::StageMgr()
 					{
 						SetGimmickGraphHandle(stageNum, roomNum, Vec2<int>(x, y));
 					}
+
+					if (chip.chipType == 1)
+					{
+						chip.drawData.handle = GetRandNormalWallGraphHandle();
+					}
 				}
 			}
 		}
@@ -709,6 +714,30 @@ bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM,
 	}
 
 	return sideFlag;
+}
+
+int StageMgr::GetRandNormalWallGraphHandle()
+{
+	static bool INIT = false;
+	static std::vector<int>NORMAL_BLOCK_HANDLE;
+	if (!INIT)
+	{
+		NORMAL_BLOCK_HANDLE.resize(3);
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/chip_sheet.png", 3, { 3,1 }, NORMAL_BLOCK_HANDLE.data());
+		INIT = true;
+	}
+
+	//èoåªämó¶
+	const float RATE = 20.0f;
+
+	int appearType = 0;
+
+	float rate = KuroFunc::GetRand(99.0f);
+	if (rate < RATE)
+	{
+		appearType = KuroFunc::GetRand(1, 2);
+	}
+	return NORMAL_BLOCK_HANDLE[appearType];
 }
 
 void StageMgr::SetGimmickGraphHandle(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> &MAPCHIP_NUM)
