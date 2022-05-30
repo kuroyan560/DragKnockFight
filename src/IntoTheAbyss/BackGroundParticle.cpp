@@ -238,7 +238,7 @@ void BackGroundParticleMgr::StageStartGenerate(const Vec2<float>& StageSize)
 	float mixStageSize = stageSize.x + stageSize.y;
 
 	// ステージサイズから生成する星の数を決める。
-	int generateCount = mixStageSize / 100.0f;
+	int generateCount = mixStageSize / 50.0f;
 
 	for (auto& index : particles) {
 
