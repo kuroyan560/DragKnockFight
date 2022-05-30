@@ -31,7 +31,7 @@ class ResultScene : public BaseScene
 	std::array<int, 12> blueNumberHandle;// 青の数字の画像ハンドル
 
 	//スコア
-	float baseBreakCount, breakCount;
+	float baseBreakCount, breakCount, prevBreakCount;
 
 	// 背景で飛ばすキャラクターのアニメーションタイマー
 	int backGroundCharaAnimTimer;
@@ -85,13 +85,6 @@ class ResultScene : public BaseScene
 
 	int ssIntervalTimer;
 
-	enum Sound
-	{
-		SOUND_GOOD,
-		SOUND_GREAT,
-		SOUND_EXCELLENT,
-		SOUND_PERFECT
-	};
 	std::array<int, 4>soundSe;
 public:
 

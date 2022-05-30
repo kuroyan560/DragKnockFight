@@ -8,7 +8,6 @@
 #include "ScrollMgr.h"
 #include "WinApp.h"
 #include"SelectStage.h"
-#include"EavaluationDataMgr.h"
 #include <IntoTheAbyss/Boss.h>
 #include "RoundCountMgr.h"
 
@@ -27,6 +26,11 @@ RoundFinishEffect::RoundFinishEffect()
 	greatGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/great.png");
 	excellentGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellent.png");
 
+
+	evaluationSoundHandle[SOUND_GOOD] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_good.wav", 0.13f);
+	evaluationSoundHandle[SOUND_GREAT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_great.wav", 0.13f);
+	evaluationSoundHandle[SOUND_EXCELLENT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_excellent.wav", 0.13f);
+	evaluationSoundHandle[SOUND_PERFECT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_perfect.wav", 0.13f);
 }
 
 void RoundFinishEffect::Init()
@@ -65,16 +69,19 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 	// 引数の割合からどの画像を使用するかをチェックする。
 	if (Rate <= GOOD_PER) {
 
+		soundType = SOUND_GOOD;
 		useGraph = goodGraph;
 
 	}
 	else if (Rate <= GREAT_PER) {
 
+		soundType = SOUND_GREAT;
 		useGraph = greatGraph;
 
 	}
 	else {
 
+		soundType = SOUND_EXCELLENT;
 		useGraph = excellentGraph;
 
 	}
@@ -161,6 +168,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 			perfectMoveAmount = PERFECT_MOVE_POS_Y;
 
 			AudioApp::Instance()->PlayWave(EXPLOSION_SE);
+			AudioApp::Instance()->PlayWave(evaluationSoundHandle[soundType]);
 		}
 
 		break;

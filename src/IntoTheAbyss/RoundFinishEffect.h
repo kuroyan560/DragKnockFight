@@ -6,6 +6,7 @@
 #include <array>
 
 #include "RoundFinishParticle.h"
+#include"EavaluationDataMgr.h"
 
 class RoundFinishEffect : public Singleton<RoundFinishEffect> {
 
@@ -56,6 +57,9 @@ public:
 	const int NUM4_RETURN_DEFPOS_TIMER = 120;
 	const int NUM5_RETURN_PLAYER_DEF_POS = 120;
 
+	
+	Sound soundType;
+	std::array<int, 4>evaluationSoundHandle;
 
 public:
 
