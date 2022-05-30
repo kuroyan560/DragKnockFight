@@ -19,7 +19,7 @@ public:
 	const int &GetRoomNum();
 	bool HaveNextLap();	//次ラップがあるか
 
-	bool resetStageFlag;//ステージをリセットする処理
+	bool moveToStageSelectFlag;//ステージをリセットする処理
 private:
 	int stageNum;	//ステージ番号
 	int roomNum;	//エリア番号

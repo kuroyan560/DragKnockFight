@@ -4,7 +4,7 @@ SelectStage::SelectStage()
 {
 	stageNum = 0;
 	roomNum = 0;
-	resetStageFlag = false;
+	moveToStageSelectFlag = false;
 }
 
 const int &SelectStage::GetStageNum()

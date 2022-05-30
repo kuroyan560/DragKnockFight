@@ -7,7 +7,7 @@ class StageSelectScreenShot
 {
 public:
 	StageSelectScreenShot(int* SelectNum);
-	void Init();
+	void Init(bool MOVE_FROM_GAME_FLAG);
 	void Update();
 	void Draw();
 
@@ -50,6 +50,7 @@ private:
 	int stageTagHandle;
 	int stageNumHandle;
 
+	Vec2<float>startStageSelectSize;//ゲーム画面からステージ選択画面に入る際のズーム処理
 
 };
 

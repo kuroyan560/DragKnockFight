@@ -55,6 +55,7 @@ void GameScene::OnUpdate()
 	bool changeInput = UsersInput::Instance()->KeyOnTrigger(DIK_B) || UsersInput::Instance()->ControllerOnTrigger(0, START);
 	if (changeInput)
 	{
+		SelectStage::Instance()->moveToStageSelectFlag = true;
 		KuroEngine::Instance().ChangeScene(1, sceneChange);
 	}
 

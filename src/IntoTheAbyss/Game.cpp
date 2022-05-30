@@ -233,8 +233,6 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	//ScrollMgr::Instance()->honraiScrollAmount = { -1060.0f,-490.0f };
 	alphaValue = 0;
 
-	//sceneLightFlag = false;
-	SelectStage::Instance()->resetStageFlag = false;
 	restartTimer = 0.0f;
 
 	DistanceCounter::Instance()->Init();
@@ -551,15 +549,6 @@ void Game::Update(const bool& Loop)
 
 	}
 
-
-	const bool resetInput = UsersInput::Instance()->KeyOnTrigger(DIK_SPACE) || UsersInput::Instance()->ControllerOnTrigger(0, BACK);
-	if (resetInput)
-	{
-		SelectStage::Instance()->resetStageFlag = true;
-		//player.isDead = true;
-		//sceneBlackFlag = true;
-		//sceneChangeDeadFlag = player.isDead;
-	}
 
 
 	addLineLengthSubAmount = DebugParameter::Instance()->addLineLengthSubAmount;
@@ -1207,7 +1196,6 @@ void Game::SwitchingStage()
 	{
 		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
 		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
-		SelectStage::Instance()->resetStageFlag = true;
 
 		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 	}

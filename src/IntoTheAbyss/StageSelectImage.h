@@ -10,7 +10,7 @@ class StageSelectImage
 {
 public:
 	StageSelectImage();
-	void Init();
+	void Init(bool MOVE_FROM_GAME_FLAG);
 	void Update();
 	void Draw();
 
@@ -42,6 +42,8 @@ private:
 	// ズームアウトするかどうかのフラグ trueだったらズームする。
 	bool zoomOutFlag;
 
-	//StageSelectScreenShot screenShot;
+	//StageSelectScreenShot screenShot;[
+
+	Vec2<float>startStageSelectSize;//ゲーム画面からステージ選択画面に入る際のズーム処理
 };
 

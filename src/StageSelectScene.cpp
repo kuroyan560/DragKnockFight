@@ -20,12 +20,29 @@ StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 
 void StageSelectScene::OnInitialize()
 {
+	bool moveToGameFlag = false;
+	if (SelectStage::Instance()->moveToStageSelectFlag)
+	{
+		moveToGameFlag = true;
+		//backAlpha = 0;
+	}
+	else
+	{
+		//backAlpha = 255;
+	}
+	backAlpha = 255;
+	SelectStage::Instance()->moveToStageSelectFlag = false;
+
+
 	charactersSelect = false;
-	//CharacterManager::Instance()->CharactersSelectInit();
 	// ステージセレクト画面の更新処理用クラスを初期化。
-	stageSelect.Init();
+	stageSelect.Init(moveToGameFlag);
 	// マップのスクショを初期化。
-	screenShot.Init();
+	screenShot.Init(moveToGameFlag);
+
+
+
+
 	// 各矢印を初期化
 	rightArrow.Init(Vec2<float>(1180.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), 0);
 	leftArrow.Init(Vec2<float>(100.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), DirectX::XM_PI);
@@ -48,8 +65,6 @@ void StageSelectScene::OnInitialize()
 		mapScreenShot[i][SCENE_CHANGE].Init(i, true);
 	}
 
-	backAlpha = 255;
-
 }
 
 void StageSelectScene::OnUpdate()
@@ -59,7 +74,7 @@ void StageSelectScene::OnUpdate()
 	if (isSkip)
 	{
 		KuroEngine::Instance().ChangeScene(2, maskSceneChange);
-		SelectStage::Instance()->resetStageFlag = true;
+		SelectStage::Instance()->moveToStageSelectFlag = true;
 	}
 
 	if (charactersSelect)
@@ -67,7 +82,7 @@ void StageSelectScene::OnUpdate()
 		//時短デバッグ用　キャラ選択飛ばす
 		{
 			KuroEngine::Instance().ChangeScene(2, maskSceneChange);
-			SelectStage::Instance()->resetStageFlag = true;
+			SelectStage::Instance()->moveToStageSelectFlag = true;
 		}
 
 		//キャラクター選択更新
@@ -77,7 +92,7 @@ void StageSelectScene::OnUpdate()
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A) && 1.0f <= stageSelect.GetLerpData().timer)
 		{
 			KuroEngine::Instance().ChangeScene(2, maskSceneChange);
-			SelectStage::Instance()->resetStageFlag = true;
+			SelectStage::Instance()->moveToStageSelectFlag = true;
 			AudioApp::Instance()->PlayWave(SE);
 		}
 		//ステージ選択へ戻る

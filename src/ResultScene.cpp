@@ -488,7 +488,7 @@ void ResultScene::DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, i
 
 	const float baseX = 500.0f;
 	float easingPosY = scoreEasingAmount * (windowSize.y / 2.0f + baseX);
-	Vec2<float> drawPos = Vec2<float>(840.0f, windowSize.y + baseX - easingPosY);
+	Vec2<float> drawPos = Vec2<float>(1020.0f, windowSize.y + baseX - easingPosY);
 
 
 	const int FONT_SIZE = 66.3f;
