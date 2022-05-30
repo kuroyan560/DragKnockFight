@@ -14,7 +14,7 @@ BlockCount::BlockCount()
 	appearFlag = false;
 }
 
-void BlockCount::Init(int COUNT_MAX, bool MODE)
+void BlockCount::Init(int COUNT_MAX, bool MODE, bool DISAPPEAR_FLAG)
 {
 	countBlockModeFlag = MODE;
 	//ブロックを全部壊すモード
@@ -36,7 +36,15 @@ void BlockCount::Init(int COUNT_MAX, bool MODE)
 
 
 	nowScoreNum = ScoreManager::Instance()->GetScore();
-	t = 0.0f;
+	if (DISAPPEAR_FLAG)
+	{
+		t = 0.0f;
+	}
+	else
+	{
+		t = 1.0f;
+	}
+
 	appearFlag = false;
 }
 

@@ -144,6 +144,7 @@ void RoundCountMgr::Init(int MaxRound)
 	maxRound = MaxRound;
 	appearFlag = false;
 	t = 0.0f;
+	
 }
 
 void RoundCountMgr::Update()

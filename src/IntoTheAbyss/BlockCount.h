@@ -8,7 +8,7 @@ class BlockCount
 public:
 	BlockCount();
 
-	void Init(int COUNT_MAX, bool MODE);
+	void Init(int COUNT_MAX, bool MODE,bool DISAPPEAR_FLAG);
 	void Update();
 	void Draw();
 
