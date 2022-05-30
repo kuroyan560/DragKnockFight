@@ -60,6 +60,10 @@ bool CutInTransition::OnUpdate()
 
 	// タイトルロゴのオフセットポス
 	Vec2<float> titleOffset = Vec2<float>(0, 170);
+	const float TITLE_OFFSET_X = 200.0f;
+	const float CHARA_OFFSET_X = 200.0f;
+	Vec2<float> titlePosBuff = {};
+	Vec2<float> charaPosBuff = {};
 
 	// 勝者によってマスクやキャラアイコンの移動を変えるための変数。
 	Vec2<float> charaStartPos = { WindowSize.x + WindowHalfSize.x, WindowHalfSize.y };
@@ -85,9 +89,27 @@ bool CutInTransition::OnUpdate()
 
 		// 開始フェーズ
 
+		// タイトルロゴの描画場所を決める。
+		titlePosBuff = MASK_POS + titleOffset;
+		if (!isLeftChara) {
+			titlePosBuff.x += TITLE_OFFSET_X;
+		}
+		else {
+			titlePosBuff.x -= TITLE_OFFSET_X;
+		}
+
+		// キャラの描画場所を決める。
+		charaPosBuff = MASK_POS;
+		if (!isLeftChara) {
+			charaPosBuff.x -= CHARA_OFFSET_X;
+		}
+		else {
+			charaPosBuff.x += CHARA_OFFSET_X;
+		}
+
 		// マスクの内側のキャラクターを動かす。
-		charaPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, charaStartPos, MASK_POS);
-		titlePos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, titleStartPos, MASK_POS + titleOffset);
+		charaPos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, charaStartPos, charaPosBuff);
+		titlePos = KuroMath::Ease(Out, Exp, knockOutTimer, START_PHASE_TIME, titleStartPos, titlePosBuff);
 
 		// キャラクターをアニメーションさせる。
 		if (knockOutTimer % CHARA_ANIM_FRAME == 0) {
@@ -148,9 +170,27 @@ bool CutInTransition::OnUpdate()
 
 		}
 
+		// タイトルロゴの描画場所を決める。
+		titlePosBuff = MASK_POS + titleOffset;
+		if (!isLeftChara) {
+			titlePosBuff.x += TITLE_OFFSET_X;
+		}
+		else {
+			titlePosBuff.x -= TITLE_OFFSET_X;
+		}
+
+		// キャラの描画場所を決める。
+		charaPosBuff = MASK_POS;
+		if (!isLeftChara) {
+			charaPosBuff.x -= CHARA_OFFSET_X;
+		}
+		else {
+			charaPosBuff.x += CHARA_OFFSET_X;
+		}
+
 		// マスクの内側のキャラクターを動かす。
-		charaPos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME, MASK_POS, charaEndPos);
-		titlePos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME, MASK_POS + titleOffset, titleEndPos);
+		charaPos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME, charaPosBuff, charaEndPos);
+		titlePos = KuroMath::Ease(In, Exp, knockOutTimer, END_PHASE_TIME, titlePosBuff, titleEndPos);
 
 
 		// タイマーが規定値に達したら、次のフェーズへ移行する。
@@ -179,6 +219,7 @@ bool CutInTransition::OnUpdate()
 	knockOutTimer += 2;
 
 	return isEnd;
+
 }
 
 void CutInTransition::OnDraw()
