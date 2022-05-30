@@ -3,6 +3,7 @@
 #include"LightManager.h"
 #include"IntoTheAbyss/Game.h"
 #include"IntoTheAbyss/SceneCange.h"
+#include"IntoTheAbyss/CRT.h"
 
 
 class Sprite;
@@ -15,6 +16,7 @@ class GameScene : public BaseScene
 	float addValue;
 	bool isSS;		// スクショを撮るかのフラグ
 	std::shared_ptr<SceneCange>sceneChange;
+	CRT crt;
 public:
 	GameScene();
 	void OnInitialize()override;

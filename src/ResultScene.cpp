@@ -257,6 +257,10 @@ void ResultScene::OnDraw()
 
 	ResultTransfer::Instance()->Draw();
 
+	crt.Excute(D3D12App::Instance()->GetCmdList(), D3D12App::Instance()->GetBackBuffRenderTarget());
+	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
+	crt.DrawResult(AlphaBlendMode_None);
+
 	Vec2<float> windowSize = { static_cast<float>(WinApp::Instance()->GetWinSize().x), static_cast<float>(WinApp::Instance()->GetWinSize().y) };
 
 	{
@@ -277,7 +281,6 @@ void ResultScene::OnDraw()
 			DrawFunc::DrawRotaGraph2D(Vec2<float>(evaluationPosX - 30, windowSize.y / 2.0f - 80.0f + easeEvaluationPosY), Vec2<float>(0.7f, 0.7f), 0.0f, TexHandleMgr::GetTexBuffer(evaluationNowHandle));
 		}
 	}
-
 }
 
 void ResultScene::OnImguiDebug()
