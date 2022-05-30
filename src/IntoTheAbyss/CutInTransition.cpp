@@ -111,7 +111,7 @@ bool CutInTransition::OnUpdate()
 		}
 
 		// 後ろに描画する黒のアルファ値を255に近づける。
-		backAlpha += (255 - backAlpha) / 5.0f;
+		backAlpha += (255 - backAlpha) / 10.0f;
 
 		break;
 	case KNOCK_OUT_PHASE::STOP_PHASE:
@@ -173,9 +173,6 @@ bool CutInTransition::OnUpdate()
 
 		}
 
-		// 後ろに描画する黒のアルファ値を255に近づける。
-		backAlpha += -backAlpha / 5.0f;
-
 
 		break;
 	default:
@@ -192,10 +189,14 @@ void CutInTransition::OnDraw()
 
 	/*===== 描画処理 =====*/
 
+	if (isEnd) return;
+
 	static const float KNOCK_OUT_SCALE = 0.8f;
 
+	static const int BLACK_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/black.png");
+
 	// 背景を黒くする。
-	//DrawFunc::DrawBox2D(Vec2<float>(0,0),WinApp)
+	DrawFunc::DrawExtendGraph2D(Vec2<float>(0, 0), WinApp::Instance()->GetExpandWinSize(), TexHandleMgr::GetTexBuffer(BLACK_HANDLE), Color(0, 0, 0, backAlpha));
 
 	// マスクの内側のキャラクターを描画。
 	if (isLeftChara) {
@@ -208,5 +209,6 @@ void CutInTransition::OnDraw()
 		DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskFrameHandle[maskAnimHandle]), Color(), Vec2<float>(0.5f, 0.5f), Vec2<bool>(true, false));
 		DrawFunc_Mask::DrawGraphByMaskGraph(charaPos, TexHandleMgr::GetTexBuffer(lacyHandle[lunaAnimHandle]), maskPos, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]), Vec2<float>(1.0f, 1.0f), Vec2<bool>(true, false));
 	}
+
 
 }

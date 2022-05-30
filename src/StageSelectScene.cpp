@@ -3,6 +3,8 @@
 #include"IntoTheAbyss/StageMgr.h"
 #include"IntoTheAbyss/CharacterManager.h"
 #include"IntoTheAbyss/StageSelectOffsetPosDebug.h"
+#include"DrawFunc.h"
+#include"WinApp.h"
 
 StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 {
@@ -45,6 +47,9 @@ void StageSelectScene::OnInitialize()
 		//ƒV[ƒ“‘JˆÚ—p
 		mapScreenShot[i][SCENE_CHANGE].Init(i, true);
 	}
+
+	backAlpha = 255;
+
 }
 
 void StageSelectScene::OnUpdate()
@@ -224,10 +229,16 @@ void StageSelectScene::OnUpdate()
 
 	maskSceneChange->backGroundTex = mapScreenShot[stageNum][SCENE_CHANGE].mapBuffer;
 	screenShot.screenShot = mapScreenShot[stageNum][STAGE_SELECT].mapBuffer;
+
+	backAlpha -= backAlpha / 10.0f;
+
 }
 
 void StageSelectScene::OnDraw()
 {
+
+	static const int BLACK_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/black.png");
+
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	stageSelect.Draw();
 	screenShot.Draw();
@@ -239,6 +250,8 @@ void StageSelectScene::OnDraw()
 
 	mapScreenShot[stageNum][STAGE_SELECT].Draw();
 	mapScreenShot[stageNum][SCENE_CHANGE].Draw();
+
+	DrawFunc::DrawExtendGraph2D(Vec2<float>(0, 0), WinApp::Instance()->GetExpandWinSize(), TexHandleMgr::GetTexBuffer(BLACK_HANDLE), Color(0, 0, 0, backAlpha));
 
 }
 

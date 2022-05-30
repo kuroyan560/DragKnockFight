@@ -26,6 +26,8 @@ class StageSelectScene : public BaseScene
 	bool isPrevInputStickRight;
 	bool isPrevInputSticlLeft;
 
+	int backAlpha;		// TitleScene‚©‚ç‘JˆÚ‚µ‚½Û‚É‚¾‚ñ‚¾‚ñ–¾‚é‚­‚·‚é‚½‚ß‚Ì•Ï”
+
 public:
 	StageSelectScene();
 	void OnInitialize()override;
