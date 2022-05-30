@@ -55,7 +55,6 @@ void CRT::Excute(const ComPtr<ID3D12GraphicsCommandList>& CmdList, const std::sh
 
 void CRT::DrawResult(const AlphaBlendMode& AlphaBlend)
 {
-	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	PostEffect::GetWinSizeSprite()->SetTexture(result);
 	PostEffect::GetWinSizeSprite()->Draw(AlphaBlend);
 }

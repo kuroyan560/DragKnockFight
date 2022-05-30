@@ -9,6 +9,7 @@
 #include"IntoTheAbyss/Game.h"
 #include"InToTheAbyss/SceneCange.h"
 #include"IntoTheAbyss/CharacterInterFace.h"
+#include"IntoTheAbyss/CRT.h"
 
 class ResultScene : public BaseScene
 {
@@ -63,6 +64,8 @@ class ResultScene : public BaseScene
 	PLAYABLE_CHARACTER_NAME winnerName;
 
 	Vec2<float> nowSize,breakSize, maxSize;
+
+	CRT crt;
 
 public:
 

@@ -65,6 +65,10 @@ void GameScene::OnDraw()
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	game.Draw();
 
+	crt.Excute(D3D12App::Instance()->GetCmdList(), D3D12App::Instance()->GetBackBuffRenderTarget());
+	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
+	crt.DrawResult(AlphaBlendMode_None);
+
 	// スクショを保存。
 	if (isSS)
 	{
