@@ -38,6 +38,8 @@ void CutInTransition::OnStart()
 	knockOutPhase = KNOCK_OUT_PHASE::START_PHASE;
 	isEnd = false;
 	isLeftChara = KuroFunc::GetRand(0, 1);
+	maskPos = { 10000,10000 };
+	charaPos = { 10000,10000 };
 
 }
 
@@ -179,7 +181,7 @@ bool CutInTransition::OnUpdate()
 		break;
 	}
 
-	++knockOutTimer;
+	knockOutTimer += 2;
 
 	return isEnd;
 }
