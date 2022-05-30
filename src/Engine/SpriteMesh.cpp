@@ -37,6 +37,15 @@ void SpriteMesh::SetUv(const float& Top, const float& Buttom, const float& Left,
 	dirty = true;
 }
 
+void SpriteMesh::AddUv(const Vec2<float>& AddLT, const Vec2<float>& AddLB, const Vec2<float>& AddRT, const Vec2<float>& AddRB)
+{
+	mesh->vertices[LT].uv += AddLT;
+	mesh->vertices[LB].uv += AddLB;
+	mesh->vertices[RT].uv += AddRT;
+	mesh->vertices[RB].uv += AddRB;
+	dirty = true;
+}
+
 void SpriteMesh::Render(const std::vector<std::shared_ptr<DescriptorData>>& DescDatas, const std::vector<DESC_HANDLE_TYPE>& DescHandleTypes, const int& InstanceNum)
 {
 	if (dirty)

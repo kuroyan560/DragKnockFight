@@ -48,6 +48,7 @@ public:
 
 	//ƒZƒbƒ^
 	void SetUv(const float& Top = 0.0f, const float& Buttom = 1.0f, const float& Left = 0.0f, const float& Right = 1.0f);
+	void AddUv(const Vec2<float>& AddLT, const Vec2<float>& AddLB, const Vec2<float>& AddRT, const Vec2<float>& AddRB);
 	void SetAnchorPoint(const Vec2<float>&AnchorPoint) {
 		if (anchorPoint == AnchorPoint)return;
 		anchorPoint = AnchorPoint;
