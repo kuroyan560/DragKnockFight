@@ -252,8 +252,8 @@ void StageSelectScene::OnDraw()
 	leftChara.Draw();
 	rightChara.Draw();
 
-	mapScreenShot[stageNum][STAGE_SELECT].Draw();
-	mapScreenShot[stageNum][SCENE_CHANGE].Draw();
+	mapScreenShot[stageNum][STAGE_SELECT].Draw(maskSceneChange->GetChangeRate());
+	mapScreenShot[stageNum][SCENE_CHANGE].Draw(maskSceneChange->GetChangeRate());
 
 	DrawFunc::DrawExtendGraph2D(Vec2<float>(0, 0), WinApp::Instance()->GetExpandWinSize(), D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, backAlpha)));
 

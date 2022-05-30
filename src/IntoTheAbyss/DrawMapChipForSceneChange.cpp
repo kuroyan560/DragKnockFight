@@ -81,16 +81,16 @@ void DrawMapChipForSceneChange::Update()
 
 #include"ClearInfoContainer.h"
 #include"DrawFunc.h"
-void DrawMapChipForSceneChange::Draw()
+void DrawMapChipForSceneChange::Draw(const float& ChangeRate)
 {
-	static auto BLACK = D3D12App::Instance()->GenerateTextureBuffer(Color(0.0f, 0.0f, 0.0f, 0.1f));
+	static auto BLACK = D3D12App::Instance()->GenerateTextureBuffer(Color(0.0f, 0.0f, 0.0f, 0.3f));
 
-	if (isSS)
-	{
+	//if (isSS)
+	//{
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		KuroEngine::Instance().Graphics().ClearRenderTarget({ mapBuffer });
 		DrawMapChip(mapChip, mapChipDraw, stageNum, 0);
-		DrawFunc::DrawExtendGraph2D({ 0,0 }, mapBuffer->GetGraphSize().Float(), BLACK);
+		DrawFunc::DrawExtendGraph2D({ 0,0 }, mapBuffer->GetGraphSize().Float(), BLACK, Color(1.0f, 1.0f, 1.0f, (1.0f - ChangeRate)));
 
 		auto& clearInfoContainer = ClearInfoContainerMgr::Instance()->GetContainer(stageNum);
 		if (clearInfoContainer.clear)
@@ -101,7 +101,7 @@ void DrawMapChipForSceneChange::Draw()
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		crt.DrawResult(AlphaBlendMode_None);
 		KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
-	}
+	//}
 }
 
 void DrawMapChipForSceneChange::DrawMapChip(const vector<vector<int>> &mapChipData, vector<vector<MapChipDrawData>> &mapChipDrawData, const int &stageNum, const int &roomNum)
