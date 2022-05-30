@@ -1,4 +1,5 @@
 #include "KazHelper.h"
+#include"../Common/KuroFunc.h"
 
 std::vector<int> KazHelper::CountNumber(int TIME, int ZERO)
 {
@@ -13,7 +14,7 @@ std::vector<int> KazHelper::CountNumber(int TIME, int ZERO)
 	}
 	else
 	{
-		haveZero = TIME;
+		haveZero = KuroFunc::GetDigit(TIME);
 	}
 
 	std::vector<int> Number(haveZero);

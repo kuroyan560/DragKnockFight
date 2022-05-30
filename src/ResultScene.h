@@ -68,6 +68,7 @@ class ResultScene : public BaseScene
 	CRT crt;
 	bool endFlg = false;
 
+	int ssIntervalTimer;
 public:
 
 	const Vec2<int> WINDOW_CENTER = WinApp::Instance()->GetWinCenter();
@@ -103,35 +104,5 @@ private:
 		return (disits % (int)pow(10, disit + 1)) / pow(10, disit);
 	}
 
-
-	std::vector<int> CountNumber(int TIME)
-	{
-		float score = TIME;
-		std::vector<int> Number(KuroFunc::GetDigit(TIME));
-		for (int i = 0; i < Number.size(); ++i)
-		{
-			Number[i] = -1;
-		}
-
-		int tmp = score;
-		//スコア計算
-		for (int i = 0; tmp > 0; ++i)
-		{
-			float result = tmp % 10;
-			//Number.push_back(result);
-			Number[i] = result;
-			tmp /= 10.0f;
-		}
-		//0埋め
-		for (int i = 0; i < Number.size(); ++i)
-		{
-			if (Number[i] == -1)
-			{
-				Number[i] = 0;
-			}
-		}
-		std::reverse(Number.begin(), Number.end());
-		return Number;
-	}
 	void DrawBreakCount(float scoreEasingAmount,int BREAK_NOW_COUNT, int BREAK_MAX_COUNT);
 };
