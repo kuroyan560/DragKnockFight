@@ -8,6 +8,7 @@
 #include"TexHandleMgr.h"
 #include"EavaluationDataMgr.h"
 #include"ClearInfoContainer.h"
+#include"CharacterManager.h"
 
 StageMgr::StageMgr()
 {
@@ -309,7 +310,7 @@ StageMgr::StageMgr()
 	ClearInfoContainerMgr::Instance()->Generate(allStageNum);
 }
 
-void StageMgr::SetLocalMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
+void StageMgr::SetLocalMapChipData(const int& STAGE_NUMBER, const int& ROOM_NUMBER)
 {
 	localRoomMapChipArray = stageInfos[STAGE_NUMBER][ROOM_NUMBER].mapChips;
 }
@@ -332,7 +333,7 @@ const SizeData StageMgr::GetMapChipSizeData(MapChipData TYPE)
 }
 
 
-const bool &StageMgr::CheckStageNum(const int &STAGE_NUMBER)
+const bool& StageMgr::CheckStageNum(const int& STAGE_NUMBER)
 {
 	if (0 <= STAGE_NUMBER && STAGE_NUMBER < stageInfos.size())
 	{
@@ -344,7 +345,7 @@ const bool &StageMgr::CheckStageNum(const int &STAGE_NUMBER)
 	}
 }
 
-const bool &StageMgr::CheckRoomNum(const int &STAGE_NUMBER, const int &ROOM_NUMBER)
+const bool& StageMgr::CheckRoomNum(const int& STAGE_NUMBER, const int& ROOM_NUMBER)
 {
 	bool checkStageFlag = 0 <= STAGE_NUMBER && STAGE_NUMBER < stageInfos.size();//ステージ番号が配列内にあるか確認
 
@@ -377,19 +378,66 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM,
 	}
 
 	// 削る場合は通さない。
-	if (CHIPNUM != 0 && CharaCheck) {
+	if (CHIPNUM != 0) {
 
 		Vec2<float> mapChipPos = Vec2<float>(MAPCHIP_NUM.x * MAP_CHIP_SIZE + MAP_CHIP_HALF_SIZE, MAPCHIP_NUM.y * MAP_CHIP_SIZE + MAP_CHIP_HALF_SIZE);
 
-		// 左側のキャラと円形の当たり判定を行って、当たっていたらブロックを生成しない。
-		//if (Vec2<float>(mapChipPos - LeftCharaPos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + LeftCharaSize) {
-		//	return;
-		//}
+		// 左側のキャラと円形の当たり判定を行って、当たっていたら
+		if (Vec2<float>(mapChipPos - CharacterManager::Instance()->Right()->pos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + CharacterManager::Instance()->Right()->size.x) {
+
+			// マップチップが進んでいる方向によって
+			switch (MoveDir)
+			{
+			case INTERSECTED_LINE::INTERSECTED_BOTTOM:
+
+				// 上から下に進んでいたら。
+				if ((CharacterManager::Instance()->Right()->isHitTop && CharacterManager::Instance()->Right()->isHitBottom) && CharacterManager::Instance()->Right()->pos.y <= mapChipPos.y && CharacterManager::Instance()->Right()->size.y * 0.75f <= fabs(mapChipPos.x - CharacterManager::Instance()->Right()->pos.x)) {
+
+					CharacterManager::Instance()->Right()->isStuckDead = true;
+
+				}
+
+				break;
+			case INTERSECTED_LINE::INTERSECTED_TOP:
+
+				// 下から上に進んでいたら。
+				if ((CharacterManager::Instance()->Right()->isHitTop && CharacterManager::Instance()->Right()->isHitBottom) && mapChipPos.y <= CharacterManager::Instance()->Right()->pos.y && CharacterManager::Instance()->Right()->size.y * 0.75f <= fabs(mapChipPos.x - CharacterManager::Instance()->Right()->pos.x)) {
+
+					CharacterManager::Instance()->Right()->isStuckDead = true;
+
+				}
+
+				break;
+			case INTERSECTED_LINE::INTERSECTED_RIGHT:
+
+				// 左から右に進んでいたら。
+				if ((CharacterManager::Instance()->Right()->isHitLeft && CharacterManager::Instance()->Right()->isHitRight) && mapChipPos.x <= CharacterManager::Instance()->Right()->pos.x && CharacterManager::Instance()->Right()->size.x * 0.75f <= fabs(mapChipPos.y - CharacterManager::Instance()->Right()->pos.y)) {
+
+					CharacterManager::Instance()->Right()->isStuckDead = true;
+
+				}
+
+				break;
+			case INTERSECTED_LINE::INTERSECTED_LEFT:
+
+				// 右から左に進んでいたら。
+				if ((CharacterManager::Instance()->Right()->isHitLeft && CharacterManager::Instance()->Right()->isHitRight) && CharacterManager::Instance()->Right()->pos.x <= mapChipPos.x && CharacterManager::Instance()->Right()->size.x * 0.75f <= fabs(mapChipPos.y - CharacterManager::Instance()->Right()->pos.y)) {
+
+					CharacterManager::Instance()->Right()->isStuckDead = true;
+
+				}
+
+				break;
+			default:
+				break;
+			}
+
+		}
 
 		// 右側のキャラと円形の当たり判定を行って、当たっていたらブロックを生成しない。
-		if (Vec2<float>(mapChipPos - RightCharaPos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + RightCharaSize) {
-			return;
-		}
+		//if (Vec2<float>(mapChipPos - RightCharaPos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + RightCharaSize) {
+		//	return;
+		//}
 
 	}
 
@@ -406,9 +454,9 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM,
 	}
 }
 
-MapChipType StageMgr::GetMapChipType(const int &STAGE_NUM, const int &ROOM_NUM, const Vec2<int> MAPCHIP_NUM)
+MapChipType StageMgr::GetMapChipType(const int& STAGE_NUM, const int& ROOM_NUM, const Vec2<int> MAPCHIP_NUM)
 {
-	if (stageInfos[STAGE_NUM][ROOM_NUM].mapChips.size() <= MAPCHIP_NUM.y 
+	if (stageInfos[STAGE_NUM][ROOM_NUM].mapChips.size() <= MAPCHIP_NUM.y
 		&& stageInfos[STAGE_NUM][ROOM_NUM].mapChips[MAPCHIP_NUM.y].size() <= MAPCHIP_NUM.x)
 	{
 		return MAPCHIP_BLOCK_NONE;
@@ -512,7 +560,7 @@ int StageMgr::GetAllLocalWallBlocksNum(int RARE_BLOCK_COUNT)
 		{
 			if (localRoomMapChipArray[y][x].chipType == MAPCHIP_TYPE_STATIC_NON_SCORE_BLOCK)continue;
 
-			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= localRoomMapChipArray[y][x].chipType && localRoomMapChipArray[y][x].chipType<= MAPCHIP_TYPE_STATIC_CHANGE_AREA - 1;
+			bool isWallFlag = mapChipMemoryData[MAPCHIP_TYPE_STATIC_BLOCK].min <= localRoomMapChipArray[y][x].chipType && localRoomMapChipArray[y][x].chipType <= MAPCHIP_TYPE_STATIC_CHANGE_AREA - 1;
 			bool isOutSideWall = y == 0 || x == 0 || y == localRoomMapChipArray.size() - 1 || x == localRoomMapChipArray[y].size() - 1;
 			bool isRareFlag = localRoomMapChipArray[y][x].chipType == MAPCHIP_TYPE_STATIC_RARE_BLOCK;
 
@@ -616,7 +664,7 @@ int StageMgr::GetEnableToUseStageNumber()
 	return count;
 }
 
-Vec2<float>StageMgr::GetPlayerResponePos(const int &StageNum, const int &RoomNum)
+Vec2<float>StageMgr::GetPlayerResponePos(const int& StageNum, const int& RoomNum)
 {
 	for (int y = 0; y < stageInfos[StageNum][RoomNum].mapChips.size(); ++y)
 	{
@@ -631,7 +679,7 @@ Vec2<float>StageMgr::GetPlayerResponePos(const int &StageNum, const int &RoomNum
 	return Vec2<float>(0.0f, 0.0f);
 }
 
-Vec2<float>StageMgr::GetBossResponePos(const int &StageNum, const int &RoomNum)
+Vec2<float>StageMgr::GetBossResponePos(const int& StageNum, const int& RoomNum)
 {
 	for (int y = 0; y < stageInfos[StageNum][RoomNum].mapChips.size(); ++y)
 	{
@@ -656,7 +704,7 @@ int StageMgr::GetMaxTime(int STAGE_NUM, int ROOM_NUM)
 	return stageInfos[STAGE_NUM][ROOM_NUM].gameMaxTimer;
 }
 
-bool StageMgr::CheckDoor(vector<Vec2<float>> *DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
+bool StageMgr::CheckDoor(vector<Vec2<float>>* DATA, int STAGE_NUM, int ROOM_NUM, Vec2<float> MAPCHIP, int DOOR_NUM)
 {
 	bool sideFlag = false;
 

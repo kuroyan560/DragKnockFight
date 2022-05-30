@@ -239,7 +239,7 @@ void MapChipGenerator_RandPattern::DesideNextIndices(const PATTERN_TYPE& Pattern
 
 	// 水平なやつ
 	PATTERN[HORIZON].clear();
-	for (int index = 0; index < chipIdxMax.x; ++index) 
+	for (int index = 0; index < chipIdxMax.x; ++index)
 	{
 		PATTERN[HORIZON].emplace_back(Vec2<int>(index, 0));
 
@@ -534,9 +534,9 @@ void MapChipGenerator_RiseUp::RiseUp()
 				if ((*mapData)[y][x + 1].chipType != 0)continue;
 
 				//自身のタイプを右チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x + 1, y), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x + 1, y), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_RIGHT, false);
 				//自身は空にする
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_RIGHT, false);
 			}
 		}
 
@@ -548,7 +548,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
-			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x,false);
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_RIGHT, false);
 		}
 	}
 	else if (dir == UP_TO_BOTTOM)
@@ -562,9 +562,9 @@ void MapChipGenerator_RiseUp::RiseUp()
 				if ((*mapData)[y + 1][x].chipType != 0)continue;
 
 				//自身のタイプを下チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y + 1), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y + 1), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_BOTTOM, false);
 				//自身は空にする
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_BOTTOM, false);
 			}
 		}
 
@@ -576,7 +576,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
-			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_BOTTOM, false);
 		}
 	}
 	else if (dir == RIGHT_TO_LEFT)
@@ -590,9 +590,9 @@ void MapChipGenerator_RiseUp::RiseUp()
 				if ((*mapData)[y][x - 1].chipType != 0)continue;
 
 				//自身のタイプを左チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x - 1, y), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x - 1, y), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_LEFT, false);
 				//自身は空にする
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_LEFT, false);
 			}
 		}
 
@@ -604,7 +604,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
-			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_LEFT, false);
 		}
 	}
 	else if (dir == BOTTOM_TO_UP)
@@ -618,9 +618,9 @@ void MapChipGenerator_RiseUp::RiseUp()
 				if ((*mapData)[y - 1][x].chipType != 0)continue;
 
 				//自身のタイプを上チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y - 1), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y - 1), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_TOP, false);
 				//自身は空にする
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_TOP, false);
 			}
 		}
 
@@ -632,7 +632,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
-			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false);
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_TOP, false);
 		}
 	}
 }

@@ -14,6 +14,7 @@
 #include"MapChipInfo.h"
 #include"MapChipGenerator.h"
 #include"CharacterInfo.h"
+#include"Intersected.h"
 
 /// <summary>
 /// 小部屋同士の部屋のリンク付けする際に必要な情報
