@@ -24,6 +24,7 @@ private:
 	int knockOutTimer;
 	bool isEnd;
 	bool isLeftChara;
+	int backAlpha;		// 後ろに描画する黒のアルファ値
 
 	// ノックアウト時のステータス
 	enum class KNOCK_OUT_PHASE {

@@ -3,6 +3,7 @@
 #include "KuroFunc.h"
 #include "DrawFunc.h"
 #include "DrawFunc_Mask.h"
+#include "WinApp.h"
 
 CutInTransition::CutInTransition()
 {
@@ -192,6 +193,9 @@ void CutInTransition::OnDraw()
 	/*===== 描画処理 =====*/
 
 	static const float KNOCK_OUT_SCALE = 0.8f;
+
+	// 背景を黒くする。
+	//DrawFunc::DrawBox2D(Vec2<float>(0,0),WinApp)
 
 	// マスクの内側のキャラクターを描画。
 	if (isLeftChara) {
