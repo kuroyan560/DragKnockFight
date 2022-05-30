@@ -44,6 +44,7 @@ private:
 
 	//StageSelectScreenShot screenShot;[
 
-	Vec2<float>startStageSelectSize;//ゲーム画面からステージ選択画面に入る際のズーム処理
+	Vec2<float>startStageSelectPos,startStageSelectSize;//ゲーム画面からステージ選択画面に入る際のズーム処理
+	Vec2<float>lerpStageSelectPos,lerpStageSelectSize;//ゲーム画面からステージ選択画面に入る際のズーム処理
 };
 

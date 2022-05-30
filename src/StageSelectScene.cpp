@@ -24,11 +24,11 @@ void StageSelectScene::OnInitialize()
 	if (SelectStage::Instance()->moveToStageSelectFlag)
 	{
 		moveToGameFlag = true;
-		//backAlpha = 0;
+		backAlpha = 0;
 	}
 	else
 	{
-		//backAlpha = 255;
+		backAlpha = 255;
 	}
 	backAlpha = 255;
 	SelectStage::Instance()->moveToStageSelectFlag = false;
