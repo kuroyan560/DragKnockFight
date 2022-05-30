@@ -79,7 +79,7 @@ void TitleScene::OnUpdate()
 			}
 		}
 
-		if (tutorialSelect && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
+		if (tutorialSelect && UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A) && !changeScene->GetNowTransition())
 		{
 			//チュートリアルシーンへ
 			if (tutorialYes)
@@ -99,7 +99,7 @@ void TitleScene::OnUpdate()
 	else
 	{
 		//ステージセレクトに移動する
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A) && !changeScene->GetNowTransition())
 		{
 			KuroEngine::Instance().ChangeScene(1, changeScene);
 			AudioApp::Instance()->PlayWave(SE);

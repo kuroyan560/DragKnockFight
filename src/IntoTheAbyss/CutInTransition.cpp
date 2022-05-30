@@ -16,6 +16,7 @@ CutInTransition::CutInTransition()
 	knockOutTimer = 0;
 	knockOutPhase = KNOCK_OUT_PHASE::START_PHASE;
 	isEnd = false;
+	isNowTransition = false;
 
 }
 
@@ -29,6 +30,7 @@ void CutInTransition::OnStart()
 	/*===== 開始処理 =====*/
 
 	backAlpha = 0;
+	isNowTransition = true;
 	lunaAnimHandle = 0;
 	knockOutTimer = 0;
 	knockOutPhase = KNOCK_OUT_PHASE::START_PHASE;
@@ -106,10 +108,6 @@ bool CutInTransition::OnUpdate()
 
 		}
 
-		// 後ろに描画する黒のアルファ値を255に近づける。
-		backAlpha += (255 - backAlpha) / 10.0f;
-		if (250 < backAlpha) backAlpha = 255;
-
 		break;
 	case KNOCK_OUT_PHASE::STOP_PHASE:
 
@@ -162,6 +160,7 @@ bool CutInTransition::OnUpdate()
 			knockOutPhase = KNOCK_OUT_PHASE::START_PHASE;
 			// 終わり
 			isEnd = true;
+			isNowTransition = false;
 
 		}
 
@@ -169,6 +168,12 @@ bool CutInTransition::OnUpdate()
 		break;
 	default:
 		break;
+	}
+
+	// 後ろに描画する黒のアルファ値を255に近づける。
+	backAlpha += (255 - backAlpha) / 10.0f;
+	if (240 < backAlpha) {
+		backAlpha = 255;
 	}
 
 	knockOutTimer += 2;
