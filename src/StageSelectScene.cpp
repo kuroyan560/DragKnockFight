@@ -21,7 +21,7 @@ StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 void StageSelectScene::OnInitialize()
 {
 	charactersSelect = false;
-	CharacterManager::Instance()->CharactersSelectInit();
+	//CharacterManager::Instance()->CharactersSelectInit();
 	// ステージセレクト画面の更新処理用クラスを初期化。
 	stageSelect.Init();
 	// マップのスクショを初期化。
@@ -136,6 +136,8 @@ void StageSelectScene::OnUpdate()
 			mapScreenShot[stageNum][SCENE_CHANGE].Finalize();
 
 
+			PLAYABLE_CHARACTER_NAME charaName = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).characterName;
+			CharacterManager::Instance()->CharactersSelectInit(charaName);
 		}
 		//タイトルシーンに移動する
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
@@ -227,6 +229,8 @@ void StageSelectScene::OnUpdate()
 
 	}*/
 
+	screenShot.stageNum = stageNum;
+
 	maskSceneChange->backGroundTex = mapScreenShot[stageNum][SCENE_CHANGE].mapBuffer;
 	screenShot.screenShot = mapScreenShot[stageNum][STAGE_SELECT].mapBuffer;
 
@@ -236,8 +240,6 @@ void StageSelectScene::OnUpdate()
 
 void StageSelectScene::OnDraw()
 {
-
-	static const int BLACK_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/black.png");
 
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	stageSelect.Draw();
@@ -251,7 +253,7 @@ void StageSelectScene::OnDraw()
 	mapScreenShot[stageNum][STAGE_SELECT].Draw();
 	mapScreenShot[stageNum][SCENE_CHANGE].Draw();
 
-	DrawFunc::DrawExtendGraph2D(Vec2<float>(0, 0), WinApp::Instance()->GetExpandWinSize(), TexHandleMgr::GetTexBuffer(BLACK_HANDLE), Color(0, 0, 0, backAlpha));
+	DrawFunc::DrawExtendGraph2D(Vec2<float>(0, 0), WinApp::Instance()->GetExpandWinSize(), D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, backAlpha)));
 
 }
 

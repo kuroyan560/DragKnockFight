@@ -21,11 +21,11 @@ std::shared_ptr<CharacterInterFace> CharacterManager::CreateCharacter(const  PLA
 	assert(0);
 }
 
-void CharacterManager::CharactersSelectInit()
+void CharacterManager::CharactersSelectInit(PLAYABLE_CHARACTER_NAME LEFT_TEAM_NAME)
 {
 	nowSelectTeam = LEFT_TEAM;
 
-	characterName[LEFT_TEAM] = PLAYABLE_LUNA;
+	characterName[LEFT_TEAM] = LEFT_TEAM_NAME;
 	if (vsMode)
 	{
 		characterName[RIGHT_TEAM] = PLAYABLE_LACY;

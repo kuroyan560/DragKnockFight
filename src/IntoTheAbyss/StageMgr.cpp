@@ -169,6 +169,23 @@ StageMgr::StageMgr()
 						stageInfos[stageNum][roomCount].generatorSpan = num;
 					}
 				}
+
+				std::string charaKey = "chara" + std::to_string(roomCount);
+				if (key == charaKey)
+				{
+					line_stream >> num;
+					switch (num)
+					{
+					case 0:
+						stageInfos[stageNum][roomCount].characterName = PLAYABLE_LUNA;
+						break;
+					case 1:
+						stageInfos[stageNum][roomCount].characterName = PLAYABLE_LACY;
+						break;
+					default:
+						break;
+					}
+				}
 			}
 		}
 		ifs.close();

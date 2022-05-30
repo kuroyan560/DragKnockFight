@@ -22,7 +22,7 @@ public:
 	//マルチ対戦モード
 	bool vsMode = false;
 	//選択
-	void CharactersSelectInit();
+	void CharactersSelectInit(PLAYABLE_CHARACTER_NAME LEFT_TEAM_NAME);
 	void CharactersSelectUpdate();
 	void CharactersSelectDraw();
 
