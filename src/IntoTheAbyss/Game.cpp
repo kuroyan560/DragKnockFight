@@ -750,6 +750,7 @@ void Game::Draw()
 	{
 		bossHandMgr->Draw();
 		playerHandMgr->Draw();
+		countBlock.Appear();
 	}
 
 	//playerHomeBase.Draw();
