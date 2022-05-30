@@ -237,8 +237,6 @@ void StageSelectScene::OnUpdate()
 void StageSelectScene::OnDraw()
 {
 
-	static const int BLACK_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/black.png");
-
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	stageSelect.Draw();
 	screenShot.Draw();
@@ -251,7 +249,7 @@ void StageSelectScene::OnDraw()
 	mapScreenShot[stageNum][STAGE_SELECT].Draw();
 	mapScreenShot[stageNum][SCENE_CHANGE].Draw();
 
-	DrawFunc::DrawExtendGraph2D(Vec2<float>(0, 0), WinApp::Instance()->GetExpandWinSize(), TexHandleMgr::GetTexBuffer(BLACK_HANDLE), Color(0, 0, 0, backAlpha));
+	DrawFunc::DrawExtendGraph2D(Vec2<float>(0, 0), WinApp::Instance()->GetExpandWinSize(), D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, backAlpha)));
 
 }
 

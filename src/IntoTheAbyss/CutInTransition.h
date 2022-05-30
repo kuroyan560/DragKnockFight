@@ -15,11 +15,8 @@ private:
 
 	std::array<int, 3> lunaHandle;			// ノックアウト時のLuna(左側のキャラ)の画像ハンドル アニメーション
 	std::array<int, 3> lacyHandle;			// ノックアウト時のLuna(左側のキャラ)の画像ハンドル アニメーション
-	std::array<int, 5> maskHandle;			// ノックアウト時にマスクとして使用する画像のハンドル アニメーション
-	std::array<int, 5> maskFrameHandle;		// ノックアウト時に使用するマスクのフレーム アニメーション
-	Vec2<float>maskPos;						// [KnockOut!!!!]にかけるマスクの座標
 	Vec2<float>charaPos;					// マスクの内側にいるキャラの座標
-	int maskAnimHandle;
+	Vec2<float>titlePos;
 	int lunaAnimHandle;
 	int knockOutTimer;
 	bool isEnd;
