@@ -4,6 +4,8 @@
 #include "ScrollMgr.h"
 #include "DrawFunc.h"
 #include "TexHandleMgr.h"
+#include "CharacterManager.h"
+#include "DistanceCounter.h"
 
 float BackGroundParticle::lissajousTimer = 0;
 
@@ -48,20 +50,36 @@ void BackGroundParticle::Generate(const Vec2<float>& Pos, const STATUS& Status, 
 	timer = 0;
 	desTimer = 0;
 	status = Status;
+	starIndex = KuroFunc::GetRand(0, 4);
+
 	// 消滅するまでのタイマーを星ごとにランダムに設定。
 	defDesTimer = KuroFunc::GetRand(MAX_DES_TIMER / 2, MAX_DES_TIMER);
+
 	// デフォルトのサイズを設定。
-	targetExp = { 3.0f,3.0f };
+	float sizeBuff = KuroFunc::GetRand(1.0f, 3.0f);
+	targetExp = { sizeBuff,sizeBuff };
 
 	// ステータスが流れ星だったら。
 	if (status == STATUS::SHOOTING_STAR) {
 
 		// 流れ星の場合は消滅するまでのタイマーを改めて設定する。
 		defDesTimer = KuroFunc::GetRand(MAX_DES_TIMER / 4, MAX_DES_TIMER);
+
 		// 移動速度をランダムに設定。
 		speed = KuroFunc::GetRand(MIN_SPEED, MAX_SPEED);
+
 		// 流れ星の場合はデフォルトのサイズを固定する。
 		targetExp = { 3.0f,3.0f };
+
+	}
+	// ステータスが流星群だったら
+	else if (status == STATUS::METEOR_SWARM) {
+
+		// スピードを再調整
+		speed = KuroFunc::GetRand(MAX_SPEED, MAX_SPEED + 30.0f);
+
+		// 流れ星の場合は消滅するまでのタイマーを改めて設定する。
+		defDesTimer = KuroFunc::GetRand(MAX_DES_TIMER / 4, MAX_DES_TIMER / 2);
 
 	}
 
@@ -120,6 +138,7 @@ void BackGroundParticle::Update()
 
 		break;
 	case BackGroundParticle::STATUS::SHOOTING_STAR:
+	case BackGroundParticle::STATUS::METEOR_SWARM:
 
 		/*===== 流れ星 =====*/
 
@@ -130,7 +149,9 @@ void BackGroundParticle::Update()
 			targetExp = {};
 
 			// 大きさが一定以下になったら初期化。
-			if (exp.x < 0.01f) Init();
+			if (exp.x < 0.01f) {
+				Init();
+			}
 
 		}
 
@@ -157,7 +178,16 @@ void BackGroundParticle::Draw()
 
 	/*===== 描画処理 =====*/
 
-	static const int STAR_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/back_star.png");
+	static int firstOne = 0;
+	static std::array<int, 5> STAR_GRAPH;
+
+	if (firstOne == 0) {
+
+		TexHandleMgr::LoadDivGraph("resource/ChainCombat/back_star.png", 5, Vec2<int>(5, 1), STAR_GRAPH.data());
+
+		++firstOne;
+
+	}
 
 	// 描画するリサージュ曲線のいちを求める。
 	float lissajousMove = 50.0f;
@@ -166,16 +196,19 @@ void BackGroundParticle::Draw()
 	// 現在のズーム量
 	float zoom = ScrollMgr::Instance()->zoom;
 
+
+	auto buff = TexHandleMgr::GetTexBuffer(STAR_GRAPH[starIndex])->GetGraphSize();
+
 	// 通常だったら
 	if (status == STATUS::STAY) {
 
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos + lissajousCurve), exp * Vec2<float>(zoom, zoom), angle, TexHandleMgr::GetTexBuffer(STAR_GRAPH));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos + lissajousCurve), exp * Vec2<float>(zoom, zoom), angle, TexHandleMgr::GetTexBuffer(STAR_GRAPH[starIndex]));
 
 	}
 	// 流れ星だったら
 	else {
 
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), exp * Vec2<float>(zoom, zoom), angle, TexHandleMgr::GetTexBuffer(STAR_GRAPH));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), exp * Vec2<float>(zoom, zoom), angle, TexHandleMgr::GetTexBuffer(STAR_GRAPH[starIndex]));
 
 	}
 
@@ -218,7 +251,13 @@ void BackGroundParticleMgr::Init()
 
 	/*===== 初期化処理 =====*/
 
-	for (auto& index : particles) {
+	for (auto& index : stayStar) {
+
+		index.Init();
+
+	}
+
+	for (auto& index : shootingStar) {
 
 		index.Init();
 
@@ -235,12 +274,16 @@ void BackGroundParticleMgr::StageStartGenerate(const Vec2<float>& StageSize)
 
 	stageSize = StageSize;
 
+	// ステージサイズが1000以下だったら1000にする。
+	if (stageSize.x < 4000) stageSize.x = 4000;
+	if (stageSize.y < 4000) stageSize.y = 4000;
+
 	float mixStageSize = stageSize.x + stageSize.y;
 
 	// ステージサイズから生成する星の数を決める。
-	int generateCount = mixStageSize / 50.0f;
+	int generateCount = mixStageSize / 20.0f;
 
-	for (auto& index : particles) {
+	for (auto& index : stayStar) {
 
 		if (index.isActive) continue;
 
@@ -248,12 +291,16 @@ void BackGroundParticleMgr::StageStartGenerate(const Vec2<float>& StageSize)
 		generatePos.x = KuroFunc::GetRand(-stageSize.x * 2.0f, stageSize.x * 2.0f + stageSize.x);
 		generatePos.y = KuroFunc::GetRand(-stageSize.y * 2.0f, stageSize.y * 2.0f + stageSize.y);
 
-		index.Generate(generatePos, BackGroundParticle::STATUS::STAY, StageSize);
+		index.Generate(generatePos, BackGroundParticle::STATUS::STAY, stageSize);
 
 		++counter;
 		if (generateCount < counter) break;
 
 	}
+
+	// 変数を初期化。
+	meterSwarmTimer = 0;
+	meterSwarmMode = false;
 
 }
 
@@ -262,7 +309,14 @@ void BackGroundParticleMgr::Update()
 
 	/*===== 更新処理 =====*/
 
-	for (auto& index : particles) {
+	for (auto& index : stayStar) {
+
+		if (!index.isActive) continue;
+
+		index.Update();
+
+	}
+	for (auto& index : shootingStar) {
 
 		if (!index.isActive) continue;
 
@@ -277,15 +331,17 @@ void BackGroundParticleMgr::Update()
 		shootingStarGenerateTimer = 0;
 
 		// 次生成するまでのタイマーをランダムに決める。
-		defShootingStarGenerateTimer = KuroFunc::GetRand(0, 180);
+		defShootingStarGenerateTimer = KuroFunc::GetRand(0, 30);
 
-		for (auto& index : particles) {
+		for (auto& index : shootingStar) {
 
 			if (index.isActive) continue;
 
-			Vec2<float> generatePos;
-			generatePos.x = KuroFunc::GetRand(-stageSize.x * 2.0f, stageSize.x * 2.0f + stageSize.x);
-			generatePos.y = KuroFunc::GetRand(-stageSize.y * 2.0f, stageSize.y * 2.0f + stageSize.y);
+			const float SHOOTING_STAR_OFFSET = 5000.0f;
+
+			Vec2<float> generatePos = DistanceCounter::Instance()->lineCenterPos;;
+			generatePos.x += KuroFunc::GetRand(-SHOOTING_STAR_OFFSET, SHOOTING_STAR_OFFSET);
+			generatePos.y += KuroFunc::GetRand(-SHOOTING_STAR_OFFSET, SHOOTING_STAR_OFFSET);
 
 			index.Generate(generatePos, BackGroundParticle::STATUS::SHOOTING_STAR, stageSize);
 
@@ -293,6 +349,68 @@ void BackGroundParticleMgr::Update()
 
 		}
 
+
+	}
+
+
+	// 超極稀に流星群を出す。
+	int meteorSwarm = KuroFunc::GetRand(0, 1000);
+	if (meteorSwarm == 50 && !meterSwarmMode) {
+
+		meterSwarmMode = true;
+		meterSwarmTimer = 0;
+
+		const float METER_SWARM_OFFSET = 1000.0f;
+
+		// 流星群を出す場所
+		meterSwarmPos = DistanceCounter::Instance()->lineCenterPos;
+		meterSwarmPos.x += METER_SWARM_OFFSET;
+		meterSwarmPos.y -= METER_SWARM_OFFSET;
+
+	}
+	else {
+
+		// 流星群状態だったら初期化しない。
+		if (!meterSwarmMode) {
+			meterSwarmMode = false;
+			meterSwarmTimer = 0;
+		}
+
+	}
+
+	// 流星群状態だったら。
+	if (meterSwarmMode) {
+
+		// 一定間隔で流星群を生成する。
+		if (meterSwarmTimer % METER_SWARM_SPAN == 0) {
+
+			// 流星群を生成する場所からさらにある程度ずらす。
+			float meterSwarmSize = 2000.0f;
+			Vec2<float> generatePos = meterSwarmPos;
+			generatePos.x += KuroFunc::GetRand(-meterSwarmSize, meterSwarmSize);
+			generatePos.y += KuroFunc::GetRand(-meterSwarmSize, meterSwarmSize);
+
+			// 流星群を生成する。
+			for (auto& index : shootingStar) {
+
+				if (index.isActive) continue;
+
+				index.Generate(generatePos, BackGroundParticle::STATUS::METEOR_SWARM, stageSize);
+
+				break;
+
+			}
+
+		}
+
+		// タイマーを更新して初期化。
+		++meterSwarmTimer;
+		if (METER_SWARM_TIMER <= meterSwarmTimer) {
+
+			meterSwarmMode = false;
+			meterSwarmTimer = 0;
+
+		}
 
 	}
 
@@ -307,7 +425,15 @@ void BackGroundParticleMgr::Draw()
 
 	/*===== 描画処理 =====*/
 
-	for (auto& index : particles) {
+	for (auto& index : stayStar) {
+
+		if (!index.isActive) continue;
+
+		index.Draw();
+
+	}
+
+	for (auto& index : shootingStar) {
 
 		if (!index.isActive) continue;
 
@@ -322,7 +448,7 @@ void BackGroundParticleMgr::CheckHit(const Vec2<float>& Pos, const float& Size)
 
 	/*===== 当たり判定 =====*/
 
-	for (auto& index : particles) {
+	for (auto& index : stayStar) {
 
 		if (!index.isActive) continue;
 

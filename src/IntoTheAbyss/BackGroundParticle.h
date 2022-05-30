@@ -19,9 +19,10 @@ public:
 	int timer;					// 何かと色々使用するタイマー
 	int desTimer;				// 消滅して別の場所に行くためのタイマー
 	int defDesTimer;			// 消滅して別の場所に行くためのタイマーのデフォルト値
+	int starIndex;
 	bool isActive;
 
-	const int MAX_DES_TIMER = 600;
+	const int MAX_DES_TIMER = 180;
 	const int MAX_SHOOTING_STAR_DES_TIMER = 600;
 	const float MAX_SPEED = 40.0f;
 	const float MIN_SPEED = 10.0f;
@@ -30,6 +31,7 @@ public:
 
 		STAY,
 		SHOOTING_STAR,
+		METEOR_SWARM,
 
 	};
 	STATUS status;
@@ -65,13 +67,22 @@ public:
 
 	/*===== メンバ変数 =====*/
 
-	static const int PARTICLR_COUNT = 300;
-	std::array<BackGroundParticle, PARTICLR_COUNT> particles;
+	static const int PARTICLR_COUNT = 400;
+	std::array<BackGroundParticle, PARTICLR_COUNT> stayStar;
+
+	static const int SHOOTING_STAR_COUNT = 400;
+	std::array<BackGroundParticle, SHOOTING_STAR_COUNT> shootingStar;
 
 	int shootingStarGenerateTimer;
 	int defShootingStarGenerateTimer;
 
 	Vec2<float> stageSize;
+
+	bool meterSwarmMode;		// 流星群状態
+	int meterSwarmTimer;		// 流星群状態のタイマー
+	Vec2<float> meterSwarmPos;	// 流星群の生成場所。
+	const int METER_SWARM_TIMER = 180;
+	const int METER_SWARM_SPAN = 5;
 
 
 public:
