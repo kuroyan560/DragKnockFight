@@ -35,7 +35,6 @@ StageSelectScreenShot::StageSelectScreenShot(int* SelectNum) : selectNumPtr(Sele
 void StageSelectScreenShot::Init(bool MOVE_FROM_GAME_FLAG)
 {
 	screenShotLerpData.Init(Vec2<float>(640.0f, 360.0f), Vec2<float>(1.12f, 1.0f), Vec2<float>(0.0f, 0.0f), Vec2<float>(0.0f, 0.0f));
-	screenShotLerpData.timer = 1.0f;
 	stageNumberData.Init(Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), 610.0f), Vec2<float>(1.0f, 1.0f), Vec2<float>(0.0f, 0.0f), Vec2<float>(0.0f, 0.0f));
 	stageNumberData.timer = 1.0f;
 	expData.Init(Vec2<float>(0, 0), Vec2<float>(0, 0), Vec2<float>(0.0f, 0.0f), Vec2<float>(0.0f, 0.0f));
@@ -46,10 +45,12 @@ void StageSelectScreenShot::Init(bool MOVE_FROM_GAME_FLAG)
 	if (MOVE_FROM_GAME_FLAG)
 	{
 		startStageSelectSize = { 1.0f,1.0f };
+		screenShotLerpData.timer = 0.0f;
 	}
 	else
 	{
 		startStageSelectSize = { 0.74f,0.87f };
+		screenShotLerpData.timer = 1.0f;
 	}
 
 }
@@ -85,7 +86,7 @@ void StageSelectScreenShot::Update()
 		screenShotLerpData.lerpPos = { 640.0f,360.0f };
 		screenShotLerpData.lerpSize = { 0.74f,0.87f };
 
-		screenShotLerpData.startPos = { 640.0f,144.0f };
+		screenShotLerpData.startPos = { 640.0f,360.0f };
 		screenShotLerpData.startSize = startStageSelectSize;
 
 		// ズームインしていたらステージ数の場所を元の位置に戻す。

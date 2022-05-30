@@ -30,7 +30,6 @@ void StageSelectScene::OnInitialize()
 	{
 		backAlpha = 255;
 	}
-	backAlpha = 255;
 	SelectStage::Instance()->moveToStageSelectFlag = false;
 
 
