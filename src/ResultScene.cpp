@@ -33,6 +33,10 @@ ResultScene::ResultScene()
 	winnerGraph[PLAYABLE_LACY] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
 	winnerGraph[PLAYABLE_BOSS_0] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
 
+	soundSe[SOUND_GOOD] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_good.wav");
+	soundSe[SOUND_GREAT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_great.wav");
+	soundSe[SOUND_EXCELLENT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_excellent.wav");
+	soundSe[SOUND_PERFECT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_perfect.wav");
 }
 
 void ResultScene::OnInitialize()
@@ -71,6 +75,8 @@ void ResultScene::OnInitialize()
 
 	endFlg = false;
 	ssIntervalTimer = 0;
+
+	initSoundFlag = false;
 }
 
 void ResultScene::OnUpdate()
@@ -241,27 +247,36 @@ void ResultScene::OnUpdate()
 		easeEvaluationPosY = -KuroMath::Ease(Out, Back, static_cast<float>(evaluationEasingTimer) / static_cast<float>(EVALUATION_EFFECT_TIMER), 0.0f, 1.0f) * 30.0f;
 	}
 
-	if (EVALUATION_EFFECT_TIMER <= evaluationEasingTimer)
-	{
-		endFlg = true;
-	}
-
+	Sound soundType = SOUND_GOOD;
 	if (rate <= GOOD_RATE)
 	{
+		soundType = SOUND_GOOD;
 		evaluationNowHandle = goodHandle;
 	}
 	else if (rate <= GREAT_RATE)
 	{
+		soundType = SOUND_GREAT;
 		evaluationNowHandle = greatHandle;
 	}
 	else if (rate <= EXCELLENT_RATE)
 	{
+		soundType = SOUND_EXCELLENT;
 		evaluationNowHandle = excellentHandle;
 	}
 	else if (PERFECR_RATE <= rate)
 	{
+		soundType = SOUND_PERFECT;
 		evaluationFlag = true;
 	}
+
+
+	if (EVALUATION_EFFECT_TIMER <= evaluationEasingTimer && !initSoundFlag)
+	{
+		endFlg = true;
+		AudioApp::Instance()->PlayWave(soundSe[soundType]);
+		initSoundFlag = true;
+	}
+
 
 
 	if (evaluationFlag)

@@ -67,8 +67,18 @@ class ResultScene : public BaseScene
 
 	CRT crt;
 	bool endFlg = false;
+	bool initSoundFlag;
 
 	int ssIntervalTimer;
+
+	enum Sound
+	{
+		SOUND_GOOD,
+		SOUND_GREAT,
+		SOUND_EXCELLENT,
+		SOUND_PERFECT
+	};
+	std::array<int, 4>soundSe;
 public:
 
 	const Vec2<int> WINDOW_CENTER = WinApp::Instance()->GetWinCenter();
