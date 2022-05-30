@@ -56,12 +56,11 @@ void StageSelectScreenShot::Update()
 
 	if (zoomOutFlag)
 	{
-
-		screenShotLerpData.lerpPos = { 640.0f,144.0f };
-		screenShotLerpData.lerpSize = { 0.4f,0.4f };
+		screenShotLerpData.lerpPos = { 640.0f,360.0f };
+		screenShotLerpData.lerpSize = { 1.0f,1.0f };
 
 		screenShotLerpData.startPos = { 640.0f,360.0f };
-		screenShotLerpData.startSize = { 1.12f,1.0f };
+		screenShotLerpData.startSize = { 0.74f,0.87f };
 
 		// ズームアウトしていたらステージ数の場所を下の方に吹っ飛ばす。
 		stageNumberData.lerpPos = Vec2<float>(stageNumberData.lerpPos.x, 2000);
@@ -74,10 +73,10 @@ void StageSelectScreenShot::Update()
 	{
 
 		screenShotLerpData.lerpPos = { 640.0f,360.0f };
-		screenShotLerpData.lerpSize = { 1.12f,1.0f };
+		screenShotLerpData.lerpSize = { 0.74f,0.87f };
 
 		screenShotLerpData.startPos = { 640.0f,144.0f };
-		screenShotLerpData.startSize = { 0.4f,0.4f };
+		screenShotLerpData.startSize = { 0.74f,0.87f };
 
 		// ズームインしていたらステージ数の場所を元の位置に戻す。
 		stageNumberData.startPos = Vec2<float>(stageNumberData.lerpPos.x, 2000);
@@ -110,7 +109,7 @@ void StageSelectScreenShot::Draw()
 
 
 	Vec2<float> debugPos = StageSelectOffsetPosDebug::Instance()->pos;
-	DrawFunc::DrawRotaGraph2D(screenShotLerpData.pos + expData.pos + debugPos, Vec2<float>(0.74f, 0.87f) + expData.size, 0.0f, screenShot);
+	DrawFunc::DrawRotaGraph2D(screenShotLerpData.pos + expData.pos + debugPos, screenShotLerpData.size + expData.size, 0.0f, screenShot);
 
 
 	//DrawFunc::DrawRotaGraph2D(stageNumberData.pos + stageNumberExpData.pos + debugPos + lissajousCurve, stageNumberData.size + stageNumberExpData.size, 0.0f, TexHandleMgr::GetTexBuffer(stageNumberHandle[*selectNumPtr]));
@@ -131,13 +130,13 @@ void StageSelectScreenShot::Draw()
 
 void StageSelectScreenShot::ImGuiDraw()
 {
-	/*ImGui::Begin("StageSelectImage");
+	ImGui::Begin("StageSelectImage");
 	ImGui::InputFloat("PosX", &screenShotLerpData.pos.x);
 	ImGui::InputFloat("PosY", &screenShotLerpData.pos.y);
 	ImGui::InputFloat("SizeX", &screenShotLerpData.size.x);
 	ImGui::InputFloat("SizeY", &screenShotLerpData.size.y);
 	ImGui::Checkbox("ZoomOut", &zoomOutFlag);
-	ImGui::End();*/
+	ImGui::End();
 }
 
 void StageSelectScreenShot::SetZoomFlag(const bool& Zoom)
