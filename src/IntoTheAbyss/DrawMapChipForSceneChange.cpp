@@ -79,13 +79,24 @@ void DrawMapChipForSceneChange::Update()
 	ScrollMgr::Instance()->Update(centralPos, true);
 }
 
+#include"ClearInfoContainer.h"
+#include"DrawFunc.h"
 void DrawMapChipForSceneChange::Draw()
 {
+	static auto BLACK = D3D12App::Instance()->GenerateTextureBuffer(Color(0.0f, 0.0f, 0.0f, 0.1f));
+
 	if (isSS)
 	{
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		KuroEngine::Instance().Graphics().ClearRenderTarget({ mapBuffer });
 		DrawMapChip(mapChip, mapChipDraw, stageNum, 0);
+		DrawFunc::DrawExtendGraph2D({ 0,0 }, mapBuffer->GetGraphSize().Float(), BLACK);
+
+		auto& clearInfoContainer = ClearInfoContainerMgr::Instance()->GetContainer(stageNum);
+		if (clearInfoContainer.clear)
+		{
+			DrawFunc::DrawGraph({ 0,0 }, clearInfoContainer.clearInfoRenderTarget);
+		}
 		crt.Excute(D3D12App::Instance()->GetCmdList(), mapBuffer);
 		KuroEngine::Instance().Graphics().SetRenderTargets({ mapBuffer });
 		crt.DrawResult(AlphaBlendMode_None);
