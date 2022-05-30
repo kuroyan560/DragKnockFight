@@ -205,10 +205,15 @@ void ResultScene::OnUpdate()
 
 
 	float rate = static_cast<float>(baseBreakCount) / static_cast<float>(ScoreKeep::Instance()->GetMaxNum());
-	const float GOOD_RATE = EavaluationDataMgr::Instance()->GOOD_RATE;
-	const float GREAT_RATE = EavaluationDataMgr::Instance()->GREAT_RATE;
-	const float EXCELLENT_RATE = EavaluationDataMgr::Instance()->EXCELLENT_RATE;
-	const float PERFECR_RATE = EavaluationDataMgr::Instance()->PERFECT_RATE;
+
+	int stageNum = SelectStage::Instance()->GetStageNum();
+	int roomNum = SelectStage::Instance()->GetRoomNum();
+
+	StageEvaluationData data = EvaluationMgr::Instance()->GetData(stageNum, roomNum);
+	const float GOOD_RATE = data.goodRate;
+	const float GREAT_RATE = data.greatRate;
+	const float EXCELLENT_RATE = data.excellentRate;
+	const float PERFECR_RATE = data.perfectRate;
 
 	if (bigFontFlag)
 	{
@@ -244,12 +249,12 @@ void ResultScene::OnUpdate()
 
 	if (evaluationFlag)
 	{
-		if (EavaluationDataMgr::Instance()->PERFECT_ANIMATION_INTERVAL <= perfectInterval && perfectIndex < 2)
+		if (EvaluationMgr::Instance()->PERFECT_ANIMATION_INTERVAL <= perfectInterval && perfectIndex < 2)
 		{
 			++perfectIndex;
 			perfectInterval = 0;
 		}
-		else if (EavaluationDataMgr::Instance()->PERFECT_ANIMATION_INTERVAL <= perfectInterval && 2 <= perfectIndex)
+		else if (EvaluationMgr::Instance()->PERFECT_ANIMATION_INTERVAL <= perfectInterval && 2 <= perfectIndex)
 		{
 			perfectIndex = 0;
 			perfectInterval = 0;

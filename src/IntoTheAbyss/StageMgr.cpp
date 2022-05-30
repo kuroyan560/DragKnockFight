@@ -6,6 +6,7 @@
 
 #include"KuroEngine.h"
 #include"TexHandleMgr.h"
+#include"EavaluationDataMgr.h"
 #include"ClearInfoContainer.h"
 
 StageMgr::StageMgr()
@@ -106,6 +107,18 @@ StageMgr::StageMgr()
 			stageInfos[stageNum][roomNum].mapChipData = data;
 		}
 	}
+
+
+	std::vector<std::vector<StageEvaluationData>>evaData;
+	std::vector<StageEvaluationData>resultEvaData;
+	evaData.resize(allStageNum);
+	resultEvaData.resize(allStageNum);
+	for (int i = 0; i < evaData.size(); ++i)
+	{
+		evaData[i].resize(stageInfos[i].size());
+	}
+
+
 	//ƒXƒe[ƒW–ˆ‚Ì¬•”‰®“Ç‚İ‚İ-----------------------
 	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
 	{
@@ -187,10 +200,62 @@ StageMgr::StageMgr()
 						break;
 					}
 				}
+
+				{
+					std::string evaGoodKey = "good" + std::to_string(roomCount);
+					float rate = 0.0f;
+					if (key == evaGoodKey)
+					{
+						line_stream >> rate;
+						evaData[stageNum][roomCount].goodRate = rate;
+					}
+
+					std::string evaGreatKey = "great" + std::to_string(roomCount);
+					if (key == evaGreatKey)
+					{
+						line_stream >> rate;
+						evaData[stageNum][roomCount].greatRate = rate;
+					}
+
+					std::string evaExcellentKey = "excellent" + std::to_string(roomCount);
+					if (key == evaExcellentKey)
+					{
+						line_stream >> rate;
+						evaData[stageNum][roomCount].excellentRate = rate;
+					}
+				}
+
+
+				{
+					std::string evaGoodKey = "goodR";
+					float rate = 0.0f;
+					if (key == evaGoodKey)
+					{
+						line_stream >> rate;
+						resultEvaData[stageNum].goodRate = rate;
+					}
+
+					std::string evaGreatKey = "greatR";
+					if (key == evaGreatKey)
+					{
+						line_stream >> rate;
+						resultEvaData[stageNum].greatRate = rate;
+					}
+
+					std::string evaExcellentKey = "excellentR";
+					if (key == evaExcellentKey)
+					{
+						line_stream >> rate;
+						resultEvaData[stageNum].excellentRate = rate;
+					}
+				}
 			}
 		}
 		ifs.close();
 	}
+
+	EvaluationMgr::Instance()->Init(evaData, resultEvaData);
+
 
 	//•”‰®‚²‚Æ‚Ì•`‰æî•ñ‚ğŠi”[‚·‚é-----------------------
 	for (int stageNum = 0; stageNum < allStageNum; ++stageNum)
