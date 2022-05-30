@@ -6,6 +6,7 @@
 
 #include"KuroEngine.h"
 #include"TexHandleMgr.h"
+#include"ClearInfoContainer.h"
 
 StageMgr::StageMgr()
 {
@@ -237,6 +238,7 @@ StageMgr::StageMgr()
 
 	//Žg‚í‚È‚¢
 	//GimmickLoader::Instance()->ErrorCheck();
+	ClearInfoContainerMgr::Instance()->Generate(allStageNum);
 }
 
 void StageMgr::SetLocalMapChipData(const int &STAGE_NUMBER, const int &ROOM_NUMBER)

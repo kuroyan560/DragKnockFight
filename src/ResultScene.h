@@ -66,6 +66,7 @@ class ResultScene : public BaseScene
 	Vec2<float> nowSize,breakSize, maxSize;
 
 	CRT crt;
+	bool endFlg = false;
 
 public:
 

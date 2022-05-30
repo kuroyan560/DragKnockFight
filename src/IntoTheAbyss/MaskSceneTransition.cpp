@@ -38,7 +38,7 @@ bool MaskSceneTransition::OnUpdate()
 
 	if (t <= 1.0f)
 	{
-		t += 1.0f / 120.0f;
+		t += 1.0f / 60.0f;
 	}
 	if (1.0f <= t)
 	{
@@ -68,6 +68,6 @@ void MaskSceneTransition::OnDraw()
 {
 	if (startFlag)
 	{
-		DrawFunc_Mask::DrawGraphByMaskGraph(pos, backGroundTex, backGroundPos, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<float>(expRate, expRate));
+		//DrawFunc_Mask::DrawGraphByMaskGraph(pos, backGroundTex, backGroundPos, TexHandleMgr::GetTexBuffer(maskHandle), Vec2<float>(expRate, expRate));
 	}
 }
