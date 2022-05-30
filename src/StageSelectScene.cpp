@@ -51,6 +51,15 @@ void StageSelectScene::OnInitialize()
 	Vec2<float> rightCharaPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x * 1.75f - 55.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y - 7.0f));
 	rightChara.Init(Vec2<float>(1830.0f, 881.0f), rightCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/lacy.png"));
 
+
+	//–îˆó‚âƒ^ƒO‚ð‰æ–ÊŠO‚©‚ç–ß‚·
+	if (moveToGameFlag)
+	{
+	}
+
+
+
+
 	isPrevInputStickRight = false;
 	isPrevInputSticlLeft = false;
 

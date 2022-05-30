@@ -775,12 +775,15 @@ void Game::Draw()
 		mapChipGeneratorChangeMap->Draw();
 		mapChipGenerator->Draw();
 
+
+		float disappearRate = CharacterManager::Instance()->Left()->GetAlphaRate();
+
 		// ¶‚ÌƒLƒƒƒ‰ ~ ‰E‚ÌƒLƒƒƒ‰ŠÔ‚Éü‚ð•`‰æ
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * disappearRate);
 
 		// ü•ª‚Ì’†S‚É‰~‚ð•`‰æ
 		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos), Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos), Vec2<float>(1.0f, 1.0f) * disappearRate, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 
 
 		if (!roundFinishFlag)

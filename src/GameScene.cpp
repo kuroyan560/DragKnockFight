@@ -53,9 +53,17 @@ void GameScene::OnUpdate()
 	}
 
 	bool changeInput = UsersInput::Instance()->KeyOnTrigger(DIK_B) || UsersInput::Instance()->ControllerOnTrigger(0, START);
+
 	if (changeInput)
 	{
 		SelectStage::Instance()->moveToStageSelectFlag = true;
+		CharacterManager::Instance()->Left()->DisAppear();
+		CharacterManager::Instance()->Right()->DisAppear();
+	}
+
+	bool sceneChangeFlag = CharacterManager::Instance()->Left()->CheckDisappear() && CharacterManager::Instance()->Right()->CheckDisappear();
+	if (sceneChangeFlag)
+	{
 		KuroEngine::Instance().ChangeScene(1, sceneChange);
 	}
 
