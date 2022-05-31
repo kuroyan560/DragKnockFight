@@ -25,6 +25,8 @@ void StageComment::Init(int STAGE_NUM)
 {
 	stageNum = STAGE_NUM;
 	prevStageNum = -1;
+	appearRate = 0.0f;
+	easeVel = 50.0f;
 }
 
 void StageComment::Update()
@@ -54,9 +56,22 @@ void StageComment::Update()
 		const float SCROLL = 0.001f;
 		commentSprite->mesh.AddUv({ SCROLL,0.0f }, { SCROLL,0.0f }, { SCROLL,0.0f }, { SCROLL,0.0f });
 	}
-	commentSprite->transform.SetPos({ WinApp::Instance()->GetExpandWinSize().x,680.0f });
 
 	//KuroMath::Lerp(0.0f, -128.0f, changeRate);
+
+
+	if (appearRate < 1.0f)
+	{
+		appearRate += 1.0f / 60.0f;
+	}
+	if (1.0f <= appearRate)
+	{
+		appearRate = 1.0f;
+	}
+
+	easeY = KuroMath::Ease(Out, Cubic, appearRate, 0.0f, 1.0f) * -easeVel;
+
+	commentSprite->transform.SetPos({ WinApp::Instance()->GetExpandWinSize().x,680.0f + easeVel + easeY });
 }
 
 void StageComment::Draw()
@@ -65,8 +80,8 @@ void StageComment::Draw()
 	Vec2<float>size(commentSprite->mesh.GetSize() * Vec2<float>(1.0f, 1.3f));
 	Vec2<float>leftUpPos(0.0f, commentSprite->transform.GetPos().y);
 	Vec2<float>rightDownPos(WinApp::Instance()->GetExpandWinSize());
+	Vec2<float>easePos(0.0f, easeVel + easeY);
 
-
-	DrawFunc::DrawBox2D(leftUpPos, rightDownPos, Color(0.0f, 0.0f, 0.0f, 0.5f), true, AlphaBlendMode_Trans);
+	DrawFunc::DrawBox2D(leftUpPos + easePos, rightDownPos + easePos, Color(0.0f, 0.0f, 0.0f, 0.5f), true, AlphaBlendMode_Trans);
 	commentSprite->Draw();
 }

@@ -21,5 +21,8 @@ private:
 
 
 	int prevStageNum;
+
+	float appearRate;
+	float easeY, easeVel;
 };
 
