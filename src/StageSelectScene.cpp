@@ -104,7 +104,7 @@ void StageSelectScene::OnUpdate()
 			AudioApp::Instance()->PlayWave(SE);
 		}
 		//ステージ選択へ戻る
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B) && 1.0f <= stageSelect.GetLerpData().timer)
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B) && 1.0f <= stageSelect.GetLerpData().timer && !charactersSelect)
 		{
 			charactersSelect = false;
 			screenShot.SetZoomFlag(false);
@@ -164,7 +164,7 @@ void StageSelectScene::OnUpdate()
 			CharacterManager::Instance()->CharactersSelectInit(charaName);
 		}
 		//タイトルシーンに移動する
-		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B))
+		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::B) && !charactersSelect)
 		{
 			KuroEngine::Instance().ChangeScene(0, sceneChange);
 			AudioApp::Instance()->PlayWave(SE);
