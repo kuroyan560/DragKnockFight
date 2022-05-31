@@ -62,7 +62,7 @@ void GameScene::OnUpdate()
 	}
 
 	bool sceneChangeFlag = CharacterManager::Instance()->Left()->CheckDisappear() && CharacterManager::Instance()->Right()->CheckDisappear();
-	if (sceneChangeFlag)
+	if (changeInput)
 	{
 		KuroEngine::Instance().ChangeScene(1, sceneChange);
 	}

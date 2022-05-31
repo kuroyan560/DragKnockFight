@@ -354,7 +354,8 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 	}
 	else
 	{
-		float alphaRate = alpha / 255.0f;
+		//float alphaRate = alpha / 255.0f;
+		float alphaRate = 1.0f;
 		DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeValue), bossScale * ScrollMgr::Instance()->zoom * alphaRate,
 			bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
 	}

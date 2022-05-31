@@ -411,7 +411,8 @@ void Player::OnDraw(const bool& isRoundStartEffect)
 	const Vec2<float> expRateBody = ((GetPlayerGraphSize() - stretch_LU + stretch_RB) / GetPlayerGraphSize());
 	bool mirorX = playerDirX == PLAYER_RIGHT || (isHold && (partner.lock()->pos - pos).x < 0);
 
-	float alphaRate = alpha / 255.0f;
+	//float alphaRate = alpha / 255.0f;
+	float alphaRate = 1.0f;
 	DrawFunc::DrawCircle2D(drawPos, (DistanceCounter::Instance()->DEAD_LINE - 80.0f) * ScrollMgr::Instance()->zoom * alphaRate, Color(8, 217, 255, 130), true, 1, AlphaBlendMode_Trans);
 	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * staminaGauge->outOfStaminaEffect.GetSize() * appearExtRate * alphaRate,
 		stagingDevice.GetSpinRadian(), bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });

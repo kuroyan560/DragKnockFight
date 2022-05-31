@@ -706,6 +706,11 @@ void Game::Update(const bool& Loop)
 	{
 		Camera::Instance()->Zoom(CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Right()->pos);
 	}
+	else if (disappearFlag)
+	{
+		//Camera::Instance()->zoom = KuroMath::Lerp(ScrollMgr::Instance()->zoom, , 0.1f);
+	}
+	
 	//else {
 
 		//ScrollMgr::Instance()->lineCenterOffset = {};
