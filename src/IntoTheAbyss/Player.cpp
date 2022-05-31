@@ -359,6 +359,7 @@ void Player::OnUpdateNoRelatedSwing()
 }
 
 #include"DistanceCounter.h"
+#include"GameSceneCamerMove.h"
 void Player::OnDraw(const bool& isRoundStartEffect)
 {
 	//if (vel.y < 0)playerDir = BACK;
@@ -413,11 +414,13 @@ void Player::OnDraw(const bool& isRoundStartEffect)
 
 	//float alphaRate = alpha / 255.0f;
 	float alphaRate = 1.0f;
-	DrawFunc::DrawCircle2D(drawPos, (DistanceCounter::Instance()->DEAD_LINE - 80.0f) * ScrollMgr::Instance()->zoom * alphaRate, Color(8, 217, 255, 130), true, 1, AlphaBlendMode_Trans);
-	DrawFunc_FillTex::DrawRotaGraph2D(drawPos, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * staminaGauge->outOfStaminaEffect.GetSize() * appearExtRate * alphaRate,
+	DrawFunc::DrawCircle2D(drawPos + GameSceneCameraMove::Instance()->move, (DistanceCounter::Instance()->DEAD_LINE - 80.0f) * ScrollMgr::Instance()->zoom * alphaRate, Color(8, 217, 255, 130), true, 1, AlphaBlendMode_Trans);
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos + GameSceneCameraMove::Instance()->move, expRateBody * ScrollMgr::Instance()->zoom * EXT_RATE * stagingDevice.GetExtRate() * staminaGauge->outOfStaminaEffect.GetSize() * appearExtRate * alphaRate,
 		stagingDevice.GetSpinRadian(), bodyTex, CRASH_TEX, stagingDevice.GetFlashAlpha(), { 0.5f,0.5f }, { mirorX,false });
 
 }
+
+#include "GameSceneCamerMove.h"
 
 void Player::OnDrawUI()
 {
@@ -441,7 +444,7 @@ void Player::OnDrawUI()
 		//êUÇËâÒÇµêÊï`âÊ
 		float dist = partner.lock()->pos.Distance(pos);
 		Vec2<float>target = pos + rightStickVec * dist;
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(target), COLOR_TEX[GetWhichTeam()], 2, AlphaBlendMode_Trans);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(pos) + GameSceneCameraMove::Instance()->move, ScrollMgr::Instance()->Affect(target), COLOR_TEX[GetWhichTeam()], 2, AlphaBlendMode_Trans);
 		//DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(target), drawScale * 0.8f, 0.0f, TexHandleMgr::GetTexBuffer(RETICLE_GRAPH[team]));
 
 		//êUÇËâÒÇµï˚å¸ï`âÊ
@@ -450,7 +453,7 @@ void Player::OnDrawUI()
 		Angle rotateAngle = arrowPosAngle + Angle(90 * (clockWise ? -1 : 1));
 		Vec2<float>vec = partner.lock()->pos - pos;
 		vec.Normalize();
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos + vec * ARROW_DIST_OFFSET), drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), Color(), { 0.0f,0.5f });
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(partner.lock()->pos + vec * ARROW_DIST_OFFSET) + GameSceneCameraMove::Instance()->move, drawScale * 0.5f, rotateAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH[team]), Color(), { 0.0f,0.5f });
 	}
 
 	const auto leftStickVec = UsersInput::Instance()->GetLeftStickVec(controllerIdx, { 0.5f,0.5f });

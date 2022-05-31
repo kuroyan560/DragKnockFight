@@ -31,6 +31,8 @@ void SwingLineSegment::Update(const Vec2<float>& Start, const Vec2<float>& End, 
 
 }
 
+#include "GameSceneCamerMove.h"
+
 void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 {
 	static const int TEAM_COLOR_X[TEAM_NUM] = { 47,239 };
@@ -47,7 +49,7 @@ void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_LINE:
 
 		// 仮でアルファで画像を変える。
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 32);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start) + GameSceneCameraMove::Instance()->move, ScrollMgr::Instance()->Affect(end) + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(graphHandle), 32);
 
 		break;
 
@@ -55,14 +57,14 @@ void SwingLineSegment::Draw(const WHICH_TEAM& Team)
 
 		drawPos = Vec2<float>(start - end) / 2.0f;
 		size = { 64.0f,64.0f };
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 32);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start) + GameSceneCameraMove::Instance()->move, ScrollMgr::Instance()->Affect(end) + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(graphHandle), 32);
 
 		break;
 
 	case SwingLineSegment::SEGMENT_ID::SEGMENT_ID_ARROW:
 
 		// 仮でアルファで画像を変える。
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start), ScrollMgr::Instance()->Affect(end), TexHandleMgr::GetTexBuffer(graphHandle), 32);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(start) + GameSceneCameraMove::Instance()->move, ScrollMgr::Instance()->Affect(end) + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(graphHandle), 32);
 
 		break;
 
@@ -253,6 +255,8 @@ void SwingLineSegmentMgr::Update(const Vec2<float>& Pos, const Vec2<float>& Targ
 	}
 
 }
+
+#include "GameSceneCamerMove.h"
 
 void SwingLineSegmentMgr::Draw(const WHICH_TEAM& Team)
 {

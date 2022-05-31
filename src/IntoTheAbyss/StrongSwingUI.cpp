@@ -13,6 +13,7 @@ void StrongSwingUI::Disappear()
 #include"WinApp.h"
 #include"TexHandleMgr.h"
 #include"KuroMath.h"
+#include"GameSceneCamerMove.h"
 void StrongSwingUI::Draw(const int& MyIdx)
 {
 	static const int STRONG_SWING_COUNT_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/canSwingCount.png");
@@ -32,15 +33,15 @@ void StrongSwingUI::Draw(const int& MyIdx)
 	const float offsetY = 100;
 	drawPos.y -= offsetY * (MyIdx + 1);
 
-	DrawFunc::DrawRotaGraph2D(drawPos, { 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(STRONG_SWING_COUNT_FRAME_GRAPH));
+	DrawFunc::DrawRotaGraph2D(drawPos + GameSceneCameraMove::Instance()->move, { 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(STRONG_SWING_COUNT_FRAME_GRAPH));
 
 	if (disappear && (timer == 1 || timer == 2))
 	{
-		DrawFunc_Color::DrawRotaGraph2D(drawPos, flashExp, 0.0f, TexHandleMgr::GetTexBuffer(STRONG_SWING_COUNT_GRAPH), Color(1.0f, 1.0f, 1.0f, 1.0f));
+		DrawFunc_Color::DrawRotaGraph2D(drawPos + GameSceneCameraMove::Instance()->move, flashExp, 0.0f, TexHandleMgr::GetTexBuffer(STRONG_SWING_COUNT_GRAPH), Color(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 	else
 	{
-		DrawFunc::DrawRotaGraph2D(drawPos, Vec2<float>(exp, exp), 0.0f, TexHandleMgr::GetTexBuffer(STRONG_SWING_COUNT_GRAPH));
+		DrawFunc::DrawRotaGraph2D(drawPos + GameSceneCameraMove::Instance()->move, Vec2<float>(exp, exp), 0.0f, TexHandleMgr::GetTexBuffer(STRONG_SWING_COUNT_GRAPH));
 	}
 }
 
@@ -67,6 +68,7 @@ void StrongSwingTutorialUI::Init()
 	ltButton->Init(0);
 }
 
+#include "GameSceneCamerMove.h"
 
 void StrongSwingTutorialUI::Draw(const bool& CanStrongSwing)
 {
@@ -79,11 +81,11 @@ void StrongSwingTutorialUI::Draw(const bool& CanStrongSwing)
 	const float exp = 0.7f;
 	float x = 110;
 	float subY = 60;
-	DrawFunc::DrawRotaGraph2D({ x,WinApp::Instance()->GetExpandWinSize().y - subY }, { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(rStick->GetGraphHandle()));
-	DrawFunc::DrawRotaGraph2D({ x,WinApp::Instance()->GetExpandWinSize().y - subY }, { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(TUTORIAL_FRAME));
+	DrawFunc::DrawRotaGraph2D(Vec2<float>{ x,WinApp::Instance()->GetExpandWinSize().y - subY } + GameSceneCameraMove::Instance()->move, { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(rStick->GetGraphHandle()));
+	DrawFunc::DrawRotaGraph2D(Vec2<float>{ x,WinApp::Instance()->GetExpandWinSize().y - subY } + GameSceneCameraMove::Instance()->move, { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(TUTORIAL_FRAME));
 
 	//x += 95;
 	subY += 80;
-	DrawFunc::DrawRotaGraph2D({ x,WinApp::Instance()->GetExpandWinSize().y - subY }, { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(ltButton->GetGraphHandle()));
-	DrawFunc::DrawRotaGraph2D({ x,WinApp::Instance()->GetExpandWinSize().y - subY }, { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(TUTORIAL_FRAME));
+	DrawFunc::DrawRotaGraph2D(Vec2<float>{ x,WinApp::Instance()->GetExpandWinSize().y - subY } + GameSceneCameraMove::Instance()->move, { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(ltButton->GetGraphHandle()));
+	DrawFunc::DrawRotaGraph2D(Vec2<float>{ x,WinApp::Instance()->GetExpandWinSize().y - subY } + GameSceneCameraMove::Instance()->move, { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(TUTORIAL_FRAME));
 }

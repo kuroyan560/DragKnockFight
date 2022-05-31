@@ -225,20 +225,22 @@ void WinCounter::Update()
 	knockOutTimer++;
 }
 
+#include "GameSceneCamerMove.h"
+
 void WinCounter::Draw()
 {
 	//勝利数カウント(左)
 
 	for (int i = 0; i < drawCountLeft; ++i)
 	{
-		DrawFunc::DrawGraph(GetWinCountPos(true, i), TexHandleMgr::GetTexBuffer(winCountGraph_Left));
+		DrawFunc::DrawGraph(GetWinCountPos(true, i) + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(winCountGraph_Left));
 	}
 
 	//勝利数カウント(右)
 
 	for (int i = 0; i < drawCountRight; ++i)
 	{
-		DrawFunc::DrawGraph(GetWinCountPos(false, i), TexHandleMgr::GetTexBuffer(winCountGraph_Right));
+		DrawFunc::DrawGraph(GetWinCountPos(false, i) + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(winCountGraph_Right));
 	}
 
 	if (!animation)return;
@@ -247,17 +249,17 @@ void WinCounter::Draw()
 	// マスクの内側のキャラクターを描画。
 	if (isLeftKnockOut) {
 		// マスクの枠を描画。
-		DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskFrameHandle[maskAnimHandle]));
-		DrawFunc_Mask::DrawGraphByMaskGraph(charaPos, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]), maskPos, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]), Vec2<float>(1.0f, 1.0f), Vec2<bool>(false, false));
+		DrawFunc::DrawRotaGraph2D(maskPos + GameSceneCameraMove::Instance()->move, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskFrameHandle[maskAnimHandle]));
+		DrawFunc_Mask::DrawGraphByMaskGraph(charaPos + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(lunaHandle[lunaAnimHandle]), maskPos, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]), Vec2<float>(1.0f, 1.0f), Vec2<bool>(false, false));
 	}
 	else {
 		// マスクの枠を描画。
-		DrawFunc::DrawRotaGraph2D(maskPos, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskFrameHandle[maskAnimHandle]), Color(), Vec2<float>(0.5f, 0.5f), Vec2<bool>(true, false));
-		DrawFunc_Mask::DrawGraphByMaskGraph(charaPos, TexHandleMgr::GetTexBuffer(lacyHandle[lunaAnimHandle]), maskPos, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]), Vec2<float>(1.0f, 1.0f), Vec2<bool>(true, false));
+		DrawFunc::DrawRotaGraph2D(maskPos + GameSceneCameraMove::Instance()->move, Vec2<float>(1.0f, 1.0f), 0.0f, TexHandleMgr::GetTexBuffer(maskFrameHandle[maskAnimHandle]), Color(), Vec2<float>(0.5f, 0.5f), Vec2<bool>(true, false));
+		DrawFunc_Mask::DrawGraphByMaskGraph(charaPos + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(lacyHandle[lunaAnimHandle]), maskPos, TexHandleMgr::GetTexBuffer(maskHandle[maskAnimHandle]), Vec2<float>(1.0f, 1.0f), Vec2<bool>(true, false));
 	}
 
 	// [KnockOut!!!!]の画像を描画。
-	DrawFunc::DrawRotaGraph2D(knockOutPos, { 1.0f * KNOCK_OUT_SCALE,1.0f * KNOCK_OUT_SCALE }, 0.0f, TexHandleMgr::GetTexBuffer(knockOutGraph));
+	DrawFunc::DrawRotaGraph2D(knockOutPos + GameSceneCameraMove::Instance()->move, { 1.0f * KNOCK_OUT_SCALE,1.0f * KNOCK_OUT_SCALE }, 0.0f, TexHandleMgr::GetTexBuffer(knockOutGraph));
 
 }
 

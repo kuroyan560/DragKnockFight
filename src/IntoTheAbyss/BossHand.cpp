@@ -44,14 +44,16 @@ void BossHand::Update(const Vec2<float> &POS, float RADIUS, float ANGLE, bool HO
 	pos = centralPos + Vec2<float>((cosf(radian) * RADIUS) + shakeAmount.x, (sinf(radian) * RADIUS) + shakeAmount.y);
 }
 
+#include "GameSceneCamerMove.h"
+
 void BossHand::Draw(bool SCROL_ON)
 {
 	if (SCROL_ON)
 	{
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), size * ScrollMgr::Instance()->zoom * CharacterManager::Instance()->Left()->GetAlphaRate(), radian, TexHandleMgr::GetTexBuffer(nowHnadle));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos) + GameSceneCameraMove::Instance()->move, size * ScrollMgr::Instance()->zoom * CharacterManager::Instance()->Left()->GetAlphaRate(), radian, TexHandleMgr::GetTexBuffer(nowHnadle));
 	}
 	else
 	{
-		DrawFunc::DrawRotaGraph2D(pos, size, radian, TexHandleMgr::GetTexBuffer(nowHnadle));
+		DrawFunc::DrawRotaGraph2D(pos + GameSceneCameraMove::Instance()->move, size, radian, TexHandleMgr::GetTexBuffer(nowHnadle));
 	}
 }

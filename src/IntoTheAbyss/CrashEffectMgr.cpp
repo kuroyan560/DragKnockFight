@@ -81,6 +81,8 @@ void ClassEffect::Update()
 
 }
 
+#include "GameSceneCamerMove.h"
+
 void ClassEffect::Draw()
 {
 
@@ -101,9 +103,9 @@ void ClassEffect::Draw()
 	Vec2<float>offset = { KuroFunc::GetRand(-MAX_OFFSET,MAX_OFFSET),KuroFunc::GetRand(-MAX_OFFSET,MAX_OFFSET) };
 
 	Vec2<float>drawSize = size;
-	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(pos - drawSize + offset), ScrollMgr::Instance()->Affect(pos + drawSize + offset), drawCol, true, AlphaBlendMode_Add);
+	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(pos - drawSize + offset) + GameSceneCameraMove::Instance()->move, ScrollMgr::Instance()->Affect(pos + drawSize + offset), drawCol, true, AlphaBlendMode_Add);
 	drawSize = { size.y,size.x };
-	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(pos - drawSize + offset), ScrollMgr::Instance()->Affect(pos + drawSize + offset), drawCol, true, AlphaBlendMode_Add);
+	DrawFunc::DrawBox2D(ScrollMgr::Instance()->Affect(pos - drawSize + offset) + GameSceneCameraMove::Instance()->move, ScrollMgr::Instance()->Affect(pos + drawSize + offset), drawCol, true, AlphaBlendMode_Add);
 }
 
 void CrashEffectMgr::Init()
@@ -160,6 +162,8 @@ void CrashEffectMgr::Update()
 	}
 
 }
+
+#include "GameSceneCamerMove.h"
 
 void CrashEffectMgr::Draw()
 {

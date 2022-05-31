@@ -84,6 +84,7 @@ void BlockCount::Update()
 #include"DrawFunc_Mask.h"
 #include"EavaluationDataMgr.h"
 #include<algorithm>
+#include"GameSceneCamerMove.h"
 void BlockCount::Draw()
 {
 	Vec2<float>texSize(30.0f, 44.0f);
@@ -102,16 +103,16 @@ void BlockCount::Draw()
 	for (int i = 0; i < nowNumber.size(); i++)
 	{
 		drawPos.x += texSize.x;
-		DrawFunc::DrawRotaGraph2D(drawPos - Vec2<float>(25.0f, 0.0f), Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[nowNumber[i]]));
+		DrawFunc::DrawRotaGraph2D(drawPos + GameSceneCameraMove::Instance()->move - Vec2<float>(25.0f, 0.0f), Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[nowNumber[i]]));
 	}
 
-	DrawFunc::DrawRotaGraph2D(basePos + Vec2<float>(-8.0f, 0.0f), Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[11]));
+	DrawFunc::DrawRotaGraph2D(basePos + Vec2<float>(-8.0f, 0.0f) + GameSceneCameraMove::Instance()->move, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[11]));
 	drawPos = basePos + Vec2<float>(10.0f, 0.0f);
 	//�ő�
 	for (int i = 0; i < maxNumber.size(); i++)
 	{
 		drawPos.x += texSize.x;
-		DrawFunc::DrawRotaGraph2D(drawPos - Vec2<float>(20.0f, 0.0f), Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[maxNumber[i]]));
+		DrawFunc::DrawRotaGraph2D(drawPos + GameSceneCameraMove::Instance()->move - Vec2<float>(20.0f, 0.0f), Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[maxNumber[i]]));
 	}
 
 	static const int GET_SCORE_RATE_GAUGE_FRAME = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/getScoreRateGauge.png");
@@ -134,7 +135,7 @@ void BlockCount::Draw()
 	const float GAUGE_OFFSET_Y = 10;
 
 	//ゲージ枠
-	DrawFunc::DrawGraph(POS, TexHandleMgr::GetTexBuffer(GET_SCORE_RATE_GAUGE_FRAME));
+	DrawFunc::DrawGraph(POS + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(GET_SCORE_RATE_GAUGE_FRAME));
 	float lateBuff = 0.0f;
 
 
@@ -144,7 +145,7 @@ void BlockCount::Draw()
 	const float goodRate = min(totalGetRate / data.goodRate, 1.0f);
 	lateBuff = data.goodRate;
 	const Vec2<float>goodOffset = { 10,GAUGE_OFFSET_Y };
-	DrawFunc_Mask::DrawGraph(POS + goodOffset, TexHandleMgr::GetTexBuffer(GOOD_GAUGE), POS + goodOffset,
+	DrawFunc_Mask::DrawGraph(POS + goodOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(GOOD_GAUGE), POS + goodOffset,
 		POS + goodOffset + TexHandleMgr::GetTexBuffer(GOOD_GAUGE)->GetGraphSize().Float() * Vec2<float>(goodRate, 1.0f));
 
 	//GREAT
@@ -153,7 +154,7 @@ void BlockCount::Draw()
 		const float greatRate = min(totalGetRate / data.greatRate, 1.0f);
 		lateBuff = data.greatRate;
 		const Vec2<float>greatOffset = { 426,GAUGE_OFFSET_Y };
-		DrawFunc_Mask::DrawGraph(POS + greatOffset, TexHandleMgr::GetTexBuffer(GREAT_GAUGE), POS + greatOffset,
+		DrawFunc_Mask::DrawGraph(POS + greatOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(GREAT_GAUGE), POS + greatOffset,
 			POS + greatOffset + TexHandleMgr::GetTexBuffer(GREAT_GAUGE)->GetGraphSize().Float() * Vec2<float>(greatRate, 1.0f));
 	}
 	//EXCELLENT
@@ -162,7 +163,7 @@ void BlockCount::Draw()
 		const float excellentRate = min(totalGetRate / data.excellentRate, 1.0f);
 		lateBuff = data.excellentRate;
 		const Vec2<float>excellentOffset = { 670,GAUGE_OFFSET_Y };
-		DrawFunc_Mask::DrawGraph(POS + excellentOffset, TexHandleMgr::GetTexBuffer(EXCELLENT_GAUGE), POS + excellentOffset,
+		DrawFunc_Mask::DrawGraph(POS + excellentOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(EXCELLENT_GAUGE), POS + excellentOffset,
 			POS + excellentOffset + TexHandleMgr::GetTexBuffer(EXCELLENT_GAUGE)->GetGraphSize().Float() * Vec2<float>(excellentRate, 1.0f));
 	}
 	//PERFECT
@@ -170,7 +171,7 @@ void BlockCount::Draw()
 	{
 		const float perfectRate = min(totalGetRate /data.perfectRate, 1.0f);
 		const Vec2<float>perfectOffset = { 755.5f,GAUGE_OFFSET_Y };
-		DrawFunc_Mask::DrawGraph(POS + perfectOffset, TexHandleMgr::GetTexBuffer(PERFECT_GAUGE), POS + perfectOffset,
+		DrawFunc_Mask::DrawGraph(POS + perfectOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(PERFECT_GAUGE), POS + perfectOffset,
 			POS + perfectOffset + TexHandleMgr::GetTexBuffer(PERFECT_GAUGE)->GetGraphSize().Float() * Vec2<float>(perfectRate, 1.0f));
 	}
 }

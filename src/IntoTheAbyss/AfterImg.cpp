@@ -79,6 +79,7 @@ void AfterImg::EmitArray(const Vec2<float>& From, const Vec2<float>& To, const i
 }
 
 #include"ScrollMgr.h"
+#include "GameSceneCamerMove.h"
 void AfterImg::Draw()
 {
 	for (auto itr = imgs.begin(); itr != imgs.end(); ++itr)
@@ -101,7 +102,7 @@ void AfterImg::Draw()
 		const Vec2<float>offset = (itr->graphSize).Float();
 		const Vec2<float>leftUp = ScrollMgr::Instance()->Affect(itr->pos - offset);
 		const Vec2<float>rightBottom = ScrollMgr::Instance()->Affect(itr->pos + offset);
-		vertices.emplace_back(leftUp, rightBottom, itr->miror, itr->handle, itr->alpha, itr->scale);
+		vertices.emplace_back(leftUp + GameSceneCameraMove::Instance()->move, rightBottom + GameSceneCameraMove::Instance()->move, itr->miror, itr->handle, itr->alpha, itr->scale);
 	}
 
 	KuroEngine::Instance().Graphics().SetPipeline(PIPELINE);

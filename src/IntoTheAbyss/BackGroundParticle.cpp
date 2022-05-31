@@ -173,6 +173,8 @@ void BackGroundParticle::Update()
 
 }
 
+#include "GameSceneCamerMove.h"
+
 void BackGroundParticle::Draw()
 {
 
@@ -202,13 +204,13 @@ void BackGroundParticle::Draw()
 	// ’Êí‚¾‚Á‚½‚ç
 	if (status == STATUS::STAY) {
 
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos + lissajousCurve), exp * Vec2<float>(zoom, zoom), angle, TexHandleMgr::GetTexBuffer(STAR_GRAPH[starIndex]));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos + lissajousCurve) + GameSceneCameraMove::Instance()->move, exp * Vec2<float>(zoom, zoom), angle, TexHandleMgr::GetTexBuffer(STAR_GRAPH[starIndex]));
 
 	}
 	// —¬‚ê¯‚¾‚Á‚½‚ç
 	else {
 
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), exp * Vec2<float>(zoom, zoom), angle, TexHandleMgr::GetTexBuffer(STAR_GRAPH[starIndex]));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos) + GameSceneCameraMove::Instance()->move, exp * Vec2<float>(zoom, zoom), angle, TexHandleMgr::GetTexBuffer(STAR_GRAPH[starIndex]));
 
 	}
 

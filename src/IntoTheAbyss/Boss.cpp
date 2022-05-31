@@ -313,6 +313,7 @@ void Boss::OnUpdate(const MapChipArray& MapData)
 }
 
 #include"DrawFunc_FillTex.h"
+#include"GameSceneCamerMove.h"
 #include"D3D12App.h"
 void Boss::OnDraw(const bool& isRoundStartEffect)
 {
@@ -349,14 +350,14 @@ void Boss::OnDraw(const bool& isRoundStartEffect)
 
 	if (!initPaticleFlag)
 	{
-		DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale), ScrollMgr::Instance()->Affect(drawPos + drawScale),
+		DrawFunc_FillTex::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(drawPos - drawScale) + GameSceneCameraMove::Instance()->move, ScrollMgr::Instance()->Affect(drawPos + drawScale),
 			TexHandleMgr::GetTexBuffer(appearBossGraphHandle), CRASH_TEX, stagingDevice.GetFlashAlpha());
 	}
 	else
 	{
 		//float alphaRate = alpha / 255.0f;
 		float alphaRate = 1.0f;
-		DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeValue), bossScale * ScrollMgr::Instance()->zoom * alphaRate,
+		DrawFunc_FillTex::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + shakeValue) + GameSceneCameraMove::Instance()->move, bossScale * ScrollMgr::Instance()->zoom * alphaRate,
 			bossGraphRadian, TexHandleMgr::GetTexBuffer(anim->GetGraphHandle()), CRASH_TEX, stagingDevice.GetFlashAlpha());
 	}
 

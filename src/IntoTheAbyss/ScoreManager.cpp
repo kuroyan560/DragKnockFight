@@ -101,6 +101,7 @@ void ScoreManager::Update()
 }
 
 #include"WinApp.h"
+#include"GameSceneCamerMove.h"
 void ScoreManager::Draw()
 {
 	if (mode == NONE)return;
@@ -126,12 +127,12 @@ void ScoreManager::Draw()
 
 	const auto drawSize = texSize * size;
 
-	DrawFunc::DrawGraph({ 1050,500 }, TexHandleMgr::GetTexBuffer(scoreGraph), Color(1.0f, 1.0f, 1.0f, alpha));
+	DrawFunc::DrawGraph(Vec2<float>{ 1050,500 } + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(scoreGraph), Color(1.0f, 1.0f, 1.0f, alpha));
 	for (int i = 0; i < numberHandle.size(); i++)
 	{
 		Vec2<float>centralPos(winSize.x - ((numberHandle.size() - 1 - i) + 0.5f) * drawSize.x, winSize.y - drawSize.y * 0.5f - scoreOffsetY);
 		centralPos += offset;
-		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[numberHandle[i]]), Color(1.0f, 1.0f, 1.0f, alpha));
+		DrawFunc::DrawRotaGraph2D(centralPos + GameSceneCameraMove::Instance()->move, Vec2<float>(size, size), 0.0f, TexHandleMgr::GetTexBuffer(number[numberHandle[i]]), Color(1.0f, 1.0f, 1.0f, alpha));
 	}
 }
 

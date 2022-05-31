@@ -88,12 +88,14 @@ void RoundFinishParticle::Update(const Vec2<float>& LeftCharaPos)
 
 }
 
+#include "GameSceneCamerMove.h"
+
 void RoundFinishParticle::Draw()
 {
 
 	/*===== •`‰æˆ— =====*/
 
-	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), Vec2<float>(ScrollMgr::Instance()->zoom, ScrollMgr::Instance()->zoom), 0, TexHandleMgr::GetTexBuffer(useGraphHanlde));
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos) + GameSceneCameraMove::Instance()->move, Vec2<float>(ScrollMgr::Instance()->zoom, ScrollMgr::Instance()->zoom), 0, TexHandleMgr::GetTexBuffer(useGraphHanlde));
 
 }
 

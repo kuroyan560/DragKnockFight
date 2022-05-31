@@ -817,6 +817,7 @@ void CharacterInterFace::Update(const MapChipArray& MapData, const Vec2<float>& 
 
 #include "DrawFunc.h"
 #include"TexHandleMgr.h"
+#include"GameSceneCamerMove.h"
 void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 {
 	// Žc‘œ‚ð•`‰æ
@@ -839,7 +840,7 @@ void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 	}
 	float auraAlpha = KuroMath::Ease(In, Cubic, healAuraEaseRate, 1.0f, 0.0f);
 	float exp = ScrollMgr::Instance()->zoom;
-	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(HEAL_GRAPH[team]), Color(1.0f, 1.0f, 1.0f, auraAlpha),
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos) + GameSceneCameraMove::Instance()->move, { exp,exp }, 0.0f, TexHandleMgr::GetTexBuffer(HEAL_GRAPH[team]), Color(1.0f, 1.0f, 1.0f, auraAlpha),
 		{ 0.5f,0.5f }, { false,false }, AlphaBlendMode_Add);
 
 	static const int LINE_GRAPH[TEAM_NUM] =
@@ -853,11 +854,11 @@ void CharacterInterFace::Draw(const bool& isRoundStartEffect)
 	if (IsPilotOutSide() && pilotGraph != -1)
 	{
 		const auto pilotDrawPos = ScrollMgr::Instance()->Affect(pilotPos);
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(pos), ScrollMgr::Instance()->Affect(pilotPos),
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(pos) + GameSceneCameraMove::Instance()->move, ScrollMgr::Instance()->Affect(pilotPos),
 			TexHandleMgr::GetTexBuffer(LINE_GRAPH[team]), CHAIN_THICKNESS * ScrollMgr::Instance()->zoom);
 
 		const auto sizeHalf = pilotSize * ScrollMgr::Instance()->zoom / 2.0f;
-		DrawFunc::DrawExtendGraph2D(pilotDrawPos - sizeHalf, pilotDrawPos + sizeHalf, TexHandleMgr::GetTexBuffer(pilotGraph), Color(), { pilotDrawMiror,false });
+		DrawFunc::DrawExtendGraph2D(pilotDrawPos - sizeHalf + GameSceneCameraMove::Instance()->move, pilotDrawPos + sizeHalf + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(pilotGraph), Color(), { pilotDrawMiror,false });
 	}
 
 	bulletMgr.Draw();

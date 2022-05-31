@@ -79,6 +79,8 @@ void DistanceCounter::Update()
 
 }
 
+#include "GameSceneCamerMove.h"
+
 void DistanceCounter::Draw()
 {
 
@@ -108,10 +110,10 @@ void DistanceCounter::Draw()
 		if (drawDisit < 0 || 9 < drawDisit) continue;
 
 		// •`‰æ‚·‚éB
-		DrawFunc_FillTex::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * index + OFFSET_X * zoom, 0), 
+		DrawFunc_FillTex::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * index + OFFSET_X * zoom, 0) + GameSceneCameraMove::Instance()->move, 
 			Vec2<float>(zoom * exp, zoom * exp), 0, TexHandleMgr::GetTexBuffer(fontGraph[drawDisit]), TexHandleMgr::GetTexBuffer(redFontGraph[drawDisit]), rate);
 	}
-	DrawFunc_FillTex::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * -1 + OFFSET_X * zoom, -8),
+	DrawFunc_FillTex::DrawRotaGraph2D(drawPos - Vec2<float>(INDEX_OFFSET * zoom * -1 + OFFSET_X * zoom, -8) + GameSceneCameraMove::Instance()->move,
 		Vec2<float>(zoom * exp, zoom * exp), 0, TexHandleMgr::GetTexBuffer(BLUE_METER), TexHandleMgr::GetTexBuffer(RED_METER), rate);
 
 }

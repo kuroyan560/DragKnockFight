@@ -187,6 +187,8 @@ void StunEffect::Update()
 
 }
 
+#include "GameSceneCamerMove.h"
+
 void StunEffect::Draw()
 {
 
@@ -194,6 +196,6 @@ void StunEffect::Draw()
 
 	if (!isActive) return;
 
-	DrawFunc::DrawRotaGraph2D(breakUIPos, Vec2<float>{breakUIExtRate, breakUIExtRate}, breakUIRadian, TexHandleMgr::GetTexBuffer(useHandle));
+	DrawFunc::DrawRotaGraph2D(breakUIPos + GameSceneCameraMove::Instance()->move, Vec2<float>{breakUIExtRate, breakUIExtRate}, breakUIRadian, TexHandleMgr::GetTexBuffer(useHandle));
 
 }

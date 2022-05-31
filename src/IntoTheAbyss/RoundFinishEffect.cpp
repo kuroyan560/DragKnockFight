@@ -344,6 +344,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 }
 
 #include <memory>
+#include "GameSceneCamerMove.h"
 
 void RoundFinishEffect::Draw()
 {
@@ -363,6 +364,6 @@ void RoundFinishEffect::Draw()
 
 	}
 
-	DrawFunc::DrawRotaGraph2D(perfectPos, perfectExp, 0, drawGraph);
+	DrawFunc::DrawRotaGraph2D(perfectPos + GameSceneCameraMove::Instance()->move, perfectExp, 0, drawGraph);
 
 }

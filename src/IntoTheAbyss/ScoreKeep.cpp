@@ -17,5 +17,7 @@ void ScoreKeep::Init(int MAX_RAP_NUM, int MAX_SCORE)
 
 void ScoreKeep::AddScore(int RAP_NUM, int SCORE_NUM)
 {
-	score[RAP_NUM] = SCORE_NUM;
+	if (RAP_NUM < score.size()) {
+		score[RAP_NUM] = SCORE_NUM;
+	}
 }
