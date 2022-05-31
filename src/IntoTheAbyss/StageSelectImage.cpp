@@ -15,17 +15,20 @@ void StageSelectImage::Init(bool MOVE_FROM_GAME_FLAG)
 {
 	if (MOVE_FROM_GAME_FLAG)
 	{
+		startStageSelectPos = { 1280.0f / 2.0f,1000.0f };
 		startStageSelectSize = { 3.8f,3.0f };
+		backGroundLerpData.timer = 0.0f;
 	}
 	else
 	{
+		startStageSelectPos = { 640,900 };
 		startStageSelectSize = { 2.8f,2.5f };
+		backGroundLerpData.timer = 1.0f;
 	}
 
 	backGroundLerpData.Init(Vec2<float>(640, 900), Vec2<float>(2.8f, 2.5f), Vec2<float>(1280.0f / 2.0f, 720.0f / 2.0f), Vec2<float>(1.0f, 1.0f));
 	expData.Init(Vec2<float>(0, 0), Vec2<float>(0, 0), Vec2<float>(0, 0), Vec2<float>(0, 0));
 	zoomOutFlag = false;
-	backGroundLerpData.timer = 1.0f;
 }
 
 void StageSelectImage::Update()
@@ -42,7 +45,7 @@ void StageSelectImage::Update()
 	{
 		backGroundLerpData.lerpPos = { 640,900 };
 		backGroundLerpData.lerpSize = { 2.8f,2.5f };
-		backGroundLerpData.startPos = { 1280.0f / 2.0f,720.0f / 2.0f };
+		backGroundLerpData.startPos = startStageSelectPos;
 		backGroundLerpData.startSize = startStageSelectSize;
 	}
 	backGroundLerpData.EaseInOut();

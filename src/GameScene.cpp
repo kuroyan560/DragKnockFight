@@ -19,7 +19,7 @@ GameScene::GameScene()
 {
 	addValue = 10.0f;
 
-	sceneChange = std::make_shared<SceneCange>();
+	sceneChange = std::make_shared<SceneTransitionDrawScreenShot>();
 
 
 	//imguiHandle = DebugImGuiManager::Instance()->Add("Round");
@@ -53,11 +53,19 @@ void GameScene::OnUpdate()
 	}
 
 	bool changeInput = UsersInput::Instance()->KeyOnTrigger(DIK_B) || UsersInput::Instance()->ControllerOnTrigger(0, START);
+
 	if (changeInput)
 	{
 		static int bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 		AudioApp::Instance()->StopWave(bgm);
 		SelectStage::Instance()->moveToStageSelectFlag = true;
+		CharacterManager::Instance()->Left()->DisAppear();
+		CharacterManager::Instance()->Right()->DisAppear();
+	}
+
+	bool sceneChangeFlag = CharacterManager::Instance()->Left()->CheckDisappear() && CharacterManager::Instance()->Right()->CheckDisappear();
+	if (changeInput)
+	{
 		KuroEngine::Instance().ChangeScene(1, sceneChange);
 	}
 

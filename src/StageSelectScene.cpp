@@ -5,6 +5,7 @@
 #include"IntoTheAbyss/StageSelectOffsetPosDebug.h"
 #include"DrawFunc.h"
 #include"WinApp.h"
+#include"IntoTheAbyss/StageSelectTransfer.h"
 
 StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 {
@@ -24,13 +25,12 @@ void StageSelectScene::OnInitialize()
 	if (SelectStage::Instance()->moveToStageSelectFlag)
 	{
 		moveToGameFlag = true;
-		//backAlpha = 0;
+		backAlpha = 0;
 	}
 	else
 	{
-		//backAlpha = 255;
+		backAlpha = 255;
 	}
-	backAlpha = 255;
 	SelectStage::Instance()->moveToStageSelectFlag = false;
 
 
@@ -44,13 +44,26 @@ void StageSelectScene::OnInitialize()
 
 
 	// 各矢印を初期化
-	rightArrow.Init(Vec2<float>(1180.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), 0);
-	leftArrow.Init(Vec2<float>(100.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), DirectX::XM_PI);
+	rightArrow.Init(Vec2<float>(3000, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), Vec2<float>(1180.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), 0);
+	leftArrow.Init(Vec2<float>(-2000, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), Vec2<float>(100.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), DirectX::XM_PI);
+
+	rightArrow.SetDefPos();
+	leftArrow.SetDefPos();
+
 	// 各キャラの画像を初期化。
 	Vec2<float> leftCharaPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x * 0.25f + 55.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y - 7.0f));
 	leftChara.Init(Vec2<float>(-550.0f, 881.0f), leftCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/luna.png"));
 	Vec2<float> rightCharaPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x * 1.75f - 55.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y - 7.0f));
 	rightChara.Init(Vec2<float>(1830.0f, 881.0f), rightCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/lacy.png"));
+
+
+	//矢印やタグを画面外から戻す
+	if (moveToGameFlag)
+	{
+	}
+
+
+
 
 	isPrevInputStickRight = false;
 	isPrevInputSticlLeft = false;
@@ -152,7 +165,6 @@ void StageSelectScene::OnUpdate()
 			mapScreenShot[stageNum][STAGE_SELECT].Finalize();
 			mapScreenShot[stageNum][SCENE_CHANGE].Finalize();
 
-
 			PLAYABLE_CHARACTER_NAME charaName = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), 0).characterName;
 			CharacterManager::Instance()->CharactersSelectInit(charaName);
 		}
@@ -250,6 +262,7 @@ void StageSelectScene::OnUpdate()
 
 	maskSceneChange->backGroundTex = mapScreenShot[stageNum][SCENE_CHANGE].mapBuffer;
 	screenShot.screenShot = mapScreenShot[stageNum][STAGE_SELECT].mapBuffer;
+	StageSelectTransfer::Instance()->screenShot = screenShot.screenShot;
 
 	backAlpha -= backAlpha / 10.0f;
 

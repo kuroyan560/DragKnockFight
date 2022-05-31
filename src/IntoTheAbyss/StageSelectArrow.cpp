@@ -14,11 +14,11 @@ StageSelectArrow::StageSelectArrow()
 
 }
 
-void StageSelectArrow::Init(const Vec2<float>& Pos, const float& Angle)
+void StageSelectArrow::Init(const Vec2<float>& InitPos, const Vec2<float>& Pos, const float& Angle)
 {
 
 	defPos = Pos;
-	pos.Init(Pos, Vec2<float>(1, 1), Vec2<float>(1.0f, 1.0f), Vec2<float>(1.0f, 1.0f));
+	pos.Init(InitPos, Vec2<float>(1, 1), Vec2<float>(1.0f, 1.0f), Vec2<float>(1.0f, 1.0f));
 	pos.timer = 1.0f;
 	expData.Init(Vec2<float>(0, 0), Vec2<float>(0, 0), Vec2<float>(0, 0), Vec2<float>(0, 0));
 	angle = Angle;
@@ -68,6 +68,7 @@ void StageSelectArrow::SetDefPos()
 	pos.startSize = pos.lerpSize;
 	pos.lerpPos = defPos;
 	pos.lerpSize = Vec2<float>(1.0f, 1.0f);
+	pos.timer = 0;
 }
 
 void StageSelectArrow::SetExitPos(const Vec2<float>& ExitPos, const Vec2<float>& ExitSize)
@@ -76,6 +77,7 @@ void StageSelectArrow::SetExitPos(const Vec2<float>& ExitPos, const Vec2<float>&
 	pos.startSize = pos.lerpSize;
 	pos.lerpPos = ExitPos;
 	pos.lerpSize = ExitSize;
+	pos.timer = 0;
 }
 
 void StageSelectArrow::SetExpSize(const Vec2<float>& Size)

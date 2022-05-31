@@ -23,7 +23,7 @@ public:
 	/*===== ƒƒ“ƒo•Ï” =====*/
 
 	StageSelectArrow();
-	void Init(const Vec2<float>& Pos, const float& Angle);
+	void Init(const Vec2<float>& InitPos, const Vec2<float>& Pos, const float& Angle);
 	void Update(const bool& isLeft);
 	void Draw();
 

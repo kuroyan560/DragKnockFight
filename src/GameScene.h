@@ -4,6 +4,7 @@
 #include"IntoTheAbyss/Game.h"
 #include"IntoTheAbyss/SceneCange.h"
 #include"IntoTheAbyss/CRT.h"
+#include"IntoTheAbyss/SceneTransitionDrawScreenShot.h"
 
 
 class Sprite;
@@ -15,7 +16,8 @@ class GameScene : public BaseScene
 	Game game;
 	float addValue;
 	bool isSS;		// スクショを撮るかのフラグ
-	std::shared_ptr<SceneCange>sceneChange;
+	//std::shared_ptr<SceneCange>sceneChange;
+	std::shared_ptr<SceneTransitionDrawScreenShot>sceneChange;
 	CRT crt;
 public:
 	GameScene();
