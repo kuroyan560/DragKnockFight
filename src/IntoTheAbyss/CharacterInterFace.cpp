@@ -396,6 +396,10 @@ void CharacterInterFace::DisAppearUpdate()
 	if (disappearFlag)
 	{
 		alpha -= 5;
+		if (alpha <= 0)
+		{
+			alpha = 0;
+		}
 	}
 }
 

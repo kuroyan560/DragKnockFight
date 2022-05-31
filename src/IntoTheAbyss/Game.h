@@ -143,7 +143,7 @@ class Game
 	StageRap stageRap;
 
 	int gameTimer;
-
+	Vec2<float>initCentralPos;
 	float addLineLengthSubAmount;
 
 	int rStickNoInputTimer = 0;

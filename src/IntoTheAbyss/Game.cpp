@@ -307,7 +307,11 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	Camera::Instance()->Init();
 	Vec2<float>distance = (CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos) / 2.0f;
+	Vec2<float>cPos = CharacterManager::Instance()->Left()->pos + distance / 2.0f;
+
 	ScrollMgr::Instance()->Init(CharacterManager::Instance()->Left()->pos + distance, Vec2<float>(tmp[0].size() * MAP_CHIP_SIZE, tmp.size() * MAP_CHIP_SIZE), cameraBasePos);
+	initCentralPos = CharacterManager::Instance()->Left()->pos + distance;
+
 
 	Camera::Instance()->Zoom(CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Right()->pos);
 	ScrollMgr::Instance()->zoom = Camera::Instance()->zoom;
@@ -559,6 +563,11 @@ void Game::Update(const bool& Loop)
 
 
 
+
+
+
+
+
 	// 陣地の判定
 	//DeterminationOfThePosition();
 
@@ -648,7 +657,18 @@ void Game::Update(const bool& Loop)
 	Camera::Instance()->Update();
 	Vec2<float> distance = CharacterManager::Instance()->Right()->pos - CharacterManager::Instance()->Left()->pos;
 	Vec2<float>cPos = CharacterManager::Instance()->Left()->pos + distance / 2.0f;
-	ScrollMgr::Instance()->Update(cPos);
+
+
+	bool disappearFlag = CharacterManager::Instance()->Left()->CheckDisappear() && CharacterManager::Instance()->Right()->CheckDisappear();
+	//スクロールを中心に戻す
+	if (disappearFlag)
+	{
+		ScrollMgr::Instance()->Update(initCentralPos);
+	}
+	else
+	{
+		ScrollMgr::Instance()->Update(cPos);
+	}
 
 	//パーティクル更新
 	ParticleMgr::Instance()->Update();
