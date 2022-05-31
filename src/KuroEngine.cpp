@@ -88,7 +88,7 @@ void KuroEngine::Initialize(const EngineOption& Option)
 	srand(time(NULL));
 
 	//ウィンドウアプリ生成
-	winApp = std::make_unique<WinApp>(Option.windowName, Option.windowSize, Option.iconPath);
+	winApp = std::make_unique<WinApp>(Option.windowName, Option.windowSize, false, Option.iconPath);
 
 	//D3D12アプリ生成
 	d3d12App = std::make_unique<D3D12App>(winApp->GetHwnd(), Option.windowSize, Option.useHDR, Option.backBuffClearColor);
