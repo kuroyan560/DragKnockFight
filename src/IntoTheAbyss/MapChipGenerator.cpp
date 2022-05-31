@@ -143,6 +143,7 @@ void MapChipGenerator_SplineOrbit::Update()
 #include"DrawFunc.h"
 #include"ScrollMgr.h"
 #include"TexHandleMgr.h"
+#include "GameSceneCamerMove.h"
 void MapChipGenerator_SplineOrbit::Draw()
 {
 	static int ARROW_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/arrow.png");
@@ -163,7 +164,7 @@ void MapChipGenerator_SplineOrbit::Draw()
 		else if (winSize.y < drawPos.y - ARROW_SIZE.y)drawPos.y = winSize.y - ARROW_SIZE.y;
 
 		float rad = KuroFunc::GetAngle(WinApp::Instance()->GetExpandWinCenter(), drawPos);
-		DrawFunc::DrawRotaGraph2D(drawPos, { ARROW_EXP,ARROW_EXP }, rad, TexHandleMgr::GetTexBuffer(ARROW_HANDLE));
+		DrawFunc::DrawRotaGraph2D(drawPos + GameSceneCameraMove::Instance()->move, { ARROW_EXP,ARROW_EXP }, rad, TexHandleMgr::GetTexBuffer(ARROW_HANDLE));
 	}
 	else
 	{
@@ -189,7 +190,7 @@ void MapChipGenerator_SplineOrbit::Draw()
 
 			// 描画する座標
 			Vec2<float> drawPos = targetPos[i] + vecNorm * (DRAW_POINT_SPAN * index);
-			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos), exp, KuroFunc::GetAngle(vec), TexHandleMgr::GetTexBuffer(ORBIT_GRAPH));
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos) + GameSceneCameraMove::Instance()->move, exp, KuroFunc::GetAngle(vec), TexHandleMgr::GetTexBuffer(ORBIT_GRAPH));
 
 		}
 
@@ -205,12 +206,12 @@ void MapChipGenerator_SplineOrbit::Draw()
 	static const int ARROW_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/generateArrow_head.png");
 	Vec2<float> arrowVec = (targetPos[3] - targetPos[2]).GetNormal();
 	float arrowAngle = atan2f(arrowVec.y, arrowVec.x);
-	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(targetPos[3]), exp, arrowAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH));
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(targetPos[3]) + GameSceneCameraMove::Instance()->move, exp, arrowAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH));
 
 	//照準
 	for (int i = 1; i < 3; ++i)
 	{
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(targetPos[i]), { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom }, { 0.0f }, TexHandleMgr::GetTexBuffer(AIM_GRAPH));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(targetPos[i]) + GameSceneCameraMove::Instance()->move, { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom }, { 0.0f }, TexHandleMgr::GetTexBuffer(AIM_GRAPH));
 	}
 
 }
@@ -355,6 +356,7 @@ void MapChipGenerator_RandPattern::Update()
 
 #include"DrawMap.h"
 #include<map>
+#include"GameSceneCamerMove.h"
 void MapChipGenerator_RandPattern::Draw()
 {
 	static std::map<int, DrawMap>DRAW_MAP_WALL;
@@ -384,7 +386,7 @@ void MapChipGenerator_RandPattern::Draw()
 		if (drawPos.y < -DRAW_MAP_CHIP_SIZE || drawPos.y > WinApp::Instance()->GetWinSize().y + DRAW_MAP_CHIP_SIZE) continue;
 		if (!CanChange(pred.idx))continue;
 
-		chipData.pos = drawPos;
+		chipData.pos = drawPos + GameSceneCameraMove::Instance()->move;
 		chipData.alpha = predictionRate;
 
 		if (pred.type == MAPCHIP_TYPE_STATIC_RARE_BLOCK)
@@ -479,7 +481,7 @@ void MapChipGenerator_ChangeMap::Draw()
 	{
 		ChipData chipData;
 		// スクロール量から描画する位置を求める。
-		const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ pred.idx.x * MAP_CHIP_SIZE,pred.idx.y * MAP_CHIP_SIZE });
+		const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ pred.idx.x * MAP_CHIP_SIZE,pred.idx.y * MAP_CHIP_SIZE }) + GameSceneCameraMove::Instance()->move;
 
 		// 画面外だったら描画しない。
 		if (drawPos.x < -DRAW_MAP_CHIP_SIZE || drawPos.x > WinApp::Instance()->GetWinSize().x + DRAW_MAP_CHIP_SIZE) continue;
