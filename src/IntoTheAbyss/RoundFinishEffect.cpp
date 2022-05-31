@@ -57,6 +57,7 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 	perfectAnimIndex = 0;
 	finishLap = false;
 	cameraZoom = CameraZoom;
+	isEndResultScene = false;
 
 	int stageNum = SelectStage::Instance()->GetStageNum();
 	int roomNum = SelectStage::Instance()->GetRoomNum();
@@ -171,7 +172,8 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 			perfectPos = WinApp::Instance()->GetWinDifferRate() * Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
 			perfectExp = { 0.0f,0.0f };
 			perfectMoveAmount = PERFECT_MOVE_POS_Y;
-
+			
+			AudioApp::Instance()->StopWave(READY_EXPLOSION_SE);
 			AudioApp::Instance()->PlayWave(EXPLOSION_SE);
 			AudioApp::Instance()->PlayWave(evaluationSoundHandle[soundType]);
 		}
@@ -199,7 +201,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			//ScoreManager::Instance()->AddDestroyPoint();
 			addScoreFlag = true;
-			
+
 			UsersInput::Instance()->ShakeController(0, 0.5f, 12);
 
 			// ラウンド数のUIを更新。
@@ -208,9 +210,13 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		}
 		else if (timer < NUM3_ENEMY_EXP_TIMER / 2.0f) {
 
-			// カメラを一気に引く。
-			Camera::Instance()->Focus(LineCenterPos, cameraZoom, 0.3f);
-			UsersInput::Instance()->ShakeController(0, 1.0f, 5);
+			if (SelectStage::Instance()->HaveNextLap()) {
+
+				// カメラを一気に引く。
+				Camera::Instance()->Focus(LineCenterPos, cameraZoom, 0.3f);
+				UsersInput::Instance()->ShakeController(0, 1.0f, 5);
+
+			}
 
 		}
 
@@ -249,14 +255,15 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		{
 			playerDefPos = StageMgr::Instance()->GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
 			enemyDefPos = StageMgr::Instance()->GetBossResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+
+
+			Camera::Instance()->Init();
+
+			CharacterManager::Instance()->Left()->pos += (playerDefPos - CharacterManager::Instance()->Left()->pos) / 30.0f;
+			CharacterManager::Instance()->Right()->pos += (enemyDefPos - CharacterManager::Instance()->Right()->pos) / 30.0f;
 		}
 		//playerDefPos = Vec2<float>(100, 700);
 		//enemyDefPos = Vec2<float>(5000, 700);
-
-		Camera::Instance()->Init();
-
-		CharacterManager::Instance()->Left()->pos += (playerDefPos - CharacterManager::Instance()->Left()->pos) / 30.0f;
-		CharacterManager::Instance()->Right()->pos += (enemyDefPos - CharacterManager::Instance()->Right()->pos) / 30.0f;
 
 		++timer;
 		if (NUM4_RETURN_DEFPOS_TIMER <= timer) {
@@ -270,6 +277,8 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 			perfectExp = {};
 
 			ScoreManager::Instance()->destroyPoint = 0;
+
+			isEndResultScene = true;
 
 		}
 

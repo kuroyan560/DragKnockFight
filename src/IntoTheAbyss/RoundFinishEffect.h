@@ -31,6 +31,8 @@ public:
 
 	int useGraph;
 
+	bool isEndResultScene;
+
 	int perfectAnimTimer;
 	int perfectAnimIndex;
 	float perfectMoveAmount;

@@ -633,7 +633,6 @@ void Game::Update(const bool& Loop)
 		RoundFinishEffect::Instance()->addScoreFlag = false;
 	}
 
-
 	miniMap.Update();
 	screenEdgeEffect.Update();
 
@@ -1387,7 +1386,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 		}
 
 		// ラウンド終了時演出の更新処理
-		RoundFinishEffect::Instance()->Update(DistanceCounter::Instance()->lineCenterPos, isFinalRound);
+		RoundFinishEffect::Instance()->Update(DistanceCounter::Instance()->lineCenterPos);
 
 		// ラウンド終了時演出が終わったかどうか
 		bool isEnd = RoundFinishEffect::Instance()->isEnd;
