@@ -54,6 +54,7 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 	perfectAnimTimer = 0;
 	perfectAnimIndex = 0;
 	finishLap = false;
+	isEndResultScene = false;
 	cameraZoom = CameraZoom;
 
 	int stageNum = SelectStage::Instance()->GetStageNum();
@@ -83,7 +84,7 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 
 }
 
-void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
+void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos, const bool& IsFinalRound)
 {
 
 	static const int EXPLOSION_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/break.wav");
@@ -164,6 +165,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			AudioApp::Instance()->PlayWave(EXPLOSION_SE);
 			AudioApp::Instance()->PlayWave(evaluationSoundHandle[soundType]);
+			AudioApp::Instance()->StopWave(READY_EXPLOSION_SE);
 		}
 
 		break;
@@ -197,7 +199,9 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		else if (timer < NUM3_ENEMY_EXP_TIMER / 2.0f) {
 
 			// カメラを一気に引く。
-			Camera::Instance()->Focus(LineCenterPos, cameraZoom, 0.3f);
+			if (SelectStage::Instance()->HaveNextLap()) {
+				Camera::Instance()->Focus(LineCenterPos, cameraZoom, 0.3f);
+			}
 			UsersInput::Instance()->ShakeController(0, 1.0f, 5);
 
 		}
@@ -206,8 +210,10 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			timer = 0;
 			status = EFFECT_STATUS::NUM4_RETURN_DEFPOS;
-			changeMap = true;
-			std::dynamic_pointer_cast<Boss>(CharacterManager::Instance()->Right())->anim->ChangeAnim(Boss::EXPLOSION_CLOSE);
+			if (SelectStage::Instance()->HaveNextLap()) {
+				changeMap = true;
+				std::dynamic_pointer_cast<Boss>(CharacterManager::Instance()->Right())->anim->ChangeAnim(Boss::EXPLOSION_CLOSE);
+			}
 		}
 
 		// パーフェクトの画像を動かす。
@@ -237,14 +243,14 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		{
 			playerDefPos = StageMgr::Instance()->GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
 			enemyDefPos = StageMgr::Instance()->GetBossResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+
+			CharacterManager::Instance()->Left()->pos += (playerDefPos - CharacterManager::Instance()->Left()->pos) / 30.0f;
+			CharacterManager::Instance()->Right()->pos += (enemyDefPos - CharacterManager::Instance()->Right()->pos) / 30.0f;
+
+			Camera::Instance()->Init();
 		}
 		//playerDefPos = Vec2<float>(100, 700);
 		//enemyDefPos = Vec2<float>(5000, 700);
-
-		Camera::Instance()->Init();
-
-		CharacterManager::Instance()->Left()->pos += (playerDefPos - CharacterManager::Instance()->Left()->pos) / 30.0f;
-		CharacterManager::Instance()->Right()->pos += (enemyDefPos - CharacterManager::Instance()->Right()->pos) / 30.0f;
 
 		++timer;
 		if (NUM4_RETURN_DEFPOS_TIMER <= timer) {
@@ -259,6 +265,8 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			ScoreManager::Instance()->destroyPoint = 0;
 
+			isEndResultScene = true;
+
 		}
 
 		break;
@@ -271,14 +279,19 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 		++timer;
 
-		// 座標を規定値に戻す。
-		if (SelectStage::Instance()->HaveNextLap())
-		{
-			playerDefPos = StageMgr::Instance()->GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
-			enemyDefPos = StageMgr::Instance()->GetBossResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
-		}
+		// 最終ラウンドだったら動かさない
+		if (!IsFinalRound) {
 
-		CharacterManager::Instance()->Left()->pos += (playerDefPos - CharacterManager::Instance()->Left()->pos) / 30.0f;
+			// 座標を規定値に戻す。
+			if (SelectStage::Instance()->HaveNextLap())
+			{
+				playerDefPos = StageMgr::Instance()->GetPlayerResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+				enemyDefPos = StageMgr::Instance()->GetBossResponePos(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum() + 1);
+			}
+
+			CharacterManager::Instance()->Left()->pos += (playerDefPos - CharacterManager::Instance()->Left()->pos) / 30.0f;
+
+		}
 
 
 		if (NUM5_RETURN_PLAYER_DEF_POS <= timer) {

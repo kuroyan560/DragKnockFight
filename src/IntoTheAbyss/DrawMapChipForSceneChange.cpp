@@ -137,7 +137,7 @@ void DrawMapChipForSceneChange::Draw(const float& ChangeRate)
 			commentSprite->mesh.AddUv({ SCROLL,0.0f }, { SCROLL,0.0f }, { SCROLL,0.0f }, { SCROLL,0.0f });
 		}
 		commentSprite->transform.SetPos({ WinApp::Instance()->GetExpandWinSize().x,KuroMath::Lerp(0.0f,-128.0f,ChangeRate) });
-		DrawFunc::DrawBox2D({ 0,0 }, commentSprite->mesh.GetSize() * Vec2<float>(1.0f, 1.3f), Color(0.0f, 0.0f, 0.0f, 0.7f), true, AlphaBlendMode_Trans);
+		DrawFunc::DrawBox2D({ 0,0 }, commentSprite->mesh.GetSize() * Vec2<float>(1.0f, 1.3f), Color(0.0f, 0.0f, 0.0f, 0.7f * KuroMath::Lerp(1.0f, 0.0f, ChangeRate)), true, AlphaBlendMode_Trans);
 		commentSprite->Draw();
 
 		crt.Excute(D3D12App::Instance()->GetCmdList(), mapBuffer);

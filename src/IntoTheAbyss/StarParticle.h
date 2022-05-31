@@ -21,5 +21,6 @@ private:
 	int finishTimer;
 	bool finishFlag;
 	bool initFlag;
+	float alphaRad;
 };
 

@@ -24,8 +24,19 @@ class ResultScene : public BaseScene
 	int goodHandle;				//Goodの画像ハンドル
 	int greatHandle;			//Greatの画像ハンドル
 	int excellentHandle;		//Excellentの画像ハンドル
-	int evaluationNowHandle;	
-	bool evaluationFlag;		
+	int evaluationNowHandle;
+	bool evaluationFlag;
+
+	bool isNewRecord;			// 新記録かどうかのフラグ
+	bool isNewRecordActive;
+	Vec2<float> newRecordPos;
+	Vec2<float> newRecordExp;
+	int newRecordTimer;
+	int newRecordAlpha;
+	int newRecordIndex;
+	int newRecordAnimTimer;
+	std::array<int, 3> newRecordHandle;
+
 	float lissajousTimer;
 	std::array<int, 3> perfectHandle; //スラッシュ
 	std::array<int, 12> blueNumberHandle;// 青の数字の画像ハンドル
@@ -59,7 +70,7 @@ class ResultScene : public BaseScene
 	bool timeUpFlag;
 	float evaluationPosX;
 
-	int perfectIndex,perfectInterval;
+	int perfectIndex, perfectInterval;
 
 	// 各タイマー
 	int resultUITimer;			// リザルトの画像のイージングに使用するタイマー
@@ -77,7 +88,7 @@ class ResultScene : public BaseScene
 	int winnerGraph[PLAYABLE_CHARACTER_NUM];
 	PLAYABLE_CHARACTER_NAME winnerName;
 
-	Vec2<float> nowSize,breakSize, maxSize;
+	Vec2<float> nowSize, breakSize, maxSize;
 
 	CRT crt;
 	bool endFlg = false;
@@ -151,5 +162,5 @@ private:
 		std::reverse(Number.begin(), Number.end());
 		return Number;
 	}
-	void DrawBreakCount(float scoreEasingAmount,int BREAK_NOW_COUNT, int BREAK_MAX_COUNT, float OFFSET_X, Vec2<float> LISSAJOUS);
+	void DrawBreakCount(float scoreEasingAmount, int BREAK_NOW_COUNT, int BREAK_MAX_COUNT, float OFFSET_X, Vec2<float> LISSAJOUS);
 };

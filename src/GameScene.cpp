@@ -55,6 +55,8 @@ void GameScene::OnUpdate()
 	bool changeInput = UsersInput::Instance()->KeyOnTrigger(DIK_B) || UsersInput::Instance()->ControllerOnTrigger(0, START);
 	if (changeInput)
 	{
+		static int bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
+		AudioApp::Instance()->StopWave(bgm);
 		SelectStage::Instance()->moveToStageSelectFlag = true;
 		KuroEngine::Instance().ChangeScene(1, sceneChange);
 	}
