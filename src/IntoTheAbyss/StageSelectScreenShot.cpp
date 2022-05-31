@@ -36,7 +36,7 @@ void StageSelectScreenShot::Init(bool MOVE_FROM_GAME_FLAG)
 {
 	screenShotLerpData.Init(Vec2<float>(640.0f, 360.0f), Vec2<float>(1.12f, 1.0f), Vec2<float>(0.0f, 0.0f), Vec2<float>(0.0f, 0.0f));
 	stageNumberData.Init(Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), 610.0f), Vec2<float>(1.0f, 1.0f), Vec2<float>(0.0f, 0.0f), Vec2<float>(0.0f, 0.0f));
-	stageNumberData.timer = 1.0f;
+	stageNumberData.timer = 0.0f;
 	expData.Init(Vec2<float>(0, 0), Vec2<float>(0, 0), Vec2<float>(0.0f, 0.0f), Vec2<float>(0.0f, 0.0f));
 	stageNumberExpData.Init(Vec2<float>(0, 0), Vec2<float>(0, 0), Vec2<float>(0.0f, 0.0f), Vec2<float>(0.0f, 0.0f));
 	zoomOutFlag = false;

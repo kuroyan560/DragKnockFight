@@ -44,8 +44,12 @@ void StageSelectScene::OnInitialize()
 
 
 	// 各矢印を初期化
-	rightArrow.Init(Vec2<float>(1180.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), 0);
-	leftArrow.Init(Vec2<float>(100.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), DirectX::XM_PI);
+	rightArrow.Init(Vec2<float>(3000, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), Vec2<float>(1180.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), 0);
+	leftArrow.Init(Vec2<float>(-2000, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), Vec2<float>(100.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), DirectX::XM_PI);
+
+	rightArrow.SetDefPos();
+	leftArrow.SetDefPos();
+
 	// 各キャラの画像を初期化。
 	Vec2<float> leftCharaPos = Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x * 0.25f + 55.0f), static_cast<float>(WinApp::Instance()->GetWinCenter().y - 7.0f));
 	leftChara.Init(Vec2<float>(-550.0f, 881.0f), leftCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/luna.png"));
