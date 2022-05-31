@@ -6,9 +6,16 @@ StageComment::StageComment()
 {
 	nonCommentHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/non.png");
 
-	stageComment.resize(2);
-	stageComment[0] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/non.png");
-	stageComment[1] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/non.png");
+	int stageNum = 0;
+	while (KuroFunc::ExistFile("resource/ChainCombat/select_scene/stage_tag/" + std::to_string(stageNum) + ".png"))
+	{
+		stageNum++;
+	}
+	stageComment.resize(stageNum);
+	for (int i = 0; i < stageNum; ++i)
+	{
+		stageComment[i] = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/stage_tag/" + std::to_string(i) + ".png");
+	}
 
 	commentSprite = std::make_shared<Sprite>(nullptr, "StageCommentSprite");
 	changeRate = 1.0f;
@@ -60,6 +67,6 @@ void StageComment::Draw()
 	Vec2<float>rightDownPos(WinApp::Instance()->GetExpandWinSize());
 
 
-	DrawFunc::DrawBox2D(leftUpPos, rightDownPos, Color(0.0f, 0.0f, 0.0f, 0.7f), true, AlphaBlendMode_Trans);
+	DrawFunc::DrawBox2D(leftUpPos, rightDownPos, Color(0.0f, 0.0f, 0.0f, 0.5f), true, AlphaBlendMode_Trans);
 	commentSprite->Draw();
 }
