@@ -787,7 +787,9 @@ void Game::Update(const bool& Loop)
 	}
 
 	// 紐の距離を計算するクラスを更新する。
-	DistanceCounter::Instance()->Update();
+	if (!roundFinishFlag) {
+		DistanceCounter::Instance()->Update();
+	}
 
 	// ラウンド数のUIを更新。
 	RoundCountMgr::Instance()->Update();
@@ -1428,7 +1430,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 				turnResultScene = true;
 
 				// リザルトシーンではDistanceCounterのPosを中心に星を生成するので、演出用でずらした値を入れる。
-				DistanceCounter::Instance()->lineCenterPos.y -= TRANSITION_MOVE_Y;
+				DistanceCounter::Instance()->lineCenterPos.y += TRANSITION_MOVE_Y;
 
 				// 各変数を初期化
 				trasitionTimer = 0;
