@@ -9,6 +9,8 @@
 #include"EavaluationDataMgr.h"
 #include"ClearInfoContainer.h"
 #include"CharacterManager.h"
+#include"ShakeMgr.h"
+#include"AudioApp.h"
 
 StageMgr::StageMgr()
 {
@@ -397,6 +399,8 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM,
 			// 左側のキャラと円形の当たり判定を行って、当たっていたら
 			if (Vec2<float>(mapChipPos - CharacterManager::Instance()->Right()->pos).Length() <= MAP_CHIP_SIZE + MAP_CHIP_SIZE + CharacterManager::Instance()->Right()->size.x) {
 
+				bool isStuck = false;
+
 				// マップチップが進んでいる方向によって
 				switch (MoveDir)
 				{
@@ -405,7 +409,7 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM,
 					// 上から下に進んでいたら。
 					if ((CharacterManager::Instance()->Right()->isHitTop && CharacterManager::Instance()->Right()->isHitBottom) && CharacterManager::Instance()->Right()->pos.y <= mapChipPos.y && CharacterManager::Instance()->Right()->size.y * 0.75f <= fabs(mapChipPos.x - CharacterManager::Instance()->Right()->pos.x)) {
 
-						CharacterManager::Instance()->Right()->isStuckDead = true;
+						isStuck = true;
 
 					}
 
@@ -415,7 +419,7 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM,
 					// 下から上に進んでいたら。
 					if ((CharacterManager::Instance()->Right()->isHitTop && CharacterManager::Instance()->Right()->isHitBottom) && mapChipPos.y <= CharacterManager::Instance()->Right()->pos.y && CharacterManager::Instance()->Right()->size.y * 0.75f <= fabs(mapChipPos.x - CharacterManager::Instance()->Right()->pos.x)) {
 
-						CharacterManager::Instance()->Right()->isStuckDead = true;
+						isStuck = true;
 
 					}
 
@@ -425,7 +429,7 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM,
 					// 左から右に進んでいたら。
 					if ((CharacterManager::Instance()->Right()->isHitLeft && CharacterManager::Instance()->Right()->isHitRight) && mapChipPos.x <= CharacterManager::Instance()->Right()->pos.x && CharacterManager::Instance()->Right()->size.x * 0.75f <= fabs(mapChipPos.y - CharacterManager::Instance()->Right()->pos.y)) {
 
-						CharacterManager::Instance()->Right()->isStuckDead = true;
+						isStuck = true;
 
 					}
 
@@ -435,13 +439,27 @@ void StageMgr::WriteMapChipData(const Vec2<int> MAPCHIP_NUM, const int& CHIPNUM,
 					// 右から左に進んでいたら。
 					if ((CharacterManager::Instance()->Right()->isHitLeft && CharacterManager::Instance()->Right()->isHitRight) && CharacterManager::Instance()->Right()->pos.x <= mapChipPos.x && CharacterManager::Instance()->Right()->size.x * 0.75f <= fabs(mapChipPos.y - CharacterManager::Instance()->Right()->pos.y)) {
 
-						CharacterManager::Instance()->Right()->isStuckDead = true;
+						isStuck = true;
 
 					}
 
 					break;
 				default:
 					break;
+				}
+
+				if (isStuck && !CharacterManager::Instance()->Right()->isStuckDead) {
+
+					// シェイクを発生させる。
+					ShakeMgr::Instance()->SetShake(30);
+
+					// 殺す
+					CharacterManager::Instance()->Right()->isStuckDead = true;
+
+					// 音声をロード
+					static const int STUCK_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/stuckSE.wav");
+					AudioApp::Instance()->PlayWave(STUCK_SE);
+
 				}
 
 			}
