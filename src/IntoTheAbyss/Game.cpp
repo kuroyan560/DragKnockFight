@@ -622,7 +622,7 @@ void Game::Update(const bool& Loop)
 
 	if (RoundFinishEffect::Instance()->addScoreFlag)
 	{
-		ScoreManager::Instance()->Add(countBlock.countAllBlockNum - countBlock.countNowBlockNum);
+		ScoreManager::Instance()->Add(countBlock.GetBlockNum());
 		RoundFinishEffect::Instance()->addScoreFlag = false;
 	}
 
@@ -643,7 +643,7 @@ void Game::Update(const bool& Loop)
 	StunEffect::Instance()->Update();
 
 	//スコアを常に代入
-	ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.countAllBlockNum - countBlock.countNowBlockNum);
+	ScoreKeep::Instance()->AddScore(stageRap.GetRapNum() - 1, countBlock.GetBlockNum());
 
 	// 中心点を計算。
 	CalCenterPos();
