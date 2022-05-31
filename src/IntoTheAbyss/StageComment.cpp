@@ -17,15 +17,15 @@ StageComment::StageComment()
 void StageComment::Init(int STAGE_NUM)
 {
 	stageNum = STAGE_NUM;
+	prevStageNum = -1;
 }
 
 void StageComment::Update()
 {
 	//ステージコメント
-	static int OLD_STAGE_NUM = -1;
 	static int COMMENT_MOVE_WAIT_TIMER = 0;
 	static const int COMMENT_MOVE_WAIT_TOTAL_TIME = 45;
-	if (OLD_STAGE_NUM != stageNum)
+	if (prevStageNum != stageNum)
 	{
 		int commentGraph = nonCommentHandle;
 		if (stageNum < stageComment.size())
@@ -35,11 +35,11 @@ void StageComment::Update()
 		commentSprite->SetTexture(TexHandleMgr::GetTexBuffer(commentGraph));
 		commentSprite->mesh.SetUv(0.0f, 1.0f, 0.0f, 1.0f);
 
-		Vec2<float>data(TexHandleMgr::GetTexBuffer(commentGraph)->GetGraphSize().Float().x / 2.0f, TexHandleMgr::GetTexBuffer(commentGraph)->GetGraphSize().Float().y);
+		Vec2<float>data(TexHandleMgr::GetTexBuffer(commentGraph)->GetGraphSize().Float().x / 2.0f + 200.0f, TexHandleMgr::GetTexBuffer(commentGraph)->GetGraphSize().Float().y);
 		commentSprite->mesh.SetSize(data);
 		commentSprite->mesh.SetAnchorPoint({ 1.0f,0.0f });
 		COMMENT_MOVE_WAIT_TIMER = 0;
-		OLD_STAGE_NUM = stageNum;
+		prevStageNum = stageNum;
 	}
 	COMMENT_MOVE_WAIT_TIMER++;
 	if (COMMENT_MOVE_WAIT_TOTAL_TIME <= COMMENT_MOVE_WAIT_TIMER)
@@ -56,8 +56,8 @@ void StageComment::Draw()
 {
 	//DrawFunc::DrawBox2D({ 0,0 }, commentSprite->mesh.GetSize() * Vec2<float>(1.0f, 1.3f), Color(0.0f, 0.0f, 0.0f, 0.7f * KuroMath::Lerp(1.0f, 0.0f, changeRate)), true, AlphaBlendMode_Trans);
 	Vec2<float>size(commentSprite->mesh.GetSize() * Vec2<float>(1.0f, 1.3f));
-	Vec2<float>leftUpPos(commentSprite->transform.GetPos().x - size.x, commentSprite->transform.GetPos().y);
-	Vec2<float>rightDownPos(leftUpPos + size);
+	Vec2<float>leftUpPos(0.0f, commentSprite->transform.GetPos().y);
+	Vec2<float>rightDownPos(WinApp::Instance()->GetExpandWinSize());
 
 
 	DrawFunc::DrawBox2D(leftUpPos, rightDownPos, Color(0.0f, 0.0f, 0.0f, 0.7f), true, AlphaBlendMode_Trans);

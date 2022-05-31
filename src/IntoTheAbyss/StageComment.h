@@ -18,5 +18,8 @@ private:
 
 	int nonCommentHandle;
 	std::vector<int>stageComment;
+
+
+	int prevStageNum;
 };
 
