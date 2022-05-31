@@ -19,7 +19,7 @@ GameScene::GameScene()
 {
 	addValue = 10.0f;
 
-	sceneChange = std::make_shared<SceneCange>();
+	sceneChange = std::make_shared<SceneTransitionDrawScreenShot>();
 
 
 	//imguiHandle = DebugImGuiManager::Instance()->Add("Round");

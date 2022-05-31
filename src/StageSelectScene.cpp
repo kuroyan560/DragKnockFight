@@ -5,6 +5,7 @@
 #include"IntoTheAbyss/StageSelectOffsetPosDebug.h"
 #include"DrawFunc.h"
 #include"WinApp.h"
+#include"IntoTheAbyss/StageSelectTransfer.h"
 
 StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 {
@@ -160,7 +161,6 @@ void StageSelectScene::OnUpdate()
 			mapScreenShot[stageNum][STAGE_SELECT].Finalize();
 			mapScreenShot[stageNum][SCENE_CHANGE].Finalize();
 
-
 			PLAYABLE_CHARACTER_NAME charaName = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), 0).characterName;
 			CharacterManager::Instance()->CharactersSelectInit(charaName);
 		}
@@ -258,6 +258,7 @@ void StageSelectScene::OnUpdate()
 
 	maskSceneChange->backGroundTex = mapScreenShot[stageNum][SCENE_CHANGE].mapBuffer;
 	screenShot.screenShot = mapScreenShot[stageNum][STAGE_SELECT].mapBuffer;
+	StageSelectTransfer::Instance()->screenShot = screenShot.screenShot;
 
 	backAlpha -= backAlpha / 10.0f;
 
