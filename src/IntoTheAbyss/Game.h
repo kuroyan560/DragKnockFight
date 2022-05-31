@@ -156,7 +156,7 @@ class Game
 	bool isTransitionResult;
 	int trasitionTimer;
 	const int TRANSITION_TIMER = 120;
-	const float TRANSITION_MOVE_Y = 2000;
+	const float TRANSITION_MOVE_Y = 4000;
 
 
 	StageComment stageComment;
@@ -169,6 +169,7 @@ public:
 
 	Game();
 	void Init(const bool& PractiveMode = false);
+	void InitRestart(const bool& PractiveMode = false);
 	void Update(const bool& Loop = false);
 	void Draw();
 	void Scramble();

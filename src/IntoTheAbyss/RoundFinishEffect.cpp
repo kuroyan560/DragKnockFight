@@ -21,12 +21,11 @@ RoundFinishEffect::RoundFinishEffect()
 	isEnd = true;
 	shakeAmount = Vec2<float>();
 
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/perfect.png", 3, Vec2<int>(3, 1), perfectGraph.data());
 	failGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/failed.png");
 	goodGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
 	greatGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/great.png");
 	excellentGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellent.png");
-
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/perfect.png", 3, Vec2<int>(3, 1), perfectGraph.data());
 
 	evaluationSoundHandle = EvaluationMgr::Instance()->soundData;
 }
@@ -66,6 +65,8 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 	static const float FAIL_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).failRate;
 	static const float GOOD_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).goodRate;
 	static const float GREAT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).greatRate;
+	static const float EXCELLENT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).excellentRate;
+	static const float PERFECT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).perfectRate;
 
 	// 引数の割合からどの画像を使用するかをチェックする。
 	if (Rate <= FAIL_PER)
@@ -87,11 +88,17 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 		useGraph = greatGraph;
 
 	}
-	else {
+	else if (Rate <= EXCELLENT_PER)
+	{
 
 		soundType = SOUND_EXCELLENT;
 		useGraph = excellentGraph;
 
+	}
+	else
+	{
+		soundType = SOUND_PERFECT;
+		useGraph = excellentGraph;
 	}
 	addScoreFlag = false;
 }

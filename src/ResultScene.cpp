@@ -338,7 +338,7 @@ void ResultScene::OnUpdate()
 	}
 
 	// 超極稀にキャラクターを左上の方に飛ばす。
-	int random = KuroFunc::GetRand(0, 1000);
+	int random = KuroFunc::GetRand(0, 500);
 	if (random == 50 && !((0 < backGroundCharaPos.x && backGroundCharaPos.x < windowSize.x) && (0 < backGroundCharaPos.y || backGroundCharaPos.y < windowSize.y))) {
 
 		backGroundCharaPos = { 2000,-1000 };
