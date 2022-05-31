@@ -55,5 +55,11 @@ public:
 		return data[STAGE_NUM][ROOM_NUM];
 	};
 
+	StageEvaluationData GetResultData(int STAGE_NUM)
+	{
+		return resultData[STAGE_NUM];
+	};
+
+
 	const int PERFECT_ANIMATION_INTERVAL = 3;
 };
