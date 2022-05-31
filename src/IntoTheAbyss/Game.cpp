@@ -508,6 +508,11 @@ void Game::Init(const bool& PracticeMode)
 	GameSceneCameraMove::Instance()->move = {};
 	rStickNoInputTimer = 0;
 
+	RoundFinishEffect::Instance()->Init();
+
+	static const int READY_EXPLOSION_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/readyExplosion.wav", 0.5f);
+	AudioApp::Instance()->StopWave(READY_EXPLOSION_SE);
+
 	isTransitionResult = false;
 	trasitionTimer = 0;
 
@@ -1223,16 +1228,16 @@ void Game::SwitchingStage()
 	}
 
 
-	const bool done = /*UsersInput::Instance()->KeyOnTrigger(DIK_RETURN)
-		||*/ (UsersInput::Instance()->ControllerInput(0, A) && UsersInput::Instance()->ControllerOnTrigger(0, B))
-		|| (UsersInput::Instance()->ControllerOnTrigger(0, A) && UsersInput::Instance()->ControllerInput(0, B));
-	if (done)
-	{
-		SelectStage::Instance()->SelectStageNum(debugStageData[0]);
-		SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
+	//const bool done = /*UsersInput::Instance()->KeyOnTrigger(DIK_RETURN)
+	//	||*/ (UsersInput::Instance()->ControllerInput(0, A) && UsersInput::Instance()->ControllerOnTrigger(0, B))
+	//	|| (UsersInput::Instance()->ControllerOnTrigger(0, A) && UsersInput::Instance()->ControllerInput(0, B));
+	//if (done)
+	//{
+	//	SelectStage::Instance()->SelectStageNum(debugStageData[0]);
+	//	SelectStage::Instance()->SelectRoomNum(debugStageData[1]);
 
-		InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-	}
+	//	InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	//}
 
 }
 

@@ -42,6 +42,7 @@ void RoundFinishEffect::Init()
 	shakeAmount = Vec2<float>();
 	changeMap = false;
 	perfectExp = {};
+	RoundFinishParticleMgr::Instance()->Init();
 }
 
 void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const float& CameraZoom)
@@ -173,7 +174,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 			perfectPos = WinApp::Instance()->GetWinDifferRate() * Vec2<float>(static_cast<float>(WinApp::Instance()->GetWinCenter().x), static_cast<float>(WinApp::Instance()->GetWinCenter().y));
 			perfectExp = { 0.0f,0.0f };
 			perfectMoveAmount = PERFECT_MOVE_POS_Y;
-			
+
 			AudioApp::Instance()->StopWave(READY_EXPLOSION_SE);
 			AudioApp::Instance()->PlayWave(EXPLOSION_SE);
 			AudioApp::Instance()->PlayWave(evaluationSoundHandle[soundType]);

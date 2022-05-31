@@ -70,6 +70,13 @@ void GameScene::OnUpdate()
 		KuroEngine::Instance().ChangeScene(1, sceneChange);
 	}
 
+	bool restartInput = UsersInput::Instance()->ControllerOnTrigger(0, BACK);
+	if (restartInput) {
+
+		game.Init();
+
+	}
+
 }
 
 void GameScene::OnDraw()
