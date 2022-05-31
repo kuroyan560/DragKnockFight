@@ -1309,8 +1309,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 
 		bool isFinalRound = false;
 
-		if (RoundFinishEffect::Instance()->changeMap &&
-			!SelectStage::Instance()->HaveNextLap() && RoundFinishEffect::Instance()->changeMap)
+		if (!SelectStage::Instance()->HaveNextLap() && RoundFinishEffect::Instance()->changeMap)
 		{
 			ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
 			if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();

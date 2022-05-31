@@ -59,6 +59,7 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 	perfectAnimTimer = 0;
 	perfectAnimIndex = 0;
 	finishLap = false;
+	isEndResultScene = false;
 	cameraZoom = CameraZoom;
 
 	int stageNum = SelectStage::Instance()->GetStageNum();
