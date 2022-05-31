@@ -424,6 +424,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 	bossHandMgr->Init(false);
 	playerHandMgr->Init(false);
+
+	stageComment.Init(0);
 }
 
 void Game::GeneratorInit()
@@ -694,6 +696,7 @@ void Game::Update(const bool& Loop)
 
 	countBlock.Update();
 	stageRap.Update();
+	stageComment.Update();
 
 	// スタミナアイテムの更新処理
 	if (!readyToStartRoundFlag) {
@@ -779,6 +782,8 @@ void Game::Draw()
 	prevDrawChipRoomNum = roomNum;
 	DrawMapChip(*mapData, stageNum, roomNum);
 
+
+	stageComment.Draw();
 
 	// ラウンド終了時のパーティクルを描画
 	RoundFinishParticleMgr::Instance()->Draw();
