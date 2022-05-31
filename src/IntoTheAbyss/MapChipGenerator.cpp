@@ -104,6 +104,7 @@ MapChipGenerator_SplineOrbit::MapChipGenerator_SplineOrbit()
 	t = 0.0f;
 }
 
+#include"ParticleMgr.h"
 void MapChipGenerator_SplineOrbit::Update()
 {
 	std::vector<Vec2<float>>targetPosVector;
@@ -128,6 +129,15 @@ void MapChipGenerator_SplineOrbit::Update()
 		t += 0.02f * GetDistRate();
 		if (1.0f < t)t = 1.0f;
 	}
+
+	static int EMIT_TIMER = 0;
+	const int EMIT_SPAN = 3;
+	if (EMIT_SPAN < EMIT_TIMER)
+	{
+		ParticleMgr::Instance()->Generate(pos, { 0,0 }, CHIP_SPLINE_GENERATOR);
+		EMIT_TIMER = 0;
+	}
+	EMIT_TIMER++;
 }
 
 #include"DrawFunc.h"
@@ -135,9 +145,10 @@ void MapChipGenerator_SplineOrbit::Update()
 #include"TexHandleMgr.h"
 void MapChipGenerator_SplineOrbit::Draw()
 {
-	static int ARROW_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/arrow_enemy.png");
+	static int ARROW_HANDLE = TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/arrow.png");
 	static const float ARROW_EXP = 0.4f;
 	static auto ARROW_SIZE = TexHandleMgr::GetTexBuffer(ARROW_HANDLE)->GetGraphSize() * ARROW_EXP;
+	static const int AIM_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/generateAim.png");
 
 	auto drawPos = ScrollMgr::Instance()->Affect(pos);
 	const auto drawRadius = ScrollMgr::Instance()->zoom * RADIUS;
@@ -156,16 +167,29 @@ void MapChipGenerator_SplineOrbit::Draw()
 	}
 	else
 	{
-		DrawFunc::DrawCircle2D(drawPos, drawRadius, Color(47, 255, 139, 255), false, 3);
+		//DrawFunc::DrawCircle2D(drawPos, drawRadius, Color(47, 255, 139, 255), false, 3);
+		//DrawFunc::DrawRotaGraph2D(drawPos, { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom }, { 0.0f }, TexHandleMgr::GetTexBuffer(AIM_GRAPH));
 	}
 
-	Color color(255, 255, 255, 255);
+	static const int ORBIT_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/generateArrow_point.png");
+	const float DRAW_POINT_SPAN = 64.0f;
+	Vec2<float>exp = { ScrollMgr::Instance()->zoom,ScrollMgr::Instance()->zoom };
+	for (int i = 1; i <= 2; ++i)
+	{
+		Vec2<float>vec = targetPos[i + 1] - targetPos[i];
+		Vec2<float> vecUint = vec / DRAW_POINT_SPAN;
+		int pointNum = vec.Length() / DRAW_POINT_SPAN;
+		for (int j = 0; j < pointNum; ++j)
+		{
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(targetPos[i] + vecUint * j), exp, KuroFunc::GetAngle(vec), TexHandleMgr::GetTexBuffer(ORBIT_GRAPH));
+		}
+	}
 
-	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(targetPos[1]), ScrollMgr::Instance()->Affect(targetPos[2]), color);
-	DrawFunc::DrawLine2D(ScrollMgr::Instance()->Affect(targetPos[2]), ScrollMgr::Instance()->Affect(targetPos[3]), color);
-	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(targetPos[1]), drawRadius, color);
-	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(targetPos[2]), drawRadius, color);
-	DrawFunc::DrawCircle2D(ScrollMgr::Instance()->Affect(targetPos[3]), drawRadius, color);
+	//è∆èÄ
+	for (int i = 1; i < 4; ++i)
+	{
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(targetPos[i]), { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom }, { 0.0f }, TexHandleMgr::GetTexBuffer(AIM_GRAPH));
+	}
 
 }
 

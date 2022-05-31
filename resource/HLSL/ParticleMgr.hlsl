@@ -92,7 +92,14 @@ void CSmain(uint3 DTid : SV_DispatchThreadID)
         v.radian += v.emitRadian;
         v.scale = Easing_Circ_In(v.life, v.lifeSpan, v.emitScale, 0.0f);
     }
+    //CHIP_OVERFLOW
     else if (v.type == 4)
+    {
+        v.scale = Easing_Circ_In(v.life, v.lifeSpan, v.emitScale, 0.0f);
+        v.pos += v.emitVec * v.speed;
+        v.alpha = Easing_Circ_In(v.life, v.lifeSpan, 1.0f, 0.0f);
+    }
+    else if(v.type == 5)
     {
         
     }
@@ -236,6 +243,7 @@ Texture2D<float4> tex5 : register(t5);
 Texture2D<float4> tex6 : register(t6);
 Texture2D<float4> tex7 : register(t7);
 Texture2D<float4> tex8 : register(t8);
+Texture2D<float4> tex9 : register(t9);
 SamplerState smp : register(s0);
 
 struct PSOutput
@@ -274,6 +282,8 @@ PSOutput PSmain(GSOutput input) : SV_TARGET
         result = tex7.Sample(smp, input.uv);
     if (input.texIdx == 8)
         result = tex8.Sample(smp, input.uv);
+    if (input.texIdx == 9)
+        result = tex9.Sample(smp, input.uv);
     
     //result.xyz *= ligEffect;
     result.w *= input.alpha;

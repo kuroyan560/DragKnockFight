@@ -71,6 +71,17 @@ void ParticleMgr::Particle::Generate(const Vec2<float>& GeneratePos, const Vec2<
 
 		lifeSpan = 50;
 	}
+	else if (type == PARTICLE_CUMPUTE_TYPE::CHIP_OVERFLOW)
+	{
+		speed = 2.0f;
+		emitSpeed = speed;
+		scale = KuroFunc::GetRand(40.0f, 70.0f);
+		emitScale = scale;
+		radian = 0.0f;
+		emitRadian = 0.0f;
+
+		lifeSpan = KuroFunc::GetRand(45, 90);
+	}
 }
 
 ParticleMgr::ParticleMgr()
@@ -128,16 +139,11 @@ ParticleMgr::ParticleMgr()
 		{
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"平行投影行列定数バッファ"),
 			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,"ズームとスクロールとスロー"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 0"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 1"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 2"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 3"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 4"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 5"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 6"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 7"),
-			RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,"テクスチャ情報 - 8"),
 		};
+		for (int i = 0; i < TEX_NUM; ++i)
+		{
+			ROOT_PARAMETER.emplace_back(RootParam(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, ("テクスチャ情報 - " + std::to_string(i)).c_str()));
+		}
 
 		//レンダーターゲット描画先情報
 		static std::vector<RenderTargetInfo>RENDER_TARGET_INFO =
@@ -164,6 +170,12 @@ ParticleMgr::ParticleMgr()
 
 	textures[STAR] = D3D12App::Instance()->GenerateTextureBuffer("resource/ChainCombat/star.png");
 	textures[SLIME] = D3D12App::Instance()->GenerateTextureBuffer("resource/ChainCombat/slime.png");
+
+	auto chips = D3D12App::Instance()->GenerateTextureBuffer("resource/ChainCombat/chip_particle.png", 3, { 3,1 });
+	for (int i = 0; i < CHIP_NUM; ++i)
+	{
+		textures[CHIP_0 + i] = chips[i];
+	}
 }
 
 void ParticleMgr::Init()
@@ -271,9 +283,10 @@ void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVe
 		//	EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::FAST_SMOKE, PARTICLE_TEX::SMOKE_0 + KuroFunc::GetRand(SMOKE_NUM - 1), mulCol);
 		//}
 
-		static const int STAR_EMIT_MAX = 5;
-		static const int STAR_EMIT_MIN = 2;
-		const int starNum = KuroFunc::GetRand(STAR_EMIT_MIN, STAR_EMIT_MAX);
+		//static const int STAR_EMIT_MAX = 5;
+		//static const int STAR_EMIT_MIN = 2;
+		//const int starNum = KuroFunc::GetRand(STAR_EMIT_MIN, STAR_EMIT_MAX);
+		const int starNum = 1;
 		const float starRadianUint = SMOKE_EMIT_DEGREE / starNum;
 
 		for (int i = 0; i < starNum; ++i)
@@ -292,6 +305,12 @@ void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVe
 			const Vec2<float>emitVec(cos(radUint * i), sin(radUint * i));
 			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::SLIME_EXPLOSION, PARTICLE_TEX::SLIME);
 		}
+	}
+	else if (Type == CHIP_SPLINE_GENERATOR)
+	{
+		float randAngle = Angle::ConvertToRadian(KuroFunc::GetRand(360.0f));
+		const Vec2<float>emitVec(cos(randAngle), sin(randAngle));
+		EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::CHIP_OVERFLOW, PARTICLE_TEX::CHIP_0 + KuroFunc::GetRand(CHIP_NUM - 1));
 	}
 	
 	//Send particles's info which also contains new particles.
