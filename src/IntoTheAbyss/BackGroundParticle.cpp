@@ -121,6 +121,8 @@ void BackGroundParticle::Update()
 			generatePos.x = KuroFunc::GetRand(-stageSize.x * 2.0f, stageSize.x * 2.0f + stageSize.x);
 			generatePos.y = KuroFunc::GetRand(-stageSize.y * 2.0f, stageSize.y * 2.0f + stageSize.y);
 
+			generatePos += DistanceCounter::Instance()->lineCenterPos;
+
 			Generate(generatePos, STATUS::STAY, stageSize);
 
 		}
