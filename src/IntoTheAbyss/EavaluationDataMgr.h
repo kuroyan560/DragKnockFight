@@ -1,9 +1,11 @@
 #pragma once
 #include"../Common/Singleton.h"
 #include<vector>
+#include"../Engine/AudioApp.h"
 
 enum Sound
 {
+	SOUND_FAIL,
 	SOUND_GOOD,
 	SOUND_GREAT,
 	SOUND_EXCELLENT,
@@ -12,22 +14,36 @@ enum Sound
 
 struct StageEvaluationData
 {
+	float failRate;
 	float goodRate;
 	float greatRate;
 	float excellentRate;
 	float perfectRate;
 
-	StageEvaluationData() :goodRate(0.3f), greatRate(0.5f), excellentRate(0.8f), perfectRate(1.0f)
+	StageEvaluationData() :failRate(0.0f), goodRate(0.3f), greatRate(0.5f), excellentRate(0.8f), perfectRate(1.0f)
 	{
 	}
 };
 
-class EvaluationMgr:public Singleton<EvaluationMgr>
+class EvaluationMgr :public Singleton<EvaluationMgr>
 {
 	std::vector<std::vector<StageEvaluationData>> data;
 	std::vector<StageEvaluationData> resultData;
 
+
 public:
+	std::vector<int>soundData;
+
+	EvaluationMgr()
+	{
+		soundData.resize(5);
+		soundData[SOUND_FAIL] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_good.wav", 0.13f);
+		soundData[SOUND_GOOD] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_good.wav", 0.13f);
+		soundData[SOUND_GREAT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_great.wav", 0.13f);
+		soundData[SOUND_EXCELLENT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_excellent.wav", 0.13f);
+		soundData[SOUND_PERFECT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_perfect.wav", 0.13f);
+	}
+
 	void Init(std::vector<std::vector<StageEvaluationData>> DATA, std::vector<StageEvaluationData> R_DATA)
 	{
 		data = DATA;

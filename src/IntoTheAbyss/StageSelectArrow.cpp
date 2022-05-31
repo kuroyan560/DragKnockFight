@@ -16,7 +16,6 @@ StageSelectArrow::StageSelectArrow()
 
 void StageSelectArrow::Init(const Vec2<float>& InitPos, const Vec2<float>& Pos, const float& Angle)
 {
-
 	defPos = Pos;
 	pos.Init(InitPos, Vec2<float>(1, 1), Vec2<float>(1.0f, 1.0f), Vec2<float>(1.0f, 1.0f));
 	pos.timer = 1.0f;

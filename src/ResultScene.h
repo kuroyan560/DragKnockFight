@@ -22,6 +22,7 @@ class ResultScene : public BaseScene
 	int lacyHandle;
 	int slashHandle;			//スラッシュ
 	int goodHandle;				//Goodの画像ハンドル
+	int failHandle;				//Failの画像ハンドル
 	int greatHandle;			//Greatの画像ハンドル
 	int excellentHandle;		//Excellentの画像ハンドル
 	int evaluationNowHandle;
@@ -96,7 +97,7 @@ class ResultScene : public BaseScene
 
 	int ssIntervalTimer;
 
-	std::array<int, 4>soundSe;
+	std::vector<int>soundSe;
 public:
 
 	const Vec2<int> WINDOW_CENTER = WinApp::Instance()->GetWinCenter();

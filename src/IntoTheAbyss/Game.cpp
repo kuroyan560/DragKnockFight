@@ -533,12 +533,31 @@ void Game::Init(const bool& PracticeMode)
 
 void Game::Update(const bool& Loop)
 {
+	if (UsersInput::Instance()->KeyOnTrigger(DIK_R))
+	{
+		int stageNum = SelectStage::Instance()->GetStageNum();
+		int roomNum = SelectStage::Instance()->GetRoomNum();
+		StageMgr::Instance()->SetLocalMapChipData(stageNum, roomNum);
+	}
 
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 	MapChipArray tmpMapData = *mapData;
 
 	// ステージの切り替え
 	SwitchingStage();
+
+	if (UsersInput::Instance()->KeyOnTrigger(DIK_R)) {
+
+		CharacterManager::Instance()->Left()->swingDestroyCounter.Increment();
+
+	}
+	else if (UsersInput::Instance()->KeyOnTrigger(DIK_T)) {
+
+		CharacterManager::Instance()->Left()->swingDestroyCounter.Init();
+
+	}
+
+
 
 	addLineLengthSubAmount = DebugParameter::Instance()->addLineLengthSubAmount;
 
@@ -607,6 +626,13 @@ void Game::Update(const bool& Loop)
 	CharacterManager::Instance()->Left()->CheckHit(tmpMapData, lineCenterPos, roundFinishFlag);
 	CharacterManager::Instance()->Right()->CheckHit(tmpMapData, lineCenterPos, roundFinishFlag);
 	CharacterAIData::Instance()->prevPos = CharacterManager::Instance()->Right()->pos;
+
+	if (RoundFinishEffect::Instance()->addScoreFlag)
+	{
+		ScoreManager::Instance()->Add(countBlock.countAllBlockNum - countBlock.countNowBlockNum);
+		RoundFinishEffect::Instance()->addScoreFlag = false;
+	}
+
 
 	miniMap.Update();
 	screenEdgeEffect.Update();
@@ -759,6 +785,12 @@ void Game::Draw()
 	RoundFinishParticleMgr::Instance()->Draw();
 
 
+	if (roundChangeEffect.readyFlag || drawCharaFlag)
+	{
+		bossHandMgr->Draw();
+		playerHandMgr->Draw();
+	}
+
 	//playerHomeBase.Draw();
 	//enemyHomeBase.Draw();
 
@@ -798,11 +830,6 @@ void Game::Draw()
 		AfterImageMgr::Instance()->Draw();
 		CharacterManager::Instance()->Left()->Draw(readyToStartRoundFlag);
 		CharacterManager::Instance()->Right()->Draw(readyToStartRoundFlag);
-	}
-	if (roundChangeEffect.readyFlag || drawCharaFlag)
-	{
-		bossHandMgr->Draw();
-		playerHandMgr->Draw();
 	}
 
 	roundChangeEffect.Draw();
@@ -1333,36 +1360,20 @@ void Game::RoundFinishEffect(const bool& Loop)
 		//時間計測ストップ
 		GameTimer::Instance()->SetInterruput(true);
 
+		RoundFinishEffect::Instance()->Update(DistanceCounter::Instance()->lineCenterPos);
+
 		const int nowRoomNum = SelectStage::Instance()->GetRoomNum();
 
-		bool isFinalRound = false;
-
-		if (!SelectStage::Instance()->HaveNextLap() && RoundFinishEffect::Instance()->changeMap)
+		if (RoundFinishEffect::Instance()->changeMap &&
+			!SelectStage::Instance()->HaveNextLap() && RoundFinishEffect::Instance()->changeMap)
 		{
 			ResultTransfer::Instance()->resultScore = ScoreManager::Instance()->GetScore();
 			if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
 			else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
-
-			// リザルトシーンへ移行できる状態だったら。
-			if (RoundFinishEffect::Instance()->isEndResultScene) {
-				turnResultScene = true;
-			}
-
-			isFinalRound = true;
-
-		}
-
-		isFinalRound = !SelectStage::Instance()->HaveNextLap();
-
-		// リザルトシーンへ移行できる状態だったら。
-		if (RoundFinishEffect::Instance()->isEndResultScene && isFinalRound) {
 			turnResultScene = true;
+			return;
 		}
 
-		// ラウンド終了時演出の更新処理
-		RoundFinishEffect::Instance()->Update(DistanceCounter::Instance()->lineCenterPos, isFinalRound);
-
-		// ラウンド終了時演出が終わったかどうか
 		bool isEnd = RoundFinishEffect::Instance()->isEnd;
 
 		if (isEnd) {
@@ -1378,16 +1389,11 @@ void Game::RoundFinishEffect(const bool& Loop)
 				readyToStartRoundFlag = true;
 				roundFinishFlag = false;
 
-				// 最終ラウンドじゃなかったら
-				if (!isFinalRound) {
-
-					SelectStage::Instance()->SelectRoomNum(nowRoomNum + 1);
-					StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
-					mapData = StageMgr::Instance()->GetLocalMap();
-					mapChipGeneratorChangeMap->RegisterMap();
-					RoundFinishEffect::Instance()->changeMap = false;
-
-				}
+				SelectStage::Instance()->SelectRoomNum(nowRoomNum + 1);
+				StageMgr::Instance()->SetLocalMapChipData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+				mapData = StageMgr::Instance()->GetLocalMap();
+				mapChipGeneratorChangeMap->RegisterMap();
+				RoundFinishEffect::Instance()->changeMap = false;
 
 				bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
 
