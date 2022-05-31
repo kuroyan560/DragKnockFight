@@ -36,7 +36,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	engineOption.frameRate = 60;
 #endif
 
-	engineOption.imguiActive = true;
+	engineOption.imguiActive = false;
 
 	//===============================
 

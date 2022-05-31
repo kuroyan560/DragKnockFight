@@ -1256,7 +1256,7 @@ void Game::RoundStartEffect(const bool& Loop, const MapChipArray& tmpMapData)
 			if (!AudioApp::Instance()->NowPlay(bgm))
 			{
 				AudioApp::Instance()->ChangeVolume(bgm, 0.1f);
-				AudioApp::Instance()->PlayWave(bgm, true);
+				//AudioApp::Instance()->PlayWave(bgm, true);
 			}
 		}
 
