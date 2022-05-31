@@ -28,6 +28,9 @@ class StageSelectScene : public BaseScene
 
 	int backAlpha;		// TitleScene‚©‚ç‘JˆÚ‚µ‚½Û‚É‚¾‚ñ‚¾‚ñ–¾‚é‚­‚·‚é‚½‚ß‚Ì•Ï”
 
+	int bgm;
+	const float bgmVol = 0.2f;
+
 public:
 	StageSelectScene();
 	void OnInitialize()override;
