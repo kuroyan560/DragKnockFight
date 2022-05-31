@@ -846,7 +846,7 @@ void Game::Draw()
 
 		// ü•ª‚Ì’†S‚É‰~‚ð•`‰æ
 		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos) + GameSceneCameraMove::Instance()->move, Vec2<float>(1.0f, 1.0f) * disappearRate, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+		//DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos) + GameSceneCameraMove::Instance()->move, Vec2<float>(1.0f, 1.0f) * disappearRate, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 
 
 		if (!roundFinishFlag)
