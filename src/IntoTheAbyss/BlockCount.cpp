@@ -118,6 +118,7 @@ void BlockCount::Draw()
 	}
 
 	static const int GET_SCORE_RATE_GAUGE_FRAME = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/getScoreRateGauge.png");
+	static const int RETRY_SELECT_UI = TexHandleMgr::LoadGraph("resource/ChainCombat/tutorial/retryselect.png");
 	static const int GOOD_GAUGE = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/goodGauge.png");
 	static const int GREAT_GAUGE = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/greatGauge.png");
 	static const int EXCELLENT_GAUGE = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellentGauge.png");
@@ -136,10 +137,13 @@ void BlockCount::Draw()
 	//const Vec2<float>POS = { 430,650 };
 	const float GAUGE_OFFSET_Y = 10;
 
+	//リトライセレクトボタン
+	const Vec2<float>RS_POS = { 1140 + hideValue + easeVel,550 };
+	DrawFunc::DrawGraph(RS_POS + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(RETRY_SELECT_UI));
+	
 	//ゲージ枠
 	DrawFunc::DrawGraph(POS + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(GET_SCORE_RATE_GAUGE_FRAME));
 	float lateBuff = 0.0f;
-
 
 	StageEvaluationData data = EvaluationMgr::Instance()->GetData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 
