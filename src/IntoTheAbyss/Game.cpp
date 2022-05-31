@@ -753,12 +753,6 @@ void Game::Draw()
 	RoundFinishParticleMgr::Instance()->Draw();
 
 
-	if (roundChangeEffect.readyFlag || drawCharaFlag)
-	{
-		bossHandMgr->Draw();
-		playerHandMgr->Draw();
-	}
-
 	//playerHomeBase.Draw();
 	//enemyHomeBase.Draw();
 
@@ -795,6 +789,11 @@ void Game::Draw()
 		AfterImageMgr::Instance()->Draw();
 		CharacterManager::Instance()->Left()->Draw(readyToStartRoundFlag);
 		CharacterManager::Instance()->Right()->Draw(readyToStartRoundFlag);
+	}
+	if (roundChangeEffect.readyFlag || drawCharaFlag)
+	{
+		bossHandMgr->Draw();
+		playerHandMgr->Draw();
 	}
 
 	roundChangeEffect.Draw();
