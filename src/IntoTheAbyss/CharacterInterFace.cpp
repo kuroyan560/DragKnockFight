@@ -386,6 +386,23 @@ void CharacterInterFace::Appear()
 	}
 }
 
+void CharacterInterFace::DisAppear()
+{
+	disappearFlag = true;
+}
+
+void CharacterInterFace::DisAppearUpdate()
+{
+	if (disappearFlag)
+	{
+		alpha -= 5;
+		if (alpha <= 0)
+		{
+			alpha = 0;
+		}
+	}
+}
+
 void CharacterInterFace::InitSwingLineSegmetn()
 {
 	CWSwingSegmentMgr.Init();
@@ -523,6 +540,9 @@ void CharacterInterFace::Init(const Vec2<float>& GeneratePos, const bool& Appear
 
 	addSwingAngle = 0.0f;
 	allSwingAngle = 0.0f;
+
+	disappearFlag = false;
+	alpha = 255;
 }
 
 #include "SlowMgr.h"
@@ -790,6 +810,8 @@ void CharacterInterFace::Update(const MapChipArray& MapData, const Vec2<float>& 
 
 	// 吹っ飛ばすブロックに合った際の吹っ飛ぶ量の移動量を0に近づける。
 	bounceVel = KuroMath::Lerp(bounceVel, { 0,0 }, 0.08f);
+
+	DisAppearUpdate();
 
 }
 
