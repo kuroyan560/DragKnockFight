@@ -233,9 +233,8 @@ void ResultScene::OnUpdate()
 	float rate = static_cast<float>(baseBreakCount) / static_cast<float>(ScoreKeep::Instance()->GetMaxNum());
 
 	int stageNum = SelectStage::Instance()->GetStageNum();
-	int roomNum = SelectStage::Instance()->GetRoomNum();
 
-	StageEvaluationData data = EvaluationMgr::Instance()->GetData(stageNum, roomNum);
+	StageEvaluationData data = EvaluationMgr::Instance()->GetResultData(stageNum);
 	const float FAIL_RATE = data.failRate;
 	const float GOOD_RATE = data.goodRate;
 	const float GREAT_RATE = data.greatRate;
