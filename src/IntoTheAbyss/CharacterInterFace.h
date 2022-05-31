@@ -177,9 +177,19 @@ protected:
 	// 当たり判定情報保存。
 	void SaveHitInfo(bool& isHitTop, bool& isHitBottom, bool& isHitLeft, bool& isHitRight, const INTERSECTED_LINE& intersectedLine, vector<Vec2<int>>& hitChipIndex, const Vec2<int>& hitChipIndexBuff, const bool& isCheckHitSize = false);
 
+
+	int alpha;
+	bool disappearFlag;
 public:
+
 	//登場演出が完了したか
 	void Appear();
+	void DisAppear();
+	void DisAppearUpdate();
+	float GetAlphaRate() { return alpha / 255.0f; }
+
+	bool CheckDisappear() { return alpha <= 0; }
+
 	bool CompleteAppear() { return 20 <= moveTimer; }
 
 	// 前フレームの座標を保存。

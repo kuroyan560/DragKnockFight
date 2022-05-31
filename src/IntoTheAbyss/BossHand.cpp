@@ -48,7 +48,7 @@ void BossHand::Draw(bool SCROL_ON)
 {
 	if (SCROL_ON)
 	{
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), size * ScrollMgr::Instance()->zoom, radian, TexHandleMgr::GetTexBuffer(nowHnadle));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(pos), size * ScrollMgr::Instance()->zoom * CharacterManager::Instance()->Left()->GetAlphaRate(), radian, TexHandleMgr::GetTexBuffer(nowHnadle));
 	}
 	else
 	{
