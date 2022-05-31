@@ -5,7 +5,7 @@
 #include"IntoTheAbyss/SceneCange.h"
 #include"IntoTheAbyss/CRT.h"
 #include"IntoTheAbyss/SceneTransitionDrawScreenShot.h"
-
+#include"IntoTheAbyss/SceneCange.h"
 
 class Sprite;
 class GaussianBlur;
@@ -18,6 +18,7 @@ class GameScene : public BaseScene
 	bool isSS;		// スクショを撮るかのフラグ
 	//std::shared_ptr<SceneCange>sceneChange;
 	std::shared_ptr<SceneTransitionDrawScreenShot>sceneChange;
+	std::shared_ptr<SceneCange>resultSceneChange;
 	CRT crt;
 public:
 	GameScene();

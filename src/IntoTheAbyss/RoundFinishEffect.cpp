@@ -27,10 +27,7 @@ RoundFinishEffect::RoundFinishEffect()
 	excellentGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellent.png");
 
 
-	evaluationSoundHandle[SOUND_GOOD] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_good.wav", 0.13f);
-	evaluationSoundHandle[SOUND_GREAT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_great.wav", 0.13f);
-	evaluationSoundHandle[SOUND_EXCELLENT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_excellent.wav", 0.13f);
-	evaluationSoundHandle[SOUND_PERFECT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_perfect.wav", 0.13f);
+	evaluationSoundHandle = EvaluationMgr::Instance()->soundData;
 }
 
 void RoundFinishEffect::Init()
@@ -63,11 +60,19 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 
 	int stageNum = SelectStage::Instance()->GetStageNum();
 	int roomNum = SelectStage::Instance()->GetRoomNum();
+	static const float FAIL_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).failRate;
 	static const float GOOD_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).goodRate;
 	static const float GREAT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).greatRate;
 
 	// 引数の割合からどの画像を使用するかをチェックする。
-	if (Rate <= GOOD_PER) {
+	if (Rate <= FAIL_PER)
+	{
+
+		soundType = SOUND_FAIL;
+		useGraph = goodGraph;
+
+	}
+	else if (Rate <= GOOD_PER) {
 
 		soundType = SOUND_GOOD;
 		useGraph = goodGraph;
