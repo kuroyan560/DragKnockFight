@@ -425,7 +425,7 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	bossHandMgr->Init(false);
 	playerHandMgr->Init(false);
 
-	stageComment.Init(0);
+	stageComment.Init(SelectStage::Instance()->GetStageNum());
 }
 
 void Game::GeneratorInit()
