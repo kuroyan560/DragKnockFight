@@ -36,7 +36,7 @@ void TitleScene::OnInitialize()
 	FIRST = false;
 	tutorialQuestion = false;
 
-
+	comment.Init(0);
 	//handMgr->Init();
 }
 
@@ -128,6 +128,9 @@ void TitleScene::OnUpdate()
 			isPressStartDraw = isPressStartDraw ? false : true;
 		}
 	}
+
+	comment.Update();
+
 }
 
 void TitleScene::OnDraw()
@@ -144,47 +147,49 @@ void TitleScene::OnDraw()
 
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 
-	if (tutorialQuestion)
-	{
-		const auto winCenter = WinApp::Instance()->GetExpandWinCenter();
-		int yes = tutorialYes ? YES_ON : YES_OFF;
-		int no = tutorialYes ? NO_OFF : NO_ON;
-		if (!tutorialSelect)
-		{
-			yes = YES_OFF;
-			no = NO_OFF;
-		}
+	//if (tutorialQuestion)
+	//{
+	//	const auto winCenter = WinApp::Instance()->GetExpandWinCenter();
+	//	int yes = tutorialYes ? YES_ON : YES_OFF;
+	//	int no = tutorialYes ? NO_OFF : NO_ON;
+	//	if (!tutorialSelect)
+	//	{
+	//		yes = YES_OFF;
+	//		no = NO_OFF;
+	//	}
 
-		DrawFunc::DrawRotaGraph2D({ winCenter.x,winCenter.y - QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(QUESTION));
-		DrawFunc::DrawRotaGraph2D({ winCenter.x - YES_NO_OFFSET_X,winCenter.y + QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(yes));
-		DrawFunc::DrawRotaGraph2D({ winCenter.x + YES_NO_OFFSET_X,winCenter.y + QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(no));
-	}
-	else
-	{
-		// ˜g‚ğ•`‰æ
-		DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(frameHandle));
+	//	DrawFunc::DrawRotaGraph2D({ winCenter.x,winCenter.y - QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(QUESTION));
+	//	DrawFunc::DrawRotaGraph2D({ winCenter.x - YES_NO_OFFSET_X,winCenter.y + QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(yes));
+	//	DrawFunc::DrawRotaGraph2D({ winCenter.x + YES_NO_OFFSET_X,winCenter.y + QUES_OFFSET_Y }, { 1,1 }, 0.0f, TexHandleMgr::GetTexBuffer(no));
+	//}
+	//else
+	//{
+	//	// ˜g‚ğ•`‰æ
+	//	DrawFunc::DrawGraph(Vec2<float>(0, 0), TexHandleMgr::GetTexBuffer(frameHandle));
 
-		float easingAmount = KuroMath::Ease(InOut, Sine, easingTimer, 0.0f, 1.0f);
+	//	float easingAmount = KuroMath::Ease(InOut, Sine, easingTimer, 0.0f, 1.0f);
 
-		// ¯‚ğ•`‰æ
-		DrawFunc::DrawGraph(Vec2<float>(0, 30) + Vec2<float>(0, easingAmount * -EASING_MOVE_STAR), TexHandleMgr::GetTexBuffer(starHandle));
+	//	// ¯‚ğ•`‰æ
+	//	DrawFunc::DrawGraph(Vec2<float>(0, 30) + Vec2<float>(0, easingAmount * -EASING_MOVE_STAR), TexHandleMgr::GetTexBuffer(starHandle));
 
-		// ”wŒiƒLƒƒƒ‰“ñl‚ğ•`‰æ
-		DrawFunc::DrawGraph(LACY_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lacyHandle));
-		DrawFunc::DrawGraph(LUNA_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lunaHandle));
+	//	// ”wŒiƒLƒƒƒ‰“ñl‚ğ•`‰æ
+	//	DrawFunc::DrawGraph(LACY_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lacyHandle));
+	//	DrawFunc::DrawGraph(LUNA_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lunaHandle));
 
-		// ”wŒiƒLƒƒƒ‰ƒƒ{ƒbƒg“ñ‘Ì‚ğ•`‰æ
-		DrawFunc::DrawGraph(LACY_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lacyRobotHandle));
-		DrawFunc::DrawGraph(LUNA_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lunaRobotHandle));
+	//	// ”wŒiƒLƒƒƒ‰ƒƒ{ƒbƒg“ñ‘Ì‚ğ•`‰æ
+	//	DrawFunc::DrawGraph(LACY_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lacyRobotHandle));
+	//	DrawFunc::DrawGraph(LUNA_ROBOT_POS + Vec2<float>(0, easingAmount * EASING_MOVE_CHAR), TexHandleMgr::GetTexBuffer(lunaRobotHandle));
 
-		// ƒ^ƒCƒgƒ‹ƒAƒCƒRƒ“‰æ‘œ‚ğ•`‰æ
-		DrawFunc::DrawGraph(TITLE_POS + Vec2<float>(0, easingAmount * -EASING_MOVE_TITLE), TexHandleMgr::GetTexBuffer(titleHandle));
+	//	// ƒ^ƒCƒgƒ‹ƒAƒCƒRƒ“‰æ‘œ‚ğ•`‰æ
+	//	DrawFunc::DrawGraph(TITLE_POS + Vec2<float>(0, easingAmount * -EASING_MOVE_TITLE), TexHandleMgr::GetTexBuffer(titleHandle));
 
-		// PRESSENTER‚Ì‰æ‘œ‚ğ•`‰æ
-		if (isPressStartDraw) {
-			DrawFunc::DrawRotaGraph2D(PRESS_START_POS, { 1,1 }, 0, TexHandleMgr::GetTexBuffer(pressStartHandle));
-		}
-	}
+	//	// PRESSENTER‚Ì‰æ‘œ‚ğ•`‰æ
+	//	if (isPressStartDraw) {
+	//		DrawFunc::DrawRotaGraph2D(PRESS_START_POS, { 1,1 }, 0, TexHandleMgr::GetTexBuffer(pressStartHandle));
+	//	}
+	//}
+
+	comment.Draw();
 
 }
 

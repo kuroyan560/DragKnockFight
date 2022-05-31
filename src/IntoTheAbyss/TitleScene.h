@@ -6,6 +6,7 @@
 #include"BehaviorPredection.h"
 #include"MaskSceneTransition.h"
 #include"CutInTransition.h"
+#include"StageComment.h"
 
 class TitleScene : public BaseScene
 {
@@ -59,5 +60,7 @@ public:
 	void OnFinalize()override;
 
 	std::shared_ptr<CutInTransition> changeScene;
+
+	StageComment comment;
 };
 
