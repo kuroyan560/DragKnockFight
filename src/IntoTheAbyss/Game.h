@@ -32,7 +32,7 @@ class RenderTarget;
 #include"BlockCount.h"
 
 #include"StageRap.h"
-
+#include"StageComment.h"
 
 class CharacterInterFace;
 
@@ -149,6 +149,8 @@ class Game
 	int rStickNoInputTimer = 0;
 
 	void GeneratorInit();
+
+	StageComment stageComment;
 
 public:
 	HomeBase playerHomeBase, enemyHomeBase;
