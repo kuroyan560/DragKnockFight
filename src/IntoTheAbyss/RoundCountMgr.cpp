@@ -126,6 +126,8 @@ void RoundCountMgr::Init(int MaxRound)
 	Vec2<float> UI_OFFSET_POS = Vec2<float>(1140 + UI_OFFSET_SIZE * num, 100);
 
 	initPos = UI_OFFSET_POS;
+	startPos = initPos;
+
 
 	int indexCounter = 0;
 
@@ -179,13 +181,12 @@ void RoundCountMgr::Draw()
 
 	/*===== ï`âÊèàóù =====*/
 
-	Vec2<float> UI_OFFSET_POS = Vec2<float>(startPos.x - 116.0f, 102);
 
 	startPos.x = initPos.x + 350.0f + KuroMath::Ease(Out, Cubic, t, 0.0f, 1.0f) * -350.0f;
 	startPos.y = initPos.y;
 
+	Vec2<float> UI_OFFSET_POS = Vec2<float>(startPos.x - 116.0f, 102);
 	DrawFunc::DrawRotaGraph2D(UI_OFFSET_POS + GameSceneCameraMove::Instance()->move, Vec2<float>(1, 1), 0, TexHandleMgr::GetTexBuffer(roundGraph));
-
 
 	for (int i = 0; i < maxRound; ++i)
 	{

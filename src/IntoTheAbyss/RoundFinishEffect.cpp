@@ -22,7 +22,7 @@ RoundFinishEffect::RoundFinishEffect()
 	shakeAmount = Vec2<float>();
 
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/perfect.png", 3, Vec2<int>(3, 1), perfectGraph.data());
-	failGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
+	failGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/failed.png");
 	goodGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
 	greatGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/great.png");
 	excellentGraph = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellent.png");
