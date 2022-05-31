@@ -25,6 +25,7 @@ public:
 	};
 
 	std::array<int, 3> perfectGraph;
+	int failGraph;
 	int goodGraph;
 	int greatGraph;
 	int excellentGraph;
