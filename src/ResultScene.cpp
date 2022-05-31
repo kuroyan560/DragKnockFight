@@ -250,28 +250,30 @@ void ResultScene::OnUpdate()
 	isNewRecordActive = 35 <= intervalTimer;
 
 
-	Sound soundType = SOUND_GOOD;
-	if (rate <= FAIL_RATE)
+	Sound soundType = SOUND_FAIL;
+	evaluationNowHandle = failHandle;
+
+	if (FAIL_RATE <= rate)
 	{
 		soundType = SOUND_FAIL;
 		evaluationNowHandle = failHandle;
 	}
-	else if (rate <= GOOD_RATE)
+	if (GOOD_RATE <= rate)
 	{
 		soundType = SOUND_GOOD;
 		evaluationNowHandle = goodHandle;
 	}
-	else if (rate <= GREAT_RATE)
+	if (GREAT_RATE <= rate)
 	{
 		soundType = SOUND_GREAT;
 		evaluationNowHandle = greatHandle;
 	}
-	else if (rate <= EXCELLENT_RATE || rate < PERFECR_RATE)
+	if (EXCELLENT_RATE <= rate)
 	{
 		soundType = SOUND_EXCELLENT;
 		evaluationNowHandle = excellentHandle;
 	}
-	else if (PERFECR_RATE <= rate)
+	if (PERFECR_RATE <= rate)
 	{
 		soundType = SOUND_PERFECT;
 		evaluationFlag = true;

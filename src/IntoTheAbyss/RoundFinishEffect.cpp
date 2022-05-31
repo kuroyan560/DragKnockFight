@@ -69,33 +69,27 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 	static const float PERFECT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).perfectRate;
 
 	// 引数の割合からどの画像を使用するかをチェックする。
-	if (Rate <= FAIL_PER)
+	if (FAIL_PER <= Rate)
 	{
-
 		soundType = SOUND_FAIL;
 		useGraph = failGraph;
-
 	}
-	else if (Rate <= GOOD_PER) {
-
+	if (GOOD_PER <= Rate)
+	{
 		soundType = SOUND_GOOD;
 		useGraph = goodGraph;
-
 	}
-	else if (Rate <= GREAT_PER) {
-
+	if (GREAT_PER <= Rate)
+	{
 		soundType = SOUND_GREAT;
 		useGraph = greatGraph;
-
 	}
-	else if (Rate <= EXCELLENT_PER)
+	if (EXCELLENT_PER <= Rate)
 	{
-
 		soundType = SOUND_EXCELLENT;
 		useGraph = excellentGraph;
-
 	}
-	else
+	if (PERFECT_PER <= Rate)
 	{
 		soundType = SOUND_PERFECT;
 		useGraph = excellentGraph;
