@@ -43,14 +43,14 @@ int MapChipGenerator::GetRandChipType()
 	return appearType;
 }
 
-void MapChipGenerator::Generate(const Vec2<int>& GenerateIdx, const int& ChipType,const int& WallGraph)
+void MapChipGenerator::Generate(const Vec2<int>& GenerateIdx, const int& ChipType, const int& WallGraph)
 {
 	if (!CanChange(GenerateIdx))return;
-	StageMgr::Instance()->WriteMapChipData(GenerateIdx, ChipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_NONE, true, WallGraph);
+	StageMgr::Instance()->WriteMapChipData(GenerateIdx, ChipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, true, INTERSECTED_NONE, true, WallGraph);
 }
 
 
-void MapChipGenerator::Generate(const Vec2<float>& GeneratePos, const int& ChipType,const int& WallGraph)
+void MapChipGenerator::Generate(const Vec2<float>& GeneratePos, const int& ChipType, const int& WallGraph)
 {
 	//生成座標を基にその場所のチップ番号取得
 	Vec2<int>centerIdx =
@@ -71,7 +71,7 @@ void MapChipGenerator::Generate(const Vec2<float>& GeneratePos, const int& ChipT
 
 	for (auto& idx : generateIndices)
 	{
-		Generate(idx, ChipType,WallGraph);
+		Generate(idx, ChipType, WallGraph);
 	}
 }
 
@@ -534,9 +534,9 @@ void MapChipGenerator_RiseUp::RiseUp()
 				if ((*mapData)[y][x + 1].chipType != 0)continue;
 
 				//自身のタイプを右チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x + 1, y), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_RIGHT, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x + 1, y), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_RIGHT, false);
 				//自身は空にする
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_RIGHT, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_RIGHT, false);
 			}
 		}
 
@@ -548,7 +548,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
-			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_RIGHT, false);
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_RIGHT, false);
 		}
 	}
 	else if (dir == UP_TO_BOTTOM)
@@ -562,9 +562,9 @@ void MapChipGenerator_RiseUp::RiseUp()
 				if ((*mapData)[y + 1][x].chipType != 0)continue;
 
 				//自身のタイプを下チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y + 1), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_BOTTOM, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y + 1), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_BOTTOM, false);
 				//自身は空にする
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_BOTTOM, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_BOTTOM, false);
 			}
 		}
 
@@ -576,7 +576,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
-			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_BOTTOM, false);
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_BOTTOM, false);
 		}
 	}
 	else if (dir == RIGHT_TO_LEFT)
@@ -590,9 +590,9 @@ void MapChipGenerator_RiseUp::RiseUp()
 				if ((*mapData)[y][x - 1].chipType != 0)continue;
 
 				//自身のタイプを左チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x - 1, y), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_LEFT, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x - 1, y), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_LEFT, false);
 				//自身は空にする
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_LEFT, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_LEFT, false);
 			}
 		}
 
@@ -604,7 +604,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
-			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_LEFT, false);
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_LEFT, false);
 		}
 	}
 	else if (dir == BOTTOM_TO_UP)
@@ -618,9 +618,9 @@ void MapChipGenerator_RiseUp::RiseUp()
 				if ((*mapData)[y - 1][x].chipType != 0)continue;
 
 				//自身のタイプを上チップに移す
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y - 1), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_TOP, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y - 1), (*mapData)[y][x].chipType, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_TOP, false);
 				//自身は空にする
-				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_TOP, false);
+				StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), 0, CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_TOP, false);
 			}
 		}
 
@@ -632,7 +632,7 @@ void MapChipGenerator_RiseUp::RiseUp()
 			if ((*mapData)[y][x].chipType != 0)continue;
 
 			//ランダム生成
-			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, INTERSECTED_TOP, false);
+			StageMgr::Instance()->WriteMapChipData(Vec2<int>(x, y), GetRandChipType(), CharacterManager::Instance()->Left()->pos, CharacterManager::Instance()->Left()->size.x, CharacterManager::Instance()->Right()->pos, CharacterManager::Instance()->Right()->size.x, false, INTERSECTED_TOP, false);
 		}
 	}
 }
