@@ -100,11 +100,13 @@ class MapChipGenerator_ChangeMap :public MapChipGenerator
 		int type;
 	};
 	std::vector<Prediction>predictionIdxArray;
+	bool active = true;
 public:
 	MapChipGenerator_ChangeMap();
 	void Update()override;
 	void Draw()override;
 	void RegisterMap();
+	void SetActive(const bool& Active) { active = Active; }
 
 private:
 	int setMapNumber;

@@ -1408,6 +1408,8 @@ void Game::RoundFinishEffect(const bool& Loop)
 
 			++roundTimer;
 
+			if (isFinalRound)mapChipGeneratorChangeMap->SetActive(false);
+
 			if (60 <= roundTimer)
 			{
 
