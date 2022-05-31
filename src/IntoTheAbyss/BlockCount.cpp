@@ -148,8 +148,8 @@ void BlockCount::Draw()
 	StageEvaluationData data = EvaluationMgr::Instance()->GetData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 
 	//GOOD
-	const float goodRate = min(totalGetRate / data.greatRate, 1.0f);
-	lateBuff = data.greatRate;
+	const float goodRate = min(totalGetRate / data.goodRate, 1.0f);
+	lateBuff = data.goodRate;
 	const Vec2<float>goodOffset = { 10,GAUGE_OFFSET_Y };
 	DrawFunc_Mask::DrawGraph(POS + goodOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(GOOD_GAUGE), POS + goodOffset,
 		POS + goodOffset + TexHandleMgr::GetTexBuffer(GOOD_GAUGE)->GetGraphSize().Float() * Vec2<float>(goodRate, 1.0f));
@@ -157,11 +157,8 @@ void BlockCount::Draw()
 	//GREAT
 	if (lateBuff < totalGetRate)
 	{
-		float rateBuff = data.excellentRate - totalGetRate;
-		float rateMaxBuff = data.excellentRate - data.greatRate;
-
-		const float greatRate = min(totalGetRate / data.excellentRate, 1.0f);
-		lateBuff = data.excellentRate;
+		const float greatRate = min(totalGetRate / data.greatRate, 1.0f);
+		lateBuff = data.greatRate;
 		const Vec2<float>greatOffset = { 426,GAUGE_OFFSET_Y };
 		DrawFunc_Mask::DrawGraph(POS + greatOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(GREAT_GAUGE), POS + greatOffset,
 			POS + greatOffset + TexHandleMgr::GetTexBuffer(GREAT_GAUGE)->GetGraphSize().Float() * Vec2<float>(greatRate, 1.0f));
@@ -169,8 +166,8 @@ void BlockCount::Draw()
 	//EXCELLENT
 	if (lateBuff < totalGetRate)
 	{
-		const float excellentRate = min(totalGetRate / data.perfectRate, 1.0f);
-		lateBuff = data.perfectRate;
+		const float excellentRate = min(totalGetRate / data.excellentRate, 1.0f);
+		lateBuff = data.excellentRate;
 		const Vec2<float>excellentOffset = { 670,GAUGE_OFFSET_Y };
 		DrawFunc_Mask::DrawGraph(POS + excellentOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(EXCELLENT_GAUGE), POS + excellentOffset,
 			POS + excellentOffset + TexHandleMgr::GetTexBuffer(EXCELLENT_GAUGE)->GetGraphSize().Float() * Vec2<float>(excellentRate, 1.0f));
