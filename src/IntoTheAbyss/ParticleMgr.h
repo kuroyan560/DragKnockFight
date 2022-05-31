@@ -16,7 +16,7 @@ static const enum PARTICLE_TYPE { DASH, BULLET, CRASH_W, CRASH_G, CRASH_R, BOUND
 
 class ParticleMgr : public Singleton<ParticleMgr>
 {
-	static const int MAX_NUM = 300;
+	static const int MAX_NUM = 1000;
 
 	static const enum PARTICLE_CUMPUTE_TYPE { NORMAL_SMOKE, FAST_SMOKE, EMIT_STAR, SLIME_EXPLOSION, DEFAULT = NORMAL_SMOKE };
 	struct Particle
