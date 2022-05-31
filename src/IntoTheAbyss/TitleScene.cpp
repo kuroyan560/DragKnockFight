@@ -36,7 +36,6 @@ void TitleScene::OnInitialize()
 	FIRST = false;
 	tutorialQuestion = false;
 
-	comment.Init(0);
 	//handMgr->Init();
 }
 
@@ -129,8 +128,6 @@ void TitleScene::OnUpdate()
 		}
 	}
 
-	comment.Update();
-
 }
 
 void TitleScene::OnDraw()
@@ -188,8 +185,6 @@ void TitleScene::OnDraw()
 			DrawFunc::DrawRotaGraph2D(PRESS_START_POS, { 1,1 }, 0, TexHandleMgr::GetTexBuffer(pressStartHandle));
 		}
 	}
-
-	comment.Draw();
 
 }
 
