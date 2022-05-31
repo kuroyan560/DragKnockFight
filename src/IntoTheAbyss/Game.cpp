@@ -1439,7 +1439,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 			}
 
 			// ã‚ÉˆÚ“®‚³‚¹‚éB
-			GameSceneCameraMove::Instance()->move.y += (-TRANSITION_MOVE_Y - GameSceneCameraMove::Instance()->move.y) / 10.0f;
+			GameSceneCameraMove::Instance()->move.y += (-TRANSITION_MOVE_Y - GameSceneCameraMove::Instance()->move.y) / 30.0f;
 
 		}
 

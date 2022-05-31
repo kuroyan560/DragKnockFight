@@ -29,6 +29,8 @@ void StageComment::Init(int STAGE_NUM)
 	easeVel = 50.0f;
 }
 
+#include "GameSceneCamerMove.h"
+
 void StageComment::Update()
 {
 	//ステージコメント
@@ -71,7 +73,7 @@ void StageComment::Update()
 
 	easeY = KuroMath::Ease(Out, Cubic, appearRate, 0.0f, 1.0f) * -easeVel;
 
-	commentSprite->transform.SetPos({ WinApp::Instance()->GetExpandWinSize().x,680.0f + easeVel + easeY });
+	commentSprite->transform.SetPos(Vec2<float>{ WinApp::Instance()->GetExpandWinSize().x,680.0f + easeVel + easeY } + GameSceneCameraMove::Instance()->move);
 }
 
 void StageComment::Draw()
@@ -82,6 +84,6 @@ void StageComment::Draw()
 	Vec2<float>rightDownPos(WinApp::Instance()->GetExpandWinSize());
 	Vec2<float>easePos(0.0f, easeVel + easeY);
 
-	DrawFunc::DrawBox2D(leftUpPos + easePos, rightDownPos + easePos, Color(0.0f, 0.0f, 0.0f, 0.5f), true, AlphaBlendMode_Trans);
+	DrawFunc::DrawBox2D(leftUpPos + easePos + GameSceneCameraMove::Instance()->move, rightDownPos + easePos + GameSceneCameraMove::Instance()->move, Color(0.0f, 0.0f, 0.0f, 0.5f), true, AlphaBlendMode_Trans);
 	commentSprite->Draw();
 }
