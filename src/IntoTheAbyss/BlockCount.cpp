@@ -123,15 +123,20 @@ void BlockCount::Draw()
 	static const int GREAT_GAUGE = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/greatGauge.png");
 	static const int EXCELLENT_GAUGE = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellentGauge.png");
 	static const int PERFECT_GAUGE = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/perfectGauge.png");
-	float totalGetRate = 0.0f;
-	if (countBlockModeFlag)
-	{
-		totalGetRate = static_cast<float>((countAllBlockNum - countNowBlockNum)) / static_cast<float>(countAllBlockNum);
-	}
-	else
-	{
-		totalGetRate = 1.0f - static_cast<float>((countAllBlockNum - countNowBlockNum)) / static_cast<float>(countAllBlockNum);
-	}
+	float nowBlockCount = countNowBlockNum;
+	float maxBclokCount = countAllBlockNum;
+	float destroyRate = GetBlockNum() / maxBclokCount;
+	float totalGetRate = destroyRate;
+	//if (countBlockModeFlag)
+	//{
+	//	totalGetRate = static_cast<float>((countAllBlockNum - countNowBlockNum)) / static_cast<float>(countAllBlockNum);
+	//}
+	//else
+	//{
+	//	totalGetRate = 1.0f - static_cast<float>((countAllBlockNum - countNowBlockNum)) / static_cast<float>(countAllBlockNum);
+	//}
+
+
 
 	const Vec2<float>POS = { 430 + hideValue + easeVel,22 };
 	//const Vec2<float>POS = { 430,650 };
