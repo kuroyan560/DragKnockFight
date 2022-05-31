@@ -1,0 +1,3 @@
+room0 3
+timer0 70
+gene0 4 45
