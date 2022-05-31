@@ -545,30 +545,6 @@ void Game::Init(const bool& PracticeMode)
 void Game::Update(const bool& Loop)
 {
 
-	const float MOVE = 10.0f;
-
-	if (UsersInput::Instance()->KeyInput(DIK_W)) {
-
-		GameSceneCameraMove::Instance()->move.y += MOVE;
-
-	}
-	if (UsersInput::Instance()->KeyInput(DIK_S)) {
-
-		GameSceneCameraMove::Instance()->move.y -= MOVE;
-
-	}
-	if (UsersInput::Instance()->KeyInput(DIK_A)) {
-
-		GameSceneCameraMove::Instance()->move.x += MOVE;
-
-	}
-	if (UsersInput::Instance()->KeyInput(DIK_D)) {
-
-		GameSceneCameraMove::Instance()->move.x -= MOVE;
-
-	}
-
-
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 	MapChipArray tmpMapData = *mapData;
 
