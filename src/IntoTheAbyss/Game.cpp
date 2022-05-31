@@ -1376,6 +1376,9 @@ void Game::RoundFinishEffect(const bool& Loop)
 				// リザルトシーンへ遷移させる。
 				turnResultScene = true;
 
+				// リザルトシーンではDistanceCounterのPosを中心に星を生成するので、演出用でずらした値を入れる。
+				DistanceCounter::Instance()->lineCenterPos.y -= TRANSITION_MOVE_Y;
+
 				// 各変数を初期化
 				trasitionTimer = 0;
 

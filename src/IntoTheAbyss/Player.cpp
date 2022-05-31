@@ -643,7 +643,7 @@ void Player::Input(const MapChipArray& MapData)
 	inputRate = inputLeftVec.Length();
 	if (isInputLB && !isPrevLeftBottom && 0.5f <= inputRate) {
 
-		AudioApp::Instance()->PlayWave(DASH_SE);
+		//AudioApp::Instance()->PlayWave(DASH_SE);
 
 		// inputVec = ひだりスティックの入力方向
 		const float DASH_SPEED = 30.0f;
