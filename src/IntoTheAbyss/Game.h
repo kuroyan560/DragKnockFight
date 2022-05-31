@@ -156,7 +156,7 @@ class Game
 	bool isTransitionResult;
 	int trasitionTimer;
 	const int TRANSITION_TIMER = 120;
-	const float TRANSITION_MOVE_Y = 2000;
+	const float TRANSITION_MOVE_Y = 4000;
 
 
 	StageComment stageComment;
