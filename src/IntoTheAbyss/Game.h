@@ -27,7 +27,7 @@ class RenderTarget;
 
 #include"BossHandMgr.h"
 
-#include "Barrages.h"
+#include"Barrages.h"
 #include"MapChipGenerator.h"
 #include"BlockCount.h"
 
