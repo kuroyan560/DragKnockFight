@@ -465,6 +465,7 @@ void MapChipGenerator_ChangeMap::Draw()
 	static const auto EMPTY_TEX = D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, 255), DXGI_FORMAT_R32G32B32A32_FLOAT, 32);
 
 	if (!RoundFinishEffect::Instance()->changeMap)return;
+	if (!active)return;
 
 	// 描画するチップのサイズ
 	const float DRAW_MAP_CHIP_SIZE = MAP_CHIP_SIZE * ScrollMgr::Instance()->zoom;
