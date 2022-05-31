@@ -32,7 +32,7 @@ ResultScene::ResultScene()
 	slashHandle = blueNumberHandle[11];
 	lissajousTimer = 0;
 
-	failHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
+	failHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/failed.png");
 	goodHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
 	greatHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/great.png");
 	excellentHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellent.png");
