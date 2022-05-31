@@ -213,8 +213,16 @@ StageMgr::StageMgr()
 				}
 
 				{
-					std::string evaGoodKey = "good" + std::to_string(roomCount);
+					std::string evaFailKey = "fail" + std::to_string(roomCount);
 					float rate = 0.0f;
+					if (key == evaFailKey)
+					{
+						line_stream >> rate;
+						evaData[stageNum][roomCount].failRate = rate;
+					}
+
+					std::string evaGoodKey = "good" + std::to_string(roomCount);
+
 					if (key == evaGoodKey)
 					{
 						line_stream >> rate;
@@ -238,8 +246,15 @@ StageMgr::StageMgr()
 
 
 				{
-					std::string evaGoodKey = "goodR";
+					std::string evaFailKey = "failR";
 					float rate = 0.0f;
+					if (key == evaFailKey)
+					{
+						line_stream >> rate;
+						resultEvaData[stageNum].failRate = rate;
+					}
+
+					std::string evaGoodKey = "goodR";
 					if (key == evaGoodKey)
 					{
 						line_stream >> rate;

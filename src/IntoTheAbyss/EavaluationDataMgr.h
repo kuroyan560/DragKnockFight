@@ -1,6 +1,7 @@
 #pragma once
 #include"../Common/Singleton.h"
 #include<vector>
+#include"../Engine/AudioApp.h"
 
 enum Sound
 {

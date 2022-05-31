@@ -32,6 +32,7 @@ ResultScene::ResultScene()
 	slashHandle = blueNumberHandle[11];
 	lissajousTimer = 0;
 
+	failHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
 	goodHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/good.png");
 	greatHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/great.png");
 	excellentHandle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/excellent.png");
@@ -250,7 +251,11 @@ void ResultScene::OnUpdate()
 
 
 	Sound soundType = SOUND_GOOD;
-	if (rate <= GOOD_RATE)
+	if (rate <= FAIL_RATE)
+	{
+		soundType = SOUND_FAIL;
+		evaluationNowHandle = failHandle;
+	}else if (rate <= GOOD_RATE)
 	{
 		soundType = SOUND_GOOD;
 		evaluationNowHandle = goodHandle;
