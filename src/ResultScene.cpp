@@ -255,7 +255,8 @@ void ResultScene::OnUpdate()
 	{
 		soundType = SOUND_FAIL;
 		evaluationNowHandle = failHandle;
-	}else if (rate <= GOOD_RATE)
+	}
+	else if (rate <= GOOD_RATE)
 	{
 		soundType = SOUND_GOOD;
 		evaluationNowHandle = goodHandle;
@@ -265,7 +266,7 @@ void ResultScene::OnUpdate()
 		soundType = SOUND_GREAT;
 		evaluationNowHandle = greatHandle;
 	}
-	else if (rate <= EXCELLENT_RATE)
+	else if (rate <= EXCELLENT_RATE || rate < PERFECR_RATE)
 	{
 		soundType = SOUND_EXCELLENT;
 		evaluationNowHandle = excellentHandle;
@@ -275,6 +276,7 @@ void ResultScene::OnUpdate()
 		soundType = SOUND_PERFECT;
 		evaluationFlag = true;
 	}
+
 
 
 	if (bigFontFlag && evaluationEasingTimer < EVALUATION_EFFECT_TIMER && timeUpFlag)
