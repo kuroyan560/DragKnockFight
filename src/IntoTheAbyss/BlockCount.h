@@ -8,7 +8,7 @@ class BlockCount
 public:
 	BlockCount();
 
-	void Init(int COUNT_MAX, bool MODE);
+	void Init(int COUNT_MAX, bool MODE,bool DISAPPEAR_FLAG);
 	void Update();
 	void Draw();
 
@@ -31,6 +31,8 @@ public:
 	int countNowBlockNum;
 
 	bool countBlockModeFlag;
+
+	void Appear();
 private:
 	std::vector<int> number;
 	std::vector<int> maxNumber;
@@ -43,4 +45,9 @@ private:
 
 	std::vector<int> CountNumber(int TIME);
 	int nowScoreNum;
+
+	float t;
+	float easeVel;
+	bool appearFlag;
+	float hideValue;
 };

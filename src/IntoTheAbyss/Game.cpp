@@ -346,13 +346,14 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 
 	bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
+	bool firstStageFlag = roomNum == 0;
 	if (nonFlag)
 	{
-		countBlock.Init(COUNT_BLOCK_MAX, false);
+		countBlock.Init(COUNT_BLOCK_MAX, false, firstStageFlag);
 	}
 	else
 	{
-		countBlock.Init(StageMgr::Instance()->GetAllLocalWallBlocksNum(), true);
+		countBlock.Init(StageMgr::Instance()->GetAllLocalWallBlocksNum(), true, firstStageFlag);
 	}
 	ScoreManager::Instance()->Init();
 	roundFinishFlag = false;
@@ -584,6 +585,9 @@ void Game::Update(const bool& Loop)
 			playerHandMgr->Hold(-sub.GetNormal(), true);
 			playerHandMgr->Update(CharacterManager::Instance()->Left()->pos);
 		}
+
+		RoundCountMgr::Instance()->Appear();
+		countBlock.Appear();
 	}
 	// プレイヤーの更新処理
 	//if (!roundFinishFlag)
@@ -1357,13 +1361,17 @@ void Game::RoundFinishEffect(const bool& Loop)
 				RoundFinishEffect::Instance()->changeMap = false;
 
 				bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
+
+				int roomNum = SelectStage::Instance()->GetRoomNum();
+				bool firstStageFlag = roomNum == 0;
+
 				if (nonFlag)
 				{
-					countBlock.Init(COUNT_BLOCK_MAX, false);
+					countBlock.Init(COUNT_BLOCK_MAX, false, firstStageFlag);
 				}
 				else
 				{
-					countBlock.Init(StageMgr::Instance()->GetAllLocalWallBlocksNum(), true);
+					countBlock.Init(StageMgr::Instance()->GetAllLocalWallBlocksNum(), true, firstStageFlag);
 				}
 				stageRap.Increment();
 				DistanceCounter::Instance()->isExpSmall = false;

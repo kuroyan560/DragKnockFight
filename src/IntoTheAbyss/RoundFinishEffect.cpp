@@ -169,6 +169,7 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 
 			AudioApp::Instance()->PlayWave(EXPLOSION_SE);
 			AudioApp::Instance()->PlayWave(evaluationSoundHandle[soundType]);
+			AudioApp::Instance()->StopWave(READY_EXPLOSION_SE);
 		}
 
 		break;

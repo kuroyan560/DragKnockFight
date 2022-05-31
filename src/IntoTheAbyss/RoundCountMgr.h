@@ -17,6 +17,9 @@ public:
 	bool isActive;			// 描画するか
 	bool isFill;			// 埋まっているか(内側も描画するか)
 
+	bool appearFlag;
+	Vec2<float>initPos, vel;
+	float t;
 public:
 
 	/*===== メンバ関数 =====*/
@@ -39,6 +42,7 @@ public:
 	// 埋める。
 	inline void SetFill() { isFill = true; }
 
+	void Appear();
 };
 
 // ラウンドUI管理クラス
@@ -57,7 +61,9 @@ public:
 	int innerGraph;
 	int roundGraph;
 
-	Vec2<float>startPos;
+	Vec2<float>startPos, initPos;
+	float t;
+	bool appearFlag;
 public:
 
 	/*===== メンバ関数 =====*/
@@ -76,5 +82,7 @@ public:
 
 	// ラウンドをインクリメント
 	void RoundIncrement();
+
+	void Appear();
 
 };

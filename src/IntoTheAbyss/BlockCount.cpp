@@ -11,9 +11,10 @@ BlockCount::BlockCount()
 	number.reserve(12);
 	texSize = { 48,44 };
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/num.png", 12, { 12, 1 }, number.data());
+	appearFlag = false;
 }
 
-void BlockCount::Init(int COUNT_MAX, bool MODE)
+void BlockCount::Init(int COUNT_MAX, bool MODE, bool DISAPPEAR_FLAG)
 {
 	countBlockModeFlag = MODE;
 	//ブロックを全部壊すモード
@@ -35,6 +36,16 @@ void BlockCount::Init(int COUNT_MAX, bool MODE)
 
 
 	nowScoreNum = ScoreManager::Instance()->GetScore();
+	if (DISAPPEAR_FLAG)
+	{
+		t = 0.0f;
+	}
+	else
+	{
+		t = 1.0f;
+	}
+
+	appearFlag = false;
 }
 
 
@@ -53,8 +64,21 @@ void BlockCount::Update()
 		maxNumber = CountNumber(countAllBlockNum);
 	}
 
+	if (appearFlag)
+	{
+		if (t <= 1.0f)
+		{
+			t += 1.0f / 60.0f;
+		}
+		if (1.0f <= t)
+		{
+			t = 1.0f;
+		}
+	}
 
-	basePos = { 1280.0f / 2.0f,90.0f };
+	hideValue = 1000.0f;
+	easeVel = KuroMath::Ease(Out, Cubic, t, 0.0f, 1.0f) * -hideValue;
+	basePos = { 1280.0f / 2.0f + hideValue + easeVel ,90.0f };
 }
 
 #include"DrawFunc_Mask.h"
@@ -105,7 +129,7 @@ void BlockCount::Draw()
 		totalGetRate = 1.0f - static_cast<float>((countAllBlockNum - countNowBlockNum)) / static_cast<float>(countAllBlockNum);
 	}
 
-	const Vec2<float>POS = { 430,22 };
+	const Vec2<float>POS = { 430 + hideValue + easeVel,22 };
 	//const Vec2<float>POS = { 430,650 };
 	const float GAUGE_OFFSET_Y = 10;
 
@@ -149,6 +173,11 @@ void BlockCount::Draw()
 		DrawFunc_Mask::DrawGraph(POS + perfectOffset, TexHandleMgr::GetTexBuffer(PERFECT_GAUGE), POS + perfectOffset,
 			POS + perfectOffset + TexHandleMgr::GetTexBuffer(PERFECT_GAUGE)->GetGraphSize().Float() * Vec2<float>(perfectRate, 1.0f));
 	}
+}
+
+void BlockCount::Appear()
+{
+	appearFlag = true;
 }
 
 std::vector<int> BlockCount::CountNumber(int TIME)

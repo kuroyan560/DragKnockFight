@@ -29,7 +29,7 @@ RoundChangeEffect::RoundChangeEffect()
 	enemyReticleData->handle = TexHandleMgr::LoadGraph("resource/ChainCombat/UI/reticle_enemy.png");
 
 	static const float VOL = 0.13f;
-	fightSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_fight.wav", VOL);
+	fightSE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_start.wav", 0.17f);
 	readySE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_ready.wav", VOL);
 	round1SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round1.wav", VOL);
 	round2SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_round2.wav", VOL);
