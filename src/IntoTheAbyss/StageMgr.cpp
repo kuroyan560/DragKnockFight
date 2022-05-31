@@ -243,37 +243,37 @@ StageMgr::StageMgr()
 						evaData[stageNum][roomCount].excellentRate = rate;
 					}
 				}
+			}
 
 
+			{
+				std::string evaFailKey = "failR";
+				float rate = 0.0f;
+				if (key == evaFailKey)
 				{
-					std::string evaFailKey = "failR";
-					float rate = 0.0f;
-					if (key == evaFailKey)
-					{
-						line_stream >> rate;
-						resultEvaData[stageNum].failRate = rate;
-					}
+					line_stream >> rate;
+					resultEvaData[stageNum].failRate = rate;
+				}
 
-					std::string evaGoodKey = "goodR";
-					if (key == evaGoodKey)
-					{
-						line_stream >> rate;
-						resultEvaData[stageNum].goodRate = rate;
-					}
+				std::string evaGoodKey = "goodR";
+				if (key == evaGoodKey)
+				{
+					line_stream >> rate;
+					resultEvaData[stageNum].goodRate = rate;
+				}
 
-					std::string evaGreatKey = "greatR";
-					if (key == evaGreatKey)
-					{
-						line_stream >> rate;
-						resultEvaData[stageNum].greatRate = rate;
-					}
+				std::string evaGreatKey = "greatR";
+				if (key == evaGreatKey)
+				{
+					line_stream >> rate;
+					resultEvaData[stageNum].greatRate = rate;
+				}
 
-					std::string evaExcellentKey = "excellentR";
-					if (key == evaExcellentKey)
-					{
-						line_stream >> rate;
-						resultEvaData[stageNum].excellentRate = rate;
-					}
+				std::string evaExcellentKey = "excellentR";
+				if (key == evaExcellentKey)
+				{
+					line_stream >> rate;
+					resultEvaData[stageNum].excellentRate = rate;
 				}
 			}
 		}
