@@ -27,7 +27,7 @@ ResultScene::ResultScene()
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/player/lacy/pull_front.png", 3, { 3, 1 }, redCharaHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/player/luna/pull_front.png", 3, { 3, 1 }, greenCharaHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/ironBall/explosion_open.png", 3, { 3, 1 }, ironBallhandle.data());
-	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/perfect.png", 3, { 3, 1 }, newRecordHandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/newRecord.png", 3, { 3, 1 }, newRecordHandle.data());
 	useHandle = ironBallhandle;
 	slashHandle = blueNumberHandle[11];
 	lissajousTimer = 0;
@@ -371,14 +371,14 @@ void ResultScene::OnUpdate()
 		}
 
 		// サイズを動かす。
-		newRecordExp.x += (0.5f - newRecordExp.x) / 5.0f;
-		newRecordExp.y += (0.5f - newRecordExp.y) / 5.0f;
+		newRecordExp.x += (1.0f - newRecordExp.x) / 5.0f;
+		newRecordExp.y += (1.0f - newRecordExp.y) / 5.0f;
 
 		// アルファを規定値に近づける。
 		newRecordAlpha += (255 - newRecordAlpha) / 5.0f;
 
 		// 座標をセットする。
-		const Vec2<float> POS = { 975,540 };
+		const Vec2<float> POS = { 985,540 };
 		newRecordPos = POS;
 
 		// アニメーションのタイマーを更新する。
