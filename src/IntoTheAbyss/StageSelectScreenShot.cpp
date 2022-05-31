@@ -159,3 +159,9 @@ void StageSelectScreenShot::SetZoomFlag(const bool& Zoom)
 	stageNumberData.timer = 0.0f;
 
 }
+
+float StageSelectScreenShot::GetZoomChangeRate()
+{
+	if (!zoomOutFlag)return (1.0f - screenShotLerpData.timer);
+	return screenShotLerpData.timer;
+}

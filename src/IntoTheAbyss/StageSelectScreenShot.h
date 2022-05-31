@@ -27,6 +27,7 @@ public:
 		return screenShotHandle.size();
 	}
 
+	float GetZoomChangeRate();
 
 	std::shared_ptr<RenderTarget>screenShot;
 

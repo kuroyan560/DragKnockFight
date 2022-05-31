@@ -17,7 +17,7 @@ StageSelectScene::StageSelectScene() : screenShot(&stageNum)
 	mapScreenShot.reserve(StageMgr::Instance()->GetMaxStageNumber());
 	mapScreenShot.resize(StageMgr::Instance()->GetMaxStageNumber());
 
-	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1_select.wav");
+	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1_select.wav", bgmVol);
 }
 
 void StageSelectScene::OnInitialize()
@@ -70,9 +70,7 @@ void StageSelectScene::OnInitialize()
 		mapScreenShot[i][SCENE_CHANGE].Init(i, true);
 	}
 
-	AudioApp::Instance()->ChangeVolume(bgm, bgmVol);
-	AudioApp::Instance()->StopWave(bgm);
-	AudioApp::Instance()->PlayWave(bgm);
+	AudioApp::Instance()->PlayWave(bgm, true);
 }
 
 void StageSelectScene::OnUpdate()
@@ -280,7 +278,7 @@ void StageSelectScene::OnDraw()
 
 	DrawFunc::DrawExtendGraph2D(Vec2<float>(0, 0), WinApp::Instance()->GetExpandWinSize(), D3D12App::Instance()->GenerateTextureBuffer(Color(56, 22, 74, backAlpha)));
 
-	AudioApp::Instance()->ChangeVolume(bgm, (1.0f - maskSceneChange->GetChangeRate()) * bgmVol);
+	AudioApp::Instance()->ChangeVolume(bgm, (1.0f - screenShot.GetZoomChangeRate()) * bgmVol);
 }
 
 void StageSelectScene::OnImguiDebug()
