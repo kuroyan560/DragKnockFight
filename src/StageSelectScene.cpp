@@ -86,7 +86,7 @@ void StageSelectScene::OnUpdate()
 		}
 
 		//キャラクター選択更新
-		CharacterManager::Instance()->CharactersSelectUpdate();
+		//CharacterManager::Instance()->CharactersSelectUpdate();
 
 		//ゲームシーンに移動する
 		if (UsersInput::Instance()->ControllerOnTrigger(0, XBOX_BUTTON::A) && 1.0f <= stageSelect.GetLerpData().timer)
