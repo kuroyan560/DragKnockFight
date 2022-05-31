@@ -361,15 +361,6 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	ScoreManager::Instance()->Init();
 	roundFinishFlag = false;
 
-	if (nonFlag)
-	{
-		ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), COUNT_BLOCK_MAX);
-	}
-	else
-	{
-		ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), StageMgr::Instance()->GetAllRoomWallBlocksNum(stageNum));
-	}
-
 	// 背景パーティクルを更新
 	BackGroundParticleMgr::Instance()->Init();
 	BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetMapIdxSize(stageNum, roomNum).x * MAP_CHIP_SIZE, StageMgr::Instance()->GetMapIdxSize(stageNum, roomNum).y * MAP_CHIP_SIZE));
@@ -1562,16 +1553,20 @@ void Game::InitCountBlock()
 		break;
 	}
 
+
 	bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
+
+	int stageNum = SelectStage::Instance()->GetStageNum();
 	int roomNum = SelectStage::Instance()->GetRoomNum();
 	bool firstStageFlag = roomNum == 0;
-
 	if (nonFlag)
 	{
 		countBlock.Init(countBlockNum, false, firstStageFlag);
+		ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), countBlockNum);
 	}
 	else
 	{
 		countBlock.Init(StageMgr::Instance()->GetAllLocalWallBlocksNum(), true, firstStageFlag);
+		ScoreKeep::Instance()->Init(StageMgr::Instance()->GetMaxLap(stageNum), StageMgr::Instance()->GetAllRoomWallBlocksNum(stageNum));
 	}
 }
