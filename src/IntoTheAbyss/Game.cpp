@@ -627,6 +627,13 @@ void Game::Update(const bool& Loop)
 	CharacterManager::Instance()->Right()->CheckHit(tmpMapData, lineCenterPos, roundFinishFlag);
 	CharacterAIData::Instance()->prevPos = CharacterManager::Instance()->Right()->pos;
 
+	if (RoundFinishEffect::Instance()->addScoreFlag)
+	{
+		ScoreManager::Instance()->Add(countBlock.countAllBlockNum - countBlock.countNowBlockNum);
+		RoundFinishEffect::Instance()->addScoreFlag = false;
+	}
+
+
 	miniMap.Update();
 	screenEdgeEffect.Update();
 

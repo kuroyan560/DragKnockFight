@@ -42,7 +42,6 @@ void StageSelectScene::OnInitialize()
 
 
 
-
 	// 各矢印を初期化
 	rightArrow.Init(Vec2<float>(1180.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), 0);
 	leftArrow.Init(Vec2<float>(100.0f, static_cast<float>(WinApp::Instance()->GetWinCenter().y) + 5.0f), DirectX::XM_PI);
@@ -53,10 +52,6 @@ void StageSelectScene::OnInitialize()
 	rightChara.Init(Vec2<float>(1830.0f, 881.0f), rightCharaPos, TexHandleMgr::LoadGraph("resource/ChainCombat/select_scene/character_card/lacy.png"));
 
 
-	//矢印やタグを画面外から戻す
-	if (moveToGameFlag)
-	{
-	}
 
 
 

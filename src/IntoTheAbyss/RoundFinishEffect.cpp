@@ -85,7 +85,7 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 		useGraph = excellentGraph;
 
 	}
-
+	addScoreFlag = false;
 }
 
 void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
@@ -192,7 +192,9 @@ void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
 		}
 		else if (timer == NUM3_ENEMY_EXP_TIMER * 0.75) {
 
-			ScoreManager::Instance()->AddDestroyPoint();
+			//ScoreManager::Instance()->AddDestroyPoint();
+			addScoreFlag = true;
+			
 			UsersInput::Instance()->ShakeController(0, 0.5f, 12);
 
 			// ラウンド数のUIを更新。

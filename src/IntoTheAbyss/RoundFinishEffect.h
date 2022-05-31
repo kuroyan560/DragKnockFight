@@ -61,6 +61,7 @@ public:
 	Sound soundType;
 	std::array<int, 4>evaluationSoundHandle;
 
+	bool addScoreFlag;
 public:
 
 	// コンストラクタ
