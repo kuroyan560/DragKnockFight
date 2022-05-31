@@ -62,11 +62,6 @@ void BlockCount::Update()
 	else
 	{
 		countNowBlockNum = CharacterManager::Instance()->Left()->swingDestroyCounter.totalCounter;
-
-		if (countAllBlockNum <= countNowBlockNum)
-		{
-			countNowBlockNum = countAllBlockNum;
-		}
 		nowNumber = CountNumber(countNowBlockNum);
 		maxNumber = CountNumber(countAllBlockNum);
 	}
