@@ -153,7 +153,7 @@ void BlockCount::Draw()
 		POS + goodOffset + TexHandleMgr::GetTexBuffer(GOOD_GAUGE)->GetGraphSize().Float() * Vec2<float>(goodRate / data.goodRate, 1.0f));
 
 	//GREAT
-	if (data.goodRate < totalGetRate)
+	if (data.goodRate <= totalGetRate)
 	{
 		const float greatRate = min(totalGetRate, data.greatRate);
 		const Vec2<float>greatOffset = { 426,GAUGE_OFFSET_Y };
@@ -161,7 +161,7 @@ void BlockCount::Draw()
 			POS + greatOffset + TexHandleMgr::GetTexBuffer(GREAT_GAUGE)->GetGraphSize().Float() * Vec2<float>(greatRate / data.greatRate, 1.0f));
 	}
 	//EXCELLENT
-	if (data.greatRate < totalGetRate)
+	if (data.greatRate <= totalGetRate)
 	{
 		const float excellentRate = min(totalGetRate, data.excellentRate);
 		const Vec2<float>excellentOffset = { 670,GAUGE_OFFSET_Y };
@@ -169,7 +169,7 @@ void BlockCount::Draw()
 			POS + excellentOffset + TexHandleMgr::GetTexBuffer(EXCELLENT_GAUGE)->GetGraphSize().Float() * Vec2<float>(excellentRate / data.excellentRate, 1.0f));
 	}
 	//PERFECT
-	if (data.excellentRate < totalGetRate)
+	if (data.excellentRate <= totalGetRate)
 	{
 		const float perfectRate = min(totalGetRate, data.perfectRate);
 		const Vec2<float>perfectOffset = { 755.5f,GAUGE_OFFSET_Y };
