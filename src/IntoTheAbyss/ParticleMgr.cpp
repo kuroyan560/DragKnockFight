@@ -265,11 +265,11 @@ void ParticleMgr::Generate(const Vec2<float>& EmitPos, const Vec2<float>& EmitVe
 		const Vec2<float>smokeStartEmitVec = KuroMath::RotateVec2(-EmitVec, Angle::ConvertToRadian(-SMOKE_EMIT_DEGREE / 2.0f));
 
 		Vec2<float>emitVec;
-		for (int i = 0; i < smokeNum; ++i)
-		{
-			emitVec = KuroMath::RotateVec2(smokeStartEmitVec, Angle::ConvertToRadian(KuroFunc::GetRand(SMOKE_EMIT_DEGREE)));
-			EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::FAST_SMOKE, PARTICLE_TEX::SMOKE_0 + KuroFunc::GetRand(SMOKE_NUM - 1), mulCol);
-		}
+		//for (int i = 0; i < smokeNum; ++i)
+		//{
+		//	emitVec = KuroMath::RotateVec2(smokeStartEmitVec, Angle::ConvertToRadian(KuroFunc::GetRand(SMOKE_EMIT_DEGREE)));
+		//	EmitParticle(EmitPos, emitVec, PARTICLE_CUMPUTE_TYPE::FAST_SMOKE, PARTICLE_TEX::SMOKE_0 + KuroFunc::GetRand(SMOKE_NUM - 1), mulCol);
+		//}
 
 		static const int STAR_EMIT_MAX = 5;
 		static const int STAR_EMIT_MIN = 2;

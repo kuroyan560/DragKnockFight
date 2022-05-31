@@ -1477,6 +1477,11 @@ void CharacterInterFace::CheckHit(const MapChipArray& MapData, const Vec2<float>
 
 					int smokeCol = 0;
 					// クラッシュさせる。
+
+					if (isHitLeft)vec = { -1,0 };
+					if (isHitRight)vec = { 1,0 };
+					if (isHitTop)vec = { 0,-1 };
+					if (isHitBottom)vec = { 0,1 };
 					Crash(vec, smokeCol);
 
 					CWSwingSegmentMgr.Init();
