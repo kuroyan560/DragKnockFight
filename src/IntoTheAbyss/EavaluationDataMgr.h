@@ -37,7 +37,7 @@ public:
 	EvaluationMgr()
 	{
 		soundData.resize(5);
-		soundData[SOUND_FAIL] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_good.wav", 0.13f);
+		soundData[SOUND_FAIL] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_failed.wav", 0.13f);
 		soundData[SOUND_GOOD] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_good.wav", 0.13f);
 		soundData[SOUND_GREAT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_great.wav", 0.13f);
 		soundData[SOUND_EXCELLENT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_excellent.wav", 0.13f);
