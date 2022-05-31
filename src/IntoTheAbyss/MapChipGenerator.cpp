@@ -171,22 +171,44 @@ void MapChipGenerator_SplineOrbit::Draw()
 		//DrawFunc::DrawRotaGraph2D(drawPos, { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom }, { 0.0f }, TexHandleMgr::GetTexBuffer(AIM_GRAPH));
 	}
 
+	// 照準と照準の間の点々を描画
 	static const int ORBIT_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/generateArrow_point.png");
-	const float DRAW_POINT_SPAN = 64.0f;
-	Vec2<float>exp = { ScrollMgr::Instance()->zoom,ScrollMgr::Instance()->zoom };
+	const float DRAW_POINT_SPAN = 64.0f;	// 点と点の間のスパン
+	Vec2<float>exp = { ScrollMgr::Instance()->zoom,ScrollMgr::Instance()->zoom };	// 拡大率
 	for (int i = 1; i <= 2; ++i)
 	{
+		// 照準と照準の間のベクトル
 		Vec2<float>vec = targetPos[i + 1] - targetPos[i];
-		Vec2<float> vecUint = vec / DRAW_POINT_SPAN;
+
+		// For文内で進めるベクトル
+		Vec2<float> vecNorm = vec.GetNormal();
+
+		// 表示する数。
+		const int DRAW_COUNT = vec.Length() / DRAW_POINT_SPAN;
+		for (int index = 1; index < DRAW_COUNT; ++index) {
+
+			// 描画する座標
+			Vec2<float> drawPos = targetPos[i] + vecNorm * (DRAW_POINT_SPAN * index);
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos), exp, KuroFunc::GetAngle(vec), TexHandleMgr::GetTexBuffer(ORBIT_GRAPH));
+
+		}
+
+		/*Vec2<float> vecUint = vec / DRAW_POINT_SPAN;
 		int pointNum = vec.Length() / DRAW_POINT_SPAN;
 		for (int j = 0; j < pointNum; ++j)
 		{
 			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(targetPos[i] + vecUint * j), exp, KuroFunc::GetAngle(vec), TexHandleMgr::GetTexBuffer(ORBIT_GRAPH));
-		}
+		}*/
 	}
 
+	// 矢印の画像
+	static const int ARROW_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/generateArrow_head.png");
+	Vec2<float> arrowVec = (targetPos[3] - targetPos[2]).GetNormal();
+	float arrowAngle = atan2f(arrowVec.y, arrowVec.x);
+	DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(targetPos[3]), exp, arrowAngle, TexHandleMgr::GetTexBuffer(ARROW_GRAPH));
+
 	//照準
-	for (int i = 1; i < 4; ++i)
+	for (int i = 1; i < 3; ++i)
 	{
 		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(targetPos[i]), { ScrollMgr::Instance()->zoom ,ScrollMgr::Instance()->zoom }, { 0.0f }, TexHandleMgr::GetTexBuffer(AIM_GRAPH));
 	}
