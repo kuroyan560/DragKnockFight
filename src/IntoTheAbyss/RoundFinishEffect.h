@@ -29,6 +29,8 @@ public:
 	int greatGraph;
 	int excellentGraph;
 
+	bool isEndResultScene;		// リザルトシーンへ以降するフラグ
+
 	int useGraph;
 
 	int perfectAnimTimer;
@@ -73,7 +75,7 @@ public:
 	void Start(const bool& IsPerfect, const float& Rate, const float& CameraZoom);
 
 	// 更新処理
-	void Update(const Vec2<float>& LineCenterPos);
+	void Update(const Vec2<float>& LineCenterPos, const bool& IsFinalRound);
 
 	// 描画処理
 	void Draw();
