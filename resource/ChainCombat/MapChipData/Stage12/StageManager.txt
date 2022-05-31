@@ -1,6 +1,2 @@
-room0 3
-timer0 20
-room1 3
-timer1 20
-room2 3
-timer2 20
+room0 1
+timer0 80

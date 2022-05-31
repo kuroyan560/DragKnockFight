@@ -1,2 +1,3 @@
-room0 2
-timer0 20
+room0 3
+timer0 80
+gene0 1 45
