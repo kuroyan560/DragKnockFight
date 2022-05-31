@@ -1,0 +1,2 @@
+room0 1
+timer0 80
