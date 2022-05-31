@@ -169,6 +169,7 @@ public:
 
 	Game();
 	void Init(const bool& PractiveMode = false);
+	void InitRestart(const bool& PractiveMode = false);
 	void Update(const bool& Loop = false);
 	void Draw();
 	void Scramble();

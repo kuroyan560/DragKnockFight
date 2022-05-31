@@ -73,7 +73,7 @@ void GameScene::OnUpdate()
 	bool restartInput = UsersInput::Instance()->ControllerOnTrigger(0, BACK);
 	if (restartInput) {
 
-		game.Init();
+		game.InitRestart();
 
 	}
 

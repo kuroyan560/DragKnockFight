@@ -549,6 +549,52 @@ void Game::Init(const bool& PracticeMode)
 	RoundCountMgr::Instance()->Init(roomNum);
 }
 
+void Game::InitRestart(const bool& PracticeMode)
+{
+	GameSceneCameraMove::Instance()->move = {};
+	rStickNoInputTimer = 0;
+
+	RoundFinishEffect::Instance()->Init();
+
+	static const int READY_EXPLOSION_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/readyExplosion.wav", 0.5f);
+	AudioApp::Instance()->StopWave(READY_EXPLOSION_SE);
+
+	isTransitionResult = false;
+	trasitionTimer = 0;
+
+	practiceMode = PracticeMode;
+
+	WinCounter::Instance()->Reset();
+
+	turnResultScene = false;
+
+	CharacterManager::Instance()->CharactersGenerate();
+
+	//SelectStage::Instance()->SelectRoomNum(0);
+	InitGame(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
+	ScrollMgr::Instance()->Reset();
+	roundChangeEffect.Init();
+	CrashEffectMgr::Instance()->Init();
+
+	StaminaItemMgr::Instance()->SetArea(playerHomeBase.hitBox.center->x - playerHomeBase.hitBox.size.x, enemyHomeBase.hitBox.center->x + enemyHomeBase.hitBox.size.x);
+
+	drawCharaFlag = false;
+	RoundFinishEffect::Instance()->Init();
+
+	stageRap.Init(StageMgr::Instance()->GetMaxLap(SelectStage::Instance()->GetStageNum()));
+
+	DistanceCounter::Instance()->Init();
+
+	GeneratorInit();
+
+	// 背景パーティクルを更新
+	//BackGroundParticleMgr::Instance()->Init();
+	//BackGroundParticleMgr::Instance()->StageStartGenerate(Vec2<float>(StageMgr::Instance()->GetLocalMap()[0].size() * MAP_CHIP_SIZE, StageMgr::Instance()->GetLocalMap()->size() * MAP_CHIP_SIZE));
+
+	int roomNum = StageMgr::Instance()->GetMaxRoomNumber(SelectStage::Instance()->GetStageNum());
+	RoundCountMgr::Instance()->Init(roomNum);
+}
+
 void Game::Update(const bool& Loop)
 {
 
