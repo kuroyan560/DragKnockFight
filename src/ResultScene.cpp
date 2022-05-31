@@ -27,6 +27,7 @@ ResultScene::ResultScene()
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/player/lacy/pull_front.png", 3, { 3, 1 }, redCharaHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/player/luna/pull_front.png", 3, { 3, 1 }, greenCharaHandle.data());
 	TexHandleMgr::LoadDivGraph("resource/ChainCombat/ironBall/explosion_open.png", 3, { 3, 1 }, ironBallhandle.data());
+	TexHandleMgr::LoadDivGraph("resource/ChainCombat/UI/perfect.png", 3, { 3, 1 }, newRecordHandle.data());
 	useHandle = ironBallhandle;
 	slashHandle = blueNumberHandle[11];
 	lissajousTimer = 0;
@@ -75,6 +76,7 @@ void ResultScene::OnInitialize()
 	}
 	defaultSize = 1.5f;
 	bigFontFlag = false;
+	isNewRecord = false;
 
 	evaluationEasingTimer = 0;
 	intervalTimer = 0;
@@ -96,44 +98,20 @@ void ResultScene::OnInitialize()
 	ssIntervalTimer = 0;
 
 	initSoundFlag = false;
+
+	newRecordExp = {};
+	newRecordPos = {};
+	newRecordTimer = 0;
+	newRecordAlpha = 0;
+	newRecordAnimTimer = 0;
+	newRecordIndex = 0;
+	isNewRecordActive = false;
+	isNewRecord = false;
+
 }
 
 void ResultScene::OnUpdate()
 {
-	if (DebugKeyManager::Instance()->DebugKeyTrigger(DIK_J, "ResetResult", TO_STRING(DIK_J)))
-	{
-		resultUITimer = 0;
-		breakEnemyUITimer = 0;
-		delayTimer = 0;
-		resultEasingAmount = 0;
-		breakCountEasingAmount = 0;
-		winnerName = ResultTransfer::Instance()->winner;
-
-		maxSize = { 0.5f,0.5f };
-		breakSize = { 1.5f,1.5f };
-
-		breakCount = 0;
-		baseBreakCount = -1;
-
-		scoreEffectTimer = 0;
-
-		for (int i = 0; i < scoreSize.size(); ++i)
-		{
-			scoreSize[i] = 1.5f;
-		}
-		defaultSize = 1.5f;
-		bigFontFlag = false;
-
-		evaluationEasingTimer = 0;
-		intervalTimer = 0;
-		evaluationFlag = false;
-
-		perfectInterval = 0;
-		perfectIndex = 0;
-		initSoundFlag = false;
-	}
-
-
 
 	static const int SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/resultScore.wav", 0.13f);
 
@@ -212,6 +190,7 @@ void ResultScene::OnUpdate()
 			intervalTimer = 35;
 			endFlg = true;
 			bigFontFlag = true;
+			isNewRecordActive = true;
 			ssIntervalTimer = 0;
 			baseBreakCount = ScoreManager::Instance()->GetScore();
 
@@ -268,6 +247,7 @@ void ResultScene::OnUpdate()
 		++intervalTimer;
 	}
 	timeUpFlag = 35 <= intervalTimer;
+	isNewRecordActive = 35 <= intervalTimer;
 
 
 	Sound soundType = SOUND_GOOD;
@@ -375,6 +355,50 @@ void ResultScene::OnUpdate()
 	// 背景のキャラを動かす。
 	backGroundCharaPos += backGroundCharaVel;
 
+
+	// 新記録だったら
+	if (isNewRecord && isNewRecordActive) {
+
+		// タイマーを更新して大きさを設定。
+		++newRecordTimer;
+		static const int EXP_TIMER = 15;
+		if (EXP_TIMER < newRecordTimer) {
+
+			newRecordTimer = 0;
+			//newRecordAlpha = 0;
+			//newRecordExp = { 0.6f,0.6f };
+
+		}
+
+		// サイズを動かす。
+		newRecordExp.x += (0.5f - newRecordExp.x) / 5.0f;
+		newRecordExp.y += (0.5f - newRecordExp.y) / 5.0f;
+
+		// アルファを規定値に近づける。
+		newRecordAlpha += (255 - newRecordAlpha) / 5.0f;
+
+		// 座標をセットする。
+		const Vec2<float> POS = { 975,540 };
+		newRecordPos = POS;
+
+		// アニメーションのタイマーを更新する。
+		++newRecordAnimTimer;
+		const int ANIM_TIMER = 10;
+		if (ANIM_TIMER < newRecordAnimTimer) {
+
+			newRecordAnimTimer = 0;
+			++newRecordIndex;
+			if (3 <= newRecordIndex) {
+
+				newRecordIndex = 0;
+
+			}
+
+		}
+
+	}
+
+
 }
 
 #include"IntoTheAbyss/ClearInfoContainer.h"
@@ -433,9 +457,17 @@ void ResultScene::OnDraw()
 		}
 	}
 
+	// 新記録の画像を描画する。
+	if (isNewRecord) {
+
+		DrawFunc::DrawRotaGraph2D(newRecordPos + lissajousCurve, newRecordExp, 0, TexHandleMgr::GetTexBuffer(newRecordHandle[newRecordIndex]), Color(255, 255, 255, newRecordAlpha));
+
+	}
+
 	crt.Excute(D3D12App::Instance()->GetCmdList(), D3D12App::Instance()->GetBackBuffRenderTarget());
 	KuroEngine::Instance().Graphics().SetRenderTargets({ D3D12App::Instance()->GetBackBuffRenderTarget() });
 	crt.DrawResult(AlphaBlendMode_None);
+
 
 	//スクリーンショットを取るまでの間隔をあける
 	if (endFlg)
@@ -444,7 +476,14 @@ void ResultScene::OnDraw()
 	}
 	const int SCREEN_SHOT_TIME = 2;
 	//クリア情報のスクショ
-	auto &nowContainer = ClearInfoContainerMgr::Instance()->GetContainer(SelectStage::Instance()->GetStageNum());
+	auto& nowContainer = ClearInfoContainerMgr::Instance()->GetContainer(SelectStage::Instance()->GetStageNum());
+
+	if (nowContainer.maxBreakCount < breakCount) {
+
+		isNewRecord = true;
+
+	}
+
 	if (endFlg && nowContainer.maxBreakCount < breakCount && SCREEN_SHOT_TIME <= ssIntervalTimer)
 	{
 		KuroEngine::Instance().Graphics().ClearRenderTarget(nowContainer.clearInfoRenderTarget);
