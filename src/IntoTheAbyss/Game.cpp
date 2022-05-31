@@ -926,9 +926,9 @@ void Game::Draw()
 
 
 	GameTimer::Instance()->Draw();
+	countBlock.Draw();
 	ScoreManager::Instance()->Draw();
 
-	countBlock.Draw();
 	stageRap.Draw();
 
 	WinCounter::Instance()->Draw();
@@ -1418,6 +1418,7 @@ void Game::RoundFinishEffect(const bool& Loop)
 		}
 
 		isFinalRound = !SelectStage::Instance()->HaveNextLap();
+		if (isFinalRound)mapChipGeneratorChangeMap->SetActive(false);
 
 		// リザルトシーンへ移行できる状態だったら。
 		if (RoundFinishEffect::Instance()->isEndResultScene && isFinalRound) {
@@ -1456,7 +1457,6 @@ void Game::RoundFinishEffect(const bool& Loop)
 
 			++roundTimer;
 
-			if (isFinalRound)mapChipGeneratorChangeMap->SetActive(false);
 
 			if (60 <= roundTimer)
 			{
