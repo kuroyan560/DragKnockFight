@@ -34,7 +34,7 @@ void ScoreManager::Add(const int& ADD_POINT)
 
 void ScoreManager::AddDestroyPoint()
 {
-	honraiScore += destroyPoint;
+	//honraiScore += destroyPoint;
 
 	timer = 0;
 	if (mode == EXIT)mode = STAY;

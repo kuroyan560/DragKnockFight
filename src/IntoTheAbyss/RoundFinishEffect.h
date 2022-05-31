@@ -29,8 +29,6 @@ public:
 	int greatGraph;
 	int excellentGraph;
 
-	bool isEndResultScene;		// リザルトシーンへ以降するフラグ
-
 	int useGraph;
 
 	int perfectAnimTimer;
@@ -61,8 +59,9 @@ public:
 
 	
 	Sound soundType;
-	std::array<int, 4>evaluationSoundHandle;
+	std::vector<int>evaluationSoundHandle;
 
+	bool addScoreFlag;
 public:
 
 	// コンストラクタ
@@ -75,7 +74,7 @@ public:
 	void Start(const bool& IsPerfect, const float& Rate, const float& CameraZoom);
 
 	// 更新処理
-	void Update(const Vec2<float>& LineCenterPos, const bool& IsFinalRound);
+	void Update(const Vec2<float>& LineCenterPos);
 
 	// 描画処理
 	void Draw();

@@ -20,6 +20,7 @@ GameScene::GameScene()
 	addValue = 10.0f;
 
 	sceneChange = std::make_shared<SceneTransitionDrawScreenShot>();
+	resultSceneChange = std::make_shared<SceneCange>();
 
 
 	//imguiHandle = DebugImGuiManager::Instance()->Add("Round");
@@ -47,7 +48,7 @@ void GameScene::OnUpdate()
 	if (game.TurnResultScene()) {
 		if (isSS)
 		{
-			KuroEngine::Instance().ChangeScene(3, sceneChange);
+			KuroEngine::Instance().ChangeScene(3, resultSceneChange);
 		}
 		isSS = true;
 	}
