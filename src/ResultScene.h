@@ -85,7 +85,7 @@ class ResultScene : public BaseScene
 
 	int ssIntervalTimer;
 
-	std::array<int, 4>soundSe;
+	std::vector<int>soundSe;
 public:
 
 	const Vec2<int> WINDOW_CENTER = WinApp::Instance()->GetWinCenter();

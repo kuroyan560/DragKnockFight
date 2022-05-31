@@ -43,10 +43,8 @@ ResultScene::ResultScene()
 	winnerGraph[PLAYABLE_LACY] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
 	winnerGraph[PLAYABLE_BOSS_0] = TexHandleMgr::LoadGraph("resource/ChainCombat/result_scene/lacy.png");
 
-	soundSe[SOUND_GOOD] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_good.wav", 0.13f);
-	soundSe[SOUND_GREAT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_great.wav", 0.13f);
-	soundSe[SOUND_EXCELLENT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_excellent.wav", 0.13f);
-	soundSe[SOUND_PERFECT] = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/voice/Voice_perfect.wav", 0.13f);
+
+	soundSe = EvaluationMgr::Instance()->soundData;
 }
 
 void ResultScene::OnInitialize()
@@ -258,6 +256,7 @@ void ResultScene::OnUpdate()
 	int roomNum = SelectStage::Instance()->GetRoomNum();
 
 	StageEvaluationData data = EvaluationMgr::Instance()->GetData(stageNum, roomNum);
+	const float FAIL_RATE = data.failRate;
 	const float GOOD_RATE = data.goodRate;
 	const float GREAT_RATE = data.greatRate;
 	const float EXCELLENT_RATE = data.excellentRate;

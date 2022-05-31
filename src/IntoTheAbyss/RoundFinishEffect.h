@@ -59,7 +59,7 @@ public:
 
 	
 	Sound soundType;
-	std::array<int, 4>evaluationSoundHandle;
+	std::vector<int>evaluationSoundHandle;
 
 public:
 
