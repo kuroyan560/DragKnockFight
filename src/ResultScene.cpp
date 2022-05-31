@@ -253,27 +253,27 @@ void ResultScene::OnUpdate()
 	Sound soundType = SOUND_FAIL;
 	//evaluationNowHandle = failHandle;
 
-	if (FAIL_RATE <= rate)
+	if (rate <= FAIL_RATE)
 	{
 		soundType = SOUND_FAIL;
 		evaluationNowHandle = failHandle;
 	}
-	if (rate <= GOOD_RATE)
+	else if (rate <= GOOD_RATE)
 	{
 		soundType = SOUND_GOOD;
 		evaluationNowHandle = goodHandle;
 	}
-	if (GOOD_RATE <= rate && rate < GREAT_RATE)
+	else if (GOOD_RATE <= rate && rate < GREAT_RATE)
 	{
 		soundType = SOUND_GREAT;
 		evaluationNowHandle = greatHandle;
 	}
-	if (GREAT_RATE <= rate && rate < EXCELLENT_RATE)
+	else if (GREAT_RATE <= rate && rate < EXCELLENT_RATE)
 	{
 		soundType = SOUND_EXCELLENT;
 		evaluationNowHandle = excellentHandle;
 	}
-	if (EXCELLENT_RATE <= rate && rate <= PERFECR_RATE)
+	else if (EXCELLENT_RATE <= rate && rate <= PERFECR_RATE)
 	{
 		soundType = SOUND_PERFECT;
 		evaluationFlag = true;

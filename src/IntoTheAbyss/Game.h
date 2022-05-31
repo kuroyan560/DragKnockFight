@@ -191,5 +191,7 @@ public:
 	// ラウンド終了時演出
 	void RoundFinishEffect(const bool& Loop);
 
+	void InitCountBlock();
+
 };
 

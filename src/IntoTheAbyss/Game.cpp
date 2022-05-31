@@ -356,15 +356,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 
 
 	bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
-	bool firstStageFlag = roomNum == 0;
-	if (nonFlag)
-	{
-		countBlock.Init(COUNT_BLOCK_MAX, false, firstStageFlag);
-	}
-	else
-	{
-		countBlock.Init(StageMgr::Instance()->GetAllLocalWallBlocksNum(), true, firstStageFlag);
-	}
+	InitCountBlock();
+
 	ScoreManager::Instance()->Init();
 	roundFinishFlag = false;
 
@@ -432,6 +425,8 @@ void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 	playerHandMgr->Init(false);
 
 	stageComment.Init(SelectStage::Instance()->GetStageNum());
+
+
 }
 
 void Game::GeneratorInit()
@@ -1476,19 +1471,8 @@ void Game::RoundFinishEffect(const bool& Loop)
 
 				}
 
-				bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
+				InitCountBlock();
 
-				int roomNum = SelectStage::Instance()->GetRoomNum();
-				bool firstStageFlag = roomNum == 0;
-
-				if (nonFlag)
-				{
-					countBlock.Init(COUNT_BLOCK_MAX, false, firstStageFlag);
-				}
-				else
-				{
-					countBlock.Init(StageMgr::Instance()->GetAllLocalWallBlocksNum(), true, firstStageFlag);
-				}
 				stageRap.Increment();
 				DistanceCounter::Instance()->isExpSmall = false;
 
@@ -1552,4 +1536,42 @@ void Game::RoundFinishEffect(const bool& Loop)
 		//}
 	}
 
+}
+
+void Game::InitCountBlock()
+{
+	int countBlockNum = COUNT_BLOCK_MAX;
+	switch (SelectStage::Instance()->GetStageNum())
+	{
+	case 4:
+		countBlockNum = 2930;
+		break;
+	case 6:
+		countBlockNum = 4300;
+		break;
+	case 9:
+		countBlockNum = 5885;
+		break;
+	case 11:
+		countBlockNum = 1769;
+		break;
+	case 14:
+		countBlockNum = 1833;
+		break;
+	default:
+		break;
+	}
+
+	bool nonFlag = StageMgr::Instance()->GetStageInfo(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum()).generatorType != NON_GENERATE;
+	int roomNum = SelectStage::Instance()->GetRoomNum();
+	bool firstStageFlag = roomNum == 0;
+
+	if (nonFlag)
+	{
+		countBlock.Init(countBlockNum, false, firstStageFlag);
+	}
+	else
+	{
+		countBlock.Init(StageMgr::Instance()->GetAllLocalWallBlocksNum(), true, firstStageFlag);
+	}
 }
