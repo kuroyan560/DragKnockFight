@@ -143,42 +143,38 @@ void BlockCount::Draw()
 	
 	//ゲージ枠
 	DrawFunc::DrawGraph(POS + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(GET_SCORE_RATE_GAUGE_FRAME));
-	float lateBuff = 0.0f;
 
 	StageEvaluationData data = EvaluationMgr::Instance()->GetData(SelectStage::Instance()->GetStageNum(), SelectStage::Instance()->GetRoomNum());
 
 	//GOOD
-	const float goodRate = min(totalGetRate / data.goodRate, 1.0f);
-	lateBuff = data.goodRate;
+	const float goodRate = min(totalGetRate, data.goodRate);
 	const Vec2<float>goodOffset = { 10,GAUGE_OFFSET_Y };
 	DrawFunc_Mask::DrawGraph(POS + goodOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(GOOD_GAUGE), POS + goodOffset,
-		POS + goodOffset + TexHandleMgr::GetTexBuffer(GOOD_GAUGE)->GetGraphSize().Float() * Vec2<float>(goodRate, 1.0f));
+		POS + goodOffset + TexHandleMgr::GetTexBuffer(GOOD_GAUGE)->GetGraphSize().Float() * Vec2<float>(goodRate / data.goodRate, 1.0f));
 
 	//GREAT
-	if (lateBuff < totalGetRate)
+	if (data.goodRate < totalGetRate)
 	{
-		const float greatRate = min(totalGetRate / data.greatRate, 1.0f);
-		lateBuff = data.greatRate;
+		const float greatRate = min(totalGetRate, data.greatRate);
 		const Vec2<float>greatOffset = { 426,GAUGE_OFFSET_Y };
 		DrawFunc_Mask::DrawGraph(POS + greatOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(GREAT_GAUGE), POS + greatOffset,
-			POS + greatOffset + TexHandleMgr::GetTexBuffer(GREAT_GAUGE)->GetGraphSize().Float() * Vec2<float>(greatRate, 1.0f));
+			POS + greatOffset + TexHandleMgr::GetTexBuffer(GREAT_GAUGE)->GetGraphSize().Float() * Vec2<float>(greatRate / data.greatRate, 1.0f));
 	}
 	//EXCELLENT
-	if (lateBuff < totalGetRate)
+	if (data.greatRate < totalGetRate)
 	{
-		const float excellentRate = min(totalGetRate / data.excellentRate, 1.0f);
-		lateBuff = data.excellentRate;
+		const float excellentRate = min(totalGetRate, data.excellentRate);
 		const Vec2<float>excellentOffset = { 670,GAUGE_OFFSET_Y };
 		DrawFunc_Mask::DrawGraph(POS + excellentOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(EXCELLENT_GAUGE), POS + excellentOffset,
-			POS + excellentOffset + TexHandleMgr::GetTexBuffer(EXCELLENT_GAUGE)->GetGraphSize().Float() * Vec2<float>(excellentRate, 1.0f));
+			POS + excellentOffset + TexHandleMgr::GetTexBuffer(EXCELLENT_GAUGE)->GetGraphSize().Float() * Vec2<float>(excellentRate / data.excellentRate, 1.0f));
 	}
 	//PERFECT
-	if (lateBuff < totalGetRate)
+	if (data.perfectRate < totalGetRate)
 	{
-		const float perfectRate = min(totalGetRate /data.perfectRate, 1.0f);
+		const float perfectRate = min(totalGetRate, data.perfectRate);
 		const Vec2<float>perfectOffset = { 755.5f,GAUGE_OFFSET_Y };
 		DrawFunc_Mask::DrawGraph(POS + perfectOffset + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(PERFECT_GAUGE), POS + perfectOffset,
-			POS + perfectOffset + TexHandleMgr::GetTexBuffer(PERFECT_GAUGE)->GetGraphSize().Float() * Vec2<float>(perfectRate, 1.0f));
+			POS + perfectOffset + TexHandleMgr::GetTexBuffer(PERFECT_GAUGE)->GetGraphSize().Float() * Vec2<float>(perfectRate / data.perfectRate, 1.0f));
 	}
 }
 
