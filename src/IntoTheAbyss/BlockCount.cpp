@@ -35,6 +35,8 @@ void BlockCount::Init(int COUNT_MAX, bool MODE, bool DISAPPEAR_FLAG)
 	}
 
 
+
+
 	nowScoreNum = ScoreManager::Instance()->GetScore();
 	if (DISAPPEAR_FLAG)
 	{

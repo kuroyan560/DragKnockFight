@@ -27,6 +27,18 @@ public:
 		return result;
 	}
 
+	int GetBlockNum()
+	{
+		if (countBlockModeFlag)
+		{
+			return countAllBlockNum - countNowBlockNum;
+		}
+		else
+		{
+			return countNowBlockNum;
+		}
+	};
+
 	int countAllBlockNum;
 	int countNowBlockNum;
 
