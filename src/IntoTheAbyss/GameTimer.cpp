@@ -237,6 +237,8 @@ void GameTimer::Update()
 
 }
 
+#include "GameSceneCamerMove.h"
+
 void GameTimer::Draw()
 {
 
@@ -247,7 +249,7 @@ void GameTimer::Draw()
 
 		if (num == 0) num = 1;
 
-		DrawFunc::DrawRotaGraph2D(WinApp::Instance()->GetExpandWinCenter(), Vec2<float>(centerCountDownSize, centerCountDownSize), 0, TexHandleMgr::GetTexBuffer(number[num]), Color(255, 255, 255, centerCoundDownAlpha));
+		DrawFunc::DrawRotaGraph2D(WinApp::Instance()->GetExpandWinCenter() + GameSceneCameraMove::Instance()->move, Vec2<float>(centerCountDownSize, centerCountDownSize), 0, TexHandleMgr::GetTexBuffer(number[num]), Color(255, 255, 255, centerCoundDownAlpha));
 
 	}
 	else {
@@ -260,19 +262,19 @@ void GameTimer::Draw()
 		{
 			offset = i;
 			centralPos = { timerPos.x + i * texSize.x, timerPos.y + offsetY };
-			DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(timerSize, timerSize), 0.0f, TexHandleMgr::GetTexBuffer(number[minitueHandle[i]]), Color(255, 255, 255, timerAlpha));
+			DrawFunc::DrawRotaGraph2D(centralPos + GameSceneCameraMove::Instance()->move, Vec2<float>(timerSize, timerSize), 0.0f, TexHandleMgr::GetTexBuffer(number[minitueHandle[i]]), Color(255, 255, 255, timerAlpha));
 		}
 
 		++offset;
 		centralPos = { timerPos.x + offset * texSize.x,timerPos.y + offsetY };
-		DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(timerSize, timerSize), 0.0f, TexHandleMgr::GetTexBuffer(number[10]), Color(255, 255, 255, timerAlpha));
+		DrawFunc::DrawRotaGraph2D(centralPos + GameSceneCameraMove::Instance()->move, Vec2<float>(timerSize, timerSize), 0.0f, TexHandleMgr::GetTexBuffer(number[10]), Color(255, 255, 255, timerAlpha));
 		++offset;
 
 		//•b
 		for (int i = 0; i < timeHandle.size(); i++)
 		{
 			centralPos = { timerPos.x + (offset + i) * texSize.x, timerPos.y + offsetY };
-			DrawFunc::DrawRotaGraph2D(centralPos, Vec2<float>(timerSize, timerSize), 0.0f, TexHandleMgr::GetTexBuffer(number[timeHandle[i]]), Color(255, 255, 255, timerAlpha));
+			DrawFunc::DrawRotaGraph2D(centralPos + GameSceneCameraMove::Instance()->move, Vec2<float>(timerSize, timerSize), 0.0f, TexHandleMgr::GetTexBuffer(number[timeHandle[i]]), Color(255, 255, 255, timerAlpha));
 		}
 
 	}

@@ -205,12 +205,13 @@ void ParticleMgr::Update()
 #include"ShakeMgr.h"
 #include"LightManager.h"
 #include"SlowMgr.h"
+#include"GameSceneCamerMove.h"
 void ParticleMgr::Draw()
 {
 	Vec2<float> scrollShakeZoom = ScrollMgr::Instance()->scrollAmount + ShakeMgr::Instance()->shakeAmount;
 	scrollShakeZoom.x *= ScrollMgr::Instance()->zoom;
 	scrollShakeZoom.y *= ScrollMgr::Instance()->zoom;
-	Vec2<float>scroll = -scrollShakeZoom + ScrollMgr::Instance()->lineCenterOffset;
+	Vec2<float>scroll = -scrollShakeZoom + ScrollMgr::Instance()->lineCenterOffset + GameSceneCameraMove::Instance()->move;
 
 	static GameInfo ZOOM_AND_SCROLL;
 	if (ZOOM_AND_SCROLL.zoom != ScrollMgr::Instance()->zoom || ZOOM_AND_SCROLL.scroll != scroll || ZOOM_AND_SCROLL.gameSpeed != SlowMgr::Instance()->slowAmount)

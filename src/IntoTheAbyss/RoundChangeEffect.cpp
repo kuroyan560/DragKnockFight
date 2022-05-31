@@ -338,18 +338,20 @@ void RoundChangeEffect::Update()
 	}
 }
 
+#include "GameSceneCamerMove.h"
+
 void RoundChangeEffect::Draw()
 {
 	if (startFlag)
 	{
 		//DrawFunc::DrawExtendGraph2D(roundData->GetLeftUpPos(), roundData->GetRightDownPos(), TexHandleMgr::GetTexBuffer(roundData->handle), AlphaBlendMode_None);
-		DrawFunc::DrawRotaGraph2D(roundData->pos, roundData->size, 0.0f, TexHandleMgr::GetTexBuffer(roundData->handle));
+		DrawFunc::DrawRotaGraph2D(roundData->pos + GameSceneCameraMove::Instance()->move, roundData->size, 0.0f, TexHandleMgr::GetTexBuffer(roundData->handle));
 		//DrawFunc::DrawRotaGraph2D(numberData->pos, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle));
 
-		DrawFunc_Mask::DrawRotaGraph2D(numberData->maskPos, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle), numberData->pos, Vec2<float>(120.0f, 120.0f));
+		DrawFunc_Mask::DrawRotaGraph2D(numberData->maskPos + GameSceneCameraMove::Instance()->move, numberData->size, 0.0f, TexHandleMgr::GetTexBuffer(numberData->handle), numberData->pos, Vec2<float>(120.0f, 120.0f));
 		if (!firstRoundFlag)
 		{
-			DrawFunc_Mask::DrawRotaGraph2D(nextNumberData->maskPos, nextNumberData->size, 0.0f, TexHandleMgr::GetTexBuffer(nextNumberData->handle), nextNumberData->pos, Vec2<float>(120.0f, 120.0f));
+			DrawFunc_Mask::DrawRotaGraph2D(nextNumberData->maskPos + GameSceneCameraMove::Instance()->move, nextNumberData->size, 0.0f, TexHandleMgr::GetTexBuffer(nextNumberData->handle), nextNumberData->pos, Vec2<float>(120.0f, 120.0f));
 		}
 		//playerReticle->transform.SetPos(playerReticleData->pos);
 		//playerReticle->transform.SetScale(playerReticleData->size);
@@ -365,11 +367,11 @@ void RoundChangeEffect::Draw()
 
 		if (drawFightFlag)
 		{
-			DrawFunc::DrawRotaGraph2D(fightData->pos, fightData->size, Angle::ConvertToRadian(-25.0f), TexHandleMgr::GetTexBuffer(fightData->handle));
+			DrawFunc::DrawRotaGraph2D(fightData->pos + GameSceneCameraMove::Instance()->move, fightData->size, Angle::ConvertToRadian(-25.0f), TexHandleMgr::GetTexBuffer(fightData->handle));
 		}
 		else
 		{
-			DrawFunc::DrawRotaGraph2D(readyData->pos, readyData->size, 0.0f, TexHandleMgr::GetTexBuffer(readyData->handle));
+			DrawFunc::DrawRotaGraph2D(readyData->pos + GameSceneCameraMove::Instance()->move, readyData->size, 0.0f, TexHandleMgr::GetTexBuffer(readyData->handle));
 		}
 	}
 }

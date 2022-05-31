@@ -56,6 +56,7 @@
 #include "RoundCountMgr.h"
 
 #include "BackGroundParticle.h"
+#include "GameSceneCamerMove.h"
 
 std::vector<std::unique_ptr<MassChipData>> Game::AddData(MapChipArray MAPCHIP_DATA, const int& CHIP_NUM)
 {
@@ -108,7 +109,7 @@ void Game::DrawMapChip(MapChipArray& mapChipData, const int& stageNum, const int
 			if (blockFlag)
 			{
 				// スクロール量から描画する位置を求める。
-				const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE });
+				const Vec2<float> drawPos = ScrollMgr::Instance()->Affect({ width * MAP_CHIP_SIZE,height * MAP_CHIP_SIZE }) + GameSceneCameraMove::Instance()->move;
 
 				// 画面外だったら描画しない。
 				if (drawPos.x < -DRAW_MAP_CHIP_SIZE || drawPos.x > WinApp::Instance()->GetWinSize().x + DRAW_MAP_CHIP_SIZE) continue;
@@ -198,6 +199,11 @@ const int& Game::GetChipNum(const vector<vector<int>>& MAPCHIP_DATA, const int& 
 #include"PlayerHand.h"
 void Game::InitGame(const int& STAGE_NUM, const int& ROOM_NUM)
 {
+	GameSceneCameraMove::Instance()->move = {};
+
+	isTransitionResult = false;
+	trasitionTimer = 0;
+
 	DebugParameter::Instance()->totalCombo = 0;
 	DebugParameter::Instance()->timer = 0;
 
@@ -459,6 +465,7 @@ void Game::GeneratorInit()
 
 Game::Game()
 {
+	GameSceneCameraMove::Instance()->move = {};
 	bgm = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/bgm_1.wav");
 
 	addLineLengthSubAmount = 1.0f;
@@ -498,7 +505,11 @@ Game::Game()
 
 void Game::Init(const bool& PracticeMode)
 {
+	GameSceneCameraMove::Instance()->move = {};
 	rStickNoInputTimer = 0;
+
+	isTransitionResult = false;
+	trasitionTimer = 0;
 
 	practiceMode = PracticeMode;
 
@@ -535,12 +546,6 @@ void Game::Init(const bool& PracticeMode)
 
 void Game::Update(const bool& Loop)
 {
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_R))
-	{
-		int stageNum = SelectStage::Instance()->GetStageNum();
-		int roomNum = SelectStage::Instance()->GetRoomNum();
-		StageMgr::Instance()->SetLocalMapChipData(stageNum, roomNum);
-	}
 
 	//ScrollMgr::Instance()->zoom = ViewPort::Instance()->zoomRate;
 	MapChipArray tmpMapData = *mapData;
@@ -548,26 +553,7 @@ void Game::Update(const bool& Loop)
 	// ステージの切り替え
 	SwitchingStage();
 
-	if (UsersInput::Instance()->KeyOnTrigger(DIK_R)) {
-
-		CharacterManager::Instance()->Left()->swingDestroyCounter.Increment();
-
-	}
-	else if (UsersInput::Instance()->KeyOnTrigger(DIK_T)) {
-
-		CharacterManager::Instance()->Left()->swingDestroyCounter.Init();
-
-	}
-
-
-
 	addLineLengthSubAmount = DebugParameter::Instance()->addLineLengthSubAmount;
-
-
-
-
-
-
 
 
 	// 陣地の判定
@@ -719,7 +705,7 @@ void Game::Update(const bool& Loop)
 	{
 		//Camera::Instance()->zoom = KuroMath::Lerp(ScrollMgr::Instance()->zoom, , 0.1f);
 	}
-	
+
 	//else {
 
 		//ScrollMgr::Instance()->lineCenterOffset = {};
@@ -815,11 +801,11 @@ void Game::Draw()
 		float disappearRate = CharacterManager::Instance()->Left()->GetAlphaRate();
 
 		// 左のキャラ ~ 右のキャラ間に線を描画
-		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos), ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos), TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * disappearRate);
+		DrawFunc::DrawLine2DGraph(ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Left()->pos) + GameSceneCameraMove::Instance()->move, ScrollMgr::Instance()->Affect(CharacterManager::Instance()->Right()->pos) + GameSceneCameraMove::Instance()->move, TexHandleMgr::GetTexBuffer(CENTER_CHAIN_GRAPH), CHAIN_THICKNESS * disappearRate);
 
 		// 線分の中心に円を描画
 		static int LINE_CENTER_GRAPH = TexHandleMgr::LoadGraph("resource/ChainCombat/line_center.png");
-		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos), Vec2<float>(1.0f, 1.0f) * disappearRate, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
+		DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(DistanceCounter::Instance()->lineCenterPos) + GameSceneCameraMove::Instance()->move, Vec2<float>(1.0f, 1.0f) * disappearRate, 0.0f, TexHandleMgr::GetTexBuffer(LINE_CENTER_GRAPH));
 
 
 		if (!roundFinishFlag)
@@ -878,9 +864,9 @@ void Game::Draw()
 		{
 			R_STICK_ANIM.Update();
 			Vec2<float>drawPos = CharacterManager::Instance()->Right()->pos + Vec2<float>(0, -160);
-			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + Vec2<float>(3, -12.5f)),
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos + Vec2<float>(3, -12.5f)) + GameSceneCameraMove::Instance()->move,
 				{ 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(R_STICK_ANIM.GetGraphHandle()));
-			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos),
+			DrawFunc::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(drawPos) + GameSceneCameraMove::Instance()->move,
 				{ 1.0f,1.0f }, 0.0f, TexHandleMgr::GetTexBuffer(TUTORIAL_FRAME));
 		}
 	}
@@ -1374,11 +1360,6 @@ void Game::RoundFinishEffect(const bool& Loop)
 			if (WinCounter::Instance()->Winner() == LEFT_TEAM)ResultTransfer::Instance()->winner = CharacterManager::Instance()->Left()->GetCharacterName();
 			else ResultTransfer::Instance()->winner = CharacterManager::Instance()->Right()->GetCharacterName();
 
-			// リザルトシーンへ移行できる状態だったら。
-			if (RoundFinishEffect::Instance()->isEndResultScene) {
-				turnResultScene = true;
-			}
-
 			isFinalRound = true;
 
 		}
@@ -1387,7 +1368,25 @@ void Game::RoundFinishEffect(const bool& Loop)
 
 		// リザルトシーンへ移行できる状態だったら。
 		if (RoundFinishEffect::Instance()->isEndResultScene && isFinalRound) {
-			turnResultScene = true;
+
+			// 上方向に移動させる。
+			++trasitionTimer;
+			if (TRANSITION_TIMER <= trasitionTimer) {
+
+				// リザルトシーンへ遷移させる。
+				turnResultScene = true;
+
+				// リザルトシーンではDistanceCounterのPosを中心に星を生成するので、演出用でずらした値を入れる。
+				DistanceCounter::Instance()->lineCenterPos.y -= TRANSITION_MOVE_Y;
+
+				// 各変数を初期化
+				trasitionTimer = 0;
+
+			}
+
+			// 上に移動させる。
+			GameSceneCameraMove::Instance()->move.y += (-TRANSITION_MOVE_Y - GameSceneCameraMove::Instance()->move.y) / 10.0f;
+
 		}
 
 		// ラウンド終了時演出の更新処理
@@ -1406,8 +1405,6 @@ void Game::RoundFinishEffect(const bool& Loop)
 
 			if (60 <= roundTimer)
 			{
-				readyToStartRoundFlag = true;
-				roundFinishFlag = false;
 
 				// 最終ラウンドじゃなかったら
 				if (!isFinalRound) {
@@ -1417,6 +1414,8 @@ void Game::RoundFinishEffect(const bool& Loop)
 					mapData = StageMgr::Instance()->GetLocalMap();
 					mapChipGeneratorChangeMap->RegisterMap();
 					RoundFinishEffect::Instance()->changeMap = false;
+					readyToStartRoundFlag = true;
+					roundFinishFlag = false;
 
 				}
 

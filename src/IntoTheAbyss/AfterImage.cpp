@@ -85,6 +85,7 @@ void AfterImageMgr::Update()
 }
 #include "DrawFunc.h"
 #include "ScrollMgr.h"
+#include "GameSceneCamerMove.h"
 void AfterImageMgr::Draw()
 {
 
@@ -102,12 +103,12 @@ void AfterImageMgr::Draw()
 		// ExtendGraphƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚½‚çB
 		if (afterImages[index].isExtendGraph) {
 
-			DrawFunc_Color::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos - afterImages[index].size), ScrollMgr::Instance()->Affect(afterImages[index].pos + afterImages[index].size), TexHandleMgr::GetTexBuffer(afterImages[index].handle), texColor, AlphaBlendMode_None);
+			DrawFunc_Color::DrawExtendGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos - afterImages[index].size) + GameSceneCameraMove::Instance()->move, ScrollMgr::Instance()->Affect(afterImages[index].pos + afterImages[index].size), TexHandleMgr::GetTexBuffer(afterImages[index].handle), texColor, AlphaBlendMode_None);
 
 		}
 		else {
 
-			DrawFunc_Color::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos), afterImages[index].extRate, afterImages[index].radian, TexHandleMgr::GetTexBuffer(afterImages[index].handle), texColor);
+			DrawFunc_Color::DrawRotaGraph2D(ScrollMgr::Instance()->Affect(afterImages[index].pos) + GameSceneCameraMove::Instance()->move, afterImages[index].extRate, afterImages[index].radian, TexHandleMgr::GetTexBuffer(afterImages[index].handle), texColor);
 
 		}
 	}

@@ -50,6 +50,8 @@ void StarParticle::Update()
 	}
 }
 
+#include "GameSceneCamerMove.h"
+
 void StarParticle::Draw()
 {
 	static const Vec2<float>BOX_SIZE = { 15,15 };
@@ -59,7 +61,7 @@ void StarParticle::Draw()
 		const auto drawPos = ScrollMgr::Instance()->Affect(pos);
 		const auto drawHalfSize = BOX_SIZE * size * ScrollMgr::Instance()->zoom * 0.5f * Vec2<float>(KuroFunc::GetRand(1.0f, 1.1f), KuroFunc::GetRand(1.0f, 1.1f));
 		int alpha = 255 * cos(alphaRad);
-		DrawFunc::DrawBox2D(drawPos - drawHalfSize, drawPos + drawHalfSize, Color(239, 1, 144, alpha), true, AlphaBlendMode_Trans);
+		DrawFunc::DrawBox2D(drawPos - drawHalfSize + GameSceneCameraMove::Instance()->move, drawPos + drawHalfSize + GameSceneCameraMove::Instance()->move, Color(239, 1, 144, alpha), true, AlphaBlendMode_Trans);
 	}
 }
 

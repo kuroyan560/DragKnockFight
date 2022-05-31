@@ -171,6 +171,8 @@ void BossHandMgr::Update(const Vec2<float> &POS)
 	}
 }
 
+#include "GameSceneCamerMove.h"
+
 void BossHandMgr::Draw()
 {
 	if (drawHandFlag)
@@ -190,9 +192,9 @@ void BossHandMgr::Draw()
 	}
 	if (debugFlag)
 	{
-		DrawFunc::DrawCircle2D(centralPos, 1.0f, Color(255, 255, 255, 255));
-		DrawFunc::DrawCircle2D(targetPos, 5.0f, Color(255, 0, 0, 255));
-		DrawFunc::DrawLine2D(centralPos, targetPos, Color(0, 255, 0, 255));
+		DrawFunc::DrawCircle2D(centralPos + GameSceneCameraMove::Instance()->move, 1.0f, Color(255, 255, 255, 255));
+		DrawFunc::DrawCircle2D(targetPos + GameSceneCameraMove::Instance()->move, 5.0f, Color(255, 0, 0, 255));
+		DrawFunc::DrawLine2D(centralPos + GameSceneCameraMove::Instance()->move, targetPos, Color(0, 255, 0, 255));
 	}
 }
 

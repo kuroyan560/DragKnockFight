@@ -76,17 +76,19 @@ void RoundCount::Update()
 
 }
 
+#include "GameSceneCamerMove.h"
+
 void RoundCount::Draw(const int& FrameGraph, const int& InnerGraph)
 {
 
 	/*===== ï`âÊèàóù =====*/
 
 	// äOë§Çï`âÊ
-	DrawFunc::DrawRotaGraph2D(pos, Vec2<float>(1.0f, 1.0f), 0, TexHandleMgr::GetTexBuffer(FrameGraph));
+	DrawFunc::DrawRotaGraph2D(pos + GameSceneCameraMove::Instance()->move, Vec2<float>(1.0f, 1.0f), 0, TexHandleMgr::GetTexBuffer(FrameGraph));
 
 	// ì‡ë§Çï`âÊ
 	if (isFill) {
-		DrawFunc::DrawRotaGraph2D(pos, exp, 0, TexHandleMgr::GetTexBuffer(InnerGraph), Color(255, 255, 255, alpha));
+		DrawFunc::DrawRotaGraph2D(pos + GameSceneCameraMove::Instance()->move, exp, 0, TexHandleMgr::GetTexBuffer(InnerGraph), Color(255, 255, 255, alpha));
 	}
 
 }
@@ -170,6 +172,8 @@ void RoundCountMgr::Update()
 	}
 }
 
+#include "GameSceneCamerMove.h"
+
 void RoundCountMgr::Draw()
 {
 
@@ -180,7 +184,7 @@ void RoundCountMgr::Draw()
 	startPos.x = initPos.x + 350.0f + KuroMath::Ease(Out, Cubic, t, 0.0f, 1.0f) * -350.0f;
 	startPos.y = initPos.y;
 
-	DrawFunc::DrawRotaGraph2D(UI_OFFSET_POS, Vec2<float>(1, 1), 0, TexHandleMgr::GetTexBuffer(roundGraph));
+	DrawFunc::DrawRotaGraph2D(UI_OFFSET_POS + GameSceneCameraMove::Instance()->move, Vec2<float>(1, 1), 0, TexHandleMgr::GetTexBuffer(roundGraph));
 
 
 	for (int i = 0; i < maxRound; ++i)

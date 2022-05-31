@@ -150,6 +150,15 @@ class Game
 
 	void GeneratorInit();
 
+
+	/*-- リザルトシーン遷移用 --*/
+
+	bool isTransitionResult;
+	int trasitionTimer;
+	const int TRANSITION_TIMER = 120;
+	const float TRANSITION_MOVE_Y = 2000;
+
+
 	StageComment stageComment;
 
 public:

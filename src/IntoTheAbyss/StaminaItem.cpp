@@ -179,12 +179,14 @@ void StaminaItem::Update()
 
 }
 
+#include "GameSceneCamerMove.h"
+
 void StaminaItem::Draw()
 {
 
 	/*===== •`‰æˆ— =====*/
 
-	Vec2<float> drawPos = ScrollMgr::Instance()->Affect(pos);
+	Vec2<float> drawPos = ScrollMgr::Instance()->Affect(pos) + GameSceneCameraMove::Instance()->move;
 
 	// ‰æ–ÊŠO‚¾‚Á‚½‚ç•`‰æ‚µ‚È‚¢B
 	Vec2<int> windowSize = WinApp::Instance()->GetWinSize();

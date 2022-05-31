@@ -59,6 +59,7 @@ void CrashMgr::Update()
 
 #include"DrawFunc.h"
 #include"ScrollMgr.h"
+#include"GameSceneCamerMove.h"
 void CrashMgr::Draw()
 {
 	for (auto& info : crashInfo)
@@ -68,7 +69,7 @@ void CrashMgr::Draw()
 
 		auto drawPos = ScrollMgr::Instance()->Affect(info.pos);
 		float drawScale = info.scale * ScrollMgr::Instance()->zoom + cos(info.scaleOffsetRadian) * 0.05f;
-		DrawFunc::DrawRotaGraph2D(drawPos, { drawScale,drawScale }, info.radian, TexHandleMgr::GetTexBuffer(crashGraph[KuroFunc::GetRand(2)]));
+		DrawFunc::DrawRotaGraph2D(drawPos + GameSceneCameraMove::Instance()->move, { drawScale,drawScale }, info.radian, TexHandleMgr::GetTexBuffer(crashGraph[KuroFunc::GetRand(2)]));
 	}
 }
 
