@@ -780,8 +780,10 @@ void Game::Update(const bool& Loop)
 
 			float nowBlockCount = countBlock.countNowBlockNum;
 			float maxBclokCount = countBlock.countAllBlockNum;
-			float destroyRate = nowBlockCount / maxBclokCount;
-			RoundFinishEffect::Instance()->Start(isBlockEmpty, 1.0f - destroyRate, Camera::Instance()->zoom);
+			float destroyRate = countBlock.GetBlockNum() / maxBclokCount;
+
+
+			RoundFinishEffect::Instance()->Start(isBlockEmpty, destroyRate, Camera::Instance()->zoom);
 			DistanceCounter::Instance()->isExpSmall = true;
 		}
 	}

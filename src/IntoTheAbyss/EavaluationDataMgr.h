@@ -20,7 +20,7 @@ struct StageEvaluationData
 	float excellentRate;
 	float perfectRate;
 
-	StageEvaluationData() :failRate(0.0f), goodRate(0.3f), greatRate(0.5f), excellentRate(0.8f), perfectRate(1.0f)
+	StageEvaluationData() :failRate(0.0f), goodRate(0.5f), greatRate(0.8f), excellentRate(1.0f), perfectRate(1.0f)
 	{
 	}
 };

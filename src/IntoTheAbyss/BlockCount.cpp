@@ -169,7 +169,7 @@ void BlockCount::Draw()
 			POS + excellentOffset + TexHandleMgr::GetTexBuffer(EXCELLENT_GAUGE)->GetGraphSize().Float() * Vec2<float>(excellentRate / data.excellentRate, 1.0f));
 	}
 	//PERFECT
-	if (data.perfectRate < totalGetRate)
+	if (data.excellentRate < totalGetRate)
 	{
 		const float perfectRate = min(totalGetRate, data.perfectRate);
 		const Vec2<float>perfectOffset = { 755.5f,GAUGE_OFFSET_Y };

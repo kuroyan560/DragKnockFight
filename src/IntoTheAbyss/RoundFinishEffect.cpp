@@ -44,7 +44,7 @@ void RoundFinishEffect::Init()
 	RoundFinishParticleMgr::Instance()->Init();
 }
 
-void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const float& CameraZoom)
+void RoundFinishEffect::Start(const bool &IsPerfect, const float &Rate, const float &CameraZoom)
 {
 
 	/*===== 初期化処理 =====*/
@@ -69,35 +69,36 @@ void RoundFinishEffect::Start(const bool& IsPerfect, const float& Rate, const fl
 	static const float PERFECT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).perfectRate;
 
 	// 引数の割合からどの画像を使用するかをチェックする。
-	if (FAIL_PER <= Rate)
+	if (Rate <= FAIL_PER)
 	{
 		soundType = SOUND_FAIL;
 		useGraph = failGraph;
 	}
-	if (GOOD_PER <= Rate)
+	else if (Rate <= GOOD_PER)
 	{
 		soundType = SOUND_GOOD;
 		useGraph = goodGraph;
 	}
-	if (GREAT_PER <= Rate)
+	else if (GOOD_PER <= Rate && Rate < GREAT_PER)
 	{
 		soundType = SOUND_GREAT;
 		useGraph = greatGraph;
 	}
-	if (EXCELLENT_PER <= Rate)
+	else if (GREAT_PER <= Rate && Rate < EXCELLENT_PER)
 	{
 		soundType = SOUND_EXCELLENT;
 		useGraph = excellentGraph;
 	}
-	if (PERFECT_PER <= Rate)
+	else if (EXCELLENT_PER <= Rate && Rate < PERFECT_PER)
 	{
 		soundType = SOUND_PERFECT;
-		useGraph = excellentGraph;
+		//useGraph = excellentGraph;
+		isPerfect = true;
 	}
 	addScoreFlag = false;
 }
 
-void RoundFinishEffect::Update(const Vec2<float>& LineCenterPos)
+void RoundFinishEffect::Update(const Vec2<float> &LineCenterPos)
 {
 
 	static const int EXPLOSION_SE = AudioApp::Instance()->LoadAudio("resource/ChainCombat/sound/break.wav");
