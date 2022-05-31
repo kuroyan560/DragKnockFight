@@ -25,12 +25,9 @@ public:
 	};
 
 	std::array<int, 3> perfectGraph;
-	int failGraph;
 	int goodGraph;
 	int greatGraph;
 	int excellentGraph;
-
-	bool isEndResultScene;		// リザルトシーンへ以降するフラグ
 
 	int useGraph;
 
@@ -62,8 +59,9 @@ public:
 
 	
 	Sound soundType;
-	std::vector<int>evaluationSoundHandle;
+	std::array<int, 4>evaluationSoundHandle;
 
+	bool addScoreFlag;
 public:
 
 	// コンストラクタ
@@ -76,7 +74,7 @@ public:
 	void Start(const bool& IsPerfect, const float& Rate, const float& CameraZoom);
 
 	// 更新処理
-	void Update(const Vec2<float>& LineCenterPos, const bool& IsFinalRound);
+	void Update(const Vec2<float>& LineCenterPos);
 
 	// 描画処理
 	void Draw();
