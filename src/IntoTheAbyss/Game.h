@@ -32,7 +32,7 @@ class RenderTarget;
 #include"BlockCount.h"
 
 #include"StageRap.h"
-
+#include"StageComment.h"
 
 class CharacterInterFace;
 
@@ -158,6 +158,8 @@ class Game
 	const int TRANSITION_TIMER = 120;
 	const float TRANSITION_MOVE_Y = 2000;
 
+
+	StageComment stageComment;
 
 public:
 	HomeBase playerHomeBase, enemyHomeBase;

@@ -36,7 +36,6 @@ void TitleScene::OnInitialize()
 	FIRST = false;
 	tutorialQuestion = false;
 
-
 	//handMgr->Init();
 }
 
@@ -128,6 +127,7 @@ void TitleScene::OnUpdate()
 			isPressStartDraw = isPressStartDraw ? false : true;
 		}
 	}
+
 }
 
 void TitleScene::OnDraw()

@@ -1,0 +1,3 @@
+room0 1
+timer0 70
+gene0 0 60

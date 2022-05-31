@@ -59,5 +59,6 @@ public:
 	void OnFinalize()override;
 
 	std::shared_ptr<CutInTransition> changeScene;
+
 };
 
