@@ -1541,7 +1541,7 @@ void Game::InitCountBlock()
 		countBlockNum = 4300;
 		break;
 	case 9:
-		countBlockNum = 885;
+		countBlockNum = 5885;
 		break;
 	case 11:
 		countBlockNum = 1769;
