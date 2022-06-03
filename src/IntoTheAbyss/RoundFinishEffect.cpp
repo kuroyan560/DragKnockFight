@@ -62,11 +62,11 @@ void RoundFinishEffect::Start(const bool &IsPerfect, const float &Rate, const fl
 
 	int stageNum = SelectStage::Instance()->GetStageNum();
 	int roomNum = SelectStage::Instance()->GetRoomNum();
-	static const float FAIL_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).failRate;
-	static const float GOOD_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).goodRate;
-	static const float GREAT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).greatRate;
-	static const float EXCELLENT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).excellentRate;
-	static const float PERFECT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).perfectRate;
+	const float FAIL_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).failRate;
+	const float GOOD_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).goodRate;
+	const float GREAT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).greatRate;
+	const float EXCELLENT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).excellentRate;
+	const float PERFECT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).perfectRate;
 
 	// 引数の割合からどの画像を使用するかをチェックする。
 	if (Rate <= FAIL_PER)
