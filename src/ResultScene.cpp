@@ -272,7 +272,7 @@ void ResultScene::OnUpdate()
 		soundType = SOUND_EXCELLENT;
 		evaluationNowHandle = excellentHandle;
 	}
-	else if (EXCELLENT_RATE <= rate && rate <= PERFECR_RATE)
+	else if (EXCELLENT_RATE <= rate)
 	{
 		soundType = SOUND_PERFECT;
 		evaluationFlag = true;

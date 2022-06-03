@@ -89,7 +89,7 @@ void RoundFinishEffect::Start(const bool &IsPerfect, const float &Rate, const fl
 		soundType = SOUND_EXCELLENT;
 		useGraph = excellentGraph;
 	}
-	else if (EXCELLENT_PER <= Rate && Rate < PERFECT_PER)
+	else if (EXCELLENT_PER <= Rate)
 	{
 		soundType = SOUND_PERFECT;
 		//useGraph = excellentGraph;
