@@ -1,2 +1,12 @@
 room0 1
 timer0 80
+
+fail0 0.33f
+good0 0.5f
+great0 0.67f
+excellent0 1.0f
+
+failR 0.33f
+goodR 0.5f
+greatR 0.67f
+excellentR 1.0f

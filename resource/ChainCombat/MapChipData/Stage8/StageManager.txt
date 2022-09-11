@@ -4,3 +4,23 @@ room1 3
 timer1 20
 room2 3
 timer2 20
+
+fail0 0.34f
+good0 0.51f
+great0 0.68f
+excellent0 1.0f
+
+fail1 0.37f
+good1 0.55f
+great1 0.74f
+excellent1 1.0f
+
+fail2 0.38f
+good2 0.57f
+great2 0.76f
+excellent2 1.0f
+
+failR 0.355f
+goodR 0.5325f
+greatR 0.71f
+excellentR 1.0f

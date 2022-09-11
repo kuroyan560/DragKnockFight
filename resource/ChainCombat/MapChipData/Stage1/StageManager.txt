@@ -4,3 +4,17 @@ gene0 0 60
 room1 3
 timer1 20
 gene1 0 60
+
+fail0 0.44f
+good0 0.61f
+great0 0.81f
+excellent0 1.0f
+fail1 0.44f
+good1 0.66f
+great1 0.88f
+excellent1 1.0f
+
+failR 0.425f
+goodR 0.6375f
+greatR 0.85f
+excellentR 1.0f
