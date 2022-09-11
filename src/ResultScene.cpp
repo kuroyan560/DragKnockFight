@@ -235,7 +235,8 @@ void ResultScene::OnUpdate()
 	int stageNum = SelectStage::Instance()->GetStageNum();
 
 	StageEvaluationData data = EvaluationMgr::Instance()->GetResultData(stageNum);
-	const float FAIL_RATE = data.failRate;
+	//const float FAIL_RATE = data.failRate;
+	const float FAIL_RATE = 0.0f;
 	const float GOOD_RATE = data.goodRate;
 	const float GREAT_RATE = data.greatRate;
 	const float EXCELLENT_RATE = data.excellentRate;

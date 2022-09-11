@@ -62,7 +62,8 @@ void RoundFinishEffect::Start(const bool &IsPerfect, const float &Rate, const fl
 
 	int stageNum = SelectStage::Instance()->GetStageNum();
 	int roomNum = SelectStage::Instance()->GetRoomNum();
-	const float FAIL_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).failRate;
+	//const float FAIL_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).failRate;
+	const float FAIL_PER = 0.0f;
 	const float GOOD_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).goodRate;
 	const float GREAT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).greatRate;
 	const float EXCELLENT_PER = EvaluationMgr::Instance()->GetData(stageNum, roomNum).excellentRate;
